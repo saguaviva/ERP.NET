@@ -1,0 +1,348 @@
+Public Class frmBackup
+    Inherits aura2k3.frmBase
+#Region " Código generado por el Diseñador de Windows Forms "
+
+    Public Sub New()
+        MyBase.New()
+
+        'El Diseñador de Windows Forms requiere esta llamada.
+        InitializeComponent() : Dim tom As SMcMaster.TabOrderManager = New SMcMaster.TabOrderManager(Me) : tom.SetTabOrder(SMcMaster.TabOrderManager.TabScheme.AcrossFirst)
+
+        'Agregar cualquier inicialización después de la llamada a InitializeComponent()
+
+    End Sub
+
+    'Form reemplaza a Dispose para limpiar la lista de componentes.
+    Protected Overloads Overrides Sub Dispose(ByVal disposing As Boolean)
+        '! Seal for less overhead - Can declare NotInheritable Class
+        If disposing Then
+            If Not (components Is Nothing) Then
+                components.Dispose()
+            End If
+        End If
+        MyBase.Dispose(disposing)
+    End Sub
+
+    'Requerido por el Diseñador de Windows Forms
+    Private components As System.ComponentModel.IContainer
+
+    'NOTA: el Diseñador de Windows Forms requiere el siguiente procedimiento
+    'Puede modificarse utilizando el Diseñador de Windows Forms. 
+    'No lo modifique con el editor de código.
+
+
+
+
+    'NETXP.Controls.XPButton
+
+
+    Friend WithEvents WebClient1 As System.Net.WebClient
+
+    Friend WithEvents btnAceptar As NETXP.Controls.XPButton
+    Friend WithEvents Button1 As NETXP.Controls.XPButton
+    <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
+        Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(frmBackup))
+        Me.WebClient1 = New System.Net.WebClient
+        Me.btnAceptar = New NETXP.Controls.XPButton
+        Me.Button1 = New NETXP.Controls.XPButton
+        Me.SuspendLayout()
+        '
+        'cboSeleccionCentro
+        '
+        Me.cboSeleccionCentro.Location = CType(resources.GetObject("cboSeleccionCentro.Location"), System.Drawing.Point)
+        Me.cboSeleccionCentro.Name = "cboSeleccionCentro"
+        '
+        'btnVerLista
+        '
+        Me.btnVerLista.Location = CType(resources.GetObject("btnVerLista.Location"), System.Drawing.Point)
+        Me.btnVerLista.Name = "btnVerLista"
+        Me.btnVerLista.Size = CType(resources.GetObject("btnVerLista.Size"), System.Drawing.Size)
+        '
+        'sbtipo
+        '
+        Me.sbtipo.FlatStyle = System.Windows.Forms.FlatStyle.System
+        Me.sbtipo.Location = CType(resources.GetObject("sbtipo.Location"), System.Drawing.Point)
+        Me.sbtipo.Name = "sbtipo"
+        Me.sbtipo.Size = CType(resources.GetObject("sbtipo.Size"), System.Drawing.Size)
+        Me.sbtipo.Text = resources.GetString("sbtipo.Text")
+        '
+        'btnRecargar
+        '
+        Me.btnRecargar.Location = CType(resources.GetObject("btnRecargar.Location"), System.Drawing.Point)
+        Me.btnRecargar.Name = "btnRecargar"
+        Me.btnRecargar.Size = CType(resources.GetObject("btnRecargar.Size"), System.Drawing.Size)
+        '
+        'btnSiguiente
+        '
+        Me.btnSiguiente.Location = CType(resources.GetObject("btnSiguiente.Location"), System.Drawing.Point)
+        Me.btnSiguiente.Name = "btnSiguiente"
+        Me.btnSiguiente.Size = CType(resources.GetObject("btnSiguiente.Size"), System.Drawing.Size)
+        '
+        'btnActualizar
+        '
+        Me.btnActualizar.Location = CType(resources.GetObject("btnActualizar.Location"), System.Drawing.Point)
+        Me.btnActualizar.Name = "btnActualizar"
+        Me.btnActualizar.Size = CType(resources.GetObject("btnActualizar.Size"), System.Drawing.Size)
+        '
+        'btnAnterior
+        '
+        Me.btnAnterior.Location = CType(resources.GetObject("btnAnterior.Location"), System.Drawing.Point)
+        Me.btnAnterior.Name = "btnAnterior"
+        Me.btnAnterior.Size = CType(resources.GetObject("btnAnterior.Size"), System.Drawing.Size)
+        '
+        'btnNuevo
+        '
+        Me.btnNuevo.Location = CType(resources.GetObject("btnNuevo.Location"), System.Drawing.Point)
+        Me.btnNuevo.Name = "btnNuevo"
+        '
+        'btnBorrar
+        '
+        Me.btnBorrar.Location = CType(resources.GetObject("btnBorrar.Location"), System.Drawing.Point)
+        Me.btnBorrar.Name = "btnBorrar"
+        Me.btnBorrar.Size = CType(resources.GetObject("btnBorrar.Size"), System.Drawing.Size)
+        '
+        'btnTancar
+        '
+        Me.btnTancar.Location = CType(resources.GetObject("btnTancar.Location"), System.Drawing.Point)
+        Me.btnTancar.Name = "btnTancar"
+        Me.btnTancar.Size = CType(resources.GetObject("btnTancar.Size"), System.Drawing.Size)
+        '
+        'btnModificar
+        '
+        Me.btnModificar.Location = CType(resources.GetObject("btnModificar.Location"), System.Drawing.Point)
+        Me.btnModificar.Name = "btnModificar"
+        Me.btnModificar.Size = CType(resources.GetObject("btnModificar.Size"), System.Drawing.Size)
+        '
+        'btnUltimo
+        '
+        Me.btnUltimo.Location = CType(resources.GetObject("btnUltimo.Location"), System.Drawing.Point)
+        Me.btnUltimo.Name = "btnUltimo"
+        Me.btnUltimo.Size = CType(resources.GetObject("btnUltimo.Size"), System.Drawing.Size)
+        '
+        'btnPrimero
+        '
+        Me.btnPrimero.Location = CType(resources.GetObject("btnPrimero.Location"), System.Drawing.Point)
+        Me.btnPrimero.Name = "btnPrimero"
+        Me.btnPrimero.Size = CType(resources.GetObject("btnPrimero.Size"), System.Drawing.Size)
+        '
+        'WebClient1
+        '
+        Me.WebClient1.BaseAddress = ""
+        Me.WebClient1.Credentials = Nothing
+        '
+        'btnAceptar
+        '
+        Me.btnAceptar.AccessibleDescription = resources.GetString("btnAceptar.AccessibleDescription")
+        Me.btnAceptar.AccessibleName = resources.GetString("btnAceptar.AccessibleName")
+        Me.btnAceptar.Anchor = CType(resources.GetObject("btnAceptar.Anchor"), System.Windows.Forms.AnchorStyles)
+        Me.btnAceptar.BackgroundImage = CType(resources.GetObject("btnAceptar.BackgroundImage"), System.Drawing.Image)
+        Me.btnAceptar.Dock = CType(resources.GetObject("btnAceptar.Dock"), System.Windows.Forms.DockStyle)
+        Me.btnAceptar.Enabled = CType(resources.GetObject("btnAceptar.Enabled"), Boolean)
+        Me.btnAceptar.FlatStyle = CType(resources.GetObject("btnAceptar.FlatStyle"), System.Windows.Forms.FlatStyle)
+        Me.btnAceptar.Font = CType(resources.GetObject("btnAceptar.Font"), System.Drawing.Font)
+        Me.btnAceptar.Image = CType(resources.GetObject("btnAceptar.Image"), System.Drawing.Image)
+        Me.btnAceptar.ImageAlign = CType(resources.GetObject("btnAceptar.ImageAlign"), System.Drawing.ContentAlignment)
+        Me.btnAceptar.ImageIndex = CType(resources.GetObject("btnAceptar.ImageIndex"), Integer)
+        Me.btnAceptar.ImeMode = CType(resources.GetObject("btnAceptar.ImeMode"), System.Windows.Forms.ImeMode)
+        Me.btnAceptar.Location = CType(resources.GetObject("btnAceptar.Location"), System.Drawing.Point)
+        Me.btnAceptar.Name = "btnAceptar"
+        Me.btnAceptar.RightToLeft = CType(resources.GetObject("btnAceptar.RightToLeft"), System.Windows.Forms.RightToLeft)
+        Me.btnAceptar.Size = CType(resources.GetObject("btnAceptar.Size"), System.Drawing.Size)
+        Me.btnAceptar.TabIndex = CType(resources.GetObject("btnAceptar.TabIndex"), Integer)
+        Me.btnAceptar.Text = resources.GetString("btnAceptar.Text")
+        Me.btnAceptar.TextAlign = CType(resources.GetObject("btnAceptar.TextAlign"), System.Drawing.ContentAlignment)
+        Me.btnAceptar.Visible = CType(resources.GetObject("btnAceptar.Visible"), Boolean)
+        '
+        'Button1
+        '
+        Me.Button1.AccessibleDescription = resources.GetString("Button1.AccessibleDescription")
+        Me.Button1.AccessibleName = resources.GetString("Button1.AccessibleName")
+        Me.Button1.Anchor = CType(resources.GetObject("Button1.Anchor"), System.Windows.Forms.AnchorStyles)
+        Me.Button1.BackgroundImage = CType(resources.GetObject("Button1.BackgroundImage"), System.Drawing.Image)
+        Me.Button1.Dock = CType(resources.GetObject("Button1.Dock"), System.Windows.Forms.DockStyle)
+        Me.Button1.Enabled = CType(resources.GetObject("Button1.Enabled"), Boolean)
+        Me.Button1.FlatStyle = CType(resources.GetObject("Button1.FlatStyle"), System.Windows.Forms.FlatStyle)
+        Me.Button1.Font = CType(resources.GetObject("Button1.Font"), System.Drawing.Font)
+        Me.Button1.Image = CType(resources.GetObject("Button1.Image"), System.Drawing.Image)
+        Me.Button1.ImageAlign = CType(resources.GetObject("Button1.ImageAlign"), System.Drawing.ContentAlignment)
+        Me.Button1.ImageIndex = CType(resources.GetObject("Button1.ImageIndex"), Integer)
+        Me.Button1.ImeMode = CType(resources.GetObject("Button1.ImeMode"), System.Windows.Forms.ImeMode)
+        Me.Button1.Location = CType(resources.GetObject("Button1.Location"), System.Drawing.Point)
+        Me.Button1.Name = "Button1"
+        Me.Button1.RightToLeft = CType(resources.GetObject("Button1.RightToLeft"), System.Windows.Forms.RightToLeft)
+        Me.Button1.Size = CType(resources.GetObject("Button1.Size"), System.Drawing.Size)
+        Me.Button1.TabIndex = CType(resources.GetObject("Button1.TabIndex"), Integer)
+        Me.Button1.Text = resources.GetString("Button1.Text")
+        Me.Button1.TextAlign = CType(resources.GetObject("Button1.TextAlign"), System.Drawing.ContentAlignment)
+        Me.Button1.Visible = CType(resources.GetObject("Button1.Visible"), Boolean)
+        '
+        'frmBackup
+        '
+        Me.AccessibleDescription = resources.GetString("$this.AccessibleDescription")
+        Me.AccessibleName = resources.GetString("$this.AccessibleName")
+        Me.AutoScaleBaseSize = CType(resources.GetObject("$this.AutoScaleBaseSize"), System.Drawing.Size)
+        Me.AutoScroll = CType(resources.GetObject("$this.AutoScroll"), Boolean)
+        Me.AutoScrollMargin = CType(resources.GetObject("$this.AutoScrollMargin"), System.Drawing.Size)
+        Me.AutoScrollMinSize = CType(resources.GetObject("$this.AutoScrollMinSize"), System.Drawing.Size)
+        Me.BackgroundImage = CType(resources.GetObject("$this.BackgroundImage"), System.Drawing.Image)
+        Me.ClientSize = CType(resources.GetObject("$this.ClientSize"), System.Drawing.Size)
+        Me.Controls.Add(Me.Button1)
+        Me.Controls.Add(Me.btnAceptar)
+        Me.Cursor = System.Windows.Forms.Cursors.Default
+        Me.Enabled = CType(resources.GetObject("$this.Enabled"), Boolean)
+        Me.Font = CType(resources.GetObject("$this.Font"), System.Drawing.Font)
+        Me.ForeColor = System.Drawing.Color.SeaGreen
+        Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
+        Me.ImeMode = CType(resources.GetObject("$this.ImeMode"), System.Windows.Forms.ImeMode)
+        Me.Location = CType(resources.GetObject("$this.Location"), System.Drawing.Point)
+        Me.MaximumSize = CType(resources.GetObject("$this.MaximumSize"), System.Drawing.Size)
+        Me.MinimumSize = CType(resources.GetObject("$this.MinimumSize"), System.Drawing.Size)
+        Me.Name = "frmBackup"
+        Me.RightToLeft = CType(resources.GetObject("$this.RightToLeft"), System.Windows.Forms.RightToLeft)
+        Me.StartPosition = CType(resources.GetObject("$this.StartPosition"), System.Windows.Forms.FormStartPosition)
+        Me.Text = resources.GetString("$this.Text")
+        Me.Controls.SetChildIndex(Me.cboSeleccionCentro, 0)
+        Me.Controls.SetChildIndex(Me.btnAceptar, 0)
+        Me.Controls.SetChildIndex(Me.Button1, 0)
+        Me.Controls.SetChildIndex(Me.sbtipo, 0)
+        Me.Controls.SetChildIndex(Me.btnActualizar, 0)
+        Me.Controls.SetChildIndex(Me.btnNuevo, 0)
+        Me.Controls.SetChildIndex(Me.btnBorrar, 0)
+        Me.Controls.SetChildIndex(Me.btnTancar, 0)
+        Me.Controls.SetChildIndex(Me.btnUltimo, 0)
+        Me.Controls.SetChildIndex(Me.btnPrimero, 0)
+        Me.Controls.SetChildIndex(Me.btnAnterior, 0)
+        Me.Controls.SetChildIndex(Me.btnSiguiente, 0)
+        Me.Controls.SetChildIndex(Me.btnRecargar, 0)
+        Me.Controls.SetChildIndex(Me.btnVerLista, 0)
+        Me.Controls.SetChildIndex(Me.btnModificar, 0)
+        Me.ResumeLayout(False)
+
+    End Sub
+
+#End Region
+
+#Region "VARIABLES"
+
+    Dim procMysqlDump As Process
+    Dim procRar As Process
+
+#End Region
+
+#Region "ORGANIZAR"
+
+    Private Sub procMysqlDumpExitEvent(ByVal sender As Object, ByVal e As System.EventArgs)
+
+        procRar = Process.Start("c:\archivos de programa\sistema\winrar\rar.exe", "a -r c:\backup.rar c:\backup\")
+        procMysqlDump.EnableRaisingEvents = True
+        AddHandler procMysqlDump.Exited, AddressOf procRarExitEvent
+
+    End Sub
+    Private Sub procRarExitEvent(ByVal sender As Object, ByVal e As System.EventArgs)
+
+        MessageBox.Show("Backup completado")
+
+    End Sub
+    Private Sub IniciarForm(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
+
+        Try
+            Cursor = Cursors.WaitCursor
+
+            'Dim myMailServer As New Quiksoft.FreeSMTP.SMTP()
+            'Dim mensaje As New Quiksoft.FreeSMTP.EmailMessage()
+
+            'mensaje.Subject = "backup"
+            'mensaje.BodyParts.Add("AgASFDASASF")
+            'mensaje.From.Email = "yomismo@menta.net"
+            'mensaje.Recipients.Add("sergioag@menta.net")
+
+            'myMailServer.SMTPServers.Add("smtp.menta.net")
+            'myMailServer.Send(mensaje)
+
+            'mensaje = Nothing
+
+        Catch ex As Exception
+
+            LOG(ex.ToString) : cargando = False : ccn() ': ccn()
+
+        End Try
+        Cursor = Cursors.Default
+    End Sub
+    Private Sub btnAceptar_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnAceptar.Click
+        Try
+
+            Dim c As New CoreLab.MySql.MySqlDump
+            c.Connection = cnn
+            cnn.Open()
+            c.UseDelayedIns = True
+            c.IncludeDrop = True
+            c.IncludeDatabase = True
+            c.Backup()
+            Dim stream As IO.StreamWriter = New IO.StreamWriter("\sqls\BACKUP.SQL")
+            stream.WriteLine(c.DumpText)
+            stream.Close()
+
+            cnn.Close()
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : ccn()
+        End Try
+
+    End Sub
+    Private Sub Button1_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button1.Click
+        Try
+
+            Dim c As New CoreLab.MySql.MySqlDump
+            c.Connection = cnn
+            cnn.Open()
+            c.UseDelayedIns = True
+            c.IncludeDrop = True
+            c.IncludeDatabase = True
+            Dim stream As IO.StreamReader = New IO.StreamReader("\sqls\BACKUP.SQL")
+
+            c.DumpText = stream.ReadToEnd()
+            c.Restore()
+            stream.Close()
+            cnn.Close()
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : ccn()
+        End Try
+
+    End Sub
+
+#End Region
+
+    Friend Overrides Sub btnActualizar_Click(ByVal sender As Object, ByVal e As System.EventArgs)
+
+    End Sub
+
+    Friend Overrides Sub btnAnterior_Click(ByVal sender As Object, ByVal e As System.EventArgs)
+
+    End Sub
+
+    Friend Overrides Sub btnBorrar_Click(ByVal sender As Object, ByVal e As System.EventArgs)
+
+    End Sub
+
+    Friend Overrides Sub btnModificar_Click(ByVal sender As Object, ByVal e As System.EventArgs)
+
+    End Sub
+
+    Friend Overrides Sub btnNuevo_Click(ByVal sender As Object, ByVal e As System.EventArgs)
+
+    End Sub
+
+   Protected Friend Overrides Sub btnPrimero_Click(ByVal sender As Object, ByVal e As System.EventArgs)
+
+    End Sub
+
+    Friend Overrides Sub btnSiguiente_Click(ByVal sender As Object, ByVal e As System.EventArgs)
+
+    End Sub
+
+    Friend Overrides Sub btnUltimo_Click(ByVal sender As Object, ByVal e As System.EventArgs)
+
+    End Sub
+End Class
+

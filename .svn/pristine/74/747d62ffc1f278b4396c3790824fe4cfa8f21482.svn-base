@@ -1,0 +1,500 @@
+Imports CoreLab.MySql
+
+
+
+Public Class frmPagoForm2
+    Inherits aura2k3.frmBase
+
+#Region " Código generado por el Diseñador de Windows Forms "
+
+    Public Sub New()
+        MyBase.New()
+
+        'El Diseñador de Windows Forms requiere esta llamada.
+        InitializeComponent() : Dim tom As SMcMaster.TabOrderManager = New SMcMaster.TabOrderManager(Me) : tom.SetTabOrder(SMcMaster.TabOrderManager.TabScheme.AcrossFirst)
+
+        'Agregar cualquier inicialización después de la llamada a InitializeComponent()
+
+    End Sub
+
+    'Form reemplaza a Dispose para limpiar la lista de componentes.
+    Protected Overloads Overrides Sub Dispose(ByVal disposing As Boolean)
+        If disposing Then
+            If Not (components Is Nothing) Then
+                components.Dispose()
+            End If
+        End If
+        MyBase.Dispose(disposing)
+        frmChildForm = Nothing
+    End Sub
+
+    'Requerido por el Diseñador de Windows Forms
+    Private components As System.ComponentModel.IContainer
+
+    'NOTA: el Diseñador de Windows Forms requiere el siguiente procedimiento
+    'Puede modificarse utilizando el Diseñador de Windows Forms. 
+    'No lo modifique con el editor de código.
+    '! Events not handled: lblNombrePago
+    '! WithEvents adds overhead: lblNombrePago
+    '! Events not handled: lblCodigoPago
+    '! WithEvents adds overhead: lblCodigoPago
+    '! WithEvents adds overhead: btnPrimero
+
+    '! WithEvents adds overhead: txtDescripcion
+    '! removed Friend WithEvents lblPago As Label
+
+    '! Events not handled: txtDias
+    '! WithEvents adds overhead: txtDias
+    '! Events not handled: txtNro
+    '! WithEvents adds overhead: txtNro
+    '! Events not handled: lblDias
+    '! WithEvents adds overhead: lblDias
+    '! Events not handled: lblNro
+    '! WithEvents adds overhead: lblNro
+    '! Events not handled: Label1
+    '! WithEvents adds overhead: Label1
+    '! Events not handled: txtV_1
+    '! WithEvents adds overhead: txtV_1
+    '! Events not handled: TabControl1
+    '! WithEvents adds overhead: TabControl1
+    '! Events not handled: TabPage1
+    '! WithEvents adds overhead: TabPage1
+    Friend WithEvents btnAceptar As System.Windows.Forms.Button
+    Friend WithEvents dgFormas As C1.Win.C1TrueDBGrid.C1TrueDBGrid
+
+    <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
+        Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(frmPagoForm2))
+        Me.btnAceptar = New System.Windows.Forms.Button
+        Me.dgFormas = New C1.Win.C1TrueDBGrid.C1TrueDBGrid
+        CType(Me.dgFormas, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.SuspendLayout()
+        '
+        'btnTancar
+        '
+        Me.btnTancar.Location = CType(resources.GetObject("btnTancar.Location"), System.Drawing.Point)
+        Me.btnTancar.Name = "btnTancar"
+        '
+        'btnBorrar
+        '
+        Me.btnBorrar.Location = CType(resources.GetObject("btnBorrar.Location"), System.Drawing.Point)
+        Me.btnBorrar.Name = "btnBorrar"
+        '
+        'btnNuevo
+        '
+        Me.btnNuevo.Location = CType(resources.GetObject("btnNuevo.Location"), System.Drawing.Point)
+        Me.btnNuevo.Name = "btnNuevo"
+        '
+        'btnUltimo
+        '
+        Me.btnUltimo.Location = CType(resources.GetObject("btnUltimo.Location"), System.Drawing.Point)
+        Me.btnUltimo.Name = "btnUltimo"
+        '
+        'btnActualizar
+        '
+        Me.btnActualizar.Location = CType(resources.GetObject("btnActualizar.Location"), System.Drawing.Point)
+        Me.btnActualizar.Name = "btnActualizar"
+        '
+        'btnPrimero
+        '
+        Me.btnPrimero.Location = CType(resources.GetObject("btnPrimero.Location"), System.Drawing.Point)
+        Me.btnPrimero.Name = "btnPrimero"
+        '
+        'btnAnterior
+        '
+        Me.btnAnterior.Location = CType(resources.GetObject("btnAnterior.Location"), System.Drawing.Point)
+        Me.btnAnterior.Name = "btnAnterior"
+        '
+        'btnSiguiente
+        '
+        Me.btnSiguiente.Location = CType(resources.GetObject("btnSiguiente.Location"), System.Drawing.Point)
+        Me.btnSiguiente.Name = "btnSiguiente"
+        '
+        'btnRecargar
+        '
+        Me.btnRecargar.Location = CType(resources.GetObject("btnRecargar.Location"), System.Drawing.Point)
+        Me.btnRecargar.Name = "btnRecargar"
+        '
+        'btnVerLista
+        '
+        Me.btnVerLista.Location = CType(resources.GetObject("btnVerLista.Location"), System.Drawing.Point)
+        Me.btnVerLista.Name = "btnVerLista"
+        '
+        'cboSeleccionCentro
+        '
+        Me.cboSeleccionCentro.Name = "cboSeleccionCentro"
+        '
+        'btnModificar
+        '
+        Me.btnModificar.Location = CType(resources.GetObject("btnModificar.Location"), System.Drawing.Point)
+        Me.btnModificar.Name = "btnModificar"
+        '
+        'sbtipo
+        '
+        Me.sbtipo.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.sbtipo.Location = CType(resources.GetObject("sbtipo.Location"), System.Drawing.Point)
+        Me.sbtipo.Name = "sbtipo"
+        Me.sbtipo.Text = resources.GetString("sbtipo.Text")
+        '
+        'btnAceptar
+        '
+        Me.btnAceptar.AccessibleDescription = resources.GetString("btnAceptar.AccessibleDescription")
+        Me.btnAceptar.AccessibleName = resources.GetString("btnAceptar.AccessibleName")
+        Me.btnAceptar.Anchor = CType(resources.GetObject("btnAceptar.Anchor"), System.Windows.Forms.AnchorStyles)
+        Me.btnAceptar.BackgroundImage = CType(resources.GetObject("btnAceptar.BackgroundImage"), System.Drawing.Image)
+        Me.btnAceptar.Dock = CType(resources.GetObject("btnAceptar.Dock"), System.Windows.Forms.DockStyle)
+        Me.btnAceptar.Enabled = CType(resources.GetObject("btnAceptar.Enabled"), Boolean)
+        Me.btnAceptar.FlatStyle = CType(resources.GetObject("btnAceptar.FlatStyle"), System.Windows.Forms.FlatStyle)
+        Me.btnAceptar.Font = CType(resources.GetObject("btnAceptar.Font"), System.Drawing.Font)
+        Me.btnAceptar.Image = CType(resources.GetObject("btnAceptar.Image"), System.Drawing.Image)
+        Me.btnAceptar.ImageAlign = CType(resources.GetObject("btnAceptar.ImageAlign"), System.Drawing.ContentAlignment)
+        Me.btnAceptar.ImageIndex = CType(resources.GetObject("btnAceptar.ImageIndex"), Integer)
+        Me.btnAceptar.ImeMode = CType(resources.GetObject("btnAceptar.ImeMode"), System.Windows.Forms.ImeMode)
+        Me.btnAceptar.Location = CType(resources.GetObject("btnAceptar.Location"), System.Drawing.Point)
+        Me.btnAceptar.Name = "btnAceptar"
+        Me.btnAceptar.RightToLeft = CType(resources.GetObject("btnAceptar.RightToLeft"), System.Windows.Forms.RightToLeft)
+        Me.btnAceptar.Size = CType(resources.GetObject("btnAceptar.Size"), System.Drawing.Size)
+        Me.btnAceptar.TabIndex = CType(resources.GetObject("btnAceptar.TabIndex"), Integer)
+        Me.btnAceptar.Text = resources.GetString("btnAceptar.Text")
+        Me.btnAceptar.TextAlign = CType(resources.GetObject("btnAceptar.TextAlign"), System.Drawing.ContentAlignment)
+        Me.btnAceptar.Visible = CType(resources.GetObject("btnAceptar.Visible"), Boolean)
+        '
+        'dgFormas
+        '
+        Me.dgFormas.AccessibleDescription = resources.GetString("dgFormas.AccessibleDescription")
+        Me.dgFormas.AccessibleName = resources.GetString("dgFormas.AccessibleName")
+        Me.dgFormas.AllowAddNew = CType(resources.GetObject("dgFormas.AllowAddNew"), Boolean)
+        Me.dgFormas.AllowArrows = CType(resources.GetObject("dgFormas.AllowArrows"), Boolean)
+        Me.dgFormas.AllowColMove = CType(resources.GetObject("dgFormas.AllowColMove"), Boolean)
+        Me.dgFormas.AllowColSelect = CType(resources.GetObject("dgFormas.AllowColSelect"), Boolean)
+        Me.dgFormas.AllowDelete = CType(resources.GetObject("dgFormas.AllowDelete"), Boolean)
+        Me.dgFormas.AllowDrag = CType(resources.GetObject("dgFormas.AllowDrag"), Boolean)
+        Me.dgFormas.AllowFilter = CType(resources.GetObject("dgFormas.AllowFilter"), Boolean)
+        Me.dgFormas.AllowHorizontalSplit = CType(resources.GetObject("dgFormas.AllowHorizontalSplit"), Boolean)
+        Me.dgFormas.AllowRowSelect = CType(resources.GetObject("dgFormas.AllowRowSelect"), Boolean)
+        Me.dgFormas.AllowSort = CType(resources.GetObject("dgFormas.AllowSort"), Boolean)
+        Me.dgFormas.AllowUpdate = CType(resources.GetObject("dgFormas.AllowUpdate"), Boolean)
+        Me.dgFormas.AllowUpdateOnBlur = CType(resources.GetObject("dgFormas.AllowUpdateOnBlur"), Boolean)
+        Me.dgFormas.AllowVerticalSplit = CType(resources.GetObject("dgFormas.AllowVerticalSplit"), Boolean)
+        Me.dgFormas.AlternatingRows = CType(resources.GetObject("dgFormas.AlternatingRows"), Boolean)
+        Me.dgFormas.Anchor = CType(resources.GetObject("dgFormas.Anchor"), System.Windows.Forms.AnchorStyles)
+        Me.dgFormas.BackgroundImage = CType(resources.GetObject("dgFormas.BackgroundImage"), System.Drawing.Image)
+        Me.dgFormas.BorderStyle = CType(resources.GetObject("dgFormas.BorderStyle"), System.Windows.Forms.BorderStyle)
+        Me.dgFormas.Caption = resources.GetString("dgFormas.Caption")
+        Me.dgFormas.CaptionHeight = CType(resources.GetObject("dgFormas.CaptionHeight"), Integer)
+        Me.dgFormas.CellTipsDelay = CType(resources.GetObject("dgFormas.CellTipsDelay"), Integer)
+        Me.dgFormas.CellTipsWidth = CType(resources.GetObject("dgFormas.CellTipsWidth"), Integer)
+        Me.dgFormas.ChildGrid = CType(resources.GetObject("dgFormas.ChildGrid"), C1.Win.C1TrueDBGrid.C1TrueDBGrid)
+        Me.dgFormas.CollapseColor = CType(resources.GetObject("dgFormas.CollapseColor"), System.Drawing.Color)
+        Me.dgFormas.ColumnFooters = CType(resources.GetObject("dgFormas.ColumnFooters"), Boolean)
+        Me.dgFormas.ColumnHeaders = CType(resources.GetObject("dgFormas.ColumnHeaders"), Boolean)
+        Me.dgFormas.DefColWidth = CType(resources.GetObject("dgFormas.DefColWidth"), Integer)
+        Me.dgFormas.Dock = CType(resources.GetObject("dgFormas.Dock"), System.Windows.Forms.DockStyle)
+        Me.dgFormas.EditDropDown = CType(resources.GetObject("dgFormas.EditDropDown"), Boolean)
+        Me.dgFormas.EmptyRows = CType(resources.GetObject("dgFormas.EmptyRows"), Boolean)
+        Me.dgFormas.Enabled = CType(resources.GetObject("dgFormas.Enabled"), Boolean)
+        Me.dgFormas.ExpandColor = CType(resources.GetObject("dgFormas.ExpandColor"), System.Drawing.Color)
+        Me.dgFormas.ExposeCellMode = CType(resources.GetObject("dgFormas.ExposeCellMode"), C1.Win.C1TrueDBGrid.ExposeCellModeEnum)
+        Me.dgFormas.ExtendRightColumn = CType(resources.GetObject("dgFormas.ExtendRightColumn"), Boolean)
+        Me.dgFormas.FetchRowStyles = CType(resources.GetObject("dgFormas.FetchRowStyles"), Boolean)
+        Me.dgFormas.FilterBar = CType(resources.GetObject("dgFormas.FilterBar"), Boolean)
+        Me.dgFormas.FlatStyle = CType(resources.GetObject("dgFormas.FlatStyle"), C1.Win.C1TrueDBGrid.FlatModeEnum)
+        Me.dgFormas.Font = CType(resources.GetObject("dgFormas.Font"), System.Drawing.Font)
+        Me.dgFormas.GroupByAreaVisible = CType(resources.GetObject("dgFormas.GroupByAreaVisible"), Boolean)
+        Me.dgFormas.GroupByCaption = resources.GetString("dgFormas.GroupByCaption")
+        Me.dgFormas.Images.Add(CType(resources.GetObject("resource"), System.Drawing.Image))
+        Me.dgFormas.ImeMode = CType(resources.GetObject("dgFormas.ImeMode"), System.Windows.Forms.ImeMode)
+        Me.dgFormas.LinesPerRow = CType(resources.GetObject("dgFormas.LinesPerRow"), Integer)
+        Me.dgFormas.Location = CType(resources.GetObject("dgFormas.Location"), System.Drawing.Point)
+        Me.dgFormas.MarqueeStyle = C1.Win.C1TrueDBGrid.MarqueeEnum.DottedCellBorder
+        Me.dgFormas.Name = "dgFormas"
+        Me.dgFormas.PictureAddnewRow = CType(resources.GetObject("dgFormas.PictureAddnewRow"), System.Drawing.Image)
+        Me.dgFormas.PictureCurrentRow = CType(resources.GetObject("dgFormas.PictureCurrentRow"), System.Drawing.Image)
+        Me.dgFormas.PictureFilterBar = CType(resources.GetObject("dgFormas.PictureFilterBar"), System.Drawing.Image)
+        Me.dgFormas.PictureFooterRow = CType(resources.GetObject("dgFormas.PictureFooterRow"), System.Drawing.Image)
+        Me.dgFormas.PictureHeaderRow = CType(resources.GetObject("dgFormas.PictureHeaderRow"), System.Drawing.Image)
+        Me.dgFormas.PictureModifiedRow = CType(resources.GetObject("dgFormas.PictureModifiedRow"), System.Drawing.Image)
+        Me.dgFormas.PictureStandardRow = CType(resources.GetObject("dgFormas.PictureStandardRow"), System.Drawing.Image)
+        Me.dgFormas.PreviewInfo.AllowSizing = CType(resources.GetObject("dgFormas.PreviewInfo.AllowSizing"), Boolean)
+        Me.dgFormas.PreviewInfo.Caption = resources.GetString("dgFormas.PreviewInfo.Caption")
+        Me.dgFormas.PreviewInfo.Location = CType(resources.GetObject("dgFormas.PreviewInfo.Location"), System.Drawing.Point)
+        Me.dgFormas.PreviewInfo.Size = CType(resources.GetObject("dgFormas.PreviewInfo.Size"), System.Drawing.Size)
+        Me.dgFormas.PreviewInfo.ToolBars = CType(resources.GetObject("dgFormas.PreviewInfo.ToolBars"), Boolean)
+        Me.dgFormas.PreviewInfo.UIStrings.Content = CType(resources.GetObject("dgFormas.PreviewInfo.UIStrings.Content"), String())
+        Me.dgFormas.PreviewInfo.ZoomFactor = CType(resources.GetObject("dgFormas.PreviewInfo.ZoomFactor"), Double)
+        Me.dgFormas.PrintInfo.MaxRowHeight = CType(resources.GetObject("dgFormas.PrintInfo.MaxRowHeight"), Integer)
+        Me.dgFormas.PrintInfo.OwnerDrawPageFooter = CType(resources.GetObject("dgFormas.PrintInfo.OwnerDrawPageFooter"), Boolean)
+        Me.dgFormas.PrintInfo.OwnerDrawPageHeader = CType(resources.GetObject("dgFormas.PrintInfo.OwnerDrawPageHeader"), Boolean)
+        Me.dgFormas.PrintInfo.PageFooter = resources.GetString("dgFormas.PrintInfo.PageFooter")
+        Me.dgFormas.PrintInfo.PageFooterHeight = CType(resources.GetObject("dgFormas.PrintInfo.PageFooterHeight"), Integer)
+        Me.dgFormas.PrintInfo.PageHeader = resources.GetString("dgFormas.PrintInfo.PageHeader")
+        Me.dgFormas.PrintInfo.PageHeaderHeight = CType(resources.GetObject("dgFormas.PrintInfo.PageHeaderHeight"), Integer)
+        Me.dgFormas.PrintInfo.PrintHorizontalSplits = CType(resources.GetObject("dgFormas.PrintInfo.PrintHorizontalSplits"), Boolean)
+        Me.dgFormas.PrintInfo.ProgressCaption = resources.GetString("dgFormas.PrintInfo.ProgressCaption")
+        Me.dgFormas.PrintInfo.RepeatColumnFooters = CType(resources.GetObject("dgFormas.PrintInfo.RepeatColumnFooters"), Boolean)
+        Me.dgFormas.PrintInfo.RepeatColumnHeaders = CType(resources.GetObject("dgFormas.PrintInfo.RepeatColumnHeaders"), Boolean)
+        Me.dgFormas.PrintInfo.RepeatGridHeader = CType(resources.GetObject("dgFormas.PrintInfo.RepeatGridHeader"), Boolean)
+        Me.dgFormas.PrintInfo.RepeatSplitHeaders = CType(resources.GetObject("dgFormas.PrintInfo.RepeatSplitHeaders"), Boolean)
+        Me.dgFormas.PrintInfo.ShowOptionsDialog = CType(resources.GetObject("dgFormas.PrintInfo.ShowOptionsDialog"), Boolean)
+        Me.dgFormas.PrintInfo.ShowProgressForm = CType(resources.GetObject("dgFormas.PrintInfo.ShowProgressForm"), Boolean)
+        Me.dgFormas.PrintInfo.ShowSelection = CType(resources.GetObject("dgFormas.PrintInfo.ShowSelection"), Boolean)
+        Me.dgFormas.PrintInfo.UseGridColors = CType(resources.GetObject("dgFormas.PrintInfo.UseGridColors"), Boolean)
+        Me.dgFormas.RecordSelectors = CType(resources.GetObject("dgFormas.RecordSelectors"), Boolean)
+        Me.dgFormas.RecordSelectorWidth = CType(resources.GetObject("dgFormas.RecordSelectorWidth"), Integer)
+        Me.dgFormas.RightToLeft = CType(resources.GetObject("dgFormas.RightToLeft"), System.Windows.Forms.RightToLeft)
+        Me.dgFormas.RowDivider.Color = CType(resources.GetObject("resource.Color"), System.Drawing.Color)
+        Me.dgFormas.RowDivider.Style = CType(resources.GetObject("resource.Style"), C1.Win.C1TrueDBGrid.LineStyleEnum)
+        Me.dgFormas.RowHeight = CType(resources.GetObject("dgFormas.RowHeight"), Integer)
+        Me.dgFormas.RowSubDividerColor = CType(resources.GetObject("dgFormas.RowSubDividerColor"), System.Drawing.Color)
+        Me.dgFormas.ScrollTips = CType(resources.GetObject("dgFormas.ScrollTips"), Boolean)
+        Me.dgFormas.ScrollTrack = CType(resources.GetObject("dgFormas.ScrollTrack"), Boolean)
+        Me.dgFormas.Size = CType(resources.GetObject("dgFormas.Size"), System.Drawing.Size)
+        Me.dgFormas.SpringMode = CType(resources.GetObject("dgFormas.SpringMode"), Boolean)
+        Me.dgFormas.TabAcrossSplits = CType(resources.GetObject("dgFormas.TabAcrossSplits"), Boolean)
+        Me.dgFormas.TabIndex = CType(resources.GetObject("dgFormas.TabIndex"), Integer)
+        Me.dgFormas.Text = resources.GetString("dgFormas.Text")
+        Me.dgFormas.ViewCaptionWidth = CType(resources.GetObject("dgFormas.ViewCaptionWidth"), Integer)
+        Me.dgFormas.ViewColumnWidth = CType(resources.GetObject("dgFormas.ViewColumnWidth"), Integer)
+        Me.dgFormas.Visible = CType(resources.GetObject("dgFormas.Visible"), Boolean)
+        Me.dgFormas.WrapCellPointer = CType(resources.GetObject("dgFormas.WrapCellPointer"), Boolean)
+        Me.dgFormas.PropBag = resources.GetString("dgFormas.PropBag")
+        '
+        'frmPagoForm2
+        '
+        Me.AccessibleDescription = resources.GetString("$this.AccessibleDescription")
+        Me.AccessibleName = resources.GetString("$this.AccessibleName")
+        Me.AutoScaleBaseSize = CType(resources.GetObject("$this.AutoScaleBaseSize"), System.Drawing.Size)
+        Me.AutoScroll = CType(resources.GetObject("$this.AutoScroll"), Boolean)
+        Me.AutoScrollMargin = CType(resources.GetObject("$this.AutoScrollMargin"), System.Drawing.Size)
+        Me.AutoScrollMinSize = CType(resources.GetObject("$this.AutoScrollMinSize"), System.Drawing.Size)
+        Me.BackgroundImage = CType(resources.GetObject("$this.BackgroundImage"), System.Drawing.Image)
+        Me.ClientSize = CType(resources.GetObject("$this.ClientSize"), System.Drawing.Size)
+        Me.Controls.Add(Me.dgFormas)
+        Me.Controls.Add(Me.btnAceptar)
+        Me.Cursor = System.Windows.Forms.Cursors.Default
+        Me.Enabled = CType(resources.GetObject("$this.Enabled"), Boolean)
+        Me.Font = CType(resources.GetObject("$this.Font"), System.Drawing.Font)
+        Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
+        Me.ImeMode = CType(resources.GetObject("$this.ImeMode"), System.Windows.Forms.ImeMode)
+        Me.KeyPreview = True
+        Me.Location = CType(resources.GetObject("$this.Location"), System.Drawing.Point)
+        Me.MaximumSize = CType(resources.GetObject("$this.MaximumSize"), System.Drawing.Size)
+        Me.MinimumSize = CType(resources.GetObject("$this.MinimumSize"), System.Drawing.Size)
+        Me.Name = "frmPagoForm2"
+        Me.RightToLeft = CType(resources.GetObject("$this.RightToLeft"), System.Windows.Forms.RightToLeft)
+        Me.StartPosition = CType(resources.GetObject("$this.StartPosition"), System.Windows.Forms.FormStartPosition)
+        Me.Text = resources.GetString("$this.Text")
+        Me.Controls.SetChildIndex(Me.cboSeleccionCentro, 0)
+        Me.Controls.SetChildIndex(Me.sbtipo, 0)
+        Me.Controls.SetChildIndex(Me.btnActualizar, 0)
+        Me.Controls.SetChildIndex(Me.btnNuevo, 0)
+        Me.Controls.SetChildIndex(Me.btnBorrar, 0)
+        Me.Controls.SetChildIndex(Me.btnTancar, 0)
+        Me.Controls.SetChildIndex(Me.btnUltimo, 0)
+        Me.Controls.SetChildIndex(Me.btnPrimero, 0)
+        Me.Controls.SetChildIndex(Me.btnAnterior, 0)
+        Me.Controls.SetChildIndex(Me.btnSiguiente, 0)
+        Me.Controls.SetChildIndex(Me.btnRecargar, 0)
+        Me.Controls.SetChildIndex(Me.btnVerLista, 0)
+        Me.Controls.SetChildIndex(Me.btnModificar, 0)
+        Me.Controls.SetChildIndex(Me.btnAceptar, 0)
+        Me.Controls.SetChildIndex(Me.dgFormas, 0)
+        CType(Me.dgFormas, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.ResumeLayout(False)
+
+    End Sub
+
+#End Region
+
+    Shared frmChildForm As frmPagoForm2
+    Public Shared Function GetInstance() As frmPagoForm2
+        If frmChildForm Is Nothing Then
+            frmChildForm = New frmPagoForm2
+        End If
+        Return frmChildForm
+    End Function
+
+#Region "VARIABLES"
+
+    Public formaActual As clsForma2
+
+#End Region
+
+#Region "INICIALIZAR"
+
+    Private Sub HacerBindings()
+        Dim i As Integer
+        Try
+
+            dgFormas.SetDataBinding(formaActual.dvForm, "")
+            OcultarColumnasDG(dgFormas)
+            i = 0
+            PPCol2("CODI", dgFormas, rm.GetString("CODIGO"), "", True, 55, False, _
+                              C1.Win.C1TrueDBGrid.PresentationEnum.Normal, False, 55, i, False)
+            i = i + 1
+            PPCol2("DESCRIPCIO", dgFormas, rm.GetString("DESCRIPCION"), "", True, 200, False, _
+                              C1.Win.C1TrueDBGrid.PresentationEnum.Normal, False, 200, i, False)
+            i = i + 1
+            PPCol2("Nro", dgFormas, "Nro", "", True, 55, False, _
+                              C1.Win.C1TrueDBGrid.PresentationEnum.Normal, False, 55, i, False)
+            i = i + 1
+            PPCol2("V_1", dgFormas, "V_1", "", True, 55, False, _
+                              C1.Win.C1TrueDBGrid.PresentationEnum.Normal, False, 55, i, False)
+            i = i + 1
+            PPCol2("Dies", dgFormas, "Dies", "", True, 55, False, _
+                              C1.Win.C1TrueDBGrid.PresentationEnum.Normal, False, 55, i, False)
+            i = i + 1
+            PPCol2("ESTRANSFERENCIA", dgFormas, "Es Transferència Bancària", "", True, 55, False, _
+                              C1.Win.C1TrueDBGrid.PresentationEnum.CheckBox, False, 55, i, False)
+
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub IniciarForm(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
+        Cursor = Cursors.WaitCursor
+        Try
+            cargando = True
+            tabla = tablaFormaPago
+            formaActual = New clsForma2(ds.Tables(tabla), "C", BindingContext)
+            HacerBindings()
+            'formaActual.tabla.AcceptChanges()
+            'PonerModificables(soloLectura)
+            ' PSBTIPO(formaActual.centro)
+            cargando = False
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+        Cursor = Cursors.Default
+    End Sub
+
+#End Region
+
+#Region "MODIFICAR DB"
+
+    'Friend Overrides Sub btnBorrar_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) 'Handles btnBorrar.Click
+    '    Try
+    '        If MessageBox.Show(rm.GetString("BorrarFormaPago"), rm.GetString("ConfirmacionEliminacion"), MessageBoxButtons.YesNo) = DialogResult.Yes Then
+    '            editando = True
+    '            formaActual.borrar()
+    '            editando = False
+    '        End If
+
+    '    Catch ex As Exception
+    '        LOG(ex.ToString) : cargando = False : CCN()
+    '    End Try
+    'End Sub
+    'Friend Overrides Sub btnActualizar_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) 'Handles btnActualizar.Click
+    '    Try
+    '        cargando = True
+    '        formaActual.ActualizarOrigen()
+    '        PSBTIPO(formaActual.centro) : cargando = False
+
+    '    Catch ex As Exception
+    '        LOG(ex.ToString) : cargando = False : CCN()
+    '    End Try
+    'End Sub
+
+#End Region
+
+#Region "ESPECÍFICO"
+
+    Private Sub Form1_Resize(ByVal sender As Object, ByVal e As System.EventArgs) Handles MyBase.Resize
+        MakeGradient()
+    End Sub
+    Private Sub Form1_Activated(ByVal sender As Object, ByVal e As System.EventArgs) Handles MyBase.Activated
+        MakeGradient()
+    End Sub
+    Private Sub MakeGradient()
+        Dim objBrush As New Drawing2D.LinearGradientBrush(Me.DisplayRectangle, Color.Blue, Color.AliceBlue, Drawing2D.LinearGradientMode.Vertical)
+        Dim objGraphics As Graphics = Me.CreateGraphics()
+        objGraphics.FillRectangle(objBrush, Me.DisplayRectangle)
+        objBrush.Dispose()
+        objGraphics.Dispose()
+    End Sub
+
+#End Region
+
+#Region "IMPRESIÓN"
+
+#End Region
+
+#Region "COMUNES"
+
+    Private Sub btnVerLista_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnVerLista.Click
+        Try
+            Cursor = Cursors.WaitCursor
+            Dim f As frmPagoLista = frmPagoLista.GetInstance(esListado)
+            f.MdiParent = Me.MdiParent
+            AddHandler f.Closed, AddressOf CType(Me.MdiParent, frmPrincipal).childCerrado
+            AddHandler f.Load, AddressOf CType(Me.MdiParent, frmPrincipal).childAbierto : AddHandler f.Activated, AddressOf CType(Me.MdiParent, frmPrincipal).childOcultandoMostrando
+            f.Show()
+            f.BringToFront()
+            Cursor = Cursors.Default
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+
+
+#End Region
+
+#Region "DESPLAZARSE"
+
+    'Protected Friend Overrides Sub btnPrimero_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)  'Handles btnPrimero.Click
+    '    Try
+    '        cargando = True
+    '        formaActual.PrimeroReg() : ActualizarOrigen()
+    '        PSBTIPO(formaActual.centro) : cargando = False
+
+    '    Catch ex As Exception
+    '        LOG(ex.ToString) : cargando = False : CCN()
+    '    End Try
+    'End Sub
+    'Friend Overrides Sub btnUltimo_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) 'Handles btnUltimo.Click
+    '    Try
+    '        cargando = True
+    '        formaActual.UltimoReg() : ActualizarOrigen()
+    '        PSBTIPO(formaActual.centro) : cargando = False
+
+    '    Catch ex As Exception
+    '        LOG(ex.ToString) : cargando = False : CCN()
+    '    End Try
+    'End Sub
+    'Friend Overrides Sub btnAnterior_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) 'Handles btnAnterior.Click
+    '    Try
+    '        cargando = True
+    '        formaActual.AnteriorReg() : ActualizarOrigen()
+    '        PSBTIPO(formaActual.centro) : cargando = False
+
+    '    Catch ex As Exception
+    '        LOG(ex.ToString) : cargando = False : CCN()
+    '    End Try
+    'End Sub
+    'Friend Overrides Sub btnSiguiente_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) 'Handles btnSiguiente.Click
+    '    Try
+    '        cargando = True
+    '        formaActual.SiguienteReg() : ActualizarOrigen()
+    '        PSBTIPO(formaActual.centro) : cargando = False
+
+    '    Catch ex As Exception
+    '        LOG(ex.ToString) : cargando = False : CCN()
+    '    End Try
+    'End Sub
+
+#End Region
+
+#Region "SELECCIÓN REGISTRO"
+
+#End Region
+
+#Region "ELECCIONES"
+
+#End Region
+
+    Private Sub btnAceptar_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnAceptar.Click
+        formaActual.ActualizarOrigen()
+    End Sub
+End Class

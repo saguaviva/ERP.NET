@@ -1,0 +1,2183 @@
+<?xml version="1.0"?>
+<doc>
+  <assembly>
+    <name>C1.Win.DataFilter.4</name>
+  </assembly>
+  <members>
+    <member name="T:C1.Win.DataFilter.C1DataFilter">
+      <summary>
+            The <see cref="T:C1.Win.DataFilter.C1DataFilter" /> lets users filter data based on criteria's. It can be bound to any data-aware control and multiple conditional filtering could be applied.
+            </summary>
+    </member>
+    <member name="M:C1.Win.DataFilter.C1DataFilter.#ctor">
+      <summary>
+            Initializes a new instance of the <see cref="T:C1.Win.DataFilter.C1DataFilter" /> control.
+            </summary>
+    </member>
+    <member name="M:C1.Win.DataFilter.C1DataFilter.Dispose(System.Boolean)">
+      <summary>
+            Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+            </summary>
+      <param name="disposing">Indicates whether the method call comes from a Dispose method or from a finalizer.</param>
+    </member>
+    <member name="P:C1.Win.DataFilter.C1DataFilter.DataSource">
+      <summary>
+            Gets or sets the object used as the data source for the current <see cref="T:C1.Win.DataFilter.C1DataFilter" /> control.
+            </summary>
+    </member>
+    <member name="P:C1.Win.DataFilter.C1DataFilter.DataMember">
+      <summary>
+            Gets or sets a name of a specific record set within the DataSource.
+            </summary>
+    </member>
+    <member name="P:C1.Win.DataFilter.C1DataFilter.AutoWidthMode">
+      <summary>
+            Gets or sets the mode by which the <see cref="T:C1.Win.DataFilter.C1DataFilter" /> automatically sets its own width.
+            </summary>
+    </member>
+    <member name="P:C1.Win.DataFilter.C1DataFilter.View">
+      <summary>
+            Gets the result of filtering the <see cref="P:C1.Win.DataFilter.C1DataFilter.DataSource" />.
+            </summary>
+    </member>
+    <member name="P:C1.Win.DataFilter.C1DataFilter.Filters">
+      <summary>
+            Gets the collection of filters.
+            </summary>
+    </member>
+    <member name="P:C1.Win.DataFilter.C1DataFilter.AutoGenerateFilters">
+      <summary>
+            Gets or sets a value indicating whether to generate filters automatically.
+            </summary>
+    </member>
+    <member name="P:C1.Win.DataFilter.C1DataFilter.ShowClearFilterButtons">
+      <summary>
+            Gets or sets a value indicating whether to show clear filter buttons in the filter headers or not.
+            </summary>
+    </member>
+    <member name="P:C1.Win.DataFilter.C1DataFilter.AutoApply">
+      <summary>
+            Gets or sets a value indicating whether the filter should be automatically applied to the DataSource after the filter value is changed or not.
+            </summary>
+    </member>
+    <member name="P:C1.Win.DataFilter.C1DataFilter.HeaderText">
+      <summary>
+            Gets or sets the header text of the current <see cref="T:C1.Win.DataFilter.C1DataFilter" /> control.
+            </summary>
+    </member>
+    <member name="P:C1.Win.DataFilter.C1DataFilter.ShowHeader">
+      <summary>
+            Gets or sets a value that indicates whether the header is displayed in the <see cref="T:C1.Win.DataFilter.C1DataFilter" /> control.
+            </summary>
+    </member>
+    <member name="P:C1.Win.DataFilter.C1DataFilter.Styles">
+      <summary>
+            Gets <see cref="T:C1.Win.DataFilter.Styles.DataFilterTheme" /> C1DataFilter styles.
+            </summary>
+    </member>
+    <member name="P:C1.Win.DataFilter.C1DataFilter.ShowToolTips">
+      <summary>
+            Gets or sets whether the <see cref="T:C1.Win.DataFilter.C1DataFilter" /> should display tooltips.
+            </summary>
+    </member>
+    <member name="E:C1.Win.DataFilter.C1DataFilter.FilterValueChanged">
+      <summary>
+            Occurs when a value of the filter changes.
+            </summary>
+    </member>
+    <member name="M:C1.Win.DataFilter.C1DataFilter.OnFilterValueChanged(C1.DataFilter.FilterChangedEventArgs)">
+      <summary>
+            Raises the <see cref="E:C1.Win.DataFilter.C1DataFilter.FilterValueChanged" /> event.
+            </summary>
+      <param name="e">An <see cref="T:C1.DataFilter.FilterChangedEventArgs" /> that contains the event data.</param>
+    </member>
+    <member name="E:C1.Win.DataFilter.C1DataFilter.FilterAutoGenerating">
+      <summary>
+            Occurs before the filter is added to the <see cref="P:C1.Win.DataFilter.C1DataFilter.Filters" />. Allows to cancel the change.
+            </summary>
+    </member>
+    <member name="M:C1.Win.DataFilter.C1DataFilter.OnFilterAutoGenerating(C1.DataFilter.FilterAutoGeneratingEventArgs)">
+      <summary>
+            Raises the <see cref="E:C1.Win.DataFilter.C1DataFilter.FilterAutoGenerating" /> event.
+            </summary>
+      <param name="e">An <see cref="T:C1.DataFilter.FilterAutoGeneratingEventArgs" /> that contains the event data.</param>
+    </member>
+    <member name="E:C1.Win.DataFilter.C1DataFilter.FilterChanging">
+      <summary>
+            Occurs before the filter is changed. Allows to cancel the change.
+            </summary>
+    </member>
+    <member name="M:C1.Win.DataFilter.C1DataFilter.OnFilterChanging(System.ComponentModel.CancelEventArgs)">
+      <summary>
+            Raises the <see cref="E:C1.Win.DataFilter.C1DataFilter.FilterChanging" /> event.
+            </summary>
+      <param name="e">An <see cref="T:System.ComponentModel.CancelEventArgs" /> that contains the event data.</param>
+    </member>
+    <member name="E:C1.Win.DataFilter.C1DataFilter.FilterChanged">
+      <summary>
+            Occurs when the filter changes.
+            </summary>
+    </member>
+    <member name="M:C1.Win.DataFilter.C1DataFilter.OnFilterChanged(System.EventArgs)">
+      <summary>
+            Raises the <see cref="E:C1.Win.DataFilter.C1DataFilter.FilterChanged" /> event.
+            </summary>
+      <param name="e">An <see cref="T:System.EventArgs" /> that contains the event data.</param>
+    </member>
+    <member name="E:C1.Win.DataFilter.C1DataFilter.BeforeTooltipShow">
+      <summary>
+            Occurs before a tooltip is shown.
+            </summary>
+    </member>
+    <member name="M:C1.Win.DataFilter.C1DataFilter.OnBeforeTooltipShow(C1.DataFilter.BeforeTooltipShowEventArgs)">
+      <summary>
+            Rises the <see cref="E:C1.Win.DataFilter.C1DataFilter.BeforeTooltipShow" /> event.
+            </summary>
+      <param name="e">An <see cref="T:System.EventArgs" /> that contains the event data.</param>
+    </member>
+    <member name="M:C1.Win.DataFilter.C1DataFilter.ExpandAll">
+      <summary>
+            Expands all filters in the <see cref="T:C1.Win.DataFilter.C1DataFilter" /> control.
+            </summary>
+    </member>
+    <member name="M:C1.Win.DataFilter.C1DataFilter.CollapseAll">
+      <summary>
+            Collapses all filters in the <see cref="T:C1.Win.DataFilter.C1DataFilter" /> control.
+            </summary>
+    </member>
+    <member name="M:C1.Win.DataFilter.C1DataFilter.GenerateFilters(System.Boolean)">
+      <summary>
+            Generates filters for the current items source.
+            </summary>
+      <param name="forced">Ignores the AutoGenerateFilters property.</param>
+    </member>
+    <member name="M:C1.Win.DataFilter.C1DataFilter.ApplyFilter">
+      <summary>
+            Applies the filter to the items source.
+            </summary>
+      <exception cref="T:System.NotSupportedException">The <see cref="T:C1.DataFilter.PredicateExpression" /> can not be used with the <see cref="T:System.Data.DataTable" /> class.</exception>
+    </member>
+    <member name="M:C1.Win.DataFilter.C1DataFilter.ApplyFilterAsync">
+      <summary>
+            Applies the filter to the items source asynchronously.
+            </summary>
+      <exception cref="T:System.NotSupportedException">The <see cref="T:C1.DataFilter.PredicateExpression" /> can not be used with the <see cref="T:System.Data.DataTable" /> class.</exception>
+    </member>
+    <member name="M:C1.Win.DataFilter.C1DataFilter.SaveFilterExpression(System.String)">
+      <summary>
+            Saves expressions from the <see cref="P:C1.Win.DataFilter.C1DataFilter.Filters" /> collection to a file.
+            </summary>
+      <param name="fileName">The file name for storing filter expressions.</param>
+    </member>
+    <member name="M:C1.Win.DataFilter.C1DataFilter.LoadFilterExpression(System.String)">
+      <summary>
+            Loads expressions to the <see cref="P:C1.Win.DataFilter.C1DataFilter.Filters" /> collection from a file.
+            </summary>
+      <param name="fileName">The file name that stores the filter expressions.</param>
+    </member>
+    <member name="M:C1.Win.DataFilter.C1DataFilter.OnFontChanged(System.EventArgs)">
+      <summary>
+             Raises the System.Windows.Forms.Control.FontChanged event.
+            </summary>
+      <param name="e">An System.EventArgs that contains the event data.</param>
+    </member>
+    <member name="P:C1.Win.DataFilter.C1DataFilter.DefaultSize">
+      <summary>
+            Gets the default size of the control.
+            </summary>
+    </member>
+    <member name="M:C1.Win.DataFilter.C1DataFilter.OnRightToLeftChanged(System.EventArgs)">
+      <summary>
+            Raises the <see cref="E:System.Windows.Forms.Control.RightToLeftChanged" /> event.
+            </summary>
+      <param name="e">An <see cref="T:System.EventArgs" /> that contains the event data.</param>
+    </member>
+    <member name="P:C1.Win.DataFilter.C1DataFilter.Margin">
+      <summary>
+            Do not use this property.
+            </summary>
+    </member>
+    <member name="P:C1.Win.DataFilter.C1DataFilter.Padding">
+      <summary>
+            Do not use this property.
+            </summary>
+    </member>
+    <member name="P:C1.Win.DataFilter.C1DataFilter.BackColor">
+      <summary>
+            Gets or sets control back color.
+            </summary>
+    </member>
+    <member name="P:C1.Win.DataFilter.C1DataFilter.ForeColor">
+      <summary>
+            Do not use this property.
+            </summary>
+    </member>
+    <member name="T:C1.Win.DataFilter.Design.C1DataFilterDesigner">
+      <summary>
+            Extends the design mode behavior of a <see cref="T:C1.Win.DataFilter.C1DataFilter" /> control.
+            </summary>
+    </member>
+    <member name="M:C1.Win.DataFilter.Design.C1DataFilterDesigner.Initialize(System.ComponentModel.IComponent)">
+      <summary>
+            Initializes the designer with the specified component.
+            </summary>
+      <param name="component">The System.ComponentModel.IComponent to associate the designer with. This component must always be an instance of <see cref="T:C1.Win.DataFilter.C1DataFilter" />.</param>
+    </member>
+    <member name="P:C1.Win.DataFilter.Design.C1DataFilterDesigner.ActionLists">
+      <summary>
+            Gets the design-time action lists supported by the component associated with the designer.
+            </summary>
+    </member>
+    <member name="T:C1.Win.DataFilter.Localization.RtStrings">
+      <summary>
+            The <see cref="T:C1.Win.DataFilter.Localization.RtStrings.RuntimeStrings" /> class contains static properties used for Runtime localization.
+            </summary>
+    </member>
+    <member name="P:C1.Win.DataFilter.Localization.RtStrings.ResourceManager">
+      <summary>
+            The <see cref="P:C1.Win.DataFilter.Localization.RtStrings.ResourceManager" /> object used for lookup resources.
+            </summary>
+      <remarks>Set this property to the valid value if 
+            you define resources in a Custom Control assembly.</remarks>
+    </member>
+    <member name="P:C1.Win.DataFilter.Localization.RtStrings.UICulture">
+      <summary>
+            Returns default <see cref="T:System.Globalization.CultureInfo" /> object used as fallback culture.
+            </summary>
+    </member>
+    <member name="T:C1.Win.DataFilter.Localization.Strings">
+      <summary>
+            The <see cref="T:C1.Win.DataFilter.Localization.Strings" /> class contains static properties used for localization.
+            </summary>
+    </member>
+    <member name="P:C1.Win.DataFilter.Localization.Strings.ResourceManager">
+      <summary>
+            The <see cref="P:C1.Win.DataFilter.Localization.Strings.ResourceManager" /> object used for lookup resources.
+            </summary>
+      <remarks>Set this property to the valid value if 
+            you define resources in a Custom Control assembly.</remarks>
+    </member>
+    <member name="P:C1.Win.DataFilter.Localization.Strings.UICulture">
+      <summary>
+            Returns default <see cref="T:System.Globalization.CultureInfo" /> object used as fallback culture.
+            </summary>
+    </member>
+    <member name="T:C1.Win.DataFilter.CalendarFilter">
+      <summary>
+            Represents a filter with calendar.
+            </summary>
+    </member>
+    <member name="M:C1.Win.DataFilter.CalendarFilter.#ctor">
+      <summary>
+            Initializes a new instance of the <see cref="T:C1.Win.DataFilter.CalendarFilter" />.
+            </summary>
+    </member>
+    <member name="M:C1.Win.DataFilter.CalendarFilter.#ctor(System.String,System.Boolean)">
+      <summary>
+            Initializes a new instance of the <see cref="T:C1.Win.DataFilter.CalendarFilter" /> with the name of the data item property.
+            </summary>
+      <param name="propertyName">The name of the data item property.</param>
+      <param name="isAutoGenerated">This filter is autogenerated.</param>
+    </member>
+    <member name="T:C1.Win.DataFilter.CustomFilter">
+      <summary>
+            Represents a custom filter.
+            </summary>
+    </member>
+    <member name="M:C1.Win.DataFilter.CustomFilter.#ctor(System.String)">
+      <summary>
+            Initializes a new instance of the <see cref="T:C1.Win.DataFilter.CustomFilter" />.
+            </summary>
+      <param name="propertyName">The name of the data item property.</param>
+    </member>
+    <member name="P:C1.Win.DataFilter.CustomFilter.Control">
+      <summary>
+            Gets or sets the control that represents the custom filter.
+            </summary>
+    </member>
+    <member name="P:C1.Win.DataFilter.CustomFilter.Expression">
+      <summary>
+            Gets the expression of the current filter.
+            </summary>
+    </member>
+    <member name="M:C1.Win.DataFilter.CustomFilter.GetExpression">
+      <summary>
+            Gets the expression for the current filter.
+            </summary>
+      <returns>The expression of custom filter.</returns>
+    </member>
+    <member name="M:C1.Win.DataFilter.CustomFilter.SetExpression(C1.DataFilter.Expression)">
+      <summary>
+            Sets the expression for the current filter.
+            </summary>
+      <param name="expression">The expression of custom filter.</param>
+    </member>
+    <member name="T:C1.Win.DataFilter.DateRangeFilter">
+      <summary>
+            Represents a filter of dates with range slider or editors of range.
+            </summary>
+    </member>
+    <member name="M:C1.Win.DataFilter.DateRangeFilter.#ctor">
+      <summary>
+            Initializes a new instance of the <see cref="T:C1.Win.DataFilter.DateRangeFilter" />.
+            </summary>
+    </member>
+    <member name="M:C1.Win.DataFilter.DateRangeFilter.#ctor(System.String,System.Boolean)">
+      <summary>
+            Initializes a new instance of the <see cref="T:C1.Win.DataFilter.DateRangeFilter" /> with the name of the data item property.
+            </summary>
+      <param name="propertyName">The name of the data item property.</param>
+      <param name="isAutoGenerated">This filter is autogenerated.</param>
+    </member>
+    <member name="T:C1.Win.DataFilter.RangeFilter">
+      <summary>
+            Represents a filter with range slider or editors of range.
+            </summary>
+    </member>
+    <member name="M:C1.Win.DataFilter.RangeFilter.#ctor">
+      <summary>
+            Initializes a new instance of the <see cref="T:C1.Win.DataFilter.RangeFilter" />.
+            </summary>
+    </member>
+    <member name="M:C1.Win.DataFilter.RangeFilter.#ctor(System.String,System.Boolean)">
+      <summary>
+            Initializes a new instance of the <see cref="T:C1.Win.DataFilter.RangeFilter" /> with the name of the data item property.
+            </summary>
+      <param name="propertyName">The name of the data item property.</param>
+      <param name="isAutoGenerated">This filter is autogenerated.</param>
+    </member>
+    <member name="T:C1.Win.DataFilter.ChecklistFilter">
+      <summary>
+            Represents a filter with checklist.
+            </summary>
+    </member>
+    <member name="M:C1.Win.DataFilter.ChecklistFilter.#ctor">
+      <summary>
+            Initializes a new instance of the <see cref="T:C1.Win.DataFilter.ChecklistFilter" />.
+            </summary>
+    </member>
+    <member name="M:C1.Win.DataFilter.ChecklistFilter.#ctor(System.String,System.Boolean)">
+      <summary>
+            Initializes a new instance of the <see cref="T:C1.Win.DataFilter.ChecklistFilter" /> with the name of the data item property.
+            </summary>
+      <param name="propertyName">The name of the data item property.</param>
+      <param name="isAutoGenerated">This filter is autogenerated.</param>
+    </member>
+    <member name="M:C1.Win.DataFilter.ChecklistFilter.SetItemsSource(System.Object)">
+      <summary>
+            Sets the object used as the items source for the checklist.
+            </summary>
+      <param name="itemsSource">The object used as the items source.</param>
+    </member>
+    <member name="M:C1.Win.DataFilter.ChecklistFilter.UpdateItems(System.Object)">
+      <summary>
+            Updates the items collection.
+            </summary>
+      <param name="itemsSource">The object used as the items source.</param>
+    </member>
+    <member name="T:C1.Win.DataFilter.BoolFilter">
+      <summary>
+            Represents a filter with checkbox.
+            </summary>
+    </member>
+    <member name="M:C1.Win.DataFilter.BoolFilter.#ctor">
+      <summary>
+            Initializes a new instance of the <see cref="T:C1.Win.DataFilter.BoolFilter" />.
+            </summary>
+    </member>
+    <member name="M:C1.Win.DataFilter.BoolFilter.#ctor(System.String,System.Boolean)">
+      <summary>
+            Initializes a new instance of the <see cref="T:C1.Win.DataFilter.BoolFilter" /> with the name of the data item property.
+            </summary>
+      <param name="propertyName">The name of the data item property.</param>
+      <param name="isAutoGenerated">This filter is autogenerated.</param>
+    </member>
+    <member name="T:C1.Win.DataFilter.Styles.BaseItemStyle">
+      <summary>
+            Style with the base item properties.
+            </summary>
+    </member>
+    <member name="P:C1.Win.DataFilter.Styles.BaseItemStyle.Padding">
+      <summary>
+            Gets or sets the thickness of the padding between the element edges and its content.
+            </summary>
+    </member>
+    <member name="P:C1.Win.DataFilter.Styles.BaseItemStyle.Margins">
+      <summary>
+            Gets or sets the thickness of the margins around the element.
+            </summary>
+    </member>
+    <member name="P:C1.Win.DataFilter.Styles.BaseItemStyle.Hot">
+      <summary>
+            Gets style containing display attributes that determine the general appearance of element on the screen when the cursor is over it.
+            </summary>
+    </member>
+    <member name="P:C1.Win.DataFilter.Styles.BaseItemStyle.Pressed">
+      <summary>
+            Gets style containing display attributes that determine the general appearance of pressed element on the screen.
+            </summary>
+    </member>
+    <member name="M:C1.Win.DataFilter.Styles.BaseItemStyle.ApplyToStyle(C1.Framework.Style)">
+      <summary>
+            Applies style to destination style if it is possible.
+            </summary>
+    </member>
+    <member name="T:C1.Win.DataFilter.Styles.BaseScrollStyle">
+      <summary>
+            Style with the base scrollbar properties.
+            </summary>
+    </member>
+    <member name="P:C1.Win.DataFilter.Styles.BaseScrollStyle.BackColor">
+      <summary>
+            Gets or sets the <see cref="T:System.Drawing.Color" /> used to paint the background.
+            </summary>
+    </member>
+    <member name="P:C1.Win.DataFilter.Styles.BaseScrollStyle.BorderColor">
+      <summary>
+            Gets or sets the <see cref="T:System.Drawing.Color" /> used to draw the border around the element.
+            </summary>
+    </member>
+    <member name="M:C1.Win.DataFilter.Styles.BaseScrollStyle.ApplyToStyle(C1.Framework.Style)">
+      <summary>
+            Applies style to destination style if it is possible.
+            </summary>
+    </member>
+    <member name="T:C1.Win.DataFilter.Styles.BaseSubItemStyle">
+      <summary>
+            Style with the base sub-item properties.
+            </summary>
+    </member>
+    <member name="P:C1.Win.DataFilter.Styles.BaseSubItemStyle.ForeColor">
+      <summary>
+            Gets or sets the <see cref="T:System.Drawing.Color" /> used to draw the text.
+            </summary>
+    </member>
+    <member name="P:C1.Win.DataFilter.Styles.BaseSubItemStyle.BackColor">
+      <summary>
+            Gets or sets the <see cref="T:System.Drawing.Color" /> used to paint the background.
+            </summary>
+    </member>
+    <member name="P:C1.Win.DataFilter.Styles.BaseSubItemStyle.BorderColor">
+      <summary>
+            Gets or sets the <see cref="T:System.Drawing.Color" /> used to draw the border around the element.
+            </summary>
+    </member>
+    <member name="M:C1.Win.DataFilter.Styles.BaseSubItemStyle.ApplyToStyle(C1.Framework.Style)">
+      <summary>
+            Applies style to destination style if it is possible.
+            </summary>
+    </member>
+    <member name="T:C1.Win.DataFilter.Styles.BasePropStyle">
+      <summary>
+            Style with the base properties.
+            </summary>
+    </member>
+    <member name="P:C1.Win.DataFilter.Styles.BasePropStyle.Padding">
+      <summary>
+            Gets or sets the thickness of the padding between the element edges and its content.
+            </summary>
+    </member>
+    <member name="P:C1.Win.DataFilter.Styles.BasePropStyle.Margins">
+      <summary>
+            Gets or sets the thickness of the margins around the element.
+            </summary>
+    </member>
+    <member name="P:C1.Win.DataFilter.Styles.BasePropStyle.BackColor">
+      <summary>
+            Gets or sets the <see cref="T:System.Drawing.Color" /> used to paint the background.
+            </summary>
+    </member>
+    <member name="P:C1.Win.DataFilter.Styles.BasePropStyle.Border">
+      <summary>
+            Gets or sets the thickness of the border around the element.
+            </summary>
+    </member>
+    <member name="P:C1.Win.DataFilter.Styles.BasePropStyle.BorderColor">
+      <summary>
+            Gets or sets the <see cref="T:System.Drawing.Color" /> used to draw the border around the element.
+            </summary>
+    </member>
+    <member name="M:C1.Win.DataFilter.Styles.BasePropStyle.ApplyToStyle(C1.Framework.Style)">
+      <summary>
+            Applies style to destination style if it is possible.
+            </summary>
+    </member>
+    <member name="T:C1.Win.DataFilter.Styles.BaseTextElementStyle">
+      <summary>
+            Style with the base text element properties.
+            </summary>
+    </member>
+    <member name="P:C1.Win.DataFilter.Styles.BaseTextElementStyle.Font">
+      <summary>
+            Gets or sets text font of element.
+            </summary>
+    </member>
+    <member name="P:C1.Win.DataFilter.Styles.BaseTextElementStyle.ForeColor">
+      <summary>
+            Gets or sets the <see cref="T:System.Drawing.Color" /> used to draw the text.
+            </summary>
+    </member>
+    <member name="M:C1.Win.DataFilter.Styles.BaseTextElementStyle.ApplyToStyle(C1.Framework.Style)">
+      <summary>
+            Applies style to destination style if it is possible.
+            </summary>
+    </member>
+    <member name="T:C1.Win.DataFilter.Styles.DataFilterButtonStyle">
+      <summary>
+            The <see cref="T:C1.Win.DataFilter.Styles.DataFilterButtonStyle" /> contains display attributes that determine the general appearance of buttons on the screen.
+            </summary>
+    </member>
+    <member name="P:C1.Win.DataFilter.Styles.DataFilterButtonStyle.Hot">
+      <summary>
+            Gets style containing display attributes that determine the general appearance of element on the screen when the cursor is over it.
+            </summary>
+    </member>
+    <member name="P:C1.Win.DataFilter.Styles.DataFilterButtonStyle.Pressed">
+      <summary>
+            Gets style containing display attributes that determine the general appearance of pressed element on the screen.
+            </summary>
+    </member>
+    <member name="P:C1.Win.DataFilter.Styles.DataFilterButtonStyle.DefaultStyle">
+      <summary>
+            Gets a style that contains the default values for current style.
+            </summary>
+    </member>
+    <member name="M:C1.Win.DataFilter.Styles.DataFilterButtonStyle.Clone">
+      <summary>
+            Creates an instance of the <see cref="T:C1.Win.C1Themes.BaseStyle" /> class that is identical to the current <see cref="T:C1.Win.C1Themes.BaseStyle" /></summary>
+    </member>
+    <member name="T:C1.Win.DataFilter.Styles.DataFilterButtonHotStyle">
+      <summary>
+            The <see cref="T:C1.Win.DataFilter.Styles.DataFilterButtonHotStyle" /> containing display attributes that determine the general appearance of button on the screen when the cursor is over it.
+            </summary>
+    </member>
+    <member name="P:C1.Win.DataFilter.Styles.DataFilterButtonHotStyle.DefaultStyle">
+      <summary>
+            Gets a style that contains the default values for current style.
+            </summary>
+    </member>
+    <member name="M:C1.Win.DataFilter.Styles.DataFilterButtonHotStyle.Clone">
+      <summary>
+            Creates an instance of the <see cref="T:C1.Win.C1Themes.BaseStyle" /> class that is identical to the current <see cref="T:C1.Win.C1Themes.BaseStyle" /></summary>
+    </member>
+    <member name="T:C1.Win.DataFilter.Styles.DataFilterButtonPressedStyle">
+      <summary>
+            The <see cref="T:C1.Win.DataFilter.Styles.DataFilterButtonPressedStyle" /> containing display attributes that determine the general appearance of pressed button on the screen.
+            </summary>
+    </member>
+    <member name="P:C1.Win.DataFilter.Styles.DataFilterButtonPressedStyle.DefaultStyle">
+      <summary>
+            Gets a style that contains the default values for current style.
+            </summary>
+    </member>
+    <member name="M:C1.Win.DataFilter.Styles.DataFilterButtonPressedStyle.Clone">
+      <summary>
+            Creates an instance of the <see cref="T:C1.Win.C1Themes.BaseStyle" /> class that is identical to the current <see cref="T:C1.Win.C1Themes.BaseStyle" /></summary>
+    </member>
+    <member name="T:C1.Win.DataFilter.Styles.DataFilterCheckBoxStyle">
+      <summary>
+        <see cref="T:C1.Win.DataFilter.Styles.DataFilterCheckBoxStyle" /> contains display attributes that 
+            determine the general appearance of the check box on the screen.
+            </summary>
+    </member>
+    <member name="P:C1.Win.DataFilter.Styles.DataFilterCheckBoxStyle.Glyph">
+      <summary>
+            Gets style containing display attributes that determine the general appearance of the glyph on the screen.
+            </summary>
+    </member>
+    <member name="P:C1.Win.DataFilter.Styles.DataFilterCheckBoxStyle.DefaultStyle">
+      <summary>
+            Gets a style that contains the default values for current style.
+            </summary>
+    </member>
+    <member name="M:C1.Win.DataFilter.Styles.DataFilterCheckBoxStyle.Clone">
+      <summary>
+            Creates an instance of the <see cref="T:C1.Win.C1Themes.BaseStyle" /> class that is identical to the current <see cref="T:C1.Win.C1Themes.BaseStyle" /></summary>
+    </member>
+    <member name="T:C1.Win.DataFilter.Styles.DataFilterCheckBoxGlyphStyle">
+      <summary>
+        <see cref="T:C1.Win.DataFilter.Styles.DataFilterCheckBoxGlyphStyle" /> contains display attributes that 
+            determine the general appearance of the caption glyph on the screen.
+            </summary>
+    </member>
+    <member name="P:C1.Win.DataFilter.Styles.DataFilterCheckBoxGlyphStyle.Padding">
+      <summary>
+            Gets or sets the thickness of the padding between the element edges and its content.
+            </summary>
+    </member>
+    <member name="P:C1.Win.DataFilter.Styles.DataFilterCheckBoxGlyphStyle.Margins">
+      <summary>
+            Gets or sets the thickness of the margins around the element.
+            </summary>
+    </member>
+    <member name="P:C1.Win.DataFilter.Styles.DataFilterCheckBoxGlyphStyle.Checked">
+      <summary>
+            Gets style containing display attributes that determine the general appearance of check box on the screen in checked state.
+            </summary>
+    </member>
+    <member name="P:C1.Win.DataFilter.Styles.DataFilterCheckBoxGlyphStyle.Unchecked">
+      <summary>
+            Gets style containing display attributes that determine the general appearance of check box on the screen in unchecked state.
+            </summary>
+    </member>
+    <member name="P:C1.Win.DataFilter.Styles.DataFilterCheckBoxGlyphStyle.Indeterminate">
+      <summary>
+            Gets style containing display attributes that determine the general appearance of check box on the screen in Indeterminate state.
+            </summary>
+    </member>
+    <member name="P:C1.Win.DataFilter.Styles.DataFilterCheckBoxGlyphStyle.DefaultStyle">
+      <summary>
+            Gets a style that contains the default values for current style.
+            </summary>
+    </member>
+    <member name="M:C1.Win.DataFilter.Styles.DataFilterCheckBoxGlyphStyle.Clone">
+      <summary>
+            Creates an instance of the <see cref="T:C1.Win.C1Themes.BaseStyle" /> class that is identical to the current <see cref="T:C1.Win.C1Themes.BaseStyle" /></summary>
+    </member>
+    <member name="M:C1.Win.DataFilter.Styles.DataFilterCheckBoxGlyphStyle.ApplyToStyle(C1.Framework.Style)">
+      <summary>
+            Applies style to destination style if it is possible.
+            </summary>
+      <param name="dst">
+      </param>
+    </member>
+    <member name="T:C1.Win.DataFilter.Styles.DataFilterCheckedGlyphStyle">
+      <summary>
+        <see cref="T:C1.Win.DataFilter.Styles.DataFilterCheckedGlyphStyle" /> contains display attributes that 
+            determine the general appearance of check box on the screen in checked state.
+            </summary>
+    </member>
+    <member name="P:C1.Win.DataFilter.Styles.DataFilterCheckedGlyphStyle.DefaultStyle">
+      <summary>
+            Gets a style that contains the default values for current style.
+            </summary>
+    </member>
+    <member name="M:C1.Win.DataFilter.Styles.DataFilterCheckedGlyphStyle.Clone">
+      <summary>
+            Creates an instance of the <see cref="T:C1.Win.C1Themes.BaseStyle" /> class that is identical to the current <see cref="T:C1.Win.C1Themes.BaseStyle" /></summary>
+    </member>
+    <member name="T:C1.Win.DataFilter.Styles.DataFilterCheckedGlyphHotStyle">
+      <summary>
+        <see cref="T:C1.Win.DataFilter.Styles.DataFilterCheckedGlyphHotStyle" /> contains display attributes that 
+            determine the general appearance of check box on the screen in checked state when the cursor is over it.
+            </summary>
+    </member>
+    <member name="P:C1.Win.DataFilter.Styles.DataFilterCheckedGlyphHotStyle.DefaultStyle">
+      <summary>
+            Gets a style that contains the default values for current style.
+            </summary>
+    </member>
+    <member name="M:C1.Win.DataFilter.Styles.DataFilterCheckedGlyphHotStyle.Clone">
+      <summary>
+            Creates an instance of the <see cref="T:C1.Win.C1Themes.BaseStyle" /> class that is identical to the current <see cref="T:C1.Win.C1Themes.BaseStyle" /></summary>
+    </member>
+    <member name="T:C1.Win.DataFilter.Styles.DataFilterCheckedGlyphPressedStyle">
+      <summary>
+        <see cref="T:C1.Win.DataFilter.Styles.DataFilterCheckedGlyphPressedStyle" /> contains display attributes that 
+            determine the general appearance of pressed check box on the screen in checked state.
+            </summary>
+    </member>
+    <member name="P:C1.Win.DataFilter.Styles.DataFilterCheckedGlyphPressedStyle.DefaultStyle">
+      <summary>
+            Gets a style that contains the default values for current style.
+            </summary>
+    </member>
+    <member name="M:C1.Win.DataFilter.Styles.DataFilterCheckedGlyphPressedStyle.Clone">
+      <summary>
+            Creates an instance of the <see cref="T:C1.Win.C1Themes.BaseStyle" /> class that is identical to the current <see cref="T:C1.Win.C1Themes.BaseStyle" /></summary>
+    </member>
+    <member name="T:C1.Win.DataFilter.Styles.DataFilterUncheckedGlyphStyle">
+      <summary>
+        <see cref="T:C1.Win.DataFilter.Styles.DataFilterUncheckedGlyphStyle" /> contains display attributes that 
+            determine the general appearance of check box on the screen in unchecked state.
+            </summary>
+    </member>
+    <member name="P:C1.Win.DataFilter.Styles.DataFilterUncheckedGlyphStyle.DefaultStyle">
+      <summary>
+            Gets a style that contains the default values for current style.
+            </summary>
+    </member>
+    <member name="M:C1.Win.DataFilter.Styles.DataFilterUncheckedGlyphStyle.Clone">
+      <summary>
+            Creates an instance of the <see cref="T:C1.Win.C1Themes.BaseStyle" /> class that is identical to the current <see cref="T:C1.Win.C1Themes.BaseStyle" /></summary>
+    </member>
+    <member name="T:C1.Win.DataFilter.Styles.DataFilterUncheckedGlyphHotStyle">
+      <summary>
+        <see cref="T:C1.Win.DataFilter.Styles.DataFilterUncheckedGlyphHotStyle" /> contains display attributes that 
+            determine the general appearance of check box on the screen in unchecked state when the cursor is over it.
+            </summary>
+    </member>
+    <member name="P:C1.Win.DataFilter.Styles.DataFilterUncheckedGlyphHotStyle.DefaultStyle">
+      <summary>
+            Gets a style that contains the default values for current style.
+            </summary>
+    </member>
+    <member name="M:C1.Win.DataFilter.Styles.DataFilterUncheckedGlyphHotStyle.Clone">
+      <summary>
+            Creates an instance of the <see cref="T:C1.Win.C1Themes.BaseStyle" /> class that is identical to the current <see cref="T:C1.Win.C1Themes.BaseStyle" /></summary>
+    </member>
+    <member name="T:C1.Win.DataFilter.Styles.DataFilterUncheckedGlyphPressedStyle">
+      <summary>
+        <see cref="T:C1.Win.DataFilter.Styles.DataFilterUncheckedGlyphPressedStyle" /> contains display attributes that 
+            determine the general appearance of pressed check box on the screen in unchecked state.
+            </summary>
+    </member>
+    <member name="P:C1.Win.DataFilter.Styles.DataFilterUncheckedGlyphPressedStyle.DefaultStyle">
+      <summary>
+            Gets a style that contains the default values for current style.
+            </summary>
+    </member>
+    <member name="M:C1.Win.DataFilter.Styles.DataFilterUncheckedGlyphPressedStyle.Clone">
+      <summary>
+            Creates an instance of the <see cref="T:C1.Win.C1Themes.BaseStyle" /> class that is identical to the current <see cref="T:C1.Win.C1Themes.BaseStyle" /></summary>
+    </member>
+    <member name="T:C1.Win.DataFilter.Styles.DataFilterIndeterminateGlyphStyle">
+      <summary>
+        <see cref="T:C1.Win.DataFilter.Styles.DataFilterIndeterminateGlyphStyle" /> contains display attributes that 
+            determine the general appearance of check box on the screen in indeterminate state.
+            </summary>
+    </member>
+    <member name="P:C1.Win.DataFilter.Styles.DataFilterIndeterminateGlyphStyle.DefaultStyle">
+      <summary>
+            Gets a style that contains the default values for current style.
+            </summary>
+    </member>
+    <member name="M:C1.Win.DataFilter.Styles.DataFilterIndeterminateGlyphStyle.Clone">
+      <summary>
+            Creates an instance of the <see cref="T:C1.Win.C1Themes.BaseStyle" /> class that is identical to the current <see cref="T:C1.Win.C1Themes.BaseStyle" /></summary>
+    </member>
+    <member name="T:C1.Win.DataFilter.Styles.DataFilterIndeterminateGlyphHotStyle">
+      <summary>
+        <see cref="T:C1.Win.DataFilter.Styles.DataFilterIndeterminateGlyphHotStyle" /> contains display attributes that 
+            determine the general appearance of check box on the screen in indeterminate state when the cursor is over it.
+            </summary>
+    </member>
+    <member name="P:C1.Win.DataFilter.Styles.DataFilterIndeterminateGlyphHotStyle.DefaultStyle">
+      <summary>
+            Gets a style that contains the default values for current style.
+            </summary>
+    </member>
+    <member name="M:C1.Win.DataFilter.Styles.DataFilterIndeterminateGlyphHotStyle.Clone">
+      <summary>
+            Creates an instance of the <see cref="T:C1.Win.C1Themes.BaseStyle" /> class that is identical to the current <see cref="T:C1.Win.C1Themes.BaseStyle" /></summary>
+    </member>
+    <member name="T:C1.Win.DataFilter.Styles.DataFilterIndeterminateGlyphPressedStyle">
+      <summary>
+        <see cref="T:C1.Win.DataFilter.Styles.DataFilterUncheckedGlyphPressedStyle" /> contains display attributes that 
+            determine the general appearance of pressed check box on the screen in indeterminate state.
+            </summary>
+    </member>
+    <member name="P:C1.Win.DataFilter.Styles.DataFilterIndeterminateGlyphPressedStyle.DefaultStyle">
+      <summary>
+            Gets a style that contains the default values for current style.
+            </summary>
+    </member>
+    <member name="M:C1.Win.DataFilter.Styles.DataFilterIndeterminateGlyphPressedStyle.Clone">
+      <summary>
+            Creates an instance of the <see cref="T:C1.Win.C1Themes.BaseStyle" /> class that is identical to the current <see cref="T:C1.Win.C1Themes.BaseStyle" /></summary>
+    </member>
+    <member name="T:C1.Win.DataFilter.Styles.DataFilterCommonStyle">
+      <summary>
+        <see cref="T:C1.Win.DataFilter.Styles.DataFilterCommonStyle" /> contains display attributes that 
+            determine the general appearance of the control on the screen.
+            </summary>
+    </member>
+    <member name="P:C1.Win.DataFilter.Styles.DataFilterCommonStyle.DefaultStyle">
+      <summary>
+            Gets a style that contains the default values for current style.
+            </summary>
+    </member>
+    <member name="M:C1.Win.DataFilter.Styles.DataFilterCommonStyle.Clone">
+      <summary>
+            Creates an instance of the <see cref="T:C1.Win.C1Themes.BaseStyle" /> class that is identical to the current <see cref="T:C1.Win.C1Themes.BaseStyle" /></summary>
+    </member>
+    <member name="M:C1.Win.DataFilter.Styles.DataFilterCommonStyle.ApplyToStyle(C1.Framework.Style)">
+      <summary>
+            Applies style to destination style if it is possible.
+            </summary>
+    </member>
+    <member name="T:C1.Win.DataFilter.Styles.DataFilterCaptionStyle">
+      <summary>
+            The <see cref="T:C1.Win.DataFilter.Styles.DataFilterCaptionStyle" /> contains display attributes that determine the general appearance of the filter captions on the screen.
+            </summary>
+    </member>
+    <member name="P:C1.Win.DataFilter.Styles.DataFilterCaptionStyle.Glyph">
+      <summary>
+            Gets style containing display attributes that determine the general appearance of the glyph on the screen.
+            </summary>
+    </member>
+    <member name="P:C1.Win.DataFilter.Styles.DataFilterCaptionStyle.FilterClearGlyph">
+      <summary>
+            Gets style containing display attributes that determine the general appearance of the clear filter button glyph on the screen.
+            </summary>
+    </member>
+    <member name="P:C1.Win.DataFilter.Styles.DataFilterCaptionStyle.WordWrap">
+      <summary>
+            Gets or sets whether text should be allowed to wrap.
+            </summary>
+    </member>
+    <member name="P:C1.Win.DataFilter.Styles.DataFilterCaptionStyle.DefaultStyle">
+      <summary>
+            Gets a style that contains the default values for current style.
+            </summary>
+    </member>
+    <member name="M:C1.Win.DataFilter.Styles.DataFilterCaptionStyle.Clone">
+      <summary>
+            Creates an instance of the <see cref="T:C1.Win.C1Themes.BaseStyle" /> class that is identical to the current <see cref="T:C1.Win.C1Themes.BaseStyle" /></summary>
+    </member>
+    <member name="M:C1.Win.DataFilter.Styles.DataFilterCaptionStyle.ApplyToStyle(C1.Framework.Style)">
+      <summary>
+            Applies style to destination style if it is possible.
+            </summary>
+      <param name="dst">
+      </param>
+    </member>
+    <member name="T:C1.Win.DataFilter.Styles.DataFilterCaptionGlyphStyle">
+      <summary>
+            The <see cref="T:C1.Win.DataFilter.Styles.DataFilterCaptionGlyphStyle" /> contains display attributes that determine the general appearance of the caption glyph on the screen.
+            </summary>
+    </member>
+    <member name="P:C1.Win.DataFilter.Styles.DataFilterCaptionGlyphStyle.Padding">
+      <summary>
+            Gets or sets the thickness of the padding between the element edges and its content.
+            </summary>
+    </member>
+    <member name="P:C1.Win.DataFilter.Styles.DataFilterCaptionGlyphStyle.Margins">
+      <summary>
+            Gets or sets the thickness of the margins around the element.
+            </summary>
+    </member>
+    <member name="P:C1.Win.DataFilter.Styles.DataFilterCaptionGlyphStyle.Expanded">
+      <summary>
+            Gets style containing display attributes that determine the general appearance of the glyph on the screen in expanded state.
+            </summary>
+    </member>
+    <member name="P:C1.Win.DataFilter.Styles.DataFilterCaptionGlyphStyle.Collapsed">
+      <summary>
+            Gets style containing display attributes that determine the general appearance of the glyph on the screen in collapsed state.
+            </summary>
+    </member>
+    <member name="P:C1.Win.DataFilter.Styles.DataFilterCaptionGlyphStyle.DefaultStyle">
+      <summary>
+            Gets a style that contains the default values for current style.
+            </summary>
+    </member>
+    <member name="M:C1.Win.DataFilter.Styles.DataFilterCaptionGlyphStyle.Clone">
+      <summary>
+            Creates an instance of the <see cref="T:C1.Win.C1Themes.BaseStyle" /> class that is identical to the current <see cref="T:C1.Win.C1Themes.BaseStyle" /></summary>
+    </member>
+    <member name="M:C1.Win.DataFilter.Styles.DataFilterCaptionGlyphStyle.ApplyToStyle(C1.Framework.Style)">
+      <summary>
+            Applies style to destination style if it is possible.
+            </summary>
+      <param name="dst">
+      </param>
+    </member>
+    <member name="T:C1.Win.DataFilter.Styles.DataFilterExpandedGlyphStyle">
+      <summary>
+            The <see cref="T:C1.Win.DataFilter.Styles.DataFilterExpandedGlyphStyle" /> contains display attributes that determine the general appearance of the caption glyph on the screen in expanded state.
+            </summary>
+    </member>
+    <member name="P:C1.Win.DataFilter.Styles.DataFilterExpandedGlyphStyle.DefaultStyle">
+      <summary>
+            Gets a style that contains the default values for current style.
+            </summary>
+    </member>
+    <member name="M:C1.Win.DataFilter.Styles.DataFilterExpandedGlyphStyle.Clone">
+      <summary>
+            Creates an instance of the <see cref="T:C1.Win.C1Themes.BaseStyle" /> class that is identical to the current <see cref="T:C1.Win.C1Themes.BaseStyle" /></summary>
+    </member>
+    <member name="T:C1.Win.DataFilter.Styles.DataFilterExpandedGlyphHotStyle">
+      <summary>
+            The <see cref="T:C1.Win.DataFilter.Styles.DataFilterExpandedGlyphHotStyle" /> containing display attributes that determine the general appearance of the caption glyph on the screen in expanded state when the cursor is over it.
+            </summary>
+    </member>
+    <member name="P:C1.Win.DataFilter.Styles.DataFilterExpandedGlyphHotStyle.DefaultStyle">
+      <summary>
+            Gets a style that contains the default values for current style.
+            </summary>
+    </member>
+    <member name="M:C1.Win.DataFilter.Styles.DataFilterExpandedGlyphHotStyle.Clone">
+      <summary>
+            Creates an instance of the <see cref="T:C1.Win.C1Themes.BaseStyle" /> class that is identical to the current <see cref="T:C1.Win.C1Themes.BaseStyle" /></summary>
+    </member>
+    <member name="T:C1.Win.DataFilter.Styles.DataFilterExpandedGlyphPressedStyle">
+      <summary>
+            The <see cref="T:C1.Win.DataFilter.Styles.DataFilterExpandedGlyphPressedStyle" /> containing display attributes that determine the general appearance of the pressed caption glyph on the screen in expanded state.
+            </summary>
+    </member>
+    <member name="P:C1.Win.DataFilter.Styles.DataFilterExpandedGlyphPressedStyle.DefaultStyle">
+      <summary>
+            Gets a style that contains the default values for current style.
+            </summary>
+    </member>
+    <member name="M:C1.Win.DataFilter.Styles.DataFilterExpandedGlyphPressedStyle.Clone">
+      <summary>
+            Creates an instance of the <see cref="T:C1.Win.C1Themes.BaseStyle" /> class that is identical to the current <see cref="T:C1.Win.C1Themes.BaseStyle" /></summary>
+    </member>
+    <member name="T:C1.Win.DataFilter.Styles.DataFilterCollapsedGlyphStyle">
+      <summary>
+            The <see cref="T:C1.Win.DataFilter.Styles.DataFilterCollapsedGlyphStyle" /> contains display attributes that determine the general appearance of the caption glyph on the screen in collapsed state.
+            </summary>
+    </member>
+    <member name="P:C1.Win.DataFilter.Styles.DataFilterCollapsedGlyphStyle.DefaultStyle">
+      <summary>
+            Gets a style that contains the default values for current style.
+            </summary>
+    </member>
+    <member name="M:C1.Win.DataFilter.Styles.DataFilterCollapsedGlyphStyle.Clone">
+      <summary>
+            Creates an instance of the <see cref="T:C1.Win.C1Themes.BaseStyle" /> class that is identical to the current <see cref="T:C1.Win.C1Themes.BaseStyle" /></summary>
+    </member>
+    <member name="T:C1.Win.DataFilter.Styles.DataFilterCollapsedGlyphHotStyle">
+      <summary>
+            the <see cref="T:C1.Win.DataFilter.Styles.DataFilterCollapsedGlyphHotStyle" /> containing display attributes that determine the general appearance of the caption glyph on the screen in collapsed state when the cursor is over it.
+            </summary>
+    </member>
+    <member name="P:C1.Win.DataFilter.Styles.DataFilterCollapsedGlyphHotStyle.DefaultStyle">
+      <summary>
+            Gets a style that contains the default values for current style.
+            </summary>
+    </member>
+    <member name="M:C1.Win.DataFilter.Styles.DataFilterCollapsedGlyphHotStyle.Clone">
+      <summary>
+            Creates an instance of the <see cref="T:C1.Win.C1Themes.BaseStyle" /> class that is identical to the current <see cref="T:C1.Win.C1Themes.BaseStyle" /></summary>
+    </member>
+    <member name="T:C1.Win.DataFilter.Styles.DataFilterCollapsedGlyphPressedStyle">
+      <summary>
+            The <see cref="T:C1.Win.DataFilter.Styles.DataFilterCollapsedGlyphPressedStyle" /> containing display attributes that determine the general appearance of the pressed caption glyph on the screen in collapsed state.
+            </summary>
+    </member>
+    <member name="P:C1.Win.DataFilter.Styles.DataFilterCollapsedGlyphPressedStyle.DefaultStyle">
+      <summary>
+            Gets a style that contains the default values for current style.
+            </summary>
+    </member>
+    <member name="M:C1.Win.DataFilter.Styles.DataFilterCollapsedGlyphPressedStyle.Clone">
+      <summary>
+            Creates an instance of the <see cref="T:C1.Win.C1Themes.BaseStyle" /> class that is identical to the current <see cref="T:C1.Win.C1Themes.BaseStyle" /></summary>
+    </member>
+    <member name="T:C1.Win.DataFilter.Styles.DataFilterClearGlyphStyle">
+      <summary>
+            The <see cref="T:C1.Win.DataFilter.Styles.DataFilterClearGlyphStyle" /> contains display attributes that determine the general appearance of the clear filter button glyph on the screen.
+            </summary>
+    </member>
+    <member name="P:C1.Win.DataFilter.Styles.DataFilterClearGlyphStyle.DefaultStyle">
+      <summary>
+            Gets a style that contains the default values for current style.
+            </summary>
+    </member>
+    <member name="M:C1.Win.DataFilter.Styles.DataFilterClearGlyphStyle.Clone">
+      <summary>
+            Creates an instance of the <see cref="T:C1.Win.C1Themes.BaseStyle" /> class that is identical to the current <see cref="T:C1.Win.C1Themes.BaseStyle" /></summary>
+    </member>
+    <member name="T:C1.Win.DataFilter.Styles.DataFilterClearGlyphHotStyle">
+      <summary>
+            The <see cref="T:C1.Win.DataFilter.Styles.DataFilterClearGlyphHotStyle" /> contains display attributes that determine the general appearance of the clear filter button glyph on the screen when the cursor is over it.
+            </summary>
+    </member>
+    <member name="P:C1.Win.DataFilter.Styles.DataFilterClearGlyphHotStyle.DefaultStyle">
+      <summary>
+            Gets a style that contains the default values for current style.
+            </summary>
+    </member>
+    <member name="M:C1.Win.DataFilter.Styles.DataFilterClearGlyphHotStyle.Clone">
+      <summary>
+            Creates an instance of the <see cref="T:C1.Win.C1Themes.BaseStyle" /> class that is identical to the current <see cref="T:C1.Win.C1Themes.BaseStyle" /></summary>
+    </member>
+    <member name="T:C1.Win.DataFilter.Styles.DataFilterClearGlyphPressedStyle">
+      <summary>
+            The <see cref="T:C1.Win.DataFilter.Styles.DataFilterClearGlyphPressedStyle" /> contains display attributes that determine the general appearance of the pressed clear filter button glyph on the screen.
+            </summary>
+    </member>
+    <member name="P:C1.Win.DataFilter.Styles.DataFilterClearGlyphPressedStyle.DefaultStyle">
+      <summary>
+            Gets a style that contains the default values for current style.
+            </summary>
+    </member>
+    <member name="M:C1.Win.DataFilter.Styles.DataFilterClearGlyphPressedStyle.Clone">
+      <summary>
+            Creates an instance of the <see cref="T:C1.Win.C1Themes.BaseStyle" /> class that is identical to the current <see cref="T:C1.Win.C1Themes.BaseStyle" /></summary>
+    </member>
+    <member name="T:C1.Win.DataFilter.Styles.DataFilterHeaderStyle">
+      <summary>
+        <see cref="T:C1.Win.DataFilter.Styles.DataFilterHeaderStyle" /> contains display attributes that 
+            determine the general appearance of the control header on the screen.
+            </summary>
+    </member>
+    <member name="P:C1.Win.DataFilter.Styles.DataFilterHeaderStyle.WordWrap">
+      <summary>
+            Gets or sets whether text should be allowed to wrap.
+            </summary>
+    </member>
+    <member name="P:C1.Win.DataFilter.Styles.DataFilterHeaderStyle.DefaultStyle">
+      <summary>
+            Gets a style that contains the default values for current style.
+            </summary>
+    </member>
+    <member name="M:C1.Win.DataFilter.Styles.DataFilterHeaderStyle.Clone">
+      <summary>
+            Creates an instance of the <see cref="T:C1.Win.C1Themes.BaseStyle" /> class that is identical to the current <see cref="T:C1.Win.C1Themes.BaseStyle" /></summary>
+    </member>
+    <member name="M:C1.Win.DataFilter.Styles.DataFilterHeaderStyle.ApplyToStyle(C1.Framework.Style)">
+      <summary>
+            Applies style to destination style if it is possible.
+            </summary>
+    </member>
+    <member name="T:C1.Win.DataFilter.Styles.DataFilterEditorStyle">
+      <summary>
+            The <see cref="T:C1.Win.DataFilter.Styles.DataFilterEditorStyle" /> contains display attributes that determine the general appearance of the editor on the screen.
+            </summary>
+    </member>
+    <member name="P:C1.Win.DataFilter.Styles.DataFilterEditorStyle.Arrow">
+      <summary>
+            Gets style containing display attributes that determine the general appearance of the arrow ellement on the screen when the cursor is over it.
+            </summary>
+    </member>
+    <member name="P:C1.Win.DataFilter.Styles.DataFilterEditorStyle.Hot">
+      <summary>
+            Gets style containing display attributes that determine the general appearance of the element on the screen when the cursor is over it.
+            </summary>
+    </member>
+    <member name="P:C1.Win.DataFilter.Styles.DataFilterEditorStyle.Selected">
+      <summary>
+            Gets style containing display attributes that determine the general appearance of the selected element on the screen.
+            </summary>
+    </member>
+    <member name="P:C1.Win.DataFilter.Styles.DataFilterEditorStyle.HotSelected">
+      <summary>
+            Gets style containing display attributes that determine the general appearance of the selected element on the screen when the cursor is over it.
+            </summary>
+    </member>
+    <member name="P:C1.Win.DataFilter.Styles.DataFilterEditorStyle.DefaultStyle">
+      <summary>
+            Gets a style that contains the default values for current style.
+            </summary>
+    </member>
+    <member name="M:C1.Win.DataFilter.Styles.DataFilterEditorStyle.Clone">
+      <summary>
+            Creates an instance of the <see cref="T:C1.Win.C1Themes.BaseStyle" /> class that is identical to the current <see cref="T:C1.Win.C1Themes.BaseStyle" /></summary>
+    </member>
+    <member name="T:C1.Win.DataFilter.Styles.DataFilterEditorHotStyle">
+      <summary>
+            The <see cref="T:C1.Win.DataFilter.Styles.DataFilterEditorHotStyle" /> containing display attributes that determine the general appearance of the editor on the screen when the cursor is over it.
+            </summary>
+    </member>
+    <member name="P:C1.Win.DataFilter.Styles.DataFilterEditorHotStyle.DefaultStyle">
+      <summary>
+            Gets a style that contains the default values for current style.
+            </summary>
+    </member>
+    <member name="M:C1.Win.DataFilter.Styles.DataFilterEditorHotStyle.Clone">
+      <summary>
+            Creates an instance of the <see cref="T:C1.Win.C1Themes.BaseStyle" /> class that is identical to the current <see cref="T:C1.Win.C1Themes.BaseStyle" /></summary>
+    </member>
+    <member name="T:C1.Win.DataFilter.Styles.DataFilterEditorSelectedStyle">
+      <summary>
+            The <see cref="T:C1.Win.DataFilter.Styles.DataFilterEditorSelectedStyle" /> containing display attributes that determine the general appearance of the selected editor on the screen.
+            </summary>
+    </member>
+    <member name="P:C1.Win.DataFilter.Styles.DataFilterEditorSelectedStyle.DefaultStyle">
+      <summary>
+            Gets a style that contains the default values for current style.
+            </summary>
+    </member>
+    <member name="M:C1.Win.DataFilter.Styles.DataFilterEditorSelectedStyle.Clone">
+      <summary>
+            Creates an instance of the <see cref="T:C1.Win.C1Themes.BaseStyle" /> class that is identical to the current <see cref="T:C1.Win.C1Themes.BaseStyle" /></summary>
+    </member>
+    <member name="T:C1.Win.DataFilter.Styles.DataFilterEditorHotSelectedStyle">
+      <summary>
+            The <see cref="T:C1.Win.DataFilter.Styles.DataFilterEditorHotSelectedStyle" /> containing display attributes that determine the general appearance of the selected editor on the screen when the cursor is over it.
+            </summary>
+    </member>
+    <member name="P:C1.Win.DataFilter.Styles.DataFilterEditorHotSelectedStyle.DefaultStyle">
+      <summary>
+            Gets a style that contains the default values for current style.
+            </summary>
+    </member>
+    <member name="M:C1.Win.DataFilter.Styles.DataFilterEditorHotSelectedStyle.Clone">
+      <summary>
+            Creates an instance of the <see cref="T:C1.Win.C1Themes.BaseStyle" /> class that is identical to the current <see cref="T:C1.Win.C1Themes.BaseStyle" /></summary>
+    </member>
+    <member name="T:C1.Win.DataFilter.Styles.DataFilterArrowStyle">
+      <summary>
+            The <see cref="T:C1.Win.DataFilter.Styles.DataFilterArrowStyle" /> containing display attributes that determine the general appearance of the arrow element on the screen when the cursor is over it.
+            </summary>
+    </member>
+    <member name="P:C1.Win.DataFilter.Styles.DataFilterArrowStyle.DefaultStyle">
+      <summary>
+            Gets a style that contains the default values for current style.
+            </summary>
+    </member>
+    <member name="M:C1.Win.DataFilter.Styles.DataFilterArrowStyle.Clone">
+      <summary>
+            Creates an instance of the <see cref="T:C1.Win.C1Themes.BaseStyle" /> class that is identical to the current <see cref="T:C1.Win.C1Themes.BaseStyle" /></summary>
+    </member>
+    <member name="T:C1.Win.DataFilter.Styles.DataFilterArrowHotStyle">
+      <summary>
+            The <see cref="T:C1.Win.DataFilter.Styles.DataFilterArrowHotStyle" /> containing display attributes that determine the general appearance of the arrow glyph on the screen in expanded state when the cursor is over it.
+            </summary>
+    </member>
+    <member name="P:C1.Win.DataFilter.Styles.DataFilterArrowHotStyle.DefaultStyle">
+      <summary>
+            Gets a style that contains the default values for current style.
+            </summary>
+    </member>
+    <member name="M:C1.Win.DataFilter.Styles.DataFilterArrowHotStyle.Clone">
+      <summary>
+            Creates an instance of the <see cref="T:C1.Win.C1Themes.BaseStyle" /> class that is identical to the current <see cref="T:C1.Win.C1Themes.BaseStyle" /></summary>
+    </member>
+    <member name="T:C1.Win.DataFilter.Styles.DataFilterArrowPressedStyle">
+      <summary>
+            The <see cref="T:C1.Win.DataFilter.Styles.DataFilterArrowPressedStyle" /> containing display attributes that determine the general appearance of the pressed arrow glyph on the screen in expanded state.
+            </summary>
+    </member>
+    <member name="P:C1.Win.DataFilter.Styles.DataFilterArrowPressedStyle.DefaultStyle">
+      <summary>
+            Gets a style that contains the default values for current style.
+            </summary>
+    </member>
+    <member name="M:C1.Win.DataFilter.Styles.DataFilterArrowPressedStyle.Clone">
+      <summary>
+            Creates an instance of the <see cref="T:C1.Win.C1Themes.BaseStyle" /> class that is identical to the current <see cref="T:C1.Win.C1Themes.BaseStyle" /></summary>
+    </member>
+    <member name="T:C1.Win.DataFilter.Styles.DataFilterScrollBarStyle">
+      <summary>
+        <see cref="T:C1.Win.DataFilter.Styles.DataFilterHeaderStyle" /> contains display attributes that 
+            determine the general appearance of the scrollbar on the screen.
+            </summary>
+    </member>
+    <member name="P:C1.Win.DataFilter.Styles.DataFilterScrollBarStyle.Buttons">
+      <summary>
+            Gets style containing display attributes that determine the general appearance of the scrollbar buttons on the screen.
+            </summary>
+    </member>
+    <member name="P:C1.Win.DataFilter.Styles.DataFilterScrollBarStyle.Thumb">
+      <summary>
+            Gets style containing display attributes that determine the general appearance of the scrollbar buttons on the screen.
+            </summary>
+    </member>
+    <member name="P:C1.Win.DataFilter.Styles.DataFilterScrollBarStyle.DefaultStyle">
+      <summary>
+            Gets a style that contains the default values for current style.
+            </summary>
+    </member>
+    <member name="M:C1.Win.DataFilter.Styles.DataFilterScrollBarStyle.Clone">
+      <summary>
+            Creates an instance of the <see cref="T:C1.Win.C1Themes.BaseStyle" /> class that is identical to the current <see cref="T:C1.Win.C1Themes.BaseStyle" /></summary>
+    </member>
+    <member name="T:C1.Win.DataFilter.Styles.DataFilterScrollButtonsStyle">
+      <summary>
+        <see cref="T:C1.Win.DataFilter.Styles.DataFilterScrollButtonsStyle" /> contains display attributes that 
+            determine the general appearance of the scrollbar buttons on the screen.
+            </summary>
+    </member>
+    <member name="P:C1.Win.DataFilter.Styles.DataFilterScrollButtonsStyle.Hot">
+      <summary>
+            Gets style containing display attributes that determine the general appearance of element on the screen when the cursor is over it.
+            </summary>
+    </member>
+    <member name="P:C1.Win.DataFilter.Styles.DataFilterScrollButtonsStyle.Pressed">
+      <summary>
+            Gets style containing display attributes that determine the general appearance of pressed element on the screen.
+            </summary>
+    </member>
+    <member name="P:C1.Win.DataFilter.Styles.DataFilterScrollButtonsStyle.DefaultStyle">
+      <summary>
+            Gets a style that contains the default values for current style.
+            </summary>
+    </member>
+    <member name="M:C1.Win.DataFilter.Styles.DataFilterScrollButtonsStyle.Clone">
+      <summary>
+            Creates an instance of the <see cref="T:C1.Win.C1Themes.BaseStyle" /> class that is identical to the current <see cref="T:C1.Win.C1Themes.BaseStyle" /></summary>
+    </member>
+    <member name="T:C1.Win.DataFilter.Styles.DataFilterScrollButtonsHotStyle">
+      <summary>
+        <see cref="T:C1.Win.DataFilter.Styles.DataFilterScrollButtonsHotStyle" /> containing display attributes that 
+            determine the general appearance of the scroll button on the screen when the cursor is over it.
+            </summary>
+    </member>
+    <member name="P:C1.Win.DataFilter.Styles.DataFilterScrollButtonsHotStyle.DefaultStyle">
+      <summary>
+            Gets a style that contains the default values for current style.
+            </summary>
+    </member>
+    <member name="M:C1.Win.DataFilter.Styles.DataFilterScrollButtonsHotStyle.Clone">
+      <summary>
+            Creates an instance of the <see cref="T:C1.Win.C1Themes.BaseStyle" /> class that is identical to the current <see cref="T:C1.Win.C1Themes.BaseStyle" /></summary>
+    </member>
+    <member name="T:C1.Win.DataFilter.Styles.DataFilterScrollButtonsPressedStyle">
+      <summary>
+        <see cref="T:C1.Win.DataFilter.Styles.DataFilterScrollButtonsPressedStyle" /> containing display attributes that 
+            determine the general appearance of the pressed scroll button on the screen.
+            </summary>
+    </member>
+    <member name="P:C1.Win.DataFilter.Styles.DataFilterScrollButtonsPressedStyle.DefaultStyle">
+      <summary>
+            Gets a style that contains the default values for current style.
+            </summary>
+    </member>
+    <member name="M:C1.Win.DataFilter.Styles.DataFilterScrollButtonsPressedStyle.Clone">
+      <summary>
+            Creates an instance of the <see cref="T:C1.Win.C1Themes.BaseStyle" /> class that is identical to the current <see cref="T:C1.Win.C1Themes.BaseStyle" /></summary>
+    </member>
+    <member name="T:C1.Win.DataFilter.Styles.DataFilterScrollThumbStyle">
+      <summary>
+        <see cref="T:C1.Win.DataFilter.Styles.DataFilterScrollThumbStyle" /> contains display attributes that 
+            determine the general appearance of the scrollbar thumb on the screen.
+            </summary>
+    </member>
+    <member name="P:C1.Win.DataFilter.Styles.DataFilterScrollThumbStyle.Hot">
+      <summary>
+            Gets style containing display attributes that determine the general appearance of element on the screen when the cursor is over it.
+            </summary>
+    </member>
+    <member name="P:C1.Win.DataFilter.Styles.DataFilterScrollThumbStyle.Pressed">
+      <summary>
+            Gets style containing display attributes that determine the general appearance of pressed element on the screen.
+            </summary>
+    </member>
+    <member name="P:C1.Win.DataFilter.Styles.DataFilterScrollThumbStyle.DefaultStyle">
+      <summary>
+            Gets a style that contains the default values for current style.
+            </summary>
+    </member>
+    <member name="M:C1.Win.DataFilter.Styles.DataFilterScrollThumbStyle.Clone">
+      <summary>
+            Creates an instance of the <see cref="T:C1.Win.C1Themes.BaseStyle" /> class that is identical to the current <see cref="T:C1.Win.C1Themes.BaseStyle" /></summary>
+    </member>
+    <member name="T:C1.Win.DataFilter.Styles.DataFilterScrollThumbHotStyle">
+      <summary>
+        <see cref="T:C1.Win.DataFilter.Styles.DataFilterScrollThumbHotStyle" /> containing display attributes that 
+            determine the general appearance of the scroll thumb on the screen when the cursor is over it.
+            </summary>
+    </member>
+    <member name="P:C1.Win.DataFilter.Styles.DataFilterScrollThumbHotStyle.DefaultStyle">
+      <summary>
+            Gets a style that contains the default values for current style.
+            </summary>
+    </member>
+    <member name="M:C1.Win.DataFilter.Styles.DataFilterScrollThumbHotStyle.Clone">
+      <summary>
+            Creates an instance of the <see cref="T:C1.Win.C1Themes.BaseStyle" /> class that is identical to the current <see cref="T:C1.Win.C1Themes.BaseStyle" /></summary>
+    </member>
+    <member name="T:C1.Win.DataFilter.Styles.DataFilterScrollThumbPressedStyle">
+      <summary>
+        <see cref="T:C1.Win.DataFilter.Styles.DataFilterScrollThumbPressedStyle" /> containing display attributes that 
+            determine the general appearance of the pressed scroll thumb on the screen.
+            </summary>
+    </member>
+    <member name="P:C1.Win.DataFilter.Styles.DataFilterScrollThumbPressedStyle.DefaultStyle">
+      <summary>
+            Gets a style that contains the default values for current style.
+            </summary>
+    </member>
+    <member name="M:C1.Win.DataFilter.Styles.DataFilterScrollThumbPressedStyle.Clone">
+      <summary>
+            Creates an instance of the <see cref="T:C1.Win.C1Themes.BaseStyle" /> class that is identical to the current <see cref="T:C1.Win.C1Themes.BaseStyle" /></summary>
+    </member>
+    <member name="T:C1.Win.DataFilter.Styles.DataFilterTheme">
+      <summary>
+            The <see cref="T:C1.Win.DataFilter.Styles.DataFilterTheme" /> class represents the theme for the C1DataFilter control 
+            which contains display attributes that determine the appearance of control. 
+            </summary>
+    </member>
+    <member name="P:C1.Win.DataFilter.Styles.DataFilterTheme.Common">
+      <summary>
+            Gets <see cref="T:C1.Win.DataFilter.Styles.DataFilterCommonStyle" /> containing display attributes that 
+            determine the general appearance of the control on the screen.
+            </summary>
+    </member>
+    <member name="P:C1.Win.DataFilter.Styles.DataFilterTheme.Header">
+      <summary>
+            Gets <see cref="T:C1.Win.DataFilter.Styles.DataFilterHeaderStyle" /> containing display attributes that 
+            determine the general appearance of the control header on the screen.
+            </summary>
+    </member>
+    <member name="P:C1.Win.DataFilter.Styles.DataFilterTheme.FilterCaption">
+      <summary>
+            Gets <see cref="T:C1.Win.DataFilter.Styles.DataFilterCaptionStyle" /> containing display attributes that 
+            determine the general appearance of the filter captions on the screen.
+            </summary>
+    </member>
+    <member name="P:C1.Win.DataFilter.Styles.DataFilterTheme.Filter">
+      <summary>
+            Gets <see cref="T:C1.Win.DataFilter.Styles.DataFilterFilterStyle" /> containing display attributes that 
+            determine the general appearance of the filters on the screen.
+            </summary>
+    </member>
+    <member name="P:C1.Win.DataFilter.Styles.DataFilterTheme.Editor">
+      <summary>
+            Gets <see cref="T:C1.Win.DataFilter.Styles.DataFilterEditorStyle" /> containing display attributes that 
+            determine the general appearance of the editors on the screen.
+            </summary>
+    </member>
+    <member name="P:C1.Win.DataFilter.Styles.DataFilterTheme.Button">
+      <summary>
+            Gets <see cref="T:C1.Win.DataFilter.Styles.DataFilterButtonStyle" /> containing display attributes that 
+            determine the general appearance of buttons on the screen.
+            </summary>
+    </member>
+    <member name="P:C1.Win.DataFilter.Styles.DataFilterTheme.CheckBox">
+      <summary>
+            Gets <see cref="T:C1.Win.DataFilter.Styles.DataFilterCheckBoxStyle" /> containing display attributes that 
+            determine the general appearance of the check boxes on the screen.
+            </summary>
+    </member>
+    <member name="P:C1.Win.DataFilter.Styles.DataFilterTheme.ScrollBar">
+      <summary>
+            Gets <see cref="T:C1.Win.DataFilter.Styles.DataFilterScrollBarStyle" /> containing display attributes that 
+            determine the general appearance of the scroll bars on the screen.
+            </summary>
+    </member>
+    <member name="P:C1.Win.DataFilter.Styles.DataFilterTheme.DefaultStyle">
+      <summary>
+            Gets a theme that contains the default values for current theme.
+            </summary>
+    </member>
+    <member name="M:C1.Win.DataFilter.Styles.DataFilterTheme.Clone">
+      <summary>
+            Creates an instance of the <see cref="T:C1.Win.C1Themes.BaseTheme" /> class that is identical to the current <see cref="T:C1.Win.C1Themes.BaseTheme" /></summary>
+      <returns>The copy of the current <see cref="T:C1.Win.C1Themes.BaseTheme" />.</returns>
+    </member>
+    <member name="T:C1.Win.DataFilter.Styles.DataFilterFilterStyle">
+      <summary>
+        <see cref="T:C1.Win.DataFilter.Styles.DataFilterFilterStyle" /> contains display attributes that 
+            determine the general appearance of the filters on the screen.
+            </summary>
+    </member>
+    <member name="P:C1.Win.DataFilter.Styles.DataFilterFilterStyle.DefaultStyle">
+      <summary>
+            Gets a style that contains the default values for current style.
+            </summary>
+    </member>
+    <member name="M:C1.Win.DataFilter.Styles.DataFilterFilterStyle.Clone">
+      <summary>
+            Creates an instance of the <see cref="T:C1.Win.C1Themes.BaseStyle" /> class that is identical to the current <see cref="T:C1.Win.C1Themes.BaseStyle" /></summary>
+    </member>
+    <member name="T:C1.DataFilter.SelectionMode">
+      <summary>
+            Defines the selection behavior.
+            </summary>
+    </member>
+    <member name="F:C1.DataFilter.SelectionMode.Multiple">
+      <summary>
+            The user can select multiple items.
+            </summary>
+    </member>
+    <member name="F:C1.DataFilter.SelectionMode.Single">
+      <summary>
+            The user can select only one item at a time.
+            </summary>
+    </member>
+    <member name="T:C1.DataFilter.LayoutType">
+      <summary>
+            Defines the layout type of checklist.
+            </summary>
+    </member>
+    <member name="F:C1.DataFilter.LayoutType.Flow">
+      <summary>
+            The layout that stacks children vertically to several columns.
+            </summary>
+    </member>
+    <member name="F:C1.DataFilter.LayoutType.List">
+      <summary>
+            The layout that stacks children vertically to one column.
+            </summary>
+    </member>
+    <member name="T:C1.DataFilter.EditorsType">
+      <summary>
+            Defines the editors type.
+            </summary>
+    </member>
+    <member name="F:C1.DataFilter.EditorsType.TextBox">
+      <summary>
+            The editor like a textbox.
+            </summary>
+    </member>
+    <member name="F:C1.DataFilter.EditorsType.SpinEditor">
+      <summary>
+            The editor that contains a text editor and a pair of spin buttons that a user can click to adjust a value.
+            </summary>
+    </member>
+    <member name="T:C1.DataFilter.AggregateType">
+      <summary>
+            Defines the type of the aggregate function expression.
+            </summary>
+    </member>
+    <member name="F:C1.DataFilter.AggregateType.None">
+      <summary>
+            None.
+            </summary>
+    </member>
+    <member name="F:C1.DataFilter.AggregateType.Min">
+      <summary>
+            Minimum item in collection.
+            </summary>
+    </member>
+    <member name="F:C1.DataFilter.AggregateType.Max">
+      <summary>
+            Maximum item in collection.
+            </summary>
+    </member>
+    <member name="F:C1.DataFilter.AggregateType.Sum">
+      <summary>
+            Sum of items in the collection.
+            </summary>
+    </member>
+    <member name="F:C1.DataFilter.AggregateType.Count">
+      <summary>
+            Count of items in the collection.
+            </summary>
+    </member>
+    <member name="T:C1.DataFilter.AutoWidthMode">
+      <summary>
+            Defines the auto width mode behavior.
+            </summary>
+    </member>
+    <member name="F:C1.DataFilter.AutoWidthMode.None">
+      <summary>
+            None.
+            </summary>
+    </member>
+    <member name="F:C1.DataFilter.AutoWidthMode.Grow">
+      <summary>
+            The C1DataFilter grows as much as necessary to fit its contents.
+            </summary>
+    </member>
+    <member name="T:C1.DataFilter.FilterAutoGeneratingEventArgs">
+      <summary>
+            Provides data for the FilterAutoGenerating event of a C1DataFilter control.
+            </summary>
+    </member>
+    <member name="M:C1.DataFilter.FilterAutoGeneratingEventArgs.#ctor(System.ComponentModel.PropertyDescriptor,C1.DataFilter.Filter)">
+      <summary>
+            Initializes a new instance of the <see cref="T:C1.DataFilter.FilterAutoGeneratingEventArgs" />.
+            </summary>
+      <param name="property">The data source property to which the filter applies.</param>
+      <param name="filter">The filter.</param>
+    </member>
+    <member name="P:C1.DataFilter.FilterAutoGeneratingEventArgs.Property">
+      <summary>
+            Gets the data item property to which the filter applies.
+            </summary>
+    </member>
+    <member name="P:C1.DataFilter.FilterAutoGeneratingEventArgs.Filter">
+      <summary>
+            Gets or sets the filter.
+            </summary>
+    </member>
+    <member name="T:C1.DataFilter.FilterChangedEventArgs">
+      <summary>
+            Provides data for the FilterChanged event of a C1DataFilter control.
+            </summary>
+    </member>
+    <member name="M:C1.DataFilter.FilterChangedEventArgs.#ctor(C1.DataFilter.Filter)">
+      <summary>
+            Initializes a new instance of the <see cref="T:C1.DataFilter.FilterChangedEventArgs" />.
+            </summary>
+      <param name="filter">The filter.</param>
+    </member>
+    <member name="P:C1.DataFilter.FilterChangedEventArgs.Filter">
+      <summary>
+            Gets the filter.
+            </summary>
+    </member>
+    <member name="T:C1.DataFilter.BeforeTooltipShowEventArgs">
+      <summary>
+            Provides data for the BeforeTooltipShow event of the C1DataFilter control. 
+            </summary>
+    </member>
+    <member name="P:C1.DataFilter.BeforeTooltipShowEventArgs.Value">
+      <summary>
+            Gets a value of C1DataFilter element.
+            </summary>
+    </member>
+    <member name="P:C1.DataFilter.BeforeTooltipShowEventArgs.ToolTip">
+      <summary>
+            Gets or sets tooltip text.
+            </summary>
+      <remarks>Use html encoding to format the text.</remarks>
+    </member>
+    <member name="P:C1.DataFilter.BeforeTooltipShowEventArgs.Filter">
+      <summary>
+            Gets the <see cref="P:C1.DataFilter.BeforeTooltipShowEventArgs.Filter" /> for which tooltip is about to be shown.
+            </summary>
+    </member>
+    <member name="T:C1.DataFilter.OperationExpression">
+      <summary>
+            Represents the filter operation expression.
+            </summary>
+    </member>
+    <member name="P:C1.DataFilter.OperationExpression.PropertyName">
+      <summary>
+            Gets or sets the name of the data item property to which the expression applies.
+            </summary>
+    </member>
+    <member name="P:C1.DataFilter.OperationExpression.Value">
+      <summary>
+            Gets or sets the value of the current filter expression.
+            </summary>
+    </member>
+    <member name="P:C1.DataFilter.OperationExpression.FilterOperation">
+      <summary>
+            Gets or sets the filter operation type.
+            </summary>
+    </member>
+    <member name="T:C1.DataFilter.CombinationExpression">
+      <summary>
+            Represents the logical combination of several <see cref="T:C1.DataFilter.OperationExpression" />.
+            </summary>
+    </member>
+    <member name="M:C1.DataFilter.CombinationExpression.#ctor">
+      <summary>
+            Initializes a new instance of the <see cref="T:C1.DataFilter.CombinationExpression" />.
+            </summary>
+    </member>
+    <member name="P:C1.DataFilter.CombinationExpression.Expressions">
+      <summary>
+            Gets or sets the collection of <see cref="T:C1.DataFilter.Expression" />.
+            </summary>
+    </member>
+    <member name="P:C1.DataFilter.CombinationExpression.FilterCombination">
+      <summary>
+            Gets or sets the logical operator applies between expressions of the current <see cref="T:C1.DataFilter.CombinationExpression" />.
+            </summary>
+    </member>
+    <member name="T:C1.DataFilter.Expression">
+      <summary>
+            Base class for filter expression condition.
+            </summary>
+    </member>
+    <member name="T:C1.DataFilter.PredicateExpression">
+      <summary>
+            Represents the expression which takes a predicate as the filtering function.
+            </summary>
+      <remarks>The <see cref="T:C1.DataFilter.PredicateExpression" /> can not be used with the <see cref="T:System.Data.DataTable" /> class.</remarks>
+    </member>
+    <member name="P:C1.DataFilter.PredicateExpression.Predicate">
+      <summary>
+            Gets the predicate which will filter the collection.
+            </summary>
+    </member>
+    <member name="T:C1.DataFilter.FilterCollection">
+      <summary>
+            Represents a collection of the filters.
+            </summary>
+    </member>
+    <member name="T:C1.DataFilter.ObservableCollectionBase`1">
+      <summary>
+            Represents a collection with the <see cref="E:C1.DataFilter.ObservableCollectionBase`1.CollectionResetting" /> event.
+            </summary>
+    </member>
+    <member name="E:C1.DataFilter.ObservableCollectionBase`1.CollectionResetting">
+      <summary>
+            Occurs before all items are removed.
+            </summary>
+    </member>
+    <member name="M:C1.DataFilter.ObservableCollectionBase`1.ClearItems">
+      <summary>
+            Removes all items from the collection.
+            </summary>
+    </member>
+    <member name="T:C1.DataFilter.FilterSummary">
+      <summary>
+            Represents the summary of <see cref="T:C1.DataFilter.Filter" />.
+            </summary>
+    </member>
+    <member name="M:C1.DataFilter.FilterSummary.#ctor(C1.DataFilter.FilterWithSummary)">
+      <summary>
+            Initializes a new instance of the <see cref="T:C1.DataFilter.FilterSummary" /> class.
+            </summary>
+    </member>
+    <member name="P:C1.DataFilter.FilterSummary.Owner">
+      <summary>
+            Gets the filter owning this summary.
+            </summary>
+    </member>
+    <member name="P:C1.DataFilter.FilterSummary.Label">
+      <summary>
+            Gets or sets a text on the left side of the summary.
+            </summary>
+    </member>
+    <member name="P:C1.DataFilter.FilterSummary.AggregateType">
+      <summary>
+            Gets or sets a type of aggregate expression.
+            </summary>
+    </member>
+    <member name="P:C1.DataFilter.FilterSummary.PropertyName">
+      <summary>
+            Gets or sets a name of the property for which the aggregate function is applied.
+            </summary>
+    </member>
+    <member name="P:C1.DataFilter.FilterSummary.CustomFormat">
+      <summary>
+            Gets or sets a expression result format.
+            </summary>
+    </member>
+    <member name="M:C1.DataFilter.FilterSummary.GetText(System.Object)">
+      <summary>
+            Returns the formatted string with summary.
+            </summary>
+      <param name="summaryValue">A value of summary</param>
+      <returns>A text of summary</returns>
+    </member>
+    <member name="E:C1.DataFilter.FilterSummary.PropertyChanged">
+      <summary>
+            Occurs when a property value changes.
+            </summary>
+    </member>
+    <member name="M:C1.DataFilter.FilterSummary.OnPropertyChanged(System.String)">
+      <summary>
+            Raises the <see cref="E:C1.DataFilter.FilterSummary.PropertyChanged" /> event. 
+            </summary>
+    </member>
+    <member name="T:C1.DataFilter.BoolFilterBase">
+      <summary>
+            Base class represents a filter with checkbox.
+            </summary>
+    </member>
+    <member name="M:C1.DataFilter.BoolFilterBase.#ctor(System.String,System.Boolean)">
+      <summary>
+            Initializes a new instance of the <see cref="T:C1.DataFilter.BoolFilterBase" /> with the name of the data item property.
+            </summary>
+      <param name="propertyName">The name of the data item property.</param>
+      <param name="isAutoGenerated">This filter is autogenerated.</param>
+    </member>
+    <member name="P:C1.DataFilter.BoolFilterBase.Text">
+      <summary>
+            Gets or sets the text of label of checkbox.
+            </summary>
+    </member>
+    <member name="P:C1.DataFilter.BoolFilterBase.Value">
+      <summary>
+            Gets or sets the value of the current filter.
+            </summary>
+    </member>
+    <member name="P:C1.DataFilter.BoolFilterBase.DefaultValue">
+      <summary>
+            Gets or sets the default value of the current filter.       
+            </summary>
+      <remarks>
+            Uses with the <see cref="P:C1.DataFilter.BoolFilterBase.IgnoreDefault" /> property.
+            </remarks>
+    </member>
+    <member name="P:C1.DataFilter.BoolFilterBase.IgnoreDefault">
+      <summary>
+            Gets or sets a value indicating whether the current filter applies when the <see cref="P:C1.DataFilter.BoolFilterBase.Value" /> is equal to the <see cref="P:C1.DataFilter.BoolFilterBase.DefaultValue" /> or not.
+            </summary>
+    </member>
+    <member name="P:C1.DataFilter.BoolFilterBase.IsApplied">
+      <summary>
+            Gets a value indicating the current filter is applied or not.
+            </summary>
+    </member>
+    <member name="P:C1.DataFilter.BoolFilterBase.Expression">
+      <summary>
+            Gets the expression of the current filter.
+            </summary>
+    </member>
+    <member name="M:C1.DataFilter.BoolFilterBase.Reset">
+      <summary>
+            Resets the filter value to the default value.
+            </summary>
+    </member>
+    <member name="T:C1.DataFilter.CalendarFilterBase">
+      <summary>
+            Base class represents a filter of dates with calendar.
+            </summary>
+    </member>
+    <member name="M:C1.DataFilter.CalendarFilterBase.#ctor(System.String,System.Boolean)">
+      <summary>
+            Initializes a new instance of the <see cref="T:C1.DataFilter.CalendarFilterBase" /> with the name of the data item property.
+            </summary>
+      <param name="propertyName">The name of the data item property.</param>
+      <param name="isAutoGenerated">This filter is autogenerated.</param>
+    </member>
+    <member name="P:C1.DataFilter.CalendarFilterBase.CalendarSettings">
+      <summary>
+            Gets the settings of calendar.
+            </summary>
+    </member>
+    <member name="P:C1.DataFilter.CalendarFilterBase.SelectedDates">
+      <summary>
+            Gets or sets an <see cref="T:System.DateTime" /> array of selected dates.
+            </summary>
+    </member>
+    <member name="P:C1.DataFilter.CalendarFilterBase.MaxSelectionCount">
+      <summary>
+            Gets or sets the maximum number of days that can be selected in the calendar.
+            </summary>
+    </member>
+    <member name="P:C1.DataFilter.CalendarFilterBase.MaxDate">
+      <summary>
+            Gets or sets the maximum allowable date.
+            </summary>
+    </member>
+    <member name="P:C1.DataFilter.CalendarFilterBase.MinDate">
+      <summary>
+            Gets or sets the minimum allowable date.
+            </summary>
+    </member>
+    <member name="P:C1.DataFilter.CalendarFilterBase.IsApplied">
+      <summary>
+            Gets a value indicating the current filter is applied or not.
+            </summary>
+    </member>
+    <member name="P:C1.DataFilter.CalendarFilterBase.Expression">
+      <summary>
+            Gets the expression of the current filter.
+            </summary>
+    </member>
+    <member name="M:C1.DataFilter.CalendarFilterBase.Reset">
+      <summary>
+            Resets the filter value to the default value.
+            </summary>
+    </member>
+    <member name="T:C1.DataFilter.CalendarSettings">
+      <summary>
+            Represents a settings of filter calendar.
+            </summary>
+    </member>
+    <member name="P:C1.DataFilter.CalendarSettings.FirstDayOfWeek">
+      <summary>
+            Gets or sets the first day of the week as displayed in the month calendar.
+            </summary>
+    </member>
+    <member name="P:C1.DataFilter.CalendarSettings.Calendar">
+      <summary>
+            Gets or set the <see cref="T:System.Globalization.Calendar" /> object that represents time in divisions of calendar.
+            </summary>
+    </member>
+    <member name="P:C1.DataFilter.CalendarSettings.CalendarType">
+      <summary>
+            Calendar, used to format date.
+            </summary>
+    </member>
+    <member name="P:C1.DataFilter.CalendarSettings.CurrentCulture">
+      <summary>
+            Get or sets current culture for the calendar.
+            </summary>
+    </member>
+    <member name="P:C1.DataFilter.CalendarSettings.CalendarWeekRule">
+      <summary>
+            Get or sets current calendar week rule.
+            </summary>
+    </member>
+    <member name="P:C1.DataFilter.CalendarSettings.ShowToday">
+      <summary>
+            Gets or sets a value that indicates whether to display today date.
+            </summary>
+    </member>
+    <member name="P:C1.DataFilter.CalendarSettings.ShowArrowButtons">
+      <summary>
+            Gets or sets the <see cref="T:System.Boolean" /> value indicating whether calendar displays arrow buttons.
+            </summary>
+    </member>
+    <member name="P:C1.DataFilter.CalendarSettings.ShowWeekNumbers">
+      <summary>
+            Gets or sets the <see cref="T:System.Boolean" /> value indicating whether calendar displays week numbers.
+            </summary>
+    </member>
+    <member name="P:C1.DataFilter.CalendarSettings.VerticalOrientationLayout">
+      <summary>
+            Gets or sets the <see cref="T:System.Boolean" /> value indicating whether positioned vertically of the month.
+            </summary>
+    </member>
+    <member name="E:C1.DataFilter.CalendarSettings.PropertyChanged">
+      <summary>
+            Occurs when a property value changes.
+            </summary>
+    </member>
+    <member name="M:C1.DataFilter.CalendarSettings.OnPropertyChanged(System.String)">
+      <summary>
+            Raises the <see cref="E:C1.DataFilter.CalendarSettings.PropertyChanged" /> event. 
+            </summary>
+    </member>
+    <member name="T:C1.DataFilter.ChecklistFilterBase">
+      <summary>
+            Base class represents a filter with checklist.
+            </summary>
+    </member>
+    <member name="M:C1.DataFilter.ChecklistFilterBase.#ctor(System.String,System.Boolean)">
+      <summary>
+            Initializes a new instance of the <see cref="T:C1.DataFilter.ChecklistFilterBase" /> with the name of the data item property.
+            </summary>
+      <param name="propertyName">The name of the data item property.</param>
+      <param name="isAutoGenerated">This filter is auto generated.</param>
+    </member>
+    <member name="P:C1.DataFilter.ChecklistFilterBase.MaxHeight">
+      <summary>
+            Gets or sets a maximum height of checklist.
+            </summary>
+    </member>
+    <member name="P:C1.DataFilter.ChecklistFilterBase.ShowSelectAll">
+      <summary>
+            Gets or sets a value indicating whether show select all checkbox or not.
+            </summary>
+    </member>
+    <member name="P:C1.DataFilter.ChecklistFilterBase.ShowSearchBox">
+      <summary>
+            Gets or sets a value indicating whether show search box or not.
+            </summary>
+    </member>
+    <member name="P:C1.DataFilter.ChecklistFilterBase.ItemsSource">
+      <summary>
+            Gets or sets the object used as the items source for the checklist.
+            </summary>
+    </member>
+    <member name="P:C1.DataFilter.ChecklistFilterBase.LayoutType">
+      <summary>
+            Gets or sets a value indicating layout type of checklist.
+            </summary>
+    </member>
+    <member name="P:C1.DataFilter.ChecklistFilterBase.DisplayedItems">
+      <summary>
+            Gets or sets the count of items displayed in the checklist, the checklist shows the 'more' button, when the <see cref="P:C1.DataFilter.ChecklistFilterBase.ItemsSource" /> contains more items.
+            </summary>
+    </member>
+    <member name="P:C1.DataFilter.ChecklistFilterBase.SelectionMode">
+      <summary>
+            Gets or sets a value indicating selection method for items of checklist.
+            </summary>
+    </member>
+    <member name="P:C1.DataFilter.ChecklistFilterBase.DisplayMemberPath">
+      <summary>
+            Gets or sets a path to a value on the source object to serve as the visual representation of the object.
+            </summary>
+    </member>
+    <member name="P:C1.DataFilter.ChecklistFilterBase.ValueMemberPath">
+      <summary>
+            Gets or sets a path to a value on the source object to serve as the value representation of the object.
+            </summary>
+    </member>
+    <member name="P:C1.DataFilter.ChecklistFilterBase.Expression">
+      <summary>
+            Gets the expression of the current filter.
+            </summary>
+    </member>
+    <member name="P:C1.DataFilter.ChecklistFilterBase.IsApplied">
+      <summary>
+            Gets a value indicating the current filter is applied or not.
+            </summary>
+    </member>
+    <member name="P:C1.DataFilter.ChecklistFilterBase.Items">
+      <summary>
+            Gets the items collection of checklist.
+            </summary>
+    </member>
+    <member name="P:C1.DataFilter.ChecklistFilterBase.SelectedItems">
+      <summary>
+            Gets the collection of selected items.
+            </summary>
+    </member>
+    <member name="M:C1.DataFilter.ChecklistFilterBase.Reset">
+      <summary>
+            Resets the filter value to the default value.
+            </summary>
+    </member>
+    <member name="M:C1.DataFilter.ChecklistFilterBase.BeginItemsUpdate">
+      <summary>
+            Maintains performance while items are added to the filter one at a time.
+            </summary>
+    </member>
+    <member name="M:C1.DataFilter.ChecklistFilterBase.EndItemsUpdate">
+      <summary>
+            Resumes events of the filter after items updating.
+            </summary>
+    </member>
+    <member name="M:C1.DataFilter.ChecklistFilterBase.SelectAll">
+      <summary>
+            Selects all items in the checklist.
+            </summary>
+    </member>
+    <member name="M:C1.DataFilter.ChecklistFilterBase.UnselectAll">
+      <summary>
+            Clears the SelectedItems collection in the checklist.
+            </summary>
+    </member>
+    <member name="M:C1.DataFilter.ChecklistFilterBase.UpdateItems(System.Object)">
+      <summary>
+            Updates the items collection.
+            </summary>
+      <param name="itemsSource">The object used as the items source.</param>
+    </member>
+    <member name="M:C1.DataFilter.ChecklistFilterBase.SetItemsSource(System.Object)">
+      <summary>
+            Sets the object used as the items source for the checklist.
+            </summary>
+      <param name="itemsSource">The object used as the items source.</param>
+    </member>
+    <member name="T:C1.DataFilter.ChecklistItem">
+      <summary>
+            Represents a item of checklist.
+            </summary>
+    </member>
+    <member name="M:C1.DataFilter.ChecklistItem.#ctor">
+      <summary>
+            Initializes a new instance of the <see cref="T:C1.DataFilter.ChecklistItem" />.
+            </summary>
+    </member>
+    <member name="M:C1.DataFilter.ChecklistItem.#ctor(System.Object,System.String)">
+      <summary>
+            Initializes a new instance of the <see cref="T:C1.DataFilter.ChecklistItem" /> with initial data.
+            </summary>
+      <param name="value">The value of the checklist item.</param>
+      <param name="displayValue">The text of label.</param>
+    </member>
+    <member name="P:C1.DataFilter.ChecklistItem.Value">
+      <summary>
+            Gets or sets the value of current <see cref="T:C1.DataFilter.ChecklistItem" />.
+            </summary>
+    </member>
+    <member name="P:C1.DataFilter.ChecklistItem.DisplayValue">
+      <summary>
+            Gets or sets the text of label.
+            </summary>
+    </member>
+    <member name="P:C1.DataFilter.ChecklistItem.Selected">
+      <summary>
+            Gets or sets the selected state of current <see cref="T:C1.DataFilter.ChecklistItem" />.
+            </summary>
+    </member>
+    <member name="E:C1.DataFilter.ChecklistItem.PropertyChanged">
+      <summary>
+            Occurs when a property value changes.
+            </summary>
+    </member>
+    <member name="M:C1.DataFilter.ChecklistItem.OnPropertyChanged(System.String)">
+      <summary>
+            Raises the <see cref="E:C1.DataFilter.ChecklistItem.PropertyChanged" /> event. 
+            </summary>
+    </member>
+    <member name="T:C1.DataFilter.ChecklistItemsCollection">
+      <summary>
+            Represents a collection of the <see cref="T:C1.DataFilter.ChecklistItem" />.
+            </summary>
+    </member>
+    <member name="T:C1.DataFilter.DateRangeFilterBase">
+      <summary>
+            Base class represents a filter of dates with range slider or editors of range.
+            </summary>
+    </member>
+    <member name="M:C1.DataFilter.DateRangeFilterBase.#ctor(System.String,System.Boolean)">
+      <summary>
+            Initializes a new instance of the <see cref="T:C1.DataFilter.DateRangeFilterBase" /> with the name of the data item property.
+            </summary>
+      <param name="propertyName">The name of the data item property.</param>
+      <param name="isAutoGenerated">This filter is autogenerated.</param>
+    </member>
+    <member name="P:C1.DataFilter.DateRangeFilterBase.CustomFormat">
+      <summary>
+            Gets or sets a custom date format.
+            </summary>
+    </member>
+    <member name="P:C1.DataFilter.DateRangeFilterBase.CalendarSettings">
+      <summary>
+            Gets the settings of calendar.
+            </summary>
+    </member>
+    <member name="P:C1.DataFilter.DateRangeFilterBase.LowerValue">
+      <summary>
+            Gets or sets the current lower magnitude of the range.
+            </summary>
+    </member>
+    <member name="P:C1.DataFilter.DateRangeFilterBase.UpperValue">
+      <summary>
+            Gets or sets the current upper magnitude of the range.
+            </summary>
+    </member>
+    <member name="P:C1.DataFilter.DateRangeFilterBase.Maximum">
+      <summary>
+            Gets or sets the maximum value of the range.
+            </summary>
+    </member>
+    <member name="P:C1.DataFilter.DateRangeFilterBase.Minimum">
+      <summary>
+            Gets or sets the minimum value of the range.
+            </summary>
+    </member>
+    <member name="P:C1.DataFilter.DateRangeFilterBase.SliderVisible">
+      <summary>
+            Gets or sets a value indicating whether show the range slider or not.
+            </summary>
+    </member>
+    <member name="P:C1.DataFilter.DateRangeFilterBase.EditorsVisible">
+      <summary>
+            Gets or sets a value indicating whether show the editors or not.
+            </summary>
+    </member>
+    <member name="P:C1.DataFilter.DateRangeFilterBase.Expression">
+      <summary>
+            Gets the expression of the current filter.
+            </summary>
+    </member>
+    <member name="M:C1.DataFilter.DateRangeFilterBase.Reset">
+      <summary>
+            Resets the filter value to the default value.
+            </summary>
+    </member>
+    <member name="T:C1.DataFilter.FilterWithSummary">
+      <summary>
+            Represents filter of the C1DataFilter control with summaries.
+            </summary>
+    </member>
+    <member name="M:C1.DataFilter.FilterWithSummary.#ctor(System.String,System.Boolean)">
+      <summary>
+            Initializes a new instance of the <see cref="T:C1.DataFilter.FilterWithSummary" /> with the name of the data item property.
+            </summary>
+      <param name="propertyName">The name of the data item property.</param>
+      <param name="isAutoGenerated">This filter is auto generated.</param>
+    </member>
+    <member name="P:C1.DataFilter.FilterWithSummary.FilterSummary">
+      <summary>
+            Gets the filter summary of the current filter.
+            </summary>
+    </member>
+    <member name="T:C1.DataFilter.RangeFilterBase">
+      <summary>
+            Base class represents a filter with range slider or editors of range.
+            </summary>
+    </member>
+    <member name="M:C1.DataFilter.RangeFilterBase.#ctor(System.String,System.Boolean)">
+      <summary>
+            Initializes a new instance of the <see cref="T:C1.DataFilter.RangeFilterBase" /> with the name of the data item property.
+            </summary>
+      <param name="propertyName">The name of the data item property.</param>
+      <param name="isAutoGenerated">This filter is autogenerated.</param>
+    </member>
+    <member name="P:C1.DataFilter.RangeFilterBase.Digits">
+      <summary>
+            Gets or sets the number of fractional digits.
+            </summary>
+    </member>
+    <member name="P:C1.DataFilter.RangeFilterBase.Increment">
+      <summary>
+            Gets or set the the amount to increment/decrement when the user clicks up/down buttons.
+            </summary>
+    </member>
+    <member name="P:C1.DataFilter.RangeFilterBase.LowerValue">
+      <summary>
+            Gets or sets the current lower magnitude of the range.
+            </summary>
+    </member>
+    <member name="P:C1.DataFilter.RangeFilterBase.UpperValue">
+      <summary>
+            Gets or sets the current upper magnitude of the range.
+            </summary>
+    </member>
+    <member name="P:C1.DataFilter.RangeFilterBase.Maximum">
+      <summary>
+            Gets or sets the maximum value of the range.
+            </summary>
+    </member>
+    <member name="P:C1.DataFilter.RangeFilterBase.Minimum">
+      <summary>
+            Gets or sets the minimum value of the range.
+            </summary>
+    </member>
+    <member name="P:C1.DataFilter.RangeFilterBase.SliderVisible">
+      <summary>
+            Gets or sets a value indicating whether show the range slider or not.
+            </summary>
+    </member>
+    <member name="P:C1.DataFilter.RangeFilterBase.EditorsVisible">
+      <summary>
+            Gets or sets a value indicating whether show the editors or not.
+            </summary>
+    </member>
+    <member name="P:C1.DataFilter.RangeFilterBase.EditorsType">
+      <summary>
+            Gets or sets a value indicating editors type.
+            </summary>
+    </member>
+    <member name="P:C1.DataFilter.RangeFilterBase.Expression">
+      <summary>
+            Gets the expression of the current filter.
+            </summary>
+    </member>
+    <member name="M:C1.DataFilter.RangeFilterBase.Reset">
+      <summary>
+            Resets the filter value to the default value.
+            </summary>
+    </member>
+    <member name="T:C1.DataFilter.Filter">
+      <summary>
+            Base class represents filter of the C1DataFilter control.
+            </summary>
+    </member>
+    <member name="M:C1.DataFilter.Filter.#ctor(System.String,System.Boolean)">
+      <summary>
+            Initializes a new instance of the <see cref="T:C1.DataFilter.Filter" /> with the name of the data item property.
+            </summary>
+      <param name="propertyName">The name of the data item property.</param>
+      <param name="isAutoGenerated">This filter is auto generated.</param>
+    </member>
+    <member name="P:C1.DataFilter.Filter.PropertyName">
+      <summary>
+            Gets or sets the name of the data item property to which the current <see cref="T:C1.DataFilter.Filter" /> applies.
+            </summary>
+    </member>
+    <member name="P:C1.DataFilter.Filter.Expression">
+      <summary>
+            Gets or sets the expression of the current <see cref="T:C1.DataFilter.Filter" />.
+            </summary>
+    </member>
+    <member name="P:C1.DataFilter.Filter.IsApplied">
+      <summary>
+            Gets a value indicating the current <see cref="T:C1.DataFilter.Filter" /> is applied or not.
+            </summary>
+    </member>
+    <member name="P:C1.DataFilter.Filter.HeaderText">
+      <summary>
+            Gets or sets a value of header text of the current <see cref="T:C1.DataFilter.Filter" />.
+            </summary>
+    </member>
+    <member name="P:C1.DataFilter.Filter.ShowHeader">
+      <summary>
+            Gets or sets a value indicating whether to show the header or not.
+            </summary>
+    </member>
+    <member name="P:C1.DataFilter.Filter.Expanded">
+      <summary>
+            Gets or set the expanded state of current <see cref="T:C1.DataFilter.Filter" />.
+            </summary>
+    </member>
+    <member name="P:C1.DataFilter.Filter.ToolTip">
+      <summary>
+            Gets or sets the text that appears as a ToolTip for header of this filter.
+            </summary>
+    </member>
+    <member name="P:C1.DataFilter.Filter.IsAutoGenerated">
+      <summary>
+            Gets a value indicating whether this filter was generated automatically.
+            </summary>
+    </member>
+    <member name="M:C1.DataFilter.Filter.Reset">
+      <summary>
+            Resets the filter value to the default value.
+            </summary>
+    </member>
+    <member name="E:C1.DataFilter.Filter.ValueChanged">
+      <summary>
+            Occurs when a value of current <see cref="T:C1.DataFilter.Filter" /> changes.
+            </summary>
+    </member>
+    <member name="M:C1.DataFilter.Filter.OnValueChanged">
+      <summary>
+            Raises the <see cref="E:C1.DataFilter.Filter.ValueChanged" /> event.
+            </summary>
+    </member>
+    <member name="E:C1.DataFilter.Filter.PropertyChanged">
+      <summary>
+            Occurs when a property value changes.
+            </summary>
+    </member>
+    <member name="M:C1.DataFilter.Filter.OnPropertyChanged(System.String)">
+      <summary>
+            Raises the <see cref="E:C1.DataFilter.Filter.PropertyChanged" /> event. 
+            </summary>
+    </member>
+  </members>
+</doc>

@@ -1,0 +1,114 @@
+﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
+Partial Class frmListadoIntrastat
+    Inherits System.Windows.Forms.Form
+
+    'Form reemplaza a Dispose para limpiar la lista de componentes.
+    <System.Diagnostics.DebuggerNonUserCode()> _
+    Protected Overrides Sub Dispose(ByVal disposing As Boolean)
+        Try
+            If disposing AndAlso components IsNot Nothing Then
+                components.Dispose()
+            End If
+        Finally
+            MyBase.Dispose(disposing)
+        End Try
+    End Sub
+
+    'Requerido por el Diseñador de Windows Forms
+    Private components As System.ComponentModel.IContainer
+
+    'NOTA: el Diseñador de Windows Forms necesita el siguiente procedimiento
+    'Se puede modificar usando el Diseñador de Windows Forms.  
+    'No lo modifique con el editor de código.
+    <System.Diagnostics.DebuggerStepThrough()> _
+    Private Sub InitializeComponent()
+        Me.cmbMeses = New C1.Win.C1Input.C1ComboBox()
+        Me.cmbAños = New C1.Win.C1Input.C1ComboBox()
+        Me.btnExcel = New C1.Win.C1Input.C1Button()
+        Me.lblMes = New System.Windows.Forms.Label()
+        Me.lblAño = New System.Windows.Forms.Label()
+        CType(Me.cmbMeses, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.cmbAños, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.btnExcel, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.SuspendLayout()
+        '
+        'cmbMeses
+        '
+        Me.cmbMeses.AllowSpinLoop = False
+        Me.cmbMeses.GapHeight = 0
+        Me.cmbMeses.ImagePadding = New System.Windows.Forms.Padding(0)
+        Me.cmbMeses.ItemsDisplayMember = ""
+        Me.cmbMeses.ItemsValueMember = ""
+        Me.cmbMeses.Location = New System.Drawing.Point(12, 24)
+        Me.cmbMeses.Name = "cmbMeses"
+        Me.cmbMeses.Size = New System.Drawing.Size(200, 18)
+        Me.cmbMeses.TabIndex = 0
+        Me.cmbMeses.Tag = Nothing
+        '
+        'cmbAños
+        '
+        Me.cmbAños.AllowSpinLoop = False
+        Me.cmbAños.GapHeight = 0
+        Me.cmbAños.ImagePadding = New System.Windows.Forms.Padding(0)
+        Me.cmbAños.ItemsDisplayMember = ""
+        Me.cmbAños.ItemsValueMember = ""
+        Me.cmbAños.Location = New System.Drawing.Point(218, 24)
+        Me.cmbAños.Name = "cmbAños"
+        Me.cmbAños.Size = New System.Drawing.Size(200, 18)
+        Me.cmbAños.TabIndex = 1
+        Me.cmbAños.Tag = Nothing
+        '
+        'btnExcel
+        '
+        Me.btnExcel.Location = New System.Drawing.Point(173, 48)
+        Me.btnExcel.Name = "btnExcel"
+        Me.btnExcel.Size = New System.Drawing.Size(75, 23)
+        Me.btnExcel.TabIndex = 2
+        Me.btnExcel.Text = "Excel"
+        Me.btnExcel.UseVisualStyleBackColor = True
+        '
+        'lblMes
+        '
+        Me.lblMes.AutoSize = True
+        Me.lblMes.Location = New System.Drawing.Point(13, 5)
+        Me.lblMes.Name = "lblMes"
+        Me.lblMes.Size = New System.Drawing.Size(27, 13)
+        Me.lblMes.TabIndex = 3
+        Me.lblMes.Text = "Mes"
+        '
+        'lblAño
+        '
+        Me.lblAño.AutoSize = True
+        Me.lblAño.Location = New System.Drawing.Point(215, 5)
+        Me.lblAño.Name = "lblAño"
+        Me.lblAño.Size = New System.Drawing.Size(26, 13)
+        Me.lblAño.TabIndex = 4
+        Me.lblAño.Text = "Año"
+        '
+        'frmListadoIntrastat
+        '
+        Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
+        Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
+        Me.ClientSize = New System.Drawing.Size(427, 81)
+        Me.Controls.Add(Me.lblAño)
+        Me.Controls.Add(Me.lblMes)
+        Me.Controls.Add(Me.btnExcel)
+        Me.Controls.Add(Me.cmbAños)
+        Me.Controls.Add(Me.cmbMeses)
+        Me.Name = "frmListadoIntrastat"
+        Me.ShowIcon = False
+        Me.Text = "Intrastat"
+        CType(Me.cmbMeses, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.cmbAños, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.btnExcel, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.ResumeLayout(False)
+        Me.PerformLayout()
+
+    End Sub
+
+    Friend WithEvents cmbMeses As C1.Win.C1Input.C1ComboBox
+    Friend WithEvents cmbAños As C1.Win.C1Input.C1ComboBox
+    Friend WithEvents btnExcel As C1.Win.C1Input.C1Button
+    Friend WithEvents lblMes As Label
+    Friend WithEvents lblAño As Label
+End Class

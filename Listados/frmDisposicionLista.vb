@@ -1,0 +1,1280 @@
+Imports MySql.Data.MySqlClient : Imports clsFuncionesLOG : Imports clsFuncionesC1 : Imports clsFuncionesUtiles : Imports clsConstantes
+
+Imports Excel = Microsoft.Office.Interop.Excel
+Imports ExcelDirecto
+
+Public Class frmDisposicionLista
+    '!!!!!
+    Inherits aura2k3.frmBase
+
+    Shared frmChildForm As frmDisposicionLista
+    Public Shared Function GetInstance(ByVal esEleccionLista As Short) As frmDisposicionLista
+        If frmChildForm Is Nothing Then
+            frmChildForm = New frmDisposicionLista
+
+        End If
+        Return frmChildForm
+    End Function
+
+#Region " Código generado por el Diseñador de Windows Forms "
+
+    Public Sub New()
+        MyBase.New()
+
+        'El Diseñador de Windows Forms requiere esta llamada.
+        InitializeComponent() : Dim tom As SMcMaster.TabOrderManager = New SMcMaster.TabOrderManager(Me) : tom.SetTabOrder(SMcMaster.TabOrderManager.TabScheme.AcrossFirst)
+
+        'Agregar cualquier inicialización después de la llamada a InitializeComponent()
+
+    End Sub
+
+    'Form reemplaza a Dispose para limpiar la lista de componentes.
+    Protected Overloads Overrides Sub Dispose(ByVal disposing As Boolean)
+        If disposing Then
+            If Not (components Is Nothing) Then
+                components.Dispose()
+            End If
+        End If
+        MyBase.Dispose(disposing)
+        frmChildForm = Nothing
+    End Sub
+
+    'Requerido por el Diseñador de Windows Forms
+    Private components As System.ComponentModel.IContainer
+
+    'NOTA: el Diseñador de Windows Forms requiere el siguiente procedimiento
+    'Puede modificarse utilizando el Diseñador de Windows Forms. 
+    'No lo modifique con el editor de código.
+    Friend WithEvents btnExportarAccess As C1.Win.C1Input.C1Button
+    Friend WithEvents btnActualizarSeleccion As C1.Win.C1Input.C1Button
+    Friend WithEvents btnCerrar As C1.Win.C1Input.C1Button
+    Friend WithEvents btnExportarPDF As C1.Win.C1Input.C1Button
+    Friend WithEvents btnExportarExcel As C1.Win.C1Input.C1Button
+    Friend WithEvents dg As C1.Win.C1TrueDBGrid.C1TrueDBGrid
+    Friend WithEvents dgEleccionCampos As System.Windows.Forms.DataGrid
+    Friend WithEvents btnImprimir As C1.Win.C1Input.C1Button
+    Friend WithEvents lstCampos As System.Windows.Forms.ListBox
+    Friend WithEvents btnFormulario As C1.Win.C1Input.C1Button
+
+    <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
+        Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(frmDisposicionLista))
+        Me.btnExportarAccess = New C1.Win.C1Input.C1Button
+        Me.btnActualizarSeleccion = New C1.Win.C1Input.C1Button
+        Me.btnCerrar = New C1.Win.C1Input.C1Button
+        Me.btnExportarPDF = New C1.Win.C1Input.C1Button
+        Me.btnExportarExcel = New C1.Win.C1Input.C1Button
+        Me.dg = New C1.Win.C1TrueDBGrid.C1TrueDBGrid
+        Me.dgEleccionCampos = New System.Windows.Forms.DataGrid
+        Me.btnImprimir = New C1.Win.C1Input.C1Button
+        Me.lstCampos = New System.Windows.Forms.ListBox
+        Me.btnFormulario = New C1.Win.C1Input.C1Button
+        CType(Me.dg, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.dgEleccionCampos, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.SuspendLayout()
+        '
+        'btnTancar
+        '
+        Me.btnTancar.Location = CType(resources.GetObject("btnTancar.Location"), System.Drawing.Point)
+        Me.btnTancar.Name = "btnTancar"
+        '
+        'sbtipo
+        '
+        Me.sbtipo.FlatStyle = System.Windows.Forms.FlatStyle.System
+        Me.sbtipo.Location = CType(resources.GetObject("sbtipo.Location"), System.Drawing.Point)
+        Me.sbtipo.Name = "sbtipo"
+        Me.sbtipo.Text = resources.GetString("sbtipo.Text")
+        '
+        'btnRecargar
+        '
+        Me.btnRecargar.Location = CType(resources.GetObject("btnRecargar.Location"), System.Drawing.Point)
+        Me.btnRecargar.Name = "btnRecargar"
+        '
+        'btnSiguiente
+        '
+        Me.btnSiguiente.Location = CType(resources.GetObject("btnSiguiente.Location"), System.Drawing.Point)
+        Me.btnSiguiente.Name = "btnSiguiente"
+        '
+        'btnAnterior
+        '
+        Me.btnAnterior.Location = CType(resources.GetObject("btnAnterior.Location"), System.Drawing.Point)
+        Me.btnAnterior.Name = "btnAnterior"
+        '
+        'btnPrimero
+        '
+        Me.btnPrimero.Location = CType(resources.GetObject("btnPrimero.Location"), System.Drawing.Point)
+        Me.btnPrimero.Name = "btnPrimero"
+        '
+        'btnUltimo
+        '
+        Me.btnUltimo.Location = CType(resources.GetObject("btnUltimo.Location"), System.Drawing.Point)
+        Me.btnUltimo.Name = "btnUltimo"
+        '
+        'btnModificar
+        '
+        Me.btnModificar.Location = CType(resources.GetObject("btnModificar.Location"), System.Drawing.Point)
+        Me.btnModificar.Name = "btnModificar"
+        '
+        'btnBorrar
+        '
+        Me.btnBorrar.Location = CType(resources.GetObject("btnBorrar.Location"), System.Drawing.Point)
+        Me.btnBorrar.Name = "btnBorrar"
+        '
+        'btnNuevo
+        '
+        Me.btnNuevo.Location = CType(resources.GetObject("btnNuevo.Location"), System.Drawing.Point)
+        Me.btnNuevo.Name = "btnNuevo"
+        '
+        'btnVerLista
+        '
+        Me.btnVerLista.Location = CType(resources.GetObject("btnVerLista.Location"), System.Drawing.Point)
+        Me.btnVerLista.Name = "btnVerLista"
+        '
+        'btnActualizar
+        '
+        Me.btnActualizar.Location = CType(resources.GetObject("btnActualizar.Location"), System.Drawing.Point)
+        Me.btnActualizar.Name = "btnActualizar"
+        '
+        'btnExportarAccess
+        '
+        Me.btnExportarAccess.AccessibleDescription = resources.GetString("btnExportarAccess.AccessibleDescription")
+        Me.btnExportarAccess.AccessibleName = resources.GetString("btnExportarAccess.AccessibleName")
+        Me.btnExportarAccess.Anchor = CType(resources.GetObject("btnExportarAccess.Anchor"), System.Windows.Forms.AnchorStyles)
+        Me.btnExportarAccess.BackgroundImage = CType(resources.GetObject("btnExportarAccess.BackgroundImage"), System.Drawing.Image)
+        Me.btnExportarAccess.Dock = CType(resources.GetObject("btnExportarAccess.Dock"), System.Windows.Forms.DockStyle)
+        Me.btnExportarAccess.Enabled = CType(resources.GetObject("btnExportarAccess.Enabled"), Boolean)
+        Me.btnExportarAccess.FlatStyle = CType(resources.GetObject("btnExportarAccess.FlatStyle"), System.Windows.Forms.FlatStyle)
+        Me.btnExportarAccess.Font = CType(resources.GetObject("btnExportarAccess.Font"), System.Drawing.Font)
+        Me.btnExportarAccess.Image = CType(resources.GetObject("btnExportarAccess.Image"), System.Drawing.Image)
+        Me.btnExportarAccess.ImageAlign = CType(resources.GetObject("btnExportarAccess.ImageAlign"), System.Drawing.ContentAlignment)
+        Me.btnExportarAccess.ImageIndex = CType(resources.GetObject("btnExportarAccess.ImageIndex"), Integer)
+        Me.btnExportarAccess.ImeMode = CType(resources.GetObject("btnExportarAccess.ImeMode"), System.Windows.Forms.ImeMode)
+        Me.btnExportarAccess.Location = CType(resources.GetObject("btnExportarAccess.Location"), System.Drawing.Point)
+        Me.btnExportarAccess.Name = "btnExportarAccess"
+        Me.btnExportarAccess.RightToLeft = CType(resources.GetObject("btnExportarAccess.RightToLeft"), System.Windows.Forms.RightToLeft)
+        Me.btnExportarAccess.Size = CType(resources.GetObject("btnExportarAccess.Size"), System.Drawing.Size)
+        Me.btnExportarAccess.TabIndex = CType(resources.GetObject("btnExportarAccess.TabIndex"), Integer)
+        Me.btnExportarAccess.Text = resources.GetString("btnExportarAccess.Text")
+        Me.btnExportarAccess.TextAlign = CType(resources.GetObject("btnExportarAccess.TextAlign"), System.Drawing.ContentAlignment)
+        Me.btnExportarAccess.Visible = CType(resources.GetObject("btnExportarAccess.Visible"), Boolean)
+        '
+        'btnActualizarSeleccion
+        '
+        Me.btnActualizarSeleccion.AccessibleDescription = resources.GetString("btnActualizarSeleccion.AccessibleDescription")
+        Me.btnActualizarSeleccion.AccessibleName = resources.GetString("btnActualizarSeleccion.AccessibleName")
+        Me.btnActualizarSeleccion.Anchor = CType(resources.GetObject("btnActualizarSeleccion.Anchor"), System.Windows.Forms.AnchorStyles)
+        Me.btnActualizarSeleccion.BackgroundImage = CType(resources.GetObject("btnActualizarSeleccion.BackgroundImage"), System.Drawing.Image)
+        Me.btnActualizarSeleccion.Dock = CType(resources.GetObject("btnActualizarSeleccion.Dock"), System.Windows.Forms.DockStyle)
+        Me.btnActualizarSeleccion.Enabled = CType(resources.GetObject("btnActualizarSeleccion.Enabled"), Boolean)
+        Me.btnActualizarSeleccion.FlatStyle = CType(resources.GetObject("btnActualizarSeleccion.FlatStyle"), System.Windows.Forms.FlatStyle)
+        Me.btnActualizarSeleccion.Font = CType(resources.GetObject("btnActualizarSeleccion.Font"), System.Drawing.Font)
+        Me.btnActualizarSeleccion.Image = CType(resources.GetObject("btnActualizarSeleccion.Image"), System.Drawing.Image)
+        Me.btnActualizarSeleccion.ImageAlign = CType(resources.GetObject("btnActualizarSeleccion.ImageAlign"), System.Drawing.ContentAlignment)
+        Me.btnActualizarSeleccion.ImageIndex = CType(resources.GetObject("btnActualizarSeleccion.ImageIndex"), Integer)
+        Me.btnActualizarSeleccion.ImeMode = CType(resources.GetObject("btnActualizarSeleccion.ImeMode"), System.Windows.Forms.ImeMode)
+        Me.btnActualizarSeleccion.Location = CType(resources.GetObject("btnActualizarSeleccion.Location"), System.Drawing.Point)
+        Me.btnActualizarSeleccion.Name = "btnActualizarSeleccion"
+        Me.btnActualizarSeleccion.RightToLeft = CType(resources.GetObject("btnActualizarSeleccion.RightToLeft"), System.Windows.Forms.RightToLeft)
+        Me.btnActualizarSeleccion.Size = CType(resources.GetObject("btnActualizarSeleccion.Size"), System.Drawing.Size)
+        Me.btnActualizarSeleccion.TabIndex = CType(resources.GetObject("btnActualizarSeleccion.TabIndex"), Integer)
+        Me.btnActualizarSeleccion.Text = resources.GetString("btnActualizarSeleccion.Text")
+        Me.btnActualizarSeleccion.TextAlign = CType(resources.GetObject("btnActualizarSeleccion.TextAlign"), System.Drawing.ContentAlignment)
+        Me.btnActualizarSeleccion.Visible = CType(resources.GetObject("btnActualizarSeleccion.Visible"), Boolean)
+        '
+        'btnCerrar
+        '
+        Me.btnCerrar.AccessibleDescription = resources.GetString("btnCerrar.AccessibleDescription")
+        Me.btnCerrar.AccessibleName = resources.GetString("btnCerrar.AccessibleName")
+        Me.btnCerrar.Anchor = CType(resources.GetObject("btnCerrar.Anchor"), System.Windows.Forms.AnchorStyles)
+        Me.btnCerrar.BackgroundImage = CType(resources.GetObject("btnCerrar.BackgroundImage"), System.Drawing.Image)
+        Me.btnCerrar.Dock = CType(resources.GetObject("btnCerrar.Dock"), System.Windows.Forms.DockStyle)
+        Me.btnCerrar.Enabled = CType(resources.GetObject("btnCerrar.Enabled"), Boolean)
+        Me.btnCerrar.FlatStyle = CType(resources.GetObject("btnCerrar.FlatStyle"), System.Windows.Forms.FlatStyle)
+        Me.btnCerrar.Font = CType(resources.GetObject("btnCerrar.Font"), System.Drawing.Font)
+        Me.btnCerrar.Image = CType(resources.GetObject("btnCerrar.Image"), System.Drawing.Image)
+        Me.btnCerrar.ImageAlign = CType(resources.GetObject("btnCerrar.ImageAlign"), System.Drawing.ContentAlignment)
+        Me.btnCerrar.ImageIndex = CType(resources.GetObject("btnCerrar.ImageIndex"), Integer)
+        Me.btnCerrar.ImeMode = CType(resources.GetObject("btnCerrar.ImeMode"), System.Windows.Forms.ImeMode)
+        Me.btnCerrar.Location = CType(resources.GetObject("btnCerrar.Location"), System.Drawing.Point)
+        Me.btnCerrar.Name = "btnCerrar"
+        Me.btnCerrar.RightToLeft = CType(resources.GetObject("btnCerrar.RightToLeft"), System.Windows.Forms.RightToLeft)
+        Me.btnCerrar.Size = CType(resources.GetObject("btnCerrar.Size"), System.Drawing.Size)
+        Me.btnCerrar.TabIndex = CType(resources.GetObject("btnCerrar.TabIndex"), Integer)
+        Me.btnCerrar.Text = resources.GetString("btnCerrar.Text")
+        Me.btnCerrar.TextAlign = CType(resources.GetObject("btnCerrar.TextAlign"), System.Drawing.ContentAlignment)
+        Me.btnCerrar.Visible = CType(resources.GetObject("btnCerrar.Visible"), Boolean)
+        '
+        'btnExportarPDF
+        '
+        Me.btnExportarPDF.AccessibleDescription = resources.GetString("btnExportarPDF.AccessibleDescription")
+        Me.btnExportarPDF.AccessibleName = resources.GetString("btnExportarPDF.AccessibleName")
+        Me.btnExportarPDF.Anchor = CType(resources.GetObject("btnExportarPDF.Anchor"), System.Windows.Forms.AnchorStyles)
+        Me.btnExportarPDF.BackgroundImage = CType(resources.GetObject("btnExportarPDF.BackgroundImage"), System.Drawing.Image)
+        Me.btnExportarPDF.Dock = CType(resources.GetObject("btnExportarPDF.Dock"), System.Windows.Forms.DockStyle)
+        Me.btnExportarPDF.Enabled = CType(resources.GetObject("btnExportarPDF.Enabled"), Boolean)
+        Me.btnExportarPDF.FlatStyle = CType(resources.GetObject("btnExportarPDF.FlatStyle"), System.Windows.Forms.FlatStyle)
+        Me.btnExportarPDF.Font = CType(resources.GetObject("btnExportarPDF.Font"), System.Drawing.Font)
+        Me.btnExportarPDF.Image = CType(resources.GetObject("btnExportarPDF.Image"), System.Drawing.Image)
+        Me.btnExportarPDF.ImageAlign = CType(resources.GetObject("btnExportarPDF.ImageAlign"), System.Drawing.ContentAlignment)
+        Me.btnExportarPDF.ImageIndex = CType(resources.GetObject("btnExportarPDF.ImageIndex"), Integer)
+        Me.btnExportarPDF.ImeMode = CType(resources.GetObject("btnExportarPDF.ImeMode"), System.Windows.Forms.ImeMode)
+        Me.btnExportarPDF.Location = CType(resources.GetObject("btnExportarPDF.Location"), System.Drawing.Point)
+        Me.btnExportarPDF.Name = "btnExportarPDF"
+        Me.btnExportarPDF.RightToLeft = CType(resources.GetObject("btnExportarPDF.RightToLeft"), System.Windows.Forms.RightToLeft)
+        Me.btnExportarPDF.Size = CType(resources.GetObject("btnExportarPDF.Size"), System.Drawing.Size)
+        Me.btnExportarPDF.TabIndex = CType(resources.GetObject("btnExportarPDF.TabIndex"), Integer)
+        Me.btnExportarPDF.Text = resources.GetString("btnExportarPDF.Text")
+        Me.btnExportarPDF.TextAlign = CType(resources.GetObject("btnExportarPDF.TextAlign"), System.Drawing.ContentAlignment)
+        Me.btnExportarPDF.Visible = CType(resources.GetObject("btnExportarPDF.Visible"), Boolean)
+        '
+        'btnExportarExcel
+        '
+        Me.btnExportarExcel.AccessibleDescription = resources.GetString("btnExportarExcel.AccessibleDescription")
+        Me.btnExportarExcel.AccessibleName = resources.GetString("btnExportarExcel.AccessibleName")
+        Me.btnExportarExcel.Anchor = CType(resources.GetObject("btnExportarExcel.Anchor"), System.Windows.Forms.AnchorStyles)
+        Me.btnExportarExcel.BackgroundImage = CType(resources.GetObject("btnExportarExcel.BackgroundImage"), System.Drawing.Image)
+        Me.btnExportarExcel.Dock = CType(resources.GetObject("btnExportarExcel.Dock"), System.Windows.Forms.DockStyle)
+        Me.btnExportarExcel.Enabled = CType(resources.GetObject("btnExportarExcel.Enabled"), Boolean)
+        Me.btnExportarExcel.FlatStyle = CType(resources.GetObject("btnExportarExcel.FlatStyle"), System.Windows.Forms.FlatStyle)
+        Me.btnExportarExcel.Font = CType(resources.GetObject("btnExportarExcel.Font"), System.Drawing.Font)
+        Me.btnExportarExcel.Image = CType(resources.GetObject("btnExportarExcel.Image"), System.Drawing.Image)
+        Me.btnExportarExcel.ImageAlign = CType(resources.GetObject("btnExportarExcel.ImageAlign"), System.Drawing.ContentAlignment)
+        Me.btnExportarExcel.ImageIndex = CType(resources.GetObject("btnExportarExcel.ImageIndex"), Integer)
+        Me.btnExportarExcel.ImeMode = CType(resources.GetObject("btnExportarExcel.ImeMode"), System.Windows.Forms.ImeMode)
+        Me.btnExportarExcel.Location = CType(resources.GetObject("btnExportarExcel.Location"), System.Drawing.Point)
+        Me.btnExportarExcel.Name = "btnExportarExcel"
+        Me.btnExportarExcel.RightToLeft = CType(resources.GetObject("btnExportarExcel.RightToLeft"), System.Windows.Forms.RightToLeft)
+        Me.btnExportarExcel.Size = CType(resources.GetObject("btnExportarExcel.Size"), System.Drawing.Size)
+        Me.btnExportarExcel.TabIndex = CType(resources.GetObject("btnExportarExcel.TabIndex"), Integer)
+        Me.btnExportarExcel.Text = resources.GetString("btnExportarExcel.Text")
+        Me.btnExportarExcel.TextAlign = CType(resources.GetObject("btnExportarExcel.TextAlign"), System.Drawing.ContentAlignment)
+        Me.btnExportarExcel.Visible = CType(resources.GetObject("btnExportarExcel.Visible"), Boolean)
+        '
+        'dg
+        '
+        Me.dg.AccessibleDescription = resources.GetString("dg.AccessibleDescription")
+        Me.dg.AccessibleName = resources.GetString("dg.AccessibleName")
+        Me.dg.AllowAddNew = CType(resources.GetObject("dg.AllowAddNew"), Boolean)
+        Me.dg.AllowArrows = CType(resources.GetObject("dg.AllowArrows"), Boolean)
+        Me.dg.AllowColMove = CType(resources.GetObject("dg.AllowColMove"), Boolean)
+        Me.dg.AllowColSelect = CType(resources.GetObject("dg.AllowColSelect"), Boolean)
+        Me.dg.AllowDelete = CType(resources.GetObject("dg.AllowDelete"), Boolean)
+        Me.dg.AllowDrag = CType(resources.GetObject("dg.AllowDrag"), Boolean)
+        Me.dg.AllowFilter = CType(resources.GetObject("dg.AllowFilter"), Boolean)
+        Me.dg.AllowHorizontalSplit = CType(resources.GetObject("dg.AllowHorizontalSplit"), Boolean)
+        Me.dg.AllowRowSelect = CType(resources.GetObject("dg.AllowRowSelect"), Boolean)
+        Me.dg.AllowSort = CType(resources.GetObject("dg.AllowSort"), Boolean)
+        Me.dg.AllowUpdate = CType(resources.GetObject("dg.AllowUpdate"), Boolean)
+        Me.dg.AllowUpdateOnBlur = CType(resources.GetObject("dg.AllowUpdateOnBlur"), Boolean)
+        Me.dg.AllowVerticalSplit = CType(resources.GetObject("dg.AllowVerticalSplit"), Boolean)
+        Me.dg.AlternatingRows = CType(resources.GetObject("dg.AlternatingRows"), Boolean)
+        Me.dg.Anchor = CType(resources.GetObject("dg.Anchor"), System.Windows.Forms.AnchorStyles)
+        Me.dg.BackgroundImage = CType(resources.GetObject("dg.BackgroundImage"), System.Drawing.Image)
+        Me.dg.BorderStyle = CType(resources.GetObject("dg.BorderStyle"), System.Windows.Forms.BorderStyle)
+        Me.dg.Caption = resources.GetString("dg.Caption")
+        Me.dg.CaptionHeight = CType(resources.GetObject("dg.CaptionHeight"), Integer)
+        Me.dg.CellTipsDelay = CType(resources.GetObject("dg.CellTipsDelay"), Integer)
+        Me.dg.CellTipsWidth = CType(resources.GetObject("dg.CellTipsWidth"), Integer)
+        Me.dg.ChildGrid = CType(resources.GetObject("dg.ChildGrid"), C1.Win.C1TrueDBGrid.C1TrueDBGrid)
+        Me.dg.CollapseColor = CType(resources.GetObject("dg.CollapseColor"), System.Drawing.Color)
+        Me.dg.ColumnFooters = CType(resources.GetObject("dg.ColumnFooters"), Boolean)
+        Me.dg.ColumnHeaders = CType(resources.GetObject("dg.ColumnHeaders"), Boolean)
+        Me.dg.DefColWidth = CType(resources.GetObject("dg.DefColWidth"), Integer)
+        Me.dg.Dock = CType(resources.GetObject("dg.Dock"), System.Windows.Forms.DockStyle)
+        Me.dg.EditDropDown = CType(resources.GetObject("dg.EditDropDown"), Boolean)
+        Me.dg.EmptyRows = CType(resources.GetObject("dg.EmptyRows"), Boolean)
+        Me.dg.Enabled = CType(resources.GetObject("dg.Enabled"), Boolean)
+        Me.dg.ExpandColor = CType(resources.GetObject("dg.ExpandColor"), System.Drawing.Color)
+        Me.dg.ExposeCellMode = CType(resources.GetObject("dg.ExposeCellMode"), C1.Win.C1TrueDBGrid.ExposeCellModeEnum)
+        Me.dg.ExtendRightColumn = CType(resources.GetObject("dg.ExtendRightColumn"), Boolean)
+        Me.dg.FetchRowStyles = CType(resources.GetObject("dg.FetchRowStyles"), Boolean)
+        Me.dg.FilterBar = CType(resources.GetObject("dg.FilterBar"), Boolean)
+        Me.dg.FlatStyle = CType(resources.GetObject("dg.FlatStyle"), C1.Win.C1TrueDBGrid.FlatModeEnum)
+        Me.dg.Font = CType(resources.GetObject("dg.Font"), System.Drawing.Font)
+        Me.dg.GroupByAreaVisible = CType(resources.GetObject("dg.GroupByAreaVisible"), Boolean)
+        Me.dg.GroupByCaption = resources.GetString("dg.GroupByCaption")
+        Me.dg.Images.Add(CType(resources.GetObject("resource"), System.Drawing.Image))
+        Me.dg.ImeMode = CType(resources.GetObject("dg.ImeMode"), System.Windows.Forms.ImeMode)
+        Me.dg.LinesPerRow = CType(resources.GetObject("dg.LinesPerRow"), Integer)
+        Me.dg.Location = CType(resources.GetObject("dg.Location"), System.Drawing.Point)
+        Me.dg.MarqueeStyle = C1.Win.C1TrueDBGrid.MarqueeEnum.HighlightRow
+        Me.dg.Name = "dg"
+        Me.dg.PictureAddnewRow = CType(resources.GetObject("dg.PictureAddnewRow"), System.Drawing.Image)
+        Me.dg.PictureCurrentRow = CType(resources.GetObject("dg.PictureCurrentRow"), System.Drawing.Image)
+        Me.dg.PictureFilterBar = CType(resources.GetObject("dg.PictureFilterBar"), System.Drawing.Image)
+        Me.dg.PictureFooterRow = CType(resources.GetObject("dg.PictureFooterRow"), System.Drawing.Image)
+        Me.dg.PictureHeaderRow = CType(resources.GetObject("dg.PictureHeaderRow"), System.Drawing.Image)
+        Me.dg.PictureModifiedRow = CType(resources.GetObject("dg.PictureModifiedRow"), System.Drawing.Image)
+        Me.dg.PictureStandardRow = CType(resources.GetObject("dg.PictureStandardRow"), System.Drawing.Image)
+        Me.dg.PreviewInfo.AllowSizing = CType(resources.GetObject("dg.PreviewInfo.AllowSizing"), Boolean)
+        Me.dg.PreviewInfo.Caption = resources.GetString("dg.PreviewInfo.Caption")
+        Me.dg.PreviewInfo.Location = CType(resources.GetObject("dg.PreviewInfo.Location"), System.Drawing.Point)
+        Me.dg.PreviewInfo.Size = CType(resources.GetObject("dg.PreviewInfo.Size"), System.Drawing.Size)
+        Me.dg.PreviewInfo.ToolBars = CType(resources.GetObject("dg.PreviewInfo.ToolBars"), Boolean)
+        Me.dg.PreviewInfo.UIStrings.Content = CType(resources.GetObject("dg.PreviewInfo.UIStrings.Content"), String())
+        Me.dg.PreviewInfo.ZoomFactor = CType(resources.GetObject("dg.PreviewInfo.ZoomFactor"), Double)
+        Me.dg.PrintInfo.MaxRowHeight = CType(resources.GetObject("dg.PrintInfo.MaxRowHeight"), Integer)
+        Me.dg.PrintInfo.OwnerDrawPageFooter = CType(resources.GetObject("dg.PrintInfo.OwnerDrawPageFooter"), Boolean)
+        Me.dg.PrintInfo.OwnerDrawPageHeader = CType(resources.GetObject("dg.PrintInfo.OwnerDrawPageHeader"), Boolean)
+        Me.dg.PrintInfo.PageFooter = resources.GetString("dg.PrintInfo.PageFooter")
+        Me.dg.PrintInfo.PageFooterHeight = CType(resources.GetObject("dg.PrintInfo.PageFooterHeight"), Integer)
+        Me.dg.PrintInfo.PageHeader = resources.GetString("dg.PrintInfo.PageHeader")
+        Me.dg.PrintInfo.PageHeaderHeight = CType(resources.GetObject("dg.PrintInfo.PageHeaderHeight"), Integer)
+        Me.dg.PrintInfo.PrintHorizontalSplits = CType(resources.GetObject("dg.PrintInfo.PrintHorizontalSplits"), Boolean)
+        Me.dg.PrintInfo.ProgressCaption = resources.GetString("dg.PrintInfo.ProgressCaption")
+        Me.dg.PrintInfo.RepeatColumnFooters = CType(resources.GetObject("dg.PrintInfo.RepeatColumnFooters"), Boolean)
+        Me.dg.PrintInfo.RepeatColumnHeaders = CType(resources.GetObject("dg.PrintInfo.RepeatColumnHeaders"), Boolean)
+        Me.dg.PrintInfo.RepeatGridHeader = CType(resources.GetObject("dg.PrintInfo.RepeatGridHeader"), Boolean)
+        Me.dg.PrintInfo.RepeatSplitHeaders = CType(resources.GetObject("dg.PrintInfo.RepeatSplitHeaders"), Boolean)
+        Me.dg.PrintInfo.ShowOptionsDialog = CType(resources.GetObject("dg.PrintInfo.ShowOptionsDialog"), Boolean)
+        Me.dg.PrintInfo.ShowProgressForm = CType(resources.GetObject("dg.PrintInfo.ShowProgressForm"), Boolean)
+        Me.dg.PrintInfo.ShowSelection = CType(resources.GetObject("dg.PrintInfo.ShowSelection"), Boolean)
+        Me.dg.PrintInfo.UseGridColors = CType(resources.GetObject("dg.PrintInfo.UseGridColors"), Boolean)
+        Me.dg.RecordSelectors = CType(resources.GetObject("dg.RecordSelectors"), Boolean)
+        Me.dg.RecordSelectorWidth = CType(resources.GetObject("dg.RecordSelectorWidth"), Integer)
+        Me.dg.RightToLeft = CType(resources.GetObject("dg.RightToLeft"), System.Windows.Forms.RightToLeft)
+        Me.dg.RowDivider.Color = CType(resources.GetObject("resource.Color"), System.Drawing.Color)
+        Me.dg.RowDivider.Style = CType(resources.GetObject("resource.Style"), C1.Win.C1TrueDBGrid.LineStyleEnum)
+        Me.dg.RowHeight = CType(resources.GetObject("dg.RowHeight"), Integer)
+        Me.dg.RowSubDividerColor = CType(resources.GetObject("dg.RowSubDividerColor"), System.Drawing.Color)
+        Me.dg.ScrollTips = CType(resources.GetObject("dg.ScrollTips"), Boolean)
+        Me.dg.ScrollTrack = CType(resources.GetObject("dg.ScrollTrack"), Boolean)
+        Me.dg.Size = CType(resources.GetObject("dg.Size"), System.Drawing.Size)
+        Me.dg.SpringMode = CType(resources.GetObject("dg.SpringMode"), Boolean)
+        Me.dg.TabAcrossSplits = CType(resources.GetObject("dg.TabAcrossSplits"), Boolean)
+        Me.dg.TabIndex = CType(resources.GetObject("dg.TabIndex"), Integer)
+        Me.dg.Text = resources.GetString("dg.Text")
+        Me.dg.ViewCaptionWidth = CType(resources.GetObject("dg.ViewCaptionWidth"), Integer)
+        Me.dg.ViewColumnWidth = CType(resources.GetObject("dg.ViewColumnWidth"), Integer)
+        Me.dg.Visible = CType(resources.GetObject("dg.Visible"), Boolean)
+        Me.dg.WrapCellPointer = CType(resources.GetObject("dg.WrapCellPointer"), Boolean)
+        Me.dg.PropBag = resources.GetString("dg.PropBag")
+        '
+        'dgEleccionCampos
+        '
+        Me.dgEleccionCampos.AccessibleDescription = resources.GetString("dgEleccionCampos.AccessibleDescription")
+        Me.dgEleccionCampos.AccessibleName = resources.GetString("dgEleccionCampos.AccessibleName")
+        Me.dgEleccionCampos.Anchor = CType(resources.GetObject("dgEleccionCampos.Anchor"), System.Windows.Forms.AnchorStyles)
+        Me.dgEleccionCampos.BackgroundImage = CType(resources.GetObject("dgEleccionCampos.BackgroundImage"), System.Drawing.Image)
+        Me.dgEleccionCampos.CaptionFont = CType(resources.GetObject("dgEleccionCampos.CaptionFont"), System.Drawing.Font)
+        Me.dgEleccionCampos.CaptionText = resources.GetString("dgEleccionCampos.CaptionText")
+        Me.dgEleccionCampos.DataMember = ""
+        Me.dgEleccionCampos.Dock = CType(resources.GetObject("dgEleccionCampos.Dock"), System.Windows.Forms.DockStyle)
+        Me.dgEleccionCampos.Enabled = CType(resources.GetObject("dgEleccionCampos.Enabled"), Boolean)
+        Me.dgEleccionCampos.Font = CType(resources.GetObject("dgEleccionCampos.Font"), System.Drawing.Font)
+        Me.dgEleccionCampos.HeaderForeColor = System.Drawing.SystemColors.ControlText
+        Me.dgEleccionCampos.ImeMode = CType(resources.GetObject("dgEleccionCampos.ImeMode"), System.Windows.Forms.ImeMode)
+        Me.dgEleccionCampos.Location = CType(resources.GetObject("dgEleccionCampos.Location"), System.Drawing.Point)
+        Me.dgEleccionCampos.Name = "dgEleccionCampos"
+        Me.dgEleccionCampos.RightToLeft = CType(resources.GetObject("dgEleccionCampos.RightToLeft"), System.Windows.Forms.RightToLeft)
+        Me.dgEleccionCampos.Size = CType(resources.GetObject("dgEleccionCampos.Size"), System.Drawing.Size)
+        Me.dgEleccionCampos.TabIndex = CType(resources.GetObject("dgEleccionCampos.TabIndex"), Integer)
+        Me.dgEleccionCampos.Visible = CType(resources.GetObject("dgEleccionCampos.Visible"), Boolean)
+        '
+        'btnImprimir
+        '
+        Me.btnImprimir.AccessibleDescription = resources.GetString("btnImprimir.AccessibleDescription")
+        Me.btnImprimir.AccessibleName = resources.GetString("btnImprimir.AccessibleName")
+        Me.btnImprimir.Anchor = CType(resources.GetObject("btnImprimir.Anchor"), System.Windows.Forms.AnchorStyles)
+        Me.btnImprimir.BackColor = System.Drawing.SystemColors.Control
+        Me.btnImprimir.BackgroundImage = CType(resources.GetObject("btnImprimir.BackgroundImage"), System.Drawing.Image)
+        Me.btnImprimir.Dock = CType(resources.GetObject("btnImprimir.Dock"), System.Windows.Forms.DockStyle)
+        Me.btnImprimir.Enabled = CType(resources.GetObject("btnImprimir.Enabled"), Boolean)
+        Me.btnImprimir.FlatStyle = CType(resources.GetObject("btnImprimir.FlatStyle"), System.Windows.Forms.FlatStyle)
+        Me.btnImprimir.Font = CType(resources.GetObject("btnImprimir.Font"), System.Drawing.Font)
+        Me.btnImprimir.Image = CType(resources.GetObject("btnImprimir.Image"), System.Drawing.Image)
+        Me.btnImprimir.ImageAlign = CType(resources.GetObject("btnImprimir.ImageAlign"), System.Drawing.ContentAlignment)
+        Me.btnImprimir.ImageIndex = CType(resources.GetObject("btnImprimir.ImageIndex"), Integer)
+        Me.btnImprimir.ImeMode = CType(resources.GetObject("btnImprimir.ImeMode"), System.Windows.Forms.ImeMode)
+        Me.btnImprimir.Location = CType(resources.GetObject("btnImprimir.Location"), System.Drawing.Point)
+        Me.btnImprimir.Name = "btnImprimir"
+        Me.btnImprimir.RightToLeft = CType(resources.GetObject("btnImprimir.RightToLeft"), System.Windows.Forms.RightToLeft)
+        Me.btnImprimir.Size = CType(resources.GetObject("btnImprimir.Size"), System.Drawing.Size)
+        Me.btnImprimir.TabIndex = CType(resources.GetObject("btnImprimir.TabIndex"), Integer)
+        Me.btnImprimir.Text = resources.GetString("btnImprimir.Text")
+        Me.btnImprimir.TextAlign = CType(resources.GetObject("btnImprimir.TextAlign"), System.Drawing.ContentAlignment)
+        Me.btnImprimir.Visible = CType(resources.GetObject("btnImprimir.Visible"), Boolean)
+        '
+        'lstCampos
+        '
+        Me.lstCampos.AccessibleDescription = resources.GetString("lstCampos.AccessibleDescription")
+        Me.lstCampos.AccessibleName = resources.GetString("lstCampos.AccessibleName")
+        Me.lstCampos.Anchor = CType(resources.GetObject("lstCampos.Anchor"), System.Windows.Forms.AnchorStyles)
+        Me.lstCampos.BackgroundImage = CType(resources.GetObject("lstCampos.BackgroundImage"), System.Drawing.Image)
+        Me.lstCampos.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+        Me.lstCampos.ColumnWidth = CType(resources.GetObject("lstCampos.ColumnWidth"), Integer)
+        Me.lstCampos.Dock = CType(resources.GetObject("lstCampos.Dock"), System.Windows.Forms.DockStyle)
+        Me.lstCampos.Enabled = CType(resources.GetObject("lstCampos.Enabled"), Boolean)
+        Me.lstCampos.Font = CType(resources.GetObject("lstCampos.Font"), System.Drawing.Font)
+        Me.lstCampos.HorizontalExtent = CType(resources.GetObject("lstCampos.HorizontalExtent"), Integer)
+        Me.lstCampos.HorizontalScrollbar = CType(resources.GetObject("lstCampos.HorizontalScrollbar"), Boolean)
+        Me.lstCampos.ImeMode = CType(resources.GetObject("lstCampos.ImeMode"), System.Windows.Forms.ImeMode)
+        Me.lstCampos.IntegralHeight = CType(resources.GetObject("lstCampos.IntegralHeight"), Boolean)
+        Me.lstCampos.ItemHeight = CType(resources.GetObject("lstCampos.ItemHeight"), Integer)
+        Me.lstCampos.Location = CType(resources.GetObject("lstCampos.Location"), System.Drawing.Point)
+        Me.lstCampos.Name = "lstCampos"
+        Me.lstCampos.RightToLeft = CType(resources.GetObject("lstCampos.RightToLeft"), System.Windows.Forms.RightToLeft)
+        Me.lstCampos.ScrollAlwaysVisible = CType(resources.GetObject("lstCampos.ScrollAlwaysVisible"), Boolean)
+        Me.lstCampos.SelectionMode = System.Windows.Forms.SelectionMode.MultiSimple
+        Me.lstCampos.Size = CType(resources.GetObject("lstCampos.Size"), System.Drawing.Size)
+        Me.lstCampos.TabIndex = CType(resources.GetObject("lstCampos.TabIndex"), Integer)
+        Me.lstCampos.Visible = CType(resources.GetObject("lstCampos.Visible"), Boolean)
+        '
+        'btnFormulario
+        '
+        Me.btnFormulario.AccessibleDescription = resources.GetString("btnFormulario.AccessibleDescription")
+        Me.btnFormulario.AccessibleName = resources.GetString("btnFormulario.AccessibleName")
+        Me.btnFormulario.Anchor = CType(resources.GetObject("btnFormulario.Anchor"), System.Windows.Forms.AnchorStyles)
+        Me.btnFormulario.BackgroundImage = CType(resources.GetObject("btnFormulario.BackgroundImage"), System.Drawing.Image)
+        Me.btnFormulario.Dock = CType(resources.GetObject("btnFormulario.Dock"), System.Windows.Forms.DockStyle)
+        Me.btnFormulario.Enabled = CType(resources.GetObject("btnFormulario.Enabled"), Boolean)
+        Me.btnFormulario.FlatStyle = CType(resources.GetObject("btnFormulario.FlatStyle"), System.Windows.Forms.FlatStyle)
+        Me.btnFormulario.Font = CType(resources.GetObject("btnFormulario.Font"), System.Drawing.Font)
+        Me.btnFormulario.Image = CType(resources.GetObject("btnFormulario.Image"), System.Drawing.Image)
+        Me.btnFormulario.ImageAlign = CType(resources.GetObject("btnFormulario.ImageAlign"), System.Drawing.ContentAlignment)
+        Me.btnFormulario.ImageIndex = CType(resources.GetObject("btnFormulario.ImageIndex"), Integer)
+        Me.btnFormulario.ImeMode = CType(resources.GetObject("btnFormulario.ImeMode"), System.Windows.Forms.ImeMode)
+        Me.btnFormulario.Location = CType(resources.GetObject("btnFormulario.Location"), System.Drawing.Point)
+        Me.btnFormulario.Name = "btnFormulario"
+        Me.btnFormulario.RightToLeft = CType(resources.GetObject("btnFormulario.RightToLeft"), System.Windows.Forms.RightToLeft)
+        Me.btnFormulario.Size = CType(resources.GetObject("btnFormulario.Size"), System.Drawing.Size)
+        Me.btnFormulario.TabIndex = CType(resources.GetObject("btnFormulario.TabIndex"), Integer)
+        Me.btnFormulario.Text = resources.GetString("btnFormulario.Text")
+        Me.btnFormulario.TextAlign = CType(resources.GetObject("btnFormulario.TextAlign"), System.Drawing.ContentAlignment)
+        Me.btnFormulario.Visible = CType(resources.GetObject("btnFormulario.Visible"), Boolean)
+        '
+        'frmDisposicionLista
+        '
+        Me.AccessibleDescription = resources.GetString("$this.AccessibleDescription")
+        Me.AccessibleName = resources.GetString("$this.AccessibleName")
+        Me.AutoScaleBaseSize = CType(resources.GetObject("$this.AutoScaleBaseSize"), System.Drawing.Size)
+        Me.AutoScroll = CType(resources.GetObject("$this.AutoScroll"), Boolean)
+        Me.AutoScrollMargin = CType(resources.GetObject("$this.AutoScrollMargin"), System.Drawing.Size)
+        Me.AutoScrollMinSize = CType(resources.GetObject("$this.AutoScrollMinSize"), System.Drawing.Size)
+        Me.BackgroundImage = CType(resources.GetObject("$this.BackgroundImage"), System.Drawing.Image)
+        Me.ClientSize = CType(resources.GetObject("$this.ClientSize"), System.Drawing.Size)
+        Me.Controls.Add(Me.btnExportarAccess)
+        Me.Controls.Add(Me.btnActualizarSeleccion)
+        Me.Controls.Add(Me.btnCerrar)
+        Me.Controls.Add(Me.btnExportarPDF)
+        Me.Controls.Add(Me.btnExportarExcel)
+        Me.Controls.Add(Me.dg)
+        Me.Controls.Add(Me.dgEleccionCampos)
+        Me.Controls.Add(Me.btnImprimir)
+        Me.Controls.Add(Me.lstCampos)
+        Me.Controls.Add(Me.btnFormulario)
+        Me.Cursor = System.Windows.Forms.Cursors.Default
+        Me.Enabled = CType(resources.GetObject("$this.Enabled"), Boolean)
+        Me.Font = CType(resources.GetObject("$this.Font"), System.Drawing.Font)
+        Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
+        Me.ImeMode = CType(resources.GetObject("$this.ImeMode"), System.Windows.Forms.ImeMode)
+        Me.Location = CType(resources.GetObject("$this.Location"), System.Drawing.Point)
+        Me.MaximumSize = CType(resources.GetObject("$this.MaximumSize"), System.Drawing.Size)
+        Me.MinimumSize = CType(resources.GetObject("$this.MinimumSize"), System.Drawing.Size)
+        Me.Name = "frmDisposicionLista"
+        Me.RightToLeft = CType(resources.GetObject("$this.RightToLeft"), System.Windows.Forms.RightToLeft)
+        Me.StartPosition = CType(resources.GetObject("$this.StartPosition"), System.Windows.Forms.FormStartPosition)
+        Me.Text = resources.GetString("$this.Text")
+        Me.Controls.SetChildIndex(Me.sbtipo, 0)
+        Me.Controls.SetChildIndex(Me.btnActualizar, 0)
+        Me.Controls.SetChildIndex(Me.btnNuevo, 0)
+        Me.Controls.SetChildIndex(Me.btnBorrar, 0)
+        Me.Controls.SetChildIndex(Me.btnTancar, 0)
+        Me.Controls.SetChildIndex(Me.btnUltimo, 0)
+        Me.Controls.SetChildIndex(Me.btnPrimero, 0)
+        Me.Controls.SetChildIndex(Me.btnAnterior, 0)
+        Me.Controls.SetChildIndex(Me.btnSiguiente, 0)
+        Me.Controls.SetChildIndex(Me.btnRecargar, 0)
+        Me.Controls.SetChildIndex(Me.btnVerLista, 0)
+        Me.Controls.SetChildIndex(Me.btnModificar, 0)
+        Me.Controls.SetChildIndex(Me.btnFormulario, 0)
+        Me.Controls.SetChildIndex(Me.lstCampos, 0)
+        Me.Controls.SetChildIndex(Me.btnImprimir, 0)
+        Me.Controls.SetChildIndex(Me.dgEleccionCampos, 0)
+        Me.Controls.SetChildIndex(Me.dg, 0)
+        Me.Controls.SetChildIndex(Me.btnExportarExcel, 0)
+        Me.Controls.SetChildIndex(Me.btnExportarPDF, 0)
+        Me.Controls.SetChildIndex(Me.btnCerrar, 0)
+        Me.Controls.SetChildIndex(Me.btnActualizarSeleccion, 0)
+        Me.Controls.SetChildIndex(Me.btnExportarAccess, 0)
+        CType(Me.dg, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.dgEleccionCampos, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.ResumeLayout(False)
+
+    End Sub
+
+#End Region
+
+#Region "VARIABLES"
+
+    Private dv As New DataView
+    Private textoListado As String = "Llistat"
+    Private nombreConsulta As String = "listado"
+    Private da As New MySql.Data.MySqlClient.MySqlDataAdapter
+    Private cmdSelect As New MySql.Data.MySqlClient.MySqlCommand
+    Private fuente As New Font("Tahoma", 9.25!, FontStyle.Regular)
+    Private ArrayCampos As New Hashtable
+    Private dtClients As New DataTable
+
+#End Region
+
+#Region "ORGANIZAR"
+
+    Private Sub PonerDetalle()
+        Dim dar As MySql.Data.MySqlClient.MySqlDataReader
+        Dim cmd As MySql.Data.MySqlClient.MySqlCommand
+        Dim dr() As DataRow
+        Dim aux As Integer = 0
+        Try
+            cmd = New MySql.Data.MySqlClient.MySqlCommand("SELECT DISTINCT DDISPOS.DISPOS, " & _
+                                    " DDISPOS.TEJIDO, " & _
+                                    " DDISPOS.NALBARAN, " & _
+                                    " DDISPOS.SERVIDO, " & _
+                                    " TALLERS.NOM AS NOMPROVE " & _
+                                    " FROM DDISPOS " & _
+                                    " LEFT JOIN TALLERS ON (TALLERS.CODI = DDISPOS.TEJEDOR)  " & _
+                                    " ORDER BY DISPOS", cnn)
+
+            dar = cmd.ExecuteReader
+
+
+            While dar.Read
+                dr = ds.Tables(tabla).Select("CODI = " & dar("DISPOS"))
+                If dr(0).Item("CODI") <> aux Then
+                    If general.nz(dr(0).Item("CODICLIENT"), "") <> "" Then
+                        dr(0).Item("IDDISPOS") = dr(0).Item("CODICLIENT") & "-" & dr(0).Item("IDDISPOS")
+                    End If
+                    If general.nz(dr(0).Item("ANY"), "") <> "" Then
+                        dr(0).Item("IDDISPOS") = dr(0).Item("IDDISPOS") & "-" & dr(0).Item("ANY")
+                    End If
+                End If
+                aux = dr(0).Item("CODI")
+
+                If IsDBNull(dr(0).Item("TEJIDO")) Then : dr(0).Item("TEJIDO") = dar("TEJIDO")
+                Else
+                    If CType(dr(0).Item("TEJIDO"), String).IndexOf(dar("TEJIDO")) = -1 Then
+                        dr(0).Item("TEJIDO") = dr(0)("TEJIDO") & " - " & dar("TEJIDO")
+                    End If
+                End If
+
+                If IsDBNull(dr(0).Item("NOMPROVE")) Then
+                    dr(0).Item("NOMPROVE") = dar("NOMPROVE")
+                Else
+                    If CType(dr(0).Item("NOMPROVE"), String).IndexOf(dar("NOMPROVE")) = -1 Then
+                        dr(0).Item("NOMPROVE") = dr(0)("NOMPROVE") & " - " & dar("NOMPROVE")
+                    End If
+                End If
+
+                If IsDBNull(dr(0).Item("NALBARAN")) Then
+                    dr(0).Item("NALBARAN") = dar("NALBARAN")
+                Else
+                    If CType(dr(0).Item("NALBARAN"), String).IndexOf(dar("NALBARAN")) = -1 Then
+                        dr(0).Item("NALBARAN") = dr(0)("NALBARAN") & " - " & dar("NALBARAN")
+                    End If
+
+                End If
+
+            End While
+
+
+            ds.AcceptChanges()
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub IniciarListado()
+        Try
+            cargando = True
+            HacerArraysCampoNombre()
+            CrearComandos()
+            ACN()
+            ds.Tables(tabla).Columns.Add(New DataColumn("TEJIDO", GetType(String)))
+            Try
+                ds.Tables(tabla).Columns.Add(New DataColumn("NOMCLIENT", GetType(String)))
+            Catch ex As Exception
+
+            End Try
+            Try
+                ds.Tables(tabla).Columns.Add(New DataColumn("NALBARAN", GetType(String)))
+            Catch ex As Exception
+
+            End Try
+            Try
+                ds.Tables(tabla).Columns.Add(New DataColumn("NOMPROVE", GetType(String)))
+            Catch ex As Exception
+
+            End Try
+            da.Fill(ds, tabla)
+            PonerDetalle()
+
+
+            CCN()
+            rellenarlista(lstCampos, tabla, ArrayCampos, True)
+            Dim i As Integer
+            For i = 0 To lstCampos.Items.Count - 1
+                lstCampos.SetSelected(i, True)
+            Next
+
+            'lstCampos.SetSelected(1, True)
+            rellenarDGLista(lstCampos, dgEleccionCampos)
+            CrearVista(dv, dgEleccionCampos, lstCampos, ArrayCampos, tabla)
+            InicializarDg2(tabla, dg, lstCampos, ArrayCampos, dv, fuente, False)
+            cargando = False
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+
+    End Sub
+    Friend Sub InicializarDg2(ByVal tabla As String, _
+               ByRef dg As C1.Win.C1TrueDBGrid.C1TrueDBGrid, _
+               ByVal lstCampos As ListBox, _
+               ByVal arraycampos As Hashtable, _
+               ByRef dv As DataView, _
+               ByVal fuente As Font, _
+               ByVal sololectura As Boolean, _
+               Optional ByVal tieneOrden As Boolean = False)
+        Dim i As Integer
+        Dim nombrecampo As String
+        Dim orden As Integer
+        Try
+            dg.SetDataBinding(dv, "")
+            dg.Refresh()
+            OcultarColumnasDG(dg)
+            With dg.Splits(0).DisplayColumns
+                For i = 0 To lstCampos.SelectedItems.Count - 1
+                    nombrecampo = GetNombreCampo(lstCampos.Items(lstCampos.SelectedIndices(i)), 0, arraycampos)
+                    orden = arraycampos(nombrecampo)(3)
+                    If orden = 0 Then
+                        If arraycampos(nombrecampo)(2) = "date" Then
+                            'PPColListado(nombrecampo, dg, lstCampos.Items(lstCampos.SelectedIndices(i)), "Short Date", -1)
+                            PPCol2(nombrecampo, dg, lstCampos.Items(lstCampos.SelectedIndices(i)), "Short Date", True, 1, True, C1.Win.C1TrueDBGrid.PresentationEnum.Normal, False, 1, -1, False)
+                        Else
+                            PPCol2(nombrecampo, dg, lstCampos.Items(lstCampos.SelectedIndices(i)), "", True, 1, True, C1.Win.C1TrueDBGrid.PresentationEnum.Normal, False, 1, -1, False)
+                        End If
+                    Else
+                        If arraycampos(nombrecampo)(2) = "date" Then
+                            PPCol2(nombrecampo, dg, lstCampos.Items(lstCampos.SelectedIndices(i)), "Short Date", True, 1, True, C1.Win.C1TrueDBGrid.PresentationEnum.Normal, False, 1, orden, False)
+                        Else
+                            PPCol2(nombrecampo, dg, lstCampos.Items(lstCampos.SelectedIndices(i)), "", True, 1, True, C1.Win.C1TrueDBGrid.PresentationEnum.Normal, False, 1, orden, False)
+                        End If
+                    End If
+                Next
+            End With
+            dg.AllowAddNew = False
+            dg.AllowDelete = False
+            dg.AllowUpdate = False
+
+            dg.Font = fuente
+            If tabla = tablaDisposiciones Then : OrdenarDG(dg, arraycampos) : End If
+            AutoSizeCC(dg)
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub OrdenarDG(ByVal dg As C1.Win.C1TrueDBGrid.C1TrueDBGrid, ByVal a As Hashtable)
+        Dim i As Integer
+        Dim a2 As New ArrayList
+        Dim e As IEnumerator
+        Dim dc As C1.Win.C1TrueDBGrid.C1DisplayColumn
+
+        Try
+            e = a.GetEnumerator
+            While e.MoveNext
+
+                dc = dg.Splits(0).DisplayColumns.Item(e.Current.Value(0))
+
+                'Dim cosa(1) As Object
+                'cosa(0) = e.Current.Value(3)
+                'cosa(1) = e.Current.Value(0)
+                'a2.Add(cosa)
+                dg.Splits(0).DisplayColumns.RemoveAt(dg.Splits(0).DisplayColumns.IndexOf(dc))
+                dg.Splits(0).DisplayColumns.Insert(e.Current.Value(3), dc)
+
+            End While
+
+            For i = 0 To a2.Count - 1
+
+            Next
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub rellenarDGLista(ByVal lstCampos As ListBox, ByVal dgEleccionCampos As DataGrid)
+        Dim ts As DataGridTableStyle = New DataGridTableStyle
+        Dim dt As New DataTable("ELECCION")
+        Dim c1 As New DataColumn("Camp")
+        Dim c2 As New DataColumn("De")
+        Dim c3 As New DataColumn("A")
+        Dim i As Integer
+        Dim dr As DataRow
+        Try
+            ts.MappingName = "ELECCION"
+            dt.Columns.Add(c1)
+            dt.Columns.Add(c2)
+            dt.Columns.Add(c3)
+            For i = 0 To lstCampos.SelectedItems.Count - 1
+                dr = dt.NewRow
+                dr(0) = lstCampos.SelectedItems(i)
+                dr(1) = ""
+                dr(2) = ""
+                dt.Rows.Add(dr)
+                dr = Nothing
+            Next
+
+            Dim c11 As New misControles.DataGridEnableTextBoxColumn(0)
+            Dim c22 As New misControles.DataGridEnableTextBoxColumn(1)
+            Dim c33 As New misControles.DataGridEnableTextBoxColumn(2)
+            c11.MappingName = "Camp"
+            c22.MappingName = "De"
+            c33.MappingName = "A"
+            c11.HeaderText = "Camp"
+            c22.HeaderText = "De"
+            c33.HeaderText = "A"
+            ts.GridColumnStyles.Add(c11)
+            ts.GridColumnStyles.Add(c22)
+            ts.GridColumnStyles.Add(c33)
+            AddHandler c11.CheckCellEnabled, New misControles.DataGridEnableTextBoxColumn.EnableCellEventHandler(AddressOf SetEnableValues)
+            dgEleccionCampos.TableStyles.Clear()
+            dgEleccionCampos.TableStyles.Add(ts)
+            dgEleccionCampos.SetDataBinding(dt, "")
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Public Sub SetEnableValues(ByVal sender As Object, ByVal e As misControles.DataGridEnableEventArgs)
+        e.EnableValue = False
+    End Sub
+    Private Function GetNombreCampo(ByVal val As String, ByVal campodesc As Byte, ByVal arraycampos As Hashtable) As Object
+        'El campodesc nos indica que tenemos q devolver si el nombre
+        'del campo o la despcripcion
+        Try
+            Dim keys As ICollection = arraycampos.Keys
+            Dim e As IEnumerator = keys.GetEnumerator
+            While e.MoveNext
+                ' MessageBox.Show("dfhnbwsfkjbgsn" & e.Current)
+                If arraycampos(e.Current)(1) = val Then
+                    Return arraycampos(e.Current)(campodesc)
+                End If
+            End While
+            'Return ArrayCampos.Item(lstCampos.Items(val))(0)
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Function
+    Private Sub CrearVista(ByRef dv As DataView, ByVal dgEleccionCampos As DataGrid, ByVal lstCampos As ListBox, ByVal arraycampos As Hashtable, ByVal tabla As String)
+        Dim i As Integer
+        Dim strFiltro As String = ""
+        Dim a1, a2 As String
+        Try
+
+            dv.Table = ds.Tables(tabla)
+            For i = 0 To lstCampos.SelectedItems.Count - 1
+                a1 = dgEleccionCampos(i, 1).ToString
+                a2 = dgEleccionCampos(i, 2).ToString
+
+                If Not (a1 = "" Or a2 = "") Then
+                    If i = lstCampos.SelectedItems.Count - 1 Then
+                        strFiltro = strFiltro & GetNombreCampo(lstCampos.SelectedItems(i), 0, arraycampos) & " >= '" & a1 & "' AND " & GetNombreCampo(lstCampos.SelectedItems(i), 0, arraycampos) & " <= '" & a2 & "'"
+                    Else
+                        strFiltro = strFiltro & GetNombreCampo(lstCampos.SelectedItems(i), 0, arraycampos) & " >= '" & a1 & "' AND " & GetNombreCampo(lstCampos.SelectedItems(i), 0, arraycampos) & " <= '" & a2 & "' AND "
+                    End If
+
+                End If
+
+            Next
+            If Not strFiltro = "" Then
+                If strFiltro.EndsWith("AND ") Then
+                    strFiltro = strFiltro.Remove(strFiltro.Length - 4, 4)
+                End If
+            End If
+            dv.RowFilter = strFiltro
+            dgEleccionCampos.Refresh()
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+
+    End Sub
+    Private Sub rellenarlista(ByRef lst As ListBox, ByVal tabla As String, ByVal ArrayCampos As Hashtable, Optional ByVal tieneOrden As Boolean = False)
+        Try
+            'Esta funcion rellena la lista de los campos que se pueden elegir
+            Dim i As Integer
+            Dim str As String
+            lst.Items.Clear()
+            For i = 0 To ArrayCampos.Count - 1
+                lst.Items.Add("----------------------------1")
+            Next
+
+            If tieneOrden Then
+
+                For i = 0 To ds.Tables(tabla).Columns.Count - 1
+                    If ArrayCampos.ContainsKey(ds.Tables(tabla).Columns(i).ColumnName.ToUpper) Then
+                        str = ArrayCampos(ds.Tables(tabla).Columns(i).ColumnName)(1)
+                        lst.Items.Insert(ArrayCampos(ds.Tables(tabla).Columns(i).ColumnName)(3), str)
+                    End If
+                Next
+            Else
+                For i = 0 To ds.Tables(tabla).Columns.Count - 1
+                    If ArrayCampos.ContainsKey(ds.Tables(tabla).Columns(i).ColumnName.ToUpper) Then
+                        str = ArrayCampos(ds.Tables(tabla).Columns(i).ColumnName)(1)
+                        lst.Items.Add(str)
+                    End If
+                Next
+            End If
+
+            For i = 0 To ArrayCampos.Count - 1
+                lst.Items.Remove("----------------------------1")
+            Next
+
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub lstCampos_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles lstCampos.SelectedIndexChanged
+        Try
+            If PuedoModificar() Then
+                cargando = True
+                InicializarDg2(tabla, dg, lstCampos, ArrayCampos, dv, fuente, False)
+                rellenarDGLista(lstCampos, dgEleccionCampos)
+                cargando = False
+            End If
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+
+    End Sub
+    Private Sub btnExportarExcel_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnExportarExcel.Click
+        Try
+            'CrearExcel(dg, lstCampos, textoListado, ArrayCampos, False)
+            CrearExcelDisposicion(dg, lstCampos, textoListado, ArrayCampos, True)
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub btnImprimir_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnImprimir.Click
+        Try
+            CrearExcelDisposicion(dg, lstCampos, textoListado, ArrayCampos, True)
+
+            'CrearTablaAccessLista(ArrayCampos, tabla, lstCampos)
+            'RellenarTablaAccess2(ArrayCampos, lstCampos, tabla, dg)
+            'CargarConsulta(nombreConsulta, lstCampos, dg, textoListado, ArrayCampos)
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub btnExportarPDF_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnExportarPDF.Click
+        Dim sDBPath As String
+        Dim NavArchivos As System.Windows.Forms.SaveFileDialog
+        Try
+
+            NavArchivos = New System.Windows.Forms.SaveFileDialog
+            NavArchivos.Filter = "Arxius pdf (*.pdf) | *.pdf"
+            NavArchivos.InitialDirectory = "c:\"
+            NavArchivos.ShowDialog()
+            sDBPath = NavArchivos.FileName
+            dg.ExportToPDF(sDBPath)
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Shadows Sub btnActualizarSeleccion_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnActualizarSeleccion.Click
+        Try
+            CrearVista(dv, dgEleccionCampos, lstCampos, ArrayCampos, tabla)
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub btnCerrar_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnCerrar.Click
+        Try
+            Close()
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub HacerArraysCampoNombre()
+        Try
+            Dim a As New clsArrays
+            With ArrayCampos
+
+
+                a.aIDDispos(3) = 1
+                a.aIDDispos(2) = "string"
+                .Add(a.aIDDispos(0), a.aIDDispos)
+
+                Dim aFECHA(3) As String
+                aFECHA(0) = "FECHA"
+                aFECHA(1) = "Data Disposició"
+                aFECHA(2) = "date"
+                aFECHA(3) = 2
+                .Add("FECHA", aFECHA)
+
+                a.aNOMCLIENT(3) = 3
+                .Add("NOMCLIENT", a.aNOMCLIENT)
+
+                a.aPedido(3) = 4
+                .Add("COMANDA", a.aPedido)
+
+                a.aTEJIDO(3) = 5
+                .Add("TEJIDO", a.aTEJIDO)
+
+                a.aNOMPROVE(3) = 6
+                .Add("NOMPROVE", a.aNOMPROVE)
+
+                Dim aNAlbaran(3) As String
+                aNAlbaran(0) = "NALBARAN"
+                aNAlbaran(1) = "Albarà Nº"
+                aNAlbaran(2) = "string"
+                aNAlbaran(3) = 7
+                .Add("NALBARAN", aNAlbaran)
+
+                Dim aTOTALPIEZAS(3) As String
+                aTOTALPIEZAS(0) = "TOTALPIEZAS"
+                aTOTALPIEZAS(1) = rm.GetString("TOTALPIEZAS")
+                aTOTALPIEZAS(2) = "double"
+                aTOTALPIEZAS(3) = 8
+                .Add("TOTALPIEZAS", aTOTALPIEZAS)
+
+                Dim aKGRS(3) As String
+                aKGRS(0) = "TOTALKG"
+                aKGRS(1) = "Kgs."
+                aKGRS(2) = "double"
+                aKGRS(3) = 9
+                .Add("TOTALKG", aKGRS)
+
+                Dim aCOLOR(3) As String
+                aCOLOR(0) = "COLOR"
+                aCOLOR(1) = "Color"
+                aCOLOR(2) = "string"
+                aCOLOR(3) = 10
+                .Add("COLOR", aCOLOR)
+
+                Dim aFECHARECIBIDO(3) As String
+                aFECHARECIBIDO(0) = "DRECEPCION"
+                aFECHARECIBIDO(1) = "Rebut"
+                aFECHARECIBIDO(2) = "date"
+                aFECHARECIBIDO(3) = 11
+                .Add("DRECEPCION", aFECHARECIBIDO)
+
+
+            End With
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+
+    End Sub
+    Private Sub CrearComandos()
+
+        Try
+            cmdSelect.CommandText = "SELECT DISPOS.*, " & _
+                    " CLIENTS.NOM AS NOMCLIENT  " & _
+                    " FROM DISPOS LEFT JOIN CLIENTS ON (DISPOS.CLIENT = CLIENTS.CODI) " & _
+                    " ORDER BY DISPOS.CODI"
+
+            '"SELECT DDISPOS.*, DISPOS.CLIENT FROM " & tabla & " INNER JOIN DISPOS ON (DISPOS.CODI = DDISPOS.DISPOS) GROUP BY any, IDDispos"
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+
+    End Sub
+    Friend Sub PonerNombres()
+        Dim i As Integer
+        Dim idx As Integer
+        Try
+            CargaTabla(tablaClientes, CCClients, CNClients, dtClients)
+            dtClients.DefaultView.Sort = "CODI"
+
+
+            For i = 0 To ds.Tables(tabla).Rows.Count - 1
+                idx = dtClients.DefaultView.Find(ds.Tables(tabla).Rows(i).Item("CLIENT"))
+                ds.Tables(tabla).Rows(i).Item("NOMCLIENT") = dtClients.DefaultView(idx).Item("NOM")
+            Next
+            ds.AcceptChanges()
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub IniciarForm(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
+        Cursor = Cursors.WaitCursor
+        Try
+            tabla = tablaDisposiciones
+
+            cmdSelect.Connection = cnn
+
+            da.SelectCommand = cmdSelect
+            textoListado = "Llistat Disposicions"
+            IniciarListado()
+            dv.Sort = "IDDISPOS"
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+        Cursor = Cursors.Default
+    End Sub
+    Friend Sub btnFormulario_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
+        Try
+            Cursor = Cursors.WaitCursor
+            Dim f As frmDisposicionLista = frmDisposicionLista.GetInstance(esListado)
+            f.MdiParent = Me.MdiParent
+            AddHandler f.Closed, AddressOf CType(Me.MdiParent, frmPrincipal).childCerrado
+            AddHandler f.Load, AddressOf CType(Me.MdiParent, frmPrincipal).childAbierto : AddHandler f.Activated, AddressOf CType(Me.MdiParent, frmPrincipal).childOcultandoMostrando
+            f.Show()
+            f.BringToFront()
+            Cursor = Cursors.Default
+            Me.Close()
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+
+    End Sub
+    'eSTO NO ESTA BIEN
+    Private Sub dg_OwnerDrawCell(ByVal sender As Object, ByVal e As C1.Win.C1TrueDBGrid.OwnerDrawCellEventArgs) 'Handles dg.OwnerDrawCell
+
+        If dg.Row = e.Row Then
+            e.Style.Font = New System.Drawing.Font("Tahoma", 8.25!, System.Drawing.FontStyle.Bold)
+            If dg(e.Row, "REBUT") = True Then
+                e.Style.BackColor = Color.Green
+            Else
+                If dg(e.Row, "REBUT") = False Then
+                    e.Style.BackColor = Color.Red
+                End If
+            End If
+        Else
+            e.Style.Font = New System.Drawing.Font("Tahoma", 8.25!, System.Drawing.FontStyle.Regular)
+            If dg(e.Row, "REBUT") = True Then
+                e.Style.BackColor = Color.LightGreen
+            Else
+                If dg(e.Row, "REBUT") = True Then
+                    e.Style.BackColor = Color.LightSalmon
+
+                End If
+            End If
+        End If
+
+    End Sub
+    Private Sub PonerFechaDisposicion(ByVal xlsDir As ExcelDirecto.ExcelDirecto, ByVal i As Integer, ByVal j As Integer, ByVal z As Integer)
+        Try
+            With xlsDir
+                Dim d As Date = dg.Item(i, dg.Splits(0).DisplayColumns(j).Name)
+                .objHojaExcel.Cells(i + 2, z + 1) = d.Day
+                .objHojaExcel.Cells(i + 2, z + 2) = d.Month
+                .objHojaExcel.Cells(i + 2, z + 3) = d.Year
+
+                .objHojaExcel.Cells(i + 2, z + 1).Borders.LineStyle = Excel.XlLineStyle.xlDot
+                .objHojaExcel.Cells(i + 2, z + 2).Borders.LineStyle = Excel.XlLineStyle.xlDot
+                .objHojaExcel.Cells(i + 2, z + 3).Borders.LineStyle = Excel.XlLineStyle.xlDot
+
+            End With
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub PonerFechaRecepcion(ByVal xlsDir As ExcelDirecto.ExcelDirecto, ByVal i As Integer, ByVal j As Integer, ByVal z As Integer)
+        Try
+            With xlsDir
+                Dim d As Date = dg.Item(i, dg.Splits(0).DisplayColumns(j).Name)
+                .objHojaExcel.Cells(i + 2, z + 1) = d.ToShortDateString
+                DirectCast(.objHojaExcel.Cells(i + 2, z + 1), Excel.Range).NumberFormat = "d-mmm"
+
+                .objHojaExcel.Cells(i + 2, z + 1).Borders.LineStyle = Excel.XlLineStyle.xlDot
+
+            End With
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Function PonerColoresATejido(ByVal i As Integer, ByVal j As Integer)
+        Dim tej As String
+        Try
+            Dim cmd As New MySql.Data.MySqlClient.MySqlCommand
+
+            cmd = New MySql.Data.MySqlClient.MySqlCommand("SELECT DISTINCT DDISPOS.DISPOS, " & _
+                                    " DDISPOS.TEJIDO, " & _
+                                    " DDISPOS.NALBARAN, " & _
+                                    " DDISPOS.SERVIDO, " & _
+                                    " TALLERS.NOM AS NOMPROVE " & _
+                                    " FROM DDISPOS " & _
+                                    " LEFT JOIN TALLERS ON (TALLERS.CODI = DDISPOS.TEJEDOR)  " & _
+                                    " WHERE DISPOS = " & dg.Item(i, "CODI") & " " & _
+                                    " ORDER BY DISPOS", cnn)
+
+            Dim D As MySql.Data.MySqlClient.MySqlDataReader
+            D = cmd.ExecuteReader
+            While D.Read
+                If D("SERVIDO") = True Then
+                    tej = D("TEJIDO") & " - "
+                    'tej.Substring(0, 2).
+                Else
+
+                End If
+            End While
+
+            'Dim codigo as Integer   = dg.Item(i, "ID
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Function
+    Private Sub PonerTejidos(ByVal xlsDir As ExcelDirecto.ExcelDirecto, ByVal i As Integer, ByVal j As Integer, ByVal z As Integer)
+        Try
+            With xlsDir
+
+                .objHojaExcel.Cells(i + 2, z + 1) = dg.Item(i, dg.Splits(0).DisplayColumns(j).Name) 'PonerColoresATejido(i, j) 
+                .objHojaExcel.Cells(i + 2, z + 1).Borders.LineStyle = Excel.XlLineStyle.xlDot
+
+
+                z = z + 1
+            End With
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub PonerCabecera(ByVal xls As ExcelDirecto.ExcelDirecto, ByVal i As Integer, ByRef z As Integer)
+        Try
+
+            If dg.Splits(0).DisplayColumns(i).DataColumn.DataField = "FECHA" Then
+                xls.objHojaExcel.Cells(1, z + 1).Font.Bold = True
+                ' xlsDir.Juntar(fila + 2, colDTO, fila + 2, colDTO + 1)
+                '.objHojaExcel.Range(.objHojaExcel.Cells(1, z + 3)).Merge()
+                xls.Juntar(1, z + 1, 1, z + 3)
+                xls.objHojaExcel.Cells(1, z + 1).Value = dg.Splits(0).DisplayColumns(i).DataColumn.Caption
+
+                z = z + 3
+            Else
+                xls.objHojaExcel.Cells(1, z + 1).Font.Bold = True
+                xls.objHojaExcel.Cells(1, z + 1).Value = dg.Splits(0).DisplayColumns(i).DataColumn.Caption
+                xls.Alinear(1, z + 1, xls.Alineacion.Centro)
+                z = z + 1
+            End If
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub CrearExcelDisposicion(ByVal dg As C1.Win.C1TrueDBGrid.C1TrueDBGrid, _
+                             ByVal lst As ListBox, _
+                             ByVal titulo As String, _
+                             ByVal arrayc As Hashtable, _
+                             ByVal vistaprevia As Boolean)
+
+        Dim xlsDir As New ExcelDirecto.ExcelDirecto(True, 55, 0, 0, 0, 0, True)
+        Dim margenes As ExcelDirecto.ExcelDirecto.TamMargenes
+        Dim z, j, i As Integer
+        Try
+            With margenes
+                .margen_der = 0.4
+                .margen_inf = 0.4
+                .margen_izq = 0.4
+                .margen_sup = 0.4
+            End With
+
+            xlsDir.AñadirHoja(rm.GetString("LISTDISPOSICION"), "Arial Narrow", True)
+            xlsDir.objHojaExcel.Cells.Font.Size = 8
+            xlsDir.objHojaExcel.Range("A1").EntireColumn.Font.Size = 11
+            xlsDir.PonerHeader(rm.GetString("LISTDISPOSICION"))
+            xlsDir.ConfigurarPagina(xlsDir.Orientacion.Horizontal, margenes)
+            xlsDir.AlinearRango("G1:G65000", ExcelDirecto.ExcelDirecto.Alineacion.Justificado)
+            With xlsDir
+                .objHojaExcel.Activate()
+                z = 0
+                'Ponemos la cabecera
+                For i = 0 To dg.Splits(0).DisplayColumns.Count - 1
+                    If dg.Splits(0).DisplayColumns(i).Visible = True Then
+                        PonerCabecera(xlsDir, i, z)
+                    End If
+                Next
+
+                'Ponemos el detalle
+                For i = 0 To dg.Splits(0).Rows.Count - 1
+                    z = 0
+                    For j = 0 To dg.Splits(0).DisplayColumns.Count - 1
+                        If dg.Splits(0).DisplayColumns(j).Visible = True Then
+                            Select Case dg.Splits(0).DisplayColumns(j).DataColumn.DataField
+                                Case "FECHA"
+                                    PonerFechaDisposicion(xlsDir, i, j, z)
+                                    z = z + 3
+                                Case "TEIXIT"
+                                    PonerTejidos(xlsDir, i, j, z)
+                                Case "DRECEPCION"
+                                    PonerFechaRecepcion(xlsDir, i, j, z)
+                                    z = z + 1
+                                Case Else
+                                    .objHojaExcel.Cells(i + 2, z + 1) = dg.Item(i, dg.Splits(0).DisplayColumns(j).Name)
+                                    .objHojaExcel.Cells(i + 2, z + 1).Borders.LineStyle = Excel.XlLineStyle.xlDot
+                                    z = z + 1
+
+                            End Select
+
+                            'Ponemos el color de la columna
+
+                        End If
+                        If j = dg.Splits(0).DisplayColumns.Count - 1 Then
+                            If dg.Item(i, "ANULADA") = True Then
+                                xlsDir.PonerColorARango(i + 2, 1, i + 2, z, RGB(255, 100, 100)) 'Rojo
+                            Else
+                                If dg.Item(i, "RECIBIDO") = False Then
+                                    xlsDir.PonerColorARango(i + 2, 1, i + 2, z, RGB(149, 255, 175)) 'Verde
+                                Else
+                                    xlsDir.PonerColorARango(i + 2, 1, i + 2, z, RGB(123, 123, 255)) 'Azul
+                                End If
+                            End If
+                        End If
+                    Next
+
+                    Dim rCell As Excel.Range
+                Next
+
+                .objHojaExcel.Range("A1", "N1").Font.Size = 8
+
+                .objHojaExcel.Cells.EntireColumn.AutoFit()
+                'AjustarTamaño(xlsDir)
+                .AlinearTodo(ExcelDirecto.ExcelDirecto.Alineacion.Justificado)
+                .objHojaExcel.Columns("G").ColumnWidth = "24"
+                .objHojaExcel.Columns("E").ColumnWidth = "24"
+                .objHojaExcel.Columns("H").ColumnWidth = "24"
+                .objHojaExcel.Cells.EntireRow.AutoFit()
+
+                If vistaprevia Then : .VerVistaPrevia() : End If
+                '.Alinear("B1", "B1", ExcelDirecto.ExcelDirecto.Alineacion.Izquierda)
+                .LiberarExcel()
+            End With
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+
+    End Sub
+    Private Sub AjustarTamaño(ByVal xls As ExcelDirecto.ExcelDirecto)
+        Try
+            xls.objHojaExcel.Columns("A").ColumnWidth = "12"
+            xls.objHojaExcel.Columns("A").ColumnWidth = "6"
+            xls.objHojaExcel.Columns("A").ColumnWidth = "6"
+            xls.objHojaExcel.Columns("A").ColumnWidth = "6"
+            xls.objHojaExcel.Columns("A").ColumnWidth = "6"
+            xls.objHojaExcel.Columns("A").ColumnWidth = "6"
+            xls.objHojaExcel.Columns("A").ColumnWidth = "6"
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+
+#End Region
+
+    'Private Sub btnCancelar_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnCancelar.Click
+    '    dr = Nothing
+    '    Me.Close()
+    '    frmChildForm = Nothing
+    'End Sub
+
+End Class

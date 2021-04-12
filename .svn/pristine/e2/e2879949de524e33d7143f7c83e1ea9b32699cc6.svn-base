@@ -1,0 +1,682 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>C1.Win.C1FlexGrid.ImportExport.4</name>
+    </assembly>
+    <members>
+        <member name="F:C1.Util.Licensing.AboutForm.components">
+            <summary>
+            Required designer variable.
+            </summary>
+        </member>
+        <member name="M:C1.Util.Licensing.AboutForm.Dispose(System.Boolean)">
+            <summary>
+            Clean up any resources being used.
+            </summary>
+            <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+        </member>
+        <member name="M:C1.Util.Licensing.AboutForm.InitializeComponent">
+            <summary>
+            Required method for Designer support - do not modify
+            the contents of this method with the code editor.
+            </summary>
+        </member>
+        <member name="T:C1.Util.Licensing.ProviderInfo">
+            <summary>
+            <para>Provides static <see cref="M:C1.Util.Licensing.ProviderInfo.Validate(System.Type,System.Object)"/> methods that 
+            should be called from the constructors of licensed classes.</para>
+            <para>Also provides a static <see cref="M:C1.Util.Licensing.ProviderInfo.ShowAboutBox(System.Object)"/> method that can 
+            be called to show the about box with product and licensing information.</para>
+            </summary>
+        </member>
+        <member name="M:C1.Util.Licensing.ProviderInfo.Validate(System.Type,System.Object)">
+            <summary>
+            Perform license validation. Call this method from the licensed object's 
+            constructor to save a license key at design time, validate it at runtime, 
+            and display a nag dialog if a valid license is not found.
+            </summary>
+            <param name="type">Type of licensed object (use typeof() and not GetType()).</param>
+            <param name="instance">Reference to the licensed object (not currently used).</param>
+            <returns>A <see cref="T:C1.Util.Licensing.LicenseInfo"/> object that contains information about the license.</returns>
+            <remarks>
+            <para>Check the <b>ShouldNag</b> property of the returned <see cref="T:C1.Util.Licensing.LicenseInfo"/> 
+            to determine whether the licensed class should nag the user. This value is set
+            to true in situations where a valid license was not found but a nag dialog
+            could not be displayed. In these cases, the licensed class is supposed to nag
+            in some other way (with a watermark for example).</para>
+            </remarks>
+        </member>
+        <member name="M:C1.Util.Licensing.ProviderInfo.Validate(System.Type,System.Object,System.Boolean)">
+            <summary>
+            Perform license validation. Call this method from the licensed object's 
+            constructor to save a license key at design time, validate it at runtime, 
+            and display a nag dialog if a valid license is not found.
+            </summary>
+            <param name="type">Type of licensed object (use typeof() and not GetType()).</param>
+            <param name="instance">Reference to the licensed object (not currently used).</param>
+            <param name="showNagDialog">Whether the nag dialog should be displayed when a valid license is not found.</param>
+            <returns>A <see cref="T:C1.Util.Licensing.LicenseInfo"/> object that contains information about the license.</returns>
+            <remarks>
+            <para>This overload was created for use in WPF. It should be called in the control's constructor
+            in order to support license persistence correctly. But it should not show the nag dialog until the
+            control is fully loaded, or the VS designer may remain blank.</para>
+            <para>So the solution is this:</para>
+            <code>
+            LicenseInfo _licInfo;
+            public LicensedControl()
+            {
+              // check license but don't nag yet
+              _licInfo = ProviderInfo.Validate(typeof(LicensedControl), this, false);
+              
+              // perform licensing after control is fully loaded
+              Loaded += LicensedControl_Loaded;
+            }
+            void LicensedControl_Loaded(object sender, RoutedEventArgs e)
+            {
+              // nag after loading
+              if (_licInfo.ShouldNag)
+              {
+                ProviderInfo.ShowAboutBox(this);
+              }
+            }
+            </code>
+            </remarks>
+        </member>
+        <member name="M:C1.Util.Licensing.ProviderInfo.Nag(System.Type,C1.Util.Licensing.LicenseInfo,System.Boolean)">
+            <summary>
+            Nag user by showing AboutBox with license information.
+            Show it only once per day per assembly.
+            </summary>
+            <param name="type">Type of licensed object (use typeof() and not GetType()).</param>
+            <param name="li"><see cref="T:C1.Util.Licensing.LicenseInfo"/> object that contains information about the license.</param>
+            <param name="designTime">Whether we're running at design or run time.</param>
+        </member>
+        <member name="M:C1.Util.Licensing.ProviderInfo.Validate(System.Type,System.Object,System.Reflection.Assembly,System.String)">
+            <summary>
+            Version of Validate used by constructors that take runtime keys.
+            </summary>
+            <param name="type">Type of licensed object (use typeof() and not GetType()).</param>
+            <param name="instance">Reference to the licensed object.</param>
+            <param name="callingAsm">Assembly that contains the owner licensed control.</param>
+            <param name="runtimeKey">Any valid C1 runtime key.</param>
+            <returns>A <see cref="T:C1.Util.Licensing.LicenseInfo"/> with information about the runtime key.</returns>
+            <remarks>
+            <para>This allows a licensed C1 class to create other C1 objects bypassing 
+            license verification for the child objects.</para>
+            <para>For extra safety, we check that the owner object is defined in an assembly
+            the contains a 'C1ProductInfo' attribute.</para>
+            </remarks>
+        </member>
+        <member name="M:C1.Util.Licensing.ProviderInfo.ValidateDesigntime(System.Type,System.ComponentModel.LicenseContext)">
+            <summary>
+            Design time validation. Looks for a license in the registry and saves it in the
+            provided <see cref="T:System.ComponentModel.LicenseContext"/>.
+            </summary>
+            <param name="type">Type of licensed object (use typeof() and not GetType()).</param>
+            <param name="context"><see cref="T:System.ComponentModel.LicenseContext"/> where the runtime key will be stored.</param>
+            <returns>A <see cref="T:C1.Util.Licensing.LicenseInfo"/> with information about the license.</returns>
+            <remarks>
+            Call this method from application-type products (that always require a license to be
+            installed in the registry). In this case, the <paramref name="context"/> parameter 
+            should be set to null.
+            </remarks>
+        </member>
+        <member name="M:C1.Util.Licensing.ProviderInfo.ValidateRuntime(System.Type,System.ComponentModel.LicenseContext)">
+            <summary>
+            Runtime validation.
+            Looks for a runtime key stored in the current application's resources.
+            </summary>
+            <param name="type">Type of licensed object (use typeof() and not GetType()).</param>
+            <param name="context"><see cref="T:System.ComponentModel.LicenseContext"/> where the runtime key will be stored.</param>
+            <returns>A <see cref="T:C1.Util.Licensing.LicenseInfo"/> with information about the license.</returns>
+        </member>
+        <member name="M:C1.Util.Licensing.ProviderInfo.ShowAboutBox(System.Object)">
+            <summary>
+            Shows the About Box for an instance of a C1 product.
+            </summary>
+        </member>
+        <member name="M:C1.Util.Licensing.ProviderInfo.GetC1Type(System.Object)">
+            <summary>
+            Get the type whose assembly contains a 'C1ProductInfoAttribute'.
+            </summary>
+            <param name="instance">Instance of an object whose type is to be checked.</param>
+            <returns>The type whose assembly contains a 'C1ProductInfoAttribute'</returns>
+        </member>
+        <member name="T:C1.Util.Licensing.LicenseInfo">
+            <summary>
+            Contains information about a license stored in an application.
+            </summary>
+        </member>
+        <member name="M:C1.Util.Licensing.LicenseInfo.#ctor(System.Type,C1.Util.Licensing.LicenseStatus,C1.Util.Licensing.ProductLicense)">
+            <summary>
+            Initializes a new instance of a <see cref="T:C1.Util.Licensing.LicenseInfo"/> class.
+            </summary>
+        </member>
+        <member name="M:C1.Util.Licensing.LicenseInfo.#ctor(System.Type,C1.Util.Licensing.LicenseStatus)">
+            <summary>
+            Initializes a new instance of a <see cref="T:C1.Util.Licensing.LicenseInfo"/> class.
+            </summary>
+        </member>
+        <member name="P:C1.Util.Licensing.LicenseInfo.LicenseStatus">
+            <summary>
+            Gets or sets the status of this license (valid, expired, unlicensed).
+            </summary>
+        </member>
+        <member name="P:C1.Util.Licensing.LicenseInfo.License">
+            <summary>
+            Gets or sets the <see cref="T:C1.Util.Licensing.ProductLicense"/> associated with this license.
+            </summary>
+        </member>
+        <member name="P:C1.Util.Licensing.LicenseInfo.Type">
+            <summary>
+            Gets or sets the <see cref="P:C1.Util.Licensing.LicenseInfo.Type"/> associated with this license.
+            </summary>
+        </member>
+        <member name="P:C1.Util.Licensing.LicenseInfo.EvaluationDaysElapsed">
+            <summary>
+            Gets the number of evaluation days elapsed.
+            Returns -1 for valid licenses.
+            </summary>
+        </member>
+        <member name="P:C1.Util.Licensing.LicenseInfo.EvaluationDaysLeft">
+            <summary>
+            Gets the number of evaluation days still left.
+            </summary>
+        </member>
+        <member name="P:C1.Util.Licensing.LicenseInfo.ShouldNag">
+            <summary>
+            Gets or sets a value that determines whether the caller should
+            nag the user. This is the case when the component/control is 
+            not licensed, but is not running in interactive mode. So we can't
+            show a dialog and the caller is supposed to nag some other way
+            (typically by adding watermarks to the UI or output).
+            </summary>
+        </member>
+        <member name="P:C1.Util.Licensing.LicenseInfo.IsValid">
+            <summary>
+            Gets a value that determines whether the license found is valid.
+            </summary>
+        </member>
+        <member name="P:C1.Util.Licensing.LicenseInfo.IsExpired">
+            <summary>
+            Gets a value that determines whether the license found is expired.
+            </summary>
+        </member>
+        <member name="P:C1.Util.Licensing.LicenseInfo.IsLocalHost">
+            <summary>
+            Gets a value that determines whether the component is running under
+            localhost and therefore should not nag the user with alert dialogs.
+            </summary>
+        </member>
+        <member name="T:C1.Util.Licensing.SafeLicenseContext">
+            <summary>
+            
+            Provides a version of GetSavedLicenseKey that doesn't require
+            special permissions.
+            
+            The code was mostly copied from the .NET framework, but then changed 
+            in a few places to require fewer permissions (assembly name, file io, 
+            etc). 
+            
+            The main change is the use of a custom deserializer to read Hashtable 
+            objects instead of the original BinaryFormatter, which requires
+            permissions.
+            
+            </summary>
+        </member>
+        <member name="T:C1.Util.Licensing.C1AboutNameAttribute">
+            <summary>
+            Attribute used to specify the product name shown on the About Box.
+            </summary>
+        </member>
+        <member name="T:C1.Util.Licensing.C1AllowedCallerAttribute">
+            <summary>
+            Attribute used to specify assemblies that can use this product without a license.
+            </summary>
+        </member>
+        <member name="T:C1.Util.Licensing.C1ProductInfoAttribute">
+            <summary>
+            Attribute used to attach licensing/product information to assemblies.
+            </summary>
+        </member>
+        <member name="T:C1.Util.Licensing.ProductLicense">
+            <summary>
+            Represents a license for a product (e.g. C1BarCode, C1Studio Enterprise).
+            
+            Provides methods for:
+            - generating new license keys (administrative task)
+            - checking license key validity (used by installer and products)
+            - generating and checking runtime keys (used by products)
+            - installing/uninstalling licenses (used by installer)
+            
+            The install/uninstall code requires elevated permissions, and is
+            used only by setups and utilities (not by controls). The code is 
+            implemented in the ProductLicense.Installer.cs, which controls should
+            not include since it won't be useful to them.
+            
+            When a product is sold, we send the user a license KEY. The user installs
+            a license on his machine by providing his name, his company name, and the 
+            key.
+            
+            The <see cref="P:C1.Util.Licensing.ProductLicense.Key"/> is a string in the following format:
+            
+                AAQYYCC-XX-NNNNNN-DD-DZZZZZZ
+                
+            Where:
+            
+                AA:     Product code (should match one of the products in the 
+                        product catalog (see ProductInformation.GetProductCatalog()).
+                Q:      Quarter when the license key was issued (1, 2, or 3)
+                YY:     Year when the license key was issued (e.g., 10 for 2010)
+                CC:     Order code, two chars that indicate whether this is a 
+                        new sale, upgrade, renewal, special offer, etc.
+                XX:     Hash code to ensure key validity.
+                NNNNNN: Unique serial number.
+                DDD:    Vendor code, three chars
+                ZZZZZZ: Combination of random numbers for uniqueness and extra hash.
+                
+            </summary>
+        </member>
+        <member name="F:C1.Util.Licensing.VersionConst.VerString">
+            <summary>
+            WinForms version string representation (4 dot-delimited numbers).
+            </summary>
+        </member>
+        <member name="F:C1.Util.Licensing.VersionConst.VersionStr">
+            <summary>
+            Same as <see cref="F:C1.Util.Licensing.VersionConst.VerString"/>.
+            </summary>
+        </member>
+        <member name="F:C1.Util.Licensing.VersionConst.VerAsmName">
+            <summary>
+            For .NET 4.0 version only, used for designer assembly names.
+            </summary>
+        </member>
+        <member name="T:C1.Util.Licensing.AssemblyNames">
+            <summary>
+            Specifies assembly name parts, used by AssemblyCommonInfo to generate actual assembly names.
+            </summary>
+        </member>
+        <member name="T:C1.Win.C1FlexGrid.FileFlags">
+            <summary>
+            Specifies options for use with the <see cref="M:C1.Win.C1FlexGrid.Extensions.SaveGrid(C1.Win.C1FlexGrid.C1FlexGridBase,System.String,C1.Win.C1FlexGrid.FileFormatEnum,C1.Win.C1FlexGrid.FileFlags,System.Text.Encoding)"/> and 
+            <see cref="M:C1.Win.C1FlexGrid.Extensions.LoadGrid(C1.Win.C1FlexGrid.C1FlexGridBase,System.String,C1.Win.C1FlexGrid.FileFormatEnum,C1.Win.C1FlexGrid.FileFlags,System.Text.Encoding)"/> methods.
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1FlexGrid.FileFlags.None">
+            <summary>
+            Use default settings.
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1FlexGrid.FileFlags.IncludeFixedCells">
+            <summary>
+            Include fixed cells when loading or saving the grid.
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1FlexGrid.FileFlags.VisibleOnly">
+            <summary>
+            Save only visible rows and columns.
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1FlexGrid.FileFlags.SelectedRowsOnly">
+            <summary>
+            Save only selected rows.
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1FlexGrid.FileFlags.AsDisplayed">
+            <summary>
+            Save values as displayed (including formatting and mapping where available).
+            This flag has no effect when saving text files, which always contain values as displayed.
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1FlexGrid.FileFlags.SaveMergedRanges">
+            <summary>
+            Save merged ranges when exporting to Excel with the <see cref="M:C1.Win.C1FlexGrid.Extensions.SaveExcel(C1.Win.C1FlexGrid.C1FlexGridBase,System.String,System.String,C1.Win.C1FlexGrid.FileFlags,System.Drawing.Printing.PrinterSettings)"/> method.
+            This flag has no effect when saving text files, it only affects Excel output.
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1FlexGrid.FileFlags.LoadMergedRanges">
+            <summary>
+            Load merged ranges when importing from Excel with the <see cref="M:C1.Win.C1FlexGrid.Extensions.LoadExcel(C1.Win.C1FlexGrid.C1FlexGridBase,System.String,System.String,C1.Win.C1FlexGrid.FileFlags)"/> method.
+            This flag has no effect when loading text files, it only affects Excel input.
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1FlexGrid.FileFlags.IncludeMergedRanges">
+            <summary>
+            Save and load merged ranges when exporting to or importing from Excel with the
+            <see cref="M:C1.Win.C1FlexGrid.Extensions.SaveExcel(C1.Win.C1FlexGrid.C1FlexGridBase,System.String,System.String,C1.Win.C1FlexGrid.FileFlags,System.Drawing.Printing.PrinterSettings)"/> and <see cref="M:C1.Win.C1FlexGrid.Extensions.LoadExcel(C1.Win.C1FlexGrid.C1FlexGridBase,System.String,System.String,C1.Win.C1FlexGrid.FileFlags)"/> methods.
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1FlexGrid.FileFlags.NoFreezing">
+            <summary>
+            Do not freeze rows and columns when exporting to or importing from Excel with the
+            <see cref="M:C1.Win.C1FlexGrid.Extensions.SaveExcel(C1.Win.C1FlexGrid.C1FlexGridBase,System.String,System.String,C1.Win.C1FlexGrid.FileFlags,System.Drawing.Printing.PrinterSettings)"/> and <see cref="M:C1.Win.C1FlexGrid.Extensions.LoadExcel(C1.Win.C1FlexGrid.C1FlexGridBase,System.String,System.String,C1.Win.C1FlexGrid.FileFlags)"/> methods.
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1FlexGrid.FileFlags.OpenXml">
+            <summary>
+            Load or save file in OpenXml (Office 2007) format.
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1FlexGrid.FileFlags.Outline">
+            <summary>
+            Save nodes as Excel groups when exporting to Excel.
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1FlexGrid.FileFlags.ExcludeEmptyRows">
+            <summary>
+            Exclude empty rows when exporting to XLSX/XLS/CSV file.
+            </summary>
+        </member>
+        <member name="T:C1.Win.C1FlexGrid.FileFormatEnum">
+            <summary>
+            Specifies the type of file to save or load with the <see cref="M:C1.Win.C1FlexGrid.Extensions.SaveGrid(C1.Win.C1FlexGrid.C1FlexGridBase,System.String,C1.Win.C1FlexGrid.FileFormatEnum,C1.Win.C1FlexGrid.FileFlags,System.Text.Encoding)"/> 
+            and <see cref="M:C1.Win.C1FlexGrid.Extensions.LoadGrid(C1.Win.C1FlexGrid.C1FlexGridBase,System.String,C1.Win.C1FlexGrid.FileFormatEnum,C1.Win.C1FlexGrid.FileFlags,System.Text.Encoding)"/> methods.
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1FlexGrid.FileFormatEnum.TextComma">
+            <summary>
+            Text file, cells separated with commas.
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1FlexGrid.FileFormatEnum.TextTab">
+            <summary>
+            Text file, cells separated with tabs.
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1FlexGrid.FileFormatEnum.TextCustom">
+            <summary>
+            Text file, cells separated with the character specified by the 
+            <see cref="P:C1.Win.C1FlexGrid.C1FlexGridBase.ClipSeparators"/> property.
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1FlexGrid.FileFormatEnum.Excel">
+            <summary>
+            Microsoft Excel files (Xls/biff-8 or OpenXml formats).
+            </summary>
+        </member>
+        <member name="T:C1.Win.C1FlexGrid.Extensions">
+            <summary>
+            Extensions class for C1FlexGridBase
+            </summary>
+        </member>
+        <member name="M:C1.Win.C1FlexGrid.Extensions.LoadGrid(C1.Win.C1FlexGrid.C1FlexGridBase,System.String,C1.Win.C1FlexGrid.FileFormatEnum,C1.Win.C1FlexGrid.FileFlags,System.Text.Encoding)">
+            <summary>
+            Loads the grid from a file.
+            </summary>
+            <param name="grid">The <see cref="T:C1.Win.C1FlexGrid.C1FlexGridBase"/> instance to which a file will be loaded.</param>
+            <param name="fileName">Name of the file to load, including the path.</param>
+            <param name="format">File format to use.</param>
+            <param name="flags">Options to use when loading the file.</param>
+            <param name="encoding">The <see cref="T:System.Text.Encoding"/> to use when loading the file.</param>
+            <remarks>
+            <para>This method loads grid from a file previously saved with the <see cref="M:C1.Win.C1FlexGrid.Extensions.SaveGrid(C1.Win.C1FlexGrid.C1FlexGridBase,System.String,C1.Win.C1FlexGrid.FileFormatEnum,C1.Win.C1FlexGrid.FileFlags,System.Text.Encoding)"/> method.
+            Formats supported include comma-delimited text files (CSV format), tab-delimited 
+            text files, and Microsoft Excel files (.XLS).</para>
+            <para>When loading text files, rows and columns are added to the grid if needed to 
+            accommodate the file contents. Text files contain only data and no formatting information.</para>
+            <para>When loading Excel files, the grid retrieves the first worksheet from the specified 
+            workbook file. The <see cref="M:C1.Win.C1FlexGrid.Extensions.LoadExcel(C1.Win.C1FlexGrid.C1FlexGridBase,System.String,System.String,C1.Win.C1FlexGrid.FileFlags)"/> method allows you to specify which worksheet should be loaded. 
+            You can use the <see cref="M:C1.Win.C1FlexGrid.Extensions.LoadExcelSheetNames(C1.Win.C1FlexGrid.C1FlexGridBase,System.String)" />
+            method allows you to retrieve a list of the worksheets stored in an XLS file.
+            The grid can save and load data and formatting information from XLS files.</para>
+            <para>Grids can also be persisted to Xml format using the <see cref="M:C1.Win.C1FlexGrid.C1FlexGridBase.WriteXml(System.String)"/> and <see cref="M:C1.Win.C1FlexGrid.C1FlexGridBase.ReadXml(System.String)"/> methods.</para>
+            </remarks>
+        </member>
+        <member name="M:C1.Win.C1FlexGrid.Extensions.LoadGrid(C1.Win.C1FlexGrid.C1FlexGridBase,System.IO.Stream,C1.Win.C1FlexGrid.FileFormatEnum,C1.Win.C1FlexGrid.FileFlags,System.Text.Encoding)">
+            <summary>
+            Loads the grid from stream.
+            </summary>
+            <param name="grid">The <see cref="T:C1.Win.C1FlexGrid.C1FlexGridBase"/> instance to which a file will be loaded.</param>
+            <param name="stream">The <see cref="T:System.IO.Stream"/> to read.</param>
+            <param name="format">File format to use.</param>
+            <param name="flags">Options to use when loading the data.</param>
+            <param name="encoding">The <see cref="T:System.Text.Encoding"/> to use when saving the file.</param>
+        </member>
+        <member name="M:C1.Win.C1FlexGrid.Extensions.LoadGrid(C1.Win.C1FlexGrid.C1FlexGridBase,System.IO.Stream,C1.Win.C1FlexGrid.FileFormatEnum,C1.Win.C1FlexGrid.FileFlags)">
+            <summary>
+            Loads the grid from stream.
+            </summary>
+            <param name="grid">The <see cref="T:C1.Win.C1FlexGrid.C1FlexGridBase"/> instance to which a file will be loaded.</param>
+            <param name="stream">The <see cref="T:System.IO.Stream"/> to read.</param>
+            <param name="format">File format to use.</param>
+            <param name="flags">Options to use when loading the data.</param>
+        </member>
+        <member name="M:C1.Win.C1FlexGrid.Extensions.LoadGrid(C1.Win.C1FlexGrid.C1FlexGridBase,System.String,C1.Win.C1FlexGrid.FileFormatEnum,C1.Win.C1FlexGrid.FileFlags)">
+            <summary>
+            Loads the grid from a file.
+            </summary>
+            <param name="grid"><see cref="T:C1.Win.C1FlexGrid.C1FlexGridBase"/> instance to which a file will be loaded.</param>
+            <param name="fileName">Name of the file to load, including the path.</param>
+            <param name="format">File format to use.</param>
+            <param name="flags">Options to use when loading the file.</param>
+        </member>
+        <member name="M:C1.Win.C1FlexGrid.Extensions.LoadGrid(C1.Win.C1FlexGrid.C1FlexGridBase,System.String,C1.Win.C1FlexGrid.FileFormatEnum)">
+            <summary>
+            Loads the grid from a file.
+            </summary>
+            <param name="grid"><see cref="T:C1.Win.C1FlexGrid.C1FlexGridBase"/> instance to which a file will be loaded.</param>
+            <param name="fileName">Name of the file to load, including the path.</param>
+            <param name="format">File format to use.</param>
+        </member>
+        <member name="M:C1.Win.C1FlexGrid.Extensions.LoadExcel(C1.Win.C1FlexGrid.C1FlexGridBase,System.String,System.String,C1.Win.C1FlexGrid.FileFlags)">
+            <summary>
+            Loads the grid from a Microsoft Excel (.XLS) file.
+            </summary>
+            <param name="grid"><see cref="T:C1.Win.C1FlexGrid.C1FlexGridBase"/> instance to which a file will be loaded.</param>
+            <param name="fileName">Name of the file to load, including the path.</param>
+            <param name="sheetName">Name of the worksheet to load.</param>
+            <param name="flags">Options to use when loading the file.</param>
+            <remarks>
+            Use the <see cref="M:C1.Win.C1FlexGrid.Extensions.LoadExcelSheetNames(C1.Win.C1FlexGrid.C1FlexGridBase,System.String)"/> method to obtain a list of the worksheets 
+            in an XLS file.
+            </remarks>
+        </member>
+        <member name="M:C1.Win.C1FlexGrid.Extensions.LoadExcel(C1.Win.C1FlexGrid.C1FlexGridBase,System.IO.Stream,System.String,C1.Win.C1FlexGrid.FileFlags)">
+            <summary>
+            Loads the grid from a Microsoft Excel (.XLS) file.
+            </summary>
+            <param name="grid"><see cref="T:C1.Win.C1FlexGrid.C1FlexGridBase"/> instance to which a file will be loaded.</param>
+            <param name="stream">The <see cref="T:System.IO.Stream"/> to read.</param>
+            <param name="sheetName">Name of the worksheet to load.</param>
+            <param name="flags">Options to use when loading the file.</param>
+            <remarks>
+            Use the <see cref="M:C1.Win.C1FlexGrid.Extensions.LoadExcelSheetNames(C1.Win.C1FlexGrid.C1FlexGridBase,System.IO.Stream)"/> method to obtain a list of the worksheets 
+            in an XLS file.
+            </remarks>
+        </member>
+        <member name="M:C1.Win.C1FlexGrid.Extensions.LoadExcel(C1.Win.C1FlexGrid.C1FlexGridBase,System.String,System.String)">
+            <summary>
+            Loads the grid from a Microsoft Excel (.XLS) file.
+            </summary>
+            <param name="grid"><see cref="T:C1.Win.C1FlexGrid.C1FlexGridBase"/> instance to which a file will be loaded.</param>
+            <param name="fileName">Name of the file to load, including the path.</param>
+            <param name="sheetName">Name of the worksheet to load.</param>
+            <remarks>
+            Use the <see cref="M:C1.Win.C1FlexGrid.Extensions.LoadExcelSheetNames(C1.Win.C1FlexGrid.C1FlexGridBase,System.String)"/> method to obtain a list of the worksheets 
+            in an XLS file.
+            </remarks>
+        </member>
+        <member name="M:C1.Win.C1FlexGrid.Extensions.LoadExcel(C1.Win.C1FlexGrid.C1FlexGridBase,System.String,C1.Win.C1FlexGrid.FileFlags)">
+            <summary>
+            Loads the grid from the first worksheet in a Microsoft Excel (.XLS) file.
+            </summary>
+            <param name="grid"><see cref="T:C1.Win.C1FlexGrid.C1FlexGridBase"/> instance to which a file will be loaded.</param>
+            <param name="fileName">Name of the file to load, including the path.</param>
+            <param name="flags">Options to use when loading the file.</param>
+        </member>
+        <member name="M:C1.Win.C1FlexGrid.Extensions.LoadExcel(C1.Win.C1FlexGrid.C1FlexGridBase,System.String)">
+            <summary>
+            Loads the grid from the first worksheet in a Microsoft Excel (.XLS) file.
+            </summary>
+            <param name="grid"><see cref="T:C1.Win.C1FlexGrid.C1FlexGridBase"/> instance to which a file will be loaded.</param>
+            <param name="fileName">Name of the file to load, including the path.</param>
+        </member>
+        <member name="M:C1.Win.C1FlexGrid.Extensions.LoadExcelSheetNames(C1.Win.C1FlexGrid.C1FlexGridBase,System.String)">
+            <summary>
+            Gets a list with the names of the worksheets in a Microsoft Excel (.XLS) file.
+            </summary>
+            <param name="grid"><see cref="T:C1.Win.C1FlexGrid.C1FlexGridBase"/> instance to which a file will be loaded.</param>
+            <param name="fileName">Name of the Excel file, including the path.</param>
+            <returns>An array containing the names of the worksheets defined in the file.</returns>
+            <remarks>
+            This method is used to obtain a list of sheet names that can later be used to load and 
+            save specific sheets using the <see cref="M:C1.Win.C1FlexGrid.Extensions.LoadExcel(C1.Win.C1FlexGrid.C1FlexGridBase,System.String,System.String,C1.Win.C1FlexGrid.FileFlags)"/> and <see cref="M:C1.Win.C1FlexGrid.Extensions.SaveExcel(C1.Win.C1FlexGrid.C1FlexGridBase,System.String,System.String,C1.Win.C1FlexGrid.FileFlags,System.Drawing.Printing.PrinterSettings)"/> methods.
+            </remarks>
+            <example>
+            The code below loads all sheets in an Excel workbook into a collection of grids in a 
+            TabControl:
+            <code>
+            // clear tabControl
+            tabControl.TabPages.Clear();
+            
+            // load sheet names
+            string fileName = "c:\book1.xls";
+            string[] sheets = _flexGrid.LoadExcelSheetNames(fileName);
+            
+            // load each sheet
+            foreach (string sheetName in sheets)
+            {
+              // create a new grid for this sheet
+              C1FlexGrid flex = new C1FlexGrid();
+              flex.Dock = DockStyle.Fill;
+              
+              // load sheet into new grid
+              flex.LoadExcel(fileName, sheetName);
+              
+              // add grid to the tabControl
+              TabPage page = new TabPage();
+              page.Controls.Add(flex);
+              page.Text = sheetName;
+              tabControl.TabPages.Add(page);
+            }
+            </code>
+            </example>
+        </member>
+        <member name="M:C1.Win.C1FlexGrid.Extensions.LoadExcelSheetNames(C1.Win.C1FlexGrid.C1FlexGridBase,System.IO.Stream)">
+            <summary>
+            Gets a list with the names of the worksheets in a Microsoft Excel (.XLS) file.
+            </summary>
+            <param name="grid"><see cref="T:C1.Win.C1FlexGrid.C1FlexGridBase"/> instance to which a file will be loaded.</param>
+            <param name="stream">The <see cref="T:System.IO.Stream"/> to read.</param>
+            <returns>An array containing the names of the worksheets defined in the file.</returns>
+        </member>
+        <member name="M:C1.Win.C1FlexGrid.Extensions.SaveGrid(C1.Win.C1FlexGrid.C1FlexGridBase,System.String,C1.Win.C1FlexGrid.FileFormatEnum,C1.Win.C1FlexGrid.FileFlags,System.Text.Encoding)">
+            <summary>
+            Saves the grid contents to a file.
+            </summary>
+            <param name="grid"><see cref="T:C1.Win.C1FlexGrid.C1FlexGridBase"/> instance that will be saved.</param>
+            <param name="fileName">Name of the file to save, including the path.</param>
+            <param name="format">File format to use.</param>
+            <param name="flags">Options to use when saving the file.</param>
+            <param name="encoding"><see cref="T:System.Text.Encoding"/> to use when saving the file.</param>
+            <remarks>
+            <para>Grids saved to CSV and other text files include data only (no formatting information is saved).</para>
+            <para>Grids saved to Excel files include data and formatting information. Images are not saved.</para>
+            <para>Grids can also be persisted to Xml format using the <see cref="M:C1.Win.C1FlexGrid.C1FlexGridBase.WriteXml(System.String)"/> and <see cref="M:C1.Win.C1FlexGrid.C1FlexGridBase.ReadXml(System.String)"/> methods.</para>
+            </remarks>
+        </member>
+        <member name="M:C1.Win.C1FlexGrid.Extensions.SaveGrid(C1.Win.C1FlexGrid.C1FlexGridBase,System.IO.Stream,C1.Win.C1FlexGrid.FileFormatEnum,C1.Win.C1FlexGrid.FileFlags,System.Text.Encoding)">
+            <summary>
+            Saves the grid contents to a stream.
+            </summary>
+            <param name="grid"><see cref="T:C1.Win.C1FlexGrid.C1FlexGridBase"/> instance that will be saved.</param>
+            <param name="stream">The <see cref="T:System.IO.Stream"/> to write.</param>
+            <param name="format">File format to use.</param>
+            <param name="flags">Options to use when saving the file.</param>
+            <param name="encoding"><see cref="T:System.Text.Encoding"/> to use when saving the file.</param>
+        </member>
+        <member name="M:C1.Win.C1FlexGrid.Extensions.SaveGrid(C1.Win.C1FlexGrid.C1FlexGridBase,System.IO.Stream,C1.Win.C1FlexGrid.FileFormatEnum,C1.Win.C1FlexGrid.FileFlags)">
+            <summary>
+            Saves the grid contents to a stream.
+            </summary>
+            <param name="grid"><see cref="T:C1.Win.C1FlexGrid.C1FlexGridBase"/> instance that will be saved.</param>
+            <param name="stream">The <see cref="T:System.IO.Stream"/> to write.</param>
+            <param name="format">File format to use.</param>
+            <param name="flags">Options to use when saving the file.</param>
+        </member>
+        <member name="M:C1.Win.C1FlexGrid.Extensions.SaveGrid(C1.Win.C1FlexGrid.C1FlexGridBase,System.String,C1.Win.C1FlexGrid.FileFormatEnum,C1.Win.C1FlexGrid.FileFlags)">
+            <summary>
+            Saves the grid contents to a file.
+            </summary>
+            <param name="grid"><see cref="T:C1.Win.C1FlexGrid.C1FlexGridBase"/> instance that will be saved.</param>
+            <param name="fileName">Name of the file to save, including the path.</param>
+            <param name="format">File format to use.</param>
+            <param name="flags">Options to use when saving the file.</param>
+        </member>
+        <member name="M:C1.Win.C1FlexGrid.Extensions.SaveGrid(C1.Win.C1FlexGrid.C1FlexGridBase,System.String,C1.Win.C1FlexGrid.FileFormatEnum)">
+            <summary>
+            Saves the grid contents to a file.
+            </summary>
+            <param name="grid"><see cref="T:C1.Win.C1FlexGrid.C1FlexGridBase"/> instance that will be saved.</param>
+            <param name="fileName">Name of the file to save, including the path.</param>
+            <param name="format">File format to use.</param>
+        </member>
+        <member name="M:C1.Win.C1FlexGrid.Extensions.SaveExcel(C1.Win.C1FlexGrid.C1FlexGridBase,System.String,System.String,C1.Win.C1FlexGrid.FileFlags,System.Drawing.Printing.PrinterSettings)">
+            <summary>
+            Saves the grid contents to a Microsoft Excel (.XLS) file.
+            </summary>
+            <param name="grid"><see cref="T:C1.Win.C1FlexGrid.C1FlexGridBase"/> instance that will be saved.</param>
+            <param name="fileName">Name of the file to save, including the path.</param>
+            <param name="sheetName">Name of the sheet to add to the Excel workbook.</param>
+            <param name="flags">Options to use when saving the file.</param>
+            <param name="ps"><see cref="T:System.Drawing.Printing.PrinterSettings"/> to use when saving the file.</param>
+            <remarks>
+            <para>If the specified file exists, the control will add or replace a single worksheet in it.
+            Existing sheets will be preserved if possible.</para>
+            <para>The worksheet to add or replace is identified by the <paramref name="sheetName"/> parameter.</para>
+            <para>If the specified file is in use by another application (usually Excel), the method will fail.</para>
+            <para>This method does not require Microsoft Excel to be installed on the machine.</para>
+            </remarks>
+        </member>
+        <member name="M:C1.Win.C1FlexGrid.Extensions.SaveExcel(C1.Win.C1FlexGrid.C1FlexGridBase,System.IO.Stream,System.String,C1.Win.C1FlexGrid.FileFlags,System.Drawing.Printing.PrinterSettings)">
+            <summary>
+            Saves the grid contents to a stream.
+            </summary>
+            <param name="grid"><see cref="T:C1.Win.C1FlexGrid.C1FlexGridBase"/> instance that will be saved.</param>
+            <param name="stream">The <see cref="T:System.IO.Stream"/> to write.</param>
+            <param name="sheetName">Name of the sheet to add to the Excel workbook.</param>
+            <param name="flags">Options to use when saving the file.</param>
+            <param name="ps"><see cref="T:System.Drawing.Printing.PrinterSettings"/> to use when saving the file.</param>
+        </member>
+        <member name="M:C1.Win.C1FlexGrid.Extensions.SaveExcel(C1.Win.C1FlexGrid.C1FlexGridBase,System.String,System.String,C1.Win.C1FlexGrid.FileFlags)">
+            <summary>
+            Saves the grid contents to a Microsoft Excel (.XLS) file.
+            </summary>
+            <param name="grid"><see cref="T:C1.Win.C1FlexGrid.C1FlexGridBase"/> instance that will be saved.</param>
+            <param name="fileName">Name of the file to save, including the path.</param>
+            <param name="sheetName">Name of the sheet to add to the Excel workbook.</param>
+            <param name="flags">Options to use when saving the file.</param>
+            <remarks>
+            <para>If the specified file exists, the control will add or replace a single worksheet in it.
+            Existing sheets will be preserved if possible.</para>
+            <para>The worksheet to add or replace is identified by the <paramref name="sheetName"/> parameter.</para>
+            <para>If the specified file is in use by another application (usually Excel), the method will fail.</para>
+            <para>This method does not require Microsoft Excel to be installed on the machine.</para>
+            </remarks>
+        </member>
+        <member name="M:C1.Win.C1FlexGrid.Extensions.SaveExcel(C1.Win.C1FlexGrid.C1FlexGridBase,System.String,System.String)">
+            <summary>
+            Saves the grid contents to a Microsoft Excel (.XLS) file.
+            </summary>
+            <param name="grid"><see cref="T:C1.Win.C1FlexGrid.C1FlexGridBase"/> instance that will be saved.</param>
+            <param name="fileName">Name of the file to save, including the path.</param>
+            <param name="sheetName">Name of the sheet to add to the Excel workbook.</param>
+        </member>
+        <member name="M:C1.Win.C1FlexGrid.Extensions.SaveExcel(C1.Win.C1FlexGrid.C1FlexGridBase,System.String,C1.Win.C1FlexGrid.FileFlags)">
+            <summary>
+            Saves the grid contents to a Microsoft Excel (.XLS) file.
+            </summary>
+            <param name="grid"><see cref="T:C1.Win.C1FlexGrid.C1FlexGridBase"/> instance that will be saved.</param>
+            <param name="fileName">Name of the file to save, including the path.</param>
+            <param name="flags"></param>
+        </member>
+        <member name="M:C1.Win.C1FlexGrid.Extensions.SaveExcel(C1.Win.C1FlexGrid.C1FlexGridBase,System.String)">
+            <summary>
+            Saves the grid contents to a Microsoft Excel (.XLS) file.
+            </summary>
+            <param name="grid"><see cref="T:C1.Win.C1FlexGrid.C1FlexGridBase"/> instance that will be saved.</param>
+            <param name="fileName">Name of the file to save, including the path.</param>
+        </member>
+    </members>
+</doc>

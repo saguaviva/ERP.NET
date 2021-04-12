@@ -1,0 +1,198 @@
+﻿Imports C1.Win.C1PrintPreview
+
+<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
+Partial Class Form1
+    Inherits System.Windows.Forms.Form
+
+    'Form reemplaza a Dispose para limpiar la lista de componentes.
+    <System.Diagnostics.DebuggerNonUserCode()> _
+    Protected Overrides Sub Dispose(ByVal disposing As Boolean)
+        Try
+            If disposing AndAlso components IsNot Nothing Then
+                components.Dispose()
+            End If
+        Finally
+            MyBase.Dispose(disposing)
+        End Try
+    End Sub
+
+    'Requerido por el Diseñador de Windows Forms
+    Private components As System.ComponentModel.IContainer
+
+    'NOTA: el Diseñador de Windows Forms necesita el siguiente procedimiento
+    'Se puede modificar usando el Diseñador de Windows Forms.  
+    'No lo modifique con el editor de código.
+    <System.Diagnostics.DebuggerStepThrough()> _
+    Private Sub InitializeComponent()
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(Form1))
+        Dim Style1 As C1.Win.C1TrueDBGrid.Style = New C1.Win.C1TrueDBGrid.Style()
+        Dim Style2 As C1.Win.C1TrueDBGrid.Style = New C1.Win.C1TrueDBGrid.Style()
+        Dim Style3 As C1.Win.C1TrueDBGrid.Style = New C1.Win.C1TrueDBGrid.Style()
+        Dim Style4 As C1.Win.C1TrueDBGrid.Style = New C1.Win.C1TrueDBGrid.Style()
+        Dim Style5 As C1.Win.C1TrueDBGrid.Style = New C1.Win.C1TrueDBGrid.Style()
+        Dim Style6 As C1.Win.C1TrueDBGrid.Style = New C1.Win.C1TrueDBGrid.Style()
+        Dim Style7 As C1.Win.C1TrueDBGrid.Style = New C1.Win.C1TrueDBGrid.Style()
+        Dim Style8 As C1.Win.C1TrueDBGrid.Style = New C1.Win.C1TrueDBGrid.Style()
+        Me.C1CommandDock1 = New C1.Win.C1Command.C1CommandDock()
+        Me.C1CommandLink3 = New C1.Win.C1Command.C1CommandLink()
+        Me.C1CommandLink5 = New C1.Win.C1Command.C1CommandLink()
+        Me.C1TrueDBGrid1 = New C1.Win.C1TrueDBGrid.C1TrueDBGrid()
+        Me.C1TrueDBDropdown1 = New C1.Win.C1TrueDBGrid.C1TrueDBDropdown()
+        Me.C1Label1 = New C1.Win.C1Input.C1Label()
+        Me.C1Button1 = New C1.Win.C1Input.C1Button()
+        Me.C1TextBox1 = New C1.Win.C1Input.C1TextBox()
+        Me.C1Report1 = New C1.C1Report.C1Report()
+        Me.C1Label2 = New C1.Win.C1Input.C1Label()
+        Me.C1TextBox2 = New C1.Win.C1Input.C1TextBox()
+        CType(Me.C1CommandDock1, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.C1TrueDBGrid1, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.C1TrueDBDropdown1, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.C1Label1, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.C1TextBox1, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.C1Report1, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.C1Label2, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.C1TextBox2, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.SuspendLayout()
+        '
+        'C1CommandDock1
+        '
+        Me.C1CommandDock1.Dock = System.Windows.Forms.DockStyle.Bottom
+        Me.C1CommandDock1.Id = 1
+        Me.C1CommandDock1.Location = New System.Drawing.Point(0, 228)
+        Me.C1CommandDock1.Name = "C1CommandDock1"
+        Me.C1CommandDock1.Size = New System.Drawing.Size(200, 32)
+        '
+        'C1TrueDBGrid1
+        '
+        Me.C1TrueDBGrid1.GroupByCaption = "Drag a column header here to group by that column"
+        Me.C1TrueDBGrid1.Images.Add(CType(resources.GetObject("C1TrueDBGrid1.Images"), System.Drawing.Image))
+        Me.C1TrueDBGrid1.Location = New System.Drawing.Point(131, 12)
+        Me.C1TrueDBGrid1.Name = "C1TrueDBGrid1"
+        Me.C1TrueDBGrid1.PreviewInfo.Location = New System.Drawing.Point(0, 0)
+        Me.C1TrueDBGrid1.PreviewInfo.Size = New System.Drawing.Size(0, 0)
+        Me.C1TrueDBGrid1.PreviewInfo.ZoomFactor = 75.0R
+        Me.C1TrueDBGrid1.PrintInfo.PageSettings = CType(resources.GetObject("C1TrueDBGrid1.PrintInfo.PageSettings"), System.Drawing.Printing.PageSettings)
+        Me.C1TrueDBGrid1.Size = New System.Drawing.Size(240, 150)
+        Me.C1TrueDBGrid1.TabIndex = 0
+        Me.C1TrueDBGrid1.Text = "C1TrueDBGrid1"
+        Me.C1TrueDBGrid1.PropBag = resources.GetString("C1TrueDBGrid1.PropBag")
+        '
+        'C1TrueDBDropdown1
+        '
+        Me.C1TrueDBDropdown1.AllowColMove = True
+        Me.C1TrueDBDropdown1.AllowColSelect = True
+        Me.C1TrueDBDropdown1.AllowRowSizing = C1.Win.C1TrueDBGrid.RowSizingEnum.AllRows
+        Me.C1TrueDBDropdown1.AlternatingRows = False
+        Me.C1TrueDBDropdown1.CaptionStyle = Style1
+        Me.C1TrueDBDropdown1.ColumnCaptionHeight = 17
+        Me.C1TrueDBDropdown1.ColumnFooterHeight = 17
+        Me.C1TrueDBDropdown1.EvenRowStyle = Style2
+        Me.C1TrueDBDropdown1.FetchRowStyles = False
+        Me.C1TrueDBDropdown1.FooterStyle = Style3
+        Me.C1TrueDBDropdown1.HeadingStyle = Style4
+        Me.C1TrueDBDropdown1.HighLightRowStyle = Style5
+        Me.C1TrueDBDropdown1.Images.Add(CType(resources.GetObject("C1TrueDBDropdown1.Images"), System.Drawing.Image))
+        Me.C1TrueDBDropdown1.Location = New System.Drawing.Point(12, 123)
+        Me.C1TrueDBDropdown1.Name = "C1TrueDBDropdown1"
+        Me.C1TrueDBDropdown1.OddRowStyle = Style6
+        Me.C1TrueDBDropdown1.RecordSelectorStyle = Style7
+        Me.C1TrueDBDropdown1.RowDivider.Color = System.Drawing.Color.DarkGray
+        Me.C1TrueDBDropdown1.RowDivider.Style = C1.Win.C1TrueDBGrid.LineStyleEnum.[Single]
+        Me.C1TrueDBDropdown1.RowSubDividerColor = System.Drawing.Color.DarkGray
+        Me.C1TrueDBDropdown1.ScrollTips = False
+        Me.C1TrueDBDropdown1.Size = New System.Drawing.Size(100, 150)
+        Me.C1TrueDBDropdown1.Style = Style8
+        Me.C1TrueDBDropdown1.TabIndex = 1
+        Me.C1TrueDBDropdown1.Text = "C1TrueDBDropdown1"
+        Me.C1TrueDBDropdown1.Visible = False
+        Me.C1TrueDBDropdown1.PropBag = resources.GetString("C1TrueDBDropdown1.PropBag")
+        '
+        'C1Label1
+        '
+        Me.C1Label1.AutoSize = True
+        Me.C1Label1.BorderStyle = System.Windows.Forms.BorderStyle.None
+        Me.C1Label1.Location = New System.Drawing.Point(60, 46)
+        Me.C1Label1.Name = "C1Label1"
+        Me.C1Label1.Size = New System.Drawing.Size(52, 13)
+        Me.C1Label1.TabIndex = 2
+        Me.C1Label1.Tag = Nothing
+        '
+        'C1Button1
+        '
+        Me.C1Button1.Location = New System.Drawing.Point(37, 76)
+        Me.C1Button1.Name = "C1Button1"
+        Me.C1Button1.Size = New System.Drawing.Size(75, 23)
+        Me.C1Button1.TabIndex = 3
+        Me.C1Button1.Text = "C1Button1"
+        Me.C1Button1.UseVisualStyleBackColor = True
+        '
+        'C1TextBox1
+        '
+        Me.C1TextBox1.Location = New System.Drawing.Point(12, 12)
+        Me.C1TextBox1.Name = "C1TextBox1"
+        Me.C1TextBox1.Size = New System.Drawing.Size(100, 20)
+        Me.C1TextBox1.TabIndex = 4
+        Me.C1TextBox1.Tag = Nothing
+        '
+        'C1Report1
+        '
+        Me.C1Report1.ReportDefinition = resources.GetString("C1Report1.ReportDefinition")
+        Me.C1Report1.ReportName = "C1Report1"
+        '
+        'C1Label2
+        '
+        Me.C1Label2.AutoSize = True
+        Me.C1Label2.BorderStyle = System.Windows.Forms.BorderStyle.None
+        Me.C1Label2.Location = New System.Drawing.Point(479, 168)
+        Me.C1Label2.Name = "C1Label2"
+        Me.C1Label2.Size = New System.Drawing.Size(52, 13)
+        Me.C1Label2.TabIndex = 5
+        Me.C1Label2.Tag = Nothing
+        '
+        'C1TextBox2
+        '
+        Me.C1TextBox2.Location = New System.Drawing.Point(479, 280)
+        Me.C1TextBox2.Name = "C1TextBox2"
+        Me.C1TextBox2.Size = New System.Drawing.Size(100, 20)
+        Me.C1TextBox2.TabIndex = 6
+        Me.C1TextBox2.Tag = Nothing
+        '
+        'Form1
+        '
+        Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
+        Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
+        Me.ClientSize = New System.Drawing.Size(875, 406)
+        Me.Controls.Add(Me.C1TextBox2)
+        Me.Controls.Add(Me.C1Label2)
+        Me.Controls.Add(Me.C1TextBox1)
+        Me.Controls.Add(Me.C1Button1)
+        Me.Controls.Add(Me.C1Label1)
+        Me.Controls.Add(Me.C1TrueDBDropdown1)
+        Me.Controls.Add(Me.C1TrueDBGrid1)
+        Me.Name = "Form1"
+        Me.Text = "Form1"
+        CType(Me.C1CommandDock1, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.C1TrueDBGrid1, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.C1TrueDBDropdown1, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.C1Label1, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.C1TextBox1, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.C1Report1, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.C1Label2, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.C1TextBox2, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.ResumeLayout(False)
+        Me.PerformLayout()
+
+    End Sub
+
+    Friend WithEvents C1CommandDock1 As C1.Win.C1Command.C1CommandDock
+    Friend WithEvents C1CommandLink3 As C1.Win.C1Command.C1CommandLink
+    Friend WithEvents C1CommandLink5 As C1.Win.C1Command.C1CommandLink
+    Friend WithEvents C1TrueDBGrid1 As C1.Win.C1TrueDBGrid.C1TrueDBGrid
+    Friend WithEvents C1TrueDBDropdown1 As C1.Win.C1TrueDBGrid.C1TrueDBDropdown
+    Friend WithEvents C1Label1 As C1.Win.C1Input.C1Label
+    Friend WithEvents C1Button1 As C1.Win.C1Input.C1Button
+    Friend WithEvents C1TextBox1 As C1.Win.C1Input.C1TextBox
+    Friend WithEvents C1Report1 As C1.C1Report.C1Report
+    Friend WithEvents C1Label2 As C1.Win.C1Input.C1Label
+    Friend WithEvents C1TextBox2 As C1.Win.C1Input.C1TextBox
+End Class

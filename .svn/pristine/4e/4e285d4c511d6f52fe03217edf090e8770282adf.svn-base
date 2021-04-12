@@ -1,0 +1,625 @@
+Imports MySql.Data.MySqlClient : Imports clsFuncionesLOG : Imports clsFuncionesC1 : Imports clsFuncionesUtiles : Imports clsConstantes : Imports clsOtrasFunciones
+
+Public Class frmPAFLista
+    Inherits frmPlantillaLista
+
+#Region " Código generado por el Diseñador de Windows Forms "
+
+    Public Sub New()
+        MyBase.New()
+
+        'El Diseñador de Windows Forms requiere esta llamada.
+        InitializeComponent() : Dim tom As SMcMaster.TabOrderManager = New SMcMaster.TabOrderManager(Me) : tom.SetTabOrder(SMcMaster.TabOrderManager.TabScheme.AcrossFirst)
+
+        'Agregar cualquier inicialización después de la llamada a InitializeComponent()
+
+    End Sub
+
+    'Form reemplaza a Dispose para limpiar la lista de componentes.
+    Protected Overloads Overrides Sub Dispose(ByVal disposing As Boolean)
+        If disposing Then
+            If Not (components Is Nothing) Then
+                components.Dispose()
+            End If
+        End If
+        MyBase.Dispose(disposing)
+        frmChildForm = Nothing
+    End Sub
+
+    'Requerido por el Diseñador de Windows Forms
+    Private components As System.ComponentModel.IContainer
+
+    'NOTA: el Diseñador de Windows Forms requiere el siguiente procedimiento
+    'Puede modificarse utilizando el Diseñador de Windows Forms. 
+    'No lo modifique con el editor de código.
+    <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
+        Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(frmPAFLista))
+        Me.SuspendLayout()
+        '
+        'btnModificar
+        '
+        Me.btnModificar.Location = CType(resources.GetObject("btnModificar.Location"), System.Drawing.Point)
+        Me.btnModificar.Name = "btnModificar"
+        Me.btnModificar.Size = CType(resources.GetObject("btnModificar.Size"), System.Drawing.Size)
+        '
+        'btnBorrar
+        '
+        Me.btnBorrar.Location = CType(resources.GetObject("btnBorrar.Location"), System.Drawing.Point)
+        Me.btnBorrar.Name = "btnBorrar"
+        Me.btnBorrar.Size = CType(resources.GetObject("btnBorrar.Size"), System.Drawing.Size)
+        '
+        'btnTancar
+        '
+        Me.btnTancar.Location = CType(resources.GetObject("btnTancar.Location"), System.Drawing.Point)
+        Me.btnTancar.Name = "btnTancar"
+        Me.btnTancar.Size = CType(resources.GetObject("btnTancar.Size"), System.Drawing.Size)
+        '
+        'cboSeleccionCentro
+        '
+        Me.cboSeleccionCentro.Location = CType(resources.GetObject("cboSeleccionCentro.Location"), System.Drawing.Point)
+        Me.cboSeleccionCentro.Name = "cboSeleccionCentro"
+        '
+        'btnNuevo
+        '
+        Me.btnNuevo.Location = CType(resources.GetObject("btnNuevo.Location"), System.Drawing.Point)
+        Me.btnNuevo.Name = "btnNuevo"
+        Me.btnNuevo.Size = CType(resources.GetObject("btnNuevo.Size"), System.Drawing.Size)
+        '
+        'btnPrimero
+        '
+        Me.btnPrimero.Location = CType(resources.GetObject("btnPrimero.Location"), System.Drawing.Point)
+        Me.btnPrimero.Name = "btnPrimero"
+        Me.btnPrimero.Size = CType(resources.GetObject("btnPrimero.Size"), System.Drawing.Size)
+        '
+        'sbtipo
+        '
+        Me.sbtipo.FlatStyle = System.Windows.Forms.FlatStyle.System
+        Me.sbtipo.Location = CType(resources.GetObject("sbtipo.Location"), System.Drawing.Point)
+        Me.sbtipo.Name = "sbtipo"
+        Me.sbtipo.Size = CType(resources.GetObject("sbtipo.Size"), System.Drawing.Size)
+        '
+        'btnRecargar
+        '
+        Me.btnRecargar.Location = CType(resources.GetObject("btnRecargar.Location"), System.Drawing.Point)
+        Me.btnRecargar.Name = "btnRecargar"
+        Me.btnRecargar.Size = CType(resources.GetObject("btnRecargar.Size"), System.Drawing.Size)
+        '
+        'btnSiguiente
+        '
+        Me.btnSiguiente.Location = CType(resources.GetObject("btnSiguiente.Location"), System.Drawing.Point)
+        Me.btnSiguiente.Name = "btnSiguiente"
+        Me.btnSiguiente.Size = CType(resources.GetObject("btnSiguiente.Size"), System.Drawing.Size)
+        '
+        'btnAnterior
+        '
+        Me.btnAnterior.Location = CType(resources.GetObject("btnAnterior.Location"), System.Drawing.Point)
+        Me.btnAnterior.Name = "btnAnterior"
+        Me.btnAnterior.Size = CType(resources.GetObject("btnAnterior.Size"), System.Drawing.Size)
+        '
+        'btnVerLista
+        '
+        Me.btnVerLista.Location = CType(resources.GetObject("btnVerLista.Location"), System.Drawing.Point)
+        Me.btnVerLista.Name = "btnVerLista"
+        Me.btnVerLista.Size = CType(resources.GetObject("btnVerLista.Size"), System.Drawing.Size)
+        '
+        'btnActualizar
+        '
+        Me.btnActualizar.Location = CType(resources.GetObject("btnActualizar.Location"), System.Drawing.Point)
+        Me.btnActualizar.Name = "btnActualizar"
+        Me.btnActualizar.Size = CType(resources.GetObject("btnActualizar.Size"), System.Drawing.Size)
+        '
+        'btnUltimo
+        '
+        Me.btnUltimo.Location = CType(resources.GetObject("btnUltimo.Location"), System.Drawing.Point)
+        Me.btnUltimo.Name = "btnUltimo"
+        Me.btnUltimo.Size = CType(resources.GetObject("btnUltimo.Size"), System.Drawing.Size)
+        '
+        'frmPAFLista
+        '
+        Me.AccessibleDescription = resources.GetString("$this.AccessibleDescription")
+        Me.AccessibleName = resources.GetString("$this.AccessibleName")
+        Me.AutoScaleBaseSize = CType(resources.GetObject("$this.AutoScaleBaseSize"), System.Drawing.Size)
+        Me.AutoScroll = CType(resources.GetObject("$this.AutoScroll"), Boolean)
+        Me.AutoScrollMargin = CType(resources.GetObject("$this.AutoScrollMargin"), System.Drawing.Size)
+        Me.AutoScrollMinSize = CType(resources.GetObject("$this.AutoScrollMinSize"), System.Drawing.Size)
+        Me.BackgroundImage = CType(resources.GetObject("$this.BackgroundImage"), System.Drawing.Image)
+        Me.ClientSize = CType(resources.GetObject("$this.ClientSize"), System.Drawing.Size)
+        Me.Enabled = CType(resources.GetObject("$this.Enabled"), Boolean)
+        Me.Font = CType(resources.GetObject("$this.Font"), System.Drawing.Font)
+        Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
+        Me.ImeMode = CType(resources.GetObject("$this.ImeMode"), System.Windows.Forms.ImeMode)
+        Me.Location = CType(resources.GetObject("$this.Location"), System.Drawing.Point)
+        Me.MaximumSize = CType(resources.GetObject("$this.MaximumSize"), System.Drawing.Size)
+        Me.MinimumSize = CType(resources.GetObject("$this.MinimumSize"), System.Drawing.Size)
+        Me.Name = "frmPAFLista"
+        Me.RightToLeft = CType(resources.GetObject("$this.RightToLeft"), System.Windows.Forms.RightToLeft)
+        Me.StartPosition = CType(resources.GetObject("$this.StartPosition"), System.Windows.Forms.FormStartPosition)
+        Me.Text = resources.GetString("$this.Text")
+        Me.Controls.SetChildIndex(Me.cboSeleccionCentro, 0)
+        Me.Controls.SetChildIndex(Me.sbtipo, 0)
+        Me.Controls.SetChildIndex(Me.btnActualizar, 0)
+        Me.Controls.SetChildIndex(Me.btnNuevo, 0)
+        Me.Controls.SetChildIndex(Me.btnBorrar, 0)
+        Me.Controls.SetChildIndex(Me.btnTancar, 0)
+        Me.Controls.SetChildIndex(Me.btnUltimo, 0)
+        Me.Controls.SetChildIndex(Me.btnPrimero, 0)
+        Me.Controls.SetChildIndex(Me.btnAnterior, 0)
+        Me.Controls.SetChildIndex(Me.btnSiguiente, 0)
+        Me.Controls.SetChildIndex(Me.btnRecargar, 0)
+        Me.Controls.SetChildIndex(Me.btnVerLista, 0)
+        Me.Controls.SetChildIndex(Me.btnModificar, 0)
+        Me.ResumeLayout(False)
+
+    End Sub
+
+#End Region
+
+#Region "VARIABLES"
+
+    Public doc As Char
+    Public tipo As String
+    Private dtClients As New DataTable
+    Private dtProve As New DataTable
+    Private filial As Char = empresaPorDefecto
+
+#End Region
+
+    Shared frmChildForm As frmPAFLista
+    Public Shared Function GetInstance(ByVal tip As Char, ByVal docu As Char, ByVal centr As Char, ByVal tab As String) As frmPAFLista
+        If frmChildForm Is Nothing Then
+            frmChildForm = New frmPAFLista
+            frmChildForm.tabla = tab
+            frmChildForm.doc = docu
+            frmChildForm.tipo = tip
+            frmChildForm.centro = centr
+        End If
+        If frmChildForm.doc <> docu _
+                    OrElse frmChildForm.tipo <> tip _
+                    OrElse centr <> frmChildForm.centro _
+                    OrElse tab <> frmChildForm.tabla Then
+
+            frmChildForm = New frmPAFLista
+            frmChildForm.tabla = tab
+            frmChildForm.doc = docu
+            frmChildForm.tipo = tip
+            frmChildForm.centro = centr
+
+        End If
+        Return frmChildForm
+
+    End Function
+    Public Shared Function GetInstance() As frmPAFLista
+        If frmChildForm Is Nothing Then
+            frmChildForm = New frmPAFLista
+            frmChildForm.tabla = "factur"
+            frmChildForm.doc = "C"
+            frmChildForm.tipo = "T"
+            frmChildForm.centro = "C"
+        End If
+        If frmChildForm.doc <> "C" _
+                    OrElse frmChildForm.tipo <> "T" _
+                    OrElse "C" <> frmChildForm.centro _
+                    OrElse "factur" <> frmChildForm.tabla Then
+
+            frmChildForm = New frmPAFLista
+            frmChildForm.tabla = "factur"
+            frmChildForm.doc = "C"
+            frmChildForm.tipo = "T"
+            frmChildForm.centro = "C"
+
+        End If
+        Return frmChildForm
+    End Function
+
+    Friend Sub PonerNombres()
+        Dim i As Integer
+        Try
+            Select Case tabla
+                Case "factur"
+                    CargaTabla(tablaClientes, CCClients, CNClients, dtClients)
+                Case "cactur"
+                    CargaTabla(tablaProveedores, CCProve, CNProve, dtProve)
+            End Select
+
+            For i = 0 To dv.Count - 1
+                Select Case tabla
+                    Case "factur"
+                        dv(i).Item("NOMCLIENT") = general.OBN(dv(i).Item("CLIENT"), dtClients)
+
+                    Case "cactur"
+                        dv(i).Item("NOMPROVE") = general.OBN(dv(i).Item(tablaProveedores), dtProve)
+                End Select
+            Next
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False
+        End Try
+    End Sub
+    Friend Overrides Sub HacerArraysCampoNombre()
+        Dim a As New clsArrays
+        Try
+            With ArrayCampos
+
+                a.aFra(3) = 1
+                .Add("FRA", a.aFra)
+
+                Select Case tabla
+                    Case "cactur"
+                        a.aNOMPROVE(3) = 2
+                        .Add("NOMPROVE", a.aNOMPROVE)
+
+                    Case "factur"
+                        a.aNOMCLIENT(3) = 2
+                        .Add("NOMCLIENT", a.aNOMCLIENT)
+
+                End Select
+
+                a.aFecha(3) = 3
+                .Add("DATA", a.aFecha)
+
+                Dim aIVA(3) As String
+                aIVA(0) = "IVA1"
+                aIVA(1) = "IVA"
+                aIVA(2) = "double"
+                aIVA(3) = 4
+                .Add("IVA1", aIVA)
+
+                Dim aBASE1(3) As String
+                aBASE1(0) = "BASE1"
+                aBASE1(1) = "Base"
+                aBASE1(2) = "double"
+                aBASE1(3) = 5
+                .Add("BASE1", aBASE1)
+
+                Dim aBRUT1(3) As String
+                aBRUT1(0) = "BRUT1"
+                aBRUT1(1) = "Brut"
+                aBRUT1(2) = "double"
+                aBRUT1(3) = 6
+                .Add("BRUT1", aBRUT1)
+
+                Dim aTOTAL(3) As String
+                aTOTAL(0) = "TOTAL"
+                aTOTAL(1) = "Total"
+                aTOTAL(2) = "double"
+                aTOTAL(3) = 7
+                .Add("TOTAL", aTOTAL)
+
+                If doc = Albaran Or doc = Pedido Then
+                    Dim aTRASPAS(3) As String
+                    aTRASPAS(0) = "TRASPAS"
+                    aTRASPAS(1) = "Ja traspasat"
+                    aTRASPAS(2) = "boolean"
+                    aTRASPAS(3) = 8
+                    .Add("TRASPAS", aTRASPAS)
+                End If
+
+            End With
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Friend Overrides Sub CrearComandos()
+        Try
+            Select Case tabla.ToUpper
+                Case "FACTUR"
+                    'Facturas
+                    cmdSelect.CommandText = "SELECT FRA, CLIENT, DATA, IVA1, BASE1, BRUT1, TOTAL, TRASPAS FROM " & tabla & " " & _
+                        " WHERE DOCUMENT = """ & doc & """ AND " & _
+                        " CENTRO = """ & centro & """ "
+                Case "CACTUR"
+                    cmdSelect.CommandText = "SELECT FRA, PROVE, DATA, IVA1, BASE1, BRUT1, TOTAL FROM " & tabla & " " & _
+                        " WHERE DOCUMENT = """ & doc & """ AND " & _
+                        " TIPUS = """ & tipo & """ AND " & _
+                        " CENTRO = """ & centro & """ "
+                Case "ORDRE"
+                    'Orden fab modelos
+                    cmdSelect.CommandText = "SELECT ORDRE, CLIENT, DATA FROM " & tabla & " " & _
+                                                " CENTRO = """ & centro & """ "
+            End Select
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+
+    End Sub
+    Private Sub IniciarForm(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
+        Try
+            Cursor = Cursors.WaitCursor
+            textoListado = rm.GetString("LISTADO")
+            IniciarListado()
+            filial = empresaPorDefecto
+            PonerNombres()
+            AutoSizeCC(dg)
+            dv.Sort = "FRA DESC"
+            PSBTIPO(empresaPorDefecto)
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+        Cursor = Cursors.Default
+
+    End Sub
+    Friend Overrides Sub btnFormulario_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
+
+        Try
+            'Cursor = Cursors.WaitCursor
+            'Dim f As frmHilos = frmt.GetInstance()
+            'f.MdiParent = Me.MdiParent
+            'AddHandler f.Closed, AddressOf CType(Me.MdiParent, frmPrincipal).childCerrado
+            'AddHandler f.Load, AddressOf CType(Me.MdiParent, frmPrincipal).childAbierto
+            'f.Show()
+            'f.BringToFront()
+            'Cursor = Cursors.Default
+
+            'Me.Close()
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+
+    End Sub
+    Friend Overrides Sub dg_DoubleClick(ByVal sender As Object, ByVal e As System.EventArgs)
+
+        Try
+            Cursor = Cursors.WaitCursor
+            If EsEleccionOListado = esEleccion Then
+                dr = dg.Item(dg.Row).Row
+                Me.Close()
+                frmChildForm = Nothing
+            Else
+
+                Select Case tabla
+                    Case tablaCompras
+                        Select Case doc
+                            Case "C"
+                                Select Case tipo
+                                    Case Tejido
+                                        Dim f As frmTejidoCompraPedido = frmTejidoCompraPedido.GetInstance()
+                                        f.cargando = True
+                                        f.MdiParent = Me.MdiParent
+                                        AddHandler f.Closed, AddressOf CType(Me.MdiParent, frmPrincipal).childCerrado
+                                        AddHandler f.Load, AddressOf CType(Me.MdiParent, frmPrincipal).childAbierto : AddHandler f.Activated, AddressOf CType(Me.MdiParent, frmPrincipal).childOcultandoMostrando
+                                        Me.Visible = False
+                                        f.Show()
+                                        f.BringToFront()
+                                        Cursor = Cursors.Default
+                                        cargando = True
+                                        If f.PAFActual.centro <> dg.Item(dg.Row, "CENTRO") Then
+                                            f.PAFActual.centro = dg.Item(dg.Row, "CENTRO")
+                                            f.PAFActual.cambioCentro(GENERAL.nz(dg.Item(dg.Row, "CENTRO"), empresaPorDefecto), primero)
+                                            f.cboSeleccionCentro.SelectedValue = f.PAFActual.centro
+                                            'f.tallerActual.tabla.AcceptChanges()
+                                        End If
+                                        f.PAFActual.CambiarAReg(dg.Item(dg.Row, "FRA"), iraregistro)
+                                        f.cargando = False
+                                        cargando = False
+
+
+                                    Case "M"
+                                        Dim f As frmHilosComprasPedido = frmHilosComprasPedido.GetInstance()
+                                        f.cargando = True
+                                        f.MdiParent = Me.MdiParent
+                                        AddHandler f.Closed, AddressOf CType(Me.MdiParent, frmPrincipal).childCerrado
+                                        AddHandler f.Load, AddressOf CType(Me.MdiParent, frmPrincipal).childAbierto : AddHandler f.Activated, AddressOf CType(Me.MdiParent, frmPrincipal).childOcultandoMostrando
+                                        Me.Visible = False
+                                        f.Show()
+                                        f.BringToFront()
+                                        Cursor = Cursors.Default
+                                        cargando = True
+                                        If f.PAFActual.centro <> dg.Item(dg.Row, "CENTRO") Then
+                                            f.PAFActual.centro = dg.Item(dg.Row, "CENTRO")
+                                            f.PAFActual.cambioCentro(GENERAL.nz(dg.Item(dg.Row, "CENTRO"), empresaPorDefecto), primero)
+                                            f.cboSeleccionCentro.SelectedValue = f.PAFActual.centro
+                                            'f.tallerActual.tabla.AcceptChanges()
+                                        End If
+                                        f.PAFActual.CambiarAReg(dg.Item(dg.Row, "FRA"), iraregistro)
+                                        f.cargando = False
+                                        cargando = False
+                                    Case "F"
+                                        Dim f As frmForniturasCompraPedido = frmForniturasCompraPedido.GetInstance()
+                                        f.cargando = True
+                                        f.MdiParent = Me.MdiParent
+                                        AddHandler f.Closed, AddressOf CType(Me.MdiParent, frmPrincipal).childCerrado
+                                        AddHandler f.Load, AddressOf CType(Me.MdiParent, frmPrincipal).childAbierto : AddHandler f.Activated, AddressOf CType(Me.MdiParent, frmPrincipal).childOcultandoMostrando
+                                        Me.Visible = False
+                                        f.Show()
+                                        f.BringToFront()
+                                        Cursor = Cursors.Default
+                                        cargando = True
+                                        If f.PAFActual.centro <> dg.Item(dg.Row, "CENTRO") Then
+                                            f.PAFActual.centro = dg.Item(dg.Row, "CENTRO")
+                                            f.PAFActual.cambioCentro(GENERAL.nz(dg.Item(dg.Row, "CENTRO"), empresaPorDefecto), primero)
+                                            f.cboSeleccionCentro.SelectedValue = f.PAFActual.centro
+                                            'f.tallerActual.tabla.AcceptChanges()
+                                        End If
+                                        f.PAFActual.CambiarAReg(dg.Item(dg.Row, "FRA"), iraregistro)
+                                        f.cargando = False
+                                        cargando = False
+
+                                End Select
+                            Case Albaran
+                                Select Case tipo
+                                    Case "T"
+                                    Case "M"
+                                        'Albaranes entrega hilos
+                                        Dim f As frmHilosComprasAlbaran = frmHilosComprasAlbaran.GetInstance()
+                                        f.cargando = True
+                                        f.MdiParent = Me.MdiParent
+                                        AddHandler f.Closed, AddressOf CType(Me.MdiParent, frmPrincipal).childCerrado
+                                        AddHandler f.Load, AddressOf CType(Me.MdiParent, frmPrincipal).childAbierto : AddHandler f.Activated, AddressOf CType(Me.MdiParent, frmPrincipal).childOcultandoMostrando
+                                        Me.Visible = False
+                                        f.Show()
+                                        f.BringToFront()
+                                        Cursor = Cursors.Default
+                                        cargando = True
+                                        If f.PAFActual.centro <> dg.Item(dg.Row, "CENTRO") Then
+                                            f.PAFActual.centro = dg.Item(dg.Row, "CENTRO")
+                                            f.PAFActual.cambioCentro(GENERAL.nz(dg.Item(dg.Row, "CENTRO"), empresaPorDefecto), primero)
+                                            f.cboSeleccionCentro.SelectedValue = f.PAFActual.centro
+                                            'f.tallerActual.tabla.AcceptChanges()
+                                        End If
+                                        f.PAFActual.CambiarAReg(dg.Item(dg.Row, "FRA"), iraregistro)
+                                        f.cargando = False
+                                        cargando = False
+                                    Case "F"
+                                End Select
+                            Case "F"
+                                Select Case tipo
+
+                                End Select
+                            Case "O"
+                                Select Case tipo
+                                    Case "M"
+                                        Dim f As frmMuestrasOrdenes = frmMuestrasOrdenes.GetInstance()
+                                        f.cargando = True
+                                        f.MdiParent = Me.MdiParent
+                                        AddHandler f.Closed, AddressOf CType(Me.MdiParent, frmPrincipal).childCerrado
+                                        AddHandler f.Load, AddressOf CType(Me.MdiParent, frmPrincipal).childAbierto : AddHandler f.Activated, AddressOf CType(Me.MdiParent, frmPrincipal).childOcultandoMostrando
+                                        Me.Visible = False
+                                        f.Show()
+                                        f.BringToFront()
+                                        Cursor = Cursors.Default
+                                        cargando = True
+                                        If f.PAFActual.centro <> dg.Item(dg.Row, "CENTRO") Then
+                                            f.PAFActual.centro = dg.Item(dg.Row, "CENTRO")
+                                            f.PAFActual.cambioCentro(GENERAL.nz(dg.Item(dg.Row, "CENTRO"), empresaPorDefecto), primero)
+                                            f.cboSeleccionCentro.SelectedValue = f.PAFActual.centro
+                                            'f.tallerActual.tabla.AcceptChanges()
+                                        End If
+                                        f.PAFActual.CambiarAReg(dg.Item(dg.Row, "FRA"), iraregistro)
+                                        f.cargando = False
+                                        cargando = False
+                                End Select
+
+                        End Select
+
+                    Case tablaVentas
+                        Select Case doc
+                            Case "C"
+                                Dim f As frmTejidoVentaPedido = frmTejidoVentaPedido.GetInstance()
+                                f.cargando = True
+                                f.MdiParent = Me.MdiParent
+                                AddHandler f.Closed, AddressOf CType(Me.MdiParent, frmPrincipal).childCerrado
+                                AddHandler f.Load, AddressOf CType(Me.MdiParent, frmPrincipal).childAbierto : AddHandler f.Activated, AddressOf CType(Me.MdiParent, frmPrincipal).childOcultandoMostrando
+                                Me.Visible = False
+                                f.Show()
+                                f.BringToFront()
+                                Cursor = Cursors.Default
+                                cargando = True
+                                If f.PAFActual.centro <> dg.Item(dg.Row, "CENTRO") Then
+                                    f.PAFActual.centro = dg.Item(dg.Row, "CENTRO")
+                                    f.PAFActual.cambioCentro(GENERAL.nz(dg.Item(dg.Row, "CENTRO"), empresaPorDefecto), primero)
+                                    f.cboSeleccionCentro.SelectedValue = f.PAFActual.centro
+                                    'f.tallerActual.tabla.AcceptChanges()
+                                End If
+                                f.PAFActual.CambiarAReg(dg.Item(dg.Row, "FRA"), iraregistro)
+                                f.cargando = False
+                                cargando = False
+
+                            Case Albaran
+                                Dim f As frmTejidoVentaAlbaran = frmTejidoVentaAlbaran.GetInstance()
+                                f.cargando = True
+                                f.MdiParent = Me.MdiParent
+                                AddHandler f.Closed, AddressOf CType(Me.MdiParent, frmPrincipal).childCerrado
+                                AddHandler f.Load, AddressOf CType(Me.MdiParent, frmPrincipal).childAbierto : AddHandler f.Activated, AddressOf CType(Me.MdiParent, frmPrincipal).childOcultandoMostrando
+                                Me.Visible = False
+                                f.Show()
+                                f.BringToFront()
+                                Cursor = Cursors.Default
+                                cargando = True
+                                If f.PAFActual.centro <> dg.Item(dg.Row, "CENTRO") Then
+                                    f.PAFActual.centro = dg.Item(dg.Row, "CENTRO")
+                                    f.PAFActual.cambioCentro(GENERAL.nz(dg.Item(dg.Row, "CENTRO"), empresaPorDefecto), primero)
+                                    f.cboSeleccionCentro.SelectedValue = f.PAFActual.centro
+                                    'f.tallerActual.tabla.AcceptChanges()
+                                End If
+                                f.PAFActual.CambiarAReg(dg.Item(dg.Row, "FRA"), iraregistro)
+                                f.cargando = False
+                                cargando = False
+
+                            Case "F"
+                                Dim f As frmVentaFactura = frmVentaFactura.GetInstance()
+                                f.cargando = True
+                                f.MdiParent = Me.MdiParent
+                                AddHandler f.Closed, AddressOf CType(Me.MdiParent, frmPrincipal).childCerrado
+                                AddHandler f.Load, AddressOf CType(Me.MdiParent, frmPrincipal).childAbierto : AddHandler f.Activated, AddressOf CType(Me.MdiParent, frmPrincipal).childOcultandoMostrando
+                                Me.Visible = False
+                                f.Show()
+                                f.BringToFront()
+                                Cursor = Cursors.Default
+                                cargando = True
+                                If f.PAFActual.centro <> dg.Item(dg.Row, "CENTRO") Then
+                                    f.PAFActual.centro = dg.Item(dg.Row, "CENTRO")
+                                    f.PAFActual.cambioCentro(GENERAL.nz(dg.Item(dg.Row, "CENTRO"), empresaPorDefecto), primero)
+                                    f.cboSeleccionCentro.SelectedValue = f.PAFActual.centro
+                                    'f.tallerActual.tabla.AcceptChanges()
+                                End If
+                                f.PAFActual.CambiarAReg(dg.Item(dg.Row, "FRA"), iraregistro)
+                                f.cargando = False
+                                cargando = False
+
+                            Case Proforma
+                                Dim f As frmVentaFacturaProforma = frmVentaFacturaProforma.GetInstance()
+                                f.cargando = True
+                                f.MdiParent = Me.MdiParent
+                                AddHandler f.Closed, AddressOf CType(Me.MdiParent, frmPrincipal).childCerrado
+                                AddHandler f.Load, AddressOf CType(Me.MdiParent, frmPrincipal).childAbierto : AddHandler f.Activated, AddressOf CType(Me.MdiParent, frmPrincipal).childOcultandoMostrando
+                                Me.Visible = False
+                                f.Show()
+                                f.BringToFront()
+                                Cursor = Cursors.Default
+                                cargando = True
+                                If f.PAFActual.centro <> dg.Item(dg.Row, "CENTRO") Then
+                                    f.PAFActual.centro = dg.Item(dg.Row, "CENTRO")
+                                    f.PAFActual.cambioCentro(GENERAL.nz(dg.Item(dg.Row, "CENTRO"), empresaPorDefecto), primero)
+                                    f.cboSeleccionCentro.SelectedValue = f.PAFActual.centro
+                                    'f.tallerActual.tabla.AcceptChanges()
+                                End If
+                                f.PAFActual.CambiarAReg(dg.Item(dg.Row, "FRA"), iraregistro)
+                                f.cargando = False
+                                cargando = False
+                            Case OrdenModelos
+                                Dim f As frmOrdenesFabricacion = frmOrdenesFabricacion.GetInstance()
+                                f.cargando = True
+                                f.MdiParent = Me.MdiParent
+                                AddHandler f.Closed, AddressOf CType(Me.MdiParent, frmPrincipal).childCerrado
+                                AddHandler f.Load, AddressOf CType(Me.MdiParent, frmPrincipal).childAbierto : AddHandler f.Activated, AddressOf CType(Me.MdiParent, frmPrincipal).childOcultandoMostrando
+                                Me.Visible = False
+                                f.Show()
+                                f.BringToFront()
+                                Cursor = Cursors.Default
+                                cargando = True
+                                If f.PAFActual.centro <> dg.Item(dg.Row, "CENTRO") Then
+                                    f.PAFActual.centro = dg.Item(dg.Row, "CENTRO")
+                                    f.PAFActual.cambioCentro(GENERAL.nz(dg.Item(dg.Row, "CENTRO"), empresaPorDefecto), primero)
+                                    f.cboSeleccionCentro.SelectedValue = f.PAFActual.centro
+                                    'f.tallerActual.tabla.AcceptChanges()
+                                End If
+                                f.PAFActual.CambiarAReg(dg.Item(dg.Row, "FRA"), iraregistro)
+                                f.cargando = False
+                                cargando = False
+
+                        End Select
+                End Select
+
+
+                Cursor = Cursors.Default
+
+                Me.Close()
+            End If
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+
+    Private Sub btnCancelar_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnCancelar.Click
+        dr = Nothing
+        Me.Close()
+        frmChildForm = Nothing
+    End Sub
+
+
+End Class

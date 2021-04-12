@@ -1,0 +1,297 @@
+Public Class frmAbout
+    Inherits aura2k3.frmBase
+
+
+#Region " Código generado por el Diseñador de Windows Forms "
+
+    Public Sub New()
+        MyBase.New()
+
+        'El Diseñador de Windows Forms requiere esta llamada.
+        InitializeComponent() : Dim tom As SMcMaster.TabOrderManager = New SMcMaster.TabOrderManager(Me) : tom.SetTabOrder(SMcMaster.TabOrderManager.TabScheme.AcrossFirst)
+
+        'Agregar cualquier inicialización después de la llamada a InitializeComponent()
+
+    End Sub
+
+    'Form reemplaza a Dispose para limpiar la lista de componentes.
+    Protected Overloads Overrides Sub Dispose(ByVal disposing As Boolean)
+        If disposing Then
+            If Not (components Is Nothing) Then
+                components.Dispose()
+            End If
+        End If
+       MyBase.Dispose(disposing)
+    End Sub
+
+    'Requerido por el Diseñador de Windows Forms
+    Private components As System.ComponentModel.IContainer
+
+    'NOTA: el Diseñador de Windows Forms requiere el siguiente procedimiento
+    'Puede modificarse utilizando el Diseñador de Windows Forms. 
+    'No lo modifique con el editor de código.
+    Friend WithEvents Label1 As System.Windows.Forms.Label
+    Friend WithEvents Button1 As NETXP.Controls.XPButton
+    Friend WithEvents lblVersion As System.Windows.Forms.Label
+    Friend WithEvents GroupBox1 As System.Windows.Forms.GroupBox
+    <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent() 
+        Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(frmAbout))
+        Me.Label1 = New System.Windows.Forms.Label
+        Me.Button1 = New NETXP.Controls.XPButton
+        Me.lblVersion = New System.Windows.Forms.Label
+        Me.GroupBox1 = New System.Windows.Forms.GroupBox
+        Me.GroupBox1.SuspendLayout()
+        Me.SuspendLayout()
+        '
+        'btnTancar
+        '
+        Me.btnTancar.Location = CType(resources.GetObject("btnTancar.Location"), System.Drawing.Point)
+        Me.btnTancar.Name = "btnTancar"
+        Me.btnTancar.Size = CType(resources.GetObject("btnTancar.Size"), System.Drawing.Size)
+        '
+        'sbtipo
+        '
+        Me.sbtipo.FlatStyle = System.Windows.Forms.FlatStyle.System
+        Me.sbtipo.Location = CType(resources.GetObject("sbtipo.Location"), System.Drawing.Point)
+        Me.sbtipo.Name = "sbtipo"
+        Me.sbtipo.Size = CType(resources.GetObject("sbtipo.Size"), System.Drawing.Size)
+        Me.sbtipo.Text = resources.GetString("sbtipo.Text")
+        '
+        'btnRecargar
+        '
+        Me.btnRecargar.Location = CType(resources.GetObject("btnRecargar.Location"), System.Drawing.Point)
+        Me.btnRecargar.Name = "btnRecargar"
+        Me.btnRecargar.Size = CType(resources.GetObject("btnRecargar.Size"), System.Drawing.Size)
+        '
+        'btnSiguiente
+        '
+        Me.btnSiguiente.Location = CType(resources.GetObject("btnSiguiente.Location"), System.Drawing.Point)
+        Me.btnSiguiente.Name = "btnSiguiente"
+        Me.btnSiguiente.Size = CType(resources.GetObject("btnSiguiente.Size"), System.Drawing.Size)
+        '
+        'btnAnterior
+        '
+        Me.btnAnterior.Location = CType(resources.GetObject("btnAnterior.Location"), System.Drawing.Point)
+        Me.btnAnterior.Name = "btnAnterior"
+        Me.btnAnterior.Size = CType(resources.GetObject("btnAnterior.Size"), System.Drawing.Size)
+        '
+        'btnPrimero
+        '
+        Me.btnPrimero.Location = CType(resources.GetObject("btnPrimero.Location"), System.Drawing.Point)
+        Me.btnPrimero.Name = "btnPrimero"
+        Me.btnPrimero.Size = CType(resources.GetObject("btnPrimero.Size"), System.Drawing.Size)
+        '
+        'btnUltimo
+        '
+        Me.btnUltimo.Location = CType(resources.GetObject("btnUltimo.Location"), System.Drawing.Point)
+        Me.btnUltimo.Name = "btnUltimo"
+        Me.btnUltimo.Size = CType(resources.GetObject("btnUltimo.Size"), System.Drawing.Size)
+        '
+        'btnModificar
+        '
+        Me.btnModificar.Location = CType(resources.GetObject("btnModificar.Location"), System.Drawing.Point)
+        Me.btnModificar.Name = "btnModificar"
+        Me.btnModificar.Size = CType(resources.GetObject("btnModificar.Size"), System.Drawing.Size)
+        '
+        'btnBorrar
+        '
+        Me.btnBorrar.Location = CType(resources.GetObject("btnBorrar.Location"), System.Drawing.Point)
+        Me.btnBorrar.Name = "btnBorrar"
+        Me.btnBorrar.Size = CType(resources.GetObject("btnBorrar.Size"), System.Drawing.Size)
+        '
+        'btnNuevo
+        '
+        Me.btnNuevo.Location = CType(resources.GetObject("btnNuevo.Location"), System.Drawing.Point)
+        Me.btnNuevo.Name = "btnNuevo"
+        Me.btnNuevo.Size = CType(resources.GetObject("btnNuevo.Size"), System.Drawing.Size)
+        '
+        'btnVerLista
+        '
+        Me.btnVerLista.Location = CType(resources.GetObject("btnVerLista.Location"), System.Drawing.Point)
+        Me.btnVerLista.Name = "btnVerLista"
+        Me.btnVerLista.Size = CType(resources.GetObject("btnVerLista.Size"), System.Drawing.Size)
+        '
+        'btnActualizar
+        '
+        Me.btnActualizar.Location = CType(resources.GetObject("btnActualizar.Location"), System.Drawing.Point)
+        Me.btnActualizar.Name = "btnActualizar"
+        Me.btnActualizar.Size = CType(resources.GetObject("btnActualizar.Size"), System.Drawing.Size)
+        '
+        'Label1
+        '
+        Me.Label1.AccessibleDescription = resources.GetString("Label1.AccessibleDescription")
+        Me.Label1.AccessibleName = resources.GetString("Label1.AccessibleName")
+        Me.Label1.Anchor = CType(resources.GetObject("Label1.Anchor"), System.Windows.Forms.AnchorStyles)
+        Me.Label1.AutoSize = CType(resources.GetObject("Label1.AutoSize"), Boolean)
+        Me.Label1.Dock = CType(resources.GetObject("Label1.Dock"), System.Windows.Forms.DockStyle)
+        Me.Label1.Enabled = CType(resources.GetObject("Label1.Enabled"), Boolean)
+        Me.Label1.Font = CType(resources.GetObject("Label1.Font"), System.Drawing.Font)
+        Me.Label1.Image = CType(resources.GetObject("Label1.Image"), System.Drawing.Image)
+        Me.Label1.ImageAlign = CType(resources.GetObject("Label1.ImageAlign"), System.Drawing.ContentAlignment)
+        Me.Label1.ImageIndex = CType(resources.GetObject("Label1.ImageIndex"), Integer)
+        Me.Label1.ImeMode = CType(resources.GetObject("Label1.ImeMode"), System.Windows.Forms.ImeMode)
+        Me.Label1.Location = CType(resources.GetObject("Label1.Location"), System.Drawing.Point)
+        Me.Label1.Name = "Label1"
+        Me.Label1.RightToLeft = CType(resources.GetObject("Label1.RightToLeft"), System.Windows.Forms.RightToLeft)
+        Me.Label1.Size = CType(resources.GetObject("Label1.Size"), System.Drawing.Size)
+        Me.Label1.TabIndex = CType(resources.GetObject("Label1.TabIndex"), Integer)
+        Me.Label1.Text = resources.GetString("Label1.Text")
+        Me.Label1.TextAlign = CType(resources.GetObject("Label1.TextAlign"), System.Drawing.ContentAlignment)
+        Me.Label1.Visible = CType(resources.GetObject("Label1.Visible"), Boolean)
+        '
+        'Button1
+        '
+        Me.Button1.AccessibleDescription = resources.GetString("Button1.AccessibleDescription")
+        Me.Button1.AccessibleName = resources.GetString("Button1.AccessibleName")
+        Me.Button1.Anchor = CType(resources.GetObject("Button1.Anchor"), System.Windows.Forms.AnchorStyles)
+        Me.Button1.BackgroundImage = CType(resources.GetObject("Button1.BackgroundImage"), System.Drawing.Image)
+        Me.Button1.Dock = CType(resources.GetObject("Button1.Dock"), System.Windows.Forms.DockStyle)
+        Me.Button1.Enabled = CType(resources.GetObject("Button1.Enabled"), Boolean)
+        Me.Button1.FlatStyle = CType(resources.GetObject("Button1.FlatStyle"), System.Windows.Forms.FlatStyle)
+        Me.Button1.Font = CType(resources.GetObject("Button1.Font"), System.Drawing.Font)
+        Me.Button1.Image = CType(resources.GetObject("Button1.Image"), System.Drawing.Image)
+        Me.Button1.ImageAlign = CType(resources.GetObject("Button1.ImageAlign"), System.Drawing.ContentAlignment)
+        Me.Button1.ImageIndex = CType(resources.GetObject("Button1.ImageIndex"), Integer)
+        Me.Button1.ImeMode = CType(resources.GetObject("Button1.ImeMode"), System.Windows.Forms.ImeMode)
+        Me.Button1.Location = CType(resources.GetObject("Button1.Location"), System.Drawing.Point)
+        Me.Button1.Name = "Button1"
+        Me.Button1.RightToLeft = CType(resources.GetObject("Button1.RightToLeft"), System.Windows.Forms.RightToLeft)
+        Me.Button1.Size = CType(resources.GetObject("Button1.Size"), System.Drawing.Size)
+        Me.Button1.TabIndex = CType(resources.GetObject("Button1.TabIndex"), Integer)
+        Me.Button1.Text = resources.GetString("Button1.Text")
+        Me.Button1.TextAlign = CType(resources.GetObject("Button1.TextAlign"), System.Drawing.ContentAlignment)
+        Me.Button1.Visible = CType(resources.GetObject("Button1.Visible"), Boolean)
+        '
+        'lblVersion
+        '
+        Me.lblVersion.AccessibleDescription = resources.GetString("lblVersion.AccessibleDescription")
+        Me.lblVersion.AccessibleName = resources.GetString("lblVersion.AccessibleName")
+        Me.lblVersion.Anchor = CType(resources.GetObject("lblVersion.Anchor"), System.Windows.Forms.AnchorStyles)
+        Me.lblVersion.AutoSize = CType(resources.GetObject("lblVersion.AutoSize"), Boolean)
+        Me.lblVersion.Dock = CType(resources.GetObject("lblVersion.Dock"), System.Windows.Forms.DockStyle)
+        Me.lblVersion.Enabled = CType(resources.GetObject("lblVersion.Enabled"), Boolean)
+        Me.lblVersion.Font = CType(resources.GetObject("lblVersion.Font"), System.Drawing.Font)
+        Me.lblVersion.ForeColor = System.Drawing.Color.Firebrick
+        Me.lblVersion.Image = CType(resources.GetObject("lblVersion.Image"), System.Drawing.Image)
+        Me.lblVersion.ImageAlign = CType(resources.GetObject("lblVersion.ImageAlign"), System.Drawing.ContentAlignment)
+        Me.lblVersion.ImageIndex = CType(resources.GetObject("lblVersion.ImageIndex"), Integer)
+        Me.lblVersion.ImeMode = CType(resources.GetObject("lblVersion.ImeMode"), System.Windows.Forms.ImeMode)
+        Me.lblVersion.Location = CType(resources.GetObject("lblVersion.Location"), System.Drawing.Point)
+        Me.lblVersion.Name = "lblVersion"
+        Me.lblVersion.RightToLeft = CType(resources.GetObject("lblVersion.RightToLeft"), System.Windows.Forms.RightToLeft)
+        Me.lblVersion.Size = CType(resources.GetObject("lblVersion.Size"), System.Drawing.Size)
+        Me.lblVersion.TabIndex = CType(resources.GetObject("lblVersion.TabIndex"), Integer)
+        Me.lblVersion.Text = resources.GetString("lblVersion.Text")
+        Me.lblVersion.TextAlign = CType(resources.GetObject("lblVersion.TextAlign"), System.Drawing.ContentAlignment)
+        Me.lblVersion.Visible = CType(resources.GetObject("lblVersion.Visible"), Boolean)
+        '
+        'GroupBox1
+        '
+        Me.GroupBox1.AccessibleDescription = resources.GetString("GroupBox1.AccessibleDescription")
+        Me.GroupBox1.AccessibleName = resources.GetString("GroupBox1.AccessibleName")
+        Me.GroupBox1.Anchor = CType(resources.GetObject("GroupBox1.Anchor"), System.Windows.Forms.AnchorStyles)
+        Me.GroupBox1.BackgroundImage = CType(resources.GetObject("GroupBox1.BackgroundImage"), System.Drawing.Image)
+        Me.GroupBox1.Controls.Add(Me.Label1)
+        Me.GroupBox1.Controls.Add(Me.lblVersion)
+        Me.GroupBox1.Dock = CType(resources.GetObject("GroupBox1.Dock"), System.Windows.Forms.DockStyle)
+        Me.GroupBox1.Enabled = CType(resources.GetObject("GroupBox1.Enabled"), Boolean)
+        Me.GroupBox1.Font = CType(resources.GetObject("GroupBox1.Font"), System.Drawing.Font)
+        Me.GroupBox1.ImeMode = CType(resources.GetObject("GroupBox1.ImeMode"), System.Windows.Forms.ImeMode)
+        Me.GroupBox1.Location = CType(resources.GetObject("GroupBox1.Location"), System.Drawing.Point)
+        Me.GroupBox1.Name = "GroupBox1"
+        Me.GroupBox1.RightToLeft = CType(resources.GetObject("GroupBox1.RightToLeft"), System.Windows.Forms.RightToLeft)
+        Me.GroupBox1.Size = CType(resources.GetObject("GroupBox1.Size"), System.Drawing.Size)
+        Me.GroupBox1.TabIndex = CType(resources.GetObject("GroupBox1.TabIndex"), Integer)
+        Me.GroupBox1.TabStop = False
+        Me.GroupBox1.Text = resources.GetString("GroupBox1.Text")
+        Me.GroupBox1.Visible = CType(resources.GetObject("GroupBox1.Visible"), Boolean)
+        '
+        'frmAbout
+        '
+        Me.AccessibleDescription = resources.GetString("$this.AccessibleDescription")
+        Me.AccessibleName = resources.GetString("$this.AccessibleName")
+        Me.AutoScaleBaseSize = CType(resources.GetObject("$this.AutoScaleBaseSize"), System.Drawing.Size)
+        Me.AutoScroll = CType(resources.GetObject("$this.AutoScroll"), Boolean)
+        Me.AutoScrollMargin = CType(resources.GetObject("$this.AutoScrollMargin"), System.Drawing.Size)
+        Me.AutoScrollMinSize = CType(resources.GetObject("$this.AutoScrollMinSize"), System.Drawing.Size)
+        Me.BackgroundImage = CType(resources.GetObject("$this.BackgroundImage"), System.Drawing.Image)
+        Me.ClientSize = CType(resources.GetObject("$this.ClientSize"), System.Drawing.Size)
+        Me.Controls.Add(Me.GroupBox1)
+        Me.Controls.Add(Me.Button1)
+        Me.Cursor = System.Windows.Forms.Cursors.Default
+        Me.Enabled = CType(resources.GetObject("$this.Enabled"), Boolean)
+        Me.Font = CType(resources.GetObject("$this.Font"), System.Drawing.Font)
+        Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
+        Me.ImeMode = CType(resources.GetObject("$this.ImeMode"), System.Windows.Forms.ImeMode)
+        Me.Location = CType(resources.GetObject("$this.Location"), System.Drawing.Point)
+        Me.MaximumSize = CType(resources.GetObject("$this.MaximumSize"), System.Drawing.Size)
+        Me.MinimumSize = CType(resources.GetObject("$this.MinimumSize"), System.Drawing.Size)
+        Me.Name = "frmAbout"
+        Me.RightToLeft = CType(resources.GetObject("$this.RightToLeft"), System.Windows.Forms.RightToLeft)
+        Me.StartPosition = CType(resources.GetObject("$this.StartPosition"), System.Windows.Forms.FormStartPosition)
+        Me.Text = resources.GetString("$this.Text")
+        Me.Controls.SetChildIndex(Me.Button1, 0)
+        Me.Controls.SetChildIndex(Me.GroupBox1, 0)
+        Me.Controls.SetChildIndex(Me.sbtipo, 0)
+        Me.Controls.SetChildIndex(Me.btnActualizar, 0)
+        Me.Controls.SetChildIndex(Me.btnNuevo, 0)
+        Me.Controls.SetChildIndex(Me.btnBorrar, 0)
+        Me.Controls.SetChildIndex(Me.btnTancar, 0)
+        Me.Controls.SetChildIndex(Me.btnUltimo, 0)
+        Me.Controls.SetChildIndex(Me.btnPrimero, 0)
+        Me.Controls.SetChildIndex(Me.btnAnterior, 0)
+        Me.Controls.SetChildIndex(Me.btnSiguiente, 0)
+        Me.Controls.SetChildIndex(Me.btnRecargar, 0)
+        Me.Controls.SetChildIndex(Me.btnVerLista, 0)
+        Me.Controls.SetChildIndex(Me.btnModificar, 0)
+        Me.GroupBox1.ResumeLayout(False)
+        Me.ResumeLayout(False)
+
+    End Sub
+
+#End Region
+
+    Private Sub IniciarForm(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
+        Cursor = Cursors.WaitCursor
+        Dim version As System.Reflection.Assembly = System.Reflection.Assembly.GetExecutingAssembly()
+
+        lblVersion.Text = version.GetName.Version.ToString
+        Cursor = Cursors.Default
+    End Sub
+
+    Private Sub Button1_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button1.Click
+        Me.Close()
+    End Sub
+
+    Friend Overrides Sub btnActualizar_Click(ByVal sender As Object, ByVal e As System.EventArgs)
+
+    End Sub
+
+    Friend Overrides Sub btnAnterior_Click(ByVal sender As Object, ByVal e As System.EventArgs)
+
+    End Sub
+
+    Friend Overrides Sub btnBorrar_Click(ByVal sender As Object, ByVal e As System.EventArgs)
+
+    End Sub
+
+    Friend Overrides Sub btnModificar_Click(ByVal sender As Object, ByVal e As System.EventArgs)
+
+    End Sub
+
+    Friend Overrides Sub btnNuevo_Click(ByVal sender As Object, ByVal e As System.EventArgs)
+
+    End Sub
+
+   Protected Friend Overrides Sub btnPrimero_Click(ByVal sender As Object, ByVal e As System.EventArgs)
+
+    End Sub
+
+    Friend Overrides Sub btnSiguiente_Click(ByVal sender As Object, ByVal e As System.EventArgs)
+
+    End Sub
+
+    Friend Overrides Sub btnUltimo_Click(ByVal sender As Object, ByVal e As System.EventArgs)
+
+    End Sub
+End Class

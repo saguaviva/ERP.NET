@@ -1,0 +1,202 @@
+<?xml version="1.0"?>
+<doc>
+  <assembly>
+    <name>C1.Win.Sparkline.4</name>
+  </assembly>
+  <members>
+    <member name="T:C1.Win.Sparkline.C1Sparkline">
+      <summary>
+            A lightweight chart control which represents the general shape of the data variation.
+            </summary>
+    </member>
+    <member name="M:C1.Win.Sparkline.C1Sparkline.#ctor">
+      <summary>
+            Initializes a new instance of the <see cref="T:C1.Win.Sparkline.C1Sparkline" /> class.
+            </summary>
+    </member>
+    <member name="P:C1.Win.Sparkline.C1Sparkline.Data">
+      <summary>
+            Gets or sets the corresponding data.
+            </summary>
+      <remarks>
+            The <see cref="P:C1.Win.Sparkline.C1Sparkline.Data" /> property supports <see cref="T:System.Collections.IEnumerable" /> and <see cref="T:System.Collections.Specialized.INotifyCollectionChanged" /> interfaces.
+            </remarks>
+    </member>
+    <member name="P:C1.Win.Sparkline.C1Sparkline.DisplayXAxis">
+      <summary>
+            Gets or sets a value that indicates whether the horizontal axis is displayed.
+            </summary>
+    </member>
+    <member name="P:C1.Win.Sparkline.C1Sparkline.ShowFirst">
+      <summary>
+            Gets or sets a value that indicates whether the first data point is formatted differently.
+            </summary>
+    </member>
+    <member name="P:C1.Win.Sparkline.C1Sparkline.ShowHigh">
+      <summary>
+            Gets or sets a value that specifies whether the data points with the highest value are formatted differently.
+            </summary>
+    </member>
+    <member name="P:C1.Win.Sparkline.C1Sparkline.ShowLast">
+      <summary>
+            Gets or sets a value that indicates whether the last data point is formatted differently.
+            </summary>
+    </member>
+    <member name="P:C1.Win.Sparkline.C1Sparkline.ShowLow">
+      <summary>
+            Gets or sets a value that specifies whether the data points with the lowest value are formatted differently.
+            </summary>
+    </member>
+    <member name="P:C1.Win.Sparkline.C1Sparkline.ShowMarkers">
+      <summary>
+            Gets or sets a value that specifies whether data markers are displayed.
+            </summary>
+    </member>
+    <member name="P:C1.Win.Sparkline.C1Sparkline.ShowNegative">
+      <summary>
+            Gets or sets a value that specifies whether the negative data points are formatted differently.
+            </summary>
+    </member>
+    <member name="P:C1.Win.Sparkline.C1Sparkline.SparklineType">
+      <summary>
+            Gets or sets the type of the sparkline.
+            </summary>
+    </member>
+    <member name="P:C1.Win.Sparkline.C1Sparkline.Styles">
+      <summary>
+            Gets or sets the styles of the sparkline.
+            </summary>
+    </member>
+    <member name="M:C1.Win.Sparkline.C1Sparkline.ShowAboutBox">
+      <summary>
+            Shows the About Box for an instance of C1Sparkline.
+            </summary>
+    </member>
+    <member name="P:C1.Win.Sparkline.C1Sparkline.DefaultSize">
+      <summary>
+            Gets the default size of the control.
+            </summary>
+    </member>
+    <member name="M:C1.Win.Sparkline.C1Sparkline.Dispose(System.Boolean)">
+      <summary>
+            Releases the unmanaged resources used by the <see cref="T:System.Windows.Forms.Control" /> and its child controls and optionally releases the managed resources.
+            </summary>
+      <param name="disposing">
+        <see langword="true" /> to release both managed and unmanaged resources; <see langword="false" /> to release only unmanaged resources.</param>
+    </member>
+    <member name="M:C1.Win.Sparkline.C1Sparkline.OnPaint(System.Windows.Forms.PaintEventArgs)">
+      <summary>
+            Raises the <see cref="E:System.Windows.Forms.Control.Paint" /> event.
+            </summary>
+      <param name="e">A <see cref="T:System.Windows.Forms.PaintEventArgs" /> that contains the event data.</param>
+    </member>
+    <member name="M:C1.Win.Sparkline.C1Sparkline.OnRightToLeftChanged(System.EventArgs)">
+      <summary>
+            Raises the <see cref="E:System.Windows.Forms.Control.RightToLeftChanged" /> event.
+            </summary>
+      <param name="e">An <see cref="T:System.EventArgs" /> that contains the event data.</param>
+    </member>
+    <member name="T:C1.Win.Sparkline.SparklineType">
+      <summary>
+            Represents the sparkline type.
+            </summary>
+    </member>
+    <member name="F:C1.Win.Sparkline.SparklineType.Line">
+      <summary>
+            Specifies the line sparkline.
+            </summary>
+    </member>
+    <member name="F:C1.Win.Sparkline.SparklineType.Column">
+      <summary>
+            Specifies the column sparkline.
+            </summary>
+    </member>
+    <member name="F:C1.Win.Sparkline.SparklineType.WinLoss">
+      <summary>
+            Specifies the WinLoss sparkline.
+            </summary>
+    </member>
+    <member name="T:C1.Win.Sparkline.Localization.Strings">
+      <summary>
+            The <see cref="T:C1.Win.Sparkline.Localization.Strings" /> class contains static properties used for localization.
+            </summary>
+    </member>
+    <member name="P:C1.Win.Sparkline.Localization.Strings.ResourceManager">
+      <summary>
+            The <see cref="P:C1.Win.Sparkline.Localization.Strings.ResourceManager" /> object used for lookup resources.
+            </summary>
+      <remarks>Set this property to the valid value if 
+            you define resources in a Custom Control assembly.</remarks>
+    </member>
+    <member name="P:C1.Win.Sparkline.Localization.Strings.UICulture">
+      <summary>
+            Returns default <see cref="T:System.Globalization.CultureInfo" /> object used as fallback culture.
+            </summary>
+    </member>
+    <member name="T:C1.Win.Sparkline.SparklineTheme">
+      <summary>
+            Represents a styles of the sparkline.
+            </summary>
+    </member>
+    <member name="P:C1.Win.Sparkline.SparklineTheme.AxisColor">
+      <summary>
+            Gets or sets the color of the axis.
+            </summary>
+    </member>
+    <member name="P:C1.Win.Sparkline.SparklineTheme.FirstMarkerColor">
+      <summary>
+            Gets or sets the color of the first data point.
+            </summary>
+    </member>
+    <member name="P:C1.Win.Sparkline.SparklineTheme.HighMarkerColor">
+      <summary>
+            Gets or sets the color of the highest data point.
+            </summary>
+    </member>
+    <member name="P:C1.Win.Sparkline.SparklineTheme.LastMarkerColor">
+      <summary>
+            Gets or sets the color of the last data point.
+            </summary>
+    </member>
+    <member name="P:C1.Win.Sparkline.SparklineTheme.LineWeight">
+      <summary>
+            Gets or sets a value that specifies the line weight.
+            </summary>
+    </member>
+    <member name="P:C1.Win.Sparkline.SparklineTheme.LowMarkerColor">
+      <summary>
+            Gets or sets the color of the lowest data point.
+            </summary>
+    </member>
+    <member name="P:C1.Win.Sparkline.SparklineTheme.MarkersColor">
+      <summary>
+            Gets or sets a value that specifies the color of the data markers.
+            </summary>
+    </member>
+    <member name="P:C1.Win.Sparkline.SparklineTheme.NegativeColor">
+      <summary>
+            Gets or sets a value that specifies the color of the negative data points.
+            </summary>
+    </member>
+    <member name="P:C1.Win.Sparkline.SparklineTheme.SeriesColor">
+      <summary>
+            Gets or sets a value that specifies the color sparkline.
+            </summary>
+    </member>
+    <member name="P:C1.Win.Sparkline.SparklineTheme.BarDistance">
+      <summary>
+            Specifies the distance between two bars of a bar sparkline.
+            </summary>
+    </member>
+    <member name="P:C1.Win.Sparkline.SparklineTheme.DefaultStyle">
+      <summary>
+            Gets a theme that contains the default values for current theme.
+            </summary>
+    </member>
+    <member name="M:C1.Win.Sparkline.SparklineTheme.Clone">
+      <summary>
+            Creates an instance of the <see cref="T:C1.Win.C1Themes.BaseTheme" /> class that is identical to the current <see cref="T:C1.Win.C1Themes.BaseTheme" /></summary>
+      <returns>The copy of the current <see cref="T:C1.Win.C1Themes.BaseTheme" />.</returns>
+    </member>
+  </members>
+</doc>

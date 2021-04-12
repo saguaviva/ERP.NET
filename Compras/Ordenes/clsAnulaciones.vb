@@ -1,0 +1,367 @@
+
+Imports MySql.Data.MySqlClient : Imports clsFuncionesLOG : Imports clsFuncionesC1 : Imports clsFuncionesUtiles : Imports clsConstantes
+Public Class clsAnulaciones
+    Inherits clsADO
+
+#Region "VARIABLES"
+
+    Private orden As clsOrdenModelo
+
+#End Region
+
+#Region "CAMPOS"
+
+    Private mORDRE As Double
+    Public Property ORDRE() As Double
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mORDRE = nzn(dvForm(PA).Row("ORDRE"), 0)
+            Catch ex As Exception : End Try
+            Return nzn(mORDRE, 0)
+        End Get
+        Set(ByVal Value As Double)
+            If PA() = -1 Then Exit Property
+            mORDRE = nzn(Value, 0)
+            dvForm(PA).Row("ORDRE") = nzn(Value, 0) : guardarDV()
+        End Set
+    End Property
+
+    Private mEXPEDICIO As Double
+    Public Property EXPEDICIO() As Double
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mEXPEDICIO = nzn(dvForm(PA).Row("EXPEDICIO"), 0)
+            Catch ex As Exception : End Try
+            Return nzn(mEXPEDICIO, 0)
+        End Get
+        Set(ByVal Value As Double)
+            If PA() = -1 Then Exit Property
+            mEXPEDICIO = nzn(Value, 0)
+            dvForm(PA).Row("EXPEDICIO") = nzn(Value, 0) : guardarDV()
+        End Set
+    End Property
+
+    Private mFABRICACIO As Double
+    Public Property FABRICACIO() As Double
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mFABRICACIO = nzn(dvForm(PA).Row("FABRICACIO"), 0)
+            Catch ex As Exception : End Try
+            Return nzn(mFABRICACIO, 0)
+        End Get
+        Set(ByVal Value As Double)
+            If PA() = -1 Then Exit Property
+            mFABRICACIO = nzn(Value, 0)
+            dvForm(PA).Row("FABRICACIO") = nzn(Value, 0) : guardarDV()
+        End Set
+    End Property
+
+    Private mCOLOR As String
+    Public Property COLOR() As String
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mCOLOR = general.nz(dvForm(PA).Row("COLOR"), "")
+            Catch ex As Exception : End Try
+            Return general.nz(mCOLOR, "")
+        End Get
+        Set(ByVal Value As String)
+            If PA() = -1 Then Exit Property
+            mCOLOR = general.nz(Value, "")
+            dvForm(PA).Row("COLOR") = general.nz(Value, "") : guardarDV()
+        End Set
+    End Property
+
+    Private mLINEA As Integer
+    Public Property LINEA() As Integer
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mLINEA = nzn(dvForm(PA).Row("LINEA"), 0)
+            Catch ex As Exception : End Try
+            Return nzn(mLINEA, 0)
+        End Get
+        Set(ByVal Value As Integer)
+            If PA() = -1 Then Exit Property
+            mLINEA = nzn(Value, 0)
+            dvForm(PA).Row("LINEA") = nzn(Value, 0) : guardarDV()
+        End Set
+    End Property
+
+    Private mCOL As Double
+    Public Property COL() As Double
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mCOL = nzn(dvForm(PA).Row("COL"), 0)
+            Catch ex As Exception : End Try
+            Return nzn(mCOL, 0)
+        End Get
+        Set(ByVal Value As Double)
+            If PA() = -1 Then Exit Property
+            mCOL = nzn(Value, 0)
+            dvForm(PA).Row("COL") = nzn(Value, 0) : guardarDV()
+        End Set
+    End Property
+
+    Private mORIGEN As Double
+    Public Property ORIGEN() As Double
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mORIGEN = nzn(dvForm(PA).Row("ORIGEN"), 0)
+            Catch ex As Exception : End Try
+            Return nzn(mORIGEN, 0)
+        End Get
+        Set(ByVal Value As Double)
+            If PA() = -1 Then Exit Property
+            mORIGEN = nzn(Value, 0)
+            dvForm(PA).Row("ORIGEN") = nzn(Value, 0) : guardarDV()
+        End Set
+    End Property
+
+    Private mTALLA As String
+    Public Property TALLA() As String
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mTALLA = general.nz(dvForm(PA).Row("TALLA"), "")
+            Catch ex As Exception : End Try
+            Return general.nz(mTALLA, "")
+        End Get
+        Set(ByVal Value As String)
+            If PA() = -1 Then Exit Property
+            mTALLA = general.nz(Value, "")
+            dvForm(PA).Row("TALLA") = general.nz(Value, "") : guardarDV()
+        End Set
+    End Property
+
+    Private mUNIT As Double
+    Public Property UNIT() As Double
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mUNIT = nzn(dvForm(PA).Row("UNIT"), 0)
+            Catch ex As Exception : End Try
+            Return nzn(mUNIT, 0)
+        End Get
+        Set(ByVal Value As Double)
+            If PA() = -1 Then Exit Property
+            mUNIT = nzn(Value, 0)
+            dvForm(PA).Row("UNIT") = nzn(Value, 0) : guardarDV()
+        End Set
+    End Property
+
+    Private mMOTIU As String
+    Public Property MOTIU() As String
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mMOTIU = general.nz(dvForm(PA).Row("MOTIU"), "")
+            Catch ex As Exception : End Try
+            Return general.nz(mMOTIU, "")
+        End Get
+        Set(ByVal Value As String)
+            If PA() = -1 Then Exit Property
+            mMOTIU = general.nz(Value, "")
+            dvForm(PA).Row("MOTIU") = general.nz(Value, "") : guardarDV()
+        End Set
+    End Property
+
+#End Region
+
+    Public Sub New(ByVal tabla As DataTable, _
+       ByVal centro As String, _
+                  ByRef bindingcontext As BindingContext, ByVal ord As clsOrdenModelo)
+
+        MyBase.New(tabla, centro, bindingcontext)
+        Dim sqlSel As String
+        Try
+            orden = ord
+            sqlSinWhere = "SELECT * FROM ANUL"
+            sqlSel = sqlSinWhere & " WHERE ORDRE = """ & orden.ORDRE & """ AND CENTRO = """ & orden.centro & """ "
+
+            cmdSel.CommandText = sqlSel
+            da.SelectCommand = cmdSel
+            da.Fill(tabla)
+            dvForm.Sort = "LINEA"
+            tabla.AcceptChanges()
+            PonerDefaults()
+            DespertarHandlers()
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub PonerDefaults()
+        Try
+            With dvForm.Table
+                .Columns("ORDRE").DefaultValue = ORDRE
+                .Columns("EXPEDICIO").DefaultValue = EXPEDICIO
+                .Columns("CENTRO").DefaultValue = centro
+                '!!!!!! 'Esto de fabricacion no se lo que es
+                .Columns("COLOR").DefaultValue = ""
+                .Columns("LINEA").DefaultValue = 10000
+                'Esto tampoco se lo que es
+                .Columns("COL").DefaultValue = 1
+                'Esto tampoco se lo que es
+                .Columns("ORIGEN").DefaultValue = 1
+                .Columns("TALLA").DefaultValue = ""
+                .Columns("UNIT").DefaultValue = 0
+                .Columns("MOTIU").DefaultValue = ""
+            End With
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Public Sub DormirHandlers()
+        RemoveHandler tabla.RowChanged, AddressOf RowChanged
+        RemoveHandler tabla.ColumnChanged, AddressOf CambioColumna
+    End Sub
+    Public Sub DespertarHandlers()
+        AddHandler tabla.RowChanged, AddressOf RowChanged
+        AddHandler tabla.ColumnChanged, AddressOf CambioColumna
+    End Sub
+    Friend Sub RowChanged(ByVal sender As Object, ByVal e As System.data.DataRowChangeEventArgs)
+        Try
+            DormirHandlers()
+            If LINEA = 10000 Then
+                Try
+                    If dvForm(dvForm.Count - 2).Item("LINEA") = -1 Then
+                        LINEA = 1
+                    Else
+                        LINEA = dvForm(dvForm.Count - 2).Item("LINEA") + 1
+                    End If
+
+                Catch ex As Exception
+                    LINEA = 1
+                End Try
+            End If
+            DespertarHandlers()
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub CambioColumna(ByVal sender As System.Object, ByVal e As System.Data.DataColumnChangeEventArgs)
+        Try
+            guardarDV()
+            ' AñadirTallas(dgAnulaciones.TableStyles(0).GridColumnStyles(CType("TALLA", Object)).columncombobox)
+            '.Item(rowNum, colCANTIDAD) = .Item(rowNum, colTALLA01) + .Item(rowNum, colTALLA02) + .Item(rowNum, colTALLA03) + .Item(rowNum, colTALLA04) + .Item(rowNum, colTALLA05) + .Item(rowNum, colTALLA06) + .Item(rowNum, colTALLA07) + .Item(rowNum, colTALLA08) + .Item(rowNum, colTALLA09) + .Item(rowNum, colTALLA10)
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Friend Sub CambioDetalle(ByVal centro As String, ByVal ord As clsOrdenModelo)
+        Try
+            Dim sqlSel As String
+            orden = ord
+            Me.centro = centro
+            sqlSel = sqlSinWhere & " WHERE ORDRE = " & orden.ORDRE & " AND CENTRO = """ & orden.centro & """ "
+
+            cmdSel.CommandText = sqlSel
+            dvForm.Sort = "LINEA"
+            da.SelectCommand = cmdSel
+            tabla.Clear()
+            da.Fill(tabla)
+            PonerDefaults()
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+
+#Region "OVERRIDES"
+
+    Friend Overrides Function TieneCambios() As Boolean
+        Try
+            guardarDV()
+            If Not tabla.GetChanges Is Nothing Then
+                Return True
+            Else
+                Return False
+            End If
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Function
+    Friend Overrides Function genWhere() As String
+        Try
+            Dim ret As String
+
+            ret = "WHERE " & tabla.TableName & ".CENTRO = """ & centro & """"
+
+            Return ret
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Function
+    Friend Overrides Function GenOrder() As String
+        Try
+            Return ""
+            'Return " ORDER BY TEMPORADA, CLIENT, SERIE, CODI "
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Function
+    Friend Overrides Function ObtenerNumeroRegistro(ByVal id As Object) As Integer
+        If id Is Nothing Then
+            id = ORDRE
+        End If
+
+        Dim cmd As New MySqlCommand(" SELECT " & _
+           " (SELECT COUNT(*) " & _
+           " FROM " & tabla.TableName & " AS M2 WHERE " & _
+           " M2.CODI < M1.CODI AND  " & WCNoTabla() & " ) AS rownum FROM " & tabla.TableName & " AS M1  WHERE CODI = """ & id & """ AND " & WCNoTabla() & GenOrder(), cnn)
+        Try
+            Dim idx As Object = cmd.ExecuteScalar()
+
+            If idx Is Nothing Then Return -1
+            Return idx '- 1
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Function
+    Friend Overrides Function genWhereNumeroRegistros() As String
+        Try
+            Return genWhere()
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Function
+
+#End Region
+
+End Class
+
+'Public Overrides Sub borrar()
+
+'    Dim i As Integer
+'    Dim a As New ArrayList
+'    Dim key(1) As Object
+'    Try
+
+'        For i = 0 To dvForm.Count - 1
+'            a.Add(dvForm(i).Item("LINEA"))
+'        Next
+'        key(0) = ORDRE
+'        key(2) = centro
+'        For i = 0 To a.Count - 1
+'            key(1) = a(i)
+'            tabla.Rows.Find(key).Delete()
+'        Next
+
+'        ActualizarOrigen(True, True)
+
+'    Catch ex As Exception
+'        LOG(ex.ToString) : cargando = False : CCN()
+'    End Try
+
+'End Sub

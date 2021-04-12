@@ -1,0 +1,879 @@
+Imports CoreLab.MySql
+
+Public Class clsTraspasosOrdenPrenda
+    Inherits clsADO
+
+#Region "VARIABLES"
+
+    Public Orden As clsOrdenModelo
+    Private Nuevodocumento As String
+
+#End Region
+
+#Region "CAMPOS"
+
+    Private mFRA As Integer
+    Public Property FRA() As Integer
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mFRA = nzn(dvForm(PA).Row("FRA"), 0)
+            Catch ex As Exception : End Try
+            Return nzn(mFRA, 0)
+        End Get
+        Set(ByVal Value As Integer)
+            If PA() = -1 Then Exit Property
+            mFRA = nzn(Value, 0)
+            dvForm(PA).Row("FRA") = nzn(Value, 0) : guardarDV()
+        End Set
+    End Property
+
+    Private mTIPUS As String
+    Public Property TIPUS() As String
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mTIPUS = nz(dvForm(PA).Row("TIPUS"), "")
+            Catch ex As Exception : End Try
+            Return nz(mTIPUS, "")
+        End Get
+        Set(ByVal Value As String)
+            If PA() = -1 Then Exit Property
+            mTIPUS = nz(Value, "")
+            dvForm(PA).Row("TIPUS") = nz(Value, "") : guardarDV()
+        End Set
+    End Property
+
+    Private mDOCUMENT As String
+    Public Property DOCUMENT() As String
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mDOCUMENT = nz(dvForm(PA).Row("DOCUMENT"), "")
+            Catch ex As Exception : End Try
+            Return nz(mDOCUMENT, "")
+        End Get
+        Set(ByVal Value As String)
+            If PA() = -1 Then Exit Property
+            mDOCUMENT = nz(Value, "")
+            dvForm(PA).Row("DOCUMENT") = nz(Value, "") : guardarDV()
+        End Set
+    End Property
+
+    Private mDATA As Date
+    Public Property DATA() As Date
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mDATA = dvForm(PA).Row("DATA")
+            Catch ex As Exception : End Try
+            Return mDATA
+        End Get
+        Set(ByVal Value As Date)
+            If PA() = -1 Then Exit Property
+            mDATA = Value
+            dvForm(PA).Row("DATA") = Value : guardarDV()
+        End Set
+    End Property
+
+    Private mQUANTITAT As Double
+    Public Property QUANTITAT() As Double
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mQUANTITAT = nzn(dvForm(PA).Row("QUANTITAT"), 0)
+            Catch ex As Exception : End Try
+            Return nzn(mQUANTITAT, 0)
+        End Get
+        Set(ByVal Value As Double)
+            If PA() = -1 Then Exit Property
+            mQUANTITAT = nzn(Value, 0)
+            dvForm(PA).Row("QUANTITAT") = nzn(Value, 0) : guardarDV()
+        End Set
+    End Property
+
+    Private mNLINEA As Integer
+    Public Property NLINEA() As Integer
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mNLINEA = nzn(dvForm(PA).Row("NLINEA"), 0)
+            Catch ex As Exception : End Try
+            Return nzn(mNLINEA, 0)
+        End Get
+        Set(ByVal Value As Integer)
+            If PA() = -1 Then Exit Property
+            mNLINEA = nzn(Value, 0)
+            dvForm(PA).Row("NLINEA") = nzn(Value, 0) : guardarDV()
+        End Set
+    End Property
+
+    Private mALINEA As Integer
+    Public Property ALINEA() As Integer
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mALINEA = nzn(dvForm(PA).Row("ALINEA"), 0)
+            Catch ex As Exception : End Try
+            Return nzn(mALINEA, 0)
+        End Get
+        Set(ByVal Value As Integer)
+            If PA() = -1 Then Exit Property
+            mALINEA = nzn(Value, 0)
+            dvForm(PA).Row("ALINEA") = nzn(Value, 0) : guardarDV()
+        End Set
+    End Property
+
+    Private mTRASPASADA As Boolean
+    Public Property TRASPASADA() As Boolean
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mTRASPASADA = dvForm(PA).Row("TRASPASADA")
+            Catch ex As Exception : End Try
+            Return mTRASPASADA
+        End Get
+        Set(ByVal Value As Boolean)
+            If PA() = -1 Then Exit Property
+            mTRASPASADA = Value
+            dvForm(PA).Row("TRASPASADA") = Value : guardarDV()
+        End Set
+    End Property
+
+    Private mVC As String
+    Public Property VC() As String
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mVC = nz(dvForm(PA).Row("VC"), "")
+            Catch ex As Exception : End Try
+            Return nz(mVC, "")
+        End Get
+        Set(ByVal Value As String)
+            If PA() = -1 Then Exit Property
+            mVC = nz(Value, "")
+            dvForm(PA).Row("VC") = nz(Value, "") : guardarDV()
+        End Set
+    End Property
+
+    Private mCOMAN As Double
+    Public Property COMAN() As Double
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mCOMAN = nzn(dvForm(PA).Row("COMAN"), 0)
+            Catch ex As Exception : End Try
+            Return nzn(mCOMAN, 0)
+        End Get
+        Set(ByVal Value As Double)
+            If PA() = -1 Then Exit Property
+            mCOMAN = nzn(Value, 0)
+            dvForm(PA).Row("COMAN") = nzn(Value, 0) : guardarDV()
+        End Set
+    End Property
+
+    Private mALBAR As Integer
+    Public Property ALBAR() As Integer
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mALBAR = nzn(dvForm(PA).Row("ALBAR"), 0)
+            Catch ex As Exception : End Try
+            Return nzn(mALBAR, 0)
+        End Get
+        Set(ByVal Value As Integer)
+            If PA() = -1 Then Exit Property
+            mALBAR = nzn(Value, 0)
+            dvForm(PA).Row("ALBAR") = nzn(Value, 0) : guardarDV()
+        End Set
+    End Property
+    Private mTALLA01 As Double
+    Public Property TALLA01() As Double
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mTALLA01 = nzn(dvForm(PA).Row("TALLA01"), 0)
+            Catch ex As Exception : End Try
+            Return nzn(mTALLA01, 0)
+        End Get
+        Set(ByVal Value As Double)
+            If PA() = -1 Then Exit Property
+            If nzn(Value, 0) <> nzn(TALLA01, 0) Then
+                mTALLA01 = nzn(Value, 0)
+                dvForm(PA).Row("TALLA01") = nzn(mTALLA01, 0) : guardarDV()
+            End If
+        End Set
+    End Property
+
+    Private mTALLA02 As Double
+    Public Property TALLA02() As Double
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mTALLA02 = nzn(dvForm(PA).Row("TALLA02"), 0)
+            Catch ex As Exception : End Try
+            Return nzn(mTALLA02, 0)
+        End Get
+        Set(ByVal Value As Double)
+            If PA() = -1 Then Exit Property
+            If nzn(Value, 0) <> nzn(TALLA02, 0) Then
+                mTALLA02 = nzn(Value, 0)
+                dvForm(PA).Row("TALLA02") = nzn(mTALLA02, 0) : guardarDV()
+            End If
+        End Set
+    End Property
+
+    Private mTALLA04 As Double
+    Public Property TALLA04() As Double
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mTALLA04 = nzn(dvForm(PA).Row("TALLA04"), 0)
+            Catch ex As Exception : End Try
+            Return nzn(mTALLA04, 0)
+        End Get
+        Set(ByVal Value As Double)
+            If PA() = -1 Then Exit Property
+            If nzn(Value, 0) <> nzn(TALLA04, 0) Then
+                mTALLA04 = nzn(Value, 0)
+                dvForm(PA).Row("TALLA04") = nzn(mTALLA04, 0) : guardarDV()
+            End If
+        End Set
+    End Property
+
+    Private mTALLA05 As Double
+    Public Property TALLA05() As Double
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mTALLA05 = nzn(dvForm(PA).Row("TALLA05"), 0)
+            Catch ex As Exception : End Try
+            Return nzn(mTALLA05, 0)
+        End Get
+        Set(ByVal Value As Double)
+            If PA() = -1 Then Exit Property
+            If nzn(Value, 0) <> nzn(TALLA05, 0) Then
+                mTALLA05 = nzn(Value, 0)
+                dvForm(PA).Row("TALLA05") = nzn(mTALLA05, 0) : guardarDV()
+            End If
+        End Set
+    End Property
+
+    Private mTALLA06 As Double
+    Public Property TALLA06() As Double
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mTALLA06 = nzn(dvForm(PA).Row("TALLA06"), 0)
+            Catch ex As Exception : End Try
+            Return nzn(mTALLA06, 0)
+        End Get
+        Set(ByVal Value As Double)
+            If PA() = -1 Then Exit Property
+            If nzn(Value, 0) <> nzn(TALLA06, 0) Then
+                mTALLA06 = nzn(Value, 0)
+                dvForm(PA).Row("TALLA06") = nzn(mTALLA06, 0) : guardarDV()
+            End If
+        End Set
+    End Property
+
+    Private mTALLA07 As Double
+    Public Property TALLA07() As Double
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mTALLA07 = nzn(dvForm(PA).Row("TALLA07"), 0)
+            Catch ex As Exception : End Try
+            Return nzn(mTALLA07, 0)
+        End Get
+        Set(ByVal Value As Double)
+            If PA() = -1 Then Exit Property
+            If nzn(Value, 0) <> nzn(TALLA07, 0) Then
+                mTALLA07 = nzn(Value, 0)
+                dvForm(PA).Row("TALLA07") = nzn(mTALLA07, 0) : guardarDV()
+            End If
+        End Set
+    End Property
+
+    Private mTALLA08 As Double
+    Public Property TALLA08() As Double
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mTALLA08 = nzn(dvForm(PA).Row("TALLA08"), 0)
+            Catch ex As Exception : End Try
+            Return nzn(mTALLA08, 0)
+        End Get
+        Set(ByVal Value As Double)
+            If PA() = -1 Then Exit Property
+            If nzn(Value, 0) <> nzn(TALLA08, 0) Then
+                mTALLA08 = nzn(Value, 0)
+                dvForm(PA).Row("TALLA08") = nzn(mTALLA08, 0) : guardarDV()
+            End If
+        End Set
+    End Property
+
+    Private mTALLA09 As Double
+    Public Property TALLA09() As Double
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mTALLA09 = nzn(dvForm(PA).Row("TALLA09"), 0)
+            Catch ex As Exception : End Try
+            Return nzn(mTALLA09, 0)
+        End Get
+        Set(ByVal Value As Double)
+            If PA() = -1 Then Exit Property
+            If nzn(Value, 0) <> nzn(TALLA09, 0) Then
+                mTALLA09 = nzn(Value, 0)
+                dvForm(PA).Row("TALLA09") = nzn(mTALLA09, 0) : guardarDV()
+            End If
+        End Set
+    End Property
+
+    Private mTALLA10 As Double
+    Public Property TALLA10() As Double
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mTALLA10 = nzn(dvForm(PA).Row("TALLA10"), 0)
+            Catch ex As Exception : End Try
+            Return nzn(mTALLA10, 0)
+        End Get
+        Set(ByVal Value As Double)
+            If PA() = -1 Then Exit Property
+            If nzn(Value, 0) <> nzn(TALLA10, 0) Then
+                mTALLA10 = nzn(Value, 0)
+                dvForm(PA).Row("TALLA10") = nzn(mTALLA10, 0) : guardarDV()
+            End If
+        End Set
+    End Property
+
+    Private mTALLA03 As Double
+    Public Property TALLA03() As Double
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mTALLA03 = nzn(dvForm(PA).Row("TALLA03"), 0)
+            Catch ex As Exception : End Try
+            Return nzn(mTALLA03, 0)
+        End Get
+        Set(ByVal Value As Double)
+            If PA() = -1 Then Exit Property
+            If nzn(Value, 0) <> nzn(TALLA03, 0) Then
+                mTALLA03 = nzn(Value, 0)
+                dvForm(PA).Row("TALLA03") = nzn(mTALLA03, 0) : guardarDV()
+            End If
+        End Set
+    End Property
+
+#End Region
+
+    Public Sub New(ByVal tabla As DataTable, _
+                   ByVal centro As String, ByRef bindingcontext As BindingContext, ByVal p As clsOrdenModelo)
+
+        MyBase.New(tabla, centro, bindingcontext, "ESDETALLE")
+        Dim sqlSel As String
+        Try
+            Orden = p
+            Me.centro = Orden.centro
+            NuevoDocumento = Albaran
+            sqlSinWhere = "SELECT dcfactutrasp.*, " & _
+                                " filiales.DESCRI AS NOMCENTRO " & _
+                                " FROM dcfactutrasp " & _
+                                " LEFT JOIN filiales ON (filiales.CODI = dcfactutrasp.CENTRO) "
+
+            sqlSel = sqlSinWhere & _
+                        " WHERE dcfactutrasp.COMAN = """ & Orden.ORDRE & """ AND " & _
+                        " dcfactutrasp.DOCUMENT = """ & NuevoDocumento & """ AND " & _
+                        " dcfactutrasp.VC = ""V"" AND " & _
+                        " dcfactutrasp.NLINEA = """ & Orden.detallePAF.LINEA & """ AND " & _
+                        " dcfactutrasp.CENTRO = """ & Orden.centro & """ ORDER BY dcfactutrasp.FRA "
+
+
+            cmdSel.CommandText = sqlSel
+
+            dvForm.Sort = "FRA"
+            da.SelectCommand = cmdSel
+            da.Fill(tabla)
+            PonerDefaults()
+
+            'CreaTablas()
+            'PonerDefaults()
+            'DespertarHandlers()
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub PonerDefaults()
+        Try
+            '+------------+---------------------+------+-----+------------+-------+
+            '| Field      | Type                | Null | Key | Default    | Extra |
+            '+------------+---------------------+------+-----+------------+-------+
+            '| FRA        | int(11)             | NO   |     | 0          |       |
+            '| TIPUS      | char(1)             | NO   | PRI |            |       |
+            '| DOCUMENT   | char(1)             | NO   | PRI |            |       |
+            '| DATA       | date                | NO   |     | 0000-00-00 |       |
+            '| QUANTITAT  | double(15,3)        | YES  |     | NULL       |       |
+            '| NLINEA     | int(11)             | NO   | PRI | 0          |       |
+            '| ALINEA     | int(11)             | NO   | PRI | 0          |       |
+            '| TRASPASADA | tinyint(1) unsigned | YES  |     | NULL       |       |
+            '| VC         | char(1)             | NO   | PRI |            |       |
+            '| COMAN      | int(11)             | NO   | PRI | 0          |       |
+            '| ALBAR      | int(11)             | NO   | PRI | 0          |       |
+            '| CENTRO     | char(1)             | NO   | PRI | C          |       |
+            '+------------+---------------------+------+-----+------------+-------+
+
+            'Ponemos 0 todavía no se sabe a donde va a ir
+            dvForm.Table.Columns("FRA").DefaultValue = 0
+            dvForm.Table.Columns("DOCUMENT").DefaultValue = NuevoDocumento
+            dvForm.Table.Columns("TIPUS").DefaultValue = Prenda
+            dvForm.Table.Columns("QUANTITAT").DefaultValue = 0
+            dvForm.Table.Columns("NLINEA").DefaultValue = Orden.detallePAF.LINEA
+            dvForm.Table.Columns("DATA").DefaultValue = Date.Today.ToShortDateString
+            dvForm.Table.Columns("ALINEA").DefaultValue = 0
+            dvForm.Table.Columns("TRASPASADA").DefaultValue = False
+            dvForm.Table.Columns("VC").DefaultValue = "V"
+            dvForm.Table.Columns("COMAN").DefaultValue = Orden.detallePAF.ORDRE
+            dvForm.Table.Columns("CENTRO").DefaultValue = Orden.centro
+            dvForm.Table.Columns("TALLA01").DefaultValue = 0
+            dvForm.Table.Columns("TALLA02").DefaultValue = 0
+            dvForm.Table.Columns("TALLA03").DefaultValue = 0
+            dvForm.Table.Columns("TALLA04").DefaultValue = 0
+            dvForm.Table.Columns("TALLA05").DefaultValue = 0
+            dvForm.Table.Columns("TALLA06").DefaultValue = 0
+            dvForm.Table.Columns("TALLA07").DefaultValue = 0
+            dvForm.Table.Columns("TALLA08").DefaultValue = 0
+            dvForm.Table.Columns("TALLA09").DefaultValue = 0
+            dvForm.Table.Columns("TALLA10").DefaultValue = 0
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Function DocDestinoCorrecto(ByVal af As Integer, ByVal doc As String, ByVal tipo As String, ByVal CENTRO As String) As Short
+        Dim cmd As New MySqlCommand
+        Dim dar As MySqlDataReader
+        Try
+            cmd.Connection = cnn
+            cmd.CommandText = "SELECT count(TRASPAS) as cantidad, TRASPAS " & _
+                " FROM FACTUR WHERE DOCUMENT = """ & doc & """ AND  " & _
+                " CENTRO = """ & CENTRO & """ AND  " & _
+                " FRA = """ & af & """ GROUP BY FRA"
+
+            cnn.Open()
+            dar = cmd.ExecuteReader
+            dar.Read()
+            If dar("cantidad") = 0 Then
+                'Hay que crearlo
+                dar.Close()
+                cnn.Close()
+                Return 1
+            End If
+            If Not dar("TRASPAS") = True Then
+                dar.Close()
+                cnn.Close()
+                Return 2
+            Else
+                MessageBox.Show("L'Albarà  " & af & " ja ha sigut trasapassat")
+                dar.Close()
+                cnn.Close()
+                Return 0
+            End If
+
+            dar.Close()
+            cnn.Close()
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+            dar.Close()
+            cnn.Close()
+        End Try
+    End Function
+
+#Region "TRASPASO"
+
+    Private Function ObtenerDocumentoATraspasar(ByVal i As Integer, ByVal traspasables As ArrayList) As clsPAFVenta
+        Dim docATraspasar As clsPAFVenta
+
+        Try
+            If FRA = traspasables(i) Then : docATraspasar = CType(Me.MemberwiseClone(), clsPAFVenta)
+            Else : docATraspasar = New clsPAFVenta(ds.Tables(tablaVentas).Copy, centro, bc, DOCUMENT, TIPUS, True, traspasables(i), False)
+            End If
+            Return docATraspasar
+
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Function
+    Friend Function CrearPAF(ByVal orden As clsOrdenModelo, ByVal fecha As Date, ByVal deOrden As Int64, ByVal dv As DataView, ByVal CENTRO As String, Optional ByVal aAlbaranFijo As Integer = 0) As Integer
+        Dim UltimoPAF As Double
+        Dim dr As DataRow
+        Dim nuevoDoc As clsPAFVenta
+        Dim cmdInsertar As New MySqlCommand
+        Try
+            If aAlbaranFijo = 0 Then : UltimoPAF = GetNumeroUltimoPAF(Albaran, CENTRO) + 1
+            Else : UltimoPAF = aAlbaranFijo : End If
+
+            ACN()
+            cmdInsertar.Connection = cnn
+            'Crear Nuevo Albaran
+            With dv.Item(0)
+                Dim fecha2 As String
+                fecha2 = fecha.Year & "-" & fecha.Month & "-" & fecha.Day
+                cmdInsertar.CommandText = "INSERT INTO " & tablaVentas & " (" & _
+                        " DOCUMENT, " & _
+                        " TIPUS, " & _
+                        " FRA, " & _
+                        " CLIENT, " & _
+                        " DATA, " & _
+                        " TRASPAS, " & _
+                        " OBSERV, " & _
+                        " REPRES, " & _
+                        " COMIS, " & _
+                        " CENTRO," & _
+                        " ORDRE," & _
+                        " PREU," & _
+                        " ALBCLI," & _
+                        " TALLA01," & _
+                        " TALLA02," & _
+                        " TALLA03," & _
+                        " TALLA04," & _
+                        " TALLA05," & _
+                        " TALLA06," & _
+                        " TALLA07," & _
+                        " TALLA08," & _
+                        " TALLA09," & _
+                        " TALLA10," & _
+                        " MODEL," & _
+                        " SERIE," & _
+                        " EXPEDICIO," & _
+                        " TEMPORADA" & _
+                        " ) VALUES (" & _
+                        " ""A"", " & _
+                        " ""P"", " & _
+                        " """ & NS(UltimoPAF, True) & """, " & _
+                        " """ & NS(orden.CLIENT, True) & """, " & _
+                        " """ & fecha2 & """, " & _
+                        " ""0"", " & _
+                        " """", " & _
+                        " """ & NS(orden.REPRES, True) & """, " & _
+                        " """ & NS(orden.COMIS, True) & """, " & _
+                        " """ & NS(orden.centro) & """, " & _
+                        " """ & NS(orden.ORDRE, True) & """, " & _
+                        " """ & NS(orden.PREU, True) & """, " & _
+                        " """ & NS(orden.ALBARA) & """, " & _
+                        " """ & NS(orden.TALLA01) & """," & _
+                        " """ & NS(orden.TALLA02) & """," & _
+                        " """ & NS(orden.TALLA03) & """," & _
+                        " """ & NS(orden.TALLA04) & """," & _
+                        " """ & NS(orden.TALLA05) & """," & _
+                        " """ & NS(orden.TALLA06) & """," & _
+                        " """ & NS(orden.TALLA07) & """," & _
+                        " """ & NS(orden.TALLA08) & """," & _
+                        " """ & NS(orden.TALLA09) & """," & _
+                        " """ & NS(orden.TALLA10) & """," & _
+                        " """ & NS(orden.MODEL) & """," & _
+                        " """ & NS(orden.SERIE) & """," & _
+                        " """ & orden.EXPEDICIO & """," & _
+                        " """ & NS(orden.TEMPORADA) & """ )"
+
+                cmdInsertar.ExecuteNonQuery()
+                CCN()
+            End With
+            CrearPAF = UltimoPAF
+            ActualizarNum("FACTUR", Albaran, CENTRO, UltimoPAF, "T")
+            'Crear un PAF nuevo segun sea el documento actual un P o A o F
+
+        Catch ex As Exception
+            LOG(ex.ToString) : CCN()
+        End Try
+    End Function
+    Private Sub HacerTraspasoLinea()
+        Dim aAF As Integer
+        Dim quehacersiponenumerodestino As Short
+        Try
+            If FRA = 0 Then
+                'FRA = PAF.ComprobarAlbaranATraspasar(0, Date.Today)
+                FRA = CrearPAF(Orden, DATA, Orden.ORDRE, Orden.dvForm, centro)
+                'Ponemos el docuemnto al que ha sido traspasado
+                ALINEA = TraspasarNLineas2(FRA, Orden.detallePAF)   ', QUANTITAT, PAF.lineasVenta.COLOR, PAF.lineasVenta.DOCUMENT, PAF.lineasVenta.TIPUS, PAF.lineasVenta.dvForm, FRA, NLINEA, centro)
+            Else
+                'Hay que controlora que el albbarán de destino sea correcto
+                quehacersiponenumerodestino = DocDestinoCorrecto(FRA, NuevoDocumento, TIPUS, centro)
+                Select Case quehacersiponenumerodestino
+                    Case 0
+                        'No hacer nada mensaje de error mostrado anteriormente pq el doc no es valido
+                    Case 1
+                        'No exite el numero de albaran que hemos escrito
+                        FRA = CrearPAF(Orden, DATA, Orden.ORDRE, Orden.dvForm, centro, FRA)
+                        ALINEA = TraspasarNLineas2(FRA, Orden.detallePAF)
+                    Case 2
+                        'Ya existe
+                        ALINEA = TraspasarNLineas2(FRA, Orden.detallePAF)
+                End Select
+            End If
+
+            'Habria que hacer un recalcular de lo nuevo en el caso de los albaranes de modelos todavia no esta hecho '!!!
+            'Dim pafp As New clsPAFVenta(ds.Tables(tablaVentas).Copy, Orden.centro, Me.bc, Albaran, Prenda)
+            'pafp.lineasVenta.HacerCalculosLineasPAF("PREU")
+            'pafp.ActualizarOrigen()
+            Dim pafp As New clsPAFVenta(ds.Tables(tablaVentas).Copy, Orden.centro, Me.bc, Albaran, Prenda, False, FRA, False)
+            pafp.lineasVenta.HacerCalculosLineasPAF("PREU", True)
+            pafp.ActualizarOrigen()
+            pafp = Nothing
+
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Friend Function TraspasarNLineas2(ByVal aAF As Integer, ByVal linea As clsDetallePAFCompraModelo) ' ByVal tejido As String, ByVal cantidad As Integer, ByVal color As String, ByVal documento as string, ByVal tipo as string, ByVal dvLineas As DataView, ByVal dePA As Integer, ByVal nlinea As Integer, ByVal CENTRO As Char)
+        Dim i As Integer
+        Dim cmdInsertar As New MySqlCommand
+        Dim cmdSel As MySqlCommand
+        Dim nlineas As Integer
+        Try
+            'TIPUS=M y DOCUMENT=A y introduciremos en DFACTU las lineas q tenemos
+            'en el dgActual
+            'Primero seleccionar 
+            'NO BORRAR
+            'Hay que buscar las lineas de AF de de aAF y mirar si tiene algun tejido
+            'q cumpla lo de color, tejido, documentonuevo y tipo
+            'Si existe le incrementamos la cantidad y recalculamos todos lo campos!! 
+            'Esto ultimo parece que el programa no lo hace actualmente preguntar
+            'End If
+            'Miramos el numero de lineas del AF y insertamos una nueva con lo que nos han pasado
+            cmdSel = New MySqlCommand("SELECT MAX(NLINEA) FROM " & tablaLineasVenta & " WHERE " & _
+                    " (TIPUS = """ & Prenda & """ AND " & _
+                    " DOCUMENT = """ & Albaran & """ AND " & _
+                    " FRA = """ & aAF & """ AND " & _
+                    " CENTRO = """ & linea.centro & """)", cnn)
+            ACN()
+            nlineas = nzn(cmdSel.ExecuteScalar, 0) + 1
+            CCN()
+            cmdInsertar.Connection = cnn
+            'Solo hay una PAF a traspasar en este caso pq son las lineas
+            'Obtenemos la linea a traspasar
+
+            cmdInsertar.Connection = cnn
+            cmdInsertar.CommandText = "INSERT INTO " & tablaLineasVenta & "(" & _
+                    " TIPUS, " & _
+                    " DOCUMENT, " & _
+                    " FRA, " & _
+                    " NLINEA, " & _
+                    " COLOR, " & _
+                    " COMAN, " & _
+                    " CENTRO, " & _
+                    " TEMPORADA, " & _
+                    " TARA1, " & _
+                    " TARA2, " & _
+                    " TARA3, " & _
+                    " TARA4, " & _
+                    " TARA5, " & _
+                    " TARA6, " & _
+                    " TARA7, " & _
+                    " TARA8, " & _
+                    " TARA9, " & _
+                    " TARA10, " & _
+                    " TTALLA01, " & _
+                    " TTALLA02, " & _
+                    " TTALLA03, " & _
+                    " TTALLA04, " & _
+                    " TTALLA05, " & _
+                    " TTALLA06, " & _
+                    " TTALLA07, " & _
+                    " TTALLA08, " & _
+                    " TTALLA09, " & _
+                    " TTALLA10, " & _
+                    " TALLA01, " & _
+                    " TALLA02, " & _
+                    " TALLA03, " & _
+                    " TALLA04, " & _
+                    " TALLA05, " & _
+                    " TALLA06, " & _
+                    " TALLA07, " & _
+                    " TALLA08, " & _
+                    " TALLA09, " & _
+                    " TALLA10, " & _
+                    " UNITATS, ESTOC " & _
+                    " ) VALUES (" & _
+                    " """ & Prenda & """, " & _
+                    " """ & Albaran & """, " & _
+                    " " & aAF & ", " & _
+                    " " & nlineas & ", " & _
+                    " """ & NS(Orden.detallePAF.COLOR) & """, " & _
+                    " """ & NS(Orden.ORDRE, True) & """, " & _
+                    " """ & NS(Orden.centro) & """, " & _
+                    " """ & NS(Orden.TEMPORADA) & """, " & _
+                    " """ & NS(Orden.detallePAF.TARA1, True) & """, " & _
+                    " """ & NS(Orden.detallePAF.TARA2, True) & """, " & _
+                    " """ & NS(Orden.detallePAF.TARA3, True) & """, " & _
+                    " """ & NS(Orden.detallePAF.TARA4, True) & """, " & _
+                    " """ & NS(Orden.detallePAF.TARA5, True) & """, " & _
+                    " """ & NS(Orden.detallePAF.TARA6, True) & """, " & _
+                    " """ & NS(Orden.detallePAF.TARA7, True) & """, " & _
+                    " """ & NS(Orden.detallePAF.TARA8, True) & """, " & _
+                    " """ & NS(Orden.detallePAF.TARA9, True) & """, " & _
+                    " """ & NS(Orden.detallePAF.TARA10, True) & """," & _
+                    " """ & NS(Orden.TALLA01) & """," & _
+                    " """ & NS(Orden.TALLA02) & """," & _
+                    " """ & NS(Orden.TALLA03) & """," & _
+                    " """ & NS(Orden.TALLA04) & """," & _
+                    " """ & NS(Orden.TALLA05) & """," & _
+                    " """ & NS(Orden.TALLA06) & """," & _
+                    " """ & NS(Orden.TALLA07) & """," & _
+                    " """ & NS(Orden.TALLA08) & """," & _
+                    " """ & NS(Orden.TALLA09) & """," & _
+                    " """ & NS(Orden.TALLA10) & """," & _
+                    " """ & NS(TALLA01, True) & """," & _
+                    " """ & NS(TALLA02, True) & """," & _
+                    " """ & NS(TALLA03, True) & """," & _
+                    " """ & NS(TALLA04, True) & """," & _
+                    " """ & NS(TALLA05, True) & """," & _
+                    " """ & NS(TALLA06, True) & """," & _
+                    " """ & NS(TALLA07, True) & """," & _
+                    " """ & NS(TALLA08, True) & """," & _
+                    " """ & NS(TALLA09, True) & """," & _
+                    " """ & NS(TALLA10, True) & """," & _
+                    " """ & NS(TALLA01 + TALLA02 + TALLA03 + TALLA04 + TALLA05 + TALLA06 + TALLA07 + TALLA08 + TALLA09 + TALLA10, True) & """, ""0"")"
+
+            'Ahora hay que insertarlo en dcfactutrasp
+            ACN()
+            cmdInsertar.ExecuteNonQuery()
+            CCN()
+
+            Dim pafp As New clsPAFVenta(ds.Tables(tablaVentas).Copy, Orden.centro, Me.bc, Albaran, Prenda, False, aAF, False)
+            pafp.lineasVenta.HacerCalculosLineasPAF("PREU", True)
+            pafp.ActualizarOrigen()
+            pafp = Nothing
+
+            Return nlineas
+
+        Catch ex As Exception
+            LOG(ex.ToString) : CCN()
+        End Try
+    End Function
+
+#End Region
+
+    Friend Sub HacerCalculos()
+        Dim b As Boolean
+        Try
+            guardarDV()
+
+            If TRASPASADA = True Then
+
+                b = ActualizarStockTejidos(-QUANTITAT)
+
+                'En este caso se quiere hacer el traspaso
+                If b Then HacerTraspasoLinea()
+            Else
+                'En este caso se quiere quitar el traspaso
+
+                ActualizarStockTejidos(QUANTITAT)
+
+            End If
+            'CantidadTraspasada()
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Function ActualizarStockTejidos(ByVal cantidad As Double) As Boolean
+        'Dim strSQL As String
+        'Dim stock As Double
+        'Dim cmdSel As New MySqlCommand
+        'Dim cmdUpd As New MySqlCommand
+        Try
+            '    cmdSel.Connection = cnn
+            '    cmdUpd.Connection = cnn
+
+            '    ACN()
+            '    If Not cantidad < 0 Then
+            '        strSQL = "UPDATE " & tablaHiloColores & " SET ACTUAL = ACTUAL + " & cantidad & " WHERE(FIL = """ & NS(PAF.lineasVenta.MOSTRA) & """ AND TIPUS = ""T"" AND COLOR = """ & NS(PAF.lineasVenta.COLOR) & """)"
+            '        cmdUpd.CommandText = strSQL
+            '        cmdUpd.ExecuteNonQuery()
+            '        CCN()
+            '        Return True
+            '    Else
+            '        strSQL = "SELECT ACTUAL FROM " & tablaHiloColores & " WHERE(FIL = """ & NS(PAF.lineasVenta.MOSTRA) & """ AND TIPUS = ""T"" AND COLOR = """ & NS(PAF.lineasVenta.COLOR) & """)"
+            '        cmdSel.CommandText = strSQL
+            '        stock = cmdSel.ExecuteScalar() - Math.Abs(cantidad)
+            '        If stock < 0 Then
+            '            MessageBox.Show("No hi suficient stock d'aquest teixit es necesiten: " & Math.Abs(stock))
+            '            If MessageBox.Show(rm.GetString("CONTINUARIGUALMENTE"), "", MessageBoxButtons.YesNo) = DialogResult.Yes Then
+            '                strSQL = "UPDATE " & tablaHiloColores & " SET ACTUAL = ACTUAL + " & cantidad & " WHERE(FIL = """ & NS(PAF.lineasVenta.MOSTRA) & """ AND TIPUS = ""T"" AND COLOR = """ & NS(PAF.lineasVenta.COLOR) & """)"
+            '            Else
+            '                CCN()
+            '                TRASPASADA = False
+            '                Return False
+            '            End If
+            '        Else
+            '            strSQL = "UPDATE " & tablaHiloColores & " SET ACTUAL = ACTUAL + " & cantidad & " WHERE(FIL = """ & NS(PAF.lineasVenta.MOSTRA) & """ AND TIPUS = ""T"" AND COLOR = """ & NS(PAF.lineasVenta.COLOR) & """)"
+            '        End If
+            '        cmdUpd.CommandText = strSQL
+            '        cmdUpd.ExecuteNonQuery()
+            '        CCN()
+            Return True
+            '    End If
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Function
+    Friend Overrides Function TieneCambios() As Boolean
+        Try
+            guardarDV()
+            If Not tabla.GetChanges Is Nothing Then
+                Return True
+            Else
+                Return False
+            End If
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Function
+
+#Region "CALCULOS"
+
+    'Public Sub CantidadTraspasada()
+    '    Dim i As Integer
+    '    Dim ret As Double = 0
+    '    Try
+    '        For i = 0 To dvForm.Count - 1
+    '            If dvForm(i).Item("TRASPASADA") = True Then
+    '                ret = dvForm(i).Item("QUANTITAT") + ret
+    '            End If
+    '        Next
+
+    '        PAF.lineasVenta.PERREBRE = PAF.lineasVenta.UNITATS - ret
+    '        PAF.lineasVenta.REBUT = ret
+
+    '    Catch ex As Exception
+    '        LOG(ex.ToString) : cargando = False
+    '    End Try
+    'End Sub
+
+#End Region
+
+#Region "OVERRIDES"
+
+    Friend Overrides Function GenOrder() As String
+
+    End Function
+    Friend Overrides Function genWhere() As String
+
+    End Function
+    Friend Overrides Function genWhereNumeroRegistros() As String
+
+    End Function
+    Friend Overrides Function ObtenerNumeroRegistro(ByVal id As Object) As Integer
+
+    End Function
+
+#End Region
+
+End Class

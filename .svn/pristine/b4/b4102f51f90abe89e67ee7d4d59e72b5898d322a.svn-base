@@ -1,0 +1,1049 @@
+<?xml version="1.0"?>
+<doc>
+  <assembly>
+    <name>C1.Win.DashboardLayout.4</name>
+  </assembly>
+  <members>
+    <member name="T:C1.Win.Layout.SplitLayout">
+      <summary>
+            Class providing ILayout interface for using C1SplitterPanels as itemContainers for Dashboard Layout Control on the base of C1SplitContainer containers.
+            </summary>
+    </member>
+    <member name="M:C1.Win.Layout.SplitLayout.#ctor(C1.Win.C1SplitContainer.C1SplitContainer)">
+      <summary>
+            Creates an instance of <see cref="T:C1.Win.Layout.SplitLayout" /></summary>
+      <param name="container">
+        <see cref="T:C1.Win.C1SplitContainer.C1SplitContainer" /> used as a container for the dashboard.</param>
+    </member>
+    <member name="T:C1.Win.Layout.IconBox">
+      <summary>
+            Icon box button for ItemContainer header.
+            </summary>
+    </member>
+    <member name="M:C1.Win.Layout.IconBox.#ctor">
+      <summary>
+            Creates an instance of <see cref="T:C1.Win.Layout.IconBox" /> class. 
+            </summary>
+    </member>
+    <member name="P:C1.Win.Layout.IconBox.BackgroundImage">
+      <summary>
+      </summary>
+    </member>
+    <member name="M:C1.Win.Layout.IconBox.OnMouseEnter(System.EventArgs)">
+      <summary>
+            Raises the OnMouseEnter event.
+            </summary>
+      <param name="e">An <see cref="T:System.EventArgs" /> that contains the event data.</param>
+    </member>
+    <member name="M:C1.Win.Layout.IconBox.OnMouseLeave(System.EventArgs)">
+      <summary>
+            Raises the OnMouseLeave event.
+            </summary>
+      <param name="e">An <see cref="T:System.EventArgs" /> that contains the event data.</param>
+    </member>
+    <member name="T:C1.Win.Layout.C1DashboardLayout">
+      <summary>
+            The <see cref="T:C1.Win.Layout.C1DashboardLayout" /> is a layout control that lets you design dynamic screens and dashboards.
+            </summary>
+    </member>
+    <member name="M:C1.Win.Layout.C1DashboardLayout.#ctor">
+      <summary>
+            Creates an instance of <see cref="T:C1.Win.Layout.C1DashboardLayout" /></summary>
+    </member>
+    <member name="P:C1.Win.Layout.C1DashboardLayout.Items">
+      <summary>
+            Returns collection of DashbordItem instances of currently selected layout.
+            </summary>
+    </member>
+    <member name="P:C1.Win.Layout.C1DashboardLayout.LayoutType">
+      <summary>
+            Gets or sets current <see cref="P:C1.Win.Layout.C1DashboardLayout.LayoutType" /> layout type.
+            </summary>
+    </member>
+    <member name="P:C1.Win.Layout.C1DashboardLayout.Options">
+      <summary>
+            Gets <see cref="T:C1.Win.Layout.DashboardOptions" /> C1DashboardLayout options.
+            </summary>
+    </member>
+    <member name="P:C1.Win.Layout.C1DashboardLayout.Styles">
+      <summary>
+            Gets <see cref="T:C1.Win.Layout.Styles.DashboardTheme" /> C1DashboardLayout styles.
+            </summary>
+    </member>
+    <member name="E:C1.Win.Layout.C1DashboardLayout.ItemContainerSelected">
+      <summary>
+            Occurs when the ItemContainer is selected.
+            </summary>
+    </member>
+    <member name="E:C1.Win.Layout.C1DashboardLayout.PaintHeader">
+      <summary>
+            Occurs when the ItemContainer Header is redrawn.
+            </summary>
+    </member>
+    <member name="M:C1.Win.Layout.C1DashboardLayout.AttachToLayout(C1.Win.Layout.ILayout)">
+      <summary>
+            Attaches the custom layout
+            </summary>
+      <param name="layout">
+      </param>
+    </member>
+    <member name="M:C1.Win.Layout.C1DashboardLayout.SaveLayout(System.String)">
+      <summary>
+            Saves layouts of <see cref="T:C1.Win.Layout.C1DashboardLayout" /> control to the XML file.
+            </summary>
+      <param name="fileName">The name of the XML file.</param>
+    </member>
+    <member name="M:C1.Win.Layout.C1DashboardLayout.SaveLayout(System.IO.Stream)">
+      <summary>
+            Saves layouts of <see cref="T:C1.Win.Layout.C1DashboardLayout" /> control to the XML file.
+            </summary>
+      <param name="stream">The stream to output.</param>
+    </member>
+    <member name="M:C1.Win.Layout.C1DashboardLayout.LoadLayout(System.String)">
+      <summary>
+            Loads layouts of <see cref="T:C1.Win.Layout.C1DashboardLayout" /> control from the XML file.
+            </summary>
+      <param name="fileName">The name of the XML file.</param>
+    </member>
+    <member name="M:C1.Win.Layout.C1DashboardLayout.LoadLayout(System.IO.Stream)">
+      <summary>
+            Loads layouts of <see cref="T:C1.Win.Layout.C1DashboardLayout" /> control from the XML file.
+            </summary>
+      <param name="stream">The stream to input.</param>
+    </member>
+    <member name="M:C1.Win.Layout.C1DashboardLayout.GetSelectedItem">
+      <summary>
+            Returns currently selected <see cref="T:C1.Win.Layout.DashboardItem" /></summary>
+      <returns>Currently selected <see cref="T:C1.Win.Layout.DashboardItem" /></returns>
+    </member>
+    <member name="M:C1.Win.Layout.C1DashboardLayout.Maximize(C1.Win.Layout.DashboardItem)">
+      <summary>
+            Maximizes the dashboard item container.
+            </summary>
+      <param name="item">The <see cref="T:C1.Win.Layout.DashboardItem" /> item to maximize</param>
+    </member>
+    <member name="M:C1.Win.Layout.C1DashboardLayout.Restore">
+      <summary>
+            Restores the dashboard item container to it's original position and size.
+            </summary>
+    </member>
+    <member name="M:C1.Win.Layout.C1DashboardLayout.SetId(System.Object,System.String)">
+      <summary>
+            Sets Id for ItemContainer instance.
+            </summary>
+      <param name="itemContainer">ItemContainer to set Id</param>
+      <param name="id">Unique identifier of dashboard item.</param>
+    </member>
+    <member name="M:C1.Win.Layout.C1DashboardLayout.GetCaption(System.Object)">
+      <summary>
+            Gets Caption for ItemContainer instance.
+            </summary>
+      <param name="itemContainer">ItemContainer to obtain caption.</param>
+      <returns>Caption of dashboard item.</returns>
+    </member>
+    <member name="M:C1.Win.Layout.C1DashboardLayout.SetCaption(System.Object,System.String)">
+      <summary>
+            Sets Caption for ItemContainer instance.
+            </summary>
+      <param name="itemContainer">ItemContainer to obtain caption.</param>
+      <param name="caption">Caption string.</param>
+    </member>
+    <member name="M:C1.Win.Layout.C1DashboardLayout.OnPaintHeader(C1.Win.Layout.HeaderPaintEventArgs)">
+      <summary>
+            Raises <see cref="E:C1.Win.Layout.C1DashboardLayout.PaintHeader" /> event.
+            </summary>
+      <param name="args"> An <see cref="T:C1.Win.Layout.HeaderPaintEventArgs" /> that contains the event data.</param>
+    </member>
+    <member name="P:C1.Win.Layout.C1DashboardLayout.DisplayRectangle">
+      <summary>
+            Gets the rectangle that represents the display area of the control.
+            </summary>
+    </member>
+    <member name="M:C1.Win.Layout.C1DashboardLayout.OnPaintBackground(System.Windows.Forms.PaintEventArgs)">
+      <summary>
+            Paints the background of the control.
+            </summary>
+    </member>
+    <member name="M:C1.Win.Layout.C1DashboardLayout.OnHandleCreated(System.EventArgs)">
+      <summary>
+             Raises the System.Windows.Forms.Control.HandleDestroyed event.
+            </summary>
+      <param name="e">An <see cref="T:System.EventArgs" /> that contains the event data.</param>
+    </member>
+    <member name="M:C1.Win.Layout.C1DashboardLayout.OnHandleDestroyed(System.EventArgs)">
+      <summary>
+            Raises the System.Windows.Forms.Control.HandleDestroyed event.
+            </summary>
+      <param name="e">An <see cref="T:System.EventArgs" /> that contains the event data.</param>
+    </member>
+    <member name="M:C1.Win.Layout.C1DashboardLayout.OnRightToLeftChanged(System.EventArgs)">
+      <summary>
+            Raises the RightToLeftChanged event.
+            </summary>
+      <param name="e">An EventArgs that contains the event data.</param>
+    </member>
+    <member name="M:C1.Win.Layout.C1DashboardLayout.OnItemContainerSelected(System.EventArgs)">
+      <summary>
+            Raises <see cref="E:C1.Win.Layout.C1DashboardLayout.ItemContainerSelected" /> event.
+            </summary>
+      <param name="args"> An <see cref="T:System.EventArgs" /> that contains the event data.</param>
+    </member>
+    <member name="M:C1.Win.Layout.C1DashboardLayout.Dispose(System.Boolean)">
+      <summary>
+            Releases the unmanaged resources used by the System.Windows.Forms.Control and 
+            its child controls and optionally releases the managed resources.
+            </summary>
+      <param name="disposing">true to release both managed and unmanaged resources; false to release only unmanaged resources.</param>
+    </member>
+    <member name="T:C1.Win.Layout.LayoutType">
+      <summary>
+            Type of layout control
+            </summary>
+    </member>
+    <member name="F:C1.Win.Layout.LayoutType.Flow">
+      <summary>
+            FlowLayout layout type 
+            </summary>
+    </member>
+    <member name="F:C1.Win.Layout.LayoutType.Grid">
+      <summary>
+            GridLayout layout type 
+            </summary>
+    </member>
+    <member name="F:C1.Win.Layout.LayoutType.Split">
+      <summary>
+            SplitLayout layout type 
+            </summary>
+    </member>
+    <member name="F:C1.Win.Layout.LayoutType.Custom">
+      <summary>
+            Custom layout type for user-defined ILayaut
+            </summary>
+    </member>
+    <member name="T:C1.Win.Layout.DragType">
+      <summary>
+            Type of ItemContainer instance modifying.
+            </summary>
+    </member>
+    <member name="F:C1.Win.Layout.DragType.None">
+      <summary>
+            Do nothing
+            </summary>
+    </member>
+    <member name="F:C1.Win.Layout.DragType.Drag">
+      <summary>
+            Drag container
+            </summary>
+    </member>
+    <member name="F:C1.Win.Layout.DragType.ResizeLeft">
+      <summary>
+            Resize container to the left
+            </summary>
+    </member>
+    <member name="F:C1.Win.Layout.DragType.ResizeTop">
+      <summary>
+            Resize container up
+            </summary>
+    </member>
+    <member name="F:C1.Win.Layout.DragType.ResizeRight">
+      <summary>
+            Resize container to the right
+            </summary>
+    </member>
+    <member name="F:C1.Win.Layout.DragType.ResizeBottom">
+      <summary>
+            Resize container down
+            </summary>
+    </member>
+    <member name="T:C1.Win.Layout.AddRemoveItemContainerDelegate">
+      <summary>
+            Delegate for add-remove ItemContainer instance event. 
+            </summary>
+      <param name="sender">Calling <see cref="T:C1.Win.Layout.ILayout" /> instance.</param>
+      <param name="id">ItemContainer's id</param>
+    </member>
+    <member name="T:C1.Win.Layout.SynchronizeItemContainerDelegate">
+      <summary>
+             Delegate for synchronizing ItemContainer instances event. Synchronizes item containers with identical id.
+            </summary>
+      <param name="sender">Calling <see cref="T:C1.Win.Layout.ILayout" /> instance.</param>
+      <param name="oldId">ItemContainer's id</param>
+      <param name="newId">ItemContainer's new id (if this is a synchronizing with renaming)</param>
+    </member>
+    <member name="T:C1.Win.Layout.ILayout">
+      <summary>
+            Layout control interface. All layouts should implement this interface in order to communicate with C1DashboardLayoutControl
+            </summary>
+    </member>
+    <member name="P:C1.Win.Layout.ILayout.Container">
+      <summary>
+            Returns main container for dashboard itemContainers
+            </summary>
+    </member>
+    <member name="M:C1.Win.Layout.ILayout.SetParent(System.Windows.Forms.Control,System.Boolean)">
+      <summary>
+            Sets parent for <see cref="T:C1.Win.Layout.ILayout" /> container.
+            </summary>
+      <param name="parent">Parent for <see cref="T:C1.Win.Layout.ILayout" /> container.</param>
+      <param name="attaching">Attaching <see cref="T:C1.Win.Layout.C1DashboardLayout" /> instance to an existing <see cref="T:C1.Win.Layout.ILayout" /> control.</param>
+    </member>
+    <member name="M:C1.Win.Layout.ILayout.SetDelegates(C1.Win.Layout.AddRemoveItemContainerDelegate,C1.Win.Layout.AddRemoveItemContainerDelegate,C1.Win.Layout.SynchronizeItemContainerDelegate)">
+      <summary>
+            Set appropriate delegates in order to control adding/removing/synchronizing ItemContainers by <see cref="T:C1.Win.Layout.C1DashboardLayout" />  instance.
+            </summary>
+      <param name="add">
+        <see cref="T:C1.Win.Layout.AddRemoveItemContainerDelegate" /> adding delegate.</param>
+      <param name="remove">
+        <see cref="T:C1.Win.Layout.AddRemoveItemContainerDelegate" /> removing delegate.</param>
+      <param name="sync">
+        <see cref="T:C1.Win.Layout.SynchronizeItemContainerDelegate" /> synchronizing delegate.</param>
+    </member>
+    <member name="P:C1.Win.Layout.ILayout.LayoutItemContainers">
+      <summary>
+            Returns <see cref="T:System.Collections.IList" /> list of ItemContainer instances.
+            </summary>
+    </member>
+    <member name="P:C1.Win.Layout.ILayout.Items">
+      <summary>
+            Returns <see cref="T:C1.Win.Layout.DashboardCollection" /> list of Dashboard DashboardItem items
+            </summary>
+    </member>
+    <member name="M:C1.Win.Layout.ILayout.GetItemContainerOnPoint(System.Drawing.Point)">
+      <summary>
+            Returns ItemContainer instance at point.
+            </summary>
+      <param name="pt">Inspecting <see cref="T:System.Drawing.Point" /> point.</param>
+      <returns>ItemContainer at the point.</returns>
+    </member>
+    <member name="M:C1.Win.Layout.ILayout.CanDrag(System.Object,System.Drawing.Point)">
+      <summary>
+            Defines whether the ItemContainer instance can be dragged or resized.
+            </summary>
+      <param name="itemContainer">Inspecting ItemContainer</param>
+      <param name="pt">Inspecting <see cref="T:System.Drawing.Point" /> point.</param>
+      <returns>
+        <see cref="T:C1.Win.Layout.DragType" /> type of dragging/resizing.</returns>
+    </member>
+    <member name="M:C1.Win.Layout.ILayout.SelectItemContainer(System.Object)">
+      <summary>
+            Selects ItemContainer instance.
+            </summary>
+      <param name="itemContainer">ItemContainer to select (highlight).</param>
+    </member>
+    <member name="M:C1.Win.Layout.ILayout.DeselectItemContainer(System.Object)">
+      <summary>
+            Removes selection from ItemContainer instance.
+            </summary>
+      <param name="itemContainer">ItemContainer to deselect (remove highlighting)</param>
+    </member>
+    <member name="M:C1.Win.Layout.ILayout.GetFace(System.Object)">
+      <summary>
+            Returns face image of ItemContainer instance.
+            </summary>
+      <param name="itemContainer">ItemContainer for getting snapshot.</param>
+      <returns>
+        <see cref="T:System.Drawing.Image" /> instance of ItemContainer's snapshot.</returns>
+    </member>
+    <member name="M:C1.Win.Layout.ILayout.SetPlaceholderAt(System.Object,System.Drawing.Point)">
+      <summary>
+            Replaces the ItemContainer instance by placeholder or replaces the placeholder by ItemContainer instance.
+            </summary>
+      <param name="itemContainer">ItemContainer (placeholder) to exchange by. Can be null.</param>
+      <param name="pt">
+        <see cref="T:System.Drawing.Point" /> point to set ItemContainer/placeholder.</param>
+    </member>
+    <member name="M:C1.Win.Layout.ILayout.GetBounds(System.Object)">
+      <summary>
+            Returns <see cref="T:System.Drawing.Rectangle" /> bounds of the ItemContainer.
+            </summary>
+      <param name="itemContainer">ItemContainer for getting bounds.</param>
+      <returns>
+        <see cref="T:System.Drawing.Rectangle" /> bounds of the ItemContainer.</returns>
+    </member>
+    <member name="M:C1.Win.Layout.ILayout.SetBounds(System.Object,System.Drawing.Rectangle,C1.Win.Layout.DragType)">
+      <summary>
+            Sets bounds for the ItemContainer instance.
+            </summary>
+      <param name="itemContainer">ItemContainer for setting bounds (resizing/moving).</param>
+      <param name="bounds">
+        <see cref="T:System.Drawing.Rectangle" /> bounds for the ItemContainer.</param>
+      <param name="dragType">Current <see cref="T:C1.Win.Layout.DragType" /> that initiated resizing/moving.</param>
+      <returns>
+      </returns>
+    </member>
+    <member name="M:C1.Win.Layout.ILayout.Attach(System.Collections.Generic.Dictionary{System.String,System.Collections.ICollection})">
+      <summary>
+            Attaches dashboard ItemContainers to layout control.
+            </summary>
+      <param name="itemContainers">Dictionary that contains Ids and collections of controls to attach to the current layout.</param>
+    </member>
+    <member name="M:C1.Win.Layout.ILayout.Detach">
+      <summary>
+            Detaches dashboard itemContainers from layout control.
+            </summary>
+      <returns>
+      </returns>
+    </member>
+    <member name="M:C1.Win.Layout.ILayout.GetId(System.Object)">
+      <summary>
+            Gets Id for ItemContainer instance.
+            </summary>
+      <param name="itemContainer">ItemContainer to obtain Id</param>
+      <returns>Unique identifier of dashboard item.</returns>
+    </member>
+    <member name="M:C1.Win.Layout.ILayout.SetId(System.Object,System.String)">
+      <summary>
+            Sets Id for ItemContainer instance.
+            </summary>
+      <param name="itemContainer">ItemContainer to set Id</param>
+      <param name="id">Unique identifier of dashboard item.</param>
+    </member>
+    <member name="M:C1.Win.Layout.ILayout.IsItemContainer(System.Object)">
+      <summary>
+            Defines whether the object is an ItemContainer.
+            </summary>
+      <param name="itemContainer">Object to inspect.</param>
+      <returns>True if the object is an ItamContainer, False otherwise.</returns>
+    </member>
+    <member name="M:C1.Win.Layout.ILayout.CreateItemContainer(System.String)">
+      <summary>
+            Creates an ItemContainer.
+            </summary>
+      <param name="id">Unique identifier for dashboard item.</param>
+    </member>
+    <member name="M:C1.Win.Layout.ILayout.RemoveItemContainer(System.String)">
+      <summary>
+            Removes an ItemContainer.
+            </summary>
+      <param name="id">Unique identifier for dashboard item.</param>
+    </member>
+    <member name="M:C1.Win.Layout.ILayout.FindItemContainer(System.String)">
+      <summary>
+            Looks for ItemCotainer with defined unique identifier.
+            </summary>
+      <param name="id">Unique identifier for dashboard item.</param>
+    </member>
+    <member name="M:C1.Win.Layout.ILayout.UseOptions(C1.Win.Layout.DashboardOptions)">
+      <summary>
+            Force Layout control to use the Dashboard options.
+            </summary>
+      <param name="options">Dashboard options</param>
+    </member>
+    <member name="M:C1.Win.Layout.ILayout.UseTheme(C1.Win.Layout.Styles.DashboardTheme)">
+      <summary>
+            Apply the specified theme to layout
+            </summary>
+      <param name="theme">Theme to use.</param>
+    </member>
+    <member name="M:C1.Win.Layout.ILayout.UpdateStyle">
+      <summary>
+            Updates style according to the current theme.
+            </summary>
+    </member>
+    <member name="M:C1.Win.Layout.ILayout.Maximize(System.Object)">
+      <summary>
+            Maximizes ItemContainer
+            </summary>
+      <param name="itemContainer">ItemContainer to maximize.</param>
+    </member>
+    <member name="M:C1.Win.Layout.ILayout.Restore">
+      <summary>
+            Restores maximized ItemContainer to it's original size.
+            </summary>
+    </member>
+    <member name="M:C1.Win.Layout.ILayout.SaveLayout(System.Xml.XmlNode)">
+      <summary>
+            Stores elements of the child container.
+            </summary>
+      <param name="node">The parent of nodes with layouts.</param>
+    </member>
+    <member name="M:C1.Win.Layout.ILayout.LoadLayout(System.Xml.XmlNode)">
+      <summary>
+            Restores elements of the child container.
+            </summary>
+      <param name="node">The node with items of current layout.</param>
+    </member>
+    <member name="M:C1.Win.Layout.ILayout.SetItemProperties(System.Object,C1.Win.Layout.ItemContainerProperties)">
+      <summary>
+            Sets the Dashboard properties for item.
+            </summary>
+      <param name="itemContainer">ItemContainer to set properties.</param>
+      <param name="properties">The <see cref="T:C1.Win.Layout.ItemContainerProperties" /> object.</param>
+    </member>
+    <member name="M:C1.Win.Layout.ILayout.GetItemProperties(System.Object)">
+      <summary>
+            Gets the Dashboard properties for item.
+            </summary>
+      <param name="itemContainer">ItemContainer to get properties.</param>
+    </member>
+    <member name="M:C1.Win.Layout.ILayout.InitializeNew">
+      <summary>
+            Initializes a newly created layout. The method is called when a C1DashboardLayout is first initialized, typically after being first added to a design surface.
+            </summary>
+    </member>
+    <member name="M:C1.Win.Layout.ILayout.SetRightToLeft(System.Windows.Forms.RightToLeft)">
+      <summary>
+            Set RightToLeft property to maximized panel: control elements are displayed from right to left
+            </summary>
+      <param name="rightToLeft">RightToLeft parameter value</param>
+    </member>
+    <member name="M:C1.Win.Layout.ILayout.PopulateItemContainer(System.String,System.Object)">
+      <summary>
+            Populates item container by items from source item container.
+            </summary>
+      <param name="id">Unique identifier of the item container to populate.</param>
+      <param name="source">Source item container.</param>
+      <returns>Returns populated item container.</returns>
+    </member>
+    <member name="T:C1.Win.Layout.DashboardCollection">
+      <summary>
+            Collection of DashboarItem itemContainers
+            </summary>
+    </member>
+    <member name="P:C1.Win.Layout.DashboardCollection.Items">
+      <summary>
+            Gets items of collection
+            </summary>
+    </member>
+    <member name="P:C1.Win.Layout.DashboardCollection.Count">
+      <summary>
+            Gets the count of items
+            </summary>
+    </member>
+    <member name="P:C1.Win.Layout.DashboardCollection.Item(System.Int32)">
+      <summary>
+            Gets item by index.
+            </summary>
+      <param name="index">Index to get item.</param>
+      <returns>The <see cref="T:C1.Win.Layout.DashboardItem" /> instance found by index.</returns>
+    </member>
+    <member name="P:C1.Win.Layout.DashboardCollection.Item(System.String)">
+      <summary>
+            Gets item by id.
+            </summary>
+      <param name="id">Unique identifier to get item</param>
+      <returns>The <see cref="T:C1.Win.Layout.DashboardItem" /> instance found by id.</returns>
+    </member>
+    <member name="M:C1.Win.Layout.DashboardCollection.Clear">
+      <summary>
+            Clears the collection.
+            </summary>
+    </member>
+    <member name="M:C1.Win.Layout.DashboardCollection.InsertBefore(System.String,C1.Win.Layout.DashboardItem)">
+      <summary>
+            Inserts item before item
+            </summary>
+      <param name="id">Id of the item before which we need to insert the item.</param>
+      <param name="item">The item to insert.</param>
+    </member>
+    <member name="M:C1.Win.Layout.DashboardCollection.InsertAfter(System.String,C1.Win.Layout.DashboardItem)">
+      <summary>
+            Inserts item after item
+            </summary>
+      <param name="id">Id of the item after which we need to insert the item.</param>
+      <param name="item">The item to insert.</param>
+    </member>
+    <member name="M:C1.Win.Layout.DashboardCollection.MoveBefore(System.String,C1.Win.Layout.DashboardItem)">
+      <summary>
+            Move the item to the place before the item with the specified ID.
+            </summary>
+      <param name="id">Id of the item before which we need to insert the item.</param>
+      <param name="item">The item to insert.</param>
+    </member>
+    <member name="M:C1.Win.Layout.DashboardCollection.MoveAfter(System.String,C1.Win.Layout.DashboardItem)">
+      <summary>
+            Move the item to the place after the item with the specified ID.
+            </summary>
+      <param name="id">Id of the item after which we need to insert the item.</param>
+      <param name="item">The item to insert.</param>
+    </member>
+    <member name="M:C1.Win.Layout.DashboardCollection.Add(System.String,System.Collections.IList)">
+      <summary>
+            Creates a new <see cref="T:C1.Win.Layout.DashboardItem" /> instance and adds it to the end of collection.
+            </summary>
+      <param name="id">Id for new item.</param>
+      <param name="items">List of items (controls) to place in ItemContainer.</param>
+    </member>
+    <member name="M:C1.Win.Layout.DashboardCollection.Remove(System.String)">
+      <summary>
+            Removes item by id.
+            </summary>
+      <param name="id">Id for the item to remove.</param>
+      <returns>True if the item has been removed successfully.</returns>
+    </member>
+    <member name="M:C1.Win.Layout.DashboardCollection.Populate">
+      <summary>
+            Populates collection
+            </summary>
+    </member>
+    <member name="T:C1.Win.Layout.DashboardItem">
+      <summary>
+            Represents a ItemContainer instance for DashboardLayout
+            </summary>
+    </member>
+    <member name="M:C1.Win.Layout.DashboardItem.#ctor(C1.Win.Layout.ILayout,System.Object,System.String,System.Collections.IList)">
+      <summary>
+            Initializes a new instance of the <see cref="T:C1.Win.Layout.DashboardItem" /> class.
+            </summary>
+      <param name="layout">The parent <see cref="T:C1.Win.Layout.ILayout" /> object to create <see cref="T:C1.Win.Layout.DashboardItem" /> on it.</param>
+      <param name="itemContainer">ItemContainer object to add on layout.</param>
+      <param name="id">The <see cref="T:C1.Win.Layout.DashboardItem" />'s Id.</param>
+      <param name="items">List of items (controls) to place in ItemContainer.</param>
+    </member>
+    <member name="P:C1.Win.Layout.DashboardItem.Id">
+      <summary>
+            Id for ItemContainer instance
+            </summary>
+    </member>
+    <member name="P:C1.Win.Layout.DashboardItem.ItemContainer">
+      <summary>
+            ItemContainer instance itself
+            </summary>
+    </member>
+    <member name="P:C1.Win.Layout.DashboardItem.Items">
+      <summary>
+            Items on ItemContainer instance.
+            </summary>
+    </member>
+    <member name="P:C1.Win.Layout.DashboardItem.Caption">
+      <summary>
+            The caption of ItemContainer
+            </summary>
+    </member>
+    <member name="T:C1.Win.Layout.ItemContainerProperties">
+      <summary>
+            Dashboard ItemContainer additional properties
+            </summary>
+    </member>
+    <member name="P:C1.Win.Layout.ItemContainerProperties.Caption">
+      <summary>
+            Caption of item container.
+            </summary>
+    </member>
+    <member name="T:C1.Win.Layout.DashboardOptions">
+      <summary>
+            Additional Dashboard options to use by layout control
+            </summary>
+    </member>
+    <member name="P:C1.Win.Layout.DashboardOptions.ToolIconAppearance">
+      <summary>
+             Gets or sets location of tool icon if Caption property is not defined for ItemContainer.
+            </summary>
+    </member>
+    <member name="P:C1.Win.Layout.DashboardOptions.MinimumItemContainerSize">
+      <summary>
+             Minimum ItemContainer instance size. When the size of parent container decreases the child ItemContainer instances decrease accordingly proportionally till the ItemContainer instance size reaches MinimumSize. In discrete system MinimumSize is a minimal size of child grid cell.
+            </summary>
+    </member>
+    <member name="P:C1.Win.Layout.DashboardOptions.MaximumItemContainerSize">
+      <summary>
+            Maximum ItemContainer instance size. When the size of parent container increases the child ItemContainer instances increase accordingly proportionally till the ItemContainer instance size reaches MamimumSize.In discrete system MaximumSize is a maximal size of child grid cell.
+            </summary>
+    </member>
+    <member name="P:C1.Win.Layout.DashboardOptions.ContextMenuStrip">
+      <summary>
+            ContextMenuStrip to use on ItemContainer instances.
+            </summary>
+    </member>
+    <member name="P:C1.Win.Layout.DashboardOptions.Span">
+      <summary>
+            Discrete size multiplier. This can be used for discrete resizing of ItemContainer.
+            </summary>
+    </member>
+    <member name="P:C1.Win.Layout.DashboardOptions.Cues">
+      <summary>
+            Use cues while dragging ItemContainers.
+            </summary>
+    </member>
+    <member name="P:C1.Win.Layout.DashboardOptions.AllowDrag">
+      <summary>
+            Allows to drag and drop ItemContainers.
+            </summary>
+    </member>
+    <member name="P:C1.Win.Layout.DashboardOptions.AllowResize">
+      <summary>
+            Allows to resize ItemContainers.
+            </summary>
+    </member>
+    <member name="P:C1.Win.Layout.DashboardOptions.HeaderElements">
+      <summary>
+            Gets a list of the ItemContainer header additional elements.
+            </summary>
+    </member>
+    <member name="P:C1.Win.Layout.DashboardOptions.HeaderAppearance">
+      <summary>
+            Defines the header appearance.
+            </summary>
+    </member>
+    <member name="P:C1.Win.Layout.DashboardOptions.GlobalDrag">
+      <summary>
+            Defines whether the item containers can be dragged from this C1DashboardLayout control to others where this global dragging also allowed.
+            </summary>
+    </member>
+    <member name="P:C1.Win.Layout.DashboardOptions.DashboardLayout">
+      <summary>
+            Gets or sets the C1DashboardLayout instance the DashboardOptions belongs.
+            </summary>
+    </member>
+    <member name="T:C1.Win.Layout.HeaderAppearance">
+      <summary>
+            Defines the header appearance.
+            </summary>
+    </member>
+    <member name="F:C1.Win.Layout.HeaderAppearance.Empty">
+      <summary>
+            There are no buttons on the header.
+            </summary>
+    </member>
+    <member name="F:C1.Win.Layout.HeaderAppearance.MaximizeButton">
+      <summary>
+            The maximize button is present.
+            </summary>
+    </member>
+    <member name="F:C1.Win.Layout.HeaderAppearance.ToolIconButton">
+      <summary>
+            The tool icon button is present.
+            </summary>
+    </member>
+    <member name="T:C1.Win.Layout.CuesType">
+      <summary>
+            Types of cues used to drag-n-dropping ItemContainers
+            </summary>
+    </member>
+    <member name="F:C1.Win.Layout.CuesType.None">
+      <summary>
+            No cues
+            </summary>
+    </member>
+    <member name="F:C1.Win.Layout.CuesType.CuesOnly">
+      <summary>
+            Shows cues only
+            </summary>
+    </member>
+    <member name="F:C1.Win.Layout.CuesType.LiveCues">
+      <summary>
+            Shows cues and shows relocated ItemContainer on pointing to cue
+            </summary>
+    </member>
+    <member name="T:C1.Win.Layout.ToolIconAppearance">
+      <summary>
+            Gets or sets location of tool icon.
+            </summary>
+    </member>
+    <member name="F:C1.Win.Layout.ToolIconAppearance.None">
+      <summary>
+            No tool icon
+            </summary>
+    </member>
+    <member name="F:C1.Win.Layout.ToolIconAppearance.UpperLeft">
+      <summary>
+            Tool icon is on the upper left corner
+            </summary>
+    </member>
+    <member name="F:C1.Win.Layout.ToolIconAppearance.UpperRight">
+      <summary>
+            Tool icon is on the upper right corner
+            </summary>
+    </member>
+    <member name="F:C1.Win.Layout.ToolIconAppearance.LowerLeft">
+      <summary>
+            Tool icon is on the lower left corner
+            </summary>
+    </member>
+    <member name="F:C1.Win.Layout.ToolIconAppearance.LowerRight">
+      <summary>
+            Tool icon is on the lower right corner
+            </summary>
+    </member>
+    <member name="T:C1.Win.Layout.HeaderPaintEventHandler">
+      <summary>
+            Represents the method that will handle the <see cref="E:C1.Win.Layout.C1DashboardLayout.PaintHeader" /> event of a <see cref="T:C1.Win.Layout.C1DashboardLayout" />.
+            </summary>
+      <param name="sender">The source of the event.</param>
+      <param name="e">A <see cref="T:C1.Win.Layout.HeaderPaintEventArgs" /> that contains the event data.</param>
+    </member>
+    <member name="T:C1.Win.Layout.HeaderPaintEventArgs">
+      <summary>
+            Provides data for the <see cref="E:C1.Win.Layout.C1DashboardLayout.PaintHeader" /> event.
+            </summary>
+    </member>
+    <member name="M:C1.Win.Layout.HeaderPaintEventArgs.#ctor(System.Windows.Forms.Control,System.Windows.Forms.Control,System.Drawing.Graphics,System.Drawing.Rectangle)">
+      <summary>
+            Initializes a new instance of the <see cref="T:C1.Win.Layout.HeaderPaintEventArgs" /> class with the specified header, item container, graphics and clipping rectangle.
+            </summary>
+      <param name="header">The header panel of the item container.</param>
+      <param name="control">The item container.</param>
+      <param name="graphics">The <see cref="T:System.Drawing.Graphics" /> used to paint the item.</param>
+      <param name="clipRect">The <see cref="T:System.Drawing.Rectangle" /> that represents the rectangle in which to paint.</param>
+    </member>
+    <member name="P:C1.Win.Layout.HeaderPaintEventArgs.Header">
+      <summary>
+            Gets the header panel of the item container.
+            </summary>
+    </member>
+    <member name="P:C1.Win.Layout.HeaderPaintEventArgs.Control">
+      <summary>
+            Gets the item container.
+            </summary>
+    </member>
+    <member name="T:C1.Win.Layout.FlowLayout">
+      <summary>
+            Class providing ILayout interface for FlowLayoutPanel container that uses Control descendants as itemContainers for Dashboard Layout Control.
+            </summary>
+    </member>
+    <member name="M:C1.Win.Layout.FlowLayout.#ctor(System.Windows.Forms.FlowLayoutPanel)">
+      <summary>
+            Creates an instanse of <see cref="T:C1.Win.Layout.FlowLayout" />.
+            </summary>
+      <param name="container">
+        <see cref="T:System.Windows.Forms.FlowLayoutPanel" /> instance to use it as a dashboard.</param>
+    </member>
+    <member name="T:C1.Win.Layout.GridLayout">
+      <summary>
+            Class providing ILayout interface for TableLayoutPanel container that uses Control descendants as itemContainers for Dashboard Layout Control.
+            </summary>
+    </member>
+    <member name="M:C1.Win.Layout.GridLayout.#ctor(System.Windows.Forms.TableLayoutPanel)">
+      <summary>
+            Creates an instanse of <see cref="T:C1.Win.Layout.GridLayout" />.
+            </summary>
+      <param name="container">
+        <see cref="T:System.Windows.Forms.TableLayoutPanel" /> instance to use it as a dashboard.</param>
+    </member>
+    <member name="T:C1.Win.Layout.Styles.CuesStyle">
+      <summary>
+        <see cref="T:C1.Win.Layout.Styles.BaseCuesStyle" /> contains display attributes that 
+            determine the general appearance of the Cues on the screen.
+            </summary>
+    </member>
+    <member name="P:C1.Win.Layout.Styles.CuesStyle.Hot">
+      <summary>
+            Gets style containing display attributes that determine the general appearance of element on the screen when the cursor is over it.
+            </summary>
+    </member>
+    <member name="P:C1.Win.Layout.Styles.CuesStyle.DefaultStyle">
+      <summary>
+            Gets a style that contains the default values for current style.
+            </summary>
+    </member>
+    <member name="M:C1.Win.Layout.Styles.CuesStyle.Clone">
+      <summary>
+            Creates an instance of the <see cref="T:C1.Win.C1Themes.BaseStyle" /> class that is identical to the current <see cref="T:C1.Win.C1Themes.BaseStyle" /></summary>
+    </member>
+    <member name="T:C1.Win.Layout.Styles.BaseCuesHotStyle">
+      <summary>
+        <see cref="T:C1.Win.Layout.Styles.BaseCuesStyle" /> contains display attributes that 
+            determine the general appearance of the Cues on the screen when the cursor is over it..
+            </summary>
+    </member>
+    <member name="P:C1.Win.Layout.Styles.BaseCuesHotStyle.DefaultStyle">
+      <summary>
+            Gets a style that contains the default values for current style.
+            </summary>
+    </member>
+    <member name="M:C1.Win.Layout.Styles.BaseCuesHotStyle.Clone">
+      <summary>
+            Creates an instance of the <see cref="T:C1.Win.C1Themes.BaseStyle" /> class that is identical to the current <see cref="T:C1.Win.C1Themes.BaseStyle" /></summary>
+    </member>
+    <member name="T:C1.Win.Layout.Styles.BaseCuesStyle">
+      <summary>
+        <see cref="T:C1.Win.Layout.Styles.BaseCuesStyle" /> contains display attributes that 
+            determine the general appearance of the Cues on the screen.
+            </summary>
+    </member>
+    <member name="P:C1.Win.Layout.Styles.BaseCuesStyle.BackColor">
+      <summary>
+            Gets or sets the <see cref="T:System.Drawing.Color" /> used to paint the background.
+            </summary>
+    </member>
+    <member name="T:C1.Win.Layout.Styles.CommonStyle">
+      <summary>
+        <see cref="T:C1.Win.Layout.Styles.CommonStyle" /> contains display attributes that 
+            determine the general appearance of the control on the screen.
+            </summary>
+    </member>
+    <member name="P:C1.Win.Layout.Styles.CommonStyle.Padding">
+      <summary>
+            Gets or sets the thickness of the padding between the element edges and its content.
+            </summary>
+    </member>
+    <member name="P:C1.Win.Layout.Styles.CommonStyle.Margins">
+      <summary>
+            Gets or sets the thickness of the margins around the element.
+            </summary>
+    </member>
+    <member name="P:C1.Win.Layout.Styles.CommonStyle.BackColor">
+      <summary>
+            Gets or sets the <see cref="T:System.Drawing.Color" /> used to paint the background.
+            </summary>
+    </member>
+    <member name="P:C1.Win.Layout.Styles.CommonStyle.DefaultStyle">
+      <summary>
+            Gets a style that contains the default values for current style.
+            </summary>
+    </member>
+    <member name="M:C1.Win.Layout.Styles.CommonStyle.Clone">
+      <summary>
+            Creates an instance of the <see cref="T:C1.Win.C1Themes.BaseStyle" /> class that is identical to the current <see cref="T:C1.Win.C1Themes.BaseStyle" /></summary>
+    </member>
+    <member name="T:C1.Win.Layout.Styles.ContainerHeaderStyle">
+      <summary>
+        <see cref="T:C1.Win.Layout.Styles.ContainerHeaderStyle" /> contains display attributes that 
+            determine the appearance of the item container header on the screen.
+            </summary>
+    </member>
+    <member name="P:C1.Win.Layout.Styles.ContainerHeaderStyle.Hot">
+      <summary>
+            Gets style containing display attributes that determine the general appearance of the element on the screen when the cursor is over it.
+            </summary>
+    </member>
+    <member name="M:C1.Win.Layout.Styles.ContainerHeaderStyle.Clone">
+      <summary>
+            Creates an instance of the <see cref="T:C1.Win.C1Themes.BaseStyle" /> class that is identical to the current <see cref="T:C1.Win.C1Themes.BaseStyle" /></summary>
+    </member>
+    <member name="T:C1.Win.Layout.Styles.BaseContainerHeaderStyle">
+      <summary>
+        <see cref="T:C1.Win.Layout.Styles.BaseContainerHeaderStyle" /> contains display attributes that 
+            determine the base appearance of the item container header on the screen.
+            </summary>
+    </member>
+    <member name="P:C1.Win.Layout.Styles.BaseContainerHeaderStyle.BackColor">
+      <summary>
+            Gets or sets the <see cref="T:System.Drawing.Color" /> used to paint the background.
+            </summary>
+    </member>
+    <member name="P:C1.Win.Layout.Styles.BaseContainerHeaderStyle.ForeColor">
+      <summary>
+            Gets or sets the <see cref="T:System.Drawing.Color" /> used to paint the text.
+            </summary>
+    </member>
+    <member name="P:C1.Win.Layout.Styles.BaseContainerHeaderStyle.DefaultStyle">
+      <summary>
+            Gets a style that contains the default values for current style.
+            </summary>
+    </member>
+    <member name="M:C1.Win.Layout.Styles.BaseContainerHeaderStyle.Clone">
+      <summary>
+            Creates an instance of the <see cref="T:C1.Win.C1Themes.BaseStyle" /> class that is identical to the current <see cref="T:C1.Win.C1Themes.BaseStyle" /></summary>
+    </member>
+    <member name="T:C1.Win.Layout.Styles.ItemContainerStyle">
+      <summary>
+        <see cref="T:C1.Win.Layout.Styles.ItemContainerStyle" /> contains display attributes that 
+            determine the appearance of the item container on the screen.
+            </summary>
+    </member>
+    <member name="P:C1.Win.Layout.Styles.ItemContainerStyle.ToolIcon">
+      <summary>
+            Gets or sets ToolIcon image.
+            </summary>
+    </member>
+    <member name="P:C1.Win.Layout.Styles.ItemContainerStyle.ToolIconColor">
+      <summary>
+            Gets or sets ToolIcon image color.
+            </summary>
+      <remarks>If the color is different from Transparent than control tries to recolor 
+            the ToolIcon image according to that color otherwise it uses the original colors.</remarks>
+    </member>
+    <member name="P:C1.Win.Layout.Styles.ItemContainerStyle.Padding">
+      <summary>
+            Gets or sets the thickness of the padding between the element edges and its content.
+            </summary>
+    </member>
+    <member name="P:C1.Win.Layout.Styles.ItemContainerStyle.Margins">
+      <summary>
+            Gets or sets the thickness of the margins around the element.
+            </summary>
+    </member>
+    <member name="P:C1.Win.Layout.Styles.ItemContainerStyle.PlaceHolderColor">
+      <summary>
+            Gets or sets the <see cref="T:System.Drawing.Color" /> used to paint the background of the place holder.
+            </summary>
+    </member>
+    <member name="P:C1.Win.Layout.Styles.ItemContainerStyle.Hot">
+      <summary>
+            Gets style containing display attributes that determine the general appearance of the element on the screen when the cursor is over it.
+            </summary>
+    </member>
+    <member name="M:C1.Win.Layout.Styles.ItemContainerStyle.Clone">
+      <summary>
+            Creates an instance of the <see cref="T:C1.Win.C1Themes.BaseStyle" /> class that is identical to the current <see cref="T:C1.Win.C1Themes.BaseStyle" /></summary>
+    </member>
+    <member name="T:C1.Win.Layout.Styles.BaseItemContainerStyle">
+      <summary>
+        <see cref="T:C1.Win.Layout.Styles.BaseItemContainerStyle" /> contains display attributes that 
+            determine the base appearance of the item container on the screen.
+            </summary>
+    </member>
+    <member name="P:C1.Win.Layout.Styles.BaseItemContainerStyle.BackColor">
+      <summary>
+            Gets or sets the <see cref="T:System.Drawing.Color" /> used to paint the background.
+            </summary>
+    </member>
+    <member name="P:C1.Win.Layout.Styles.BaseItemContainerStyle.DefaultStyle">
+      <summary>
+            Gets a style that contains the default values for current style.
+            </summary>
+    </member>
+    <member name="M:C1.Win.Layout.Styles.BaseItemContainerStyle.Clone">
+      <summary>
+            Creates an instance of the <see cref="T:C1.Win.C1Themes.BaseStyle" /> class that is identical to the current <see cref="T:C1.Win.C1Themes.BaseStyle" /></summary>
+    </member>
+    <member name="T:C1.Win.Layout.Styles.DashboardTheme">
+      <summary>
+            The <see cref="T:C1.Win.Layout.Styles.DashboardTheme" /> class represents the theme for the C1DashboardLayout control 
+            which contains display attributes that determine the appearance of control. 
+            </summary>
+    </member>
+    <member name="P:C1.Win.Layout.Styles.DashboardTheme.Common">
+      <summary>
+            Gets <see cref="T:C1.Win.Layout.Styles.CommonStyle" /> containing display attributes that 
+            determine the general appearance of the control on the screen.
+            </summary>
+    </member>
+    <member name="P:C1.Win.Layout.Styles.DashboardTheme.ContainerHeader">
+      <summary>
+            Gets <see cref="T:C1.Win.Layout.Styles.ContainerHeaderStyle" /> containing display attributes that 
+            determine the general appearance of the ItemContainer header on the screen.
+            </summary>
+    </member>
+    <member name="P:C1.Win.Layout.Styles.DashboardTheme.ItemContainer">
+      <summary>
+            Gets <see cref="T:C1.Win.Layout.Styles.ItemContainerStyle" /> containing display attributes that 
+            determine the general appearance of the ItemContainer on the screen.
+            </summary>
+    </member>
+    <member name="P:C1.Win.Layout.Styles.DashboardTheme.Cues">
+      <summary>
+            Gets <see cref="T:C1.Win.Layout.Styles.CuesStyle" /> containing display attributes that 
+            determine the general appearance of the Cues on the screen.
+            </summary>
+    </member>
+    <member name="P:C1.Win.Layout.Styles.DashboardTheme.DefaultStyle">
+      <summary>
+            Gets a theme that contains the default values for current theme.
+            </summary>
+    </member>
+    <member name="M:C1.Win.Layout.Styles.DashboardTheme.Clone">
+      <summary>
+            Creates an instance of the <see cref="T:C1.Win.C1Themes.BaseTheme" /> class that is identical to the current <see cref="T:C1.Win.C1Themes.BaseTheme" /></summary>
+      <returns>The copy of the current <see cref="T:C1.Win.C1Themes.BaseTheme" />.</returns>
+    </member>
+    <member name="T:C1.Win.Layout.Localization.Strings">
+      <summary>
+            The <see cref="T:C1.Win.Layout.Localization.Strings" /> class contains static properties used for localization.
+            </summary>
+    </member>
+    <member name="P:C1.Win.Layout.Localization.Strings.ResourceManager">
+      <summary>
+            The <see cref="P:C1.Win.Layout.Localization.Strings.ResourceManager" /> object used for lookup resources.
+            </summary>
+      <remarks>Set this property to the valid value if 
+            you define resources in a Custom Control assembly.</remarks>
+    </member>
+    <member name="P:C1.Win.Layout.Localization.Strings.UICulture">
+      <summary>
+            Returns default <see cref="T:System.Globalization.CultureInfo" /> object used as fallback culture.
+            </summary>
+    </member>
+  </members>
+</doc>

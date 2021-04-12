@@ -1,0 +1,133 @@
+Public Class frCargando
+    Inherits System.Windows.Forms.Form
+
+#Region " Código generado por el Diseñador de Windows Forms "
+
+    Public Sub New()
+        MyBase.New()
+
+        'El Diseñador de Windows Forms requiere esta llamada.
+        InitializeComponent() : Dim tom As SMcMaster.TabOrderManager = New SMcMaster.TabOrderManager(Me) : tom.SetTabOrder(SMcMaster.TabOrderManager.TabScheme.AcrossFirst)
+
+        'Agregar cualquier inicialización después de la llamada a InitializeComponent()
+
+    End Sub
+
+    'Form reemplaza a Dispose para limpiar la lista de componentes.
+    Protected Overloads Overrides Sub Dispose(ByVal disposing As Boolean)
+        If disposing Then
+            If Not (components Is Nothing) Then
+                components.Dispose()
+            End If
+        End If
+       MyBase.Dispose(disposing)
+    End Sub
+
+    'Requerido por el Diseñador de Windows Forms
+    Private components As System.ComponentModel.IContainer
+
+    'NOTA: el Diseñador de Windows Forms requiere el siguiente procedimiento
+    'Puede modificarse utilizando el Diseñador de Windows Forms. 
+    'No lo modifique con el editor de código.
+    Friend WithEvents lblstatus As Label
+    Friend WithEvents ProgressBar1 As System.Windows.Forms.ProgressBar
+    Friend WithEvents Timer1 As System.Windows.Forms.Timer
+    <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent() 
+        Me.components = New System.ComponentModel.Container
+        Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(frCargando))
+        Me.lblstatus = New System.Windows.Forms.Label
+        Me.ProgressBar1 = New System.Windows.Forms.ProgressBar
+        Me.Timer1 = New System.Windows.Forms.Timer(Me.components)
+        Me.SuspendLayout()
+        '
+        'lblstatus
+        '
+        Me.lblstatus.AccessibleDescription = resources.GetString("lblstatus.AccessibleDescription")
+        Me.lblstatus.AccessibleName = resources.GetString("lblstatus.AccessibleName")
+        Me.lblstatus.Anchor = CType(resources.GetObject("lblstatus.Anchor"), System.Windows.Forms.AnchorStyles)
+        Me.lblstatus.AutoSize = CType(resources.GetObject("lblstatus.AutoSize"), Boolean)
+        Me.lblstatus.BackColor = System.Drawing.Color.FromArgb(CType(154, Byte), CType(166, Byte), CType(233, Byte))
+        Me.lblstatus.Dock = CType(resources.GetObject("lblstatus.Dock"), System.Windows.Forms.DockStyle)
+        Me.lblstatus.Enabled = CType(resources.GetObject("lblstatus.Enabled"), Boolean)
+        Me.lblstatus.Font = CType(resources.GetObject("lblstatus.Font"), System.Drawing.Font)
+        Me.lblstatus.ForeColor = System.Drawing.Color.FromArgb(CType(192, Byte), CType(0, Byte), CType(0, Byte))
+        Me.lblstatus.Image = CType(resources.GetObject("lblstatus.Image"), System.Drawing.Image)
+        Me.lblstatus.ImageAlign = CType(resources.GetObject("lblstatus.ImageAlign"), System.Drawing.ContentAlignment)
+        Me.lblstatus.ImageIndex = CType(resources.GetObject("lblstatus.ImageIndex"), Integer)
+        Me.lblstatus.ImeMode = CType(resources.GetObject("lblstatus.ImeMode"), System.Windows.Forms.ImeMode)
+        Me.lblstatus.Location = CType(resources.GetObject("lblstatus.Location"), System.Drawing.Point)
+        Me.lblstatus.Name = "lblstatus"
+        Me.lblstatus.RightToLeft = CType(resources.GetObject("lblstatus.RightToLeft"), System.Windows.Forms.RightToLeft)
+        Me.lblstatus.Size = CType(resources.GetObject("lblstatus.Size"), System.Drawing.Size)
+        Me.lblstatus.TabIndex = CType(resources.GetObject("lblstatus.TabIndex"), Integer)
+        Me.lblstatus.Text = resources.GetString("lblstatus.Text")
+        Me.lblstatus.TextAlign = CType(resources.GetObject("lblstatus.TextAlign"), System.Drawing.ContentAlignment)
+        Me.lblstatus.Visible = CType(resources.GetObject("lblstatus.Visible"), Boolean)
+        '
+        'ProgressBar1
+        '
+        Me.ProgressBar1.AccessibleDescription = resources.GetString("ProgressBar1.AccessibleDescription")
+        Me.ProgressBar1.AccessibleName = resources.GetString("ProgressBar1.AccessibleName")
+        Me.ProgressBar1.Anchor = CType(resources.GetObject("ProgressBar1.Anchor"), System.Windows.Forms.AnchorStyles)
+        Me.ProgressBar1.BackgroundImage = CType(resources.GetObject("ProgressBar1.BackgroundImage"), System.Drawing.Image)
+        Me.ProgressBar1.Dock = CType(resources.GetObject("ProgressBar1.Dock"), System.Windows.Forms.DockStyle)
+        Me.ProgressBar1.Enabled = CType(resources.GetObject("ProgressBar1.Enabled"), Boolean)
+        Me.ProgressBar1.Font = CType(resources.GetObject("ProgressBar1.Font"), System.Drawing.Font)
+        Me.ProgressBar1.ImeMode = CType(resources.GetObject("ProgressBar1.ImeMode"), System.Windows.Forms.ImeMode)
+        Me.ProgressBar1.Location = CType(resources.GetObject("ProgressBar1.Location"), System.Drawing.Point)
+        Me.ProgressBar1.Maximum = 1000
+        Me.ProgressBar1.Name = "ProgressBar1"
+        Me.ProgressBar1.RightToLeft = CType(resources.GetObject("ProgressBar1.RightToLeft"), System.Windows.Forms.RightToLeft)
+        Me.ProgressBar1.Size = CType(resources.GetObject("ProgressBar1.Size"), System.Drawing.Size)
+        Me.ProgressBar1.Step = 20
+        Me.ProgressBar1.TabIndex = CType(resources.GetObject("ProgressBar1.TabIndex"), Integer)
+        Me.ProgressBar1.Text = resources.GetString("ProgressBar1.Text")
+        Me.ProgressBar1.Visible = CType(resources.GetObject("ProgressBar1.Visible"), Boolean)
+        '
+        'Timer1
+        '
+        Me.Timer1.Enabled = True
+        Me.Timer1.Interval = 250
+        '
+        'frCargando
+        '
+        Me.AccessibleDescription = resources.GetString("$this.AccessibleDescription")
+        Me.AccessibleName = resources.GetString("$this.AccessibleName")
+        Me.AutoScaleBaseSize = CType(resources.GetObject("$this.AutoScaleBaseSize"), System.Drawing.Size)
+        Me.AutoScroll = CType(resources.GetObject("$this.AutoScroll"), Boolean)
+        Me.AutoScrollMargin = CType(resources.GetObject("$this.AutoScrollMargin"), System.Drawing.Size)
+        Me.AutoScrollMinSize = CType(resources.GetObject("$this.AutoScrollMinSize"), System.Drawing.Size)
+        Me.BackColor = System.Drawing.Color.FromArgb(CType(154, Byte), CType(166, Byte), CType(233, Byte))
+        Me.BackgroundImage = CType(resources.GetObject("$this.BackgroundImage"), System.Drawing.Image)
+        Me.ClientSize = CType(resources.GetObject("$this.ClientSize"), System.Drawing.Size)
+        Me.Controls.Add(Me.ProgressBar1)
+        Me.Controls.Add(Me.lblstatus)
+        Me.Enabled = CType(resources.GetObject("$this.Enabled"), Boolean)
+        Me.Font = CType(resources.GetObject("$this.Font"), System.Drawing.Font)
+        Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None
+        Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
+        Me.ImeMode = CType(resources.GetObject("$this.ImeMode"), System.Windows.Forms.ImeMode)
+        Me.Location = CType(resources.GetObject("$this.Location"), System.Drawing.Point)
+        Me.MaximumSize = CType(resources.GetObject("$this.MaximumSize"), System.Drawing.Size)
+        Me.MinimumSize = CType(resources.GetObject("$this.MinimumSize"), System.Drawing.Size)
+        Me.Name = "frCargando"
+        Me.RightToLeft = CType(resources.GetObject("$this.RightToLeft"), System.Windows.Forms.RightToLeft)
+        Me.StartPosition = CType(resources.GetObject("$this.StartPosition"), System.Windows.Forms.FormStartPosition)
+        Me.Text = resources.GetString("$this.Text")
+        Me.ResumeLayout(False)
+
+    End Sub
+
+#End Region
+
+    Private Sub Timer1_Tick(ByVal sender As Object, ByVal e As System.EventArgs) Handles Timer1.Tick
+        ProgressBar1.PerformStep()
+        If ProgressBar1.Value = 1000 Then
+            ProgressBar1.Step = -20
+        End If
+        If ProgressBar1.Value = 0 Then
+            ProgressBar1.Step = 20
+        End If
+    End Sub
+
+End Class

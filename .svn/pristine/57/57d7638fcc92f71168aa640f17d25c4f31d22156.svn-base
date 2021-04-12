@@ -1,0 +1,4289 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>C1.Win.DashboardLayout.4</name>
+    </assembly>
+    <members>
+        <member name="T:C1.Win.BaseStyle">
+            <summary>
+            Base style.
+            </summary>    
+        </member>
+        <member name="M:C1.Win.BaseStyle.#ctor(C1.Win.BaseThemeProvider,System.String,C1.Win.StyledPropertyInfo[])">
+            <summary>
+            Initializes a new instance of the <see cref="T:C1.Win.BaseStyle"/>.
+            </summary>
+            <param name="provider">theme provider.</param>
+            <param name="name">style name.</param>
+            <param name="props">styled properties.</param>
+        </member>
+        <member name="M:C1.Win.BaseStyle.#ctor(C1.Win.BaseThemeProvider,C1.Framework.Style,C1.Win.StyledPropertyInfo[])">
+            <summary>
+            Initializes a new instance of the <see cref="T:C1.Win.BaseStyle"/>.
+            </summary>
+            <param name="provider">theme provider.</param>
+            <param name="style">style to use.</param>
+            <param name="props">styled properties.</param>
+        </member>
+        <member name="P:C1.Win.BaseStyle.Name">
+            <summary>
+            Gets or sets the style name.
+            </summary>
+        </member>
+        <member name="P:C1.Win.BaseStyle.Style">
+            <summary>
+            Gets the <see cref="P:C1.Win.BaseStyle.Style"/> inner style.
+            </summary>
+        </member>
+        <member name="P:C1.Win.BaseStyle.Root">
+            <summary>
+            Gets or sets the root directory in C1Theme.
+            </summary>
+        </member>
+        <member name="P:C1.Win.BaseStyle.ThemeProvider">
+            <summary>
+            Gets theme provider of the current theme.
+            </summary>
+        </member>
+        <member name="M:C1.Win.BaseStyle.Reset">
+            <summary>
+            Resets style to it default value according to the applied theme.
+            </summary>
+        </member>
+        <member name="M:C1.Win.BaseStyle.Copy(C1.Win.BaseStyle)">
+            <summary>
+            Copies properties of the specified style of the same type.
+            </summary> 
+            <param name="prototype">specified style.</param>
+        </member>
+        <member name="P:C1.Win.BaseStyle.DefaultStyle">
+            <summary>
+            Gets a style that contains the default values for current style.
+            </summary>
+        </member>
+        <member name="M:C1.Win.BaseStyle.Copy(C1.Framework.Style)">
+            <summary>
+            Copies properties of the specified style.
+            </summary> 
+            <param name="prototype">specified style.</param>
+        </member>
+        <member name="P:C1.Win.BaseStyle.IsDefault">
+            <summary>
+            Gets value indicating whether the style is default.
+            </summary>
+        </member>
+        <member name="M:C1.Win.BaseStyle.ApplyTheme(System.Object)">
+            <summary>
+            Applies a new C1Theme to a style
+            </summary>
+            <param name="newTheme"></param>
+        </member>
+        <member name="M:C1.Win.BaseStyle.ToString">
+            <summary>
+            Returns the string that represents the current object.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:C1.Win.BaseStyle.Dispose(System.Boolean)">
+            <summary>
+            Releases all unmanaged resources.
+            </summary>
+            <param name="disposing"></param>
+        </member>
+        <member name="T:C1.Win.ItemState">
+            <summary>
+            The <see cref="T:C1.Win.ItemState"/> reflects the state of the item.
+            </summary>
+        </member>
+        <member name="F:C1.Win.ItemState.Default">
+            <summary>
+            Default item state.
+            </summary>
+        </member>
+        <member name="F:C1.Win.ItemState.Hot">
+            <summary>
+            The state of the item when the cursor is over it.
+            </summary>
+        </member>
+        <member name="F:C1.Win.ItemState.Selected">
+            <summary>
+            The state of the item when it is selected.
+            </summary>
+        </member>
+        <member name="F:C1.Win.ItemState.HotSelected">
+            <summary>
+            The state of the item when it is selected and the cursor is over it.
+            </summary>
+        </member>
+        <member name="T:C1.Win.BaseTheme">
+            <summary>
+            Base theme.
+            </summary>
+        </member>
+        <member name="M:C1.Win.BaseTheme.#ctor(C1.Win.BaseThemeProvider,System.String,C1.Win.StyledPropertyInfo[])">
+            <summary>
+            Initializes a new instance of the <see cref="T:C1.Win.BaseTheme"/>.
+            </summary>
+            <param name="provider">theme provider.</param>
+            <param name="name">theme name.</param>
+            <param name="props">theme properties</param>
+        </member>
+        <member name="P:C1.Win.BaseTheme.Name">
+            <summary>
+            Gets theme name.
+            </summary>
+        </member>
+        <member name="P:C1.Win.BaseTheme.Root">
+            <summary>
+            Gets or sets the root directory in C1Theme.
+            </summary>
+        </member>
+        <member name="P:C1.Win.BaseTheme.ThemeProvider">
+            <summary>
+            Gets theme provider of the current theme.
+            </summary>
+        </member>
+        <member name="M:C1.Win.BaseTheme.Reset">
+            <summary>
+            Resets theme to it default value according to the applied theme.
+            </summary>  
+        </member>
+        <member name="P:C1.Win.BaseTheme.DefaultTheme">
+            <summary>
+            Gets a theme that contains the default values for current theme.
+            </summary>
+        </member>
+        <member name="P:C1.Win.BaseTheme.IsDefault">
+            <summary>
+            Gets value indicating whether the theme is default.
+            </summary>
+        </member>
+        <member name="M:C1.Win.BaseTheme.Clone">
+            <summary>
+            Creates an instance of the <see cref="T:C1.Win.BaseTheme"/> class that is identical to the current <see cref="T:C1.Win.BaseTheme"/> 
+            </summary>
+            <returns>The copy of the current <see cref="T:C1.Win.BaseTheme"/>.</returns>
+        </member>
+        <member name="M:C1.Win.BaseTheme.Copy(C1.Win.BaseTheme)">
+            <summary>
+            Copies properties of the specified theme of the same type.
+            </summary> 
+            <param name="prototype">specified theme.</param>
+        </member>
+        <member name="M:C1.Win.BaseTheme.ApplyTheme(System.Object)">
+            <summary>
+            Applies a new C1Theme.
+            </summary>
+            <param name="newTheme"></param>
+        </member>
+        <member name="M:C1.Win.BaseTheme.ToString">
+            <summary>
+            Returns the string that represents the current object.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:C1.Win.BaseThemeProvider">
+            <summary>
+            Base ThemeProvider.
+            </summary>
+        </member>
+        <member name="M:C1.Win.BaseThemeProvider.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:C1.Win.BaseThemeProvider"/>.
+            </summary>
+        </member>
+        <member name="P:C1.Win.BaseThemeProvider.EmptyTheme">
+            <summary>
+            Gets an empty theme.
+            </summary>
+        </member>
+        <member name="P:C1.Win.BaseThemeProvider.DefaultTheme">
+            <summary>
+            Gets the default theme.
+            </summary>
+        </member>
+        <member name="P:C1.Win.BaseThemeProvider.CurrentTheme">
+            <summary>
+            Gets the current theme.
+            </summary>
+        </member>
+        <member name="P:C1.Win.BaseThemeProvider.Updating">
+            <summary>
+            Gets value indicating whether the current theme is updating now. Deny events until the end of the operation.
+            </summary>
+        </member>
+        <member name="M:C1.Win.BaseThemeProvider.BeginUpdate">
+            <summary>
+            Start editing the current theme.
+            </summary>
+        </member>
+        <member name="M:C1.Win.BaseThemeProvider.EndUpdate">
+            <summary>
+            Stop editing the current theme.
+            </summary>
+        </member>
+        <member name="M:C1.Win.BaseThemeProvider.ApplyTheme(System.Object)">
+            <summary>
+            Applies a new C1Theme to a style
+            </summary>
+            <param name="newTheme"></param>
+        </member>
+        <member name="M:C1.Win.BaseThemeProvider.CreateEmptyTheme">
+            <summary>
+            Creates a new instance of an current empty theme.
+            </summary>
+        </member>
+        <member name="E:C1.Win.BaseThemeProvider.PropertyChanged">
+            <summary>
+            Fires when any properties change.
+            </summary>
+        </member>
+        <member name="M:C1.Win.BaseThemeProvider.OnPropertyChanged(System.Object,System.ComponentModel.PropertyChangedEventArgs)">
+            <summary>
+            Raises the <see cref="E:C1.Win.BaseThemeProvider.PropertyChanged"/> event.
+            </summary>
+            <param name="sender"><see cref="T:System.Object"/> event sender.</param>
+            <param name="e"><see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> that contains the event data.</param>
+        </member>
+        <member name="M:C1.Win.BaseThemeProvider.Dispose(System.Boolean)">
+            <summary>
+            Releases all unmanaged resources.
+            </summary>
+            <param name="disposing"></param>
+        </member>
+        <member name="M:C1.Win.BaseThemeProvider.Dispose">
+            <summary>
+            Releases all unmanaged resources.
+            </summary>
+        </member>
+        <member name="M:C1.Win.C1Themes.Shared.C1FrameworkHelper.ApplyStyle(C1.Win.C1Themes.Shared.C1ThemeProxy,C1.Framework.Style,System.String)">
+            <summary>
+            fills style props with values from the specified path
+            </summary>
+            <param name="tp"></param>
+            <param name="style"></param>
+            <param name="path"></param>
+        </member>
+        <member name="M:C1.Win.C1Themes.Shared.C1FrameworkHelper.ApplyHotStyle(C1.Win.C1Themes.Shared.C1ThemeProxy,C1.Framework.Style,System.String)">
+            <summary>
+            
+            </summary>
+            <param name="tp"></param>
+            <param name="style">reference to the framework style, for which hot style should be applied</param>
+            <param name="path">xml path to the hot style</param>
+        </member>
+        <member name="T:C1.Win.C1Themes.Shared.Dock_SizeMode">
+            <summary>
+            Used in:
+            C1DockingTab\Style
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Dock_SizeMode.Normal">
+            <summary>
+            Borders are shown only for headers of columns.
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Dock_SizeMode.Fit">
+            <summary>
+            No borders.
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Dock_SizeMode.FillToEnd">
+            <summary>
+            Only left and right borders of columns are shown.
+            </summary>
+        </member>
+        <member name="T:C1.Win.C1Themes.Shared.TreeViewBorderStyleEnum">
+            <summary>
+            Used in:
+            C1TreeView\Style
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.TreeViewBorderStyleEnum.ColumnsHeaderOnly">
+            <summary>
+            Borders are shown only for headers of columns.
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.TreeViewBorderStyleEnum.None">
+            <summary>
+            No borders.
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.TreeViewBorderStyleEnum.ColumnsLineOnly">
+            <summary>
+            Only left and right borders of columns are shown.
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.TreeViewBorderStyleEnum.Full">
+            <summary>
+            Borders are shown for all cells.
+            </summary>
+        </member>
+        <member name="T:C1.Win.C1Themes.Shared.CheckBoxStyleEnum">
+            <summary>
+            Used in:
+            C1TreeView\Style
+            C1MultiSelect\C1CheckList\Style
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.CheckBoxStyleEnum.System">
+            <summary>
+            Standard system view.
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.CheckBoxStyleEnum.Office2007Black">
+            <summary>
+            Like a MS Office 2007 Black.
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.CheckBoxStyleEnum.Office2007Blue">
+            <summary>
+            Like a MS Office 2007 Blue.
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.CheckBoxStyleEnum.Office2007Silver">
+            <summary>
+            Like a MS Office 2007 Silver.
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.CheckBoxStyleEnum.Office2010Black">
+            <summary>
+            Like a MS Office 2010 Black.
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.CheckBoxStyleEnum.Office2010Blue">
+            <summary>
+            Like a MS Office 2010 Blue.
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.CheckBoxStyleEnum.Office2010Silver">
+            <summary>
+            Like a MS Office 2010 Silver.
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.CheckBoxStyleEnum.Office2013">
+            <summary>
+            Like a MS Office 2013.
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.CheckBoxStyleEnum.Windows10">
+            <summary>
+            Like a Windows 10.
+            </summary>
+        </member>
+        <member name="T:C1.Win.C1Themes.Shared.BackgroundPictureDrawModeEnum">
+            <summary>
+            Used in:
+            C1TrueDBGrid\Style
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.BackgroundPictureDrawModeEnum.Center">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.BackgroundPictureDrawModeEnum.Stretch">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.BackgroundPictureDrawModeEnum.Tile">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.BackgroundPictureDrawModeEnum.Fill">
+            <summary>
+            The image is stretched and aspect ratio is saved.
+            </summary>
+        </member>
+        <member name="T:C1.Win.C1Themes.Shared.BorderType">
+            <summary>
+            Used in:
+            C1TrueDBGrid\GridBorder
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.BorderType.None">
+            <summary>
+            No borders.
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.BorderType.Flat">
+            <summary>
+            Borders have a Flat appearance.
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.BorderType.Raised">
+            <summary>
+            Borders have a 3D raised appearance.
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.BorderType.Inset">
+            <summary>
+            Borders have a 3D inset appearance.
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.BorderType.Groove">
+            <summary>
+            A line around the inside of the border.
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.BorderType.Fillet">
+            <summary>
+            A fillet type border.
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.BorderType.RaisedBevel">
+            <summary>
+            Borders have a 3D raised with a bevel.
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.BorderType.InsetBevel">
+            <summary>
+            Borders have a 3D inset with a bevel.
+            </summary>
+        </member>
+        <member name="T:C1.Win.C1Themes.Shared.ForegroundPicturePosition">
+            <summary>
+            Used in:
+            C1TrueDBGrid\Style
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.ForegroundPicturePosition.Near">
+            <summary>
+            Image is rendered in the near side of the cell.
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.ForegroundPicturePosition.Far">
+            <summary>
+            Image is rendered in the far side of the cell.
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.ForegroundPicturePosition.LeftOfText">
+            <summary>
+            Image is rendered to the left of any text in the cell.
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.ForegroundPicturePosition.RightOfText">
+            <summary>
+            Image is rendered to the right of any text in the cell.
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.ForegroundPicturePosition.TopOfText">
+            <summary>
+            Image is rendered on top of any text in the cell.
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.ForegroundPicturePosition.BottomOfText">
+            <summary>
+            Image is rendered below any text in the cell.
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.ForegroundPicturePosition.PictureOnly">
+            <summary>
+            Text is not displayed.
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.ForegroundPicturePosition.TextOnly">
+            <summary>
+            Image is not displayed.
+            </summary>
+        </member>
+        <member name="T:C1.Win.C1Themes.Shared.AlignHorzEnum">
+            <summary>
+            Used in:
+            C1TrueDBGrid\Style
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.AlignHorzEnum.General">
+            <summary>
+            Text is aligned Near and numeric values Far
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.AlignHorzEnum.Near">
+            <summary>
+            Text is aligned to the left.
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.AlignHorzEnum.Center">
+            <summary>
+            Text is aligned centered.
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.AlignHorzEnum.Far">
+            <summary>
+            Text is aligned to the right.
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.AlignHorzEnum.Justify">
+            <summary>
+            Text is aligned with respect to the cells boundries.
+            </summary>
+        </member>
+        <member name="T:C1.Win.C1Themes.Shared.AlignVertEnum">
+            <summary>
+            Used in:
+            C1TrueDBGrid\Style
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.AlignVertEnum.Top">
+            <summary>
+            Text is rendered at the top of the cell.
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.AlignVertEnum.Center">
+            <summary>
+            Text is rendered at the center of the cell.
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.AlignVertEnum.Bottom">
+            <summary>
+            Text is rendered at the bottom of the cell.
+            </summary>
+        </member>
+        <member name="T:C1.Win.C1Themes.Shared.LineStyle">
+            <summary>
+            Used in:
+            C1TrueDBGrid\GridLines
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.LineStyle.None">
+            <summary>
+            No line.
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.LineStyle.Single">
+            <summary>
+            Single line.
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.LineStyle.Double">
+            <summary>
+            Double line.
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.LineStyle.Raised">
+            <summary>
+            Line with 3D raised appearance.
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.LineStyle.Inset">
+            <summary>
+            Line with 3D inset appearance.
+            </summary>
+        </member>
+        <member name="T:C1.Win.C1Themes.Shared.PaletteType">
+            <summary>
+            Used in:
+            C1Schedule\PaletteType
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.PaletteType.Office2007">
+            <summary>
+            Office 2007 palette includes back and border colors 
+            of free and working hours and days, day headers, grid borders 
+            and calendar tabs. 
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.PaletteType.Office2010">
+            <summary>
+            Office 2010 palette includes back and border colors 
+            of free and working hours and days, day headers, grid borders 
+            and calendar tabs. 
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.PaletteType.Office2016">
+            <summary>
+            Office 2016 palette includes accent color to use in calendar headers and additional darker color for current day.
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.PaletteType.Office2016Dark">
+            <summary>
+            Office 2016 dark palette includes accent color to use in calendar headers and additional darker color for current day.
+            </summary>
+        </member>
+        <member name="T:C1.Win.C1Themes.Shared.GroupTabStyle">
+            <summary>
+            Used in:
+            C1Schedule\GroupTabStyle
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.GroupTabStyle.FullWidth">
+            <summary>
+            Group headers of rectangular shape take the full width of the corresponding group.
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.GroupTabStyle.Office2007">
+            <summary>
+            Group headers of Office2007 appearance.
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.GroupTabStyle.Office2016">
+            <summary>
+            Group headers of Office2016 appearance.
+            </summary>
+        </member>
+        <member name="T:C1.Win.C1Themes.Shared.WeekTabStyle">
+            <summary>
+            Used in:
+            C1Schedule\WeekTabStyle
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.WeekTabStyle.Office2007">
+            <summary>
+            Week tabs of Office2007 appearance.
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.WeekTabStyle.Office2016">
+            <summary>
+            Week tabs of Office2016 appearance.
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.BackgroundGradient.None">
+            <summary>
+            Use no background gradient.
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.BackgroundGradient.Automatic">
+            <summary>
+            Use a gradient that matches the current system Visual Style.
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.BackgroundGradient.Silver">
+            <summary>
+            Use a silver background gradient.
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.BackgroundGradient.Blue">
+            <summary>
+            Use a blue background gradient.
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.BackgroundGradient.Gold">
+            <summary>
+            Use a gold background gradient.
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.BackgroundGradient.Olive">
+            <summary>
+            Use an olive background gradient.
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.BackgroundGradient.Vista">
+            <summary>
+            Use the Vista-style background gradient.
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.GradientMode.None">
+            <summary>
+            No gradient.
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.GradientMode.Horizontal">
+            <summary>
+            Horizontal gradient (left to right).
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.GradientMode.Vertical">
+            <summary>
+            Vertical gradient (top to bottom).
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.GradientMode.DiagonalDown">
+            <summary>
+            Diagonal gradient (left-top to right-bottom).
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.GradientMode.DiagonalUp">
+            <summary>
+            Diagonal gradient (left-bottom to right-top).
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.GradientMode.Radial">
+            <summary>
+            Radial gradient.
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.ImageAlignment.LeftTop">
+            <summary>
+            Image is vertically aligned at the top, 
+            and horizontally aligned on the left. 
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.ImageAlignment.CenterTop">
+            <summary>
+            Image is vertically aligned at the top, 
+            and horizontally aligned at the center.
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.ImageAlignment.RightTop">
+            <summary>
+            Image is vertically aligned at the top, 
+            and horizontally aligned on the right. 
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.ImageAlignment.LeftCenter">
+            <summary>
+            Image is vertically aligned in the middle, 
+            and horizontally aligned on the left. 
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.ImageAlignment.CenterCenter">
+            <summary>
+            Image is vertically aligned in the middle, 
+            and horizontally aligned at the center. 
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.ImageAlignment.RightCenter">
+            <summary>
+            Image is vertically aligned in the middle, 
+            and horizontally aligned on the right. 
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.ImageAlignment.LeftBottom">
+            <summary>
+            Image is vertically aligned at the bottom, 
+            and horizontally aligned on the left. 		
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.ImageAlignment.CenterBottom">
+            <summary>
+            Image is vertically aligned at the bottom, 
+            and horizontally aligned at the center.
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.ImageAlignment.RightBottom">
+            <summary>
+            Image is vertically aligned at the bottom, 
+            and horizontally aligned on the right. 
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.ImageScaling.Clip">
+            <summary>
+            Use the image's original size, clipping it to the display area if necessary.
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.ImageScaling.Stretch">
+            <summary>
+            Stretch the image to fill the display area. 
+            This mode will usually change the image's aspect ratio.
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.ImageScaling.Scale">
+            <summary>
+            Scale the image to fit the display area. 
+            This mode may increase or reduce the size of the image 
+            while maintaining its aspect ratio.
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.ImageScaling.Tile">
+            <summary>
+            Tile the image to fill the display area.
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.ImageScaling.TileStretch">
+            <summary>
+            Tile the image into the 3x3 matrix and stretch it to fill the display area.
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.ImageScaling.TileStretchHorizontal">
+            <summary>
+            Tile the image into the row of 3 images and stretch it to fill the display area.
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.ImageScaling.TileStretchVertical">
+            <summary>
+            Tile the image into the column of 3 images and stretch it to fill the display area.
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.ImageScaling.Hide">
+            <summary>
+            Hide the image.
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Alignment.NotSet">
+            <summary>
+            Default value.
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Alignment.Near">
+            <summary>
+            Near.
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Alignment.Far">
+            <summary>
+            Far.
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Alignment.Center">
+            <summary>
+            Center.
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Alignment.Spread">
+            <summary>
+            Spread.
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.TextDirection.Normal">
+            <summary>
+            Text is drawn in the horizontal direction, left to right.
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.TextDirection.Up">
+            <summary>
+            Text is draw vertically, from the bottom up.
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.TextDirection.Down">
+            <summary>
+            Text is draw vertically, from the top down.
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.RadialMenuTooltipPosition.None">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.RadialMenuTooltipPosition.Left">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.RadialMenuTooltipPosition.Top">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.RadialMenuTooltipPosition.Right">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.RadialMenuTooltipPosition.Bottom">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="T:C1.Win.C1Themes.Shared.ImageSetEnum">
+            <summary>
+            Describes the image set used for toolbar images of the
+            preview actions.
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.ImageSetEnum.Classic">
+            <summary>
+            Classic image set.
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.ImageSetEnum.XP">
+            <summary>
+            XP image set.
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.ImageSetEnum.XP2">
+            <summary>
+            XP alternative image set.
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.ImageSetEnum.XP3">
+            <summary>
+            XP second alternative image set.
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.ImageSetEnum.Adobe">
+            <summary>
+            Adobe image set.
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.ImageSetEnum.OsX">
+            <summary>
+            Os X image set.
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.ImageSetEnum.Original">
+            <summary>
+            Original (C1Preview "classic") image set.
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Flex_BorderDirEnum.Both">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Flex_BorderDirEnum.Horizontal">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Flex_BorderDirEnum.Vertical">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Flex_BorderStyleEnum.None">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Flex_BorderStyleEnum.Flat">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Flex_BorderStyleEnum.Double">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Flex_BorderStyleEnum.Raised">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Flex_BorderStyleEnum.Inset">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Flex_BorderStyleEnum.Groove">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Flex_BorderStyleEnum.Fillet">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Flex_BorderStyleEnum.Dotted">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Flex_DisplayEnum.TextOnly">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Flex_DisplayEnum.ImageOnly">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Flex_DisplayEnum.Overlay">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Flex_DisplayEnum.Stack">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Flex_DisplayEnum.None">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Flex_ImageAlignEnum.LeftTop">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Flex_ImageAlignEnum.LeftCenter">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Flex_ImageAlignEnum.LeftBottom">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Flex_ImageAlignEnum.CenterTop">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Flex_ImageAlignEnum.CenterCenter">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Flex_ImageAlignEnum.CenterBottom">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Flex_ImageAlignEnum.RightTop">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Flex_ImageAlignEnum.RightCenter">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Flex_ImageAlignEnum.RightBottom">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Flex_ImageAlignEnum.Scale">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Flex_ImageAlignEnum.Stretch">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Flex_ImageAlignEnum.Tile">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Flex_ImageAlignEnum.Hide">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Flex_ImageAlignEnum.TileStretch">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Flex_TextAlignEnum.LeftTop">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Flex_TextAlignEnum.LeftCenter">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Flex_TextAlignEnum.LeftBottom">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Flex_TextAlignEnum.CenterTop">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Flex_TextAlignEnum.CenterCenter">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Flex_TextAlignEnum.CenterBottom">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Flex_TextAlignEnum.RightTop">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Flex_TextAlignEnum.RightCenter">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Flex_TextAlignEnum.RightBottom">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Flex_TextAlignEnum.GeneralTop">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Flex_TextAlignEnum.GeneralCenter">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Flex_TextAlignEnum.GeneralBottom">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Flex_TextDirectionEnum.Normal">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Flex_TextDirectionEnum.Up">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Flex_TextDirectionEnum.Down">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Flex_TextEffectEnum.Flat">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Flex_TextEffectEnum.Raised">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Flex_TextEffectEnum.Inset">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Flex_TreeStyleFlags.None">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Flex_TreeStyleFlags.Lines">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Flex_TreeStyleFlags.Symbols">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Flex_TreeStyleFlags.ButtonBar">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Flex_TreeStyleFlags.Leaf">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Flex_TreeStyleFlags.Complete">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Flex_TreeStyleFlags.Simple">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Flex_TreeStyleFlags.CompleteLeaf">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Flex_TreeStyleFlags.SimpleLeaf">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Flex_FocusRectEnum.None">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Flex_FocusRectEnum.Light">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Flex_FocusRectEnum.Heavy">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Flex_FocusRectEnum.Solid">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Flex_FocusRectEnum.Raised">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Flex_FocusRectEnum.Inset">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Gantt_BarShape.None">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Gantt_BarShape.ThickBar">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Gantt_BarShape.TopBar">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Gantt_BarShape.MiddleBar">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Gantt_BarShape.BottomBar">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Gantt_BarShape.TopLine">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Gantt_BarShape.MiddleLine">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Gantt_BarShape.BottomLine">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Gantt_BarShape.Frame">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Gantt_BarShape.HalfFrame">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Gantt_HatchPattern.Empty">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Gantt_HatchPattern.SolidBrush">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Gantt_HatchPattern.Gradient">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Gantt_HatchPattern.Percent25">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Gantt_HatchPattern.Percent50">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Gantt_HatchPattern.Percent70">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Gantt_HatchPattern.ForwardDiagonal">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Gantt_HatchPattern.BackwardDiagonal">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Gantt_HatchPattern.DiagonalCross">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Gantt_HatchPattern.Vertical">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Gantt_HatchPattern.Horizontal">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Gantt_HatchPattern.NarrowVertical">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Gantt_HatchPattern.NarrowHorizontal">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Gantt_HatchPattern.Confetti">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Gantt_HatchPattern.ZigZag">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Gantt_TaskProperty.None">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Gantt_TaskProperty.Name">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Gantt_TaskProperty.Mode">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Gantt_TaskProperty.Calendar">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Gantt_TaskProperty.Duration">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Gantt_TaskProperty.DurationUnits">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Gantt_TaskProperty.Start">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Gantt_TaskProperty.Finish">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Gantt_TaskProperty.PercentComplete">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Gantt_TaskProperty.Deadline">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Gantt_TaskProperty.ConstraintType">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Gantt_TaskProperty.ConstraintDate">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Gantt_TaskProperty.Predecessors">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Gantt_TaskProperty.ResourceNames">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Gantt_TaskProperty.Notes">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Gantt_ProgressLineStyle.None">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Gantt_ProgressLineStyle.Solid">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Gantt_ProgressLineStyle.Dash">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Gantt_ProgressLineStyle.Dot">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Gantt_ProgressLineStyle.DashDot">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Gantt_ProgressLineStyle.DashDotDot">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Ribbon_ThemeColor.Azure">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Ribbon_ThemeColor.Blue">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Ribbon_ThemeColor.Green">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Ribbon_ThemeColor.Orange">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Ribbon_ThemeColor.Orchid">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Ribbon_ThemeColor.Red">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Ribbon_ThemeColor.Teal">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Ribbon_ThemeColor.Violet">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Ribbon_ThemeLightness.DarkGray">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Ribbon_ThemeLightness.LightGray">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Ribbon_ThemeLightness.White">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Chart_ColorGeneration.CopyCurrentToCustom">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Chart_ColorGeneration.Custom">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Chart_ColorGeneration.Standard">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Chart_ColorGeneration.Office">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Chart_ColorGeneration.GrayScale">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Chart_ColorGeneration.Apex">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Chart_ColorGeneration.Aspect">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Chart_ColorGeneration.Civic">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Chart_ColorGeneration.Concourse">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Chart_ColorGeneration.Equity">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Chart_ColorGeneration.Flow">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Chart_ColorGeneration.Foundry">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Chart_ColorGeneration.Median">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Chart_ColorGeneration.Metro">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Chart_ColorGeneration.Module">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Chart_ColorGeneration.Opulent">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Chart_ColorGeneration.Oriel">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Chart_ColorGeneration.Origin">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Chart_ColorGeneration.Paper">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Chart_ColorGeneration.Solstice">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Chart_ColorGeneration.Technic">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Chart_ColorGeneration.Trek">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Chart_ColorGeneration.Urban">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Chart_ColorGeneration.Verve">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Chart_GradientStyleEnum.None">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Chart_GradientStyleEnum.Horizontal">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Chart_GradientStyleEnum.HorizontalCenter">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Chart_GradientStyleEnum.Vertical">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Chart_GradientStyleEnum.VerticalCenter">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Chart_GradientStyleEnum.Diagonal">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Chart_GradientStyleEnum.DiagonalCenter">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Chart_GradientStyleEnum.DiagonalBack">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Chart_GradientStyleEnum.DiagonalBackCenter">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Chart_GradientStyleEnum.Radial">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Chart_GradientStyleEnum.FromCenter">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Chart_HatchStyleEnum.None">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Chart_HatchStyleEnum.Horizontal">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Chart_HatchStyleEnum.Vertical">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Chart_HatchStyleEnum.ForwardDiagonal">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Chart_HatchStyleEnum.BackwardDiagonal">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Chart_HatchStyleEnum.Cross">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Chart_HatchStyleEnum.DiagonalCross">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Chart_HatchStyleEnum.Percent05">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Chart_HatchStyleEnum.Percent10">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Chart_HatchStyleEnum.Percent20">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Chart_HatchStyleEnum.Percent25">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Chart_HatchStyleEnum.Percent30">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Chart_HatchStyleEnum.Percent40">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Chart_HatchStyleEnum.Percent50">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Chart_HatchStyleEnum.Percent60">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Chart_HatchStyleEnum.Percent70">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Chart_HatchStyleEnum.Percent75">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Chart_HatchStyleEnum.Percent80">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Chart_HatchStyleEnum.Percent90">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Chart_HatchStyleEnum.LightDownwardDiagonal">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Chart_HatchStyleEnum.LightUpwardDiagonal">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Chart_HatchStyleEnum.DarkDownwardDiagonal">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Chart_HatchStyleEnum.DarkUpwardDiagonal">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Chart_HatchStyleEnum.WideDownwardDiagonal">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Chart_HatchStyleEnum.WideUpwardDiagonal">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Chart_HatchStyleEnum.LightVertical">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Chart_HatchStyleEnum.LightHorizontal">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Chart_HatchStyleEnum.NarrowVertical">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Chart_HatchStyleEnum.NarrowHorizontal">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Chart_HatchStyleEnum.DarkVertical">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Chart_HatchStyleEnum.DarkHorizontal">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Chart_HatchStyleEnum.DashedDownwardDiagonal">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Chart_HatchStyleEnum.DashedUpwardDiagonal">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Chart_HatchStyleEnum.DashedHorizontal">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Chart_HatchStyleEnum.DashedVertical">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Chart_HatchStyleEnum.SmallConfetti">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Chart_HatchStyleEnum.LargeConfetti">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Chart_HatchStyleEnum.ZigZag">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Chart_HatchStyleEnum.Wave">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Chart_HatchStyleEnum.DiagonalBrick">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Chart_HatchStyleEnum.HorizontalBrick">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Chart_HatchStyleEnum.Weave">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Chart_HatchStyleEnum.Plaid">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Chart_HatchStyleEnum.Divot">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Chart_HatchStyleEnum.DottedGrid">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Chart_HatchStyleEnum.DottedDiamond">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Chart_HatchStyleEnum.Shingle">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Chart_HatchStyleEnum.Trellis">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Chart_HatchStyleEnum.Sphere">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Chart_HatchStyleEnum.SmallGrid">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Chart_HatchStyleEnum.SmallCheckerBoard">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Chart_HatchStyleEnum.LargeCheckerBoard">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Chart_HatchStyleEnum.OutlinedDiamond">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Chart_HatchStyleEnum.SolidDiamond">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Chart_AlignImageEnum.Hide">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Chart_AlignImageEnum.Left">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Chart_AlignImageEnum.Right">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Chart_AlignImageEnum.Top">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Chart_AlignImageEnum.Bottom">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Chart_AlignImageEnum.Center">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Chart_AlignImageEnum.Scale">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Chart_AlignImageEnum.Stretch">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Chart_AlignImageEnum.Tile">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Chart_RotationEnum.Rotate0">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Chart_RotationEnum.Rotate90">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Chart_RotationEnum.Rotate180">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Chart_RotationEnum.Rotate270">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Chart_BorderStyleEnum.NotSet">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Chart_BorderStyleEnum.None">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Chart_BorderStyleEnum.Empty">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Chart_BorderStyleEnum.Solid">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Chart_BorderStyleEnum.Raised">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Chart_BorderStyleEnum.Inset">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Chart_BorderStyleEnum.RaisedBevel">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Chart_BorderStyleEnum.InsetBevel">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Chart_BorderStyleEnum.Groove">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Chart_BorderStyleEnum.Fillet">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Chart_BorderStyleEnum.Double">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Chart_BorderStyleEnum.Dashed">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.Chart_BorderStyleEnum.Opaque">
+            <summary>For internal use.</summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.ThemeVisualStyle.Custom">
+            <summary>
+            For internal use.
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.ThemeVisualStyle.System">
+            <summary>
+            For internal use.
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.ThemeVisualStyle.Office2007Blue">
+            <summary>
+            For internal use.
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.ThemeVisualStyle.Office2007Black">
+            <summary>
+            For internal use.
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.ThemeVisualStyle.Office2007Silver">
+            <summary>
+            For internal use.
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.ThemeVisualStyle.Office2010Blue">
+            <summary>
+            For internal use.
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.ThemeVisualStyle.Office2010Black">
+            <summary>
+            For internal use.
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.ThemeVisualStyle.Office2010Silver">
+            <summary>
+            For internal use.
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.ThemeVisualStyle.Windows7">
+            <summary>
+            For internal use.
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.ThemeVisualStyle.WinXPBlue">
+            <summary>
+            For internal use.
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.ThemeVisualStyle.WinXPSilver">
+            <summary>
+            For internal use.
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.ThemeVisualStyle.WinXPOlive">
+            <summary>
+            For internal use.
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.ThemeVisualStyle.Royale">
+            <summary>
+            For internal use.
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.ThemeVisualStyle.Yahoo">
+            <summary>
+            For internal use.
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.ThemeVisualStyle.Aero">
+            <summary>
+            For internal use.
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.ThemeVisualStyle.Office2003Blue">
+            <summary>
+            For internal use.
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.ThemeVisualStyle.Office2003Olive">
+            <summary>
+            For internal use.
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.ThemeVisualStyle.Office2003Silver">
+            <summary>
+            For internal use.
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.ThemeVisualStyle.OfficeXP">
+            <summary>
+            For internal use.
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.ThemeVisualStyle.Classic">
+            <summary>
+            For internal use.
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.ThemeVisualStyle.WindowsXP">
+            <summary>
+            For internal use.
+            </summary>
+        </member>
+        <member name="M:C1.Win.C1Themes.Shared.IC1ThemeControl.ThemeChanged(System.Object)">
+            <summary>
+            For internal use.
+            </summary>
+            <param name="theme"></param>
+        </member>
+        <member name="T:C1.Win.C1Themes.Shared.ThemeBrushBase">
+            <summary>
+            Abstract base class for all classes representing a brush in a theme.
+            Use the <see cref="M:C1.Win.C1Themes.Shared.ThemeBrushBase.GetBrush(System.Drawing.Rectangle)"/> method to get an actual matching GDI+ brush.
+            Classes derived from <see cref="T:C1.Win.C1Themes.Shared.ThemeBrushBase"/> override Equals() and
+            GetHashCode() methods and compare objects by content rather than by references.
+            </summary>
+        </member>
+        <member name="M:C1.Win.C1Themes.Shared.ThemeBrushBase.EncodeValues(C1.Win.C1Themes.Shared.Utils.ValuesStore)">
+            <summary>
+            For internal use.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:C1.Win.C1Themes.Shared.ThemeBrushBase.DecodeValues(C1.Win.C1Themes.Shared.Utils.ValuesStore)">
+            <summary>
+            For internal use.
+            </summary>
+        </member>
+        <member name="M:C1.Win.C1Themes.Shared.ThemeBrushBase.AssignFrom(C1.Win.C1Themes.Shared.ThemeBrushBase)">
+            <summary>
+            Assigns (copies) properties from another <see cref="T:C1.Win.C1Themes.Shared.ThemeBrushBase"/> to the current object.
+            </summary>
+            <param name="source">The source object to copy properties from.</param>
+        </member>
+        <member name="M:C1.Win.C1Themes.Shared.ThemeBrushBase.Clone">
+            <summary>
+            Creates an exact copy of this <see cref="T:C1.Win.C1Themes.Shared.ThemeBrushBase"/>.
+            </summary>
+            <returns>The <see cref="T:C1.Win.C1Themes.Shared.ThemeBrushBase"/> this method creates.</returns>
+        </member>
+        <member name="M:C1.Win.C1Themes.Shared.ThemeBrushBase.GetBrush(System.Drawing.Rectangle)">
+            <summary>
+            Returns a GDI+ brush matching the theme brush.
+            It is the caller's responsibility to dispose this brush when it is no longer needed.
+            </summary>
+            <param name="brushRect">The brush rectangle (used for gradient brushes).</param>
+            <returns>The GDI+ <see cref="T:System.Drawing.Brush"/> object.</returns>
+        </member>
+        <member name="M:C1.Win.C1Themes.Shared.ThemeBrushBase.DependOnRect">
+            <summary>
+            Returns true if a GDI+ brush created for this theme brush depends on the rectangle
+            passed to the <see cref="M:C1.Win.C1Themes.Shared.ThemeBrushBase.GetBrush(System.Drawing.Rectangle)"/> method. E.g. gradient brushes return
+            true in this method while solid return false.
+            </summary>
+            <returns>True if the GDI+ brush depends on the application area, false otherwise.</returns>
+        </member>
+        <member name="M:C1.Win.C1Themes.Shared.ThemeBrushBase.EncodeToString">
+            <summary>
+            Encodes this <see cref="T:C1.Win.C1Themes.Shared.ThemeBrushBase"/> object to string.
+            </summary>
+            <returns>String represengin this <see cref="T:C1.Win.C1Themes.Shared.ThemeBrushBase"/> object.</returns>
+        </member>
+        <member name="M:C1.Win.C1Themes.Shared.ThemeBrushBase.IsBrushesEqual(C1.Win.C1Themes.Shared.ThemeBrushBase,C1.Win.C1Themes.Shared.ThemeBrushBase)">
+            <summary>
+            Checks whether the two <see cref="T:C1.Win.C1Themes.Shared.ThemeBrushBase"/> objects are equal by value
+            (i.e. represent identically described theme brushes).
+            </summary>
+            <param name="tb1">First <see cref="T:C1.Win.C1Themes.Shared.ThemeBrushBase"/> object.</param>
+            <param name="tb2">Second <see cref="T:C1.Win.C1Themes.Shared.ThemeBrushBase"/> object.</param>
+            <returns>True if the two brushes are identical, or are both null.</returns>
+        </member>
+        <member name="M:C1.Win.C1Themes.Shared.ThemeBrushBase.TryDecodeFromString(System.String,C1.Win.C1Themes.Shared.ThemeBrushBase@)">
+            <summary>
+            Create <see cref="T:C1.Win.C1Themes.Shared.ThemeBrushBase"/> object from specified string.
+            </summary>
+            <param name="s">String representing <see cref="T:C1.Win.C1Themes.Shared.ThemeBrushBase"/> object.</param>
+            <param name="value"><see cref="T:C1.Win.C1Themes.Shared.ThemeBrushBase"/> object created from string.</param>
+            <returns>True if string was successfully parsed, false otherwise.</returns>
+        </member>
+        <member name="T:C1.Win.C1Themes.Shared.ThemeSolidBrush">
+            <summary>
+            Represents a solid theme brush.
+            </summary>
+        </member>
+        <member name="M:C1.Win.C1Themes.Shared.ThemeSolidBrush.EncodeValues(C1.Win.C1Themes.Shared.Utils.ValuesStore)">
+            <summary>
+            For internal use.
+            </summary>
+            <param name="store"></param>
+        </member>
+        <member name="M:C1.Win.C1Themes.Shared.ThemeSolidBrush.DecodeValues(C1.Win.C1Themes.Shared.Utils.ValuesStore)">
+            <summary>
+            For internal use.
+            </summary>
+            <param name="store"></param>
+            <returns></returns>
+        </member>
+        <member name="M:C1.Win.C1Themes.Shared.ThemeSolidBrush.AssignFrom(C1.Win.C1Themes.Shared.ThemeBrushBase)">
+            <summary>
+            Overridden, assigns (copies) properties from another <see cref="T:C1.Win.C1Themes.Shared.ThemeBrushBase"/> to the current object.
+            </summary>
+            <param name="source">The source object to copy properties from.</param>
+        </member>
+        <member name="M:C1.Win.C1Themes.Shared.ThemeSolidBrush.GetBrush(System.Drawing.Rectangle)">
+            <summary>
+            Overridden, creates a GDI+ <see cref="T:System.Drawing.SolidBrush"/> matching this <see cref="T:C1.Win.C1Themes.Shared.ThemeSolidBrush"/> object.
+            Can return null if color is not specified or transparent.
+            </summary>
+            <param name="brushRect">Target application area for the brush (ignored).</param>
+            <returns>A <see cref="T:System.Drawing.SolidBrush"/> object.</returns>
+        </member>
+        <member name="M:C1.Win.C1Themes.Shared.ThemeSolidBrush.DependOnRect">
+            <summary>
+            For internal use.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:C1.Win.C1Themes.Shared.ThemeSolidBrush.GetHashCode">
+            <summary>
+            For internal use.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:C1.Win.C1Themes.Shared.ThemeSolidBrush.Equals(System.Object)">
+            <summary>
+            For internal use.
+            </summary>
+            <param name="obj"></param>
+            <returns></returns>
+        </member>
+        <member name="P:C1.Win.C1Themes.Shared.ThemeSolidBrush.Color">
+            <summary>
+            Gets or sets the color of this solid brush.
+            </summary>
+        </member>
+        <member name="T:C1.Win.C1Themes.Shared.ThemeGradientBrush">
+            <summary>
+            Abstract base class for gradient theme brushes.
+            </summary>
+        </member>
+        <member name="M:C1.Win.C1Themes.Shared.ThemeGradientBrush.DependOnRect">
+            <summary>
+            For internal use.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:C1.Win.C1Themes.Shared.ThemeLinearBrush">
+            <summary>
+            Abstract base class for linear gradient theme brushes.
+            </summary>
+        </member>
+        <member name="M:C1.Win.C1Themes.Shared.ThemeLinearBrush.EncodeValues(C1.Win.C1Themes.Shared.Utils.ValuesStore)">
+            <summary>
+            For internal use.
+            </summary>
+            <param name="store"></param>
+        </member>
+        <member name="M:C1.Win.C1Themes.Shared.ThemeLinearBrush.DecodeValues(C1.Win.C1Themes.Shared.Utils.ValuesStore)">
+            <summary>
+            For internal use.
+            </summary>
+            <param name="store"></param>
+            <returns></returns>
+        </member>
+        <member name="M:C1.Win.C1Themes.Shared.ThemeLinearBrush.AssignFrom(C1.Win.C1Themes.Shared.ThemeBrushBase)">
+            <summary>
+            Overridden, assigns (copies) properties from another <see cref="T:C1.Win.C1Themes.Shared.ThemeBrushBase"/> to the current object.
+            </summary>
+            <param name="source">The source object to copy properties from.</param>
+        </member>
+        <member name="P:C1.Win.C1Themes.Shared.ThemeLinearBrush.GammaCorrection">
+            <summary>
+            Gets or sets a value indicating whether gamma correction is enabled,
+            same as LinearGradientBrush.GammaCorrection.
+            </summary>
+        </member>
+        <member name="P:C1.Win.C1Themes.Shared.ThemeLinearBrush.Angle">
+            <summary>
+            Gets or sets the angle, measured in degrees clockwise from the x-axis,
+            of the gradient's orientation line. 
+            </summary>
+        </member>
+        <member name="T:C1.Win.C1Themes.Shared.ThemeTwoColorLinearBrush">
+            <summary>
+            Represents a linear gradient brush based on the starting and ending colors,
+            and a <see cref="P:C1.Win.C1Themes.Shared.ThemeTwoColorLinearBrush.Blend"/> object.
+            </summary>
+        </member>
+        <member name="M:C1.Win.C1Themes.Shared.ThemeTwoColorLinearBrush.EncodeValues(C1.Win.C1Themes.Shared.Utils.ValuesStore)">
+            <summary>
+            For internal use.
+            </summary>
+            <param name="store"></param>
+        </member>
+        <member name="M:C1.Win.C1Themes.Shared.ThemeTwoColorLinearBrush.DecodeValues(C1.Win.C1Themes.Shared.Utils.ValuesStore)">
+            <summary>
+            For internal use.
+            </summary>
+            <param name="store"></param>
+            <returns></returns>
+        </member>
+        <member name="M:C1.Win.C1Themes.Shared.ThemeTwoColorLinearBrush.AssignFrom(C1.Win.C1Themes.Shared.ThemeBrushBase)">
+            <summary>
+            Overridden, assigns (copies) properties from another <see cref="T:C1.Win.C1Themes.Shared.ThemeBrushBase"/> to the current object.
+            </summary>
+            <param name="source">The source object to copy properties from.</param>
+        </member>
+        <member name="M:C1.Win.C1Themes.Shared.ThemeTwoColorLinearBrush.GetBrush(System.Drawing.Rectangle)">
+            <summary>
+            Overridden, creates a <see cref="T:System.Drawing.Drawing2D.LinearGradientBrush"/> matching this <see cref="T:C1.Win.C1Themes.Shared.ThemeTwoColorLinearBrush"/> object.
+            </summary>
+            <param name="brushRect">The gradient rectangle.</param>
+            <returns>A <see cref="T:System.Drawing.Drawing2D.LinearGradientBrush"/> object.</returns>
+        </member>
+        <member name="M:C1.Win.C1Themes.Shared.ThemeTwoColorLinearBrush.GetHashCode">
+            <summary>
+            For internal use.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:C1.Win.C1Themes.Shared.ThemeTwoColorLinearBrush.Equals(System.Object)">
+            <summary>
+            For internal use.
+            </summary>
+            <param name="obj"></param>
+            <returns></returns>
+        </member>
+        <member name="P:C1.Win.C1Themes.Shared.ThemeTwoColorLinearBrush.StartColor">
+            <summary>
+            Gets or sets the starting gradient color.
+            </summary>
+        </member>
+        <member name="P:C1.Win.C1Themes.Shared.ThemeTwoColorLinearBrush.EndColor">
+            <summary>
+            Gets or sets the ending gradient color.
+            </summary>
+        </member>
+        <member name="P:C1.Win.C1Themes.Shared.ThemeTwoColorLinearBrush.Blend">
+            <summary>
+            Gets or sets the <see cref="P:C1.Win.C1Themes.Shared.ThemeTwoColorLinearBrush.Blend"/> object. Can be null.
+            </summary>
+        </member>
+        <member name="T:C1.Win.C1Themes.Shared.ThemeMultiColorLinearBrush">
+            <summary>
+            Represents a multicolor linear gradient brush.
+            </summary>
+        </member>
+        <member name="M:C1.Win.C1Themes.Shared.ThemeMultiColorLinearBrush.EncodeValues(C1.Win.C1Themes.Shared.Utils.ValuesStore)">
+            <summary>
+            For internal use.
+            </summary>
+            <param name="store"></param>
+        </member>
+        <member name="M:C1.Win.C1Themes.Shared.ThemeMultiColorLinearBrush.DecodeValues(C1.Win.C1Themes.Shared.Utils.ValuesStore)">
+            <summary>
+            For internal use.
+            </summary>
+            <param name="store"></param>
+            <returns></returns>
+        </member>
+        <member name="M:C1.Win.C1Themes.Shared.ThemeMultiColorLinearBrush.AssignFrom(C1.Win.C1Themes.Shared.ThemeBrushBase)">
+            <summary>
+            Overridden, assigns (copies) properties from another <see cref="T:C1.Win.C1Themes.Shared.ThemeBrushBase"/> to the current object.
+            </summary>
+            <param name="source">The source object to copy properties from.</param>
+        </member>
+        <member name="M:C1.Win.C1Themes.Shared.ThemeMultiColorLinearBrush.GetBrush(System.Drawing.Rectangle)">
+            <summary>
+            Overridden, creates a <see cref="T:System.Drawing.Drawing2D.LinearGradientBrush"/> matching this <see cref="T:C1.Win.C1Themes.Shared.ThemeMultiColorLinearBrush"/> object.
+            </summary>
+            <param name="brushRect">Gradient brush rectangle.</param>
+            <returns>A <see cref="T:System.Drawing.Drawing2D.LinearGradientBrush"/> object.</returns>
+        </member>
+        <member name="M:C1.Win.C1Themes.Shared.ThemeMultiColorLinearBrush.GetHashCode">
+            <summary>
+            For internal use.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:C1.Win.C1Themes.Shared.ThemeMultiColorLinearBrush.Equals(System.Object)">
+            <summary>
+            For internal use.
+            </summary>
+            <param name="obj"></param>
+            <returns></returns>
+        </member>
+        <member name="P:C1.Win.C1Themes.Shared.ThemeMultiColorLinearBrush.InterpolationColors">
+            <summary>
+            Gets or sets a <see cref="T:System.Drawing.Drawing2D.ColorBlend"/> that defines a multicolor linear gradient.
+            </summary>
+        </member>
+        <member name="T:C1.Win.C1Themes.Shared.ThemeRadialBrush">
+            <summary>
+            Abstract base class for radial gradient theme brushes.
+            </summary>
+        </member>
+        <member name="M:C1.Win.C1Themes.Shared.ThemeRadialBrush.CreateBrush(System.Drawing.Rectangle)">
+            <summary>
+            For internal use.
+            </summary>
+            <param name="brushRect"></param>
+            <returns></returns>
+        </member>
+        <member name="M:C1.Win.C1Themes.Shared.ThemeRadialBrush.EncodeValues(C1.Win.C1Themes.Shared.Utils.ValuesStore)">
+            <summary>
+            For internal use.
+            </summary>
+            <param name="store"></param>
+        </member>
+        <member name="M:C1.Win.C1Themes.Shared.ThemeRadialBrush.DecodeValues(C1.Win.C1Themes.Shared.Utils.ValuesStore)">
+            <summary>
+            For internal use.
+            </summary>
+            <param name="store"></param>
+            <returns></returns>
+        </member>
+        <member name="M:C1.Win.C1Themes.Shared.ThemeRadialBrush.AssignFrom(C1.Win.C1Themes.Shared.ThemeBrushBase)">
+            <summary>
+            Overridden, assigns (copies) properties from another <see cref="T:C1.Win.C1Themes.Shared.ThemeBrushBase"/> to the current object.
+            </summary>
+            <param name="source">The source object to copy properties from.</param>
+        </member>
+        <member name="M:C1.Win.C1Themes.Shared.ThemeRadialBrush.DependOnRect">
+            <summary>
+            For internal use.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="P:C1.Win.C1Themes.Shared.ThemeRadialBrush.Center">
+            <summary>
+            Gets or sets a <see cref="T:System.Drawing.Point"/> structure that defines position
+            of center point.
+            (0,0) is the top-left corner, (100,100) is the bottom-right corner.
+            </summary>
+        </member>
+        <member name="T:C1.Win.C1Themes.Shared.ThemeTwoColorRadialBrush">
+            <summary>
+            Represents a radial gradient brush based on center point,
+            surrounding color and a <see cref="P:C1.Win.C1Themes.Shared.ThemeTwoColorRadialBrush.Blend"/> object.
+            </summary>
+        </member>
+        <member name="M:C1.Win.C1Themes.Shared.ThemeTwoColorRadialBrush.EncodeValues(C1.Win.C1Themes.Shared.Utils.ValuesStore)">
+            <summary>
+            For internal use.
+            </summary>
+            <param name="store"></param>
+        </member>
+        <member name="M:C1.Win.C1Themes.Shared.ThemeTwoColorRadialBrush.DecodeValues(C1.Win.C1Themes.Shared.Utils.ValuesStore)">
+            <summary>
+            For internal use.
+            </summary>
+            <param name="store"></param>
+            <returns></returns>
+        </member>
+        <member name="M:C1.Win.C1Themes.Shared.ThemeTwoColorRadialBrush.AssignFrom(C1.Win.C1Themes.Shared.ThemeBrushBase)">
+            <summary>
+            Overridden, assigns (copies) properties from another <see cref="T:C1.Win.C1Themes.Shared.ThemeBrushBase"/> to the current object.
+            </summary>
+            <param name="source">The source object to copy properties from.</param>
+        </member>
+        <member name="M:C1.Win.C1Themes.Shared.ThemeTwoColorRadialBrush.GetBrush(System.Drawing.Rectangle)">
+            <summary>
+            Overridden, creates a <see cref="T:System.Drawing.Drawing2D.PathGradientBrush"/> matching this <see cref="T:C1.Win.C1Themes.Shared.ThemeTwoColorRadialBrush"/> object.
+            </summary>
+            <param name="brushRect">The gradient rectangle.</param>
+            <returns>A <see cref="T:System.Drawing.Drawing2D.PathGradientBrush"/> object.</returns>
+        </member>
+        <member name="M:C1.Win.C1Themes.Shared.ThemeTwoColorRadialBrush.Equals(System.Object)">
+            <summary>
+            For internal use.
+            </summary>
+            <param name="obj"></param>
+            <returns></returns>
+        </member>
+        <member name="M:C1.Win.C1Themes.Shared.ThemeTwoColorRadialBrush.GetHashCode">
+            <summary>
+            For internal use.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="P:C1.Win.C1Themes.Shared.ThemeTwoColorRadialBrush.CenterColor">
+            <summary>
+            Gets or sets the color at the center of the radial gradient.
+            </summary>
+        </member>
+        <member name="P:C1.Win.C1Themes.Shared.ThemeTwoColorRadialBrush.SurroundColor">
+            <summary>
+            Gets or sets the surrounding color of the radial gradient.
+            </summary>
+        </member>
+        <member name="P:C1.Win.C1Themes.Shared.ThemeTwoColorRadialBrush.Blend">
+            <summary>
+            Gets or sets the <see cref="P:C1.Win.C1Themes.Shared.ThemeTwoColorRadialBrush.Blend"/> object. Can be null.
+            </summary>
+        </member>
+        <member name="T:C1.Win.C1Themes.Shared.ThemeMultiColorRadialBrush">
+            <summary>
+            Represents a multicolor radial gradient brush.
+            </summary>
+        </member>
+        <member name="M:C1.Win.C1Themes.Shared.ThemeMultiColorRadialBrush.EncodeValues(C1.Win.C1Themes.Shared.Utils.ValuesStore)">
+            <summary>
+            For internal use.
+            </summary>
+            <param name="store"></param>
+        </member>
+        <member name="M:C1.Win.C1Themes.Shared.ThemeMultiColorRadialBrush.DecodeValues(C1.Win.C1Themes.Shared.Utils.ValuesStore)">
+            <summary>
+            For internal use.
+            </summary>
+            <param name="store"></param>
+            <returns></returns>
+        </member>
+        <member name="M:C1.Win.C1Themes.Shared.ThemeMultiColorRadialBrush.AssignFrom(C1.Win.C1Themes.Shared.ThemeBrushBase)">
+            <summary>
+            Overridden, assigns (copies) properties from another <see cref="T:C1.Win.C1Themes.Shared.ThemeBrushBase"/> to the current object.
+            </summary>
+            <param name="source">The source object to copy properties from.</param>
+        </member>
+        <member name="M:C1.Win.C1Themes.Shared.ThemeMultiColorRadialBrush.GetBrush(System.Drawing.Rectangle)">
+            <summary>
+            Overridden, creates a <see cref="T:System.Drawing.Drawing2D.PathGradientBrush"/> matching this <see cref="T:C1.Win.C1Themes.Shared.ThemeMultiColorRadialBrush"/> object.
+            </summary>
+            <param name="brushRect">The gradient rectangle.</param>
+            <returns>A <see cref="T:System.Drawing.Drawing2D.PathGradientBrush"/> object.</returns>
+        </member>
+        <member name="M:C1.Win.C1Themes.Shared.ThemeMultiColorRadialBrush.Equals(System.Object)">
+            <summary>
+            For internal use.
+            </summary>
+            <param name="obj"></param>
+            <returns></returns>
+        </member>
+        <member name="M:C1.Win.C1Themes.Shared.ThemeMultiColorRadialBrush.GetHashCode">
+            <summary>
+            For internal use.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="P:C1.Win.C1Themes.Shared.ThemeMultiColorRadialBrush.InterpolationColors">
+            <summary>
+            Gets or sets a <see cref="T:System.Drawing.Drawing2D.ColorBlend"/> that defines this multicolor radiant gradient.
+            </summary>
+        </member>
+        <member name="P:C1.Win.C1Themes.Shared.ThemeBrushHelper.ForeignBrush">
+            <summary>
+            Gets or sets a brush object which is stored but not managed by this ThemeBrushHelper -
+            i.e. it will not be disposed when this ThemeBrushHelper is disposed, or a new brush is
+            assigned to it.
+            Note that while the 'get' accessor is provided for this property, there is no need to use it -
+            just use the <see cref="M:C1.Win.C1Themes.Shared.ThemeBrushHelper.GetBrush(System.Drawing.Rectangle)"/> method to get a usable GDI+ brush.
+            </summary>
+        </member>
+        <member name="M:C1.Win.C1Themes.Shared.ThemeBrushHelper.CreateThemeBrushNoTransparentOrEmpty(C1.Win.C1Themes.Shared.C1ThemeProxy,System.String,C1.Win.C1Themes.Shared.ThemeBrushBase)">
+            <summary>
+            Creates brush based on specified theme path.
+            Returns defaultValue if brush can not be created or it is solid and color is transparent or empty.
+            </summary>
+            <param name="themeProxy"></param>
+            <param name="path"></param>
+            <param name="defaultValue"></param>
+            <returns></returns>
+        </member>
+        <member name="M:C1.Win.C1Themes.Shared.Utils.Utils.IsBlendEqual(System.Drawing.Drawing2D.Blend,System.Drawing.Drawing2D.Blend)">
+            <summary>
+            For internal use.
+            </summary>
+            <param name="b1"></param>
+            <param name="b2"></param>
+            <returns></returns>
+        </member>
+        <member name="M:C1.Win.C1Themes.Shared.Utils.Utils.IsColorBlendEqual(System.Drawing.Drawing2D.ColorBlend,System.Drawing.Drawing2D.ColorBlend)">
+            <summary>
+            For internal use.
+            </summary>
+            <param name="cb1"></param>
+            <param name="cb2"></param>
+            <returns></returns>
+        </member>
+        <member name="M:C1.Win.C1Themes.Shared.Utils.Utils.GradientModeToAngle(C1.Win.C1Themes.Shared.GradientMode)">
+            <summary>
+            For internal use.
+            </summary>
+            <param name="gradientMode"></param>
+            <returns></returns>
+        </member>
+        <member name="M:C1.Win.C1Themes.Shared.Utils.Utils.AngleToGradientMode(System.Single)">
+            <summary>
+            For internal use.
+            </summary>
+            <param name="angle"></param>
+            <returns></returns>
+        </member>
+        <member name="T:C1.Win.C1Themes.Shared.ThemeVersions">
+            <summary>
+            Versions of c1theme XML.
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.ThemeVersions.c_PlatformVersionPrefix">
+            <summary>
+            For internal use.
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.ThemeVersions.c_InitialFormatVersion">
+            <summary>
+            First public versions of C1Themes.
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.ThemeVersions.c_NewBackgroundsFormatVersion">
+            <summary>
+            Version of theme XML when structure of BackgroundProp was changed.
+            </summary>
+        </member>
+        <member name="F:C1.Win.C1Themes.Shared.ThemeVersions.c_NewRibbonFormatVersion">
+            <summary>
+            Version of theme XML when structure of C1Ribbon theme was changed
+            </summary>
+        </member>
+        <member name="T:C1.Win.StyledPropertyInfo">
+            <summary>
+            Contains information about styled property.
+            </summary>
+        </member>
+        <member name="M:C1.Win.StyledPropertyInfo.#ctor(System.String,System.Type)">
+            <summary>
+            Initializes a new instance of the <see cref="T:C1.Win.StyledPropertyInfo"/>.
+            </summary>
+            <param name="name">property name.</param>
+            <param name="type">property type.</param>
+        </member>
+        <member name="P:C1.Win.StyledPropertyInfo.Type">
+            <summary>
+            Gets property type.
+            </summary>
+        </member>
+        <member name="P:C1.Win.StyledPropertyInfo.Name">
+            <summary>
+            Gets property name.
+            </summary>
+        </member>
+        <member name="E:C1.Win.StyledProperty.PropertyChanged">
+            <summary>
+            Fires when any properties change.
+            </summary>
+        </member>
+        <member name="M:C1.Win.StyledProperty.OnPropertyChanged(System.Object,System.ComponentModel.PropertyChangedEventArgs)">
+            <summary>
+            Raises the <see cref="E:C1.Win.StyledProperty.PropertyChanged"/> event.
+            </summary>
+            <param name="sender"><see cref="T:System.Object"/> event sender.</param>
+            <param name="e"><see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> that contains the event data.</param>
+        </member>
+        <member name="M:C1.Win.StyledProperty.Dispose(System.Boolean)">
+            <summary>
+            Releases all unmanaged resources.
+            </summary>
+            <param name="disposing"></param>
+        </member>
+        <member name="M:C1.Win.StyledProperty.Dispose">
+            <summary>
+            Releases all unmanaged resources.
+            </summary>
+        </member>
+        <member name="T:C1.Win.StyledPropertyCollection">
+            <summary>
+            Closed collection of <see cref="T:C1.Win.StyledProperty"/> objects.
+            </summary>
+        </member>
+        <member name="M:C1.Win.StyledPropertyCollection.#ctor(C1.Win.StyledPropertyInfo[])">
+            <summary>
+            Initializes a new instance of the <see cref="T:C1.Win.StyledPropertyCollection"/>.
+            </summary>
+            <param name="props">styled properties.</param>
+        </member>
+        <member name="M:C1.Win.StyledPropertyCollection.GetStyledImage(System.String,System.Drawing.Color)">
+            <summary>
+            Gets styled image with specified color.
+            </summary>
+            <remarks>If the color is different from Transparent than control tries to recolor 
+            the ToolIcon image according to that color otherwise it uses the original colors.</remarks>
+            <param name="name">property name.</param>
+            <param name="color">specified color.</param>
+        </member>
+        <member name="M:C1.Win.StyledPropertyCollection.SetStyledImage(System.String,System.Drawing.Image)">
+            <summary>
+            Sets styled image property.
+            </summary>
+            <param name="name">property name.</param>
+            <param name="value">image to set.</param>
+        </member>
+        <member name="M:C1.Win.StyledPropertyCollection.GetProperty(System.String)">
+            <summary>
+            Gets value of the specified styled property.
+            </summary>
+            <param name="name">styled property name.</param>
+            <returns></returns>
+        </member>
+        <member name="M:C1.Win.StyledPropertyCollection.GetPropertiesByType``1">
+            <summary>
+            Gets value of the styled property with the specified type.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:C1.Win.StyledPropertyCollection.SetProperty(System.String,System.Object)">
+            <summary>
+            Sets value of the existing styled property.
+            </summary>
+            <param name="name">styled property name.</param>
+            <param name="value">property value.</param>
+            <returns>returns True if the value was successfully set, otherwise False</returns>
+        </member>
+        <member name="E:C1.Win.StyledPropertyCollection.PropertyChanged">
+            <summary>
+            Fires when any properties change.
+            </summary>
+        </member>
+        <member name="M:C1.Win.StyledPropertyCollection.OnPropertyChanged(System.Object,System.ComponentModel.PropertyChangedEventArgs)">
+            <summary>
+            Raises the <see cref="E:C1.Win.StyledPropertyCollection.PropertyChanged"/> event.
+            </summary>
+            <param name="sender"><see cref="T:System.Object"/> event sender.</param>
+            <param name="e"><see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> that contains the event data.</param>
+        </member>
+        <member name="M:C1.Win.StyledPropertyCollection.Dispose(System.Boolean)">
+            <summary>
+            Releases all unmanaged resources.
+            </summary>
+            <param name="disposing"></param>
+        </member>
+        <member name="M:C1.Win.StyledPropertyCollection.Dispose">
+            <summary>
+            Releases all unmanaged resources.
+            </summary>
+        </member>
+        <member name="M:C1.Win.ImageWorkerService.Dispose(System.Boolean)">
+            <summary>
+            Releases all unmanaged resources.
+            </summary>
+            <param name="disposing"></param>
+        </member>
+        <member name="M:C1.Win.ImageWorkerService.Dispose">
+            <summary>
+            Releases all unmanaged resources.
+            </summary>
+        </member>
+        <member name="T:C1.Win.Layout.SplitLayout">
+            <summary>
+            Class providing ILayout interface for using C1SplitterPanels as itemContainers for Dashboard Layout Control on the base of C1SplitContainer containers.
+            </summary>
+        </member>
+        <member name="M:C1.Win.Layout.SplitLayout.#ctor(C1.Win.C1SplitContainer.C1SplitContainer)">
+            <summary>
+            Creates an instance of <see cref="T:C1.Win.Layout.SplitLayout"/>
+            </summary>
+            <param name="container"><see cref="T:C1.Win.C1SplitContainer.C1SplitContainer"/> used as a container for the dashboard.</param>
+        </member>
+        <member name="M:C1.Win.Layout.DashboardSplitContainer.ShowAboutBox">
+            <summary>
+            Shows the About Box for an instance of C1SplitContainer.
+            </summary>
+        </member>
+        <member name="T:C1.Win.Layout.DashboardControlCollection">
+            <summary>
+            ItemContainer instance for Flow and Grid Layouts
+            </summary>
+        </member>
+        <member name="T:C1.Win.Layout.C1DashboardLayout">
+            <summary>
+            The <see cref="T:C1.Win.Layout.C1DashboardLayout"/> is a layout control that lets you design dynamic screens and dashboards.
+            </summary>
+        </member>
+        <member name="M:C1.Win.Layout.C1DashboardLayout.#ctor">
+            <summary>
+            Creates an instance of <see cref="T:C1.Win.Layout.C1DashboardLayout"/>
+            </summary>
+        </member>
+        <member name="P:C1.Win.Layout.C1DashboardLayout.FlowLayoutControl">
+            <summary>
+            Returns <see cref="T:System.Windows.Forms.FlowLayoutPanel"/> flow layout control.
+            </summary>
+        </member>
+        <member name="P:C1.Win.Layout.C1DashboardLayout.GridLayoutControl">
+            <summary>
+            Returns <see cref="T:System.Windows.Forms.TableLayoutPanel"/> grid layout control.
+            </summary>
+        </member>
+        <member name="P:C1.Win.Layout.C1DashboardLayout.SplitLayoutControl">
+            <summary>
+            Returns <see cref="T:C1.Win.C1SplitContainer.C1SplitContainer"/> split layout control
+            </summary>
+        </member>
+        <member name="P:C1.Win.Layout.C1DashboardLayout.Items">
+            <summary>
+            Returns collection of DashbordItem instances of currently selected layout.
+            </summary>
+        </member>
+        <member name="P:C1.Win.Layout.C1DashboardLayout.LayoutType">
+            <summary>
+            Gets or sets current <see cref="P:C1.Win.Layout.C1DashboardLayout.LayoutType"/> layout type.
+            </summary>
+        </member>
+        <member name="P:C1.Win.Layout.C1DashboardLayout.Options">
+            <summary>
+            Gets <see cref="T:C1.Win.Layout.DashboardOptions"/> C1DashboardLayout options.
+            </summary>
+        </member>
+        <member name="P:C1.Win.Layout.C1DashboardLayout.Styles">
+            <summary>
+            Gets <see cref="T:C1.Win.Layout.DashboardOptions"/> C1DashboardLayout styles.
+            </summary>
+        </member>
+        <member name="M:C1.Win.Layout.C1DashboardLayout.AttachToLayout(C1.Win.Layout.ILayout)">
+            <summary>
+            Attaches the custom layout
+            </summary>
+            <param name="layout"></param>
+        </member>
+        <member name="M:C1.Win.Layout.C1DashboardLayout.SaveLayout(System.String)">
+            <summary>
+            Saves layouts of <see cref="T:C1.Win.Layout.C1DashboardLayout"/> control to the XML file.
+            </summary>
+            <param name="fileName">The name of the XML file.</param>
+        </member>
+        <member name="M:C1.Win.Layout.C1DashboardLayout.SaveLayout(System.IO.Stream)">
+            <summary>
+            Saves layouts of <see cref="T:C1.Win.Layout.C1DashboardLayout"/> control to the XML file.
+            </summary>
+            <param name="stream">The stream to output.</param>
+        </member>
+        <member name="M:C1.Win.Layout.C1DashboardLayout.LoadLayout(System.String)">
+            <summary>
+            Loads layouts of <see cref="T:C1.Win.Layout.C1DashboardLayout"/> control from the XML file.
+            </summary>
+            <param name="fileName">The name of the XML file.</param>
+        </member>
+        <member name="M:C1.Win.Layout.C1DashboardLayout.LoadLayout(System.IO.Stream)">
+            <summary>
+            Loads layouts of <see cref="T:C1.Win.Layout.C1DashboardLayout"/> control from the XML file.
+            </summary>
+            <param name="stream">The stream to input.</param>
+        </member>
+        <member name="M:C1.Win.Layout.C1DashboardLayout.GetSelectedItem">
+            <summary>
+            Returns currently selected <see cref="T:C1.Win.Layout.DashboardItem"/>
+            </summary>
+            <returns>Currently selected <see cref="T:C1.Win.Layout.DashboardItem"/></returns>
+        </member>
+        <member name="M:C1.Win.Layout.C1DashboardLayout.Maximize(C1.Win.Layout.DashboardItem)">
+            <summary>
+            Maximizes the dashboard item container.
+            </summary>
+            <param name="item">The <see cref="T:C1.Win.Layout.DashboardItem"/> item to maximize</param>
+        </member>
+        <member name="M:C1.Win.Layout.C1DashboardLayout.Restore">
+            <summary>
+            Restores the dashboard item container to it's original position and size.
+            </summary>
+        </member>
+        <member name="M:C1.Win.Layout.C1DashboardLayout.GetId(System.Object)">
+            <summary>
+            Gets Id for ItemContainer instance.
+            </summary>
+            <param name="itemContainer">ItemContainer to obtain Id</param>
+            <returns>Unique identifier of dashboard item.</returns>
+        </member>
+        <member name="M:C1.Win.Layout.C1DashboardLayout.SetId(System.Object,System.String)">
+            <summary>
+            Sets Id for ItemContainer instance.
+            </summary>
+            <param name="itemContainer">ItemContainer to set Id</param>
+            <param name="id">Unique identifier of dashboard item.</param>
+        </member>
+        <member name="M:C1.Win.Layout.C1DashboardLayout.GetCaption(System.Object)">
+            <summary>
+            Gets Caption for ItemContainer instance.
+            </summary>
+            <param name="itemContainer">ItemContainer to obtain caption.</param>
+            <returns>Caption of dashboard item.</returns>
+        </member>
+        <member name="M:C1.Win.Layout.C1DashboardLayout.SetCaption(System.Object,System.String)">
+            <summary>
+            Sets Caption for ItemContainer instance.
+            </summary>
+            <param name="itemContainer">ItemContainer to obtain caption.</param>
+            <param name="caption">Caption string.</param>
+        </member>
+        <member name="M:C1.Win.Layout.C1DashboardLayout.ShowAboutBox">
+            <summary>
+            Shows the product about box dialog.
+            </summary>
+        </member>
+        <member name="P:C1.Win.Layout.C1DashboardLayout.BackColor">
+            <summary>
+             Gets or sets the background color for the control.
+            </summary>
+        </member>
+        <member name="P:C1.Win.Layout.C1DashboardLayout.DisplayRectangle">
+            <summary>
+            Gets the rectangle that represents the display area of the control.
+            </summary>
+        </member>
+        <member name="M:C1.Win.Layout.C1DashboardLayout.OnPaintBackground(System.Windows.Forms.PaintEventArgs)">
+            <summary>
+            Paints the background of the control.
+            </summary>
+        </member>
+        <member name="P:C1.Win.Layout.C1DashboardLayout.ContextMenuStrip">
+            <summary>
+             Gets or sets the System.Windows.Forms.ContextMenuStrip associated with this control.
+            </summary>
+        </member>
+        <member name="M:C1.Win.Layout.C1DashboardLayout.OnHandleCreated(System.EventArgs)">
+            <summary>
+             Raises the System.Windows.Forms.Control.HandleDestroyed event.
+            </summary>
+            <param name="e">An <see cref="T:System.EventArgs"/> that contains the event data.</param>
+        </member>
+        <member name="M:C1.Win.Layout.C1DashboardLayout.OnHandleDestroyed(System.EventArgs)">
+            <summary>
+            Raises the System.Windows.Forms.Control.HandleDestroyed event.
+            </summary>
+            <param name="e">An <see cref="T:System.EventArgs"/> that contains the event data.</param>
+        </member>
+        <member name="M:C1.Win.Layout.C1DashboardLayout.OnParentChanged(System.EventArgs)">
+            <summary>
+             Raises the System.Windows.Forms.Control.ParentChanged event.
+            </summary>
+            <param name="e">An System.EventArgs that contains the event data.</param>
+        </member>
+        <member name="P:C1.Win.Layout.C1DashboardLayout.CurrentLayout">
+            <summary>
+            Returns the currently selected ILayout instance
+            </summary>
+        </member>
+        <member name="M:C1.Win.Layout.C1DashboardLayout.GetLayouts">
+            <summary>
+            Gets layouts of <see cref="T:C1.Win.Layout.C1DashboardLayout"/> control.
+            </summary>        
+        </member>
+        <member name="M:C1.Win.Layout.C1DashboardLayout.Dispose(System.Boolean)">
+            <summary>
+            Releases the unmanaged resources used by the System.Windows.Forms.Control and 
+            its child controls and optionally releases the managed resources.
+            </summary>
+            <param name="disposing">true to release both managed and unmanaged resources; false to release only unmanaged resources.</param>
+        </member>
+        <member name="M:C1.Win.Layout.C1DashboardLayout.ThemeChanged(System.Object)">
+            <summary>
+            Use internal only for theming support.
+            </summary>
+            <param name="newTheme">The new theme to be applied.</param>
+        </member>
+        <member name="T:C1.Win.Layout.LayoutType">
+            <summary>
+            Type of layout control
+            </summary>
+        </member>
+        <member name="F:C1.Win.Layout.LayoutType.Flow">
+            <summary>
+            FlowLayout layout type 
+            </summary>
+        </member>
+        <member name="F:C1.Win.Layout.LayoutType.Grid">
+            <summary>
+            GridLayout layout type 
+            </summary>
+        </member>
+        <member name="F:C1.Win.Layout.LayoutType.Split">
+            <summary>
+            SplitLayout layout type 
+            </summary>
+        </member>
+        <member name="F:C1.Win.Layout.LayoutType.Custom">
+            <summary>
+            Custom layout type for user-defined ILayaut
+            </summary>
+        </member>
+        <member name="T:C1.Win.Layout.DragType">
+            <summary>
+            Type of ItemContainer instance modifying.
+            </summary>
+        </member>
+        <member name="F:C1.Win.Layout.DragType.None">
+            <summary>
+            Do nothing
+            </summary>
+        </member>
+        <member name="F:C1.Win.Layout.DragType.Drag">
+            <summary>
+            Drag container
+            </summary>
+        </member>
+        <member name="F:C1.Win.Layout.DragType.ResizeLeft">
+            <summary>
+            Resize container to the left
+            </summary>
+        </member>
+        <member name="F:C1.Win.Layout.DragType.ResizeTop">
+            <summary>
+            Resize container up
+            </summary>
+        </member>
+        <member name="F:C1.Win.Layout.DragType.ResizeRight">
+            <summary>
+            Resize container to the right
+            </summary>
+        </member>
+        <member name="F:C1.Win.Layout.DragType.ResizeBottom">
+            <summary>
+            Resize container down
+            </summary>
+        </member>
+        <member name="T:C1.Win.Layout.AddRemoveItemContainerDelegate">
+            <summary>
+            Delegate for add-remove ItemContainer instance event. 
+            </summary>
+            <param name="sender">Calling <see cref="T:C1.Win.Layout.ILayout"/> instance.</param>
+            <param name="id">ItemContainer's id</param>
+        </member>
+        <member name="T:C1.Win.Layout.SynchronizeItemContainerDelegate">
+            <summary>
+             Delegate for synchronizing ItemContainer instances event. Synchronizes item containers with identical id.
+            </summary>
+            <param name="sender">Calling <see cref="T:C1.Win.Layout.ILayout"/> instance.</param>
+            <param name="oldId">ItemContainer's id</param>
+            <param name="newId">ItemContainer's new id (if this is a synchronizing with renaming)</param>
+        </member>
+        <member name="T:C1.Win.Layout.ILayout">
+            <summary>
+            Layout control interface. All layouts should implement this interface in order to communicate with C1DashboardLayoutControl
+            </summary>
+        </member>
+        <member name="P:C1.Win.Layout.ILayout.Container">
+            <summary>
+            Returns main container for dashboard itemContainers
+            </summary>
+        </member>
+        <member name="M:C1.Win.Layout.ILayout.SetParent(System.Windows.Forms.Control,System.Boolean)">
+            <summary>
+            Sets parent for <see cref="T:C1.Win.Layout.ILayout"/> container.
+            </summary>
+            <param name="parent">Parent for <see cref="T:C1.Win.Layout.ILayout"/> container.</param>
+            <param name="attaching">Attaching <see cref="T:C1.Win.Layout.C1DashboardLayout"/> instance to an existing <see cref="T:C1.Win.Layout.ILayout"/> control.</param>
+        </member>
+        <member name="M:C1.Win.Layout.ILayout.SetDelegates(C1.Win.Layout.AddRemoveItemContainerDelegate,C1.Win.Layout.AddRemoveItemContainerDelegate,C1.Win.Layout.SynchronizeItemContainerDelegate)">
+            <summary>
+            Set appropriate delegates in order to control adding/removing/synchronizing ItemContainers by <see cref="T:C1.Win.Layout.C1DashboardLayout"/>  instance.
+            </summary>
+            <param name="add"><see cref="T:C1.Win.Layout.AddRemoveItemContainerDelegate"/> adding delegate.</param>
+            <param name="remove"><see cref="T:C1.Win.Layout.AddRemoveItemContainerDelegate"/> removing delegate.</param>
+            <param name="sync"><see cref="T:C1.Win.Layout.SynchronizeItemContainerDelegate"/> synchronizing delegate.</param>
+        </member>
+        <member name="P:C1.Win.Layout.ILayout.LayoutItemContainers">
+            <summary>
+            Returns <see cref="T:System.Collections.IList"/> list of ItemContainer instances.
+            </summary>
+        </member>
+        <member name="P:C1.Win.Layout.ILayout.Items">
+            <summary>
+            Returns <see cref="T:C1.Win.Layout.DashboardCollection"/> list of Dashboard DashboardItem items
+            </summary>
+        </member>
+        <member name="M:C1.Win.Layout.ILayout.GetItemContainerOnPoint(System.Drawing.Point)">
+            <summary>
+            Returns ItemContainer instance at point.
+            </summary>
+            <param name="pt">Inspecting <see cref="T:System.Drawing.Point"/> point.</param>
+            <returns>ItemContainer at the point.</returns>
+        </member>
+        <member name="M:C1.Win.Layout.ILayout.CanDrag(System.Object,System.Drawing.Point)">
+            <summary>
+            Defines whether the ItemContainer instance can be dragged or resized.
+            </summary>
+            <param name="itemContainer">Inspecting ItemContainer</param>
+            <param name="pt">Inspecting <see cref="T:System.Drawing.Point"/> point.</param>
+            <returns><see cref="T:C1.Win.Layout.DragType"/> type of dragging/resizing.</returns>
+        </member>
+        <member name="M:C1.Win.Layout.ILayout.SelectItemContainer(System.Object)">
+            <summary>
+            Selects ItemContainer instance.
+            </summary>
+            <param name="itemContainer">ItemContainer to select (highlight).</param>
+        </member>
+        <member name="M:C1.Win.Layout.ILayout.DeselectItemContainer(System.Object)">
+            <summary>
+            Removes selection from ItemContainer instance.
+            </summary>
+            <param name="itemContainer">ItemContainer to deselect (remove highlighting)</param>
+        </member>
+        <member name="M:C1.Win.Layout.ILayout.GetFace(System.Object)">
+            <summary>
+            Returns face image of ItemContainer instance.
+            </summary>
+            <param name="itemContainer">ItemContainer for getting snapshot.</param>
+            <returns><see cref="T:System.Drawing.Image"/> instance of ItemContainer's snapshot.</returns>
+        </member>
+        <member name="M:C1.Win.Layout.ILayout.SetPlaceholderAt(System.Object,System.Drawing.Point)">
+            <summary>
+            Replaces the ItemContainer instance by placeholder or replaces the placeholder by ItemContainer instance.
+            </summary>
+            <param name="itemContainer">ItemContainer (placeholder) to exchange by. Can be null.</param>
+            <param name="pt"><see cref="T:System.Drawing.Point"/> point to set ItemContainer/placeholder.</param>
+        </member>
+        <member name="M:C1.Win.Layout.ILayout.GetBounds(System.Object)">
+            <summary>
+            Returns <see cref="T:System.Drawing.Rectangle"/> bounds of the ItemContainer.
+            </summary>
+            <param name="itemContainer">ItemContainer for getting bounds.</param>
+            <returns><see cref="T:System.Drawing.Rectangle"/> bounds of the ItemContainer.</returns>
+        </member>
+        <member name="M:C1.Win.Layout.ILayout.SetBounds(System.Object,System.Drawing.Rectangle,C1.Win.Layout.DragType)">
+            <summary>
+            Sets bounds for the ItemContainer instance.
+            </summary>
+            <param name="itemContainer">ItemContainer for setting bounds (resizing/moving).</param>
+            <param name="bounds"><see cref="T:System.Drawing.Rectangle"/> bounds for the ItemContainer.</param>
+            <param name="dragType">Current <see cref="T:C1.Win.Layout.DragType"/> that initiated resizing/moving.</param>
+            <returns></returns>
+        </member>
+        <member name="M:C1.Win.Layout.ILayout.Attach(System.Collections.Generic.Dictionary{System.String,System.Collections.ICollection})">
+            <summary>
+            Attaches dashboard ItemContainers to layout control.
+            </summary>
+            <param name="itemContainers">Dictionary that contains Ids and collections of controls to attach to the current layout.</param>
+        </member>
+        <member name="M:C1.Win.Layout.ILayout.Detach">
+            <summary>
+            Detaches dashboard itemContainers from layout control.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:C1.Win.Layout.ILayout.GetId(System.Object)">
+            <summary>
+            Gets Id for ItemContainer instance.
+            </summary>
+            <param name="itemContainer">ItemContainer to obtain Id</param>
+            <returns>Unique identifier of dashboard item.</returns>
+        </member>
+        <member name="M:C1.Win.Layout.ILayout.SetId(System.Object,System.String)">
+            <summary>
+            Sets Id for ItemContainer instance.
+            </summary>
+            <param name="itemContainer">ItemContainer to set Id</param>
+            <param name="id">Unique identifier of dashboard item.</param>
+        </member>
+        <member name="M:C1.Win.Layout.ILayout.IsItemContainer(System.Object)">
+            <summary>
+            Defines whether the object is an ItemContainer.
+            </summary>
+            <param name="itemContainer">Object to inspect.</param>
+            <returns>True if the object is an ItamContainer, False otherwise.</returns>
+        </member>
+        <member name="M:C1.Win.Layout.ILayout.CreateItemContainer(System.String)">
+            <summary>
+            Creates an ItemContainer.
+            </summary>
+            <param name="id">Unique identifier for dashboard item.</param>
+        </member>
+        <member name="M:C1.Win.Layout.ILayout.RemoveItemContainer(System.String)">
+            <summary>
+            Removes an ItemContainer.
+            </summary>
+            <param name="id">Unique identifier for dashboard item.</param>
+        </member>
+        <member name="M:C1.Win.Layout.ILayout.FindItemContainer(System.String)">
+            <summary>
+            Looks for ItemCotainer with defined unique identifier.
+            </summary>
+            <param name="id">Unique identifier for dashboard item.</param>
+        </member>
+        <member name="M:C1.Win.Layout.ILayout.UseOptions(C1.Win.Layout.DashboardOptions)">
+            <summary>
+            Force Layout control to use the Dashboard options.
+            </summary>
+            <param name="options">Dashboard options</param>
+        </member>
+        <member name="M:C1.Win.Layout.ILayout.UseTheme(C1.Win.Layout.Styles.DashboardTheme)">
+            <summary>
+            Apply the specified theme to layout
+            </summary>
+            <param name="theme">Theme to use.</param>
+        </member>
+        <member name="M:C1.Win.Layout.ILayout.UpdateStyle">
+            <summary>
+            Updates style according to the current theme.
+            </summary>
+        </member>
+        <member name="M:C1.Win.Layout.ILayout.Maximize(System.Object)">
+            <summary>
+            Maximizes ItemContainer
+            </summary>
+            <param name="itemContainer">ItemContainer to maximize.</param>
+        </member>
+        <member name="M:C1.Win.Layout.ILayout.Restore">
+            <summary>
+            Restores maximized ItemContainer to it's original size.
+            </summary>
+        </member>
+        <member name="M:C1.Win.Layout.ILayout.SaveLayout(System.Xml.XmlNode)">
+            <summary>
+            Stores elements of the child container.
+            </summary>
+            <param name="node">The parent of nodes with layouts.</param>
+        </member>
+        <member name="M:C1.Win.Layout.ILayout.LoadLayout(System.Xml.XmlNode)">
+            <summary>
+            Restores elements of the child container.
+            </summary>
+            <param name="node">The node with items of current layout.</param>
+        </member>
+        <member name="M:C1.Win.Layout.ILayout.SetItemProperties(System.Object,C1.Win.Layout.ItemContainerProperties)">
+            <summary>
+            Sets the Dashboard properties for item.
+            </summary>
+            <param name="itemContainer">ItemContainer to set properties.</param>
+            <param name="properties">The <see cref="T:C1.Win.Layout.ItemContainerProperties"/> object.</param>
+        </member>
+        <member name="M:C1.Win.Layout.ILayout.GetItemProperties(System.Object)">
+            <summary>
+            Gets the Dashboard properties for item.
+            </summary>
+            <param name="itemContainer">ItemContainer to get properties.</param>
+        </member>
+        <member name="M:C1.Win.Layout.ILayout.InitializeNew">
+            <summary>
+            Initializes a newly created layout. The method is called when a C1DashboardLayout is first initialized, typically after being first added to a design surface.
+            </summary>
+        </member>
+        <member name="T:C1.Win.Layout.DashboardCollection">
+            <summary>
+            Collection of DashboarItem itemContainers
+            </summary>
+        </member>
+        <member name="P:C1.Win.Layout.DashboardCollection.Items">
+            <summary>
+            Gets items of collection
+            </summary>
+        </member>
+        <member name="P:C1.Win.Layout.DashboardCollection.Count">
+            <summary>
+            Gets the count of items
+            </summary>
+        </member>
+        <member name="P:C1.Win.Layout.DashboardCollection.Item(System.Int32)">
+            <summary>
+            Gets item by index.
+            </summary>
+            <param name="index">Index to get item.</param>
+            <returns>The <see cref="T:C1.Win.Layout.DashboardItem"/> instance found by index.</returns>
+        </member>
+        <member name="P:C1.Win.Layout.DashboardCollection.Item(System.String)">
+            <summary>
+            Gets item by id.
+            </summary>
+            <param name="id">Unique identifier to get item</param>
+            <returns>The <see cref="T:C1.Win.Layout.DashboardItem"/> instance found by id.</returns>
+        </member>
+        <member name="M:C1.Win.Layout.DashboardCollection.Clear">
+            <summary>
+            Clears the collection.
+            </summary>
+        </member>
+        <member name="M:C1.Win.Layout.DashboardCollection.InsertBefore(System.String,C1.Win.Layout.DashboardItem)">
+            <summary>
+            Inserts item before item
+            </summary>
+            <param name="id">Id of the item before which we need to insert the item.</param>
+            <param name="item">The item to insert.</param>
+        </member>
+        <member name="M:C1.Win.Layout.DashboardCollection.InsertAfter(System.String,C1.Win.Layout.DashboardItem)">
+            <summary>
+            Inserts item after item
+            </summary>
+            <param name="id">Id of the item after which we need to insert the item.</param>
+            <param name="item">The item to insert.</param>
+        </member>
+        <member name="M:C1.Win.Layout.DashboardCollection.Add(System.String,System.Collections.IList)">
+            <summary>
+            Creates a new <see cref="T:C1.Win.Layout.DashboardItem"/> instance and adds it to the end of collection.
+            </summary>
+            <param name="id">Id for new item.</param>
+            <param name="items">List of items (controls) to place in ItemContainer.</param>
+        </member>
+        <member name="M:C1.Win.Layout.DashboardCollection.Remove(System.String)">
+            <summary>
+            Removes item by id.
+            </summary>
+            <param name="id">Id for the item to remove.</param>
+            <returns>True if the item has been removed successfully.</returns>
+        </member>
+        <member name="M:C1.Win.Layout.DashboardCollection.Populate">
+            <summary>
+            Populates collection
+            </summary>
+        </member>
+        <member name="T:C1.Win.Layout.DashboardItem">
+            <summary>
+            Represents a ItemContainer instance for DashboardLayout
+            </summary>
+        </member>
+        <member name="M:C1.Win.Layout.DashboardItem.#ctor(C1.Win.Layout.ILayout,System.Object,System.String,System.Collections.IList)">
+            <summary>
+            Creates DashboardItem instance
+            </summary>
+            <param name="layout">The parent <see cref="T:C1.Win.Layout.ILayout"/> object to create <see cref="T:C1.Win.Layout.DashboardItem"/> on it.</param>
+            <param name="itemContainer">ItemContainer object to add on layout.</param>
+            <param name="id">The <see cref="T:C1.Win.Layout.DashboardItem"/>'s Id.</param>
+            <param name="items">List of items (controls) to place in ItemContainer.</param>
+        </member>
+        <member name="M:C1.Win.Layout.DashboardItem.#ctor">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:C1.Win.Layout.DashboardItem.Id">
+            <summary>
+            Id for ItemContainer instance
+            </summary>
+        </member>
+        <member name="P:C1.Win.Layout.DashboardItem.ItemContainer">
+            <summary>
+            ItemContainer instance itself
+            </summary>
+        </member>
+        <member name="P:C1.Win.Layout.DashboardItem.Items">
+            <summary>
+            Items on ItemContainer instance.
+            </summary>
+        </member>
+        <member name="P:C1.Win.Layout.DashboardItem.Caption">
+            <summary>
+            The caption of ItemContainer
+            </summary>
+        </member>
+        <member name="T:C1.Win.Layout.ItemContainerProperties">
+            <summary>
+            Dashboard ItemContainer additional properties
+            </summary>
+        </member>
+        <member name="P:C1.Win.Layout.ItemContainerProperties.Caption">
+            <summary>
+            Caption of item container.
+            </summary>
+        </member>
+        <member name="T:C1.Win.Layout.DashboardOptions">
+            <summary>
+            Additional Dashboard options to use by layout control
+            </summary>
+        </member>
+        <member name="P:C1.Win.Layout.DashboardOptions.ToolIconAppearance">
+            <summary>
+             Gets or sets location of tool icon if Caption property is not defined for ItemContainer.
+            </summary>
+        </member>
+        <member name="P:C1.Win.Layout.DashboardOptions.MinimumItemContainerSize">
+            <summary>
+             Minimum ItemContainer instance size. When the size of parent container decreases the child ItemContainer instances decrease accordingly proportionally till the ItemContainer instance size reaches MinimumSize. In discrete system MinimumSize is a minimal size of child grid cell.
+            </summary>
+        </member>
+        <member name="P:C1.Win.Layout.DashboardOptions.MaximumItemContainerSize">
+            <summary>
+            Maximum ItemContainer instance size. When the size of parent container increases the child ItemContainer instances increase accordingly proportionally till the ItemContainer instance size reaches MamimumSize.In discrete system MaximumSize is a maximal size of child grid cell.
+            </summary>
+        </member>
+        <member name="P:C1.Win.Layout.DashboardOptions.ContextMenuStrip">
+            <summary>
+            ContextMenuStrip to use on ItemContainer instances.
+            </summary>
+        </member>
+        <member name="P:C1.Win.Layout.DashboardOptions.Span">
+            <summary>
+            Discrete size multiplier. This can be used for discrete resizing of ItemContainer.
+            </summary>
+        </member>
+        <member name="P:C1.Win.Layout.DashboardOptions.AllowDrag">
+            <summary>
+            Allows to drag and drop ItemContainers.
+            </summary>
+        </member>
+        <member name="P:C1.Win.Layout.DashboardOptions.AllowResize">
+            <summary>
+            Allows to resize ItemContainers.
+            </summary>
+        </member>
+        <member name="T:C1.Win.Layout.ToolIconAppearance">
+            <summary>
+            Gets or sets location of tool icon.
+            </summary>
+        </member>
+        <member name="F:C1.Win.Layout.ToolIconAppearance.None">
+            <summary>
+            No tool icon
+            </summary>
+        </member>
+        <member name="F:C1.Win.Layout.ToolIconAppearance.UpperLeft">
+            <summary>
+            Tool icon is on the upper left corner
+            </summary>
+        </member>
+        <member name="F:C1.Win.Layout.ToolIconAppearance.UpperRight">
+            <summary>
+            Tool icon is on the upper right corner
+            </summary>
+        </member>
+        <member name="F:C1.Win.Layout.ToolIconAppearance.LowerLeft">
+            <summary>
+            Tool icon is on the lower left corner
+            </summary>
+        </member>
+        <member name="F:C1.Win.Layout.ToolIconAppearance.LowerRight">
+            <summary>
+            Tool icon is on the lower right corner
+            </summary>
+        </member>
+        <member name="T:C1.Win.Layout.FlowLayout">
+            <summary>
+            Class providing ILayout interface for FlowLayoutPanel container that uses Control descendants as itemContainers for Dashboard Layout Control.
+            </summary>
+        </member>
+        <member name="M:C1.Win.Layout.FlowLayout.#ctor(System.Windows.Forms.FlowLayoutPanel)">
+            <summary>
+            Creates an instanse of <see cref="T:C1.Win.Layout.FlowLayout"/>.
+            </summary>
+            <param name="container"><see cref="T:System.Windows.Forms.FlowLayoutPanel"/> instance to use it as a dashboard.</param>
+        </member>
+        <member name="T:C1.Win.Layout.GridLayout">
+            <summary>
+            Class providing ILayout interface for TableLayoutPanel container that uses Control descendants as itemContainers for Dashboard Layout Control.
+            </summary>
+        </member>
+        <member name="M:C1.Win.Layout.GridLayout.#ctor(System.Windows.Forms.TableLayoutPanel)">
+            <summary>
+            Creates an instanse of <see cref="T:C1.Win.Layout.GridLayout"/>.
+            </summary>
+            <param name="container"><see cref="T:System.Windows.Forms.TableLayoutPanel"/> instance to use it as a dashboard.</param>
+        </member>
+        <member name="T:C1.Win.Layout.Properties.Resources">
+            <summary>
+              A strongly-typed resource class, for looking up localized strings, etc.
+            </summary>
+        </member>
+        <member name="P:C1.Win.Layout.Properties.Resources.ResourceManager">
+            <summary>
+              Returns the cached ResourceManager instance used by this class.
+            </summary>
+        </member>
+        <member name="P:C1.Win.Layout.Properties.Resources.Culture">
+            <summary>
+              Overrides the current thread's CurrentUICulture property for all
+              resource lookups using this strongly typed resource class.
+            </summary>
+        </member>
+        <member name="P:C1.Win.Layout.Properties.Resources.Maximize">
+            <summary>
+              Looks up a localized resource of type System.Drawing.Bitmap.
+            </summary>
+        </member>
+        <member name="P:C1.Win.Layout.Properties.Resources.Restore">
+            <summary>
+              Looks up a localized resource of type System.Drawing.Bitmap.
+            </summary>
+        </member>
+        <member name="T:C1.Win.Layout.Utils.DashboardXmlLoadService">
+            <summary>
+            Loads layouts of <see cref="T:C1.Win.Layout.C1DashboardLayout"/> control from the XML file.
+            </summary>
+        </member>
+        <member name="T:C1.Win.Layout.Utils.DashboardXmlSaveService">
+            <summary>
+            Saves layouts of <see cref="T:C1.Win.Layout.C1DashboardLayout"/> control to the XML file.
+            </summary>
+        </member>
+        <member name="T:C1.Win.Layout.Styles.CommonStyle">
+            <summary>
+            <see cref="T:C1.Win.Layout.Styles.CommonStyle"/> contains display attributes that 
+            determine the general appearance of the control on the screen.
+            </summary>
+        </member>
+        <member name="M:C1.Win.Layout.Styles.CommonStyle.#ctor(C1.Win.Layout.Styles.ThemeProvider)">
+            <summary>
+            Initializes a new instance of the <see cref="T:C1.Win.Layout.Styles.CommonStyle"/>.
+            </summary>
+            <param name="provider">theme provider.</param>
+        </member>
+        <member name="P:C1.Win.Layout.Styles.CommonStyle.Padding">
+            <summary>
+            Gets or sets the thickness of the padding between the element edges and its content.
+            </summary>
+        </member>
+        <member name="P:C1.Win.Layout.Styles.CommonStyle.Margins">
+            <summary>
+            Gets or sets the thickness of the margins around the element.
+            </summary>
+        </member>
+        <member name="P:C1.Win.Layout.Styles.CommonStyle.BackColor">
+            <summary>
+            Gets or sets the <see cref="T:System.Drawing.Color"/> used to paint the background.
+            </summary>
+        </member>
+        <member name="P:C1.Win.Layout.Styles.CommonStyle.DefaultStyle">
+            <summary>
+            Gets a style that contains the default values for current style.
+            </summary>        
+        </member>
+        <member name="M:C1.Win.Layout.Styles.CommonStyle.Copy(C1.Framework.Style)">
+            <summary>
+            Copies properties of the specified style.
+            </summary> 
+            <param name="prototype">specified style.</param>
+        </member>
+        <member name="P:C1.Win.Layout.Styles.CommonStyle.IsDefault">
+            <summary>
+            Gets value indicating whether the style is default.
+            </summary>
+        </member>
+        <member name="M:C1.Win.Layout.Styles.CommonStyle.ApplyTheme(System.Object)">
+            <summary>
+            Applies a new C1Theme to the style.
+            </summary>
+            <param name="newTheme"></param>
+        </member>
+        <member name="T:C1.Win.Layout.Styles.ContainerHeaderStyle">
+            <summary>
+            <see cref="T:C1.Win.Layout.Styles.ContainerHeaderStyle"/> contains display attributes that 
+            determine the appearance of the item container header on the screen.
+            </summary>
+        </member>
+        <member name="M:C1.Win.Layout.Styles.ContainerHeaderStyle.#ctor(C1.Win.Layout.Styles.ThemeProvider)">
+            <summary>
+            Initializes a new instance of the <see cref="T:C1.Win.Layout.Styles.ContainerHeaderStyle"/>.
+            </summary>
+            <param name="provider">theme provider.</param>
+        </member>
+        <member name="P:C1.Win.Layout.Styles.ContainerHeaderStyle.Hot">
+            <summary>
+            Gets or sets <see cref="T:C1.Win.Layout.Styles.BaseContainerHeaderStyle"/> contains display attributes that 
+            determine the general appearance of the ItemContainer Header on the screen when the cursor is over it.
+            </summary>
+        </member>
+        <member name="M:C1.Win.Layout.Styles.ContainerHeaderStyle.Copy(C1.Framework.Style)">
+            <summary>
+            Copies properties of the specified style.
+            </summary> 
+            <param name="prototype">specified style.</param>
+        </member>
+        <member name="P:C1.Win.Layout.Styles.ContainerHeaderStyle.IsDefault">
+            <summary>
+            Gets value indicating whether the style is default.
+            </summary>
+        </member>
+        <member name="M:C1.Win.Layout.Styles.ContainerHeaderStyle.ApplyTheme(System.Object)">
+            <summary>
+            Applies a new C1Theme to the style.
+            </summary>
+            <param name="newTheme"></param>
+        </member>
+        <member name="T:C1.Win.Layout.Styles.BaseContainerHeaderStyle">
+            <summary>
+            <see cref="T:C1.Win.Layout.Styles.BaseContainerHeaderStyle"/> contains display attributes that 
+            determine the base appearance of the item container header on the screen.
+            </summary>
+        </member>
+        <member name="M:C1.Win.Layout.Styles.BaseContainerHeaderStyle.#ctor(C1.Win.Layout.Styles.ThemeProvider,C1.Win.ItemState,C1.Win.StyledPropertyInfo[])">
+            <summary>
+            Initializes a new instance of the <see cref="T:C1.Win.Layout.Styles.BaseContainerHeaderStyle"/>.
+            </summary>
+            <param name="provider">theme provider.</param>
+            <param name="state">the state of the element for which the style is defined.</param>
+            <param name="props">styled properties.</param>
+        </member>
+        <member name="M:C1.Win.Layout.Styles.BaseContainerHeaderStyle.#ctor(C1.Win.Layout.Styles.ThemeProvider,C1.Win.ItemState,C1.Framework.Style,C1.Win.StyledPropertyInfo[])">
+            <summary>
+            Initializes a new instance of the <see cref="T:C1.Win.Layout.Styles.BaseContainerHeaderStyle"/>.
+            </summary>
+            <param name="provider">theme provider.</param>
+            <param name="state">the state of the element for which the style is defined.</param>
+            <param name="style">style to use.</param>
+            <param name="props">styled properties.</param>
+        </member>
+        <member name="P:C1.Win.Layout.Styles.BaseContainerHeaderStyle.BackColor">
+            <summary>
+            Gets or sets the <see cref="T:System.Drawing.Color"/> used to paint the background.
+            </summary>
+        </member>
+        <member name="P:C1.Win.Layout.Styles.BaseContainerHeaderStyle.ForeColor">
+            <summary>
+            Gets or sets the <see cref="T:System.Drawing.Color"/> used to paint the text.
+            </summary>
+        </member>
+        <member name="P:C1.Win.Layout.Styles.BaseContainerHeaderStyle.DefaultStyle">
+            <summary>
+            Gets a style that contains the default values for current style.
+            </summary>
+        </member>
+        <member name="M:C1.Win.Layout.Styles.BaseContainerHeaderStyle.Copy(C1.Framework.Style)">
+            <summary>
+            Copies properties of the specified style.
+            </summary> 
+            <param name="prototype">specified style.</param>
+        </member>
+        <member name="P:C1.Win.Layout.Styles.BaseContainerHeaderStyle.IsDefault">
+            <summary>
+            Gets value indicating whether the style is default.
+            </summary>
+        </member>
+        <member name="M:C1.Win.Layout.Styles.BaseContainerHeaderStyle.ApplyTheme(System.Object)">
+            <summary>
+            Applies a new C1Theme to the style.
+            </summary>
+            <param name="newTheme"></param>
+        </member>
+        <member name="T:C1.Win.Layout.Styles.ItemContainerStyle">
+            <summary>
+            <see cref="T:C1.Win.Layout.Styles.ItemContainerStyle"/> contains display attributes that 
+            determine the appearance of the item container on the screen.
+            </summary>
+        </member>
+        <member name="M:C1.Win.Layout.Styles.ItemContainerStyle.#ctor(C1.Win.Layout.Styles.ThemeProvider)">
+            <summary>
+            Initializes a new instance of the <see cref="T:C1.Win.Layout.Styles.ItemContainerStyle"/>.
+            </summary>
+            <param name="provider">theme provider.</param>
+        </member>
+        <member name="P:C1.Win.Layout.Styles.ItemContainerStyle.ToolIcon">
+            <summary>
+            Gets or sets ToolIcon image.
+            </summary>
+        </member>
+        <member name="P:C1.Win.Layout.Styles.ItemContainerStyle.ToolIconColor">
+            <summary>
+            Gets or sets ToolIcon image color.
+            </summary>
+            <remarks>If the color is different from Transparent than control tries to recolor 
+            the ToolIcon image according to that color otherwise it uses the original colors.</remarks>
+        </member>
+        <member name="P:C1.Win.Layout.Styles.ItemContainerStyle.Padding">
+            <summary>
+            Gets or sets the thickness of the padding between the element edges and its content.
+            </summary>
+        </member>
+        <member name="P:C1.Win.Layout.Styles.ItemContainerStyle.Margins">
+            <summary>
+            Gets or sets the thickness of the margins around the element.
+            </summary>
+        </member>
+        <member name="P:C1.Win.Layout.Styles.ItemContainerStyle.PlaceHolderColor">
+            <summary>
+            Gets or sets the <see cref="T:System.Drawing.Color"/> used to paint the background of the place holder.
+            </summary>
+        </member>
+        <member name="P:C1.Win.Layout.Styles.ItemContainerStyle.Hot">
+            <summary>
+            Gets or sets <see cref="T:C1.Win.Layout.Styles.BaseItemContainerStyle"/> containing display attributes that 
+            determine the general appearance of the ItemContainer on the screen when the cursor is over it.
+            </summary>
+        </member>
+        <member name="M:C1.Win.Layout.Styles.ItemContainerStyle.Copy(C1.Win.BaseStyle)">
+            <summary>
+            Copies properties of the specified style of the same type.
+            </summary> 
+            <param name="prototype">specified style.</param>
+        </member>
+        <member name="M:C1.Win.Layout.Styles.ItemContainerStyle.Copy(C1.Framework.Style)">
+            <summary>
+            Copies properties of the specified style.
+            </summary> 
+            <param name="prototype">specified style.</param>
+        </member>
+        <member name="P:C1.Win.Layout.Styles.ItemContainerStyle.IsDefault">
+            <summary>
+            Gets value indicating whether the style is default.
+            </summary>
+        </member>
+        <member name="M:C1.Win.Layout.Styles.ItemContainerStyle.ApplyTheme(System.Object)">
+            <summary>
+            Applies a new C1Theme to the style.
+            </summary>
+            <param name="newTheme"></param>
+        </member>
+        <member name="T:C1.Win.Layout.Styles.BaseItemContainerStyle">
+            <summary>
+            <see cref="T:C1.Win.Layout.Styles.BaseItemContainerStyle"/> contains display attributes that 
+            determine the base appearance of the item container on the screen.
+            </summary>
+        </member>
+        <member name="M:C1.Win.Layout.Styles.BaseItemContainerStyle.#ctor(C1.Win.Layout.Styles.ThemeProvider,C1.Win.ItemState,C1.Win.StyledPropertyInfo[])">
+            <summary>
+            Initializes a new instance of the <see cref="T:C1.Win.Layout.Styles.BaseItemContainerStyle"/>.
+            </summary>
+            <param name="provider">theme provider.</param>
+            <param name="state">the state of the element for which the style is defined.</param>
+            <param name="props">styled properties.</param>
+        </member>
+        <member name="M:C1.Win.Layout.Styles.BaseItemContainerStyle.#ctor(C1.Win.Layout.Styles.ThemeProvider,C1.Win.ItemState,C1.Framework.Style,C1.Win.StyledPropertyInfo[])">
+            <summary>
+            Initializes a new instance of the <see cref="T:C1.Win.Layout.Styles.BaseItemContainerStyle"/>.
+            </summary>
+            <param name="provider">theme provider.</param>
+            <param name="state">the state of the element for which the style is defined.</param>
+            <param name="style">style to use.</param>
+            <param name="props">styled properties.</param>
+        </member>
+        <member name="P:C1.Win.Layout.Styles.BaseItemContainerStyle.BackColor">
+            <summary>
+            Gets or sets the <see cref="T:System.Drawing.Color"/> used to paint the background.
+            </summary>
+        </member>
+        <member name="P:C1.Win.Layout.Styles.BaseItemContainerStyle.DefaultStyle">
+            <summary>
+            Gets a style that contains the default values for current style.
+            </summary>
+        </member>
+        <member name="M:C1.Win.Layout.Styles.BaseItemContainerStyle.Copy(C1.Framework.Style)">
+            <summary>
+            Copies properties of the specified style.
+            </summary> 
+            <param name="prototype">specified style.</param>
+        </member>
+        <member name="P:C1.Win.Layout.Styles.BaseItemContainerStyle.IsDefault">
+            <summary>
+            Gets value indicating whether the style is default.
+            </summary>
+        </member>
+        <member name="M:C1.Win.Layout.Styles.BaseItemContainerStyle.ApplyTheme(System.Object)">
+            <summary>
+            Applies a new C1Theme to the style.
+            </summary>
+            <param name="newTheme"></param>
+        </member>
+        <member name="T:C1.Win.Layout.Styles.DashboardTheme">
+            <summary>
+            The <see cref="T:C1.Win.Layout.Styles.DashboardTheme"/> class represents the theme for the C1DashboardLayout control 
+            which contains display attributes that determine the appearance of control. 
+            </summary>    
+        </member>
+        <member name="M:C1.Win.Layout.Styles.DashboardTheme.#ctor(C1.Win.Layout.Styles.ThemeProvider)">
+            <summary>
+            Initializes a new instance of the <see cref="T:C1.Win.Layout.Styles.DashboardTheme"/>.
+            </summary>
+            <param name="provider">theme provider.</param>        
+        </member>
+        <member name="P:C1.Win.Layout.Styles.DashboardTheme.Common">
+            <summary>
+            Gets or sets <see cref="T:C1.Win.Layout.Styles.CommonStyle"/> containing display attributes that 
+            determine the general appearance of the control on the screen.
+            </summary>
+        </member>
+        <member name="P:C1.Win.Layout.Styles.DashboardTheme.ContainerHeader">
+            <summary>
+            Gets or sets <see cref="T:C1.Win.Layout.Styles.ContainerHeaderStyle"/> containing display attributes that 
+            determine the general appearance of the ItemContainer on the screen.
+            </summary>
+        </member>
+        <member name="P:C1.Win.Layout.Styles.DashboardTheme.ItemContainer">
+            <summary>
+            Gets or sets <see cref="T:C1.Win.Layout.Styles.ItemContainerStyle"/> containing display attributes that 
+            determine the general appearance of the ItemContainer on the screen.
+            </summary>
+        </member>
+        <member name="P:C1.Win.Layout.Styles.DashboardTheme.DefaultTheme">
+            <summary>
+            Gets a theme that contains the default values for current theme.
+            </summary>
+        </member>
+        <member name="P:C1.Win.Layout.Styles.DashboardTheme.IsDefault">
+            <summary>
+            Gets value indicating whether the theme is default.
+            </summary>        
+        </member>
+        <member name="M:C1.Win.Layout.Styles.DashboardTheme.Clone">
+            <summary>
+            Creates an instance of the <see cref="T:C1.Win.BaseTheme"/> class that is identical to the current <see cref="T:C1.Win.BaseTheme"/> 
+            </summary>
+            <returns>The copy of the current <see cref="T:C1.Win.BaseTheme"/>.</returns>
+        </member>
+        <member name="T:C1.Win.Layout.Styles.ThemeProvider">
+            <summary>
+            ThemeProvider for DashboardTheme. 
+            </summary>
+        </member>
+        <member name="M:C1.Win.Layout.Styles.ThemeProvider.CreateEmptyTheme">
+            <summary>
+            Creates a new instance of an current empty theme.
+            </summary>
+        </member>
+        <member name="T:C1.Win.Layout.Localization.C1DescriptionAttribute">
+            <summary>
+            C1DescriptionAttribute replaces the DescriptionAttribute
+            and uses the StringsManager and Strings classes to
+            return the localized Attribute string.   
+            </summary>
+        </member>
+        <member name="T:C1.Win.Layout.Localization.C1CategoryAttribute">
+            <summary>
+            C1CategoryAttribute replaces the CategoryAttribute
+            and uses the StringsManager and Strings classes to
+            return the localized Attribute string.
+            </summary>
+        </member>
+        <member name="T:C1.Win.Layout.Localization.Strings">
+            <summary>
+            The <see cref="T:C1.Win.Layout.Localization.Strings"/> class contains static properties used for localization.
+            </summary>
+        </member>
+        <member name="P:C1.Win.Layout.Localization.Strings.ResourceManager">
+            <summary>
+            The <see cref="P:C1.Win.Layout.Localization.Strings.ResourceManager"/> object used for lookup resources.
+            </summary>
+            <remarks>Set this property to the valid value if 
+            you define resources in a Custom Control assembly.</remarks>
+        </member>
+        <member name="P:C1.Win.Layout.Localization.Strings.UICulture">
+            <summary>
+            Returns default <see cref="T:System.Globalization.CultureInfo"/> object used as fallback culture.
+            </summary>
+        </member>
+        <member name="T:C1.Win.Localization.EndUserLocalizeOptionsAttribute">
+            <summary>
+            Allows to redefine default end user localize options for property, field or class.
+            </summary>
+        </member>
+        <member name="M:C1.Win.Localization.EndUserLocalizeOptionsAttribute.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:C1.Win.Localization.EndUserLocalizeOptionsAttribute"/> attribute.
+            </summary>
+        </member>
+        <member name="M:C1.Win.Localization.EndUserLocalizeOptionsAttribute.#ctor(System.String[])">
+            <summary>
+            Initializes a new instance of the <see cref="T:C1.Win.Localization.EndUserLocalizeOptionsAttribute"/> attribute.
+            </summary>
+            <param name="properties"></param>
+        </member>
+        <member name="M:C1.Win.Localization.EndUserLocalizeOptionsAttribute.#ctor(System.Boolean)">
+            <summary>
+            Initializes a new instance of the <see cref="T:C1.Win.Localization.EndUserLocalizeOptionsAttribute"/> attribute.
+            </summary>
+            <param name="exclude"></param>
+        </member>
+        <member name="P:C1.Win.Localization.EndUserLocalizeOptionsAttribute.Properties">
+            <summary>
+            Defines the list of properties that should be localized.
+            </summary>
+        </member>
+        <member name="P:C1.Win.Localization.EndUserLocalizeOptionsAttribute.ExcludedMembers">
+            <summary>
+            Defines a list of members of control that should be excluded from localization.
+            Currently used only AddControlToResources application for automatically generating
+            control resources.
+            </summary>
+        </member>
+        <member name="P:C1.Win.Localization.EndUserLocalizeOptionsAttribute.Exclude">
+            <summary>
+            If true then class, property or field will be not displayed for 
+            enduser localization.
+            </summary>
+        </member>
+        <member name="P:C1.Win.Localization.EndUserLocalizeOptionsAttribute.Description">
+            <summary>
+            Gets the description of string that will be displayed in the
+            end user localizer in design-time.
+            </summary>
+        </member>
+        <member name="P:C1.Win.Localization.EndUserLocalizeOptionsAttribute.StringsType">
+            <summary>
+            Gets or sets type providing string used to localize <see cref="P:C1.Win.Localization.EndUserLocalizeOptionsAttribute.Description"/>.
+            </summary>
+        </member>
+        <member name="P:C1.Win.Localization.EndUserLocalizeOptionsAttribute.Key">
+            <summary>
+            Gets or sets resource key containing localized string for <see cref="P:C1.Win.Localization.EndUserLocalizeOptionsAttribute.Description"/>.
+            </summary>
+        </member>
+        <member name="T:C1.Win.Localization.C1DescriptionAttribute">
+            <summary>
+            C1DescriptionAttribute replaces the DescriptionAttribute
+            and uses the StringsManager and Strings classes to
+            return the localized Attribute string.
+            </summary>
+        </member>
+        <member name="M:C1.Win.Localization.C1DescriptionAttribute.#ctor(System.Type,System.String,System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:C1.Win.Localization.C1DescriptionAttribute"/> attribute.
+            </summary>
+            <param name="stringsType">The <see cref="T:System.Type"/> defining string properties.</param>
+            <param name="key">The key value used to keep specific string description.</param>
+            <param name="description">Default non-localized description text.</param>
+        </member>
+        <member name="M:C1.Win.Localization.C1DescriptionAttribute.#ctor(System.Type,System.String,System.String,System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:C1.Win.Localization.C1DescriptionAttribute"/> attribute.
+            </summary>
+            <param name="stringsType">The <see cref="T:System.Type"/> defining string properties.</param>
+            <param name="key">The key value used to keep specific string description.</param>
+            <param name="formatDescription">Default non-localized description text.</param>
+            <param name="ag0">Argument for formatDescription parameter.</param>
+        </member>
+        <member name="P:C1.Win.Localization.C1DescriptionAttribute.Description">
+            <summary>
+            Returns localized description text if it is available or default value 
+            </summary>
+        </member>
+        <member name="T:C1.Win.Localization.C1CategoryAttribute">
+            <summary>
+            C1CategoryAttribute replaces the CategoryAttribute
+            and uses the StringsManager and Strings classes to
+            return the localized Attribute string.
+            </summary>
+        </member>
+        <member name="M:C1.Win.Localization.C1CategoryAttribute.#ctor(System.Type,System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:C1.Win.Localization.C1CategoryAttribute"/> attribute.
+            </summary>
+            <param name="stringsType">The <see cref="T:System.Type"/> defining string properties.</param>
+            <param name="categoryName">Default non-localized category name.</param>
+        </member>
+        <member name="M:C1.Win.Localization.C1CategoryAttribute.#ctor(System.Type,System.String,System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:C1.Win.Localization.C1CategoryAttribute"/> attribute.
+            </summary>
+            <param name="stringsType">The <see cref="T:System.Type"/> defining string properties.</param>
+            <param name="key">The key value used to keep specific category.</param>
+            <param name="categoryName">Default non-localized category name.</param>
+        </member>
+        <member name="M:C1.Win.Localization.C1CategoryAttribute.GetLocalizedString(System.String)">
+            <summary>
+            Looks up the localized name of the specified category.
+            </summary>
+            <param name="value">The identifer for the category to look up.</param>
+            <returns>The localized name of the category, or null if a localized name does not exist.</returns>
+        </member>
+        <member name="T:C1.Win.Localization.StringsManager">
+            <summary>
+            The utility class which handles localization tasks.
+            </summary>
+        </member>
+        <member name="M:C1.Win.Localization.StringsManager.GetC1BuiltinResourceStream(System.String,System.Reflection.Assembly,System.String)">
+            <summary>
+            Returns ResourceStream for "official" resources
+            that provided only by C1, typicallly those resources contains
+            design-time strings.
+            Those resources can be only in main control assembly like C1.C1Preview.2.dll 
+            and name of resource should have following format:
+            CulturePrefix.StringsTypeName
+            for example:
+            ja.C1.C1Preview.Design.DesignStrings.resx
+            </summary>
+            <param name="resourceName"></param>
+            <param name="assembly"></param>
+            <param name="cultureName"></param>
+            <returns></returns>
+        </member>
+        <member name="M:C1.Win.Localization.StringsManager.GetResourceStream(System.String,System.Reflection.Assembly,System.String,System.Boolean)">
+            <summary>
+            Searches for standard resources which looks like BlaBla.Strings.CultureName.resx,
+            like C1.Win.C1Preview.Strings.zh.resx or C1.Win.C1Preview.Strings.resx etc.
+            Ensures that resource is not *C1* built-in resource, i.e. its name DOES NOT HAVE format
+            like
+            CultureName.BlaBla.Strings.resx, otherwise bug can occur if entry assembly 
+            have C1 builtin resources as in case of C1 executables like C1ThemeDesigner or C1FlexReportDesigner.
+            For example C1ThemeDesigner have ja.C1ThemeDesigner.Strings.resx resource
+            and this resource *SHOULD BE IGNORED* if  resouceName is "C1ThemeDesigner.Strings.resx" and
+            cultureName is "" (invariant).
+            </summary>
+            <param name="resourceName"></param>
+            <param name="assembly"></param>
+            <param name="cultureName"></param>
+            <param name="searchInSatelliteOnly"></param>
+            <returns></returns>
+        </member>
+        <member name="M:C1.Win.Localization.StringsManager.GetParentCulture(System.String)">
+            <summary>
+            Returns the parent of the CultureInfo passed in. Differs from ci.Parent
+            in that while ci can be equal to ci.Parent, this method it never returns
+            the passed ci itself, rather it would return null.
+            Also this function has special handling for chinese culture.
+            Under NET2 it returns "zh" culture name for
+            neutral "zh-Hans" and "zh-Hant" chinese cultures, under
+            NET2 "zh" is not exists.
+            </summary>
+            <param name="cultureName">The culture name to get parent for.</param>
+            <returns>The parent of the culture info, or null.</returns>
+        </member>
+        <member name="T:C1.Util.Win.Win32.DM">
+            <summary>
+            Fiels of DEVMODE structure.
+            </summary>
+        </member>
+        <member name="T:C1.Util.Win.Win32.GetDeviceCapsConsts">
+            <summary>
+            GetDeviceCaps() constants
+            </summary>
+        </member>
+        <member name="T:C1.Util.Win.Win32.SORT">
+            <summary>
+            Sorting IDs.
+            </summary>
+        </member>
+        <member name="T:C1.Util.Win.Win32.LANG">
+            <summary>
+            Primary language IDs.
+            </summary>
+        </member>
+        <member name="T:C1.Util.Win.Win32.SUBLANG">
+             <summary>
+              Sublanguage IDs.
+            
+              The name immediately following SUBLANG_ dictates which primary
+              language ID that sublanguage ID can be combined with to form a
+              valid language ID.
+             </summary>
+        </member>
+        <member name="T:C1.Util.Win.Win32.LOCALE">
+            <summary>
+            Locale Types.
+            </summary>
+        </member>
+        <member name="T:C1.Util.Win.Win32.FixFpu">
+            <summary>
+            usage:
+             using (FixFpu ff = new FixFpu())
+             { do printer stuff }
+            or
+             do printer stuff
+             FixFpu.Doit();
+            </summary>
+        </member>
+        <member name="M:C1.Util.Win.Win32.LOWORDU(System.IntPtr)">
+            <summary>
+            Retrieves the low-order word from the specified value. This function handles the message parameters of window. See in MSDN which function used to process the message.
+            </summary>
+            <param name="value">The value to be converted.</param>
+            <returns>The return value is the low-order word of the specified value.</returns>
+            <remarks>
+            Use:
+            WM_COMMAND, WM_SYSCOMMAND
+            WM_SETCURSOR
+            WM_ACTIVATE
+            WM_MENUCHAR
+            WM_HSCROLL WM_VSCROLL - SB_THUMBPOSITION or SB_THUMBTRACK
+            </remarks>
+        </member>
+        <member name="M:C1.Util.Win.Win32.HIWORDU(System.IntPtr)">
+            <summary>
+            Retrieves the high-order word from the specified value. This function handles the message parameters of window. See in MSDN which function used to process the message.
+            </summary>
+            <param name="value">The value to be converted.</param>
+            <returns>The return value is the high-order word of the specified value.</returns>
+            <remarks>
+            WM_HSCROLL WM_VSCROLL -  current position of the scroll box
+            </remarks>
+        </member>
+        <member name="M:C1.Util.Win.Win32.GET_X_LPARAM(System.IntPtr)">
+            <summary>
+            Retrieves the signed x-coordinate from the given value. 
+            This function handles the message parameters of window and is a replacement for LOWORD because LOWORD must return the unsigned value. 
+            See in MSDN which function used to process the message.
+            </summary>
+            <param name="lParam">The value to be converted.</param>
+            <returns>The return value is the low-order int of the specified value.</returns>
+            <remarks>
+            Use:
+            WM_CONTEXTMENU,
+            WM_MOUSEDOWN, WM_MOUSEUP, WM_MOUSEWHEEL, WM_MOUSEMOVE
+            </remarks>
+        </member>
+        <member name="M:C1.Util.Win.Win32.GET_Y_LPARAM(System.IntPtr)">
+            <summary>
+            Retrieves the signed y-coordinate from the given value. 
+            This function handles the message parameters of window and is a replacement for HIWORD because HIWORD must return the unsigned value. 
+            See in MSDN which function used to process the message.
+            </summary>
+            <param name="lParam">The value to be converted.</param>
+            <returns>The return value is the high-order int of the specified value.</returns>
+            <remarks>
+            Use:
+            WM_CONTEXTMENU,
+            WM_MOUSEDOWN, WM_MOUSEUP, WM_MOUSEWHEEL, WM_MOUSEMOVE
+            </remarks>
+        </member>
+        <member name="M:C1.Util.Win.Win32.GET_WHEEL_DELTA_WPARAM(System.IntPtr)">
+            <summary>
+            Retrieves the wheel-delta value from the specified WPARAM value.
+            </summary>
+            <param name="wParam">The value to be converted.</param>
+            <returns>
+            The return value is the high-order word representing the wheel-delta value. 
+            It indicates the distance that the wheel is rotated, expressed in multiples or divisions of WHEEL_DELTA, which is 120. A positive value indicates that the wheel was rotated forward, away from the user; 
+            a negative value indicates that the wheel was rotated backward, toward the user.
+            </returns>
+            <remarks>
+            Use:
+            WM_MOUSEWHEEL - zDelta 
+            </remarks>
+        </member>
+        <member name="M:C1.Util.Win.Win32.GET_KEYSTATE_WPARAM(System.IntPtr)">
+            <summary>
+            Retrieves the state of certain virtual keys from the specified WPARAM value.
+            </summary>
+            <param name="wParam">The value to be converted.</param>
+            <returns>
+            The return value is the low-order word representing the virtual key state.
+            </returns>
+            <remarks>
+            Use:
+            WM_MOUSEWHEEL - fwKeys  
+            </remarks>
+        </member>
+        <member name="F:C1.Util.Win.Win32.C1PdfAcrofieldType.None">
+            <summary>A field type invalid or not found.</summary>
+        </member>
+        <member name="T:C1.Util.Win.Win32.SC">
+            <summary>
+            System Menu Command Values
+            </summary>
+        </member>
+        <member name="T:C1.Util.Win.Win32.SWP">
+            <summary>
+            SetWindowPos flags.
+            </summary>
+        </member>
+        <member name="T:C1.Util.Win.Win32.CDS">
+            <summary>
+            Flags for ChangeDisplaySettings() function.
+            </summary>
+        </member>
+        <member name="T:C1.Util.Win.Win32.DISP">
+            <summary>
+            Return values of the ChangeDisplaySettings() function.
+            </summary>
+        </member>
+        <member name="T:C1.Util.Win.Win32.WM">
+            <summary>
+            Windows messages.
+            </summary>
+        </member>
+        <member name="T:C1.Util.Win.Win32.EM">
+            <summary>
+            EditControl window messages.
+            </summary>
+        </member>
+        <member name="T:C1.Util.Win.Win32.SB">
+            <summary>
+            WM_HSCROLL and WM_VSCROLL notifications codes.
+            </summary>
+        </member>
+        <member name="T:C1.Util.Win.Win32.BST">
+            <summary>
+            BM_GETSTATE flags.
+            </summary>
+        </member>
+        <member name="T:C1.Util.Win.Win32.BM">
+            <summary>
+            BM_XXX flags.
+            </summary>
+        </member>
+        <member name="T:C1.Util.Win.Win32.ODT">
+            <summary>
+            DRAWITEMSTRUCT control types.
+            </summary>
+        </member>
+        <member name="T:C1.Util.Win.Win32.ODA">
+            <summary>
+            DRAWITEMSTRUCT drawing actions.
+            </summary>
+        </member>
+        <member name="T:C1.Util.Win.Win32.ODS">
+            <summary>
+            DRAWITEMSTRUCT visual states.
+            </summary>
+        </member>
+        <member name="T:C1.Util.Win.Win32.C1">
+            <summary>
+            ComponentOne constants.
+            </summary>
+        </member>
+        <member name="T:C1.Util.Win.Win32.RasterOperationCodes">
+            <summary>
+            Specifies a raster-operation code, used by BitBlt function and other.
+            </summary>
+        </member>
+        <member name="T:C1.Util.Win.Win32.SW">
+            <summary>
+            ShowWindow() function codes.
+            </summary>
+        </member>
+        <member name="T:C1.Util.Win.Win32.PRF">
+            <summary>
+            WM_PRINT drawing options.
+            </summary>
+        </member>
+        <member name="T:C1.Util.Win.Win32.SF">
+            <summary>
+            Rich edit data format types.
+            </summary>
+        </member>
+        <member name="T:C1.Util.Win.Win32.SFF">
+            <summary>
+            Rich edit data format replacement options.
+            </summary>
+        </member>
+        <member name="T:C1.Util.Win.Win32.SCF">
+            <summary>
+            EM_SETCHARFORMAT / EM_GETCHARFORMAT flags.
+            </summary>
+        </member>
+        <member name="T:C1.Util.Win.Win32.PFM">
+            <summary>
+            EM_SETPARAFORMAT / EM_GETPARAFORMAT flags.
+            </summary>
+        </member>
+        <member name="T:C1.Util.Win.Win32.CFM">
+            <summary>
+            CHARFORMAT mask values.
+            </summary>
+        </member>
+        <member name="T:C1.Util.Win.Win32.CFE">
+            <summary>
+            CHARFORMAT effects.
+            </summary>
+        </member>
+        <member name="T:C1.Util.Win.Win32.TO">
+            <summary>
+            EM_SETTYPOGRAPHYOPTIONS flags.
+            </summary>
+        </member>
+        <member name="T:C1.Util.Win.Win32.TA">
+            <summary>
+            Text Alignment Options.
+            </summary>
+        </member>
+        <member name="T:C1.Util.Win.Win32.DCX">
+            <summary>
+            GetDCEx() flags.
+            </summary>
+        </member>
+        <member name="T:C1.Util.Win.Win32.GW">
+            <summary>
+            GetWindow() Constants.
+            </summary>
+        </member>
+        <member name="T:C1.Util.Win.Win32.GA">
+            <summary>
+            GetAncestor() constants.
+            </summary>
+        </member>
+        <member name="T:C1.Util.Win.Win32.ETO">
+            <summary>
+            ExtTextOut() flags.
+            </summary>
+        </member>
+        <member name="T:C1.Util.Win.Win32.SetBkModeConsts">
+            <summary>
+            SetBkMode modes.
+            </summary>
+        </member>
+        <member name="T:C1.Util.Win.Win32.OBJ">
+            <summary>
+            GetObjectType() returning values.
+            </summary>
+        </member>
+        <member name="T:C1.Util.Win.Win32.TMPF">
+            <summary>
+            TEXTMETRIC tmPitchAndFamily flags.
+            </summary>
+        </member>
+        <member name="T:C1.Util.Win.Win32.NTM">
+            <summary>
+            Values for NETTEXMETRIC.ntmFlags.
+            </summary>
+        </member>
+        <member name="T:C1.Util.Win.Win32.OLE">
+            <summary>
+            OLE constants.
+            </summary>
+        </member>
+        <member name="T:C1.Util.Win.Win32.WS">
+            <summary>
+            CreateWindow() flags.
+            </summary>
+        </member>
+        <member name="T:C1.Util.Win.Win32.WS_EX">
+            <summary>
+            Extended Window Styles
+            </summary>
+        </member>
+        <member name="T:C1.Util.Win.Win32.ES">
+            <summary>
+            CreateWindow() flags for edit controls.
+            </summary>
+        </member>
+        <member name="T:C1.Util.Win.Win32.DFC">
+            <summary>
+            DrawFrameControl(), type of frame control to draw.
+            </summary>
+        </member>
+        <member name="T:C1.Util.Win.Win32.DFCS">
+            <summary>
+            DrawFrameControl(), state of control.
+            </summary>
+        </member>
+        <member name="T:C1.Util.Win.Win32.PS">
+            <summary>
+            CreatePen() flags
+            </summary>
+        </member>
+        <member name="T:C1.Util.Win.Win32.GWL">
+            <summary>
+            SetWindowLong() flags.
+            </summary>
+        </member>
+        <member name="T:C1.Util.Win.Win32.GR">
+            <summary>
+            GetGuiResources() flags.
+            </summary>
+        </member>
+        <member name="T:C1.Util.Win.Win32.RGN">
+            <summary>
+            ExtSelectClipRgn() flags.
+            </summary>
+        </member>
+        <member name="T:C1.Util.Win.Win32.ScrollWindowFlags">
+            <summary>
+            ScrollWindowEx flags
+            </summary>
+        </member>
+        <member name="T:C1.Util.Win.Win32.MA">
+            <summary>
+            WM_MOUSEACTIVATE Return Codes
+            </summary>
+        </member>
+        <member name="T:C1.Util.Win.Win32.RasterOp">
+            <summary>
+            Constants for SetROP2
+            </summary>
+        </member>
+        <member name="T:C1.Util.Win.Win32.ASSOCF">
+            <summary>
+            Defines ASSOCF values for AssocQueryString method's first parameter (flags).
+            </summary>
+        </member>
+        <member name="T:C1.Util.Win.Win32.ASSOCSTR">
+            <summary>
+            Defines ASSOCSTR values for AssocQueryString method's second parameter (str).
+            </summary>
+        </member>
+        <member name="M:C1.Util.Win.Win32.AssocQueryString(System.Int32,System.Int32,System.String,System.String,System.Text.StringBuilder,System.UInt32@)">
+            <summary>
+            Gets file-association string from the registry.
+            </summary>
+            <param name="flags">Use <see cref="T:C1.Util.Win.Win32.ASSOCF"/> constants.</param>
+            <param name="str">Use <see cref="T:C1.Util.Win.Win32.ASSOCSTR"/> constants.</param>
+            <param name="pszAssoc"></param>
+            <param name="pszExtra"></param>
+            <param name="pszOut"></param>
+            <param name="pcchOut"></param>
+            <returns>An <see cref="T:C1.Util.Win.Win32.OLE"/> success/error code.</returns>
+            <remarks>
+            To get associated exe's length/exe:
+            <code>
+            uint assocLen = 0;
+            AssocQueryString(ASSOCF.ASSOCF_INIT_DEFAULTTOSTAR,ASSOCSTR.ASSOCSTR_EXECUTABLE,Path.GetExtension(OutputFileName),"open",null,ref assocLen);
+            </code>
+            For existing files, another option is FindExecutable.
+            </remarks>
+        </member>
+        <member name="P:C1.Util.Win.Win32.Gdip.AtomName">
+            <summary>
+            Name of Atom create by GDI+ for current thread.
+            </summary>
+        </member>
+        <member name="P:C1.Util.Win.Win32.Gdip.IsShutdown">
+            <summary>
+            Gets true if GDI+ currently shutdown.
+            </summary>
+        </member>
+        <member name="T:C1.Util.Licensing.AssemblyNames">
+            <summary>
+            Specifies assembly name parts, used by AssemblyCommonInfo to generate actual assembly names.
+            </summary>
+        </member>
+        <member name="F:C1.Util.Licensing.AboutForm.components">
+            <summary>
+            Required designer variable.
+            </summary>
+        </member>
+        <member name="M:C1.Util.Licensing.AboutForm.Dispose(System.Boolean)">
+            <summary>
+            Clean up any resources being used.
+            </summary>
+            <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+        </member>
+        <member name="M:C1.Util.Licensing.AboutForm.InitializeComponent">
+            <summary>
+            Required method for Designer support - do not modify
+            the contents of this method with the code editor.
+            </summary>
+        </member>
+        <member name="T:C1.Util.Licensing.ProviderInfo">
+            <summary>
+            <para>Provides static <see cref="M:C1.Util.Licensing.ProviderInfo.Validate(System.Type,System.Object)"/> methods that 
+            should be called from the constructors of licensed classes.</para>
+            <para>Also provides a static <see cref="M:C1.Util.Licensing.ProviderInfo.ShowAboutBox(System.Object)"/> method that can 
+            be called to show the about box with product and licensing information.</para>
+            </summary>
+        </member>
+        <member name="M:C1.Util.Licensing.ProviderInfo.Validate(System.Type,System.Object)">
+            <summary>
+            Perform license validation. Call this method from the licensed object's 
+            constructor to save a license key at design time, validate it at runtime, 
+            and display a nag dialog if a valid license is not found.
+            </summary>
+            <param name="type">Type of licensed object (use typeof() and not GetType()).</param>
+            <param name="instance">Reference to the licensed object (not currently used).</param>
+            <returns>A <see cref="T:C1.Util.Licensing.LicenseInfo"/> object that contains information about the license.</returns>
+            <remarks>
+            <para>Check the <b>ShouldNag</b> property of the returned <see cref="T:C1.Util.Licensing.LicenseInfo"/> 
+            to determine whether the licensed class should nag the user. This value is set
+            to true in situations where a valid license was not found but a nag dialog
+            could not be displayed. In these cases, the licensed class is supposed to nag
+            in some other way (with a watermark for example).</para>
+            </remarks>
+        </member>
+        <member name="M:C1.Util.Licensing.ProviderInfo.Validate(System.Type,System.Object,System.Boolean)">
+            <summary>
+            Perform license validation. Call this method from the licensed object's 
+            constructor to save a license key at design time, validate it at runtime, 
+            and display a nag dialog if a valid license is not found.
+            </summary>
+            <param name="type">Type of licensed object (use typeof() and not GetType()).</param>
+            <param name="instance">Reference to the licensed object (not currently used).</param>
+            <param name="showNagDialog">Whether the nag dialog should be displayed when a valid license is not found.</param>
+            <returns>A <see cref="T:C1.Util.Licensing.LicenseInfo"/> object that contains information about the license.</returns>
+            <remarks>
+            <para>This overload was created for use in WPF. It should be called in the control's constructor
+            in order to support license persistence correctly. But it should not show the nag dialog until the
+            control is fully loaded, or the VS designer may remain blank.</para>
+            <para>So the solution is this:</para>
+            <code>
+            LicenseInfo _licInfo;
+            public LicensedControl()
+            {
+              // check license but don't nag yet
+              _licInfo = ProviderInfo.Validate(typeof(LicensedControl), this, false);
+              
+              // perform licensing after control is fully loaded
+              Loaded += LicensedControl_Loaded;
+            }
+            void LicensedControl_Loaded(object sender, RoutedEventArgs e)
+            {
+              // nag after loading
+              if (_licInfo.ShouldNag)
+              {
+                ProviderInfo.ShowAboutBox(this);
+              }
+            }
+            </code>
+            </remarks>
+        </member>
+        <member name="M:C1.Util.Licensing.ProviderInfo.Nag(System.Type,C1.Util.Licensing.LicenseInfo,System.Boolean)">
+            <summary>
+            Nag user by showing AboutBox with license information.
+            Show it only once per day per assembly.
+            </summary>
+            <param name="type">Type of licensed object (use typeof() and not GetType()).</param>
+            <param name="li"><see cref="T:C1.Util.Licensing.LicenseInfo"/> object that contains information about the license.</param>
+            <param name="designTime">Whether we're running at design or run time.</param>
+        </member>
+        <member name="M:C1.Util.Licensing.ProviderInfo.Validate(System.Type,System.Object,System.Reflection.Assembly,System.String)">
+            <summary>
+            Version of Validate used by constructors that take runtime keys.
+            </summary>
+            <param name="type">Type of licensed object (use typeof() and not GetType()).</param>
+            <param name="instance">Reference to the licensed object.</param>
+            <param name="callingAsm">Assembly that contains the owner licensed control.</param>
+            <param name="runtimeKey">Any valid C1 runtime key.</param>
+            <returns>A <see cref="T:C1.Util.Licensing.LicenseInfo"/> with information about the runtime key.</returns>
+            <remarks>
+            <para>This allows a licensed C1 class to create other C1 objects bypassing 
+            license verification for the child objects.</para>
+            <para>For extra safety, we check that the owner object is defined in an assembly
+            the contains a 'C1ProductInfo' attribute.</para>
+            </remarks>
+        </member>
+        <member name="M:C1.Util.Licensing.ProviderInfo.ValidateDesigntime(System.Type,System.ComponentModel.LicenseContext)">
+            <summary>
+            Design time validation. Looks for a license in the registry and saves it in the
+            provided <see cref="T:System.ComponentModel.LicenseContext"/>.
+            </summary>
+            <param name="type">Type of licensed object (use typeof() and not GetType()).</param>
+            <param name="context"><see cref="T:System.ComponentModel.LicenseContext"/> where the runtime key will be stored.</param>
+            <returns>A <see cref="T:C1.Util.Licensing.LicenseInfo"/> with information about the license.</returns>
+            <remarks>
+            Call this method from application-type products (that always require a license to be
+            installed in the registry). In this case, the <paramref name="context"/> parameter 
+            should be set to null.
+            </remarks>
+        </member>
+        <member name="M:C1.Util.Licensing.ProviderInfo.ValidateRuntime(System.Type,System.ComponentModel.LicenseContext)">
+            <summary>
+            Runtime validation.
+            Looks for a runtime key stored in the current application's resources.
+            </summary>
+            <param name="type">Type of licensed object (use typeof() and not GetType()).</param>
+            <param name="context"><see cref="T:System.ComponentModel.LicenseContext"/> where the runtime key will be stored.</param>
+            <returns>A <see cref="T:C1.Util.Licensing.LicenseInfo"/> with information about the license.</returns>
+        </member>
+        <member name="M:C1.Util.Licensing.ProviderInfo.ShowAboutBox(System.Object)">
+            <summary>
+            Shows the About Box for an instance of a C1 product.
+            </summary>
+        </member>
+        <member name="M:C1.Util.Licensing.ProviderInfo.GetC1Type(System.Object)">
+            <summary>
+            Get the type whose assembly contains a 'C1ProductInfoAttribute'.
+            </summary>
+            <param name="instance">Instance of an object whose type is to be checked.</param>
+            <returns>The type whose assembly contains a 'C1ProductInfoAttribute'</returns>
+        </member>
+        <member name="T:C1.Util.Licensing.LicenseInfo">
+            <summary>
+            Contains information about a license stored in an application.
+            </summary>
+        </member>
+        <member name="M:C1.Util.Licensing.LicenseInfo.#ctor(System.Type,C1.Util.Licensing.LicenseStatus,C1.Util.Licensing.ProductLicense)">
+            <summary>
+            Initializes a new instance of a <see cref="T:C1.Util.Licensing.LicenseInfo"/> class.
+            </summary>
+        </member>
+        <member name="M:C1.Util.Licensing.LicenseInfo.#ctor(System.Type,C1.Util.Licensing.LicenseStatus)">
+            <summary>
+            Initializes a new instance of a <see cref="T:C1.Util.Licensing.LicenseInfo"/> class.
+            </summary>
+        </member>
+        <member name="P:C1.Util.Licensing.LicenseInfo.LicenseStatus">
+            <summary>
+            Gets or sets the status of this license (valid, expired, unlicensed).
+            </summary>
+        </member>
+        <member name="P:C1.Util.Licensing.LicenseInfo.License">
+            <summary>
+            Gets or sets the <see cref="T:C1.Util.Licensing.ProductLicense"/> associated with this license.
+            </summary>
+        </member>
+        <member name="P:C1.Util.Licensing.LicenseInfo.Type">
+            <summary>
+            Gets or sets the <see cref="P:C1.Util.Licensing.LicenseInfo.Type"/> associated with this license.
+            </summary>
+        </member>
+        <member name="P:C1.Util.Licensing.LicenseInfo.EvaluationDaysElapsed">
+            <summary>
+            Gets the number of evaluation days elapsed.
+            Returns -1 for valid licenses.
+            </summary>
+        </member>
+        <member name="P:C1.Util.Licensing.LicenseInfo.EvaluationDaysLeft">
+            <summary>
+            Gets the number of evaluation days still left.
+            </summary>
+        </member>
+        <member name="P:C1.Util.Licensing.LicenseInfo.ShouldNag">
+            <summary>
+            Gets or sets a value that determines whether the caller should
+            nag the user. This is the case when the component/control is 
+            not licensed, but is not running in interactive mode. So we can't
+            show a dialog and the caller is supposed to nag some other way
+            (typically by adding watermarks to the UI or output).
+            </summary>
+        </member>
+        <member name="P:C1.Util.Licensing.LicenseInfo.IsValid">
+            <summary>
+            Gets a value that determines whether the license found is valid.
+            </summary>
+        </member>
+        <member name="P:C1.Util.Licensing.LicenseInfo.IsExpired">
+            <summary>
+            Gets a value that determines whether the license found is expired.
+            </summary>
+        </member>
+        <member name="P:C1.Util.Licensing.LicenseInfo.IsLocalHost">
+            <summary>
+            Gets a value that determines whether the component is running under
+            localhost and therefore should not nag the user with alert dialogs.
+            </summary>
+        </member>
+        <member name="T:C1.Util.Licensing.SafeLicenseContext">
+            <summary>
+            
+            Provides a version of GetSavedLicenseKey that doesn't require
+            special permissions.
+            
+            The code was mostly copied from the .NET framework, but then changed 
+            in a few places to require fewer permissions (assembly name, file io, 
+            etc). 
+            
+            The main change is the use of a custom deserializer to read Hashtable 
+            objects instead of the original BinaryFormatter, which requires
+            permissions.
+            
+            </summary>
+        </member>
+        <member name="T:C1.Util.Licensing.C1AboutNameAttribute">
+            <summary>
+            Attribute used to specify the product name shown on the About Box.
+            </summary>
+        </member>
+        <member name="T:C1.Util.Licensing.C1ProductInfoAttribute">
+            <summary>
+            Attribute used to attach licensing/product information to assemblies.
+            </summary>
+        </member>
+        <member name="T:C1.Util.Licensing.ProductLicense">
+            <summary>
+            Represents a license for a product (e.g. C1BarCode, C1Studio Enterprise).
+            
+            Provides methods for:
+            - generating new license keys (administrative task)
+            - checking license key validity (used by installer and products)
+            - generating and checking runtime keys (used by products)
+            - installing/uninstalling licenses (used by installer)
+            
+            The install/uninstall code requires elevated permissions, and is
+            used only by setups and utilities (not by controls). The code is 
+            implemented in the ProductLicense.Installer.cs, which controls should
+            not include since it won't be useful to them.
+            
+            When a product is sold, we send the user a license KEY. The user installs
+            a license on his machine by providing his name, his company name, and the 
+            key.
+            
+            The <see cref="P:C1.Util.Licensing.ProductLicense.Key"/> is a string in the following format:
+            
+                AAQYYCC-XX-NNNNNN-DD-DZZZZZZ
+                
+            Where:
+            
+                AA:     Product code (should match one of the products in the 
+                        product catalog (see ProductInformation.GetProductCatalog()).
+                Q:      Quarter when the license key was issued (1, 2, or 3)
+                YY:     Year when the license key was issued (e.g., 10 for 2010)
+                CC:     Order code, two chars that indicate whether this is a 
+                        new sale, upgrade, renewal, special offer, etc.
+                XX:     Hash code to ensure key validity.
+                NNNNNN: Unique serial number.
+                DDD:    Vendor code, three chars
+                ZZZZZZ: Combination of random numbers for uniqueness and extra hash.
+                
+            </summary>
+        </member>
+        <member name="F:C1.Util.Licensing.VersionConst.VerString">
+            <summary>
+            WinForms version string representation (4 dot-delimited numbers).
+            </summary>
+        </member>
+        <member name="F:C1.Util.Licensing.VersionConst.VersionStr">
+            <summary>
+            Same as <see cref="F:C1.Util.Licensing.VersionConst.VerString"/>.
+            </summary>
+        </member>
+        <member name="F:C1.Util.Licensing.VersionConst.VerAsmName">
+            <summary>
+            For .NET 4.0 version only, used for designer assembly names.
+            </summary>
+        </member>
+        <member name="T:C1.Util.Localization.C1DescriptionAttribute">
+            <summary>
+            C1DescriptionAttribute replaces the DescriptionAttribute
+            and uses the C1Localizer class to return the localized Attribute string
+            </summary>
+        </member>
+        <member name="T:C1.Util.Localization.C1CategoryAttribute">
+            <summary>
+            C1CategoryAttribute replaces the CategoryAttribute
+            and uses the C1Localizer class to return the localized Attribute string
+            </summary>
+        </member>
+        <member name="T:C1.Util.Localization.C1Localizer">
+            <summary>
+            Localization tables and methods for looking up localized strings.
+            </summary>
+        </member>
+        <member name="T:C1.Util.Localization.StringTables">
+            <summary>
+            StringTables
+            this class contains a single static method InitTables that populates the
+            tables used by the Localizer class.
+            </summary>
+        </member>
+    </members>
+</doc>

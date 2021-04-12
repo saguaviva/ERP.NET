@@ -1,0 +1,2828 @@
+Imports CoreLab.MySql
+Imports Excel = Microsoft.Office.Interop.Excel
+
+'COLORES
+'CYCO
+'0; 109; 91 (OSCURO)
+'219; 222; 105 (CLARO)
+Public Class clsImpresionPAFPO
+
+#Region "VARIABLES"
+
+    Private doc As DataView
+    Private lineasDoc As DataView
+    Private vencimientos As DataView
+    Private detalleExtrangero As DataView
+    Private detalleExtrangero2 As DataView
+    Private strRegMercantil = rm.GetString("REGISTROMERCANTILCOESPUNT")
+    Private lugarExp = "SANT VICENÇ DELS HORTS"
+    Private documento As String
+    Private tipo As String
+    Private compraVenta As Char
+    Private xlsDir As ExcelDirecto.ExcelDirecto
+    Private filaActual As Integer
+    Private hojaActual As Integer
+    Private colorIndexCentro As Integer
+    Private colorIndexDocumento As Integer
+    Private MODELO As Boolean = False
+    Private fcargando As frCargando
+    Private esExtrangero As Boolean
+    Private INCOTERM As String
+    Private domEnvio As String
+    Private PLAZOENTEGA As String
+#End Region
+
+#Region "COLUMNAS EXCEL"
+
+    Private colAlbar As Short = -1
+    Private colCodigo As Short = -1
+    Private colDescri As Short = -1
+    Private colColor As Short = -1
+    Private colMaquina As Short = -1
+    Private colUnidades As Short = -1
+    Private colPrecio As Short = -1
+    Private colDTO As Short = -1
+    Private colIMPORT As Short = -1
+    Private colUltima As Short = -1
+    Private colCabeceraPAF As Short = -1
+    Private colBrutoTotal As Short = -1
+    Private colDTOTotal As Short = -1
+    Private colBaseTotal As Short = -1
+    Private colIVATotal As Short = -1
+    Private colRETotal As Short = -1
+    Private colTotalTotal As Short = -1
+
+    Private colPrimera As Short = 1
+    Private colTipo As Short = -1
+    Private colTalla As Short = -1
+    Private colBrut As Short = -1
+    Private colIVA As Short = -1
+    Private colRE As Short = -1
+    Private colBase As Short = -1
+    Private colTotal As Short = -1
+    Private colObserv As Short = -1
+    Private colDescripcionDocumento As Short = -1
+
+    Private colIniBanco As Short = -1
+    Private colVencimiento As Short = -1
+    Private colIMPORTVencim As Short = -1
+    Private pathRec As String = ""
+    Private pathLogo As String = ""
+
+#End Region
+
+#Region "INICIALIZACION"
+
+    Public Sub ImprimirDocumento(ByVal sinVistaPreliminar As Boolean)
+        Try
+
+            System.Threading.Thread.CurrentThread.CurrentUICulture = New System.Globalization.CultureInfo(idiomaImpresion)
+            CrearXLSDir()
+            PonerColorIndexCentro()
+            PonerNumeroColumnas()
+            PonerHojas()
+            ConfigurarPagina()
+            PonerLogo()
+            PonerCabeceraInfoPersona()
+            PonerCabeceraPAF(1)
+            PonerCabeceraDetalle(1)
+            PonerDetalle()
+            PonerPieDocumento()
+            If esExtrangero Then
+                PonerDetallePacking()
+            End If
+            If documento = Factura Then PonerVencimientos()
+
+            PonerObservaciones()
+            TratamientoFinal()
+            DuplicarHojasSegunDocumento()
+
+            xlsDir.m_Excel.Visible = True
+
+            Select Case documento
+                Case Pedido, OrdenFabComplementos, Proforma
+                    xlsDir.m_Excel.Dialogs(Excel.XlBuiltInDialog.xlDialogPrint).Show(, , , 1, , , , , , , , , , , False)
+                Case Albaran
+                    xlsDir.m_Excel.Dialogs(Excel.XlBuiltInDialog.xlDialogPrint).Show(, , , 1, , , , , , , , , , False)
+                Case Factura
+                    xlsDir.m_Excel.Dialogs(Excel.XlBuiltInDialog.xlDialogPrint).Show(, , , 1, , , , , , , , , , , False)
+            End Select
+            ' xlDialogPrint
+            '   range_num, from, to, copies, draft, preview, print_what, color,
+            '   feed, quality, y_resolution, selection, printer_text, print_to_file, collate
+
+            xlsDir.LiberarExcel()
+            System.Threading.Thread.CurrentThread.CurrentUICulture = New System.Globalization.CultureInfo(idiomaImpresion)
+            fcargando.Close()
+
+        Catch ex As Exception
+            fcargando.Close() : xlsDir.CerrarExcel() : Throw ex ': LOG(ex.ToString) 
+        End Try
+    End Sub
+    Private Sub PonerDetallePacking()
+        Dim i As Integer
+        Dim fuente As ExcelDirecto.ExcelDirecto.Fuente
+        Dim filaSiguiente As Integer
+        Try
+            filaSiguiente = filaActual + 10
+
+            fuente.nombre = "Tahoma"
+            fuente.tamaño = 8
+            fuente.color = RGB(0, 0, 0)
+            fuente.negrita = True
+            xlsDir.PonerFuenteARango(filaActual, colVencimiento, filaActual + 8, colUltima, fuente)
+            xlsDir.objHojaExcel.Cells(filaActual, colVencimiento).Value = "'" & rm.GetString("DETALLE").ToUpper
+            filaActual = filaActual + 1
+            With xlsDir.objHojaExcel
+                xlsDir.PonerBordeARango(.Range(.Cells(filaActual, colVencimiento), .Cells(filaActual, colIMPORTVencim + (colIMPORTVencim - colVencimiento - 1))), _
+                            Excel.XlBordersIndex.xlEdgeBottom, _
+                            Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlThin, colorIndexDocumento)
+                xlsDir.PonerBordeARango(.Range(.Cells(filaActual, colIMPORTVencim), .Cells(filaActual + 5, colIMPORTVencim - 1)), _
+                        Excel.XlBordersIndex.xlEdgeLeft, _
+                        Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlThin, colorIndexDocumento)
+
+
+                '.Cells(filaActual, colIMPORTVencim).Value = "'" & rm.GetString("IMPORTE")
+                filaActual = filaActual + 1
+                For i = 0 To detalleExtrangero.Count - 1
+                    .Cells(filaActual + i, colVencimiento).Value = "'" & detalleExtrangero(i).Item("NOMBREDETALLE")
+                    .Cells(filaActual + i, colIMPORTVencim).Value = "'" & detalleExtrangero(i).Item("DESCRIDETALLE")
+                Next
+                'Ponemos el incoterm el ultimo
+                .Cells(filaActual + i, colVencimiento).Value = "'INCOTERM"
+                .Cells(filaActual + i, colIMPORTVencim).Value = "'" & INCOTERM
+                For i = 0 To detalleExtrangero2.Count - 1
+                    .Cells(filaActual + i, colIniBanco + 2).Value = "'" & detalleExtrangero2(i).Item("TEXTO1")
+                Next
+
+                filaActual = filaActual + i
+            End With
+
+            filaActual = filaSiguiente
+
+        Catch ex As Exception
+            fcargando.Close() : xlsDir.CerrarExcel() : Throw ex ': LOG(ex.ToString) 
+        End Try
+    End Sub
+    Public Sub New(ByVal document As String, _
+           ByVal tip As String, _
+           ByVal compraVent As String, _
+           ByVal docu As DataView, _
+           ByVal lineasDocu As DataView, _
+           ByVal extrangero As Boolean, _
+           Optional ByVal venc As DataView = Nothing, Optional ByVal model As Boolean = False, Optional ByVal arrayDatosFactura As ArrayList = Nothing, Optional ByVal detExtrangero As DataView = Nothing, Optional ByVal detExtrangero2 As DataView = Nothing)
+        Try
+            CargandoFormulario()
+            Try
+                If Not arrayDatosFactura Is Nothing Then
+                    Try
+                        INCOTERM = nz(arrayDatosFactura(0), "")
+                    Catch ex As Exception
+                    End Try
+                    Try
+                        domEnvio = nz(arrayDatosFactura(1), "")
+                    Catch ex As Exception
+                    End Try
+                    Try
+                        PLAZOENTEGA = nz(arrayDatosFactura(2), "")
+                    Catch ex As Exception
+                    End Try
+                End If
+            Catch ex As Exception
+                LOG(ex.ToString)
+            End Try
+            MODELO = model
+            documento = document
+            tipo = tip
+            compraVenta = compraVent
+            lineasDoc = lineasDocu
+            vencimientos = venc
+            detalleExtrangero = detExtrangero
+            detalleExtrangero2 = detExtrangero2
+            doc = docu
+            esExtrangero = extrangero
+
+        Catch ex As Exception
+            fcargando.Close() : xlsDir.CerrarExcel() : Throw ex ': LOG(ex.ToString)  : xlsDir.CerrarExcel()
+        End Try
+    End Sub
+
+    Private Sub CrearXLSDir()
+        Try
+            Select Case compraVenta
+                Case Compra
+                    Select Case documento
+                        Case Pedido
+                            xlsDir = New ExcelDirecto.ExcelDirecto(False, 63, 35, 43, 16, 8)
+                        Case Albaran
+                            xlsDir = New ExcelDirecto.ExcelDirecto(False, 63, 35, 43, 19, 8)
+                        Case Albaran
+                            xlsDir = New ExcelDirecto.ExcelDirecto(False, 63, 35, 43, 16, 8)
+                        Case OrdenFabComplementos
+                            xlsDir = New ExcelDirecto.ExcelDirecto(False, 63, 35, 43, 19, 8)
+                    End Select
+
+                Case Venta
+                    Select Case documento
+                        Case Pedido
+                            xlsDir = New ExcelDirecto.ExcelDirecto(False, 63, 35, 43, 16, 8)
+                        Case Albaran
+                            xlsDir = New ExcelDirecto.ExcelDirecto(False, 62, 30, 44, 16, 8)
+                        Case Factura
+                            If esExtrangero Then
+                                xlsDir = New ExcelDirecto.ExcelDirecto(False, 63, 11, 35, 30, 8)
+                            Else
+                                xlsDir = New ExcelDirecto.ExcelDirecto(False, 63, 30, 35, 20, 8)
+                            End If
+
+                        Case Proforma
+                            If esExtrangero Then
+                                xlsDir = New ExcelDirecto.ExcelDirecto(False, 63, 11, 43, 26, 8)
+                            Else
+                                xlsDir = New ExcelDirecto.ExcelDirecto(False, 63, 30, 35, 20, 8)
+                            End If
+
+                        Case OrdenModelos
+                            xlsDir = New ExcelDirecto.ExcelDirecto(False, 63, 32, 40, 19, 8)
+
+                    End Select
+            End Select
+
+        Catch ex As Exception
+            fcargando.Close() : xlsDir.CerrarExcel() : Throw ex ': LOG(ex.ToString) 
+        End Try
+    End Sub
+    Private Sub PonerNumeroColumnas()
+        Try
+            colPrimera = 1 : colBrutoTotal = 1 : colObserv = 1 : colBrut = 1 : colDTOTotal = 10 : colBaseTotal = 20 : colIVATotal = 30
+            colRETotal = 40 : colTotalTotal = 50 : colCabeceraPAF = 11 : colUltima = 60 : colDescripcionDocumento = 37
+
+            Select Case compraVenta
+                Case Compra
+                    Select Case documento
+                        Case Pedido
+                            Select Case tipo
+                                Case Tejido
+                                    colAlbar = 1 : colCodigo = 2 : colDescri = 10 : colColor = 30 : colMaquina = 36 : colUnidades = 39
+                                    colPrecio = 45 : colDTO = 50 : colIMPORT = 55
+                                Case Hilos
+                                    'Hilos
+                                    colAlbar = 1 : colCodigo = 2 : colDescri = 10 : colColor = 30 : colUnidades = 37 : colPrecio = 44
+                                    colDTO = 50 : colIMPORT = 55
+                                Case Fornitura
+                                    colAlbar = 1 : colCodigo = 2 : colDescri = 9 : colColor = 28 : colTalla = 34 : colUnidades = 39
+                                    colPrecio = 44 : colDTO = 50 : colIMPORT = 55
+                            End Select
+                            'Solo Albaranes de compra de hilos
+                        Case Albaran
+                            colAlbar = 1 : colCodigo = 2 : colDescri = 10 : colColor = 30 : colUnidades = 37
+                            colPrecio = 44 : colDTO = 50 : colIMPORT = 55
+
+                        Case OrdenFabComplementos
+                            colCodigo = 2 : colDescri = 10 : colColor = 28 : colTalla = 36 : colUnidades = 43 : colIMPORT = 50
+                    End Select
+                Case Venta
+                    Select Case MODELO
+                        Case True
+                            Select Case documento
+                                Case OrdenModelos
+                                    colTipo = 1 : colColor = 2 : colTalla = 10 : colUnidades = 55
+                                Case Albaran
+                                    'El colTipo es la columna de la temporada
+                                    colTipo = 2 : colCodigo = 7
+                                    'Aqui es la serie
+                                    colDescri = 12 : colColor = 17 : colTalla = 22 : colUnidades = 52 : colIMPORT = 56 : colPrecio = 56 : colObserv = 30
+                                Case Proforma
+                                Case Factura
+                                    colAlbar = 3 : colTipo = 8 : colCodigo = 14
+                                    'Es la serie
+                                    colDescri = 24 : colColor = 33 : colUnidades = 42 : colPrecio = 48 : colIMPORT = 55 : colVencimiento = 1
+                                    colIMPORTVencim = 10 : colIniBanco = 20
+                            End Select
+                        Case False
+                            'NO MODEO
+                            Select Case documento
+                                Case Pedido
+                                    colCodigo = 2 : colDescri = 12 : colColor = 30 : colTalla = 39 : colUnidades = 45 : colPrecio = 51
+                                    colIMPORT = 56 : colDTO = 9 : colBase = 18 : colIVA = 29 : colRE = 41 : colTotal = 51
+
+                                Case Albaran
+                                    colTipo = 2 : colCodigo = 8 : colDescri = 15 : colColor = 36 : colTalla = 43 : colUnidades = 49 : colPrecio = 55
+                                    colObserv = 13 '30
+
+                                Case Proforma
+                                    colTipo = 6 : colCodigo = 11 : colDescri = 18 : colColor = 34 : colTalla = 39 : colUnidades = 44 : colPrecio = 50
+                                    colIMPORT = 55 : colObserv = 30 : colBrut = 1 : colDTO = 9 : colBase = 18 : colIVA = 29 : colRE = 41 : colTotal = 51
+
+                                Case Factura
+                                    colAlbar = 2 : colTipo = 6 : colCodigo = 11 : colDescri = 17 : colColor = 35 : colTalla = 41
+                                    colUnidades = 46 : colPrecio = 51 : colIMPORT = 56 : colObserv = 30 : colBrut = 1 : colDTO = 9
+                                    colBase = 18 : colIVA = 29 : colRE = 41 : colTotal = 51 : colVencimiento = 1 : colIMPORTVencim = 10
+                                    colIniBanco = 20
+                            End Select
+                    End Select
+            End Select
+        Catch ex As Exception
+            fcargando.Close() : xlsDir.CerrarExcel() : Throw ex ': LOG(ex.ToString) 
+        End Try
+    End Sub
+
+#End Region
+
+#Region "PONERCOLORESLOGOS"
+
+    Private Sub PonerLogo()
+        Try
+            xlsDir.InsertPicture(pathLogo, _
+                    xlsDir.objHojaExcel.Range(xlsDir.objHojaExcel.Cells(1, 1), _
+                    xlsDir.objHojaExcel.Cells(1, 16)), False, False, False, 101, 150)
+
+        Catch ex As Exception
+            fcargando.Close() : xlsDir.CerrarExcel() : Throw ex ': LOG(ex.ToString) 
+        End Try
+    End Sub
+    Private Sub PonerColorIndexCentro()
+        Try
+
+            If nz(doc(0).Item("centro"), "") = "C" Then
+                'colorIndexCentro = 29
+                Select Case documento
+                    Case Pedido
+                        colorIndexDocumento = 1
+                    Case Albaran
+                        colorIndexDocumento = 45
+                    Case Factura
+                        colorIndexDocumento = 29
+                    Case Proforma
+                        colorIndexDocumento = 1
+                    Case OrdenFabComplementos
+                        colorIndexDocumento = 1
+                End Select
+                colorIndexCentro = 29
+            Else
+                Select Case documento
+                    Case Pedido
+                        colorIndexDocumento = 1
+                    Case Albaran
+                        colorIndexDocumento = 45
+                    Case Factura
+                        colorIndexDocumento = 10
+                    Case Proforma
+                        colorIndexDocumento = 10
+                    Case OrdenFabComplementos
+                        colorIndexDocumento = 1
+                End Select
+                colorIndexCentro = 43
+            End If
+
+            If nz(doc(0).Item("centro"), "") = "C" Then : pathRec = directorio & "\imagenes\recCoespunt.JPG"
+            Else : pathRec = directorio & "\imagenes\recCyco.JPG" : End If
+
+            If nz(doc(0).Item("centro"), "") = "C" Then : pathLogo = directorio & "\imagenes\LOGO COESPUNT2.tif"
+            Else : pathLogo = directorio & "\imagenes\LOGO CYCO.tif" : End If
+
+            'If nz(doc(0).Item("centro"), "") = "C" Then
+            'Else : pathLogo2 = directorio & "\imagenes\LOGO CYCO.tif" : End If
+
+        Catch ex As Exception
+            fcargando.Close() : xlsDir.CerrarExcel() : Throw ex ': LOG(ex.ToString) 
+        End Try
+    End Sub
+
+#End Region
+
+#Region "CABECERAS"
+
+    Private Sub PonerCabeceraDetalleComplTej(ByVal mas As Integer)
+        Try
+            With xlsDir.objHojaExcel
+                If documento = Factura Then
+                    If esExtrangero Then
+                        .Cells(mas, colAlbar).Value = "'" & "  " & rm.GetString("PACKING").ToUpper
+                    Else
+                        .Cells(mas, colAlbar).Value = "'" & "  " & rm.GetString("ALBARAN").ToUpper
+                    End If
+
+                    .Cells(mas, colTipo).Value = "'" & "  " & rm.GetString("FECHA").ToUpper
+                    '!!??!!?
+                    'xlsDir.InsertPicture(pathRec, .Cells(mas, colAlbar), False, True)
+                End If
+
+                If documento = Albaran Then
+                    .Cells(mas, colTipo).Value = "'" & "  " & rm.GetString("PEDIDO").ToUpper
+                End If
+
+                .Cells(mas, colCodigo).Value = "'" & "  " & rm.GetString("CODIGO").ToUpper
+                .Cells(mas, colDescri).Value = "'" & "  " & rm.GetString("DESCRIPCION").ToUpper
+                .Cells(mas, colColor).Value = "'" & "  " & rm.GetString("COLOR").ToUpper
+                .Cells(mas, colTalla).Value = "'" & "  " & rm.GetString("TALLA").ToUpper
+                .Cells(mas, colUnidades).Value = "'" & "  " & rm.GetString("CANTIDAD").ToUpper
+                .Cells(mas, colPrecio).Value = "'" & "  " & rm.GetString("PRECIO").ToUpper & " €"
+                If documento <> Albaran Then .Cells(mas, colIMPORT).Value = "'" & "  " & rm.GetString("IMPORTE").ToUpper & " €"
+                If documento <> Pedido Then
+                    'xlsDir.InsertPicture(pathRec, .Cells(mas, colTipo), False, True)
+                End If
+                '!!??!!?
+                'xlsDir.InsertPicture(pathRec, .Cells(mas, colCodigo), False, True)
+                'xlsDir.InsertPicture(pathRec, .Cells(mas, colDescri), False, True)
+                'xlsDir.InsertPicture(pathRec, .Cells(mas, colColor), False, True)
+                'xlsDir.InsertPicture(pathRec, .Cells(mas, colTalla), False, True)
+                'xlsDir.InsertPicture(pathRec, .Cells(mas, colUnidades), False, True)
+                'xlsDir.InsertPicture(pathRec, .Cells(mas, colPrecio), False, True)
+                'If documento <> Albaran Then xlsDir.InsertPicture(pathRec, .Cells(mas, colIMPORT), False, True)
+            End With
+
+        Catch ex As Exception
+            fcargando.Close() : xlsDir.CerrarExcel() : Throw ex ': LOG(ex.ToString) 
+        End Try
+    End Sub
+    Private Sub PonerCabeceraDetalleModelo(ByVal mas As Integer)
+        Dim coltallaa As Integer
+        Try
+            With xlsDir.objHojaExcel
+                If documento = Factura Then
+                    .Cells(mas, colAlbar).Value = "'" & "  " & rm.GetString("ALBARAN").ToUpper
+                    .Cells(mas, colTipo).Value = "'" & "  " & rm.GetString("FECHA").ToUpper
+                Else
+                    .Cells(mas, colTipo).Value = "'" & "  " & rm.GetString("ORDEN").ToUpper
+                End If
+
+                .Cells(mas, colCodigo).Value = "'" & "  " & rm.GetString("MODELO").ToUpper
+                .Cells(mas, colDescri).Value = "'" & "  " & rm.GetString("SERIE").ToUpper
+                .Cells(mas, colColor).Value = "'" & "  " & rm.GetString("COLOR").ToUpper
+                If documento <> Factura Then
+                    .Cells(mas - 1, colTalla + 10).Value = "'" & "  " & rm.GetString("TALLAS").ToUpper
+                    xlsDir.InsertPicture(pathRec, .Cells(mas - 1, colTalla + 10), False, True)
+                    coltallaa = colTalla
+
+                    xlsDir.Juntar(mas, coltallaa, mas, coltallaa + 2)
+                    .Cells(mas, coltallaa).Value = "'" & "  " & nz(doc(0).Item("TALLA01"), "")
+                    coltallaa = coltallaa + 3
+
+                    xlsDir.Juntar(mas, coltallaa, mas, coltallaa + 2)
+                    .Cells(mas, coltallaa).Value = "'" & "  " & nz(doc(0).Item("TALLA02"), "")
+                    coltallaa = coltallaa + 3
+
+                    xlsDir.Juntar(mas, coltallaa, mas, coltallaa + 2)
+                    .Cells(mas, coltallaa).Value = "'" & "  " & nz(doc(0).Item("TALLA03"), "")
+                    coltallaa = coltallaa + 3
+
+                    xlsDir.Juntar(mas, coltallaa, mas, coltallaa + 2)
+                    .Cells(mas, coltallaa).Value = "'" & "  " & nz(doc(0).Item("TALLA04"), "")
+                    coltallaa = coltallaa + 3
+
+                    xlsDir.Juntar(mas, coltallaa, mas, coltallaa + 2)
+                    .Cells(mas, coltallaa).Value = "'" & "  " & nz(doc(0).Item("TALLA05"), "")
+                    coltallaa = coltallaa + 3
+
+                    xlsDir.Juntar(mas, coltallaa, mas, coltallaa + 2)
+                    .Cells(mas, coltallaa).Value = "'" & "  " & nz(doc(0).Item("TALLA06"), "")
+                    coltallaa = coltallaa + 3
+
+                    xlsDir.Juntar(mas, coltallaa, mas, coltallaa + 2)
+                    .Cells(mas, coltallaa).Value = "'" & "  " & nz(doc(0).Item("TALLA07"), "")
+                    coltallaa = coltallaa + 3
+
+                    xlsDir.Juntar(mas, coltallaa, mas, coltallaa + 2)
+                    .Cells(mas, coltallaa).Value = "'" & "  " & nz(doc(0).Item("TALLA08"), "")
+                    coltallaa = coltallaa + 3
+
+                    xlsDir.Juntar(mas, coltallaa, mas, coltallaa + 2)
+                    .Cells(mas, coltallaa).Value = "'" & "  " & nz(doc(0).Item("TALLA09"), "")
+                    coltallaa = coltallaa + 3
+
+                    xlsDir.Juntar(mas, coltallaa, mas, coltallaa + 2)
+                    .Cells(mas, coltallaa).Value = "'" & "  " & nz(doc(0).Item("TALLA10"), "")
+
+                End If
+                .Cells(mas, colUnidades).Value = "'" & "  " & rm.GetString("CANTIDAD").ToUpper
+                If documento = Factura Then .Cells(mas, colPrecio).Value = "'" & "  " & rm.GetString("PRECIO").ToUpper & " €"
+                If documento = Albaran Then
+                    .Cells(mas, colIMPORT).Value = "'" & "  " & rm.GetString("PRECIO").ToUpper & " €"
+                Else
+                    .Cells(mas, colIMPORT).Value = "'" & "  " & rm.GetString("IMPORTE").ToUpper & " €"
+                End If
+
+                xlsDir.InsertPicture(pathRec, .Cells(mas, colTipo), False, True)
+                xlsDir.InsertPicture(pathRec, .Cells(mas, colCodigo), False, True)
+                xlsDir.InsertPicture(pathRec, .Cells(mas, colDescri), False, True)
+                xlsDir.InsertPicture(pathRec, .Cells(mas, colColor), False, True)
+                xlsDir.InsertPicture(pathRec, .Cells(mas, colUnidades), False, True)
+                xlsDir.InsertPicture(pathRec, .Cells(mas, colIMPORT), False, True)
+            End With
+
+        Catch ex As Exception
+            fcargando.Close() : xlsDir.CerrarExcel() : Throw ex ': LOG(ex.ToString) 
+        End Try
+    End Sub
+    Private Sub PonerCabeceraDetalleOrdenModelos(ByVal mas As Integer)
+        Try
+            With xlsDir.objHojaExcel
+                Dim colTallaa As Short = colTalla
+                .Cells(mas, colColor).Value = "'" & "  " & rm.GetString("COLOR").ToUpper
+
+                xlsDir.Juntar(mas, colTallaa, mas, colTallaa + 2)
+                .Cells(mas, colTallaa).Value = "'" & "  " & nz(doc(0).Item("TALLA01"), "")
+                colTallaa = colTallaa + 3
+
+                xlsDir.Juntar(mas, colTallaa, mas, colTallaa + 2)
+                .Cells(mas, colTallaa).Value = "'" & "  " & nz(doc(0).Item("TALLA02"), "")
+                colTallaa = colTallaa + 3
+
+                xlsDir.Juntar(mas, colTallaa, mas, colTallaa + 2)
+                .Cells(mas, colTallaa).Value = "'" & "  " & nz(doc(0).Item("TALLA03"), "")
+                colTallaa = colTallaa + 3
+
+                xlsDir.Juntar(mas, colTallaa, mas, colTallaa + 2)
+                .Cells(mas, colTallaa).Value = "'" & "  " & nz(doc(0).Item("TALLA04"), "")
+                colTallaa = colTallaa + 3
+
+                xlsDir.Juntar(mas, colTallaa, mas, colTallaa + 2)
+                .Cells(mas, colTallaa).Value = "'" & "  " & nz(doc(0).Item("TALLA05"), "")
+                colTallaa = colTallaa + 3
+
+                xlsDir.Juntar(mas, colTallaa, mas, colTallaa + 2)
+                .Cells(mas, colTallaa).Value = "'" & "  " & nz(doc(0).Item("TALLA06"), "")
+                colTallaa = colTallaa + 3
+
+                xlsDir.Juntar(mas, colTallaa, mas, colTallaa + 2)
+                .Cells(mas, colTallaa).Value = "'" & "  " & nz(doc(0).Item("TALLA07"), "")
+                colTallaa = colTallaa + 3
+
+                xlsDir.Juntar(mas, colTallaa, mas, colTallaa + 2)
+                .Cells(mas, colTallaa).Value = "'" & "  " & nz(doc(0).Item("TALLA08"), "")
+                colTallaa = colTallaa + 3
+
+                xlsDir.Juntar(mas, colTallaa, mas, colTallaa + 2)
+                .Cells(mas, colTallaa).Value = "'" & "  " & nz(doc(0).Item("TALLA09"), "")
+                colTallaa = colTallaa + 3
+
+                xlsDir.Juntar(mas, colTallaa, mas, colTallaa + 2)
+                .Cells(mas, colTallaa).Value = "'" & "  " & nz(doc(0).Item("TALLA10"), "")
+
+                .Cells(mas, colUnidades).Value = "'" & "  " & rm.GetString("CANTIDAD").ToUpper
+            End With
+
+        Catch ex As Exception
+            fcargando.Close() : xlsDir.CerrarExcel() : Throw ex ': LOG(ex.ToString) 
+        End Try
+    End Sub
+    Private Sub PonerCabeceraDetalleCompra(ByVal mas As Integer)
+        Try
+            With xlsDir.objHojaExcel
+                If documento = Factura Then .Cells(mas, colAlbar).Value = "'" & "  " & rm.GetString("TIPUS").ToUpper
+                .Cells(mas, colCodigo).Value = "'" & "  " & rm.GetString("CODIGO").ToUpper
+                .Cells(mas, colDescri).Value = "'" & "  " & rm.GetString("DESCRIPCION").ToUpper
+                .Cells(mas, colColor).Value = "'" & "  " & rm.GetString("COLOR").ToUpper
+
+                If tipo = Tejido Then .Cells(mas, colMaquina).Value = "'" & "  " & rm.GetString("MAQ").ToUpper
+                .Cells(mas, colUnidades).Value = "'" & "  " & rm.GetString("UNIDADES").ToUpper
+
+                If documento <> OrdenFabComplementos AndAlso (documento <> Albaran) Then ' AndAlso tipo <> Hilos) Then
+                    .Cells(mas, colPrecio).Value = "'" & "  " & rm.GetString("PRECIO").ToUpper & " €"
+                    .Cells(mas, colDTO).Value = "'" & "  " & rm.GetString("DTE").ToUpper
+                    .Cells(mas, colIMPORT).Value = "'" & "  " & rm.GetString("IMPORTE").ToUpper
+                    'xlsDir.InsertPicture(pathRec, .Cells(mas, colPrecio), False, True)
+                    'xlsDir.InsertPicture(pathRec, .Cells(mas, colDTO), False, True)
+                    'xlsDir.InsertPicture(pathRec, .Cells(mas, colIMPORT), False, True)
+                End If
+                If documento = OrdenFabComplementos Then
+                    .Cells(mas, colTalla).Value = "'" & "  " & rm.GetString("TALLA").ToUpper
+                End If
+                If tipo = Fornitura Then
+                    .Cells(mas, colTalla).Value = "'" & "  " & rm.GetString("MEDIDA").ToUpper
+                End If
+                If documento = OrdenFabComplementos Then
+                    .Cells(mas, colIMPORT).Value = "'" & "  " & rm.GetString("IMPORTE").ToUpper
+                End If
+                'If documento = Factura Then xlsDir.InsertPicture(pathRec, .Range("A" & mas & ":A" & mas), False, True)
+
+                'xlsDir.InsertPicture(pathRec, .Cells(mas, colCodigo), False, True)
+                'xlsDir.InsertPicture(pathRec, .Cells(mas, colDescri), False, True)
+                'If tipo = Tejido Or tipo = Muestra Then xlsDir.InsertPicture(pathRec, .Cells(mas, colColor), False, True)
+                'If tipo = Tejido Then xlsDir.InsertPicture(pathRec, .Cells(mas, colMaquina), False, True)
+                'xlsDir.InsertPicture(pathRec, .Cells(mas, colUnidades), False, True)
+            End With
+
+        Catch ex As Exception
+            fcargando.Close() : xlsDir.CerrarExcel() : Throw ex ': LOG(ex.ToString) 
+        End Try
+    End Sub
+    Private Sub PonerCabeceraComun(ByVal mas As Integer)
+        Try
+            Dim fuente As ExcelDirecto.ExcelDirecto.Fuente
+
+            fuente.nombre = "Verdana"
+            fuente.tamaño = 9
+            'fuente.color = colorIndexCentro
+            fuente.negrita = True
+            fuente.negrita = False
+
+            With xlsDir.objHojaExcel
+                Select Case documento
+                    Case Pedido
+                        'xlsDir.Juntar(mas, 1, mas + 1, colCodigo - 1, ExcelDirecto.ExcelDirecto.Alineacion.Izquierda, ExcelDirecto.ExcelDirecto.Alineacion.Centro)
+                        'xlsDir.Juntar(mas, colCodigo, mas + 1, colCodigo + 9, ExcelDirecto.ExcelDirecto.Alineacion.Izquierda, ExcelDirecto.ExcelDirecto.Alineacion.Centro)
+
+                        xlsDir.PonerBordeARangoRectangulo(mas, 1, mas + 1, colCodigo + 25, Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlThin, colorIndexDocumento)
+                        xlsDir.PonerColorARango(mas, 1, mas, colCodigo + 10, 15)
+                        xlsDir.PonerFuenteARango(mas, colCodigo + 17, mas, colCodigo + 12, fuente)
+
+                        .Cells(mas, 1).Value = "'" & rm.GetString("PEDIDO").ToUpper
+                        .Cells(mas, colCodigo + 5).Value = "'" & nzn(doc(0).Item("FRA"), 0)
+                        .Cells(mas, colCodigo + 12).Value = "'" & rm.GetString("FECHA")
+                        .Cells(mas, colCodigo + 17).Value = "'" & nz(doc(0).Item("DATA"), "", False, True)
+                        filaActual = mas + 2
+                    Case Albaran, OrdenFabComplementos
+                        Select Case MODELO
+                            Case True
+                                .Cells(mas, 1).Value = "'" & rm.GetString("ALBARAN")
+                                .Cells(mas, colCabeceraPAF).Value = "'" & nzn(doc(0).Item("FRA"), 0)
+                                xlsDir.PonerColorARango(mas, colCabeceraPAF, mas, colCabeceraPAF + 5, colorIndexDocumento)
+                                .Cells(mas + 1, 1).Value = "'" & rm.GetString("FECHA")
+                                .Cells(mas + 1, 10).Value = "'" & nz(doc(0).Item("DATA"), "")
+                                .Cells(mas + 2, 1).Value = "'" & rm.GetString("PEDIDO")
+                                .Cells(mas + 2, 10).Value = "'" & nz(doc(0).Item("ALBCLI"), "")
+                                filaActual = mas + 2
+                            Case False
+                                .Cells(mas, 1).Value = "'" & rm.GetString("ALBARAN")
+                                .Cells(mas, colCabeceraPAF).Value = "'" & nzn(doc(0).Item("FRA"), 0)
+                                xlsDir.PonerColorARango(mas, colCabeceraPAF, mas, colCabeceraPAF + 5, colorIndexDocumento)
+                                .Cells(mas + 1, 1).Value = "'" & rm.GetString("FECHA")
+                                .Cells(mas + 1, colCabeceraPAF).Value = "'" & nz(doc(0).Item("DATA"), "", False, True)
+                                .Cells(mas + 3, 1).Value = "'" & rm.GetString("PEDIDO") : .Cells(mas + 3, colCabeceraPAF).Value = "'" '"'!!!!!& doc(0).ITEM("lineasDoc.COMAN
+                                .Cells(mas + 3, colCabeceraPAF + 5).Value = "'" & rm.GetString("FECHA") : .Cells(mas + 3, colCabeceraPAF + 10).Value = "'" & " " '!!!!!ObtenerFechaDePedidoString(lineasDoc.COMAN)
+                                Try
+                                    'Solo cuando es venta
+                                    .Cells(mas + 4, 1).Value = "'" & rm.GetString("NUMEROPROVE")
+                                    .Cells(mas + 4, 10).Value = "'" & nz(doc(0).Item("NUMEROPROVE"), "")
+                                Catch ex As Exception
+                                End Try
+
+                                filaActual = mas + 2
+
+                        End Select
+                    Case Factura
+                        xlsDir.AlinearRango("A" & mas & ":A" & mas + 1, ExcelDirecto.ExcelDirecto.Alineacion.Izquierda)
+                        .Cells(mas, 1).Value = "'" & rm.GetString("FACTURA")
+                        .Cells(mas, colTipo).Value = "'" & nzn(doc(0).Item("FRA"), 0)
+                        xlsDir.PonerColorARango(mas, colTipo, mas, colTipo + 5, 39)
+                        .Cells(mas + 1, 1).Value = "'" & rm.GetString("FECHA")
+                        .Cells(mas + 1, colTipo).Value = "'" & nz(doc(0).Item("DATA"), "", False, True)
+                        .Cells(mas + 2, 1).Value = "'" & rm.GetString("NUMEROPROVE")
+                        .Cells(mas + 2, colCabeceraPAF).Value = "'" & nz(doc(0).Item("NUMEROPROVE"), "")
+                        If esExtrangero Then
+                            xlsDir.Juntar(mas + 3, colCabeceraPAF + 1, mas + 4, colCabeceraPAF + 17, ExcelDirecto.ExcelDirecto.Alineacion.Izquierda)
+                            '.Cells(mas + 3, 1).Value = "'" & rm.GetString("INCOTERM")
+                            '.Cells(mas + 3, colCabeceraPAF + 1).Value = "'" & INCOTERM
+
+                            .Cells(mas + 3, 1).Value = "'" & rm.GetString("PLAZOENTREGA")
+                            .Cells(mas + 3, colCabeceraPAF + 1).Value = "'" & PLAZOENTEGA & " " & rm.GetString("SEMANAS")
+
+                            filaActual = mas + 5
+                        Else
+                            filaActual = mas + 2
+                        End If
+
+                        PonerObservacionesFactura()
+                        If esExtrangero Then
+                            filaActual = mas + 4
+                        Else
+                            filaActual = mas + 2
+                        End If
+                    Case Proforma
+                        xlsDir.AlinearRango("A" & mas & ":A" & mas + 1, ExcelDirecto.ExcelDirecto.Alineacion.Izquierda)
+                        .Cells(mas, 1).Value = "'" & rm.GetString("FACTURA")
+                        .Cells(mas, colTipo).Value = "'" & nzn(doc(0).Item("FRA"), 0)
+                        xlsDir.PonerColorARango(mas, colTipo, mas, colTipo + 5, 39)
+                        .Cells(mas + 1, 1).Value = "'" & rm.GetString("FECHA")
+                        .Cells(mas + 1, colTipo).Value = "'" & nz(doc(0).Item("DATA"), "", False, True)
+                        .Cells(mas + 2, 1).Value = "'" & rm.GetString("NUMEROPROVE")
+                        .Cells(mas + 2, colCabeceraPAF).Value = "'" & nz(doc(0).Item("NUMEROPROVE"), "")
+
+                        If esExtrangero Then
+                            xlsDir.Juntar(mas + 3, colCabeceraPAF + 1, mas + 4, colCabeceraPAF + 17, ExcelDirecto.ExcelDirecto.Alineacion.Izquierda)
+                            .Cells(mas + 3, 1).Value = "'" & rm.GetString("INCOTERM")
+                            .Cells(mas + 3, colCabeceraPAF + 1).Value = "'" & INCOTERM
+
+                            .Cells(mas + 5, 1).Value = "'" & rm.GetString("PLAZOENTREGA")
+                            .Cells(mas + 5, colCabeceraPAF + 1).Value = "'" & PLAZOENTEGA & " " & rm.GetString("SEMANAS")
+
+                            filaActual = mas + 5
+                        Else
+                            filaActual = mas + 2
+                        End If
+
+                        PonerObservacionesFactura()
+                        If esExtrangero Then
+                            filaActual = mas + 4
+                        Else
+                            filaActual = mas + 2
+                        End If
+                    Case OrdenModelos
+                        .Cells(mas, 1).Value = "'" & rm.GetString("ORDEN")
+                        .Cells(mas, 10).Value = "'" & nzn(doc(0).Item("ORDRE"), 0)
+                        xlsDir.PonerColorARango(mas, 10, mas, 10 + 5, colorIndexDocumento)
+                        .Cells(mas + 1, 1).Value = "'" & rm.GetString("FECHAENTRADA")
+                        .Cells(mas + 1, 10).Value = "'" & nz(doc(0).Item("ENTRADA"), "", False, True)
+                        .Cells(mas + 1, 20).Value = "'" & rm.GetString("FECHAPREVISTA")
+                        .Cells(mas + 1, 30).Value = "'" & nz(doc(0).Item("PREVISTA"), "", False, True)
+                        .Cells(mas + 1, 40).Value = "'" & rm.GetString("FECHAFINAL")
+                        .Cells(mas + 1, 50).Value = "'" & nz(doc(0).Item("FINAL"), "", False, True)
+                        .Cells(mas + 2, 1).Value = "'" & rm.GetString("MODELO")
+                        .Cells(mas + 2, 10).Value = "'" & nz(doc(0).Item("MODEL"), "")
+                        .Cells(mas + 2, 20).Value = "'" & rm.GetString("SERIE")
+                        .Cells(mas + 2, 30).Value = "'" & nz(doc(0).Item("SERIE"), "")
+                        '.Cells(mas + 3, 1).Value = "'" & rm.GetString("SERIE")
+                        '.Cells(mas + 3, 10).Value = "'" & nz(doc(0).Item("SERIE"), "")
+                        '.Cells(mas + 3, 30).Value = "'" & rm.GetString("CLIENTE")
+                        '.Cells(mas + 3, 40).Value = "'" & rm.GetString("PRECIO")
+                        '.Cells(mas + 3, 50).Value = "'" & nz(doc(0).Item("PREU"), "")
+                        '.Cells(mas + 3, 50)
+                        filaActual = mas + 3
+                End Select
+            End With
+
+
+        Catch ex As Exception
+            fcargando.Close() : xlsDir.CerrarExcel() : Throw ex ': LOG(ex.ToString) 
+        End Try
+    End Sub
+    Private Sub PonerObservacionesFactura()
+        Dim fuente As ExcelDirecto.ExcelDirecto.Fuente
+        Try
+            fuente.nombre = "Verdana"
+            fuente.tamaño = 9
+            'fuente.color = colorIndexCentro
+            fuente.negrita = True
+            xlsDir.PonerFuenteARango(filaActual + 1, 1, filaActual + 1, 2, fuente)
+            With xlsDir.objHojaExcel
+                .Cells(filaActual + 1, 2).value = "'" & rm.GetString("OBSERVACIONES") & ":"
+                xlsDir.Juntar(filaActual + 2, 2, filaActual + 6, 27, ExcelDirecto.ExcelDirecto.Alineacion.Izquierda)
+                .Cells(filaActual + 2, 2).Value = "'" & DirectCast(nz(doc(0).Item("OBSERV"), ""), String).Replace(vbCrLf, vbLf)
+            End With
+
+        Catch ex As Exception
+            Throw ex : LOG(ex.ToString)
+        End Try
+    End Sub
+    Private Function PonerCabeceraAlbaranEntregaHilos(ByVal mas As Integer)
+        Try
+            With xlsDir.objHojaExcel
+                .Cells(mas, 1).Value = "'" & rm.GetString("NUMERO")
+                .Cells(mas, colCabeceraPAF).Value = "'" & nzn(doc(0).Item("FRA"), 0)
+                .Cells(mas + 1, 1).Value = "'" & rm.GetString("FECHA") : .Cells(mas + 1, colCabeceraPAF).Value = "'" & nz(doc(0).Item("DATA"), "", False, True)
+                '.Cells(mas + 1, 1 + 7).Value = "'" & rm.GetString("FECHAENTREGA") : .Cells(mas + 1, colCabeceraPAF + 7).Value = "'" & nz(doc(0).Item("DATAENTREGA"), "", False, True)
+                .Cells(mas + 3, 1).Value = "'" & rm.GetString("ORDENCOMPLEMENTO") : .Cells(mas + 3, 20).Value = "'" & doc(0).Item("ORDENFABCOMP")
+                filaActual = mas + 2
+            End With
+
+        Catch ex As Exception
+            fcargando.Close() : xlsDir.CerrarExcel() : Throw ex ': LOG(ex.ToString) 
+        End Try
+    End Function
+    Private Function PonerCabeceraOrdenComplemento(ByVal mas As Integer)
+        Try
+            With xlsDir.objHojaExcel
+                .Cells(mas, 1).Value = "'" & rm.GetString("NUMERO")
+                .Cells(mas, colCabeceraPAF).Value = "'" & nzn(doc(0).Item("FRA"), 0)
+                .Cells(mas + 1, 1).Value = "'" & rm.GetString("FECHA") : .Cells(mas + 1, colCabeceraPAF).Value = "'" & nz(doc(0).Item("DATA"), "", False, True)
+                .Cells(mas + 2, 1).Value = "'" & rm.GetString("FECHAENTREGA") : .Cells(mas + 2, colCabeceraPAF).Value = "'" & nz(doc(0).Item("DATAENTREGA"), "", False, True)
+                '.Cells(mas + 3, 1).Value = "'" & rm.GetString("ORDENCOMPLEMENTO") : .Cells(mas + 3, 20).Value = "'" & doc(0).Item("ORDENFABCOMP")
+                filaActual = mas + 2
+            End With
+
+        Catch ex As Exception
+            fcargando.Close() : xlsDir.CerrarExcel() : Throw ex ': LOG(ex.ToString) 
+        End Try
+    End Function
+    Private Function PonerCabeceraPAF(ByVal hoja As Integer) As Integer
+        Dim fuente As ExcelDirecto.ExcelDirecto.Fuente
+        Dim mas As Integer = xlsDir.tamHoja * (hoja - 1) + 2 '+ hoja
+        Try
+            If hoja = 1 Then mas = 9
+
+            fuente.nombre = "Verdana"
+            fuente.tamaño = 9
+            'fuente.color = colorIndexCentro
+            fuente.negrita = True
+
+            xlsDir.PonerFuenteARango(mas, 1, mas + 4, 1, fuente)
+            xlsDir.PonerFuenteARango(mas, colCabeceraPAF, mas + 4, colCabeceraPAF, fuente)
+
+            'fuente.color = RGB(0, 0, 0)
+            fuente.negrita = False
+
+            xlsDir.PonerFuenteARango(mas + 1, 5, mas + 4, 5, fuente)
+            xlsDir.PonerFuenteARango(mas + 1, 8, mas + 4, 8, fuente)
+
+            Select Case compraVenta
+                Case Compra
+                    Select Case documento
+                        Case Pedido
+                            Select Case tipo
+                                Case Tejido : PonerCabeceraComun(mas)
+                                Case Hilos : PonerCabeceraComun(mas)
+                                Case Fornitura : PonerCabeceraComun(mas)
+                            End Select
+                            'Solo Albaranes de compra de hilos
+                        Case Albaran : PonerCabeceraAlbaranEntregaHilos(mas)
+                        Case OrdenFabComplementos : PonerCabeceraOrdenComplemento(mas)
+                    End Select
+                Case Venta
+                    Select Case MODELO
+                        Case True
+                            Select Case documento
+                                Case OrdenModelos : PonerCabeceraComun(mas)
+                                Case Albaran : PonerCabeceraComun(mas)
+                                Case Proforma : PonerCabeceraComun(mas)
+                                Case Factura : PonerCabeceraComun(mas)
+                            End Select
+                        Case False
+                            Select Case documento
+                                Case Pedido : PonerCabeceraComun(mas)
+                                Case Albaran : PonerCabeceraComun(mas)
+                                Case Proforma : PonerCabeceraComun(mas)
+                                Case Factura : PonerCabeceraComun(mas)
+                            End Select
+                    End Select
+            End Select
+
+        Catch ex As Exception
+            fcargando.Close() : xlsDir.CerrarExcel() : Throw ex ': LOG(ex.ToString) 
+        End Try
+    End Function
+    Private Function PonerCabeceraDetalle(ByVal hoja As Integer) As Integer
+        Dim fuente As ExcelDirecto.ExcelDirecto.Fuente
+        Dim i As Integer
+        Dim mas As Integer = xlsDir.tamHoja * (hoja - 1) + 7
+        If hoja = 1 Then mas = xlsDir.iniDetalle
+
+        Try
+            fuente.nombre = "Verdana"
+            fuente.tamaño = 8
+
+            With xlsDir.objHojaExcel
+                xlsDir.PonerFuenteARango(.Range(.Cells(mas, 1), .Cells(mas, colUltima)), fuente)
+
+                Select Case compraVenta
+                    Case Compra : PonerCabeceraDetalleCompra(mas)
+
+                    Case Venta
+                        Select Case documento
+                            Case Albaran, Factura, Pedido, Proforma
+                                Select Case MODELO
+                                    Case True : PonerCabeceraDetalleModelo(mas)
+                                    Case False : PonerCabeceraDetalleComplTej(mas)
+                                End Select
+                            Case OrdenModelos : PonerCabeceraDetalleOrdenModelos(mas)
+                        End Select
+                End Select
+                xlsDir.PonerBordeARango(.Range(.Cells(mas, 2), .Cells(mas, colUltima)), Excel.XlBordersIndex.xlEdgeBottom, _
+                             Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlMedium, colorIndexDocumento)
+
+            End With
+            filaActual = mas
+            Return mas
+
+        Catch ex As Exception
+            fcargando.Close() : xlsDir.CerrarExcel() : Throw ex ': LOG(ex.ToString) 
+        End Try
+    End Function
+    Private Sub PonerCabeceraInfoPersona()
+        Dim str As String
+        Try
+            Select Case compraVenta
+                Case Compra
+                    Select Case documento
+                        Case Pedido
+                            'Pedidos de tejidos, hilos, fornituras
+                            str = "SELECT CODI, NOM, DOM, CP, PROV, POB, NIF, EMAIL1 FROM " & tablaProveedores & " " & _
+                                    " WHERE CODI = """ & nzn(doc(0).Item("PROVE"), 0) & """ "
+                        Case Albaran
+                            'Albaran entrega hilos llevan el taller y podrían llevar también el proveedor del hilo
+                            str = "SELECT CODI, NOM, DOM, CP, PROV, POB, NIF, EMAIL1 FROM " & tablaTalleres & " WHERE CODI = """ & nzn(doc(0).Item("TALLER"), 0) & """ "
+                        Case Factura
+                            'No existe facturas de compra
+                            str = "SELECT CODI, NOM, DOM, CP, PROV, POB, NIF, EMAIL1 FROM " & tablaProveedores & " WHERE CODI = """ & nzn(doc(0).Item("PROVE"), 0) & """ "
+                        Case OrdenFabComplementos
+                            'Ordenes de fabricacion de muestras llevan el taller
+                            str = "SELECT CODI, NOM, DOM, CP, PROV, POB, NIF, EMAIL1 FROM " & tablaTalleres & " WHERE CODI = """ & nzn(doc(0).Item("PROVE"), 0) & """ "
+                    End Select
+                Case Venta
+                    Select Case documento
+                        Case Pedido, Albaran, Factura, Proforma
+                            'If nz(doc(0).Item("DOM"), "") <> "" Then
+                            '   str = "SELECT " & _
+                            '           " CLIENTS.CODI, " & _
+                            '           " CLIENTS.NIF, " & _
+                            '           " CLIENTS.EMAIL1, " & _
+                            '           " ADRES.NOM, " & _
+                            '           " ADRES.DOM, " & _
+                            '           " ADRES.PAIS, " & _
+                            '           " ADRES.CP, " & _
+                            '           " ADRES.PROV, " & _
+                            '           " ADRES.POB " & _
+                            '           " FROM CLIENTS " & _
+                            '           " LEFT JOIN ADRES ON (ADRES.CODI = """ & nzn(doc(0).Item("CLIENT"), 0) & """ AND " & _
+                            '           " ADRES.DOM =  """ & doc(0).Item("DOM") & """) " & _
+                            ''            " WHERE CLIENTS.CODI = """ & nzn(doc(0).Item("CLIENT"), 0) & """ "
+                            'Else
+                            '    str = "SELECT CODI, NOM, DOM, CP, PROV, POB, NIF, EMAIL1, PAIS FROM " & tablaClientes & " WHERE CODI = """ & nzn(doc(0).Item("CLIENT"), 0) & """ "
+                            'End If
+                            str = "SELECT CODI, NOM, DOM, CP, PROV, POB, NIF, EMAIL1, PAIS FROM " & tablaClientes & " WHERE CODI = """ & nzn(doc(0).Item("CLIENT"), 0) & """ "
+                        Case OrdenModelos
+
+                    End Select
+
+            End Select
+            If documento <> OrdenModelos Then
+                If documento = Factura Then
+                    PonerInformacionPersonaFactura(str)
+                Else
+                    PonerInformacionPersona(str)
+                End If
+            End If
+            PonerTipoDocumento()
+
+        Catch ex As Exception
+            fcargando.Close() : xlsDir.CerrarExcel() : Throw ex ': LOG(ex.ToString) 
+        End Try
+
+    End Sub
+    Private Sub PonerInformacionPersona(ByVal str As String)
+        Dim cmdSel As New MySqlCommand
+        Dim dareader As MySqlDataReader
+        Dim fuente As ExcelDirecto.ExcelDirecto.Fuente
+        Try
+            cmdSel.CommandText = str
+            cmdSel.Connection = cnn
+            ACN()
+            dareader = cmdSel.ExecuteReader
+
+            While dareader.Read
+                With dareader
+                    xlsDir.objLibroExcel.direccionEnvioMail = nz(dareader.Item("EMAIL1"), "")
+
+                    fuente.nombre = "Verdana"
+                    fuente.tamaño = 10
+                    xlsDir.PonerFuenteARango("E5:E10", fuente)
+                    With xlsDir.objHojaExcel
+                        xlsDir.PonerImagenRepetidaEnFilas(pathRec, 8, New String() {colDescripcionDocumento, colUltima}, False, False, True)
+                        xlsDir.PonerImagenRepetidaEnFilas(pathRec, 14, New String() {colDescripcionDocumento, colUltima}, False, False, True)
+
+                        'xlsDir.PonerTextosEnColumnas(21, New String() {dareader.Item("NOM"), 5, dareader.Item("DOM"), 6, _
+                        'dareader.Item("CP") & " " & dareader.Item("POB"), 7, dareader.Item("PROV"), 8, dareader.Item("NIF"), 9})
+
+                        .Cells(8, colDescripcionDocumento).Value = "'" & "   " & dareader.Item("NOM") & "      " & dareader.Item("CODI")
+                        .Cells(9, colDescripcionDocumento).Value = "'" & "   " & DirectCast(dareader.Item("DOM"), String).Replace(vbCrLf, " ")
+                        .Cells(10, colDescripcionDocumento).Value = "'" & "   " & dareader.Item("CP") & " " & dareader.Item("POB")
+                        .Cells(11, colDescripcionDocumento).Value = "'" & "   " & dareader.Item("PROV")
+                        Try
+                            If nz(dareader.Item("PAIS"), "") <> "" Then
+                                .Cells(12, colDescripcionDocumento - 5).Value = "'" & "    " & dareader.Item("PAIS")
+                            End If
+                        Catch ex As Exception
+
+                        End Try
+
+                        .Cells(13, colDescripcionDocumento).Value = "'" & "   " & dareader.Item("NIF")
+
+
+                    End With
+                End With
+            End While
+
+
+            dareader.Close()
+            CCN()
+
+        Catch ex As Exception
+            Throw ex : LOG(ex.ToString)
+        End Try
+    End Sub
+    Private Sub PonerInformacionPersonaFactura(ByVal str As String)
+        Dim cmdSel As New MySqlCommand
+        Dim dareader As MySqlDataReader
+        Dim fuente As ExcelDirecto.ExcelDirecto.Fuente
+        Try
+
+            cmdSel.CommandText = str
+            cmdSel.Connection = cnn
+            ACN()
+            dareader = cmdSel.ExecuteReader
+            With xlsDir.objHojaExcel
+                While dareader.Read
+                    ' With dareader
+                    xlsDir.objLibroExcel.direccionEnvioMail = nz(dareader.Item("EMAIL1"), "")
+
+                    fuente.nombre = "Verdana"
+                    fuente.tamaño = 10
+                    xlsDir.PonerFuenteARango("E5:E10", fuente)
+
+                    xlsDir.PonerImagenRepetidaEnFilas(pathRec, 10, New String() {colDescripcionDocumento - 5, colUltima}, False, False, True)
+                    xlsDir.PonerImagenRepetidaEnFilas(pathRec, 19, New String() {colDescripcionDocumento - 5, colUltima}, False, False, True)
+
+                    'xlsDir.PonerTextosEnColumnas(21, New String() {dareader.Item("NOM"), 5, dareader.Item("DOM"), 6, _
+                    'dareader.Item("CP") & " " & dareader.Item("POB"), 7, dareader.Item("PROV"), 8, dareader.Item("NIF"), 9})
+                    If esExtrangero Then
+                        fuente.negrita = True
+                        xlsDir.PonerFuenteARango(8, colDescripcionDocumento - 5, 8, colDescripcionDocumento - 5, fuente)
+                        fuente.negrita = False
+
+                        .Cells(8, colDescripcionDocumento - 5).Value = "'" & rm.GetString("COMPRADOR").ToUpper
+                    End If
+                    .Cells(10, colDescripcionDocumento - 5).Value = "'" & "    " & dareader.Item("NOM") & "      " & dareader.Item("CODI")
+                    .Cells(11, colDescripcionDocumento - 5).Value = "'" & "    " & DirectCast(dareader.Item("DOM"), String).Replace(vbCrLf, " ")
+                    .Cells(12, colDescripcionDocumento - 5).Value = "'" & "    " & dareader.Item("CP") & " " & dareader.Item("POB")
+                    .Cells(13, colDescripcionDocumento - 5).Value = "'" & "    " & dareader.Item("PROV")
+                    If nz(dareader.Item("PAIS"), "") <> "" Then
+                        .Cells(14, colDescripcionDocumento - 5).Value = "'" & "    " & dareader.Item("PAIS")
+                    End If
+                    .Cells(19, colDescripcionDocumento - 5).Value = "'" & "    " & dareader.Item("NIF")
+
+
+                End While
+                'Ponermos la direccion de envio en caso de empresa extrangera
+                If esExtrangero And nz(doc(0).Item("DOM"), "") <> "" Then
+                    fuente.negrita = True
+                    xlsDir.PonerFuenteARango(21, colDescripcionDocumento - 5, 21, colDescripcionDocumento - 5, fuente)
+                    fuente.negrita = False
+                    .Cells(21, colDescripcionDocumento - 5).Value = "'" & rm.GetString("DIRECCIONENVIO").ToUpper
+                    xlsDir.PonerBordeARangoRectangulo(22, colDescripcionDocumento - 5, 22 + 6, colUltima - 1, _
+                       Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlThin, colorIndexDocumento)
+                    xlsDir.AlinearRango(22, colDescripcionDocumento - 5, 22, colDescripcionDocumento - 5, ExcelDirecto.ExcelDirecto.Alineacion.Izquierda, ExcelDirecto.ExcelDirecto.Alineacion.Superior)
+                    xlsDir.Juntar(22, colDescripcionDocumento - 5, 22 + 6, colUltima - 1)
+                    xlsDir.AlinearRango(22, colDescripcionDocumento - 5, 22 + 6, colUltima - 1, ExcelDirecto.ExcelDirecto.Alineacion.Izquierda, ExcelDirecto.ExcelDirecto.Alineacion.Superior)
+                    .Cells(22, colDescripcionDocumento - 5).Value = "'" & domEnvio
+                End If
+            End With
+            dareader.Close()
+            CCN()
+
+        Catch ex As Exception
+            Throw ex : LOG(ex.ToString)
+        End Try
+    End Sub
+
+    Private Sub PonerTipoDocumento()
+        Dim fuente As ExcelDirecto.ExcelDirecto.Fuente
+        Try
+            'Aqui ponemos el TIPUS de DOCUMENT
+            fuente.nombre = "Trebuchet MS"
+            fuente.tamaño = 12
+            'fuente.color = colorIndexCentro
+            fuente.colorIndex = colorIndexDocumento
+            fuente.negrita = False
+
+            With xlsDir.objHojaExcel
+                Select Case compraVenta
+                    Case Compra
+
+                        Select Case documento
+                            Case Pedido
+                                Select Case tipo
+                                    Case Tejido
+                                        xlsDir.Juntar(2, colDescripcionDocumento, 3, colUltima - 1)
+                                        .Cells(2, colDescripcionDocumento).Value = "'" & rm.GetString("PEDIDOCOMPRATEJIDO").ToUpper
+                                        xlsDir.objLibroExcel.asuntoMail = rm.GetString("PTEJIDO")
+                                    Case Hilos
+                                        xlsDir.Juntar(2, colDescripcionDocumento, 3, colUltima - 1)
+                                        .Cells(2, colDescripcionDocumento).Value = "'" & rm.GetString("PEDIDOCOMPRAHILO").ToUpper
+                                        xlsDir.objLibroExcel.asuntoMail = rm.GetString("PHILO")
+                                    Case Fornitura
+                                        xlsDir.Juntar(2, colDescripcionDocumento, 3, colUltima - 1)
+                                        .Cells(2, colDescripcionDocumento).Value = "'" & rm.GetString("PEDIDOCOMPRAFORNI").ToUpper
+                                        xlsDir.objLibroExcel.asuntoMail = rm.GetString("PFORNI")
+                                End Select
+                                'Solo Albaranes de compra de hilos
+                            Case Albaran
+                                xlsDir.Juntar(2, colDescripcionDocumento, 3, colUltima - 1)
+                                .Cells(2, colDescripcionDocumento).Value = "'" & rm.GetString("ALBARANESENTREGAHILOS").ToUpper
+                                xlsDir.objLibroExcel.asuntoMail = rm.GetString("AENTREGAHILOS")
+                            Case OrdenFabComplementos
+                                xlsDir.Juntar(2, colDescripcionDocumento, 3, colUltima - 1)
+                                .Cells(2, colDescripcionDocumento).Value = "'" & rm.GetString("ORDENCOMPLEMENTO").ToUpper
+                                xlsDir.objLibroExcel.asuntoMail = rm.GetString("OFABCOMPLEMENTO")
+                        End Select
+                        xlsDir.PonerFuenteARango(2, colDescripcionDocumento, 2, colDescripcionDocumento, fuente)
+
+                    Case Venta
+                        fuente.tamaño = 24
+                        'xlsDir.Juntar(2, colDescripcionDocumento - 6, 3, colDescripcionDocumento + 5)
+
+                        Select Case documento
+
+                            Case OrdenModelos
+                                fuente.tamaño = 12
+                                xlsDir.Juntar(2, colDescripcionDocumento - 6, 3, colUltima - 1)
+                                .Cells(2, colDescripcionDocumento - 6).Value = "'" & rm.GetString("ORDENESMODELOS").ToUpper
+                                xlsDir.objLibroExcel.asuntoMail = rm.GetString("ORDENESMODELOS")
+                                xlsDir.PonerFuenteARango(2, colDescripcionDocumento - 6, 2, colDescripcionDocumento - 6, fuente)
+                            Case Pedido
+                                xlsDir.Juntar(2, colDescripcionDocumento - 6, 3, colUltima - 1)
+                                .Cells(2, colDescripcionDocumento - 6).Value = "'" & rm.GetString("PEDIDO").ToUpper
+                                xlsDir.objLibroExcel.asuntoMail = rm.GetString("PEDIDO")
+                            Case Albaran
+                                xlsDir.Juntar(2, colDescripcionDocumento - 6, 3, colUltima - 1)
+                                .Cells(2, colDescripcionDocumento - 6).Value = "'" & rm.GetString("ALBARAN").ToUpper
+                                xlsDir.objLibroExcel.asuntoMail = rm.GetString("ALBARAN")
+                            Case Proforma
+                                xlsDir.Juntar(2, colDescripcionDocumento - 6, 3, colUltima - 1)
+                                .Cells(2, colDescripcionDocumento - 6).Value = "'" & rm.GetString("PROFORMA").ToUpper
+                                xlsDir.objLibroExcel.asuntoMail = rm.GetString("PROFORMA")
+                            Case Factura
+                                xlsDir.Juntar(2, colDescripcionDocumento - 6, 3, colUltima - 1)
+                                .Cells(2, colDescripcionDocumento - 6).Value = "'" & rm.GetString("FACTURA").ToUpper
+                                xlsDir.objLibroExcel.asuntoMail = rm.GetString("FACTURA")
+                        End Select
+                        xlsDir.PonerFuenteARango(2, colDescripcionDocumento - 6, 2, colDescripcionDocumento - 6, fuente)
+                End Select
+            End With
+
+        Catch ex As Exception
+            Throw ex : LOG(ex.ToString)
+        End Try
+    End Sub
+#End Region
+
+#Region "DETALLE"
+
+    Private Function obtenerFechaLineaAlbaran(ByVal pos As Integer) As Object
+        Dim cmd As New MySqlCommand("SELECT DATA FROM FACTUR WHERE DOCUMENT = """ & Albaran & """ AND FRA = """ & lineasDoc(pos).Item("ALBAR") & """", cnn)
+        Try
+            ACN()
+            Return cmd.ExecuteScalar()
+            'CCN()
+
+        Catch ex As Exception
+            fcargando.Close() : xlsDir.CerrarExcel() : Throw ex ': LOG(ex.ToString) 
+        End Try
+    End Function
+    Private Function PonerArticuloModelo(ByVal x As Integer, ByVal pos As Integer) As Integer
+        'x es la filas
+        Dim coltallaa As Short = colTalla
+        With xlsDir.objHojaExcel
+            Select Case documento
+                Case OrdenModelos, Albaran
+                    .Cells(x, colTipo).Value = "'" & doc(0).Item("ALBCLI")
+                    xlsDir.Juntar(x, colTipo, x, colCodigo - 1)
+
+                    .Cells(x, colCodigo).Value = "'" & doc(0).Item("MODEL")
+                    xlsDir.Juntar(x, colCodigo, x, colDescri - 1)
+
+                    .Cells(x, colDescri).Value = "'" & doc(0).Item("SERIE")
+                    xlsDir.Juntar(x, colDescri, x, colColor - 1)
+
+                    .Cells(x, colColor).Value = "'" & lineasDoc(pos).Item("COLOR")
+                    xlsDir.Juntar(x, colColor, x, coltallaa - 1)
+
+                    .Cells(x, coltallaa).Value = "'" & nzn(lineasDoc(pos).Item("TALLA01"), 0)
+                    xlsDir.Juntar(x, coltallaa - 3, x, coltallaa - 1)
+                    coltallaa = coltallaa + 3
+
+                    .Cells(x, coltallaa).Value = "'" & nzn(lineasDoc(pos).Item("TALLA02"), 0)
+                    xlsDir.Juntar(x, coltallaa - 3, x, coltallaa - 1)
+                    coltallaa = coltallaa + 3
+
+                    .Cells(x, coltallaa).Value = "'" & nzn(lineasDoc(pos).Item("TALLA03"), 0)
+                    xlsDir.Juntar(x, coltallaa - 3, x, coltallaa - 1)
+                    coltallaa = coltallaa + 3
+
+                    .Cells(x, coltallaa).Value = "'" & nzn(lineasDoc(pos).Item("TALLA04"), 0)
+                    xlsDir.Juntar(x, coltallaa - 3, x, coltallaa - 1)
+                    coltallaa = coltallaa + 3
+
+                    .Cells(x, coltallaa).Value = "'" & nzn(lineasDoc(pos).Item("TALLA05"), 0)
+                    xlsDir.Juntar(x, coltallaa - 3, x, coltallaa - 1)
+                    coltallaa = coltallaa + 3
+
+                    .Cells(x, coltallaa).Value = "'" & nzn(lineasDoc(pos).Item("TALLA05"), 0)
+                    xlsDir.Juntar(x, coltallaa - 3, x, coltallaa - 1)
+                    coltallaa = coltallaa + 3
+
+                    .Cells(x, coltallaa).Value = "'" & nzn(lineasDoc(pos).Item("TALLA06"), 0)
+                    xlsDir.Juntar(x, coltallaa - 3, x, coltallaa - 1)
+                    coltallaa = coltallaa + 3
+
+                    .Cells(x, coltallaa).Value = "'" & nzn(lineasDoc(pos).Item("TALLA07"), 0)
+                    xlsDir.Juntar(x, coltallaa - 3, x, coltallaa - 1)
+                    coltallaa = coltallaa + 3
+
+                    .Cells(x, coltallaa).Value = "'" & nzn(lineasDoc(pos).Item("TALLA09"), 0)
+                    xlsDir.Juntar(x, coltallaa - 3, x, coltallaa - 1)
+                    coltallaa = coltallaa + 3
+
+                    .Cells(x, coltallaa).Value = "'" & nzn(lineasDoc(pos).Item("TALLA08"), 0)
+                    xlsDir.Juntar(x, coltallaa - 3, x, coltallaa - 1)
+                    coltallaa = coltallaa + 3
+
+                    .Cells(x, coltallaa).Value = "'" & nzn(lineasDoc(pos).Item("TALLA10"), 0)
+                    xlsDir.Juntar(x, coltallaa - 3, x, coltallaa - 1)
+
+                    .Cells(x, colUnidades).Value = "'" & lineasDoc(pos).Item("UNITATS")
+                    xlsDir.Juntar(x, colUnidades, x, colIMPORT - 1)
+
+                    .Cells(x, colPrecio).Value = "'" & Format(nzn(doc(0).Item("PREU"), 0), "#,##0.00")
+                    xlsDir.Juntar(x, colIMPORT, x, colUltima - 1)
+
+                Case Factura
+                    With xlsDir.objHojaExcel
+                        xlsDir.Juntar(x, colAlbar, x, colTipo - 1)
+                        .Cells(x, colAlbar).Value = "'" & lineasDoc(pos).Item("ALBAR")
+
+                        xlsDir.Juntar(x, colTipo, x, colCodigo - 1)
+                        .Cells(x, colTipo).Value = "'" & lineasDoc(pos).Item("FECHA") 'nz(obtenerFechaLineaAlbaran(pos), "", False, True)
+
+                        xlsDir.Juntar(x, colCodigo, x, colDescri - 1)
+                        'Mostra es el articulo en este caso una prenda
+                        .Cells(x, colCodigo).Value = "'" & lineasDoc(pos).Item("MOSTRA")
+
+                        xlsDir.Juntar(x, colDescri, x, colColor - 1)
+                        .Cells(x, colDescri).Value = "'" & lineasDoc(pos).Item("SERIE")
+
+                        xlsDir.Juntar(x, colColor, x, colUnidades - 1)
+                        .Cells(x, colColor).Value = "'" & lineasDoc(pos).Item("COLOR")
+
+                        xlsDir.Juntar(x, colUnidades, x, colPrecio - 1)
+                        .Cells(x, colUnidades).Value = "'" & nzn(Format(lineasDoc(pos).Item("UNITATS"), 0), "#,##0.00") '"'" & lineasDoc(pos).Item("UNITATS")
+
+                        xlsDir.Juntar(x, colPrecio, x, colIMPORT - 1)
+                        .Cells(x, colPrecio).Value = "'" & Format(nzn(lineasDoc(pos).Item("PREU"), 0), "#,##0.00") '"'" & lineasDoc(pos).Item("PREU") & "€"
+                        xlsDir.Juntar(x, colIMPORT, x, colUltima - 1)
+
+                        .Cells(x, colIMPORT).Value = "'" & Format(nzn(lineasDoc(pos).Item("IMPORT"), 0), "#,##0.00")
+                        xlsDir.AlinearRango(x, colCodigo, x, colCodigo, ExcelDirecto.ExcelDirecto.Alineacion.Centro)
+
+
+                    End With
+                    Return x
+            End Select
+
+        End With
+        Return x
+    End Function
+    Private Function PonerArticuloModeloOrdenFab(ByVal x As Integer, ByVal pos As Integer) As Integer
+        Try
+            Dim coltallaa As Short = colTalla
+            With xlsDir.objHojaExcel
+                .Cells(x, colColor).Value = "'" & lineasDoc(pos).Item("COLOR")
+                xlsDir.Juntar(x, colColor, x, coltallaa - 1)
+
+                .Cells(x, coltallaa).Value = "'" & nzn(lineasDoc(pos).Item("TALL1"), 0)
+                xlsDir.Juntar(x, colDescri, x, coltallaa - 1)
+                coltallaa = coltallaa + 3
+
+                .Cells(x, coltallaa).Value = "'" & nzn(lineasDoc(pos).Item("TALL2"), 0)
+                xlsDir.Juntar(x, colDescri, x, coltallaa - 1)
+                coltallaa = coltallaa + 3
+
+                .Cells(x, coltallaa).Value = "'" & nzn(lineasDoc(pos).Item("TALL3"), 0)
+                xlsDir.Juntar(x, colDescri, x, coltallaa - 1)
+                coltallaa = coltallaa + 3
+
+                .Cells(x, coltallaa).Value = "'" & nzn(lineasDoc(pos).Item("TALL4"), 0)
+                xlsDir.Juntar(x, colDescri, x, coltallaa - 1)
+                coltallaa = coltallaa + 3
+
+                .Cells(x, coltallaa).Value = "'" & nzn(lineasDoc(pos).Item("TALL5"), 0)
+                xlsDir.Juntar(x, colDescri, x, coltallaa - 1)
+                coltallaa = coltallaa + 3
+
+                .Cells(x, coltallaa).Value = "'" & nzn(lineasDoc(pos).Item("TALL6"), 0)
+                xlsDir.Juntar(x, colDescri, x, coltallaa - 1)
+                coltallaa = coltallaa + 3
+
+                .Cells(x, coltallaa).Value = "'" & nzn(lineasDoc(pos).Item("TALL7"), 0)
+                xlsDir.Juntar(x, colDescri, x, coltallaa - 1)
+                coltallaa = coltallaa + 3
+                .Cells(x, coltallaa).Value = "'" & nzn(lineasDoc(pos).Item("TALL8"), 0)
+                xlsDir.Juntar(x, colDescri, x, coltallaa - 1)
+                coltallaa = coltallaa + 3
+                .Cells(x, coltallaa).Value = "'" & nzn(lineasDoc(pos).Item("TALL9"), 0)
+                xlsDir.Juntar(x, colDescri, x, coltallaa - 1)
+                coltallaa = coltallaa + 3
+                .Cells(x, coltallaa).Value = "'" & nzn(lineasDoc(pos).Item("TALL10"), 0)
+                xlsDir.Juntar(x, colDescri, x, coltallaa - 1)
+                coltallaa = coltallaa + 3
+
+                .Cells(x, colUnidades).Value = "'" & lineasDoc(pos).Item("QUANTITAT")
+                xlsDir.Juntar(x, colUnidades, x, colUnidades + 6)
+            End With
+            Return x
+
+        Catch ex As Exception
+            fcargando.Close() : xlsDir.CerrarExcel() : Throw ex ': LOG(ex.ToString) 
+        End Try
+    End Function
+    Private Function PonerArticuloComplementoTejido(ByVal x As Integer, ByVal pos As Integer) As Integer
+        Try
+            With xlsDir.objHojaExcel
+                If documento = Factura Then
+                    ' xlsDir.Juntar(x, colAlbar, x, colTipo - 1)
+                    .Cells(x, colAlbar).Value = "'" & lineasDoc(pos).Item("ALBAR")
+                    .Cells(x, colTipo).Value = "'" & lineasDoc(pos).Item("FECHA") 'nz(obtenerFechaLineaAlbaran(pos), "", False, True)
+                End If
+                If documento = Albaran Then .Cells(x, colTipo).Value = "'" & nz(doc(0).Item("ALBCLI"), "")
+
+                If documento <> Pedido Then
+                    ' xlsDir.Juntar(x, colTipo, x, colCodigo - 1)
+                End If
+
+                .Cells(x, colCodigo).Value = "'" & lineasDoc(pos).Item("MOSTRA")
+                'xlsDir.Juntar(x, colCodigo, x, colDescri - 1)
+                'xlsDir.Juntar(x, colDescri, x, colColor - 1)
+                'xlsDir.Juntar(x, colColor, x, colTalla - 1)
+                'xlsDir.Juntar(x, colTalla, x, colUnidades - 1)
+                xlsDir.Juntar(x, colUnidades, x, colPrecio - 1, ExcelDirecto.ExcelDirecto.Alineacion.Derecha)
+                xlsDir.Juntar(x, colPrecio, x, colIMPORT - 1, ExcelDirecto.ExcelDirecto.Alineacion.Derecha)
+
+                .Cells(x, colDescri).Value = "'" & lineasDoc(pos).Item("DESCRI")
+                .Cells(x, colColor).Value = "'" & lineasDoc(pos).Item("COLOR")
+                .Cells(x, colTalla).Value = "'" & lineasDoc(pos).Item("TALLA") & " " & PonerKGM(pos)
+                .Cells(x, colUnidades).Value = "'" & Format(nzn(lineasDoc(pos).Item("UNITATS"), 0), "#,##0.00") '& " " & PonerKGM(pos) '"'" & lineasDoc(pos).Item("UNITATS") & " " & PonerKGM(pos)
+                .Cells(x, colPrecio).Value = "'" & Format(nzn(lineasDoc(pos).Item("PREU"), 0), "#,##0.00") & "€"  '"'" & lineasDoc(pos).Item("PREU") & "€"
+                'xlsDir.m_Excel.Columns(.Range(.Cells(x, colPrecio), .Cells(x, colPrecio))).Select()
+                'xlsDir.m_Excel.Selection.NumberFormat = "#,##0"
+                If documento <> Albaran Then
+                    xlsDir.Juntar(x, colIMPORT, x, colUltima, ExcelDirecto.ExcelDirecto.Alineacion.Derecha)
+                    .Cells(x, colIMPORT).Value = "'" & Format(nzn(lineasDoc(pos).Item("IMPORT"), 0), "#,##0.00") ' "'" & lineasDoc(pos).Item("IMPORT") & "€"
+                End If
+            End With
+            Return x
+
+        Catch ex As Exception
+            fcargando.Close() : xlsDir.CerrarExcel() : Throw ex ': LOG(ex.ToString) 
+        End Try
+    End Function
+    Private Function obtenerMaquina(ByVal tejido As String)
+        Dim cmd As New MySqlCommand("SELECT MAQUI FROM TEIXITS WHERE CODI = """ & tejido & """ ", cnn)
+        Try
+            ACN()
+            Return nzn(cmd.ExecuteScalar, 0)
+
+        Catch ex As Exception
+            Throw ex : LOG(ex.ToString)
+        End Try
+    End Function
+    Private Function PonerArticuloCompra(ByVal x As Single, ByVal pos As Integer)
+        Try
+            With xlsDir.objHojaExcel
+                If documento = Factura Then .Range(x, colAlbar).Value = "'" & lineasDoc(pos).Item("ALBAR")
+
+                .Cells(x, colCodigo).Value = "'" & lineasDoc(pos).Item("ARTICLE")
+                xlsDir.Juntar(x, colCodigo, x, colDescri - 1)
+                .Cells(x, colDescri).Value = "'" & lineasDoc(pos).Item("DESCRI")
+
+                xlsDir.Juntar(x, colDescri, x, colColor - 1)
+                .Cells(x, colColor).Value = "'" & lineasDoc(pos).Item("COLOR")
+                'Select Case tipo
+                '    Case Tejido
+                '        xlsDir.Juntar(x, colColor, x, colMaquina - 1)
+                '    Case Muestra
+                '    Case Fornitura
+
+                'End Select
+                If tipo = Fornitura Then
+                    xlsDir.Juntar(x, colColor, x, colTalla - 1)
+                    .Cells(x, colTalla).Value = "'" & lineasDoc(pos).Item("TALLA")
+                End If
+                If tipo = Tejido OrElse tipo = Muestra Then
+                    'xlsDir.Juntar(x, colDescri, x, colColor - 1)
+                    '.Cells(x, colColor).Value = "'" & lineasDoc(pos).Item("COLOR")
+                    Select Case tipo
+                        Case Tejido : xlsDir.Juntar(x, colColor, x, colMaquina - 1)
+                        Case Else
+                            If documento <> OrdenFabComplementos Then
+                                xlsDir.Juntar(x, colColor, x, colUnidades - 1)
+                            Else
+                                xlsDir.Juntar(x, colColor, x, colTalla - 1)
+                            End If
+                    End Select
+
+                End If
+                If tipo = Tejido Then
+                    'LA MAQUINA
+                    .Cells(x, colMaquina).Value = "'" & obtenerMaquina(lineasDoc(pos).Item("ARTICLE"))
+                    xlsDir.Juntar(x, colMaquina, x, colUnidades - 1)
+                End If
+
+                If documento = OrdenFabComplementos Then
+                    .Cells(x, colUnidades + 2).Value = "'" & lineasDoc(pos).Item("UNITATS") & " " & PonerKGM(pos)
+                    xlsDir.Juntar(x, colTalla, x, colUnidades - 1)
+                    .Cells(x, colTalla).Value = "'" & lineasDoc(pos).Item("TALLA")
+                    xlsDir.Juntar(x, colUnidades, x, colPrecio - 1)
+                Else
+                    .Cells(x, colUnidades).Value = "'" & lineasDoc(pos).Item("UNITATS") & " " & PonerKGM(pos)
+                    xlsDir.Juntar(x, colUnidades, x, colPrecio - 1)
+                End If
+
+
+                If documento <> OrdenFabComplementos AndAlso (documento <> Albaran) Then ' AndAlso tipo <> Hilos) Then
+                    'Siempre que no sea un orden de fabricacion o un albaran de entrega de hilos
+                    .Cells(x, colPrecio).Value = "'" & lineasDoc(pos).Item("PREU") & "€"
+                    xlsDir.Juntar(x, colPrecio, x, colDTO - 1)
+                    .Cells(x, colDTO).Value = "'" & lineasDoc(pos).Item("DTE") & "€"
+                    xlsDir.Juntar(x, colDTO, x, colIMPORT - 1)
+                    .Cells(x, colIMPORT).Value = "'" & Format(nzn(lineasDoc(pos).Item("IMPORT"), 0), "#,##0.00")
+                    xlsDir.Juntar(x, colIMPORT, x, colUltima)
+                Else
+                    If documento = OrdenFabComplementos Then
+                        .Cells(x, colIMPORT).Value = "'" & Format(nzn(lineasDoc(pos).Item("IMPORT"), 0), "#,##0.00")
+                        xlsDir.Juntar(x, colIMPORT, x, colUltima)
+                    End If
+                End If
+            End With
+
+            Return x
+
+        Catch ex As Exception
+            fcargando.Close() : xlsDir.CerrarExcel() : Throw ex ': LOG(ex.ToString) 
+        End Try
+    End Function
+    Private Function PonerArticulo(ByVal pos As Integer, ByVal hoja As Integer, ByVal hojaNueva As Boolean, ByVal fil As Integer) As Integer
+        Dim fuente As ExcelDirecto.ExcelDirecto.Fuente
+        Dim filaMAX As Integer
+        Try
+            If hojaNueva Then
+                fil = 0
+                If hoja = 1 Then
+                    If xlsDir.Cabe(xlsDir.iniDetalle + lineasDoc.Count - pos, hoja) Then
+                        filaMAX = xlsDir.tamDetalle + xlsDir.iniDetalle
+                    Else
+                        filaMAX = xlsDir.tamDetalleNoPrimera + 13
+                    End If
+                    PonerBordesDetalle(xlsDir.iniDetalle, filaMAX, hoja)
+                Else
+                    If xlsDir.iniDetalleNoPrimera + lineasDoc.Count - pos <= xlsDir.tamDetalleNoPrimera Then : filaMAX = xlsDir.tamDetalleNoPrimera + ((hoja - 1) * xlsDir.tamHoja) + xlsDir.iniDetalleNoPrimera
+                    Else : filaMAX = xlsDir.tamDetalleNoPrimera + ((hoja - 1) * xlsDir.tamHoja) : End If
+                    PonerBordesDetalle(xlsDir.iniDetalleNoPrimera + ((hoja - 1) * xlsDir.tamHoja), filaMAX, hoja)
+                End If
+            End If
+            If hoja = 1 Then fil = pos
+            Dim x As Integer = xlsDir.tamHoja * (hoja - 1) + fil
+
+            If hoja = 1 Then : x = x + xlsDir.iniDetalle + 1 : Else : x = x + xlsDir.iniDetalleNoPrimera : End If
+            If xlsDir.Cabe(x + 15, hoja) Then
+
+                fuente.nombre = "Arial"
+                If MODELO Then
+                    fuente.tamaño = 7
+                Else
+                    fuente.tamaño = 8
+                End If
+
+                fuente.negrita = False
+                xlsDir.PonerFuenteARango(xlsDir.objHojaExcel.Range(xlsDir.objHojaExcel.Cells(x, colPrimera), xlsDir.objHojaExcel.Cells(x, colUltima)), fuente)
+
+                Select Case compraVenta
+                    Case Compra : Return PonerArticuloCompra(x, pos)
+                    Case Venta
+                        Select Case documento
+                            Case Pedido, Albaran, Factura, Proforma
+                                Select Case MODELO
+                                    Case True : Return PonerArticuloModelo(x, pos)
+                                    Case False : Return PonerArticuloComplementoTejido(x, pos)
+                                End Select
+                            Case OrdenModelos : Return PonerArticuloModeloOrdenFab(x, pos)
+                        End Select
+                End Select
+            Else
+                'xlsDir.objHojaExcel.Cells(x, colColor).Value = "'" & rm.GetString("SUMAYSIGUE")
+                'Poner otra cabecera
+                Select Case documento
+                    Case Pedido, Albaran : PonerCabeceraPAF(hoja + 1)
+                        'Case Albaran : PonerCabeceraPAF(hoja + 1)
+                End Select
+                PonerCabeceraDetalle(hoja + 1)
+                Return -1
+            End If
+            filaActual = filaMAX
+
+        Catch ex As Exception
+            fcargando.Close() : xlsDir.CerrarExcel() : Throw ex ': LOG(ex.ToString) 
+        End Try
+    End Function
+    Private Function PonerTIPUS(ByVal i As Integer) As String
+        Try
+            Select Case lineasDoc(i).Item("TIPUS")
+                Case "T" : Return rm.GetString("TEJIDO")
+                Case "M" : Return rm.GetString("HILO")
+                Case "F" : Return rm.GetString("FORNITURA")
+            End Select
+
+        Catch ex As Exception
+            fcargando.Close() : xlsDir.CerrarExcel() : Throw ex ': LOG(ex.ToString) 
+        End Try
+    End Function
+    Private Function PonerTipo(ByVal i As Integer) As String
+        Try
+            If lineasDoc(i).Item("TIPUS") = "T" Then
+                Return rm.GetString("TEJIDO")
+            Else
+                Return rm.GetString("COMPLEMENTO")
+            End If
+        Catch ex As Exception
+            fcargando.Close() : xlsDir.CerrarExcel() : Throw ex ': LOG(ex.ToString) 
+        End Try
+    End Function
+    Private Function PonerKGM(ByVal pos As Integer) As String
+        Try
+            If lineasDoc(pos).Item("TIPUS") = "T" Then
+                If lineasDoc(pos).Item("KM") = "K" Then
+                    Return rm.GetString("ABRKILOS")
+                Else
+                    Return rm.GetString("ABRMETROS")
+                End If
+            End If
+        Catch ex As Exception
+            fcargando.Close() : xlsDir.CerrarExcel() : Throw ex ': LOG(ex.ToString) 
+        End Try
+    End Function
+    Private Sub PonerBordesDetallaOrdenesModelos(ByVal x As Integer, ByVal y As Integer)
+        Try
+            With xlsDir.objHojaExcel
+                xlsDir.PonerBordeARango(.Range(.Cells(x, colTipo), .Cells(y, colTipo)), Excel.XlBordersIndex.xlEdgeLeft, _
+                                    Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlThin, colorIndexDocumento)
+                xlsDir.PonerBordeARango(.Range(.Cells(x, colColor), .Cells(y, colColor)), Excel.XlBordersIndex.xlEdgeLeft, _
+                                    Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlThin, colorIndexDocumento)
+                xlsDir.PonerBordeARango(.Range(.Cells(x, colTalla), .Cells(y, colTalla)), Excel.XlBordersIndex.xlEdgeLeft, _
+                                    Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlThin, colorIndexDocumento)
+                xlsDir.PonerBordeARango(.Range(.Cells(x, colTalla + 3), .Cells(y, colTalla + 3)), Excel.XlBordersIndex.xlEdgeLeft, _
+                                    Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlThin, colorIndexDocumento)
+                xlsDir.PonerBordeARango(.Range(.Cells(x, colTalla + 6), .Cells(y, colTalla + 6)), Excel.XlBordersIndex.xlEdgeLeft, _
+                                    Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlThin, colorIndexDocumento)
+                xlsDir.PonerBordeARango(.Range(.Cells(x, colTalla + 9), .Cells(y, colTalla + 9)), Excel.XlBordersIndex.xlEdgeLeft, _
+                                    Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlThin, colorIndexDocumento)
+                xlsDir.PonerBordeARango(.Range(.Cells(x, colTalla + 12), .Cells(y, colTalla + 12)), Excel.XlBordersIndex.xlEdgeLeft, _
+                                    Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlThin, colorIndexDocumento)
+                xlsDir.PonerBordeARango(.Range(.Cells(x, colTalla + 15), .Cells(y, colTalla + 15)), Excel.XlBordersIndex.xlEdgeLeft, _
+                                    Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlThin, colorIndexDocumento)
+                xlsDir.PonerBordeARango(.Range(.Cells(x, colTalla + 18), .Cells(y, colTalla + 18)), Excel.XlBordersIndex.xlEdgeLeft, _
+                                    Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlThin, colorIndexDocumento)
+                xlsDir.PonerBordeARango(.Range(.Cells(x, colTalla + 21), .Cells(y, colTalla + 21)), Excel.XlBordersIndex.xlEdgeLeft, _
+                                    Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlThin, colorIndexDocumento)
+                xlsDir.PonerBordeARango(.Range(.Cells(x, colTalla + 24), .Cells(y, colTalla + 24)), Excel.XlBordersIndex.xlEdgeLeft, _
+                                    Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlThin, colorIndexDocumento)
+                xlsDir.PonerBordeARango(.Range(.Cells(x, colTalla + 27), .Cells(y, colTalla + 27)), Excel.XlBordersIndex.xlEdgeLeft, _
+                                    Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlThin, colorIndexDocumento)
+                xlsDir.PonerBordeARango(.Range(.Cells(x, colUnidades), .Cells(y, colUnidades)), Excel.XlBordersIndex.xlEdgeLeft, _
+                                    Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlThin, colorIndexDocumento)
+
+            End With
+
+        Catch ex As Exception
+            fcargando.Close() : xlsDir.CerrarExcel() : Throw ex ': LOG(ex.ToString) 
+        End Try
+    End Sub
+    Private Sub PonerBordesDetalleModeloFactura(ByVal x As Integer, ByVal y As Integer)
+        Try
+            With xlsDir.objHojaExcel
+
+                y = y - 1
+
+                xlsDir.PonerBordeARango(.Range(.Cells(x, colAlbar), .Cells(y, colAlbar)), Excel.XlBordersIndex.xlEdgeLeft, _
+                                                    Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlThin, colorIndexDocumento)
+                xlsDir.PonerBordeARango(.Range(.Cells(x, colTipo), .Cells(y, colTipo)), Excel.XlBordersIndex.xlEdgeLeft, _
+                                                    Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlThin, colorIndexDocumento)
+                xlsDir.PonerBordeARango(.Range(.Cells(x, colCodigo), .Cells(y, colCodigo)), Excel.XlBordersIndex.xlEdgeLeft, _
+                                                    Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlThin, colorIndexDocumento)
+                xlsDir.PonerBordeARango(.Range(.Cells(x, colDescri), .Cells(y, colDescri)), Excel.XlBordersIndex.xlEdgeLeft, _
+                                                    Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlThin, colorIndexDocumento)
+                xlsDir.PonerBordeARango(.Range(.Cells(x, colColor), .Cells(y, colColor)), Excel.XlBordersIndex.xlEdgeLeft, _
+                                                    Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlThin, colorIndexDocumento)
+                xlsDir.PonerBordeARango(.Range(.Cells(x, colUnidades), .Cells(y, colUnidades)), Excel.XlBordersIndex.xlEdgeLeft, _
+                                                    Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlThin, colorIndexDocumento)
+                xlsDir.PonerBordeARango(.Range(.Cells(x, colPrecio), .Cells(y, colPrecio)), Excel.XlBordersIndex.xlEdgeLeft, _
+                                                    Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlThin, colorIndexDocumento)
+                xlsDir.PonerBordeARango(.Range(.Cells(x, colIMPORT), .Cells(y, colIMPORT)), Excel.XlBordersIndex.xlEdgeLeft, _
+                                                    Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlThin, colorIndexDocumento)
+            End With
+
+        Catch ex As Exception
+            Throw ex : LOG(ex.ToString)
+        End Try
+    End Sub
+    Private Sub PonerBordesDetalleComun(ByVal x As Integer, ByVal y As Integer, ByVal hoja As Integer)
+        Try
+            With xlsDir.objHojaExcel
+                y = y - 1
+                If hoja <> 1 Then x = x - 1
+                Select Case compraVenta
+                    Case Venta
+                        Select Case documento
+                            Case Pedido, Albaran, Factura, Proforma
+                                If documento = Factura Then
+                                    xlsDir.PonerBordeARango(.Range(.Cells(x, colAlbar), .Cells(y, colAlbar)), Excel.XlBordersIndex.xlEdgeLeft, _
+                                                        Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlHairline, colorIndexDocumento)
+                                End If
+                                If documento <> Pedido Then
+                                    xlsDir.PonerBordeARango(.Range(.Cells(x, colTipo), .Cells(y, colTipo)), Excel.XlBordersIndex.xlEdgeLeft, _
+                                                        Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlHairline, colorIndexDocumento)
+                                End If
+                                xlsDir.PonerBordeARango(.Range(.Cells(x, colCodigo), .Cells(y, colCodigo)), Excel.XlBordersIndex.xlEdgeLeft, _
+                                                                    Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlHairline, colorIndexDocumento)
+                                xlsDir.PonerBordeARango(.Range(.Cells(x, colDescri), .Cells(y, colDescri)), Excel.XlBordersIndex.xlEdgeLeft, _
+                                                    Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlHairline, colorIndexDocumento)
+                                xlsDir.PonerBordeARango(.Range(.Cells(x, colColor), .Cells(y, colColor)), Excel.XlBordersIndex.xlEdgeLeft, _
+                                                    Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlHairline, colorIndexDocumento)
+                                xlsDir.PonerBordeARango(.Range(.Cells(x, colTalla), .Cells(y, colTalla)), Excel.XlBordersIndex.xlEdgeLeft, _
+                                                                    Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlHairline, colorIndexDocumento)
+                                xlsDir.PonerBordeARango(.Range(.Cells(x, colUnidades), .Cells(y, colUnidades)), Excel.XlBordersIndex.xlEdgeLeft, _
+                                                    Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlHairline, colorIndexDocumento)
+                                xlsDir.PonerBordeARango(.Range(.Cells(x, colTalla), .Cells(y, colTalla)), Excel.XlBordersIndex.xlEdgeLeft, _
+                                                    Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlHairline, colorIndexDocumento)
+                                xlsDir.PonerBordeARango(.Range(.Cells(x, colPrecio), .Cells(y, colPrecio)), Excel.XlBordersIndex.xlEdgeLeft, _
+                                                    Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlHairline, colorIndexDocumento)
+                                If documento <> Albaran Then
+                                    xlsDir.PonerBordeARango(.Range(.Cells(x, colIMPORT), .Cells(y, colIMPORT)), Excel.XlBordersIndex.xlEdgeLeft, _
+                                                                        Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlHairline, colorIndexDocumento)
+                                End If
+                                If MODELO Then
+                                    xlsDir.PonerBordeARango(.Range(.Cells(x, colTalla), .Cells(y, colTalla)), Excel.XlBordersIndex.xlEdgeLeft, _
+                                                        Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlHairline, colorIndexDocumento)
+                                    xlsDir.PonerBordeARango(.Range(.Cells(x, colTalla + 3), .Cells(y, colTalla + 3)), Excel.XlBordersIndex.xlEdgeLeft, _
+                                                        Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlHairline, colorIndexDocumento)
+                                    xlsDir.PonerBordeARango(.Range(.Cells(x, colTalla + 6), .Cells(y, colTalla + 6)), Excel.XlBordersIndex.xlEdgeLeft, _
+                                                        Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlHairline, colorIndexDocumento)
+                                    xlsDir.PonerBordeARango(.Range(.Cells(x, colTalla + 9), .Cells(y, colTalla + 9)), Excel.XlBordersIndex.xlEdgeLeft, _
+                                                        Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlHairline, colorIndexDocumento)
+                                    xlsDir.PonerBordeARango(.Range(.Cells(x, colTalla + 12), .Cells(y, colTalla + 12)), Excel.XlBordersIndex.xlEdgeLeft, _
+                                                        Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlHairline, colorIndexDocumento)
+                                    xlsDir.PonerBordeARango(.Range(.Cells(x, colTalla + 15), .Cells(y, colTalla + 15)), Excel.XlBordersIndex.xlEdgeLeft, _
+                                                        Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlHairline, colorIndexDocumento)
+                                    xlsDir.PonerBordeARango(.Range(.Cells(x, colTalla + 18), .Cells(y, colTalla + 18)), Excel.XlBordersIndex.xlEdgeLeft, _
+                                                        Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlHairline, colorIndexDocumento)
+                                    xlsDir.PonerBordeARango(.Range(.Cells(x, colTalla + 21), .Cells(y, colTalla + 21)), Excel.XlBordersIndex.xlEdgeLeft, _
+                                                        Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlHairline, colorIndexDocumento)
+                                    xlsDir.PonerBordeARango(.Range(.Cells(x, colTalla + 24), .Cells(y, colTalla + 24)), Excel.XlBordersIndex.xlEdgeLeft, _
+                                                        Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlHairline, colorIndexDocumento)
+                                    xlsDir.PonerBordeARango(.Range(.Cells(x, colTalla + 27), .Cells(y, colTalla + 27)), Excel.XlBordersIndex.xlEdgeLeft, _
+                                                        Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlHairline, colorIndexDocumento)
+
+                                End If
+                        End Select
+
+                    Case Compra
+                        If documento = Factura Then
+                            xlsDir.PonerBordeARango(.Range("A" & x & ":A" & y), Excel.XlBordersIndex.xlEdgeLeft, _
+                                                                Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlHairline, colorIndexDocumento)
+                        End If
+                        'Range(Cells(1, 1), Cells(5, 3)).
+                        'xlsdir.PonerBordeARango(.Range(.Cells(x, colTIPUS), .Cells(y, colTIPUS)), Excel.XlBordersIndex.xlEdgeLeft, _
+                        '     Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlhairline, colorIndexDocumento)
+                        xlsDir.PonerBordeARango(.Range(.Cells(x, colCodigo), .Cells(y, colCodigo)), Excel.XlBordersIndex.xlEdgeLeft, _
+                             Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlHairline, colorIndexDocumento)
+                        xlsDir.PonerBordeARango(.Range(.Cells(x, colDescri), .Cells(y, colDescri)), Excel.XlBordersIndex.xlEdgeLeft, _
+                             Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlHairline, colorIndexDocumento)
+                        'If tipo = Tejido OrElse tipo = Muestra Then
+                        xlsDir.PonerBordeARango(.Range(.Cells(x, colColor), .Cells(y, colColor)), Excel.XlBordersIndex.xlEdgeLeft, _
+                             Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlHairline, colorIndexDocumento)
+                        'End If
+                        If tipo = Fornitura Then
+                            xlsDir.PonerBordeARango(.Range(.Cells(x, colTalla), .Cells(y, colTalla)), Excel.XlBordersIndex.xlEdgeLeft, _
+                                                         Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlHairline, colorIndexDocumento)
+                        End If
+                        If tipo = Tejido Then xlsDir.PonerBordeARango(.Range(.Cells(x, colMaquina), .Cells(y, colMaquina)), Excel.XlBordersIndex.xlEdgeLeft, _
+                             Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlHairline, colorIndexDocumento)
+
+                        xlsDir.PonerBordeARango(.Range(.Cells(x, colUnidades), .Cells(y, colUnidades)), Excel.XlBordersIndex.xlEdgeLeft, _
+                             Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlHairline, colorIndexDocumento)
+
+                        If documento <> OrdenFabComplementos Then
+                            xlsDir.PonerBordeARango(.Range(.Cells(x, colPrecio), .Cells(y, colPrecio)), Excel.XlBordersIndex.xlEdgeLeft, _
+                                Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlHairline, colorIndexDocumento)
+                            xlsDir.PonerBordeARango(.Range(.Cells(x, colDTO), .Cells(y, colDTO)), Excel.XlBordersIndex.xlEdgeLeft, _
+                                 Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlHairline, colorIndexDocumento)
+
+                        End If
+                        If documento = OrdenFabComplementos Then
+                            xlsDir.PonerBordeARango(.Range(.Cells(x, colTalla), .Cells(y, colTalla)), Excel.XlBordersIndex.xlEdgeLeft, _
+                                 Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlHairline, colorIndexDocumento)
+                        End If
+                        xlsDir.PonerBordeARango(.Range(.Cells(x, colIMPORT), .Cells(y, colIMPORT)), Excel.XlBordersIndex.xlEdgeLeft, _
+                                 Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlHairline, colorIndexDocumento)
+                End Select
+            End With
+        Catch ex As Exception
+            fcargando.Close() : xlsDir.CerrarExcel() : Throw ex ': LOG(ex.ToString) 
+        End Try
+    End Sub
+    Private Sub PonerBordesDetalle(ByVal x As Integer, ByVal y As Integer, ByVal hoja As Integer)
+        Try
+            Select Case compraVenta
+                Case Compra
+                    Select Case documento
+                        Case Pedido
+                            Select Case tipo
+                                Case Tejido : PonerBordesDetalleComun(x, y, hoja)
+                                Case Hilos : PonerBordesDetalleComun(x, y, hoja)
+                                Case Fornitura : PonerBordesDetalleComun(x, y, hoja)
+                            End Select
+                            'Solo Albaranes de compra de hilos
+                        Case Albaran : PonerBordesDetalleComun(x, y, hoja)
+                        Case OrdenFabComplementos : PonerBordesDetalleComun(x, y, hoja)
+                    End Select
+                Case Venta
+                    Select Case MODELO
+                        Case True
+                            Select Case documento
+                                Case OrdenModelos : PonerBordesDetallaOrdenesModelos(x, y)
+                                Case Albaran : PonerBordesDetalleComun(x, y, hoja)
+                                Case Proforma : PonerBordesDetalleComun(x, y, hoja)
+                                Case Factura : PonerBordesDetalleModeloFactura(x, y)
+                            End Select
+                        Case False
+                            Select Case documento
+                                Case Pedido : PonerBordesDetalleComun(x, y, hoja)
+                                Case Albaran : PonerBordesDetalleComun(x, y, hoja)
+                                Case Proforma : PonerBordesDetalleComun(x, y, hoja)
+                                Case Factura : PonerBordesDetalleComun(x, y, hoja)
+                            End Select
+                    End Select
+            End Select
+
+        Catch ex As Exception
+            fcargando.Close() : xlsDir.CerrarExcel() : Throw ex ': LOG(ex.ToString) 
+        End Try
+    End Sub
+    Private Sub PonerFechasAlbaranes(ByRef lineasDoc As DataView)
+        Dim cmd As MySqlCommand
+        Dim dar As MySqlDataReader
+        Try
+            If MODELO = True Then
+                cmd = New MySqlCommand("SELECT " & _
+                    " FACTUR.DATA AS FECHA FROM DFACTU " & _
+                    " LEFT JOIN FACTUR ON (FACTUR.FRA = DFACTU.ALBAR) " & _
+                    " WHERE " & _
+                    " DFACTU.FRA = """ & doc(0).Item("FRA") & """ " & _
+                    " AND DFACTU.DOCUMENT = ""F"" " & _
+                    " AND DFACTU.TIPUS = ""P"" " & _
+                    " AND DFACTU.CENTRO = """ & doc(0).Item("CENTRO") & """ " & _
+                    " AND FACTUR.TIPUS = ""P"" " & _
+                    " AND FACTUR.CENTRO = """ & doc(0).Item("CENTRO") & """ " & _
+                    " AND FACTUR.DOCUMENT = ""A"" ORDER BY DFACTU.NLINEA", cnn)
+            Else
+                cmd = New MySqlCommand("SELECT " & _
+                    " FACTUR.DATA AS FECHA FROM DFACTU " & _
+                    " LEFT JOIN FACTUR ON (FACTUR.FRA = DFACTU.ALBAR) " & _
+                    " WHERE " & _
+                    " DFACTU.FRA = """ & doc(0).Item("FRA") & """ " & _
+                    " AND DFACTU.DOCUMENT = ""F"" " & _
+                    " AND DFACTU.TIPUS <> ""P"" " & _
+                    " AND DFACTU.CENTRO = """ & doc(0).Item("CENTRO") & """ " & _
+                    " AND FACTUR.TIPUS <> ""P"" " & _
+                    " AND FACTUR.CENTRO = """ & doc(0).Item("CENTRO") & """ " & _
+                    " AND FACTUR.DOCUMENT = ""A"" ORDER BY DFACTU.NLINEA", cnn)
+            End If
+            ACN()
+            If Not lineasDoc.Table.Columns.Contains("FECHA") Then lineasDoc.Table.Columns.Add(New DataColumn("FECHA"))
+
+            dar = cmd.ExecuteReader
+            lineasDoc.Sort = "NLINEA"
+            Dim i As Integer = 0
+            While dar.Read
+                lineasDoc(i).Item("FECHA") = nz(dar("FECHA"), "", False, True)
+                i = i + 1
+            End While
+            dar.Close()
+            CCN()
+
+        Catch ex As Exception
+            fcargando.Close() : xlsDir.CerrarExcel() : Throw ex ': LOG(ex.ToString) 
+        End Try
+    End Sub
+    Private Sub PonerDetalle()
+        Dim hoja, temp, i, j As Integer
+        Dim hojaNueva As Boolean = False
+        Try
+            hoja = 1
+            temp = -1
+            'If lineasDoc.Count = 0 Then PonerRegistroMercantil(hoja) : PonerPiePagina() ': AñadirFondo()
+            If documento = Factura Then PonerFechasAlbaranes(lineasDoc)
+            fcargando.ProgressBar1.Maximum = lineasDoc.Count
+            For i = 0 To lineasDoc.Count - 1
+                If temp = -1 Then : hojaNueva = True
+                Else : hojaNueva = False
+                End If
+                ' i es la posicion total
+                ' j la relativa
+                temp = PonerArticulo(i, hoja, hojaNueva, j)
+                fcargando.lblstatus.Text = roundnum(100 * i / lineasDoc.Count, 0) & " % " & rm.GetString("COMPLETADO")
+                fcargando.ProgressBar1.Step = i
+                Application.DoEvents()
+                If hojaNueva Then PonerRegistroMercantil(hoja) : PonerPiePagina() ': AñadirFondo()
+                If temp = -1 Then
+                    j = 0
+                    i = i - 1
+                    hoja = hoja + 1
+                Else
+                    j = j + 1
+                End If
+            Next
+
+        Catch ex As Exception
+            fcargando.Close() : xlsDir.CerrarExcel() : Throw ex ': LOG(ex.ToString) 
+        End Try
+    End Sub
+
+#End Region
+
+#Region "TOTALES/PIEDETALLE"
+
+    Private Sub PonerRegistroMercantil(ByVal hoja As Integer)
+        Dim fuente2 As ExcelDirecto.ExcelDirecto.Fuente
+        Dim inicio As Integer
+        Dim final As Integer
+        Try
+            If hoja = 1 Then
+                If esExtrangero Then
+                    fuente2.tamaño = 5
+                    inicio = xlsDir.iniDetalle - 17
+                Else
+                    fuente2.tamaño = 6
+                    inicio = xlsDir.iniDetalle - 2
+                End If
+            Else
+                fuente2.tamaño = 6
+                inicio = xlsDir.tamHoja * (hoja - 1) + xlsDir.iniDetalleNoPrimera
+            End If
+
+            If hoja = 1 Then : final = xlsDir.iniDetalle + xlsDir.tamDetalle
+            Else : final = xlsDir.tamHoja * (hoja - 1) + xlsDir.iniDetalleNoPrimera + xlsDir.tamDetalle : End If
+
+            fuente2.nombre = "Tahoma"
+
+            fuente2.color = 0
+            'fuente2.colorIndex = colorIndexCentro
+            fuente2.negrita = False
+            final = final - 1
+            xlsDir.Juntar(inicio, 1, final, 1)
+            xlsDir.PonerFuenteARango(inicio, 1, inicio, 1, fuente2)
+            xlsDir.AlinearRango(inicio, 1, inicio, 1, ExcelDirecto.ExcelDirecto.Alineacion.Izquierda, ExcelDirecto.ExcelDirecto.Alineacion.Inferior)
+            xlsDir.OrientarRango(inicio, 1, inicio, 1, ExcelDirecto.ExcelDirecto.OrientacionTexto.Upward)
+
+            Select Case nz(doc(0).Item("centro"), "")
+                Case "C" : xlsDir.objHojaExcel.Cells(inicio, 1).Value = rm.GetString("REGISTROMERCANTILCOESPUNT")
+                Case "O" : xlsDir.objHojaExcel.Cells(inicio, 1).Value = rm.GetString("REGISTROMERCANTILCYCO")
+            End Select
+
+        Catch ex As Exception
+            fcargando.Close() : xlsDir.CerrarExcel() : Throw ex ': LOG(ex.ToString) 
+        End Try
+    End Sub
+    Private Function PonerPieDocumento() As Integer
+        Try
+            Select Case documento
+                Case Pedido, Factura, Proforma : PonerTotal()
+                Case Albaran, OrdenFabComplementos : PonerPieAlbaran()
+                Case OrdenModelos : PonerTotalOrdenModelo()
+            End Select
+
+        Catch ex As Exception
+            fcargando.Close() : xlsDir.CerrarExcel() : Throw ex ': LOG(ex.ToString) 
+        End Try
+    End Function
+    Private Sub PonerPieAlbaran()
+        Dim fuente As ExcelDirecto.ExcelDirecto.Fuente
+        Dim hoja As Integer = xlsDir.ObtenerHoja(filaActual)
+        Dim numeroTejidos As Integer = lineasDoc.Count
+        Dim i As Integer
+        Try
+            If hoja = 1 Then : filaActual = xlsDir.tamDetalle + xlsDir.iniDetalle
+            Else : filaActual = (xlsDir.tamHoja * (hoja - 1)) + xlsDir.tamDetalleNoPrimera + xlsDir.iniDetalleNoPrimera : End If
+
+            Select Case compraVenta
+                Case Venta
+                    With xlsDir.objHojaExcel
+
+                        If documento = Factura Then xlsDir.InsertPicture(directorio & "\imagenes\recAzul.JPG", .Range(.Cells(filaActual, colAlbar - 1), .Cells(filaActual, colAlbar - 1)), False, False, True, -1, -1, 4)
+                        Select Case MODELO
+                            Case False
+                                xlsDir.PonerImagenRepetidaEnFilas(directorio & "\imagenes\recAzul.JPG", filaActual, _
+                                New String() {colTipo - 1, colCodigo - 1, colDescri - 1, colColor - 1, _
+                                colTalla - 1, colUnidades - 1, colPrecio - 1}, False, False, True, -1, -1, 4)
+                            Case True
+                                xlsDir.PonerImagenRepetidaEnFilas(directorio & "\imagenes\recAzul.JPG", filaActual, _
+                                New String() {colTipo - 1, colCodigo - 1, colDescri - 1, colColor - 1, colTalla - 1, colTalla + 3 - 1, colTalla + 6 - 1, _
+                                colTalla + 9 - 1, colTalla + 12 - 1, colTalla + 15 - 1, colTalla + 18 - 1, colTalla + 21 - 1, colTalla + 24 - 1, colTalla + 27 - 1, colUnidades - 1, colIMPORT - 1}, False, False, True, -1, -1, 4)
+                        End Select
+
+                        If xlsDir.Cabe(filaActual + 7, hoja) Then
+                            fuente.nombre = "Verdana"
+                            fuente.tamaño = 9
+                            fuente.color = RGB(0, 0, 0)
+                            fuente.negrita = True
+
+                            xlsDir.PonerFuenteARango(.Range(.Cells(filaActual + 1, 1), .Cells(filaActual + 4, colUltima)), fuente)
+
+
+                        Else
+                            filaActual = PonerCabeceraDetalle(hoja + 1)
+                            PonerPieAlbaran()
+                        End If
+                    End With
+                    filaActual = filaActual + 1
+
+                Case Compra
+                    PonerRectangulosParteInferior(filaActual)
+                    With xlsDir.objHojaExcel
+                        If xlsDir.Cabe(filaActual + 5, hoja) Then
+                            filaActual = filaActual + 1
+                        Else
+                            filaActual = PonerCabeceraDetalle(hoja + 1)
+                            PonerTotal()
+                        End If
+                    End With
+            End Select
+
+        Catch ex As Exception
+            fcargando.Close() : xlsDir.CerrarExcel() : Throw ex ': LOG(ex.ToString) 
+        End Try
+    End Sub
+    Private Sub PonerDatosBanco()
+        Try
+            With xlsDir.objHojaExcel
+                If esExtrangero Then
+                    xlsDir.PonerBordeARangoRectangulo(filaActual + 1, colIniBanco, filaActual + 3, colIniBanco + 39, Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlThin, colorIndexDocumento)
+                    .Cells(filaActual, colIniBanco).Value = "'" & rm.GetString("FORMADEPAGO")
+                    .Cells(filaActual, colIniBanco + 10).Value = "'" & doc(0).Item("NOMFORMA")
+
+                    .Cells(filaActual + 1, colIniBanco).Value = "'" & rm.GetString("BANCO")
+                    .Cells(filaActual + 1, colIniBanco + 6).Value = "'CAIXA DE CATALUNYA"
+
+                    .Cells(filaActual + 2, colIniBanco).Value = "'SWIFT: "
+                    .Cells(filaActual + 2, colIniBanco + 6).Value = "'CESCESBB204  TELEX 50209 CADC E (SPAIN)"
+
+                    .Cells(filaActual + 3, colIniBanco).Value = "'IBAN: "
+                    .Cells(filaActual + 3, colIniBanco + 6).Value = "'ES19 2013 0235 3002 0059 3647"
+
+                    ' .Cells(filaActual + 4, colIniBanco).Value = "'" & rm.GetString("CCC")
+                    ' .Cells(filaActual + 4, colIniBanco + 6).Value = "'" & ""
+                Else
+                    xlsDir.PonerBordeARangoRectangulo(filaActual + 1, colIniBanco, filaActual + 3, colIniBanco + 39, Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlThin, colorIndexDocumento)
+                    .Cells(filaActual, colIniBanco).Value = "'" & rm.GetString("FORMADEPAGO")
+                    .Cells(filaActual, colIniBanco + 10).Value = "'" & doc(0).Item("NOMFORMA")
+
+                    .Cells(filaActual + 1, colIniBanco).Value = "'" & rm.GetString("BANCO")
+                    .Cells(filaActual + 1, colIniBanco + 6).Value = "'" & doc(0).Item("NOMBANC")
+
+                    ' .Cells(filaActual + 2, colIniBanco).Value = "'" & rm.GetString("DIRECCION")
+                    ' .Cells(filaActual + 2, colIniBanco + 6).Value = "'" & nz(doc(0).Item("OFI"), "")
+
+                    .Cells(filaActual + 3, colIniBanco).Value = "'" & rm.GetString("NUMCTA")
+                    .Cells(filaActual + 3, colIniBanco + 6).Value = "'" & IIf(nzn(doc(0).Item("BANC"), 0) = 0, "", doc(0).Item("BANC")) & _
+                                                                    " " & IIf(nzn(doc(0).Item("COFI"), 0) = 0, "", doc(0).Item("COFI")) & _
+                                                                    " " & IIf(nzn(doc(0).Item("DC"), 0) = 0, "", doc(0).Item("DC")) & _
+                                                                    " " & IIf(nzn(doc(0).Item("CTA"), 0) = 0, "", doc(0).Item("CTA"))
+
+                    ' .Cells(filaActual + 4, colIniBanco).Value = "'" & rm.GetString("CCC")
+                    ' .Cells(filaActual + 4, colIniBanco + 6).Value = "'" & ""
+                End If
+
+            End With
+
+        Catch ex As Exception
+            fcargando.Close() : xlsDir.CerrarExcel() : Throw ex ': LOG(ex.ToString) 
+        End Try
+    End Sub
+    Private Function PonerVencimientos() As Integer
+        Dim i As Integer
+        Dim fuente As ExcelDirecto.ExcelDirecto.Fuente
+        Try
+            fuente.nombre = "Tahoma"
+            fuente.tamaño = 8
+            fuente.color = RGB(0, 0, 0)
+            fuente.negrita = True
+            xlsDir.PonerFuenteARango(filaActual, colVencimiento, filaActual + 10, colUltima, fuente)
+
+            With xlsDir.objHojaExcel
+                xlsDir.PonerBordeARango(.Range(.Cells(filaActual, colVencimiento), .Cells(filaActual, colIMPORTVencim + (colIMPORTVencim - colVencimiento - 1))), _
+                            Excel.XlBordersIndex.xlEdgeBottom, _
+                            Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlThin, colorIndexDocumento)
+                xlsDir.PonerBordeARango(.Range(.Cells(filaActual, colIMPORTVencim), .Cells(filaActual + 5, colIMPORTVencim - 1)), _
+                        Excel.XlBordersIndex.xlEdgeLeft, _
+                        Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlThin, colorIndexDocumento)
+                PonerDatosBanco()
+                .Cells(filaActual, colVencimiento).Value = "'" & rm.GetString("VENCIMIENTO")
+                .Cells(filaActual, colIMPORTVencim).Value = "'" & rm.GetString("IMPORTE") & " €"
+                filaActual = filaActual + 1
+                For i = 0 To vencimientos.Count - 1
+                    .Cells(filaActual + i, colVencimiento).Value = "'" & vencimientos(i).Item("VENCIM")
+                    .Cells(filaActual + i, colIMPORTVencim).Value = "'" & Format(nzn(vencimientos(i).Item("IMPORT"), 0), "#,##0.00")
+                Next
+                filaActual = filaActual + i
+            End With
+            PonerPiePagina()
+
+        Catch ex As Exception
+            fcargando.Close() : xlsDir.CerrarExcel() : Throw ex ': LOG(ex.ToString) 
+        End Try
+    End Function
+    Private Sub PonerRectangulosParteInferior(ByVal inicio As Integer)
+        Try
+            With xlsDir.objHojaExcel
+
+                'xlsDir.InsertPicture(directorio & "\imagenes\recAzul.JPG", .Range(.Cells(inicio, colTIPUS - 1)_, .Cells(inicio, colTIPUS - 1)), False, False, True)
+                xlsDir.InsertPicture(directorio & "\imagenes\recAzul.JPG", .Range(.Cells(inicio, colCodigo - 1), _
+                                        .Cells(inicio, colCodigo - 1)), False, False, True, -1, -1, 4)
+                xlsDir.InsertPicture(directorio & "\imagenes\recAzul.JPG", .Range(.Cells(inicio, colDescri - 1), _
+                                        .Cells(inicio, colDescri - 1)), False, False, True, -1, -1, 4)
+                If tipo = Tejido OrElse tipo = Muestra Then _
+                    xlsDir.InsertPicture(directorio & "\imagenes\recAzul.JPG", .Range(.Cells(inicio, colColor - 1), _
+                                        .Cells(inicio, colColor - 1)), False, False, True, -1, -1, 4)
+                If tipo = Tejido Then _
+                    xlsDir.InsertPicture(directorio & "\imagenes\recAzul.JPG", .Range(.Cells(inicio, colMaquina - 1), _
+                                        .Cells(inicio, colMaquina - 1)), False, False, True, -1, -1, 4)
+                xlsDir.InsertPicture(directorio & "\imagenes\recAzul.JPG", .Range(.Cells(inicio, colUnidades - 1), _
+                                        .Cells(inicio, colUnidades - 1)), False, False, True, -1, -1, 4)
+                If documento <> OrdenFabComplementos AndAlso (documento <> Albaran) Then ' AndAlso tipo <> Hilos) Then
+                    xlsDir.InsertPicture(directorio & "\imagenes\recAzul.JPG", .Range(.Cells(inicio, colPrecio - 1), _
+                        .Cells(inicio, colPrecio - 1)), False, False, True, -1, -1, 4)
+                    xlsDir.InsertPicture(directorio & "\imagenes\recAzul.JPG", .Range(.Cells(inicio, colDTO - 1), _
+                                            .Cells(inicio, colDTO - 1)), False, False, True, -1, -1, 4)
+                    xlsDir.InsertPicture(directorio & "\imagenes\recAzul.JPG", .Range(.Cells(inicio, colIMPORT - 1), _
+                                            .Cells(inicio, colIMPORT - 1)), False, False, True, -1, -1, 4)
+                Else
+                    If documento = OrdenFabComplementos Then
+                        xlsDir.InsertPicture(directorio & "\imagenes\recAzul.JPG", .Range(.Cells(inicio, colIMPORT - 1), _
+                                                .Cells(inicio, colIMPORT - 1)), False, False, True, -1, -1, 4)
+
+                    End If
+                End If
+            End With
+
+        Catch ex As Exception
+            fcargando.Close() : xlsDir.CerrarExcel() : Throw ex ': LOG(ex.ToString) 
+        End Try
+    End Sub
+    Private Sub PonerTotal()
+        Dim fuente As ExcelDirecto.ExcelDirecto.Fuente
+        Dim hoja As Integer = xlsDir.ObtenerHoja(filaActual)
+        Dim numeroTejidos As Integer = lineasDoc.Count
+        Dim i As Integer
+        Dim x, xx As Integer
+        Try
+            If hoja = 1 Then : filaActual = xlsDir.tamDetalle + xlsDir.iniDetalle
+            Else : filaActual = (xlsDir.tamHoja * (hoja - 1)) + xlsDir.tamDetalleNoPrimera + xlsDir.iniDetalleNoPrimera : End If
+
+            With xlsDir.objHojaExcel
+                Select Case compraVenta
+                    Case Compra
+                        With xlsDir.objHojaExcel
+                            PonerRectangulosParteInferior(filaActual)
+                        End With
+                    Case Venta
+                        Select Case documento
+                            Case Factura
+                                Select Case MODELO
+                                    Case True
+                                        xlsDir.PonerImagenRepetidaEnFilas(directorio & "\imagenes\recAzul.JPG", filaActual, _
+                                        New String() {colAlbar - 1, colTipo - 1, colCodigo - 1, colDescri - 1, colColor - 1, _
+                                                colUnidades - 1, colPrecio - 1, colIMPORT - 1}, False, False, True, -1, -1, 4)
+
+                                    Case False
+                                        xlsDir.PonerImagenRepetidaEnFilas(directorio & "\imagenes\recAzul.JPG", filaActual, _
+                                            New String() {colAlbar - 1, colTipo - 1, colCodigo - 1, colDescri - 1, colColor - 1, _
+                                            colTalla - 1, colUnidades - 1, colPrecio - 1, colIMPORT - 1}, False, False, True, -1, -1, 4)
+
+                                End Select
+                            Case OrdenModelos
+                                xlsDir.PonerImagenRepetidaEnFilas(directorio & "\imagenes\recAzul.JPG", filaActual, _
+                                    New String() {colColor - 1, colTalla - 1, colTalla + 3 - 1, colTalla + 6 - 1, _
+                                    colTalla + 9 - 1, colTalla + 12 - 1, colTalla + 15 - 1, colTalla + 18 - 1, colTalla + 21 - 1, colTalla + 24 - 1, colTalla + 27 - 1, colUnidades - 1}, False, False, True, -1, -1, 4)
+                            Case Pedido
+                                xlsDir.PonerImagenRepetidaEnFilas(directorio & "\imagenes\recAzul.JPG", filaActual, _
+                                    New String() {colCodigo - 1, colDescri - 1, colColor - 1, _
+                                    colTalla - 1, colUnidades - 1, colPrecio - 1, colIMPORT - 1}, False, False, True, -1, -1, 4)
+                            Case Else
+                                xlsDir.PonerImagenRepetidaEnFilas(directorio & "\imagenes\recAzul.JPG", filaActual, _
+                                    New String() {colTipo - 1, colCodigo - 1, colDescri - 1, colColor - 1, _
+                                    colTalla - 1, colUnidades - 1, colPrecio - 1, colIMPORT - 1}, False, False, True, -1, -1, 4)
+                        End Select
+                End Select
+
+                If xlsDir.Cabe(filaActual + 5, hoja) Then
+                    x = filaActual + 1
+                    xx = filaActual + 2
+
+                    fuente.nombre = "Verdana"
+                    fuente.tamaño = 8
+                    fuente.color = RGB(0, 0, 0)
+                    fuente.negrita = True
+
+                    xlsDir.PonerFuenteARango(.Range(.Cells(filaActual + 1, 1), .Cells(filaActual + 4, colUltima)), fuente)
+
+
+                    'BRUTO
+                    xlsDir.PonerBordeARangoRectangulo(x, colBrutoTotal, xx, colDTOTotal, _
+                                    Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlThin, colorIndexDocumento)
+                    xlsDir.InsertPicture(pathRec, x, colBrutoTotal, x, colBrutoTotal, False, True, True)
+                    xlsDir.Juntar(xx, colBrutoTotal, xx, colDTOTotal - 1)
+                    xlsDir.Juntar(x, colBrutoTotal, x, colDTOTotal - 1)
+                    .Cells(x, colBrutoTotal).Value = "'" & rm.GetString("BRUTO")
+                    .Cells(xx, colBrutoTotal).Value = "'" & Format(nzn(doc(0).Item("BRUT1"), 0), "#,##0.00") '"'" & nzn(doc(0).Item("BRUT1"), 0) & " €"
+                    xlsDir.AlinearRango(x, 1, xx, colUltima, ExcelDirecto.ExcelDirecto.Alineacion.Centro)
+
+
+                    'DESCUENTO
+                    xlsDir.PonerBordeARangoRectangulo(x, colDTOTotal, xx, colBaseTotal, _
+                          Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlThin, colorIndexDocumento)
+                    xlsDir.InsertPicture(pathRec, x, colDTOTotal, x, colDTOTotal, False, True, True)
+                    xlsDir.Juntar(xx, colDTOTotal, xx, colBaseTotal - 1)
+                    xlsDir.Juntar(x, colDTOTotal, x, colBaseTotal - 1)
+                    .Cells(x, colDTOTotal).Value = "'" & rm.GetString("DTE") & "  " & doc(0).Item("P_DTE") & "%"
+                    .Cells(xx, colDTOTotal).Value = "'" & Format(nzn(doc(0).Item("DTE1"), 0), "#,##0.00") '"'" & nzn(doc(0).Item("DTE1"), 0) & " €"
+
+                    'BASE
+                    xlsDir.PonerBordeARangoRectangulo(x, colBaseTotal, xx, colIVATotal, _
+                         Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlThin, colorIndexDocumento)
+                    xlsDir.InsertPicture(pathRec, x, colBaseTotal, x, colBaseTotal, False, True, True)
+                    xlsDir.Juntar(xx, colBaseTotal, xx, colIVATotal - 1)
+                    xlsDir.Juntar(x, colBaseTotal, x, colIVATotal - 1)
+                    .Cells(x, colBaseTotal).Value = "'" & rm.GetString("BASEIMPONIBLE")
+                    .Cells(xx, colBaseTotal).Value = "'" & Format(nzn(doc(0).Item("BASE1"), 0), "#,##0.00") '"'" & nzn(doc(0).Item("BASE1"), 0) & " €"
+
+
+                    'IVA
+                    xlsDir.PonerBordeARangoRectangulo(x, colIVATotal, xx, colRETotal, _
+                            Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlThin, colorIndexDocumento)
+                    xlsDir.InsertPicture(pathRec, x, colIVATotal, x, colIVATotal, False, True, True)
+                    xlsDir.Juntar(xx, colIVATotal, xx, colRETotal - 1)
+                    xlsDir.Juntar(x, colIVATotal, x, colRETotal - 1)
+                    If esExtrangero Then
+                        .Cells(x, colIVATotal).Value = "'" & doc(0).Item("P_IVA1") & "%  V.A.T"
+                    Else
+
+                        .Cells(x, colIVATotal).Value = "'" & doc(0).Item("P_IVA1") & "%  " & rm.GetString("IVA")
+                    End If
+
+                    .Cells(xx, colIVATotal).Value = "'" & Format(nzn(doc(0).Item("IVA1"), 0), "#,##0.00") '"'" & doc(0).Item("IVA1") & " €"
+
+
+                    'RE
+                    xlsDir.PonerBordeARangoRectangulo(x, colRETotal, xx, colTotalTotal, _
+                        Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlThin, colorIndexDocumento)
+                    xlsDir.InsertPicture(pathRec, x, colRETotal, x, colRETotal, False, True, True)
+                    xlsDir.Juntar(xx, colRETotal, xx, colTotalTotal - 1)
+                    xlsDir.Juntar(x, colRETotal, x, colTotalTotal - 1)
+                    .Cells(x, colRETotal).value = "'" & doc(0).Item("P_RE1") & "%  " & rm.GetString("RE")
+                    .Cells(xx, colRETotal).value = "'" & Format(nzn(doc(0).Item("RE1"), 0), "#,##0.00") '"'" & nzn(doc(0).Item("RE1"), 0) & " €"
+
+
+                    'TOTAL
+                    xlsDir.PonerBordeARangoRectangulo(x, colTotalTotal, xx, colUltima - 1, _
+                            Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlThin, colorIndexDocumento)
+                    xlsDir.InsertPicture(pathRec, x, colTotalTotal, x, colTotalTotal, False, True, True)
+                    xlsDir.Juntar(xx, colTotalTotal, xx, colUltima - 1)
+                    xlsDir.Juntar(x, colTotalTotal, x, colUltima - 1)
+                    .Cells(x, colTotalTotal).Value = "'" & rm.GetString("TOTAL")
+                    .Cells(xx, colTotalTotal).Value = "'" & Format(nzn(doc(0).Item("TOTAL"), 0), "#,##0.00") & "€" '"'" & nzn(doc(0).Item("TOTAL"), 0) & " €"
+                    filaActual = filaActual + 4
+                Else
+                    'filaActual = PonerCabeceraDetalle(hoja + 1)
+                    'Seguro que no es la 1ª hoja
+                    filaActual = (xlsDir.tamHoja * (hoja) + 7) + 5
+                    PonerTotal()
+                End If
+                'Else
+                'filaActual = PonerCabeceraDetalle(hoja + 1)
+                'PonerTotal()
+                'End If
+            End With
+            'este es el espacio para el detalle
+            'If esExtrangero Then filaActual = filaActual + 10
+
+        Catch ex As Exception
+            fcargando.Close() : xlsDir.CerrarExcel() : Throw ex ': LOG(ex.ToString) 
+        End Try
+    End Sub
+    Private Sub PonerTotalOrdenModelo()
+        Dim fuente As ExcelDirecto.ExcelDirecto.Fuente
+        Dim hoja As Integer = xlsDir.ObtenerHoja(filaActual)
+        Dim numeroTejidos As Integer = lineasDoc.Count
+        Dim i As Integer
+        Dim x, xx As Integer
+        Try
+            If hoja = 1 Then : filaActual = xlsDir.tamDetalle + xlsDir.iniDetalle
+            Else : filaActual = (xlsDir.tamHoja * (hoja - 1)) + xlsDir.tamDetalleNoPrimera + xlsDir.iniDetalleNoPrimera : End If
+
+            With xlsDir.objHojaExcel
+
+                xlsDir.PonerImagenRepetidaEnFilas(directorio & "\imagenes\recAzul.JPG", filaActual, _
+                                                  New String() {colColor - 1, colTalla - 1, colTalla + 3 - 1, colTalla + 6 - 1, _
+                                                  colTalla + 9 - 1, colTalla + 12 - 1, colTalla + 15 - 1, colTalla + 18 - 1, colTalla + 21 - 1, colTalla + 24 - 1, colTalla + 27 - 1, colUnidades - 1}, False, False, True, -1, -1, 4)
+
+                If xlsDir.Cabe(filaActual + 5, hoja) Then
+                    x = filaActual + 1
+                    xx = filaActual + 2
+
+                    fuente.nombre = "Verdana"
+                    fuente.tamaño = 8
+                    fuente.color = RGB(0, 0, 0)
+                    fuente.negrita = True
+
+                    xlsDir.PonerFuenteARango(.Range(.Cells(filaActual + 1, 1), .Cells(filaActual + 4, colUltima)), fuente)
+
+
+                    'BRUTO
+                    'xlsDir.PonerBordeARangoRectangulo(x, colBrutoTotal, xx, colDTOTotal, _
+                    '                Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlThin, colorIndexDocumento)
+                    'xlsDir.InsertPicture(pathRec, x, colBrutoTotal, x, colBrutoTotal, False, True, True)
+                    'xlsDir.Juntar(xx, colBrutoTotal, xx, colDTOTotal - 1)
+                    'xlsDir.Juntar(x, colBrutoTotal, x, colDTOTotal - 1)
+                    '.Cells(x, colBrutoTotal).Value = "'" & rm.GetString("BRUTO")
+                    ''.Cells(xx, colBrutoTotal).Value = "'" & nzn(doc(0).Item("BRUT1"), 0) & " €"
+                    'xlsDir.AlinearRango(x, 1, xx, colUltima, ExcelDirecto.ExcelDirecto.Alineacion.Centro)
+
+
+                    ''DESCUENTO
+                    'xlsDir.PonerBordeARangoRectangulo(x, colDTOTotal, xx, colBaseTotal, _
+                    '      Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlThin, colorIndexDocumento)
+                    'xlsDir.InsertPicture(pathRec, x, colDTOTotal, x, colDTOTotal, False, True, True)
+                    'xlsDir.Juntar(xx, colDTOTotal, xx, colBaseTotal - 1)
+                    'xlsDir.Juntar(x, colDTOTotal, x, colBaseTotal - 1)
+                    ''.Cells(x, colDTOTotal).Value = "'" & rm.GetString("DTE") & "  " & doc(0).Item("P_DTE") & "%"
+                    ''.Cells(xx, colDTOTotal).Value = "'" & nzn(doc(0).Item("DTE1"), 0) & " €"
+
+                    ''BASE
+                    'xlsDir.PonerBordeARangoRectangulo(x, colBaseTotal, xx, colIVATotal, _
+                    '     Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlThin, colorIndexDocumento)
+                    'xlsDir.InsertPicture(pathRec, x, colBaseTotal, x, colBaseTotal, False, True, True)
+                    'xlsDir.Juntar(xx, colBaseTotal, xx, colIVATotal - 1)
+                    'xlsDir.Juntar(x, colBaseTotal, x, colIVATotal - 1)
+                    '.Cells(x, colBaseTotal).Value = "'" & rm.GetString("BASEIMPONIBLE")
+                    ''.Cells(xx, colBaseTotal).Value = "'" & nzn(doc(0).Item("BASE1"), 0) & " €"
+
+
+                    ''IVA
+                    'xlsDir.PonerBordeARangoRectangulo(x, colIVATotal, xx, colRETotal, _
+                    '        Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlThin, colorIndexDocumento)
+                    'xlsDir.InsertPicture(pathRec, x, colIVATotal, x, colIVATotal, False, True, True)
+                    'xlsDir.Juntar(xx, colIVATotal, xx, colRETotal - 1)
+                    'xlsDir.Juntar(x, colIVATotal, x, colRETotal - 1)
+                    ''.Cells(x, colIVATotal).Value = "'" & doc(0).Item("P_IVA1") & "%  " & rm.GetString("IVA")
+                    ''.Cells(xx, colIVATotal).Value = "'" & doc(0).Item("IVA1") & " €"
+
+
+                    ''RE
+                    'xlsDir.PonerBordeARangoRectangulo(x, colRETotal, xx, colTotalTotal, _
+                    '    Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlThin, colorIndexDocumento)
+                    'xlsDir.InsertPicture(pathRec, x, colRETotal, x, colRETotal, False, True, True)
+                    'xlsDir.Juntar(xx, colRETotal, xx, colTotalTotal - 1)
+                    'xlsDir.Juntar(x, colRETotal, x, colTotalTotal - 1)
+                    ''.Cells(x, colRETotal).value = "'" & doc(0).Item("P_RE1") & "%  " & rm.GetString("RE")
+                    ''.Cells(xx, colRETotal).value = "'" & nzn(doc(0).Item("RE1"), 0) & " €"
+
+
+                    ''TOTAL
+                    'xlsDir.PonerBordeARangoRectangulo(x, colTotalTotal, xx, colUltima - 1, _
+                    '        Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlThin, colorIndexDocumento)
+                    'xlsDir.InsertPicture(pathRec, x, colTotalTotal, x, colTotalTotal, False, True, True)
+                    'xlsDir.Juntar(xx, colTotalTotal, xx, colUltima - 1)
+                    'xlsDir.Juntar(x, colTotalTotal, x, colUltima - 1)
+                    '.Cells(x, colTotalTotal).Value = "'" & rm.GetString("TOTAL")
+                    ''.Cells(xx, colTotalTotal).Value = "'" & nzn(doc(0).Item("TOTAL"), 0) & " €"
+                    filaActual = filaActual + 4
+                Else
+                    filaActual = PonerCabeceraDetalle(hoja + 1)
+                    filaActual = filaActual + 5
+                    PonerTotal()
+                End If
+                'Else
+                'filaActual = PonerCabeceraDetalle(hoja + 1)
+                'PonerTotal()
+                'End If
+            End With
+
+
+        Catch ex As Exception
+            fcargando.Close() : xlsDir.CerrarExcel() : Throw ex ': LOG(ex.ToString) 
+        End Try
+    End Sub
+    Private Sub PonerPiePagina()
+        Dim fuente As ExcelDirecto.ExcelDirecto.Fuente
+        Try
+            hojaActual = xlsDir.ObtenerHoja(filaActual)
+            fuente.nombre = "Tahoma"
+            fuente.tamaño = 6
+            fuente.colorIndex = colorIndexCentro
+            fuente.negrita = False
+            xlsDir.PonerFuenteARango(xlsDir.tamHoja * hojaActual, 1, xlsDir.tamHoja * hojaActual, colUltima, fuente)
+            xlsDir.PonerFuenteARango((xlsDir.tamHoja * hojaActual) + 1, 10, (xlsDir.tamHoja * hojaActual) + 1, colUltima, fuente)
+            If doc(0).Item("CENTRO") = "C" Then
+                xlsDir.objHojaExcel.Cells(xlsDir.tamHoja * hojaActual, 1).Value = "C/. Masia de Can Coll, 7 · Pol. Ind. Can Coll · 08620 Sant Vicenç dels Horts (Barcelona) Tel.: (34) 93 337 07 79 Fax.: (34) 93 337 35 74 · email: facturacio@coespunt.com"
+            Else
+                xlsDir.objHojaExcel.Cells(xlsDir.tamHoja * hojaActual, 1).Value = "C/ Camí Masia de Can Coll, nº 7 Pol Ind. Can Coll · 08620 Sant Vicenç dels Horts  (Barcelona) · T. (34) 93.337.07.79 · F. (34) 93.337.35.74 · email: cyco@coespunt.com"
+                xlsDir.objHojaExcel.Cells((xlsDir.tamHoja * hojaActual) + 1, 20).Value = "Taller: Nord, 5 - 08560 (Barcelona) -  T. i F. (34) 93 850 73 19"
+            End If
+
+
+        Catch ex As Exception
+            fcargando.Close() : xlsDir.CerrarExcel() : Throw ex ': LOG(ex.ToString) 
+        End Try
+    End Sub
+    Private Function PonerObservaciones()
+        Dim fuente As ExcelDirecto.ExcelDirecto.Fuente
+        Try
+            fuente.nombre = "Tahoma"
+            fuente.tamaño = "8"
+            With xlsDir.objHojaExcel
+
+                If documento = Pedido OrElse documento = OrdenModelos Then
+                    xlsDir.PonerBordeARangoRectangulo(filaActual, colBrutoTotal, filaActual + 7, colUltima - 1, _
+                              Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlThin, colorIndexDocumento)
+                    xlsDir.AlinearRango(filaActual, colObserv, filaActual, colObserv, ExcelDirecto.ExcelDirecto.Alineacion.Izquierda, ExcelDirecto.ExcelDirecto.Alineacion.Superior)
+                    .Cells(filaActual - 1, 1).value = "'" & rm.GetString("OBSERVACIONES") & ":"
+                    xlsDir.Juntar(filaActual, colObserv, filaActual + 7, colUltima - 1)
+                    xlsDir.PonerFuenteARango(filaActual, colObserv, filaActual, colObserv, fuente)
+                    .Cells(filaActual, colObserv).Value = "'" & DirectCast(nz(doc(0).Item("OBSERV"), ""), String).Replace(vbCrLf, vbLf)
+
+                    filaActual = filaActual + 7
+                Else
+                    Select Case compraVenta
+                        Case Compra
+                            Select Case documento
+                                Case OrdenFabComplementos
+                                    'Ordenes fabricacion muestras
+                                    xlsDir.PonerBordeARangoRectangulo(filaActual, colCodigo, filaActual + 6, colUltima - 1, _
+                                        Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlThin, colorIndexDocumento)
+                                    xlsDir.AlinearRango(filaActual, colCodigo, filaActual, colCodigo, ExcelDirecto.ExcelDirecto.Alineacion.Izquierda, ExcelDirecto.ExcelDirecto.Alineacion.Superior)
+                                    xlsDir.Juntar(filaActual, colCodigo, filaActual + 6, colUltima - 1)
+                                    .Cells(filaActual - 1, colBrutoTotal).value = "'" & rm.GetString("OBSERVACIONES") & ":"
+                                    .Cells(filaActual, colCodigo).Value = "'" & DirectCast(nz(doc(0).Item("OBSERV"), ""), String).Replace(vbCrLf, vbLf)
+                                    '.Cells(filaActual + 8, 1).Value = PonerPiePagina(filaActual + 8)
+                                    xlsDir.PonerFuenteARango(filaActual + 1, colObserv, filaActual + 1, colObserv, fuente)
+                                    '.Cells(filaActual + 1, colObserv).value = "'" & rm.GetString("OBSERVACIONES") & ":"
+                                    filaActual = filaActual + 7
+                                Case Albaran
+                                    Select Case tipo
+                                        Case Hilos
+                                            'Albaran entrega hilos
+                                            xlsDir.PonerBordeARangoRectangulo(filaActual, colObserv, filaActual + 6, colUltima - 1, _
+                                                Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlThin, colorIndexDocumento)
+                                            xlsDir.AlinearRango(filaActual, colObserv, filaActual, colObserv, ExcelDirecto.ExcelDirecto.Alineacion.Izquierda, ExcelDirecto.ExcelDirecto.Alineacion.Superior)
+                                            xlsDir.Juntar(filaActual, colObserv, filaActual + 6, colUltima - 1)
+                                            .Cells(filaActual - 1, 1).value = "'" & rm.GetString("OBSERVACIONES") & ":"
+                                            .Cells(filaActual, colObserv).Value = "'" & DirectCast(nz(doc(0).Item("OBSERV"), ""), String).Replace(vbCrLf, vbLf)
+                                            xlsDir.PonerFuenteARango(filaActual + 1, colObserv, filaActual + 1, colObserv, fuente)
+                                            filaActual = filaActual + 7
+                                    End Select
+                            End Select
+                        Case Venta
+                            Select Case documento
+                                Case Albaran
+                                    'CONFORME CLIENTE
+                                    xlsDir.PonerBordeARangoRectangulo(.Range(.Cells(filaActual, colPrimera), .Cells(filaActual + 12, colObserv - 1)), _
+                                                                        Excel.XlBordersIndex.xlEdgeTop, _
+                                                                        Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlThin, colorIndexDocumento)
+
+                                    'OBSERVACIONES
+                                    xlsDir.PonerBordeARangoRectangulo(.Range(.Cells(filaActual, colPrimera), .Cells(filaActual + 12, colUltima - 1)), _
+                                                                        Excel.XlBordersIndex.xlEdgeTop, _
+                                                                        Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlThin, colorIndexDocumento)
+
+                                    xlsDir.PonerBordeARangoRectangulo(.Range(.Cells(filaActual, colPrimera), .Cells(filaActual, colUltima - 1)), _
+                                                           Excel.XlBordersIndex.xlEdgeTop, _
+                                                           Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlThin, colorIndexDocumento)
+
+                                    xlsDir.Juntar(filaActual + 1, colPrimera, filaActual + 12, colObserv - 1)
+                                    xlsDir.Juntar(filaActual + 1, colObserv, filaActual + 12, colUltima - 1)
+
+                                    xlsDir.AlinearRango(filaActual, colPrimera, filaActual + 1, colPrimera, ExcelDirecto.ExcelDirecto.Alineacion.Centro)
+                                    xlsDir.AlinearRango(filaActual, colObserv, filaActual + 1, colObserv, ExcelDirecto.ExcelDirecto.Alineacion.Centro)
+
+                                    xlsDir.Juntar(filaActual, colPrimera, filaActual, colObserv - 1)
+                                    .Cells(filaActual, colPrimera).Value = "'" & rm.GetString("CONFOMECLIENTE").ToUpper
+                                    xlsDir.Juntar(filaActual, colObserv, filaActual, colUltima - 1)
+                                    .Cells(filaActual, colObserv).Value = "'" & rm.GetString("OBSERVACIONES").ToUpper
+                                    Dim observacionesAlbaran As String
+                                    observacionesAlbaran = obtenerObservacionesAlbaran
+                                    .Cells(filaActual + 1, colObserv).Value = "'" & DirectCast(observacionesAlbaran, String).Replace(vbCrLf, vbLf)
+                            End Select
+                    End Select
+                End If
+            End With
+            PonerPiePagina()
+        Catch ex As Exception
+            fcargando.Close() : xlsDir.CerrarExcel() : Throw ex ': LOG(ex.ToString) 
+        End Try
+    End Function
+
+#End Region
+
+    Private Function obtenerObservacionesAlbaran() As String
+        Dim i As Integer
+        Dim ret As String
+        Try
+            ret = ""
+            If esExtrangero Then
+                For i = 0 To detalleExtrangero.Count - 1
+                    ret = ret & detalleExtrangero(i).Item("NOMBREDETALLE") & ": " & detalleExtrangero(i).Item("DESCRIDETALLE") & vbLf
+                Next
+                ret = ret & "INCOTERM: " & INCOTERM & vbLf & nz(doc(0).Item("OBSERV"), "")
+            Else
+                ret = nz(doc(0).Item("OBSERV"), "")
+            End If
+
+            Return ret
+
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Function
+
+#Region "ORGANIZAR"
+
+    Friend Sub CargandoFormulario()
+        Try
+            fcargando = New frCargando
+            fcargando.Show()
+            fcargando.Refresh()
+            fcargando.BringToFront()
+
+        Catch ex As Exception
+            fcargando.Close() : xlsDir.CerrarExcel() : Throw ex ': LOG(ex.ToString)  : xlsDir.CerrarExcel() : CCN() : cnn.Close()
+        End Try
+    End Sub
+
+    'Procedimiento no utlizado actualmente
+    Private Sub DuplicarHojasSegunDocumento()
+        Try
+            Select Case documento
+                Case Albaran
+                    xlsDir.DuplicarHoja(rm.GetString("ALBARANTEJIDO"), rm.GetString("ALBARANTEJIDO") & " copia", RGB(251, 251, 0))
+                    xlsDir.DuplicarHoja(rm.GetString("ALBARANTEJIDO"), rm.GetString("ALBARANTEJIDO") & " copia", RGB(251, 251, 0))
+                Case Factura
+                    xlsDir.DuplicarHoja(rm.GetString("FACTURATEJIDO"), rm.GetString("FACTURATEJIDO") & " copia", RGB(255, 128, 128))
+                    xlsDir.DuplicarHoja(rm.GetString("FACTURATEJIDO"), rm.GetString("FACTURATEJIDO") & " copia", RGB(255, 128, 128))
+                    xlsDir.DuplicarHoja(rm.GetString("FACTURATEJIDO"), rm.GetString("FACTURATEJIDO") & " copia", RGB(255, 128, 128))
+                Case Pedido
+
+                Case Proforma
+
+            End Select
+
+        Catch ex As Exception
+            fcargando.Close() : xlsDir.CerrarExcel() : Throw ex ': LOG(ex.ToString) 
+        End Try
+    End Sub
+    Private Sub TratamientoFinal()
+        Try
+            'Dim rVer As Excel.Range = xlsDir.objHojaExcel.Range(xlsDir.objHojaExcel.Cells(1, 1), xlsDir.objHojaExcel.Cells(filaActual + 10, colUltima))
+            'xlsDir.OcularFilasYColumnas(rVer, True)
+            xlsDir.PonerQuitarGridLines(False)
+            xlsDir.m_Excel.Visible = True
+            xlsDir.AsignarMacro(xlsDir.AñadirBoton(1, 23, 1, 23 + 5, 50, 25, rm.GetString("ENVIARPORMAIL")), "EnviarMailEnCuerpo2")
+
+        Catch ex As Exception
+            fcargando.Close() : xlsDir.CerrarExcel() : Throw ex ': LOG(ex.ToString) 
+        End Try
+    End Sub
+    Private Sub AñadirFondo()
+        Dim hoja As Integer = xlsDir.ObtenerHoja(filaActual)
+        Try
+            Select Case documento
+                Case Pedido
+                    xlsDir.MarcaDeAgua(rm.GetString("PEDIDO").ToUpper, 15 + ((hoja - 1) * xlsDir.tamHoja), 30)
+                Case Albaran
+                    xlsDir.MarcaDeAgua(rm.GetString("ALBARAN").ToUpper, 15 + ((hoja - 1) * xlsDir.tamHoja), 30)
+                Case Factura
+                    xlsDir.MarcaDeAgua(rm.GetString("FACTURA").ToUpper, 15 + ((hoja - 1) * xlsDir.tamHoja), 30)
+                Case Proforma
+                    xlsDir.MarcaDeAgua(rm.GetString("PROFORMA").ToUpper, 15 + ((hoja - 1) * xlsDir.tamHoja), 30)
+                Case OrdenModelos
+                    xlsDir.MarcaDeAgua(rm.GetString("ORDEN").ToUpper, 15 + ((hoja - 1) * xlsDir.tamHoja), 30)
+            End Select
+
+        Catch ex As Exception
+            fcargando.Close() : xlsDir.CerrarExcel() : Throw ex ': LOG(ex.ToString) 
+        End Try
+    End Sub
+    Private Sub ConfigurarPagina()
+        Dim margenes As ExcelDirecto.ExcelDirecto.TamMargenes
+        With margenes
+            .margen_der = 0.02
+            .margen_inf = 0.02
+            .margen_izq = 0.02
+            .margen_sup = 0.02
+        End With
+        xlsDir.ConfigurarPagina(xlsDir.Orientacion.Vertical, margenes)
+    End Sub
+    Private Sub PonerHojas()
+        Try
+            xlsDir.QuitarTodasLasHojas()
+            Select Case compraVenta
+                Case Compra
+                    Select Case documento
+                        Case Pedido : xlsDir.AñadirHoja(rm.GetString("PEDIDOTEJIDO"), "Arial")
+                        Case Albaran : xlsDir.AñadirHoja(rm.GetString("ALBARANTEJIDO"), "Arial")
+                        Case OrdenFabComplementos : xlsDir.AñadirHoja(rm.GetString("ORDENCOMPLEMENTO"), "Arial")
+                    End Select
+                Case Venta
+                    Select Case documento
+                        Case Pedido : xlsDir.AñadirHoja(rm.GetString("PEDIDOTEJIDO"), "Arial")
+                        Case Albaran : xlsDir.AñadirHoja(rm.GetString("ALBARANTEJIDO").ToUpper, "Arial")
+                        Case Factura : xlsDir.AñadirHoja(rm.GetString("ALBARANTEJIDO"), "Arial")
+                        Case Proforma : xlsDir.AñadirHoja(rm.GetString("ALBARANTEJIDO"), "Arial")
+                        Case OrdenModelos : xlsDir.AñadirHoja(rm.GetString("ORDENMODELO"), "Arial")
+                    End Select
+            End Select
+
+        Catch ex As Exception
+            fcargando.Close() : xlsDir.CerrarExcel() : Throw ex ': LOG(ex.ToString) 
+        End Try
+    End Sub
+    Public Sub Prueba()
+        Try
+            'Dim cone As New OleDb.OleDbConnection("Provider=Microsoft.Jet.OLEDB.4.0;Data Source=C:\prueba.xls;Extended Properties = Excel 8.0;HDR=YES;)
+            'Dim cmd As New OleDb.OleDbCommand("SELECT * FROM HOJA1$")
+            'Dim dar As OleDb.OleDbDataReader
+            'dar = cmd.ExecuteReader
+            'While dar.Read
+
+            'End While
+            UsarUnaFuenteExterna()
+
+        Catch ex As Exception
+            Throw ex : LOG(ex.ToString)
+        End Try
+    End Sub
+    Public Sub UsarUnaFuenteExterna()
+        Dim m_sConn1 As String = "Provider=Microsoft.Jet.OLEDB.4.0;" & _
+               "Data Source=C:\ExcelData1.xls;" & _
+               "Extended Properties=""Excel 8.0;HDR=YES"""
+        Dim cn2 As New OleDb.OleDbConnection
+        cn2.ConnectionString = m_sConn1
+        cn2.Open()
+        Dim cmd1 As New OleDb.OleDbCommand
+        cmd1.Connection = cn2
+        cmd1.CommandText = "CREATE TABLE EmployeeData (Nombre char(255))"
+        cmd1.ExecuteNonQuery()
+
+        Dim m_sNorthwind = _
+              "E:\Archivos de programa\Microsoft Office\Office10\Samples\Neptuno.mdb"
+        ' Open a connection to the sample Northwind Access database.
+        Dim conn As New System.Data.OleDb.OleDbConnection("Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" & m_sNorthwind & ";")
+        conn.Open()
+        Dim cmd As New System.Data.OleDb.OleDbCommand
+        '=======================================================================
+        ' Run an INSERT..INTO command on the Northwind database to append
+        ' the records from a table/query to an existing table in the Excel
+        ' workbook.
+        '=======================================================================
+        cmd.CommandText = "INSERT INTO [EmployeeData$] IN 'C:\ExcelData1.xls' 'Excel 8.0;'" & _
+             "SELECT Nombre FROM Empleados"
+        cmd.Connection = conn
+        cmd.ExecuteNonQuery()
+
+        '==========================================================================
+        ' Run a SELECT..INTO command on the Northwind database to insert
+        ' all the records from a table/query into a new sheet in the Excel
+        ' workbook.
+        '==========================================================================
+        cmd.CommandText = "SELECT * INTO [Excel 8.0;Database=C:\ExcelData2.xls].[ProductSales]" & _
+                        "FROM [Ventas por categoría para 1997]"
+        cmd.ExecuteNonQuery()
+
+        CCN()
+
+    End Sub
+
+#End Region
+
+#Region "RECIBOS"
+
+    Private Sub obtenerDatosCliente(ByVal cliente As Integer, ByRef strCliente As String, ByRef strBanco As String, ByRef strDC As String, ByRef strNumCuenta As String, ByRef strCOFI As String, ByRef strBANC As String)
+        Dim cmdSel As New MySqlCommand
+        Dim dareader As MySqlDataReader
+        Dim strSQL As String
+        Try
+            strSQL = "SELECT CLIENTS.NOM, " & _
+                        " CLIENTS.DOM, " & _
+                        " CLIENTS.CP,  " & _
+                        " CLIENTS.PROV,  " & _
+                        " CLIENTS.POB,  " & _
+                        " CLIENTS.NIF, " & _
+                        " CLIENTS.OFI, CLIENTS.BANC, " & _
+                        " CLIENTS.DC, CLIENTS.COFI, " & _
+                        " clients.CTA, BANCS.DESCRIPCIO AS NOMBANC " & _
+                        " FROM clients LEFT JOIN bancs ON (bancs.CODI = clients.BANC) " & _
+                        " WHERE clients.CODI = " & cliente & " "
+
+            cmdSel.CommandText = strSQL
+            cmdSel.Connection = cnn
+            ACN()
+            dareader = cmdSel.ExecuteReader
+
+            While dareader.Read
+                With dareader
+                    strCliente = .Item("NOM") & vbCrLf & .Item("DOM") & vbCrLf & .Item("CP") & " " & .Item("POB") & vbCrLf & .Item("PROV")
+                    strBanco = nz(.Item("NOMBANC"), "") & vbCrLf & nz(.Item("OFI"), "")
+                    strNumCuenta = nz(.Item("CTA"), "")
+                    strCOFI = nz(.Item("COFI"), "")
+                    strBANC = nz(.Item("BANC"), "")
+                    strDC = nz(.Item("DC"), "")
+                End With
+            End While
+            dareader.Close()
+            CCN()
+
+        Catch ex As Exception
+            fcargando.Close() : xlsDir.CerrarExcel() : Throw ex ': LOG(ex.ToString)  : xlsDir.CerrarExcel() : CCN()
+        End Try
+    End Sub
+    Private Function ObtenerVencimientos(ByVal FRA1 As Double, ByVal FRA2 As Double, ByVal FECHA1 As Date, ByVal FECHA2 As Date, ByVal tenerEncuentaFechas As Boolean) As DataTable
+        Dim cmd As New MySqlCommand
+        Dim dt As New DataTable
+        Dim dar As New MySqlDataAdapter
+        Dim i As Integer
+        Dim dr As DataRow
+        Try
+            cmd.CommandText = "SELECT vencim.*, " & _
+                    " factur.CLIENT " & _
+                    " FROM vencim  " & _
+                    " LEFT JOIN factur ON (factur.DOCUMENT = ""F"" AND factur.FRA = vencim.FRA AND vencim.CENTRO = factur.CENTRO)  " & _
+                    " WHERE  " & _
+                    " vencim.CENTRO = """ & doc(0).Item("CENTRO") & """ AND " & _
+                    " vencim.COMVEN = ""V"" AND " & _
+                    " vencim.FRA >= """ & FRA1 & """ AND " & _
+                    " vencim.FRA <= """ & FRA2 & """  "
+
+            If tenerEncuentaFechas Then
+                cmd.CommandText = cmd.CommandText & " AND vencim.EMISSIO >= """ & ConvertirAfechaMysql(FECHA1) & """ AND " & _
+                                    " vencim.EMISSIO <= """ & ConvertirAfechaMysql(FECHA2) & """  "
+            End If
+            cmd.Connection = cnn
+            dar.SelectCommand = cmd
+
+            ACN()
+            dar.Fill(dt)
+            CCN()
+            Return dt
+
+        Catch ex As Exception
+            fcargando.Close() : xlsDir.CerrarExcel() : Throw ex ': LOG(ex.ToString) 
+        End Try
+    End Function
+    Private Function obtenerLogoEmpresa(ByVal CENTRO As Char)
+        Dim cmd As New MySqlCommand
+        Dim dt As New DataTable
+        Try
+            cmd.CommandText = "SELECT LOGO AS LOGOEMPRESA FROM FILIALES WHERE CODI = """ & CENTRO & """ "
+            cmd.Connection = cnn
+            ACN()
+            Return cmd.ExecuteScalar
+
+        Catch ex As Exception
+            Throw ex : LOG(ex.ToString)
+        End Try
+    End Function
+    'Hay que cargar los dvVencimientos, los datos de los clientes seran diferenctes.
+    'Ordenar por cliente e ir cargando los clientes
+    Private Function CrearTablaRecibos(ByVal FRA1 As Double, ByVal FRA2 As Double, ByVal FECHA1 As Date, ByVal FECHA2 As Date, ByVal TenerEnCuentaFechas As Boolean) As DataTable
+        Dim strCliente, strBANCO, strCantidad, strBANC, strDC, strNumCta, strCOFI As String
+        Dim cNum2Text As num2text.Guille.Num2Text.cNum2Text
+        Dim dt As New DataTable("RECIBOS")
+        Dim dr As DataRow
+        Dim dtVencim As New DataTable
+        Dim clienteActual, i As Integer
+        Dim clienteAnterior As Integer = -1
+
+        Try
+            dtVencim = ObtenerVencimientos(FRA1, FRA2, FECHA1, FECHA2, TenerEnCuentaFechas)
+            vencimientos = dtVencim.DefaultView
+            vencimientos.Sort = "CLIENT, VENCIM"
+            cNum2Text = New num2text.Guille.Num2Text.cNum2Text
+
+            dt.Columns.Add(New DataColumn("CENTRO"))
+            dt.Columns("CENTRO").DefaultValue = vencimientos(0).Item("CENTRO")
+            dt.Columns.Add(New DataColumn("NUMRECIBO"))
+            dt.Columns.Add(New DataColumn("LUGAREXP"))
+            dt.Columns("LUGAREXP").DefaultValue = lugarExp
+            dt.Columns.Add(New DataColumn("IMPORTE"))
+            dt.Columns.Add(New DataColumn("FECHAEXP"))
+            dt.Columns.Add(New DataColumn("FECHAVENCIM"))
+            dt.Columns.Add(New DataColumn("CANTIDAD"))
+            dt.Columns.Add(New DataColumn("ENCONCEPTODE"))
+            dt.Columns.Add(New DataColumn("PAGADEROEN"))
+            dt.Columns.Add(New DataColumn("NUMCUENTA"))
+            dt.Columns.Add(New DataColumn("CLIENTE"))
+            dt.Columns.Add(New DataColumn("COFI"))
+            dt.Columns.Add(New DataColumn("CCC"))
+            dt.Columns.Add(New DataColumn("LOGOEMPRESA"))
+            dt.Columns("LOGOEMPRESA").DataType = GetType(Byte())
+            dt.Columns("LOGOEMPRESA").DefaultValue = obtenerLogoEmpresa(vencimientos(0).Item("CENTRO"))
+
+            dt.Columns.Add(New DataColumn("DC"))
+            vencimientos.Sort = "FRA"
+            ACN()
+            For i = 0 To vencimientos.Count - 1
+                dr = dt.NewRow
+                With vencimientos(i)
+                    clienteActual = .Item("CLIENT")
+
+                    If clienteActual <> clienteAnterior Then
+                        obtenerDatosCliente(.Item("CLIENT"), strCliente, strBANCO, strDC, strNumCta, strCOFI, strBANC)
+                        clienteAnterior = clienteActual
+                    End If
+
+                    strCantidad = cNum2Text.Numero2Letra("" & .Item("IMPORT") & "", 0, 2, " Eur.", " Cent.", 1, 1).ToUpper
+                    dr("NUMRECIBO") = vencimientos(i).Item("FRA")
+                    'dr("LUGAREXP") = lugarExp
+                    dr("IMPORTE") = PonerAsteriscos(Format(nzn(vencimientos(i).Item("IMPORT"), 0), "#,##0.00")) 'PonerAsteriscos(Format(nzn(vencimientos(i).Item("IMPORT"), 0), "#,##0.00"))
+                    dr("FECHAEXP") = nz(vencimientos(i).Item("EMISSIO"), "", False, True)
+                    dr("FECHAVENCIM") = nz(vencimientos(i).Item("VENCIM"), "", False, True)
+                    dr("CANTIDAD") = strCantidad
+                    dr("ENCONCEPTODE") = ""
+                    dr("PAGADEROEN") = strBANCO
+                    dr("NUMCUENTA") = strNumCta
+                    dr("CLIENTE") = strCliente
+                    dr("DC") = strDC
+                    dr("COFI") = strCOFI
+                    dr("CCC") = strBANC
+                End With
+                dt.Rows.Add(dr)
+            Next
+            dt.DefaultView.Sort = "NUMRECIBO, FECHAVENCIM"
+            Dim dsTEMPORAL As New DataSet
+            dsTEMPORAL.Tables.Add(dt)
+            dsTEMPORAL.WriteXml(directorio & "\tablasC71.xml")
+            Return dt
+
+        Catch ex As Exception
+            fcargando.Close() : xlsDir.CerrarExcel() : Throw ex ': LOG(ex.ToString)  : xlsDir.CerrarExcel() : CCN()
+        End Try
+    End Function
+    Private Function PonerAsteriscos(ByVal d As String)
+        Dim i As Integer
+        Dim temp As String
+        Try
+            temp = "/"
+            For i = d.Length To 14
+                temp = temp & "*"
+            Next
+            Return temp & d.ToString & "*/"
+
+        Catch ex As Exception
+            Throw ex : LOG(ex.ToString)
+        End Try
+    End Function
+    'Antes de llegar aqui se tienen que haber generado los vencimientos que no estubieran generados
+
+    Public Function ImprimirRecibos(ByVal FRA1 As Double, ByVal FRA2 As Double, ByVal FECHA1 As Date, ByVal FECHA2 As Date, ByVal TenerEnCuentaFechas As Boolean) As System.Drawing.Printing.PrintDocument
+        Try
+            Dim c1r As New C1.Win.C1Report.C1Report
+            Select Case doc(0).Item("CENTRO")
+                Case "C" : c1r.Load(directorio & "informes\informes.xml", "iRECIBOS")
+                Case "O" : c1r.Load(directorio & "informes\informes.xml", "iRECIBOSCYCO")
+            End Select
+
+            'Las facturas de este intervalo que no tengan puestos los vencimientos hay que generarlos
+            '!!
+            c1r.DataSource.Recordset = CrearTablaRecibos(FRA1, FRA2, FECHA1, FECHA2, TenerEnCuentaFechas).DefaultView
+            'Dim mdbDirecto As New AccessDirecto("RECIBOS")
+            'mdbDirecto.TraspasarTabla(CrearTablaRecibos(FRA1, FRA2, FECHA1, FECHA2, TenerEnCuentaFechas))
+            fcargando.Close()
+            Return (c1r.Document)
+
+        Catch ex As Exception
+            fcargando.Close() : xlsDir.CerrarExcel() : Throw ex ': LOG(ex.ToString)  : xlsDir.CerrarExcel() : CCN()
+        End Try
+    End Function
+
+#End Region
+
+End Class
+
+'Select Case compraVenta
+'                Case Compra
+'                    Select Case documento
+'                        Case Pedido
+'                            Select Case tipo
+'                                Case Tejido : PonerCabeceraComun(mas)
+'                                Case Hilos : PonerCabeceraComun(mas)
+'                                Case Fornitura : PonerCabeceraComun(mas)
+'                            End Select
+''Solo Albaranes de compra de hilos
+'                        Case Albaran : PonerCabeceraComun(mas)
+'                        Case OrdenFabComplementos : PonerCabeceraComun(mas)
+'                    End Select
+'                Case Venta
+'                    Select Case MODELO
+'                        Case True
+'                            Select Case documento
+'                                Case OrdenModelos : PonerCabeceraComun(mas)
+'                                Case Albaran : PonerCabeceraComun(mas)
+'                                Case Proforma : PonerCabeceraComun(mas)
+'                                Case Factura : PonerCabeceraComun(mas)
+'                            End Select
+'                        Case False
+'                            Select Case documento
+'                                Case Pedido : PonerCabeceraComun(mas)
+'                                Case Albaran : PonerCabeceraComun(mas)
+'                                Case Proforma : PonerCabeceraComun(mas)
+'                                Case Factura : PonerCabeceraComun(mas)
+'                            End Select
+'                    End Select
+'            End Select

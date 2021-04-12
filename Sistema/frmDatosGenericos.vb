@@ -1,0 +1,304 @@
+Imports MySql.Data.MySqlClient : Imports clsFuncionesLOG : Imports clsFuncionesC1 : Imports clsFuncionesUtiles : Imports clsConstantes : Imports clsOtrasFunciones
+
+Public Class frmDatosGenericos
+    Inherits System.Windows.Forms.Form
+
+#Region " Código generado por el Diseñador de Windows Forms "
+
+    Public Sub New()
+        MyBase.New()
+
+        'El Diseñador de Windows Forms requiere esta llamada.
+        InitializeComponent()
+
+        'Agregar cualquier inicialización después de la llamada a InitializeComponent()
+
+    End Sub
+
+    'Form reemplaza a Dispose para limpiar la lista de componentes.
+    Protected Overloads Overrides Sub Dispose(ByVal disposing As Boolean)
+        If disposing Then
+            If Not (components Is Nothing) Then
+                components.Dispose()
+            End If
+        End If
+        MyBase.Dispose(disposing)
+        frmChildForm = Nothing
+    End Sub
+
+    'Requerido por el Diseñador de Windows Forms
+    Private components As System.ComponentModel.IContainer
+
+    'NOTA: el Diseñador de Windows Forms requiere el siguiente procedimiento
+    'Puede modificarse utilizando el Diseñador de Windows Forms. 
+    'No lo modifique con el editor de código.
+    Friend WithEvents ExplorerBarControl1 As Compona.Windows.Forms.ExplorerBarControl
+    Friend WithEvents General As Compona.Windows.Forms.ExplorerBar.ExplorerBarBox
+    Friend WithEvents ExplorerBarBoxItem1 As Compona.Windows.Forms.ExplorerBar.ExplorerBarBoxItem
+    Friend WithEvents RealPanel1 As System.Windows.Forms.Panel ' NETXP.Controls.RealPanel
+    Friend WithEvents ExplorerBarBox1 As Compona.Windows.Forms.ExplorerBar.ExplorerBarBox
+    Friend WithEvents ExplorerBarBoxItem2 As Compona.Windows.Forms.ExplorerBar.ExplorerBarBoxItem
+    Friend WithEvents ExplorerBarBoxItem3 As Compona.Windows.Forms.ExplorerBar.ExplorerBarBoxItem
+    <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
+        Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(frmDatosGenericos))
+        Me.ExplorerBarControl1 = New Compona.Windows.Forms.ExplorerBarControl
+        Me.ExplorerBarBox1 = New Compona.Windows.Forms.ExplorerBar.ExplorerBarBox
+        Me.General = New Compona.Windows.Forms.ExplorerBar.ExplorerBarBox
+        Me.ExplorerBarBoxItem1 = New Compona.Windows.Forms.ExplorerBar.ExplorerBarBoxItem
+        Me.ExplorerBarBoxItem2 = New Compona.Windows.Forms.ExplorerBar.ExplorerBarBoxItem
+        Me.ExplorerBarBoxItem3 = New Compona.Windows.Forms.ExplorerBar.ExplorerBarBoxItem
+        Me.RealPanel1 = New System.Windows.Forms.Panel
+        Me.ExplorerBarControl1.SuspendLayout()
+        Me.General.SuspendLayout()
+        Me.SuspendLayout()
+        '
+        'ExplorerBarControl1
+        '
+        Me.ExplorerBarControl1.AccessibleDescription = resources.GetString("ExplorerBarControl1.AccessibleDescription")
+        Me.ExplorerBarControl1.AccessibleName = resources.GetString("ExplorerBarControl1.AccessibleName")
+        Me.ExplorerBarControl1.Anchor = CType(resources.GetObject("ExplorerBarControl1.Anchor"), System.Windows.Forms.AnchorStyles)
+        Me.ExplorerBarControl1.AutoScroll = CType(resources.GetObject("ExplorerBarControl1.AutoScroll"), Boolean)
+        Me.ExplorerBarControl1.AutoScrollMargin = CType(resources.GetObject("ExplorerBarControl1.AutoScrollMargin"), System.Drawing.Size)
+        Me.ExplorerBarControl1.AutoScrollMinSize = CType(resources.GetObject("ExplorerBarControl1.AutoScrollMinSize"), System.Drawing.Size)
+        Me.ExplorerBarControl1.BackColor = System.Drawing.Color.FromArgb(CType(111, Byte), CType(141, Byte), CType(223, Byte))
+        Me.ExplorerBarControl1.BackgroundImage = CType(resources.GetObject("ExplorerBarControl1.BackgroundImage"), System.Drawing.Image)
+        Me.ExplorerBarControl1.Controls.Add(Me.ExplorerBarBox1)
+        Me.ExplorerBarControl1.Controls.Add(Me.General)
+        Me.ExplorerBarControl1.Dock = CType(resources.GetObject("ExplorerBarControl1.Dock"), System.Windows.Forms.DockStyle)
+        Me.ExplorerBarControl1.DockPadding.Left = 10
+        Me.ExplorerBarControl1.DockPadding.Right = 10
+        Me.ExplorerBarControl1.Enabled = CType(resources.GetObject("ExplorerBarControl1.Enabled"), Boolean)
+        Me.ExplorerBarControl1.Font = CType(resources.GetObject("ExplorerBarControl1.Font"), System.Drawing.Font)
+        Me.ExplorerBarControl1.ImeMode = CType(resources.GetObject("ExplorerBarControl1.ImeMode"), System.Windows.Forms.ImeMode)
+        Me.ExplorerBarControl1.Location = CType(resources.GetObject("ExplorerBarControl1.Location"), System.Drawing.Point)
+        Me.ExplorerBarControl1.Name = "ExplorerBarControl1"
+        Me.ExplorerBarControl1.RightToLeft = CType(resources.GetObject("ExplorerBarControl1.RightToLeft"), System.Windows.Forms.RightToLeft)
+        Me.ExplorerBarControl1.Size = CType(resources.GetObject("ExplorerBarControl1.Size"), System.Drawing.Size)
+        Me.ExplorerBarControl1.TabIndex = CType(resources.GetObject("ExplorerBarControl1.TabIndex"), Integer)
+        Me.ExplorerBarControl1.Text = resources.GetString("ExplorerBarControl1.Text")
+        Me.ExplorerBarControl1.Visible = CType(resources.GetObject("ExplorerBarControl1.Visible"), Boolean)
+        '
+        'ExplorerBarBox1
+        '
+        Me.ExplorerBarBox1.AccessibleDescription = resources.GetString("ExplorerBarBox1.AccessibleDescription")
+        Me.ExplorerBarBox1.AccessibleName = resources.GetString("ExplorerBarBox1.AccessibleName")
+        Me.ExplorerBarBox1.Anchor = CType(resources.GetObject("ExplorerBarBox1.Anchor"), System.Windows.Forms.AnchorStyles)
+        Me.ExplorerBarBox1.AutoScroll = CType(resources.GetObject("ExplorerBarBox1.AutoScroll"), Boolean)
+        Me.ExplorerBarBox1.AutoScrollMargin = CType(resources.GetObject("ExplorerBarBox1.AutoScrollMargin"), System.Drawing.Size)
+        Me.ExplorerBarBox1.AutoScrollMinSize = CType(resources.GetObject("ExplorerBarBox1.AutoScrollMinSize"), System.Drawing.Size)
+        Me.ExplorerBarBox1.BackColor = System.Drawing.Color.FromArgb(CType(214, Byte), CType(223, Byte), CType(247, Byte))
+        Me.ExplorerBarBox1.BackgroundImage = CType(resources.GetObject("ExplorerBarBox1.BackgroundImage"), System.Drawing.Image)
+        Me.ExplorerBarBox1.BorderColor = System.Drawing.Color.White
+        Me.ExplorerBarBox1.CaptionEndColor = System.Drawing.Color.FromArgb(CType(199, Byte), CType(211, Byte), CType(247, Byte))
+        Me.ExplorerBarBox1.CaptionStartColor = System.Drawing.Color.FromArgb(CType(255, Byte), CType(255, Byte), CType(255, Byte))
+        Me.ExplorerBarBox1.Dock = CType(resources.GetObject("ExplorerBarBox1.Dock"), System.Windows.Forms.DockStyle)
+        Me.ExplorerBarBox1.DockPadding.Bottom = 8
+        Me.ExplorerBarBox1.DockPadding.Left = 8
+        Me.ExplorerBarBox1.DockPadding.Right = 8
+        Me.ExplorerBarBox1.DockPadding.Top = 52
+        Me.ExplorerBarBox1.Enabled = CType(resources.GetObject("ExplorerBarBox1.Enabled"), Boolean)
+        Me.ExplorerBarBox1.Expanded = True
+        Me.ExplorerBarBox1.ExpanderCollapseImage = CType(resources.GetObject("ExplorerBarBox1.ExpanderCollapseImage"), System.Drawing.Image)
+        Me.ExplorerBarBox1.ExpanderExpandImage = CType(resources.GetObject("ExplorerBarBox1.ExpanderExpandImage"), System.Drawing.Image)
+        Me.ExplorerBarBox1.ExpanderHoverCollapseImage = CType(resources.GetObject("ExplorerBarBox1.ExpanderHoverCollapseImage"), System.Drawing.Image)
+        Me.ExplorerBarBox1.ExpanderHoverExpandImage = CType(resources.GetObject("ExplorerBarBox1.ExpanderHoverExpandImage"), System.Drawing.Image)
+        Me.ExplorerBarBox1.FoldingSpeed = 20
+        Me.ExplorerBarBox1.Font = CType(resources.GetObject("ExplorerBarBox1.Font"), System.Drawing.Font)
+        Me.ExplorerBarBox1.ForeColor = System.Drawing.Color.FromArgb(CType(33, Byte), CType(93, Byte), CType(198, Byte))
+        Me.ExplorerBarBox1.HoverForeColor = System.Drawing.Color.FromArgb(CType(123, Byte), CType(153, Byte), CType(244, Byte))
+        Me.ExplorerBarBox1.ImeMode = CType(resources.GetObject("ExplorerBarBox1.ImeMode"), System.Windows.Forms.ImeMode)
+        Me.ExplorerBarBox1.Location = CType(resources.GetObject("ExplorerBarBox1.Location"), System.Drawing.Point)
+        Me.ExplorerBarBox1.Name = "ExplorerBarBox1"
+        Me.ExplorerBarBox1.RightToLeft = CType(resources.GetObject("ExplorerBarBox1.RightToLeft"), System.Windows.Forms.RightToLeft)
+        Me.ExplorerBarBox1.Size = CType(resources.GetObject("ExplorerBarBox1.Size"), System.Drawing.Size)
+        Me.ExplorerBarBox1.TabIndex = CType(resources.GetObject("ExplorerBarBox1.TabIndex"), Integer)
+        Me.ExplorerBarBox1.Text = resources.GetString("ExplorerBarBox1.Text")
+        Me.ExplorerBarBox1.TopLeftMask = CType(resources.GetObject("ExplorerBarBox1.TopLeftMask"), System.Drawing.Bitmap)
+        Me.ExplorerBarBox1.TopRightMask = CType(resources.GetObject("ExplorerBarBox1.TopRightMask"), System.Drawing.Bitmap)
+        Me.ExplorerBarBox1.Visible = CType(resources.GetObject("ExplorerBarBox1.Visible"), Boolean)
+        '
+        'General
+        '
+        Me.General.AccessibleDescription = resources.GetString("General.AccessibleDescription")
+        Me.General.AccessibleName = resources.GetString("General.AccessibleName")
+        Me.General.Anchor = CType(resources.GetObject("General.Anchor"), System.Windows.Forms.AnchorStyles)
+        Me.General.AutoScroll = CType(resources.GetObject("General.AutoScroll"), Boolean)
+        Me.General.AutoScrollMargin = CType(resources.GetObject("General.AutoScrollMargin"), System.Drawing.Size)
+        Me.General.AutoScrollMinSize = CType(resources.GetObject("General.AutoScrollMinSize"), System.Drawing.Size)
+        Me.General.BackColor = System.Drawing.Color.FromArgb(CType(214, Byte), CType(223, Byte), CType(247, Byte))
+        Me.General.BackgroundImage = CType(resources.GetObject("General.BackgroundImage"), System.Drawing.Image)
+        Me.General.BorderColor = System.Drawing.Color.White
+        Me.General.CaptionEndColor = System.Drawing.Color.FromArgb(CType(199, Byte), CType(211, Byte), CType(247, Byte))
+        Me.General.CaptionStartColor = System.Drawing.Color.FromArgb(CType(255, Byte), CType(255, Byte), CType(255, Byte))
+        Me.General.Controls.Add(Me.ExplorerBarBoxItem1)
+        Me.General.Controls.Add(Me.ExplorerBarBoxItem2)
+        Me.General.Controls.Add(Me.ExplorerBarBoxItem3)
+        Me.General.Dock = CType(resources.GetObject("General.Dock"), System.Windows.Forms.DockStyle)
+        Me.General.DockPadding.Bottom = 8
+        Me.General.DockPadding.Left = 8
+        Me.General.DockPadding.Right = 8
+        Me.General.DockPadding.Top = 39
+        Me.General.Enabled = CType(resources.GetObject("General.Enabled"), Boolean)
+        Me.General.Expanded = True
+        Me.General.ExpanderCollapseImage = CType(resources.GetObject("General.ExpanderCollapseImage"), System.Drawing.Image)
+        Me.General.ExpanderExpandImage = CType(resources.GetObject("General.ExpanderExpandImage"), System.Drawing.Image)
+        Me.General.ExpanderHoverCollapseImage = CType(resources.GetObject("General.ExpanderHoverCollapseImage"), System.Drawing.Image)
+        Me.General.ExpanderHoverExpandImage = CType(resources.GetObject("General.ExpanderHoverExpandImage"), System.Drawing.Image)
+        Me.General.FoldingSpeed = 20
+        Me.General.Font = CType(resources.GetObject("General.Font"), System.Drawing.Font)
+        Me.General.ForeColor = System.Drawing.Color.FromArgb(CType(33, Byte), CType(93, Byte), CType(198, Byte))
+        Me.General.HoverForeColor = System.Drawing.Color.FromArgb(CType(123, Byte), CType(153, Byte), CType(244, Byte))
+        Me.General.ImeMode = CType(resources.GetObject("General.ImeMode"), System.Windows.Forms.ImeMode)
+        Me.General.Location = CType(resources.GetObject("General.Location"), System.Drawing.Point)
+        Me.General.Name = "General"
+        Me.General.RightToLeft = CType(resources.GetObject("General.RightToLeft"), System.Windows.Forms.RightToLeft)
+        Me.General.Size = CType(resources.GetObject("General.Size"), System.Drawing.Size)
+        Me.General.TabIndex = CType(resources.GetObject("General.TabIndex"), Integer)
+        Me.General.Text = resources.GetString("General.Text")
+        Me.General.TopLeftMask = CType(resources.GetObject("General.TopLeftMask"), System.Drawing.Bitmap)
+        Me.General.TopRightMask = CType(resources.GetObject("General.TopRightMask"), System.Drawing.Bitmap)
+        Me.General.Visible = CType(resources.GetObject("General.Visible"), Boolean)
+        '
+        'ExplorerBarBoxItem1
+        '
+        Me.ExplorerBarBoxItem1.AccessibleDescription = resources.GetString("ExplorerBarBoxItem1.AccessibleDescription")
+        Me.ExplorerBarBoxItem1.AccessibleName = resources.GetString("ExplorerBarBoxItem1.AccessibleName")
+        Me.ExplorerBarBoxItem1.ActiveLinkColor = System.Drawing.Color.Red
+        Me.ExplorerBarBoxItem1.Anchor = CType(resources.GetObject("ExplorerBarBoxItem1.Anchor"), System.Windows.Forms.AnchorStyles)
+        Me.ExplorerBarBoxItem1.Dock = CType(resources.GetObject("ExplorerBarBoxItem1.Dock"), System.Windows.Forms.DockStyle)
+        Me.ExplorerBarBoxItem1.Enabled = CType(resources.GetObject("ExplorerBarBoxItem1.Enabled"), Boolean)
+        Me.ExplorerBarBoxItem1.Font = CType(resources.GetObject("ExplorerBarBoxItem1.Font"), System.Drawing.Font)
+        Me.ExplorerBarBoxItem1.Image = CType(resources.GetObject("ExplorerBarBoxItem1.Image"), System.Drawing.Image)
+        Me.ExplorerBarBoxItem1.ImeMode = CType(resources.GetObject("ExplorerBarBoxItem1.ImeMode"), System.Windows.Forms.ImeMode)
+        Me.ExplorerBarBoxItem1.LinkColor = System.Drawing.Color.FromArgb(CType(51, Byte), CType(106, Byte), CType(174, Byte))
+        Me.ExplorerBarBoxItem1.Location = CType(resources.GetObject("ExplorerBarBoxItem1.Location"), System.Drawing.Point)
+        Me.ExplorerBarBoxItem1.Name = "ExplorerBarBoxItem1"
+        Me.ExplorerBarBoxItem1.RightToLeft = CType(resources.GetObject("ExplorerBarBoxItem1.RightToLeft"), System.Windows.Forms.RightToLeft)
+        Me.ExplorerBarBoxItem1.Size = CType(resources.GetObject("ExplorerBarBoxItem1.Size"), System.Drawing.Size)
+        Me.ExplorerBarBoxItem1.TabIndex = CType(resources.GetObject("ExplorerBarBoxItem1.TabIndex"), Integer)
+        Me.ExplorerBarBoxItem1.Text = resources.GetString("ExplorerBarBoxItem1.Text")
+        Me.ExplorerBarBoxItem1.Visible = CType(resources.GetObject("ExplorerBarBoxItem1.Visible"), Boolean)
+        '
+        'ExplorerBarBoxItem2
+        '
+        Me.ExplorerBarBoxItem2.AccessibleDescription = resources.GetString("ExplorerBarBoxItem2.AccessibleDescription")
+        Me.ExplorerBarBoxItem2.AccessibleName = resources.GetString("ExplorerBarBoxItem2.AccessibleName")
+        Me.ExplorerBarBoxItem2.ActiveLinkColor = System.Drawing.Color.Red
+        Me.ExplorerBarBoxItem2.Anchor = CType(resources.GetObject("ExplorerBarBoxItem2.Anchor"), System.Windows.Forms.AnchorStyles)
+        Me.ExplorerBarBoxItem2.Dock = CType(resources.GetObject("ExplorerBarBoxItem2.Dock"), System.Windows.Forms.DockStyle)
+        Me.ExplorerBarBoxItem2.Enabled = CType(resources.GetObject("ExplorerBarBoxItem2.Enabled"), Boolean)
+        Me.ExplorerBarBoxItem2.Font = CType(resources.GetObject("ExplorerBarBoxItem2.Font"), System.Drawing.Font)
+        Me.ExplorerBarBoxItem2.Image = CType(resources.GetObject("ExplorerBarBoxItem2.Image"), System.Drawing.Image)
+        Me.ExplorerBarBoxItem2.ImeMode = CType(resources.GetObject("ExplorerBarBoxItem2.ImeMode"), System.Windows.Forms.ImeMode)
+        Me.ExplorerBarBoxItem2.LinkColor = System.Drawing.Color.FromArgb(CType(51, Byte), CType(106, Byte), CType(174, Byte))
+        Me.ExplorerBarBoxItem2.Location = CType(resources.GetObject("ExplorerBarBoxItem2.Location"), System.Drawing.Point)
+        Me.ExplorerBarBoxItem2.Name = "ExplorerBarBoxItem2"
+        Me.ExplorerBarBoxItem2.RightToLeft = CType(resources.GetObject("ExplorerBarBoxItem2.RightToLeft"), System.Windows.Forms.RightToLeft)
+        Me.ExplorerBarBoxItem2.Size = CType(resources.GetObject("ExplorerBarBoxItem2.Size"), System.Drawing.Size)
+        Me.ExplorerBarBoxItem2.TabIndex = CType(resources.GetObject("ExplorerBarBoxItem2.TabIndex"), Integer)
+        Me.ExplorerBarBoxItem2.Text = resources.GetString("ExplorerBarBoxItem2.Text")
+        Me.ExplorerBarBoxItem2.Visible = CType(resources.GetObject("ExplorerBarBoxItem2.Visible"), Boolean)
+        '
+        'ExplorerBarBoxItem3
+        '
+        Me.ExplorerBarBoxItem3.AccessibleDescription = resources.GetString("ExplorerBarBoxItem3.AccessibleDescription")
+        Me.ExplorerBarBoxItem3.AccessibleName = resources.GetString("ExplorerBarBoxItem3.AccessibleName")
+        Me.ExplorerBarBoxItem3.ActiveLinkColor = System.Drawing.Color.Red
+        Me.ExplorerBarBoxItem3.Anchor = CType(resources.GetObject("ExplorerBarBoxItem3.Anchor"), System.Windows.Forms.AnchorStyles)
+        Me.ExplorerBarBoxItem3.Dock = CType(resources.GetObject("ExplorerBarBoxItem3.Dock"), System.Windows.Forms.DockStyle)
+        Me.ExplorerBarBoxItem3.Enabled = CType(resources.GetObject("ExplorerBarBoxItem3.Enabled"), Boolean)
+        Me.ExplorerBarBoxItem3.Font = CType(resources.GetObject("ExplorerBarBoxItem3.Font"), System.Drawing.Font)
+        Me.ExplorerBarBoxItem3.Image = CType(resources.GetObject("ExplorerBarBoxItem3.Image"), System.Drawing.Image)
+        Me.ExplorerBarBoxItem3.ImeMode = CType(resources.GetObject("ExplorerBarBoxItem3.ImeMode"), System.Windows.Forms.ImeMode)
+        Me.ExplorerBarBoxItem3.LinkColor = System.Drawing.Color.FromArgb(CType(51, Byte), CType(106, Byte), CType(174, Byte))
+        Me.ExplorerBarBoxItem3.Location = CType(resources.GetObject("ExplorerBarBoxItem3.Location"), System.Drawing.Point)
+        Me.ExplorerBarBoxItem3.Name = "ExplorerBarBoxItem3"
+        Me.ExplorerBarBoxItem3.RightToLeft = CType(resources.GetObject("ExplorerBarBoxItem3.RightToLeft"), System.Windows.Forms.RightToLeft)
+        Me.ExplorerBarBoxItem3.Size = CType(resources.GetObject("ExplorerBarBoxItem3.Size"), System.Drawing.Size)
+        Me.ExplorerBarBoxItem3.TabIndex = CType(resources.GetObject("ExplorerBarBoxItem3.TabIndex"), Integer)
+        Me.ExplorerBarBoxItem3.Text = resources.GetString("ExplorerBarBoxItem3.Text")
+        Me.ExplorerBarBoxItem3.Visible = CType(resources.GetObject("ExplorerBarBoxItem3.Visible"), Boolean)
+        '
+        'RealPanel1
+        '
+        Me.RealPanel1.AccessibleDescription = resources.GetString("RealPanel1.AccessibleDescription")
+        Me.RealPanel1.AccessibleName = resources.GetString("RealPanel1.AccessibleName")
+        Me.RealPanel1.Anchor = CType(resources.GetObject("RealPanel1.Anchor"), System.Windows.Forms.AnchorStyles)
+        Me.RealPanel1.AutoScroll = CType(resources.GetObject("RealPanel1.AutoScroll"), Boolean)
+        Me.RealPanel1.AutoScrollMargin = CType(resources.GetObject("RealPanel1.AutoScrollMargin"), System.Drawing.Size)
+        Me.RealPanel1.AutoScrollMinSize = CType(resources.GetObject("RealPanel1.AutoScrollMinSize"), System.Drawing.Size)
+        Me.RealPanel1.BackColor = System.Drawing.SystemColors.ControlLight
+        Me.RealPanel1.BackgroundImage = CType(resources.GetObject("RealPanel1.BackgroundImage"), System.Drawing.Image)
+        Me.RealPanel1.Dock = CType(resources.GetObject("RealPanel1.Dock"), System.Windows.Forms.DockStyle)
+        Me.RealPanel1.Enabled = CType(resources.GetObject("RealPanel1.Enabled"), Boolean)
+        Me.RealPanel1.Font = CType(resources.GetObject("RealPanel1.Font"), System.Drawing.Font)
+        Me.RealPanel1.ImeMode = CType(resources.GetObject("RealPanel1.ImeMode"), System.Windows.Forms.ImeMode)
+        Me.RealPanel1.Location = CType(resources.GetObject("RealPanel1.Location"), System.Drawing.Point)
+        Me.RealPanel1.Name = "RealPanel1"
+        Me.RealPanel1.RightToLeft = CType(resources.GetObject("RealPanel1.RightToLeft"), System.Windows.Forms.RightToLeft)
+        Me.RealPanel1.Size = CType(resources.GetObject("RealPanel1.Size"), System.Drawing.Size)
+        Me.RealPanel1.TabIndex = CType(resources.GetObject("RealPanel1.TabIndex"), Integer)
+        Me.RealPanel1.Text = resources.GetString("RealPanel1.Text")
+        Me.RealPanel1.Visible = CType(resources.GetObject("RealPanel1.Visible"), Boolean)
+        '
+        'frmDatosGenericos
+        '
+        Me.AccessibleDescription = resources.GetString("$this.AccessibleDescription")
+        Me.AccessibleName = resources.GetString("$this.AccessibleName")
+        Me.AutoScaleBaseSize = CType(resources.GetObject("$this.AutoScaleBaseSize"), System.Drawing.Size)
+        Me.AutoScroll = CType(resources.GetObject("$this.AutoScroll"), Boolean)
+        Me.AutoScrollMargin = CType(resources.GetObject("$this.AutoScrollMargin"), System.Drawing.Size)
+        Me.AutoScrollMinSize = CType(resources.GetObject("$this.AutoScrollMinSize"), System.Drawing.Size)
+        Me.BackgroundImage = CType(resources.GetObject("$this.BackgroundImage"), System.Drawing.Image)
+        Me.ClientSize = CType(resources.GetObject("$this.ClientSize"), System.Drawing.Size)
+        Me.Controls.Add(Me.RealPanel1)
+        Me.Controls.Add(Me.ExplorerBarControl1)
+        Me.Enabled = CType(resources.GetObject("$this.Enabled"), Boolean)
+        Me.Font = CType(resources.GetObject("$this.Font"), System.Drawing.Font)
+        Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
+        Me.ImeMode = CType(resources.GetObject("$this.ImeMode"), System.Windows.Forms.ImeMode)
+        Me.Location = CType(resources.GetObject("$this.Location"), System.Drawing.Point)
+        Me.MaximumSize = CType(resources.GetObject("$this.MaximumSize"), System.Drawing.Size)
+        Me.MinimumSize = CType(resources.GetObject("$this.MinimumSize"), System.Drawing.Size)
+        Me.Name = "frmDatosGenericos"
+        Me.RightToLeft = CType(resources.GetObject("$this.RightToLeft"), System.Windows.Forms.RightToLeft)
+        Me.StartPosition = CType(resources.GetObject("$this.StartPosition"), System.Windows.Forms.FormStartPosition)
+        Me.Text = resources.GetString("$this.Text")
+        Me.ExplorerBarControl1.ResumeLayout(False)
+        Me.General.ResumeLayout(False)
+        Me.ResumeLayout(False)
+
+    End Sub
+
+#End Region
+
+    Shared frmChildForm As frmDatosGenericos
+
+    Public Shared Function GetInstance() As frmDatosGenericos
+        If frmChildForm Is Nothing Then
+            frmChildForm = New frmDatosGenericos
+
+        End If
+        Return frmChildForm
+    End Function
+    Private Sub LimpiarPanel()
+        Try
+            If RealPanel1.Controls.Count <> 0 Then
+                RealPanel1.Controls.RemoveAt(0)
+            End If
+
+        Catch ex As Exception
+            LOG(ex.ToString) : CCN()
+        End Try
+    End Sub
+    Private Sub ExplorerBarBoxItem1_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ExplorerBarBoxItem1.Click
+        Try
+            LimpiarPanel()
+            'RealPanel1.Controls.Add(New ctrlEmpreses)
+
+        Catch ex As Exception
+            LOG(ex.ToString) : CCN()
+        End Try
+    End Sub
+
+End Class

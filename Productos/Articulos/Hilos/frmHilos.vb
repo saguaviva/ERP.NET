@@ -1,0 +1,1419 @@
+Imports MySql.Data.MySqlClient : Imports clsFuncionesLOG : Imports clsFuncionesC1 : Imports clsFuncionesUtiles : Imports clsConstantes
+Imports Microsoft.Office.Interop
+
+
+Public Class frmHilos
+    Inherits aura2k3.frmBase
+
+#Region " Código generado por el Diseñador de Windows Forms "
+
+    Public Sub New()
+        MyBase.New()
+
+        'El Diseñador de Windows Forms requiere esta llamada.
+        InitializeComponent() : Dim tom As SMcMaster.TabOrderManager = New SMcMaster.TabOrderManager(Me) : tom.SetTabOrder(SMcMaster.TabOrderManager.TabScheme.AcrossFirst)
+
+        'Agregar cualquier inicialización después de la llamada a InitializeComponent()
+
+    End Sub
+
+    'Form reemplaza a Dispose para limpiar la lista de componentes.
+    Protected Overloads Overrides Sub Dispose(ByVal disposing As Boolean)
+        '! Seal for less overhead - Can declare NotInheritable Class
+        If disposing Then
+            If Not (components Is Nothing) Then
+                components.Dispose()
+            End If
+        End If
+       MyBase.Dispose(disposing)
+        frmChildForm = Nothing
+    End Sub
+
+    'Requerido por el Diseñador de Windows Forms
+    Private components As System.ComponentModel.IContainer
+
+    'NOTA: el Diseñador de Windows Forms requiere el siguiente procedimiento
+    'Puede modificarse utilizando el Diseñador de Windows Forms. 
+    'No lo modifique con el editor de código.
+
+    Friend WithEvents lblNombreMateria As Label
+    Friend WithEvents btnElegirProveedor As C1.Win.C1Input.C1Button
+    Friend WithEvents lblProveedor As Label
+    Friend WithEvents lblDescripcion As Label
+    Friend WithEvents lblPreu As Label
+    Friend WithEvents lblPrecioCoste As Label
+    Friend WithEvents lblIvaHilo As Label
+    Friend WithEvents lblNotasHilo As Label
+    Friend WithEvents comboIVA As C1.Win.C1List.C1Combo
+    Friend WithEvents GroupBox1 As System.Windows.Forms.GroupBox
+    Friend WithEvents btnElegirHilo As C1.Win.C1Input.C1Button
+    Friend WithEvents rdoHilosProveedor As System.Windows.Forms.RadioButton
+    Friend WithEvents rdoTodosHilos As System.Windows.Forms.RadioButton
+    Friend WithEvents cboMostrarProveedor As C1.Win.C1List.C1Combo
+    Friend WithEvents tabControlHilos As System.Windows.Forms.TabControl
+    Friend WithEvents tabPageHilo As System.Windows.Forms.TabPage
+    Friend WithEvents lblNumeroHilos As C1.Win.C1Input.C1Label
+    Friend WithEvents cboID As C1.Win.C1List.C1Combo
+    Friend WithEvents dgCartaColores As C1.Win.C1TrueDBGrid.C1TrueDBGrid
+    Friend WithEvents gpSeleccionProveedores As System.Windows.Forms.GroupBox
+    Friend WithEvents txtPROVE As C1.Win.C1Input.C1TextBox
+    Friend WithEvents txtDESCRI As C1.Win.C1Input.C1TextBox
+    Friend WithEvents txtCOST As C1.Win.C1Input.C1TextBox
+    Friend WithEvents cboNOMPROVE As C1.Win.C1List.C1Combo
+    Friend WithEvents txtPREU As C1.Win.C1Input.C1TextBox
+    Friend WithEvents txtOBSERV As C1.Win.C1Input.C1TextBox
+    Friend WithEvents tabPageValoracion As System.Windows.Forms.TabPage
+    Friend WithEvents btnExportarPDF As C1.Win.C1Input.C1Button
+    Friend WithEvents dgValoracion As C1.Win.C1TrueDBGrid.C1TrueDBGrid
+    Friend WithEvents btnExportarExcel As C1.Win.C1Input.C1Button
+
+    <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmHilos))
+        Me.lblNombreMateria = New System.Windows.Forms.Label()
+        Me.btnElegirProveedor = New C1.Win.C1Input.C1Button()
+        Me.txtPROVE = New C1.Win.C1Input.C1TextBox()
+        Me.lblProveedor = New System.Windows.Forms.Label()
+        Me.lblDescripcion = New System.Windows.Forms.Label()
+        Me.txtDESCRI = New C1.Win.C1Input.C1TextBox()
+        Me.lblPreu = New System.Windows.Forms.Label()
+        Me.txtPREU = New C1.Win.C1Input.C1TextBox()
+        Me.lblPrecioCoste = New System.Windows.Forms.Label()
+        Me.lblIvaHilo = New System.Windows.Forms.Label()
+        Me.txtCOST = New C1.Win.C1Input.C1TextBox()
+        Me.txtOBSERV = New C1.Win.C1Input.C1TextBox()
+        Me.lblNotasHilo = New System.Windows.Forms.Label()
+        Me.comboIVA = New C1.Win.C1List.C1Combo()
+        Me.GroupBox1 = New System.Windows.Forms.GroupBox()
+        Me.cboID = New C1.Win.C1List.C1Combo()
+        Me.btnElegirHilo = New C1.Win.C1Input.C1Button()
+        Me.cboNOMPROVE = New C1.Win.C1List.C1Combo()
+        Me.dgCartaColores = New C1.Win.C1TrueDBGrid.C1TrueDBGrid()
+        Me.rdoHilosProveedor = New System.Windows.Forms.RadioButton()
+        Me.rdoTodosHilos = New System.Windows.Forms.RadioButton()
+        Me.cboMostrarProveedor = New C1.Win.C1List.C1Combo()
+        Me.tabControlHilos = New System.Windows.Forms.TabControl()
+        Me.tabPageHilo = New System.Windows.Forms.TabPage()
+        Me.tabPageValoracion = New System.Windows.Forms.TabPage()
+        Me.btnExportarExcel = New C1.Win.C1Input.C1Button()
+        Me.btnExportarPDF = New C1.Win.C1Input.C1Button()
+        Me.dgValoracion = New C1.Win.C1TrueDBGrid.C1TrueDBGrid()
+        Me.lblNumeroHilos = New C1.Win.C1Input.C1Label()
+        Me.gpSeleccionProveedores = New System.Windows.Forms.GroupBox()
+        CType(Me.btnRecargar, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.btnSiguiente, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.btnAnterior, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.btnPrimero, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.btnUltimo, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.btnModificar, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.btnTancar, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.btnBorrar, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.btnNuevo, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.btnActualizar, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.btnVerLista, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.btnElegirProveedor, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.txtPROVE, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.txtDESCRI, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.txtPREU, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.txtCOST, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.txtOBSERV, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.comboIVA, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.GroupBox1.SuspendLayout()
+        CType(Me.cboID, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.btnElegirHilo, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.cboNOMPROVE, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.dgCartaColores, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.cboMostrarProveedor, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.tabControlHilos.SuspendLayout()
+        Me.tabPageHilo.SuspendLayout()
+        Me.tabPageValoracion.SuspendLayout()
+        CType(Me.btnExportarExcel, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.btnExportarPDF, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.dgValoracion, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.lblNumeroHilos, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.gpSeleccionProveedores.SuspendLayout()
+        Me.SuspendLayout()
+        '
+        'sbtipo
+        '
+        Me.sbtipo.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.sbtipo.Location = New System.Drawing.Point(12, 28)
+        Me.sbtipo.Text = ""
+        '
+        'btnRecargar
+        '
+        '
+        'btnVerLista
+        '
+        '
+        'cboSeleccionCentro
+        '
+        '
+        'lblNombreMateria
+        '
+        Me.lblNombreMateria.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.lblNombreMateria.Location = New System.Drawing.Point(8, 24)
+        Me.lblNombreMateria.Name = "lblNombreMateria"
+        Me.lblNombreMateria.Size = New System.Drawing.Size(80, 16)
+        Me.lblNombreMateria.TabIndex = 196
+        Me.lblNombreMateria.Text = "Nom Materia"
+        Me.lblNombreMateria.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
+        '
+        'btnElegirProveedor
+        '
+        Me.btnElegirProveedor.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.btnElegirProveedor.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft
+        Me.btnElegirProveedor.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.btnElegirProveedor.Location = New System.Drawing.Point(132, 48)
+        Me.btnElegirProveedor.Name = "btnElegirProveedor"
+        Me.btnElegirProveedor.Size = New System.Drawing.Size(24, 20)
+        Me.btnElegirProveedor.TabIndex = 3
+        Me.btnElegirProveedor.TabStop = False
+        Me.btnElegirProveedor.Text = "..."
+        Me.btnElegirProveedor.UseVisualStyleBackColor = True
+        '
+        'txtPROVE
+        '
+        Me.txtPROVE.Location = New System.Drawing.Point(92, 48)
+        Me.txtPROVE.Name = "txtPROVE"
+        Me.txtPROVE.Size = New System.Drawing.Size(40, 18)
+        Me.txtPROVE.TabIndex = 1
+        Me.txtPROVE.Tag = Nothing
+        '
+        'lblProveedor
+        '
+        Me.lblProveedor.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.lblProveedor.Location = New System.Drawing.Point(8, 52)
+        Me.lblProveedor.Name = "lblProveedor"
+        Me.lblProveedor.Size = New System.Drawing.Size(80, 16)
+        Me.lblProveedor.TabIndex = 198
+        Me.lblProveedor.Text = "Proveïdor"
+        Me.lblProveedor.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
+        '
+        'lblDescripcion
+        '
+        Me.lblDescripcion.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.lblDescripcion.Location = New System.Drawing.Point(8, 80)
+        Me.lblDescripcion.Name = "lblDescripcion"
+        Me.lblDescripcion.Size = New System.Drawing.Size(80, 15)
+        Me.lblDescripcion.TabIndex = 202
+        Me.lblDescripcion.Text = "Descripcion"
+        Me.lblDescripcion.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
+        '
+        'txtDESCRI
+        '
+        Me.txtDESCRI.Location = New System.Drawing.Point(92, 76)
+        Me.txtDESCRI.Name = "txtDESCRI"
+        Me.txtDESCRI.Size = New System.Drawing.Size(400, 18)
+        Me.txtDESCRI.TabIndex = 3
+        Me.txtDESCRI.Tag = Nothing
+        '
+        'lblPreu
+        '
+        Me.lblPreu.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.lblPreu.Location = New System.Drawing.Point(196, 108)
+        Me.lblPreu.Name = "lblPreu"
+        Me.lblPreu.Size = New System.Drawing.Size(44, 15)
+        Me.lblPreu.TabIndex = 13
+        Me.lblPreu.Text = "Preu"
+        Me.lblPreu.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
+        '
+        'txtPREU
+        '
+        Me.txtPREU.Location = New System.Drawing.Point(248, 104)
+        Me.txtPREU.Name = "txtPREU"
+        Me.txtPREU.Size = New System.Drawing.Size(60, 18)
+        Me.txtPREU.TabIndex = 5
+        Me.txtPREU.Tag = Nothing
+        '
+        'lblPrecioCoste
+        '
+        Me.lblPrecioCoste.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.lblPrecioCoste.Location = New System.Drawing.Point(8, 108)
+        Me.lblPrecioCoste.Name = "lblPrecioCoste"
+        Me.lblPrecioCoste.Size = New System.Drawing.Size(80, 15)
+        Me.lblPrecioCoste.TabIndex = 206
+        Me.lblPrecioCoste.Text = "Preu Cost"
+        Me.lblPrecioCoste.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
+        '
+        'lblIvaHilo
+        '
+        Me.lblIvaHilo.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.lblIvaHilo.Location = New System.Drawing.Point(8, 136)
+        Me.lblIvaHilo.Name = "lblIvaHilo"
+        Me.lblIvaHilo.Size = New System.Drawing.Size(48, 15)
+        Me.lblIvaHilo.TabIndex = 208
+        Me.lblIvaHilo.Text = "IVA"
+        Me.lblIvaHilo.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
+        '
+        'txtCOST
+        '
+        Me.txtCOST.Location = New System.Drawing.Point(92, 104)
+        Me.txtCOST.Name = "txtCOST"
+        Me.txtCOST.Size = New System.Drawing.Size(60, 18)
+        Me.txtCOST.TabIndex = 4
+        Me.txtCOST.Tag = Nothing
+        '
+        'txtOBSERV
+        '
+        Me.txtOBSERV.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.txtOBSERV.Location = New System.Drawing.Point(508, 24)
+        Me.txtOBSERV.Multiline = True
+        Me.txtOBSERV.Name = "txtOBSERV"
+        Me.txtOBSERV.ScrollBars = System.Windows.Forms.ScrollBars.Vertical
+        Me.txtOBSERV.Size = New System.Drawing.Size(384, 156)
+        Me.txtOBSERV.TabIndex = 0
+        Me.txtOBSERV.Tag = Nothing
+        '
+        'lblNotasHilo
+        '
+        Me.lblNotasHilo.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.lblNotasHilo.Location = New System.Drawing.Point(508, 4)
+        Me.lblNotasHilo.Name = "lblNotasHilo"
+        Me.lblNotasHilo.Size = New System.Drawing.Size(100, 15)
+        Me.lblNotasHilo.TabIndex = 212
+        Me.lblNotasHilo.Text = "Notes"
+        Me.lblNotasHilo.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
+        '
+        'comboIVA
+        '
+        Me.comboIVA.AddItemSeparator = Global.Microsoft.VisualBasic.ChrW(59)
+        Me.comboIVA.AutoSelect = True
+        Me.comboIVA.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+        Me.comboIVA.Caption = ""
+        Me.comboIVA.CaptionHeight = 17
+        Me.comboIVA.CharacterCasing = System.Windows.Forms.CharacterCasing.Normal
+        Me.comboIVA.ColumnCaptionHeight = 17
+        Me.comboIVA.ColumnFooterHeight = 17
+        Me.comboIVA.Cursor = System.Windows.Forms.Cursors.Default
+        Me.comboIVA.DeadAreaBackColor = System.Drawing.Color.Empty
+        Me.comboIVA.EditorBackColor = System.Drawing.SystemColors.Window
+        Me.comboIVA.EditorFont = New System.Drawing.Font("Microsoft Sans Serif", 8.25!)
+        Me.comboIVA.EditorForeColor = System.Drawing.SystemColors.WindowText
+        Me.comboIVA.Images.Add(CType(resources.GetObject("comboIVA.Images"), System.Drawing.Image))
+        Me.comboIVA.IntegralHeight = True
+        Me.comboIVA.ItemHeight = 13
+        Me.comboIVA.Location = New System.Drawing.Point(92, 132)
+        Me.comboIVA.MatchEntryTimeout = CType(100, Long)
+        Me.comboIVA.MaxDropDownItems = CType(8, Short)
+        Me.comboIVA.MaxLength = 0
+        Me.comboIVA.MouseCursor = System.Windows.Forms.Cursors.Default
+        Me.comboIVA.Name = "comboIVA"
+        Me.comboIVA.RowDivider.Style = C1.Win.C1List.LineStyleEnum.None
+        Me.comboIVA.RowSubDividerColor = System.Drawing.Color.DarkGray
+        Me.comboIVA.Size = New System.Drawing.Size(140, 19)
+        Me.comboIVA.TabIndex = 6
+        Me.comboIVA.PropBag = resources.GetString("comboIVA.PropBag")
+        '
+        'GroupBox1
+        '
+        Me.GroupBox1.BackColor = System.Drawing.Color.FromArgb(CType(CType(200, Byte), Integer), CType(CType(237, Byte), Integer), CType(CType(163, Byte), Integer))
+        Me.GroupBox1.Controls.Add(Me.cboID)
+        Me.GroupBox1.Controls.Add(Me.btnElegirHilo)
+        Me.GroupBox1.Controls.Add(Me.cboNOMPROVE)
+        Me.GroupBox1.Controls.Add(Me.comboIVA)
+        Me.GroupBox1.Controls.Add(Me.lblNombreMateria)
+        Me.GroupBox1.Controls.Add(Me.btnElegirProveedor)
+        Me.GroupBox1.Controls.Add(Me.lblPrecioCoste)
+        Me.GroupBox1.Controls.Add(Me.txtPROVE)
+        Me.GroupBox1.Controls.Add(Me.lblProveedor)
+        Me.GroupBox1.Controls.Add(Me.lblDescripcion)
+        Me.GroupBox1.Controls.Add(Me.txtDESCRI)
+        Me.GroupBox1.Controls.Add(Me.lblPreu)
+        Me.GroupBox1.Controls.Add(Me.txtPREU)
+        Me.GroupBox1.Controls.Add(Me.lblIvaHilo)
+        Me.GroupBox1.Controls.Add(Me.txtCOST)
+        Me.GroupBox1.FlatStyle = System.Windows.Forms.FlatStyle.System
+        Me.GroupBox1.Location = New System.Drawing.Point(4, 8)
+        Me.GroupBox1.Name = "GroupBox1"
+        Me.GroupBox1.Size = New System.Drawing.Size(500, 172)
+        Me.GroupBox1.TabIndex = 219
+        Me.GroupBox1.TabStop = False
+        '
+        'cboID
+        '
+        Me.cboID.AddItemSeparator = Global.Microsoft.VisualBasic.ChrW(59)
+        Me.cboID.AutoCompletion = True
+        Me.cboID.Caption = ""
+        Me.cboID.CaptionHeight = 17
+        Me.cboID.CharacterCasing = System.Windows.Forms.CharacterCasing.Normal
+        Me.cboID.ColumnCaptionHeight = 17
+        Me.cboID.ColumnFooterHeight = 17
+        Me.cboID.DeadAreaBackColor = System.Drawing.Color.Empty
+        Me.cboID.EditorBackColor = System.Drawing.SystemColors.Window
+        Me.cboID.EditorFont = New System.Drawing.Font("Microsoft Sans Serif", 8.25!)
+        Me.cboID.EditorForeColor = System.Drawing.SystemColors.WindowText
+        Me.cboID.Images.Add(CType(resources.GetObject("cboID.Images"), System.Drawing.Image))
+        Me.cboID.ItemHeight = 15
+        Me.cboID.Location = New System.Drawing.Point(92, 20)
+        Me.cboID.MatchEntryTimeout = CType(2000, Long)
+        Me.cboID.MaxDropDownItems = CType(15, Short)
+        Me.cboID.MaxLength = 10
+        Me.cboID.MouseCursor = System.Windows.Forms.Cursors.Default
+        Me.cboID.Name = "cboID"
+        Me.cboID.RowDivider.Style = C1.Win.C1List.LineStyleEnum.None
+        Me.cboID.RowSubDividerColor = System.Drawing.Color.DarkGray
+        Me.cboID.Size = New System.Drawing.Size(140, 21)
+        Me.cboID.TabIndex = 223
+        Me.cboID.Text = "C1Combo1"
+        Me.cboID.PropBag = resources.GetString("cboID.PropBag")
+        '
+        'btnElegirHilo
+        '
+        Me.btnElegirHilo.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.btnElegirHilo.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft
+        Me.btnElegirHilo.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.btnElegirHilo.Location = New System.Drawing.Point(236, 20)
+        Me.btnElegirHilo.Name = "btnElegirHilo"
+        Me.btnElegirHilo.Size = New System.Drawing.Size(24, 20)
+        Me.btnElegirHilo.TabIndex = 220
+        Me.btnElegirHilo.TabStop = False
+        Me.btnElegirHilo.Text = "..."
+        Me.btnElegirHilo.UseVisualStyleBackColor = True
+        Me.btnElegirHilo.Visible = False
+        '
+        'cboNOMPROVE
+        '
+        Me.cboNOMPROVE.AddItemSeparator = Global.Microsoft.VisualBasic.ChrW(59)
+        Me.cboNOMPROVE.AllowColSelect = True
+        Me.cboNOMPROVE.AutoCompletion = True
+        Me.cboNOMPROVE.AutoSelect = True
+        Me.cboNOMPROVE.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+        Me.cboNOMPROVE.Caption = ""
+        Me.cboNOMPROVE.CaptionHeight = 17
+        Me.cboNOMPROVE.CharacterCasing = System.Windows.Forms.CharacterCasing.Normal
+        Me.cboNOMPROVE.ColumnCaptionHeight = 17
+        Me.cboNOMPROVE.ColumnFooterHeight = 17
+        Me.cboNOMPROVE.Cursor = System.Windows.Forms.Cursors.Default
+        Me.cboNOMPROVE.DeadAreaBackColor = System.Drawing.Color.Empty
+        Me.cboNOMPROVE.EditorBackColor = System.Drawing.SystemColors.Window
+        Me.cboNOMPROVE.EditorFont = New System.Drawing.Font("Microsoft Sans Serif", 8.25!)
+        Me.cboNOMPROVE.EditorForeColor = System.Drawing.SystemColors.WindowText
+        Me.cboNOMPROVE.Images.Add(CType(resources.GetObject("cboNOMPROVE.Images"), System.Drawing.Image))
+        Me.cboNOMPROVE.IntegralHeight = True
+        Me.cboNOMPROVE.ItemHeight = 13
+        Me.cboNOMPROVE.Location = New System.Drawing.Point(160, 48)
+        Me.cboNOMPROVE.MatchEntryTimeout = CType(100, Long)
+        Me.cboNOMPROVE.MaxDropDownItems = CType(8, Short)
+        Me.cboNOMPROVE.MaxLength = 255
+        Me.cboNOMPROVE.MouseCursor = System.Windows.Forms.Cursors.Default
+        Me.cboNOMPROVE.Name = "cboNOMPROVE"
+        Me.cboNOMPROVE.RowDivider.Style = C1.Win.C1List.LineStyleEnum.None
+        Me.cboNOMPROVE.RowSubDividerColor = System.Drawing.Color.DarkGray
+        Me.cboNOMPROVE.Size = New System.Drawing.Size(332, 19)
+        Me.cboNOMPROVE.TabIndex = 2
+        Me.cboNOMPROVE.PropBag = resources.GetString("cboNOMPROVE.PropBag")
+        '
+        'dgCartaColores
+        '
+        Me.dgCartaColores.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.dgCartaColores.BackColor = System.Drawing.Color.FromArgb(CType(CType(202, Byte), Integer), CType(CType(217, Byte), Integer), CType(CType(183, Byte), Integer))
+        Me.dgCartaColores.Caption = "CARTA COLORES (stock)"
+        Me.dgCartaColores.ExtendRightColumn = True
+        Me.dgCartaColores.GroupByCaption = "Drag a column header here to group by that column"
+        Me.dgCartaColores.Images.Add(CType(resources.GetObject("dgCartaColores.Images"), System.Drawing.Image))
+        Me.dgCartaColores.Location = New System.Drawing.Point(8, 188)
+        Me.dgCartaColores.Name = "dgCartaColores"
+        Me.dgCartaColores.PreviewInfo.Location = New System.Drawing.Point(0, 0)
+        Me.dgCartaColores.PreviewInfo.Size = New System.Drawing.Size(0, 0)
+        Me.dgCartaColores.PreviewInfo.ZoomFactor = 75.0R
+        Me.dgCartaColores.PrintInfo.PageSettings = CType(resources.GetObject("dgCartaColores.PrintInfo.PageSettings"), System.Drawing.Printing.PageSettings)
+        Me.dgCartaColores.Size = New System.Drawing.Size(872, 240)
+        Me.dgCartaColores.TabIndex = 220
+        Me.dgCartaColores.Text = "C1TrueDBGrid1"
+        Me.dgCartaColores.UseCompatibleTextRendering = False
+        Me.dgCartaColores.PropBag = resources.GetString("dgCartaColores.PropBag")
+        '
+        'rdoHilosProveedor
+        '
+        Me.rdoHilosProveedor.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.rdoHilosProveedor.Location = New System.Drawing.Point(156, 28)
+        Me.rdoHilosProveedor.Name = "rdoHilosProveedor"
+        Me.rdoHilosProveedor.Size = New System.Drawing.Size(164, 16)
+        Me.rdoHilosProveedor.TabIndex = 1
+        Me.rdoHilosProveedor.Text = "Mostrar fils del proveïdor:"
+        '
+        'rdoTodosHilos
+        '
+        Me.rdoTodosHilos.Checked = True
+        Me.rdoTodosHilos.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.rdoTodosHilos.Location = New System.Drawing.Point(16, 28)
+        Me.rdoTodosHilos.Name = "rdoTodosHilos"
+        Me.rdoTodosHilos.Size = New System.Drawing.Size(136, 16)
+        Me.rdoTodosHilos.TabIndex = 0
+        Me.rdoTodosHilos.TabStop = True
+        Me.rdoTodosHilos.Text = "Mostrar tots els fils"
+        '
+        'cboMostrarProveedor
+        '
+        Me.cboMostrarProveedor.AddItemSeparator = Global.Microsoft.VisualBasic.ChrW(59)
+        Me.cboMostrarProveedor.AutoCompletion = True
+        Me.cboMostrarProveedor.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+        Me.cboMostrarProveedor.Caption = ""
+        Me.cboMostrarProveedor.CaptionHeight = 17
+        Me.cboMostrarProveedor.CharacterCasing = System.Windows.Forms.CharacterCasing.Normal
+        Me.cboMostrarProveedor.ColumnCaptionHeight = 17
+        Me.cboMostrarProveedor.ColumnFooterHeight = 17
+        Me.cboMostrarProveedor.ColumnHeaders = False
+        Me.cboMostrarProveedor.Cursor = System.Windows.Forms.Cursors.Default
+        Me.cboMostrarProveedor.DeadAreaBackColor = System.Drawing.Color.Empty
+        Me.cboMostrarProveedor.EditorBackColor = System.Drawing.SystemColors.Window
+        Me.cboMostrarProveedor.EditorFont = New System.Drawing.Font("Microsoft Sans Serif", 8.25!)
+        Me.cboMostrarProveedor.EditorForeColor = System.Drawing.SystemColors.WindowText
+        Me.cboMostrarProveedor.Images.Add(CType(resources.GetObject("cboMostrarProveedor.Images"), System.Drawing.Image))
+        Me.cboMostrarProveedor.IntegralHeight = True
+        Me.cboMostrarProveedor.ItemHeight = 13
+        Me.cboMostrarProveedor.LimitToList = True
+        Me.cboMostrarProveedor.Location = New System.Drawing.Point(332, 24)
+        Me.cboMostrarProveedor.MatchEntryTimeout = CType(100, Long)
+        Me.cboMostrarProveedor.MaxDropDownItems = CType(8, Short)
+        Me.cboMostrarProveedor.MaxLength = 10
+        Me.cboMostrarProveedor.MouseCursor = System.Windows.Forms.Cursors.Default
+        Me.cboMostrarProveedor.Name = "cboMostrarProveedor"
+        Me.cboMostrarProveedor.RowDivider.Style = C1.Win.C1List.LineStyleEnum.None
+        Me.cboMostrarProveedor.RowSubDividerColor = System.Drawing.Color.DarkGray
+        Me.cboMostrarProveedor.Size = New System.Drawing.Size(292, 19)
+        Me.cboMostrarProveedor.TabIndex = 2
+        Me.cboMostrarProveedor.Visible = False
+        Me.cboMostrarProveedor.PropBag = resources.GetString("cboMostrarProveedor.PropBag")
+        '
+        'tabControlHilos
+        '
+        Me.tabControlHilos.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.tabControlHilos.Controls.Add(Me.tabPageHilo)
+        Me.tabControlHilos.Controls.Add(Me.tabPageValoracion)
+        Me.tabControlHilos.ItemSize = New System.Drawing.Size(62, 18)
+        Me.tabControlHilos.Location = New System.Drawing.Point(4, 76)
+        Me.tabControlHilos.Name = "tabControlHilos"
+        Me.tabControlHilos.SelectedIndex = 0
+        Me.tabControlHilos.Size = New System.Drawing.Size(900, 464)
+        Me.tabControlHilos.TabIndex = 222
+        '
+        'tabPageHilo
+        '
+        Me.tabPageHilo.BackColor = System.Drawing.Color.FromArgb(CType(CType(200, Byte), Integer), CType(CType(237, Byte), Integer), CType(CType(163, Byte), Integer))
+        Me.tabPageHilo.Controls.Add(Me.dgCartaColores)
+        Me.tabPageHilo.Controls.Add(Me.txtOBSERV)
+        Me.tabPageHilo.Controls.Add(Me.lblNotasHilo)
+        Me.tabPageHilo.Controls.Add(Me.GroupBox1)
+        Me.tabPageHilo.Location = New System.Drawing.Point(4, 22)
+        Me.tabPageHilo.Name = "tabPageHilo"
+        Me.tabPageHilo.Size = New System.Drawing.Size(892, 438)
+        Me.tabPageHilo.TabIndex = 0
+        Me.tabPageHilo.Text = "Fil"
+        '
+        'tabPageValoracion
+        '
+        Me.tabPageValoracion.BackColor = System.Drawing.Color.FromArgb(CType(CType(200, Byte), Integer), CType(CType(237, Byte), Integer), CType(CType(163, Byte), Integer))
+        Me.tabPageValoracion.Controls.Add(Me.btnExportarExcel)
+        Me.tabPageValoracion.Controls.Add(Me.btnExportarPDF)
+        Me.tabPageValoracion.Controls.Add(Me.dgValoracion)
+        Me.tabPageValoracion.Location = New System.Drawing.Point(4, 22)
+        Me.tabPageValoracion.Name = "tabPageValoracion"
+        Me.tabPageValoracion.Size = New System.Drawing.Size(892, 438)
+        Me.tabPageValoracion.TabIndex = 4
+        Me.tabPageValoracion.Text = "Valoració Stock"
+        '
+        'btnExportarExcel
+        '
+        Me.btnExportarExcel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnExportarExcel.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.btnExportarExcel.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft
+        Me.btnExportarExcel.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.btnExportarExcel.Location = New System.Drawing.Point(664, 400)
+        Me.btnExportarExcel.Name = "btnExportarExcel"
+        Me.btnExportarExcel.Size = New System.Drawing.Size(100, 28)
+        Me.btnExportarExcel.TabIndex = 271
+        Me.btnExportarExcel.Text = "Exportar a Excel"
+        Me.btnExportarExcel.UseVisualStyleBackColor = True
+        '
+        'btnExportarPDF
+        '
+        Me.btnExportarPDF.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnExportarPDF.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.btnExportarPDF.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft
+        Me.btnExportarPDF.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.btnExportarPDF.Location = New System.Drawing.Point(776, 400)
+        Me.btnExportarPDF.Name = "btnExportarPDF"
+        Me.btnExportarPDF.Size = New System.Drawing.Size(100, 28)
+        Me.btnExportarPDF.TabIndex = 270
+        Me.btnExportarPDF.Text = "Exportar a PDF"
+        Me.btnExportarPDF.UseVisualStyleBackColor = True
+        '
+        'dgValoracion
+        '
+        Me.dgValoracion.AllowUpdate = False
+        Me.dgValoracion.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.dgValoracion.Caption = "Llistat Valorat"
+        Me.dgValoracion.ExtendRightColumn = True
+        Me.dgValoracion.FilterBar = True
+        Me.dgValoracion.GroupByCaption = "Desplaça aquí una capçalera de columna per agrupar per aquesta columna"
+        Me.dgValoracion.Images.Add(CType(resources.GetObject("dgValoracion.Images"), System.Drawing.Image))
+        Me.dgValoracion.Location = New System.Drawing.Point(8, 8)
+        Me.dgValoracion.Name = "dgValoracion"
+        Me.dgValoracion.PreviewInfo.Location = New System.Drawing.Point(0, 0)
+        Me.dgValoracion.PreviewInfo.Size = New System.Drawing.Size(0, 0)
+        Me.dgValoracion.PreviewInfo.ZoomFactor = 75.0R
+        Me.dgValoracion.PrintInfo.PageSettings = CType(resources.GetObject("dgValoracion.PrintInfo.PageSettings"), System.Drawing.Printing.PageSettings)
+        Me.dgValoracion.RowDivider.Color = System.Drawing.Color.Black
+        Me.dgValoracion.RowDivider.Style = C1.Win.C1TrueDBGrid.LineStyleEnum.[Single]
+        Me.dgValoracion.Size = New System.Drawing.Size(872, 384)
+        Me.dgValoracion.SpringMode = True
+        Me.dgValoracion.TabIndex = 0
+        Me.dgValoracion.UseCompatibleTextRendering = False
+        Me.dgValoracion.WrapCellPointer = True
+        Me.dgValoracion.PropBag = resources.GetString("dgValoracion.PropBag")
+        '
+        'lblNumeroHilos
+        '
+        Me.lblNumeroHilos.AutoSize = True
+        Me.lblNumeroHilos.BorderStyle = System.Windows.Forms.BorderStyle.None
+        Me.lblNumeroHilos.ForeColor = System.Drawing.Color.Red
+        Me.lblNumeroHilos.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.lblNumeroHilos.Location = New System.Drawing.Point(628, 28)
+        Me.lblNumeroHilos.Name = "lblNumeroHilos"
+        Me.lblNumeroHilos.Size = New System.Drawing.Size(0, 13)
+        Me.lblNumeroHilos.TabIndex = 223
+        Me.lblNumeroHilos.Tag = Nothing
+        Me.lblNumeroHilos.TextDetached = True
+        '
+        'gpSeleccionProveedores
+        '
+        Me.gpSeleccionProveedores.BackColor = System.Drawing.Color.FromArgb(CType(CType(164, Byte), Integer), CType(CType(223, Byte), Integer), CType(CType(209, Byte), Integer))
+        Me.gpSeleccionProveedores.Controls.Add(Me.lblNumeroHilos)
+        Me.gpSeleccionProveedores.Controls.Add(Me.rdoHilosProveedor)
+        Me.gpSeleccionProveedores.Controls.Add(Me.rdoTodosHilos)
+        Me.gpSeleccionProveedores.Controls.Add(Me.cboMostrarProveedor)
+        Me.gpSeleccionProveedores.Location = New System.Drawing.Point(4, 4)
+        Me.gpSeleccionProveedores.Name = "gpSeleccionProveedores"
+        Me.gpSeleccionProveedores.Size = New System.Drawing.Size(740, 64)
+        Me.gpSeleccionProveedores.TabIndex = 224
+        Me.gpSeleccionProveedores.TabStop = False
+        Me.gpSeleccionProveedores.Text = "Selecció fils"
+        '
+        'frmHilos
+        '
+        Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
+        Me.BackColor = System.Drawing.Color.FromArgb(CType(CType(200, Byte), Integer), CType(CType(237, Byte), Integer), CType(CType(163, Byte), Integer))
+        Me.ClientSize = New System.Drawing.Size(912, 598)
+        Me.Controls.Add(Me.gpSeleccionProveedores)
+        Me.Controls.Add(Me.tabControlHilos)
+        Me.Cursor = System.Windows.Forms.Cursors.Default
+        Me.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!)
+        Me.KeyPreview = True
+        Me.MinimumSize = New System.Drawing.Size(696, 520)
+        Me.Name = "frmHilos"
+        Me.Text = "Fils"
+        Me.Controls.SetChildIndex(Me.cboSeleccionCentro, 0)
+        Me.Controls.SetChildIndex(Me.sbtipo, 0)
+        Me.Controls.SetChildIndex(Me.btnActualizar, 0)
+        Me.Controls.SetChildIndex(Me.btnNuevo, 0)
+        Me.Controls.SetChildIndex(Me.btnBorrar, 0)
+        Me.Controls.SetChildIndex(Me.btnTancar, 0)
+        Me.Controls.SetChildIndex(Me.btnUltimo, 0)
+        Me.Controls.SetChildIndex(Me.btnPrimero, 0)
+        Me.Controls.SetChildIndex(Me.btnAnterior, 0)
+        Me.Controls.SetChildIndex(Me.btnSiguiente, 0)
+        Me.Controls.SetChildIndex(Me.btnRecargar, 0)
+        Me.Controls.SetChildIndex(Me.btnVerLista, 0)
+        Me.Controls.SetChildIndex(Me.btnModificar, 0)
+        Me.Controls.SetChildIndex(Me.tabControlHilos, 0)
+        Me.Controls.SetChildIndex(Me.gpSeleccionProveedores, 0)
+        CType(Me.btnRecargar, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.btnSiguiente, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.btnAnterior, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.btnPrimero, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.btnUltimo, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.btnModificar, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.btnTancar, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.btnBorrar, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.btnNuevo, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.btnActualizar, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.btnVerLista, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.btnElegirProveedor, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.txtPROVE, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.txtDESCRI, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.txtPREU, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.txtCOST, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.txtOBSERV, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.comboIVA, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.GroupBox1.ResumeLayout(False)
+        Me.GroupBox1.PerformLayout()
+        CType(Me.cboID, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.btnElegirHilo, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.cboNOMPROVE, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.dgCartaColores, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.cboMostrarProveedor, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.tabControlHilos.ResumeLayout(False)
+        Me.tabPageHilo.ResumeLayout(False)
+        Me.tabPageValoracion.ResumeLayout(False)
+        CType(Me.btnExportarExcel, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.btnExportarPDF, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.dgValoracion, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.lblNumeroHilos, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.gpSeleccionProveedores.ResumeLayout(False)
+        Me.gpSeleccionProveedores.PerformLayout()
+        Me.ResumeLayout(False)
+
+    End Sub
+
+#End Region
+
+    Shared frmChildForm As frmHilos
+    Public Shared Function GetInstance() As frmHilos
+        If frmChildForm Is Nothing Then
+            frmChildForm = New frmHilos
+        End If
+        Return frmChildForm
+    End Function
+
+#Region "VARIABLES"
+
+    Public hiloActual As clsHilo
+
+#End Region
+
+#Region "INICIALIZAR"
+
+    Private Sub IniciarForm(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
+        Cursor = Cursors.WaitCursor
+        Try
+            cargando = True
+            Me.arrayEtiquetas = New System.Windows.Forms.Control() {Me.lblDescripcion, Me.lblIvaHilo, Me.lblNombreMateria, Me.lblNotasHilo, Me.lblNumeroHilos, Me.lblPrecioCoste, Me.lblPreu, Me.lblProveedor}
+            Me.arrayBotones = New System.Windows.Forms.Control() {Me.btnElegirHilo, Me.btnElegirProveedor}
+            Me.arrayCombos = New System.Windows.Forms.Control() {Me.cboNOMPROVE, Me.comboIVA}
+            Me.arrayGrids = New System.Windows.Forms.Control() {Me.dgCartaColores}
+            Me.arrayTextBox = New System.Windows.Forms.Control() {Me.txtPROVE, Me.txtDESCRI, Me.txtOBSERV, Me.txtCOST, Me.txtPREU}
+
+            ACN()
+            tabla = tablaHilos
+            hiloActual = New clsHilo(ds.Tables(tabla), empresaPorDefecto, BindingContext)
+            HacerBindings()
+            IniciarCartaColores()
+
+            'hiloActual.tabla.AcceptChanges()
+            hiloActual.PrimeroReg() : ActualizarOrigen()
+
+            PonerModificables(soloLectura)
+            PSBTIPO(hiloActual.centro)
+            cnn.Close()
+            PonerHandlersErroresParaGrids()
+            lblNumeroHilos.Text = rm.GetString("NUMHILOS") & " " & hiloActual.dtIdentificadores.DefaultView.Count
+            btnSiguiente.Focus()
+            cargando = False
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : ccn()
+        End Try
+        Cursor = Cursors.Default
+    End Sub
+
+    Private Sub IniciarCartaColores()
+        Try
+            Dim i As Integer
+            OcultarColumnasDG(dgCartaColores)
+            PPCol2("COLOR", dgCartaColores, rm.GetString("COLOR"), "", True, 140, _
+                    False, C1.Win.C1TrueDBGrid.PresentationEnum.Normal, False, 140, i, False)
+            i = i + 1
+
+            PPCol2("ACTUAL", dgCartaColores, rm.GetString("ACTUAL"), "#,##0.00", True, 70, _
+                                False, C1.Win.C1TrueDBGrid.PresentationEnum.Normal, False, 70, i, False)
+            i = i + 1
+
+            PPCol2("MINIM", dgCartaColores, rm.GetString("MINIMO"), "#,##0.00", True, 70, _
+                                False, C1.Win.C1TrueDBGrid.PresentationEnum.Normal, False, 70, i, False)
+            i = i + 1
+
+            PPCol2("OBSERV", dgCartaColores, rm.GetString("OBSERVACIONES"), "", True, 349, _
+                                False, C1.Win.C1TrueDBGrid.PresentationEnum.Normal, False, 349, i, False)
+            i = i + 1
+            PPCol2("PREUCOST", dgCartaColores, rm.GetString("PRECIOCOSTE"), "#,##0.00", True, 70, _
+                                False, C1.Win.C1TrueDBGrid.PresentationEnum.Normal, False, 70, i, False)
+            'i = i + 1
+            'PPCol2("PREU", dgCartaColores, rm.GetString("PRECIOVENTA"), "#,##0.00", True, 70, _
+            '                    False, C1.Win.C1TrueDBGrid.PresentationEnum.Normal, False, 70, i, False)
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : ccn()
+        End Try
+    End Sub
+    Private Sub HacerBindings()
+        Try
+            HacerBindingsTodos(hiloActual.dvForm)
+            CrearBindingIVA(comboIVA, hiloActual.dvForm, True)
+            AñadirBinding(cboID, hiloActual.dvForm, "CODI")
+            AñadirBindingCombo(cboID, hiloActual.dvIdentificadores, CCFil, CCFil)
+            OcultarMostrarColumnaCbo(cboID, "CENTRO", False)
+            OcultarMostrarColumnaCbo(cboID, "PROVE", False)
+
+            AñadirBindingCombo(cboNOMPROVE, hiloActual.dtProve, CCProve, CNProve)
+            AñadirBindingCombo(cboMostrarProveedor, hiloActual.dtProveConHilos, CCProve, CNProve)
+
+            dgCartaColores.SetDataBinding(hiloActual.cartaColores.dvForm, "")
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : ccn()
+        End Try
+    End Sub
+
+#End Region
+
+#Region "MODIFICAR DB"
+
+    Private Sub ActualizarOrigen()
+        Try
+            If editando Then
+                editando = False
+                PonerModificables(soloLectura)
+            End If
+            If EsRegistroNuevo Then
+                editando = True : PSBTIPO(hiloActual.centro)
+                PonerControlesNuevo(True)
+                EsRegistroNuevo = False
+                dgCartaColores.Visible = True
+                gpSeleccionProveedores.Visible = True
+            End If
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+
+    Friend Overrides Sub btnActualizar_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) 'Handles btnActualizar.Click
+        Try
+            cargando = True
+            If hiloActual.TieneCambios Then
+                Select Case MessageBox.Show(rm.GetString("QUIERECONFIRMARLOSCAMBIOS"), rm.GetString("INFORMACION"), MessageBoxButtons.YesNoCancel)
+                    Case DialogResult.Cancel
+                        cargando = False
+                        Exit Sub
+                    Case DialogResult.No
+                        hiloActual.tabla.RejectChanges()
+                        hiloActual.cartaColores.tabla.RejectChanges()
+                        cargando = False
+                        Exit Sub
+                End Select
+            End If
+
+            hiloActual.ActualizarOrigen() : ActualizarOrigen()
+            PSBTIPO(hiloActual.centro) : cargando = False
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+
+    End Sub
+    Friend Overrides Sub btnBorrar_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) 'Handles btnBorrar.Click
+        Try
+            If MessageBox.Show(rm.GetString("BorrarHilo"), rm.GetString("ConfirmacionEliminacion"), MessageBoxButtons.YesNo) = DialogResult.Yes Then
+                cargando = True
+                editando = True
+                hiloActual.borrar() : ActualizarOrigen()
+                editando = False
+                PSBTIPO(hiloActual.centro) : cargando = False
+            End If
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Friend Overrides Sub btnModificar_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
+        Try
+            If Not editando Then
+                cargando = True
+                editando = True
+                PonerModificables(modificable)
+                PSBTIPO(hiloActual.centro)
+                cargando = False
+            End If
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Friend Overrides Sub btnNuevo_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
+        Dim drNew As DataRow
+        Dim key(1) As String
+        Try
+            cargando = True
+            dgCartaColores.Visible = False
+            gpSeleccionProveedores.Visible = False
+
+            EsRegistroNuevo = True
+            rdoTodosHilos.Checked = True
+            rdoHilosProveedor.Checked = False
+            cboMostrarProveedor.Visible = False
+
+            PonerControlesNuevo(False)
+            PonerModificables(modificable)
+
+            cboID.ClearItems()
+            hiloActual.NuevoRegistro()
+            'se le pasa esto pq todavia no sabemos que hilo es el que se va a introducir
+
+            PSBTIPO(hiloActual.centro) : cargando = False
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+
+    End Sub
+
+#End Region
+
+#Region "ESPECÍFICO"
+
+    Friend Function ObtenerCodigoProveedor(ByVal nombreprove As String) As Integer
+        Try
+            Dim cmdSel As New MySqlCommand("SELECT codi FROM prove WHERE (NOM = """ & general.NS(nombreprove) & """)", cnn)
+            ACN()
+            Dim i As Integer = cmdSel.ExecuteScalar
+            CCN()
+            Return i
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Function
+    Private Sub CargarProveConHilos()
+        Try
+            Dim cmd As New MySqlCommand("select prove.codi, prove.nom from fil left join prove on (prove.codi = fil.prove) group by nom order by nom", cnn)
+            Dim dar As MySqlDataReader
+            Dim dr As DataRow
+            Dim dc1 As New DataColumn("CODI")
+            Dim dc2 As New DataColumn("NOM")
+
+            CCN()
+            cnn.Open()
+            dar = cmd.ExecuteReader
+            hiloActual.dtProveConHilos = New DataTable
+            hiloActual.dtProveConHilos.Columns.Clear()
+            hiloActual.dtProveConHilos.Columns.Add(dc1)
+            hiloActual.dtProveConHilos.Columns.Add(dc2)
+
+            While dar.Read
+                dr = hiloActual.dtProveConHilos.NewRow
+                dr("CODI") = dar("CODI")
+                dr("NOM") = dar("NOM")
+                hiloActual.dtProveConHilos.Rows.Add(dr)
+            End While
+            dar.Close()
+            cnn.Close()
+
+            AñadirBindingCombo(cboMostrarProveedor, hiloActual.dtProveConHilos, CCProve, CNProve)
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+
+#End Region
+
+#Region "IMPRESION"
+
+#End Region
+
+#Region "COMUNES"
+
+    Private Sub btnVerLista_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnVerLista.Click
+        Try
+            Cursor = Cursors.WaitCursor
+            Dim f As frmHilosLista = frmHilosLista.GetInstance(esListado, hiloActual.centro)
+            f.MdiParent = Me.MdiParent
+            AddHandler f.Closed, AddressOf CType(Me.MdiParent, frmPrincipal).childCerrado
+            AddHandler f.Load, AddressOf CType(Me.MdiParent, frmPrincipal).childAbierto : AddHandler f.Activated, AddressOf CType(Me.MdiParent, frmPrincipal).childOcultandoMostrando
+            f.Show()
+            f.BringToFront()
+            Cursor = Cursors.Default
+            PSBTIPO(hiloActual.centro) : cargando = False
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub PonerControlesNuevo(ByVal b As Boolean)
+        Try
+            If Not b Then
+                btnActualizar.Text = rm.GetString("CONFIRMAR")
+            Else
+                btnActualizar.Text = rm.GetString("ACTUALIZAR")
+            End If
+            ModiNuev(b)
+            cboID.AutoCompletion = Not editando
+            gpSeleccionProveedores.Visible = b
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub PonerModificables(Optional ByVal b As Boolean = False)
+        Try
+            PonerMod(b)
+            If Not b Then : cboID.DataSource = Nothing
+            Else : AñadirBindingCombo(cboID, hiloActual.dvIdentificadores, CCFil, CCFil)
+                hiloActual.tabla.AcceptChanges() : End If
+
+            cboID.LimitToList = b
+            cboID.SuperBack = b
+            cboID.ReadOnly = editando ''or esregistronuevo
+            ModiNuev(b)
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+
+#End Region
+
+#Region "DESPLAZARSE"
+
+    Protected Friend Overrides Sub btnPrimero_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) 'Handles btnPrimero.Click
+        Try
+            cargando = True
+            hiloActual.PrimeroReg() : ActualizarOrigen()
+            PSBTIPO(hiloActual.centro) : cargando = False
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Friend Overrides Sub btnUltimo_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) 'Handles btnUltimo.Click
+        Try
+            cargando = True
+            hiloActual.UltimoReg() : ActualizarOrigen()
+            PSBTIPO(hiloActual.centro) : cargando = False
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Friend Overrides Sub btnAnterior_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) 'Handles btnAnterior.Click
+        Try
+            cargando = True
+            hiloActual.AnteriorReg() : ActualizarOrigen()
+            PSBTIPO(hiloActual.centro) : cargando = False
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Friend Overrides Sub btnSiguiente_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) 'Handles btnSiguiente.Click '
+        Try
+            cargando = True
+            hiloActual.SiguienteReg() : ActualizarOrigen()
+            PSBTIPO(hiloActual.centro) : cargando = False
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Friend Sub btnRecargar_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnRecargar.Click
+        Try
+            If consulta() Then
+                cargando = True
+                cboID.DataBindings.Clear()
+                hiloActual.CambiarAReg(ObtenerFiladeColumnasC1(cboID.Columns, hiloActual.dtIdentificadores), iraRegistroFila)
+                cboID.DataBindings.Add(New Binding("Text", hiloActual.dvForm, "CODI"))
+                AñadirBindingCombo(cboID, hiloActual.dvIdentificadores, CCFil, CCFil)
+                PSBTIPO(hiloActual.centro) : cargando = False
+            End If
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+
+#End Region
+
+#Region "SELECCIÓN REGISTRO"
+
+    Private Sub btnElegirHilo_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnElegirHilo.Click
+        Try
+            cargando = True
+            Cursor = Cursors.WaitCursor
+            Dim f As frmHilosLista = frmHilosLista.GetInstance(esEleccion, hiloActual.centro)
+            f.ShowDialog()
+            Cursor = Cursors.Default
+
+            cboID.DataBindings.Clear()
+            If Not f.dr Is Nothing Then
+                hiloActual.CambiarAReg(GENERAL.nz(f.dr("CODI"), ""), iraregistro)
+                cboID.DataBindings.Add(New Binding("Text", hiloActual.dvForm, "CODI"))
+                AñadirBindingCombo(cboID, hiloActual.dvIdentificadores, CCFil, CCFil)
+            End If
+            f = Nothing
+            'hiloActual.tabla.AcceptChanges()
+            PSBTIPO(hiloActual.centro) : cargando = False
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub cboID_KeyPress(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyPressEventArgs) Handles cboID.KeyPress
+        Try
+            If editando Or editando Then
+                cboID.AutoCompletion = False
+            Else
+                cboID.AutoCompletion = True
+            End If
+        Catch ex As Exception
+            MessageBox.Show(ex.ToString)
+        End Try
+    End Sub
+    Private Sub cboID_ItemChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles cboID.RowChange
+        Try
+            If consulta() Then
+                cargando = True
+                cboID.DataBindings.Clear()
+                hiloActual.CambiarAReg(ObtenerFiladeColumnasC1(cboID.Columns, hiloActual.dtIdentificadores), iraRegistroFila)
+                AñadirBindingCombo(cboID, hiloActual.dvIdentificadores, CCModelo, CCModelo)
+                AñadirBinding(cboID, hiloActual.dvForm, "CODI")
+                PSBTIPO(hiloActual.centro) : cargando = False : CCN()
+            End If
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    'Private Sub cboID_ItemChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cboID.RowChange
+    '    Try
+    '        If consulta() Then
+    '            cargando = True
+    '            'cboID.DataBindings.Clear()
+    '            'hiloActual.CambiarAReg(ObtenerFiladeColumnasC1(cboID.Columns, hiloActual.dtIdentificadores), iraRegistroFila)
+    '            'hiloActual.CambiarAReg(GENERAL.nz(cboID.WillChangeToValue, ""), iraRegistroFila)
+    '            'cboID.DataBindings.Add(New Binding("Text", hiloActual.dvForm, "CODI"))
+    '            'AñadirBindingCombo(cboID, hiloActual.dvIdentificadores, CCFil, CCFil)
+    '            PSBTIPO(hiloActual.centro) : cargando = False
+    '        End If
+
+    '    Catch ex As Exception
+    '        LOG(ex.ToString) : cargando = False : CCN()
+    '    End Try
+    'End Sub
+    Private Sub cboSeleccion_ItemChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles cboSeleccionCentro.SelectionChangeCommitted
+        Try
+            If consulta() Then
+                cargando = True
+                hiloActual.cambioCentro(GENERAL.nz(cboSeleccionCentro.SelectedValue, empresaPorDefecto), primero)
+                lblNumeroHilos.Text = rm.GetString("NUMHILOS") & " " & hiloActual.dtIdentificadores.DefaultView.Count 'CargarIDs(cboID, "CODI", False, tabla, "", hiloActual.centro)
+                'hiloActual.tabla.AcceptChanges()
+                cboSeleccionCentro.SelectedValue = hiloActual.centro
+                'hiloActual.tabla.AcceptChanges()
+                cargando = False
+            Else
+                If EsRegistroNuevo And Not cargando Then
+                    cargando = True
+                    hiloActual.centro = general.nz(cboSeleccionCentro.SelectedValue, empresaPorDefecto)
+                    hiloActual.tabla.Clear()
+                    hiloActual.NuevoRegistro()
+                    PSBTIPO(hiloActual.centro)
+                    cargando = False
+                End If
+            End If
+
+            hiloActual.GenerarValoracionStock()
+            IniciarDgValoracion()
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub rdoHilosProveedor_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles rdoHilosProveedor.CheckedChanged
+        Try
+            If consulta() Then
+                cargando = True
+                If rdoHilosProveedor.Checked = True Then
+                    hiloActual.ActualizarOrigen()
+                    hiloActual.tabla.Clear()
+                    'hiloActual.cartaColores.dvForm.RowFilter = "PROVE = '-1'"
+                    CargarProveConHilos()
+                    cboMostrarProveedor.Visible = True
+                    cboMostrarProveedor.Focus()
+                    dgCartaColores.Visible = False
+                Else
+                    cboMostrarProveedor.Visible = False
+                End If
+                cargando = False
+            End If
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub rdoTodosHilos_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles rdoTodosHilos.CheckedChanged
+        Try
+            If consulta() Then
+                cargando = True
+                If rdoTodosHilos.Checked = True Then
+                    hiloActual.ProveSeleccionado = -1
+                    btnPrimero_Click(Nothing, Nothing)
+                    ' hiloActual.tabla.AcceptChanges()
+                    lblNumeroHilos.Text = rm.GetString("NUMHILOS") & " " & hiloActual.dtIdentificadores.DefaultView.Count
+                    dgCartaColores.Visible = True
+                End If
+                PSBTIPO(hiloActual.centro) : cargando = False
+            End If
+
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub cboMostrarProveedor_SelChange(ByVal sender As Object, ByVal e As System.EventArgs) Handles cboMostrarProveedor.SelectedValueChanged
+
+        Try
+            If consulta() Then
+                cargando = True
+                hiloActual.ProveSeleccionado = nzn(cboMostrarProveedor.WillChangeToValue, 0)
+                'lblNumeroHilos.Text = rm.GetString("NUMHILOS") & " " & _
+                'CargarIDs(cboID, CCFil, True, tablaHilos, " AND PROVE = " & _
+                'cboMostrarProveedor.WillChangeToValue, hiloActual.centro)
+                lblNumeroHilos.Text = rm.GetString("NUMHILOS") & " " & hiloActual.dtIdentificadores.DefaultView.Count
+                'hiloActual.tabla.AcceptChanges()
+                If hiloActual.tabla.Rows.Count = 0 Then
+                    MessageBox.Show("PROVESINHILOS")
+                End If
+                dgCartaColores.Visible = True
+                PSBTIPO(hiloActual.centro) : cargando = False
+
+            End If
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+
+#End Region
+
+#Region "ELECCIONES"
+
+    Private Sub txtCodigoProveedor_Validated(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles txtPROVE.Validated
+
+        Try
+            If PuedoModificar() Then cargando = True : hiloActual.PROVE = nzn(txtPROVE.Text, 0) : cargando = False
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub btnElegirProveedor_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnElegirProveedor.Click
+        Try
+            Cursor = Cursors.WaitCursor
+            Dim f As frmProveedoresLista = frmProveedoresLista.GetInstance(esEleccion)
+            f.ShowDialog()
+            If Not f.dr Is Nothing Then hiloActual.PROVE = nzn(f.dr("CODI"), 0)
+            Cursor = Cursors.Default
+            f = Nothing
+            PSBTIPO(hiloActual.centro) : cargando = False
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub cboNOMPROVE_SelectedValueChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cboNOMPROVE.SelectedValueChanged
+        Try
+            hiloActual.PROVE = nzn(cboNOMPROVE.WillChangeToValue, 0)
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+
+#End Region
+
+    Private Sub DGCARTACOLORES_BeforeDelete(ByVal sender As Object, ByVal e As C1.Win.C1TrueDBGrid.CancelEventArgs) Handles dgCartaColores.BeforeDelete
+        Try
+            If MessageBox.Show(rm.GetString("BORRARLINEA"), rm.GetString("ConfirmacionEliminacion"), MessageBoxButtons.YesNo) = DialogResult.Yes Then
+                'Dim i As Integer
+                'For i = dgCartaColores.SelectedRows.Count - 1 To -1 - 1 Step i - 1
+                '    dgCartaColores.Bookmark = dgCartaColores.SelectedRows(i)
+                '    dgCartaColores.Delete()
+                'Next
+
+                'dgCartaColores.SelectedRows.Clear()
+
+                e.Cancel = False
+            Else
+                e.Cancel = True
+            End If
+
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Sub
+
+    Private Sub tabControlHilos_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tabControlHilos.SelectedIndexChanged
+        If tabControlHilos.SelectedTab Is tabPageValoracion Then
+            'Rellena la tabla tejidoActual.dtValaroracionStock
+            hiloActual.GenerarValoracionStock()
+            'Carga el tejidoActual.dtValaroracionStock en el grid
+            IniciarDgValoracion()
+        End If
+    End Sub
+    Private Sub IniciarDgValoracion()
+        Dim i As Integer
+        Try
+            dgValoracion.SetDataBinding(hiloActual.dtValoracion.DefaultView, "")
+            dgValoracion.DataView = C1.Win.C1TrueDBGrid.DataViewEnum.GroupBy
+            'Desplaça aquí una capçalera de columna per agrupar per aquesta columna
+            OcultarColumnasDG(dgValoracion)
+            i = 0
+            'CODIGOTEJEDOR, NOMBRETEJEDOR, SUM(SUMASTOCK) AS STOCKTOTAL ,SUM(VALORACION)  
+            PPCol2("FIL", dgValoracion, rm.GetString("CODIGO"), "", _
+                    True, 0, False, C1.Win.C1TrueDBGrid.PresentationEnum.Normal, False, 1, i, False)
+            i = i + 1
+            PPCol2("DESCRI", dgValoracion, rm.GetString("DESCRIPCION"), "", _
+                    True, 0, False, C1.Win.C1TrueDBGrid.PresentationEnum.Normal, False, 1, i, False)
+            i = i + 1
+            PPCol2("PROVE", dgValoracion, rm.GetString("CODIGOPROVEEDOR"), "", _
+                    True, 0, False, C1.Win.C1TrueDBGrid.PresentationEnum.Normal, False, 1, i, False)
+            i = i + 1
+            PPCol2("NOMPROVE", dgValoracion, rm.GetString("NOMBRE"), "", _
+                    True, 0, False, C1.Win.C1TrueDBGrid.PresentationEnum.Normal, False, 1, i, False)
+            i = i + 1
+            PPCol2("COST", dgValoracion, rm.GetString("COSTE"),  "#,##0.00", _
+                True, 0, False, C1.Win.C1TrueDBGrid.PresentationEnum.Normal, False, 1, i, False)
+            i = i + 1
+            PPCol2("STOCKTOTAL", dgValoracion, "Stock Total",  "#,##0.00", _
+                            True, 0, False, C1.Win.C1TrueDBGrid.PresentationEnum.Normal, False, 1, i, False)
+            i = i + 1
+            PPCol2("VALORACION", dgValoracion, rm.GetString("VALORACION"), "#,##0.00", _
+                    True, 0, False, C1.Win.C1TrueDBGrid.PresentationEnum.Normal, False, 1, i, False)
+            i = i + 1
+
+            ' Dim tam As Double
+            AutoSizeCC(dgValoracion)
+            'With DirectCast(dgValoracion, C1.Win.C1TrueDBGrid.C1TrueDBGrid)
+            'For i = 0 To .Splits(0).DisplayColumns.Count - 1
+            '.Splits(0).DisplayColumns(i).AutoSize()
+            'If .Splits(0).DisplayColumns(i).Width < .Splits(0).DisplayColumns(i).MinWidth Then
+            '    .Splits(0).DisplayColumns(i).Width = .Splits(0).DisplayColumns(i).MinWidth
+            'End If
+            'If .Splits(0).DisplayColumns(i).DataColumn.NumberFormat <> "" Then
+            '    .Splits(0).DisplayColumns(i).Width = .Splits(0).DisplayColumns(i).Width + 10
+            'End If
+            'If .Splits(0).DisplayColumns(i).Visible = True Then
+            '    tam = tam + .Splits(0).DisplayColumns(i).Width
+            'End If
+            'Next
+            'End With
+
+
+            dgValoracion.Refresh()
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+
+    End Sub
+
+    Private Sub btnExportarPDF_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnExportarPDF.Click
+        Dim sDBPath As String
+        Dim NavArchivos As System.Windows.Forms.SaveFileDialog
+        Try
+
+            NavArchivos = New System.Windows.Forms.SaveFileDialog
+            NavArchivos.Filter = "Arxius pdf (*.pdf) | *.pdf"
+            NavArchivos.InitialDirectory = "c:\"
+            NavArchivos.ShowDialog()
+            sDBPath = NavArchivos.FileName
+            dgValoracion.ExportToPDF(sDBPath)
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub btnExportarExcel_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnExportarExcel.Click
+        Dim sDBPath As String
+        Dim NavArchivos As System.Windows.Forms.SaveFileDialog
+        Try
+
+            'NavArchivos = New System.Windows.Forms.SaveFileDialog
+            'NavArchivos.Filter = "Arxius pdf (*.xls) | *.xls"
+            'NavArchivos.InitialDirectory = "c:\"
+            'NavArchivos.ShowDialog()
+            'sDBPath = NavArchivos.FileName
+
+            'dgValoracion.ExportToExcel(sDBPath)
+            CrearExcel(dgValoracion, "Llistat Valorat", False)
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Friend Sub CrearExcel(ByVal dg As C1.Win.C1TrueDBGrid.C1TrueDBGrid, _
+                                     ByVal titulo As String, _
+                                     ByVal vistaprevia As Boolean)
+        Dim m_Excel As Excel.Application
+        Dim i, j, z As Integer
+        '' Creamos un objeto WorkBook 
+        Dim objLibroExcel As Excel.Workbook
+        '' Creamos un objeto WorkSheet
+        Dim objHojaExcel As Excel.Worksheet
+        Try
+
+            m_Excel = New Excel.Application
+            m_Excel.Visible = False
+
+            '' Creamos una instancia del Workbooks de excel
+            '' Creamos una instancia de la primera hoja de trabajo de excel
+            objLibroExcel = m_Excel.Workbooks.Add()
+            objHojaExcel = objLibroExcel.Worksheets(1)
+            m_Excel.Application.ScreenUpdating = False
+            m_Excel.Calculation = Excel.XlCalculation.xlCalculationManual
+            objHojaExcel.Name = titulo
+            objHojaExcel.Visible = Excel.XlSheetVisibility.xlSheetVisible
+            '' Hacemos esta hoja la visible en pantalla 
+            '' (como seleccionamos la primera esto no es necesario
+            '' si seleccionamos una diferente a la primera si lo
+            '' necesitariamos).
+            objHojaExcel.Activate()
+            objHojaExcel.Range("A1:D1").Merge()
+            objHojaExcel.Range("A1:D1").Value = titulo
+            objHojaExcel.Range("A1:D1").Font.Bold = True
+            objHojaExcel.Range("A1:D1").Font.Size = 15
+
+            z = 0
+            For i = 0 To dg.Splits(0).DisplayColumns.Count - 1
+
+                If dg.Splits(0).DisplayColumns(i).Visible = True Then
+                    objHojaExcel.Cells(3, z + 1).Font.Bold = True
+                    objHojaExcel.Cells(3, z + 1).Value = dg.Splits(0).DisplayColumns(i).DataColumn.Caption
+                    z = z + 1
+                End If
+            Next
+
+            For i = 0 To dg.Splits(0).Rows.Count - 1
+                Application.DoEvents()
+                z = 0
+                For j = 0 To dg.Splits(0).DisplayColumns.Count - 1
+                    If dg.Splits(0).DisplayColumns(j).Visible = True Then
+                        objHojaExcel.Cells(i + 5, z + 1) = dg.Item(i, dg.Splits(0).DisplayColumns(j).Name)
+                        z = z + 1
+                    End If
+
+                Next
+            Next
+
+            objHojaExcel.Cells.EntireColumn.AutoFit()
+            '' Selecionado todo el rango especificado
+            If vistaprevia Then
+                objLibroExcel.PrintPreview()
+            Else
+
+            End If
+
+            objHojaExcel = Nothing
+            objLibroExcel = Nothing
+            m_Excel.Calculation = Excel.XlCalculation.xlCalculationAutomatic
+            m_Excel.Visible = True
+            m_Excel.ScreenUpdating = True
+
+            ' xls1.Save("prueba1.xls")
+            ' abrirExcel()
+        Catch ex1 As Exception
+            MessageBox.Show(ex1.ToString)
+        End Try
+
+    End Sub
+End Class

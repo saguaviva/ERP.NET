@@ -1,0 +1,1552 @@
+Imports CoreLab.MySql
+
+
+
+Public Class frmRepresentantesForm
+    Inherits aura2k3.frmBase
+
+#Region " Código generado por el Diseñador de Windows Forms "
+
+    Public Sub New()
+        MyBase.New()
+
+        'El Diseñador de Windows Forms requiere esta llamada.
+        InitializeComponent() : Dim tom As SMcMaster.TabOrderManager = New SMcMaster.TabOrderManager(Me) : tom.SetTabOrder(SMcMaster.TabOrderManager.TabScheme.AcrossFirst)
+
+        'Agregar cualquier inicialización después de la llamada a InitializeComponent()
+
+    End Sub
+
+    'Form reemplaza a Dispose para limpiar la lista de componentes.
+    Protected Overloads Overrides Sub Dispose(ByVal disposing As Boolean)
+        '! Seal for less overhead - Can declare NotInheritable Class
+        If disposing Then
+            If Not (components Is Nothing) Then
+                components.Dispose()
+            End If
+        End If
+        MyBase.Dispose(disposing)
+        frmChildForm = Nothing
+    End Sub
+
+    'Requerido por el Diseñador de Windows Forms
+    Private components As System.ComponentModel.IContainer
+
+    'NOTA: el Diseñador de Windows Forms requiere el siguiente procedimiento
+    'Puede modificarse utilizando el Diseñador de Windows Forms. 
+    'No lo modifique con el editor de código.
+    Friend WithEvents lblFax As Label
+    Friend WithEvents lblPoblacion As Label
+    Friend WithEvents lblObservaciones As Label
+    Friend WithEvents lblNIF As Label
+    Friend WithEvents lblProvincia As Label
+    Friend WithEvents lblCP As Label
+    Friend WithEvents txtNIF As C1.Win.C1Input.C1TextBox
+    Friend WithEvents txtCP As C1.Win.C1Input.C1TextBox
+    Friend WithEvents lblDomicilio As Label
+    Friend WithEvents btnVerListarepresentantes As NETXP.Controls.XPButton
+    Friend WithEvents lblNombreRepresentante As Label
+    Friend WithEvents lblCodigoRepresentante As Label
+    Friend WithEvents GroupBox1 As System.Windows.Forms.GroupBox
+    Friend WithEvents lblComision As Label
+    Friend WithEvents btnElegirRepresentante As NETXP.Controls.XPButton 
+    Friend WithEvents cboID As C1.Win.C1List.C1Combo
+    Friend WithEvents txtPROV As C1.Win.C1Input.C1TextBox
+    Friend WithEvents txtPOB As C1.Win.C1Input.C1TextBox
+    Friend WithEvents txtDOM As C1.Win.C1Input.C1TextBox
+    Friend WithEvents txtTEL As C1.Win.C1Input.C1TextBox
+    Friend WithEvents txtFAX As C1.Win.C1Input.C1TextBox
+    Friend WithEvents txtCOMIS As C1.Win.C1Input.C1TextBox
+    Friend WithEvents txtOBSERV As C1.Win.C1Input.C1TextBox
+    Friend WithEvents txtCODI As C1.Win.C1Input.C1TextBox
+    Friend WithEvents Label1 As System.Windows.Forms.Label
+    Friend WithEvents txtTEL2 As C1.Win.C1Input.C1TextBox
+    Friend WithEvents Label2 As System.Windows.Forms.Label
+    Friend WithEvents WLabel1 As System.Windows.Forms.Label
+    Friend WithEvents txtEMAIL As C1.Win.C1Input.C1TextBox
+    Friend WithEvents txtPAIS As C1.Win.C1Input.C1TextBox
+    Friend WithEvents Label3 As System.Windows.Forms.Label
+    Friend WithEvents tabControlRepresentantes As System.Windows.Forms.TabControl
+    Friend WithEvents tabPageRepresentantes As System.Windows.Forms.TabPage
+    Friend WithEvents tabPageComisiones As System.Windows.Forms.TabPage
+    Protected WithEvents dgConsumos As C1.Win.C1TrueDBGrid.C1TrueDBGrid
+    Friend WithEvents lblImpReciboAFecha As System.Windows.Forms.Label
+    Friend WithEvents lblImpReciboDeFecha As System.Windows.Forms.Label
+    Friend WithEvents dtpDeFecha As C1.Win.C1Input.C1DateEdit
+    Friend WithEvents dtpAFecha As C1.Win.C1Input.C1DateEdit
+    Friend WithEvents btnGenerarComisiones As NETXP.Controls.XPButton
+    Friend WithEvents txtTotalComis As C1.Win.C1Input.C1TextBox
+    Friend WithEvents txtTotalBase As C1.Win.C1Input.C1TextBox
+    Friend WithEvents lblTotalComision As System.Windows.Forms.Label
+    Friend WithEvents lblTotalBase As System.Windows.Forms.Label
+    Friend WithEvents btnExportarExcel As NETXP.Controls.XPButton
+    Friend WithEvents XpButton1 As NETXP.Controls.XPButton
+    Friend WithEvents cboEmpresaEnvio As C1.Win.C1List.C1Combo
+    Friend WithEvents lblEmpresa As System.Windows.Forms.Label
+    Friend WithEvents txtIVA As C1.Win.C1Input.C1TextBox
+    Friend WithEvents txtFactura As C1.Win.C1Input.C1TextBox
+    Friend WithEvents dtpFactura As C1.Win.C1Input.C1DateEdit
+    Friend WithEvents lblFechaFactura As System.Windows.Forms.Label
+    Friend WithEvents lblFactura As System.Windows.Forms.Label
+    Friend WithEvents lblIVAfactura As System.Windows.Forms.Label
+    Friend WithEvents lblIRPF As System.Windows.Forms.Label
+    Friend WithEvents txtIRPF As C1.Win.C1Input.C1TextBox
+    Friend WithEvents lblTotalComisionDespuesImpuestos As System.Windows.Forms.Label
+    Friend WithEvents txtTotalComisionImpuestos As C1.Win.C1Input.C1TextBox
+
+    <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent() 
+        Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(frmRepresentantesForm))
+        Me.tabControlRepresentantes = New System.Windows.Forms.TabControl
+        Me.tabPageRepresentantes = New System.Windows.Forms.TabPage
+        Me.GroupBox1 = New System.Windows.Forms.GroupBox
+        Me.txtPAIS = New C1.Win.C1Input.C1TextBox
+        Me.Label3 = New System.Windows.Forms.Label
+        Me.WLabel1 = New System.Windows.Forms.Label
+        Me.txtEMAIL = New C1.Win.C1Input.C1TextBox
+        Me.Label1 = New System.Windows.Forms.Label
+        Me.txtTEL2 = New C1.Win.C1Input.C1TextBox
+        Me.Label2 = New System.Windows.Forms.Label
+        Me.txtCODI = New C1.Win.C1Input.C1TextBox
+        Me.cboID = New C1.Win.C1List.C1Combo
+        Me.btnElegirRepresentante = New NETXP.Controls.XPButton
+        Me.lblComision = New System.Windows.Forms.Label
+        Me.txtPROV = New C1.Win.C1Input.C1TextBox
+        Me.txtPOB = New C1.Win.C1Input.C1TextBox
+        Me.lblCodigoRepresentante = New System.Windows.Forms.Label
+        Me.txtCP = New C1.Win.C1Input.C1TextBox
+        Me.txtDOM = New C1.Win.C1Input.C1TextBox
+        Me.txtNIF = New C1.Win.C1Input.C1TextBox
+        Me.lblFax = New System.Windows.Forms.Label
+        Me.txtTEL = New C1.Win.C1Input.C1TextBox
+        Me.lblProvincia = New System.Windows.Forms.Label
+        Me.lblPoblacion = New System.Windows.Forms.Label
+        Me.lblNIF = New System.Windows.Forms.Label
+        Me.txtFAX = New C1.Win.C1Input.C1TextBox
+        Me.lblDomicilio = New System.Windows.Forms.Label
+        Me.lblCP = New System.Windows.Forms.Label
+        Me.txtCOMIS = New C1.Win.C1Input.C1TextBox
+        Me.lblNombreRepresentante = New System.Windows.Forms.Label
+        Me.lblObservaciones = New System.Windows.Forms.Label
+        Me.txtOBSERV = New C1.Win.C1Input.C1TextBox
+        Me.tabPageComisiones = New System.Windows.Forms.TabPage
+        Me.lblTotalComisionDespuesImpuestos = New System.Windows.Forms.Label
+        Me.txtTotalComisionImpuestos = New C1.Win.C1Input.C1TextBox
+        Me.lblIRPF = New System.Windows.Forms.Label
+        Me.txtIRPF = New C1.Win.C1Input.C1TextBox
+        Me.lblIVAfactura = New System.Windows.Forms.Label
+        Me.lblFechaFactura = New System.Windows.Forms.Label
+        Me.lblFactura = New System.Windows.Forms.Label
+        Me.txtIVA = New C1.Win.C1Input.C1TextBox
+        Me.dtpFactura = New C1.Win.C1Input.C1DateEdit
+        Me.txtFactura = New C1.Win.C1Input.C1TextBox
+        Me.cboEmpresaEnvio = New C1.Win.C1List.C1Combo
+        Me.lblEmpresa = New System.Windows.Forms.Label
+        Me.XpButton1 = New NETXP.Controls.XPButton
+        Me.btnExportarExcel = New NETXP.Controls.XPButton
+        Me.lblTotalComision = New System.Windows.Forms.Label
+        Me.lblTotalBase = New System.Windows.Forms.Label
+        Me.txtTotalComis = New C1.Win.C1Input.C1TextBox
+        Me.txtTotalBase = New C1.Win.C1Input.C1TextBox
+        Me.btnGenerarComisiones = New NETXP.Controls.XPButton
+        Me.lblImpReciboAFecha = New System.Windows.Forms.Label
+        Me.lblImpReciboDeFecha = New System.Windows.Forms.Label
+        Me.dtpAFecha = New C1.Win.C1Input.C1DateEdit
+        Me.dtpDeFecha = New C1.Win.C1Input.C1DateEdit
+        Me.dgConsumos = New C1.Win.C1TrueDBGrid.C1TrueDBGrid
+        Me.tabControlRepresentantes.SuspendLayout()
+        Me.tabPageRepresentantes.SuspendLayout()
+        Me.GroupBox1.SuspendLayout()
+        CType(Me.txtPAIS, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.txtEMAIL, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.txtTEL2, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.txtCODI, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.cboID, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.txtPROV, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.txtPOB, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.txtCP, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.txtDOM, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.txtNIF, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.txtTEL, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.txtFAX, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.txtCOMIS, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.txtOBSERV, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.tabPageComisiones.SuspendLayout()
+        CType(Me.txtTotalComisionImpuestos, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.txtIRPF, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.txtIVA, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.dtpFactura, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.txtFactura, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.cboEmpresaEnvio, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.txtTotalComis, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.txtTotalBase, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.dtpAFecha, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.dtpDeFecha, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.dgConsumos, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.SuspendLayout()
+        '
+        'arrayTextBox
+        '
+        Me.arrayTextBox.Controls.AddRange(New System.Windows.Forms.Control() {Me.txtCOMIS, Me.txtCP, Me.txtDOM, Me.txtEMAIL, Me.txtFAX, Me.txtNIF, Me.txtOBSERV, Me.txtPAIS, Me.txtPOB, Me.txtPROV, Me.txtTEL, Me.txtTEL2})
+        '
+        'btnBorrar
+        '
+        Me.btnBorrar.Name = "btnBorrar"
+        '
+        'btnTancar
+        '
+        Me.btnTancar.Name = "btnTancar"
+        '
+        'arrayEtiquetas
+        '
+        Me.arrayEtiquetas.Controls.AddRange(New System.Windows.Forms.Control() {Me.lblCP, Me.lblCodigoRepresentante, Me.lblComision, Me.lblDomicilio, Me.lblFax, Me.lblNIF, Me.lblNombreRepresentante, Me.lblObservaciones, Me.lblPoblacion, Me.lblProvincia})
+        '
+        'arrayTabPages
+        '
+        Me.arrayTabPages.Controls.AddRange(New System.Windows.Forms.Control() {Me.tabPageRepresentantes})
+        '
+        'btnModificar
+        '
+        Me.btnModificar.Name = "btnModificar"
+        '
+        'cboSeleccionCentro
+        '
+        Me.cboSeleccionCentro.Name = "cboSeleccionCentro"
+        '
+        'btnVerLista
+        '
+        Me.btnVerLista.Name = "btnVerLista"
+        '
+        'btnActualizar
+        '
+        Me.btnActualizar.Name = "btnActualizar"
+        '
+        'sbtipo
+        '
+        Me.sbtipo.Name = "sbtipo"
+        '
+        'btnRecargar
+        '
+        Me.btnRecargar.Name = "btnRecargar"
+        '
+        'btnSiguiente
+        '
+        Me.btnSiguiente.Name = "btnSiguiente"
+        '
+        'btnAnterior
+        '
+        Me.btnAnterior.Name = "btnAnterior"
+        '
+        'btnNuevo
+        '
+        Me.btnNuevo.Name = "btnNuevo"
+        '
+        'btnPrimero
+        '
+        Me.btnPrimero.Name = "btnPrimero"
+        '
+        'arrayBotones
+        '
+        Me.arrayBotones.Controls.AddRange(New System.Windows.Forms.Control() {Me.btnElegirRepresentante})
+        '
+        'btnUltimo
+        '
+        Me.btnUltimo.Name = "btnUltimo"
+        '
+        'tabControlRepresentantes
+        '
+        Me.tabControlRepresentantes.Controls.Add(Me.tabPageRepresentantes)
+        Me.tabControlRepresentantes.Controls.Add(Me.tabPageComisiones)
+        Me.tabControlRepresentantes.ItemSize = New System.Drawing.Size(78, 18)
+        Me.tabControlRepresentantes.Location = New System.Drawing.Point(16, 16)
+        Me.tabControlRepresentantes.Name = "tabControlRepresentantes"
+        Me.tabControlRepresentantes.SelectedIndex = 0
+        Me.tabControlRepresentantes.Size = New System.Drawing.Size(864, 484)
+        Me.tabControlRepresentantes.TabIndex = 0
+        '
+        'tabPageRepresentantes
+        '
+        Me.tabPageRepresentantes.BackColor = System.Drawing.Color.FromArgb(CType(197, Byte), CType(180, Byte), CType(207, Byte))
+        Me.tabPageRepresentantes.Controls.Add(Me.GroupBox1)
+        Me.tabPageRepresentantes.Controls.Add(Me.lblObservaciones)
+        Me.tabPageRepresentantes.Controls.Add(Me.txtOBSERV)
+        Me.tabPageRepresentantes.Location = New System.Drawing.Point(4, 22)
+        Me.tabPageRepresentantes.Name = "tabPageRepresentantes"
+        Me.tabPageRepresentantes.Size = New System.Drawing.Size(856, 458)
+        Me.tabPageRepresentantes.TabIndex = 0
+        Me.tabPageRepresentantes.Text = "Representant"
+        '
+        'GroupBox1
+        '
+        Me.GroupBox1.BackColor = System.Drawing.Color.FromArgb(CType(197, Byte), CType(180, Byte), CType(207, Byte))
+        Me.GroupBox1.Controls.Add(Me.txtPAIS)
+        Me.GroupBox1.Controls.Add(Me.Label3)
+        Me.GroupBox1.Controls.Add(Me.WLabel1)
+        Me.GroupBox1.Controls.Add(Me.txtEMAIL)
+        Me.GroupBox1.Controls.Add(Me.Label1)
+        Me.GroupBox1.Controls.Add(Me.txtTEL2)
+        Me.GroupBox1.Controls.Add(Me.Label2)
+        Me.GroupBox1.Controls.Add(Me.txtCODI)
+        Me.GroupBox1.Controls.Add(Me.cboID)
+        Me.GroupBox1.Controls.Add(Me.btnElegirRepresentante)
+        Me.GroupBox1.Controls.Add(Me.lblComision)
+        Me.GroupBox1.Controls.Add(Me.txtPROV)
+        Me.GroupBox1.Controls.Add(Me.txtPOB)
+        Me.GroupBox1.Controls.Add(Me.lblCodigoRepresentante)
+        Me.GroupBox1.Controls.Add(Me.txtCP)
+        Me.GroupBox1.Controls.Add(Me.txtDOM)
+        Me.GroupBox1.Controls.Add(Me.txtNIF)
+        Me.GroupBox1.Controls.Add(Me.lblFax)
+        Me.GroupBox1.Controls.Add(Me.txtTEL)
+        Me.GroupBox1.Controls.Add(Me.lblProvincia)
+        Me.GroupBox1.Controls.Add(Me.lblPoblacion)
+        Me.GroupBox1.Controls.Add(Me.lblNIF)
+        Me.GroupBox1.Controls.Add(Me.txtFAX)
+        Me.GroupBox1.Controls.Add(Me.lblDomicilio)
+        Me.GroupBox1.Controls.Add(Me.lblCP)
+        Me.GroupBox1.Controls.Add(Me.txtCOMIS)
+        Me.GroupBox1.Controls.Add(Me.lblNombreRepresentante)
+        Me.GroupBox1.FlatStyle = System.Windows.Forms.FlatStyle.System
+        Me.GroupBox1.Location = New System.Drawing.Point(8, 8)
+        Me.GroupBox1.Name = "GroupBox1"
+        Me.GroupBox1.Size = New System.Drawing.Size(428, 428)
+        Me.GroupBox1.TabIndex = 212
+        Me.GroupBox1.TabStop = False
+        '
+        'txtPAIS
+        '
+        Me.txtPAIS.Location = New System.Drawing.Point(92, 236)
+        Me.txtPAIS.MaxLength = 35
+        Me.txtPAIS.Name = "txtPAIS"
+        Me.txtPAIS.Size = New System.Drawing.Size(292, 20)
+        Me.txtPAIS.TabIndex = 221
+        Me.txtPAIS.Tag = Nothing
+        '
+        'Label3
+        '
+        Me.Label3.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.Label3.Location = New System.Drawing.Point(12, 236)
+        Me.Label3.Name = "Label3"
+        Me.Label3.Size = New System.Drawing.Size(76, 20)
+        Me.Label3.TabIndex = 222
+        Me.Label3.Text = "Pais"
+        Me.Label3.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        '
+        'WLabel1
+        '
+        Me.WLabel1.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.WLabel1.Location = New System.Drawing.Point(12, 368)
+        Me.WLabel1.Name = "WLabel1"
+        Me.WLabel1.Size = New System.Drawing.Size(76, 20)
+        Me.WLabel1.TabIndex = 220
+        Me.WLabel1.Text = "e-mail"
+        Me.WLabel1.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        '
+        'txtEMAIL
+        '
+        Me.txtEMAIL.Location = New System.Drawing.Point(92, 368)
+        Me.txtEMAIL.Name = "txtEMAIL"
+        Me.txtEMAIL.Size = New System.Drawing.Size(292, 20)
+        Me.txtEMAIL.TabIndex = 219
+        Me.txtEMAIL.Tag = Nothing
+        '
+        'Label1
+        '
+        Me.Label1.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.Label1.Location = New System.Drawing.Point(12, 312)
+        Me.Label1.Name = "Label1"
+        Me.Label1.Size = New System.Drawing.Size(76, 20)
+        Me.Label1.TabIndex = 218
+        Me.Label1.Text = "Telèfon 2"
+        Me.Label1.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        '
+        'txtTEL2
+        '
+        Me.txtTEL2.Location = New System.Drawing.Point(92, 312)
+        Me.txtTEL2.Name = "txtTEL2"
+        Me.txtTEL2.Size = New System.Drawing.Size(292, 20)
+        Me.txtTEL2.TabIndex = 217
+        Me.txtTEL2.Tag = Nothing
+        '
+        'Label2
+        '
+        Me.Label2.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.Label2.Location = New System.Drawing.Point(12, 288)
+        Me.Label2.Name = "Label2"
+        Me.Label2.Size = New System.Drawing.Size(76, 20)
+        Me.Label2.TabIndex = 216
+        Me.Label2.Text = "Telèfon 1"
+        Me.Label2.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        '
+        'txtCODI
+        '
+        Me.txtCODI.BackColor = System.Drawing.Color.Khaki
+        Me.txtCODI.Location = New System.Drawing.Point(92, 24)
+        Me.txtCODI.MaxLength = 35
+        Me.txtCODI.Name = "txtCODI"
+        Me.txtCODI.Size = New System.Drawing.Size(48, 20)
+        Me.txtCODI.TabIndex = 215
+        Me.txtCODI.Tag = Nothing
+        '
+        'cboID
+        '
+        Me.cboID.AddItemSeparator = Microsoft.VisualBasic.ChrW(59)
+        Me.cboID.AutoCompletion = True
+        Me.cboID.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+        Me.cboID.Caption = ""
+        Me.cboID.CaptionHeight = 17
+        Me.cboID.CharacterCasing = System.Windows.Forms.CharacterCasing.Normal
+        Me.cboID.ColumnCaptionHeight = 17
+        Me.cboID.ColumnFooterHeight = 17
+        Me.cboID.ContentHeight = 15
+        Me.cboID.Cursor = System.Windows.Forms.Cursors.Default
+        Me.cboID.DeadAreaBackColor = System.Drawing.Color.Empty
+        Me.cboID.EditorBackColor = System.Drawing.Color.LightCyan
+        Me.cboID.EditorFont = New System.Drawing.Font("Microsoft Sans Serif", 8.25!)
+        Me.cboID.EditorForeColor = System.Drawing.SystemColors.WindowText
+        Me.cboID.EditorHeight = 15
+        Me.cboID.FlatStyle = C1.Win.C1List.FlatModeEnum.System
+        Me.cboID.GapHeight = 2
+        Me.cboID.Images.Add(CType(resources.GetObject("resource"), System.Drawing.Image))
+        Me.cboID.ItemHeight = 15
+        Me.cboID.Location = New System.Drawing.Point(92, 48)
+        Me.cboID.MatchEntryTimeout = CType(100, Long)
+        Me.cboID.MaxDropDownItems = CType(15, Short)
+        Me.cboID.MaxLength = 35
+        Me.cboID.MouseCursor = System.Windows.Forms.Cursors.Default
+        Me.cboID.Name = "cboID"
+        ''Me.cbo.PartialRightColumn = False
+        Me.cboID.RowDivider.Color = System.Drawing.Color.DarkGray
+        Me.cboID.RowDivider.Style = C1.Win.C1List.LineStyleEnum.None
+        Me.cboID.RowSubDividerColor = System.Drawing.Color.DarkGray
+        Me.cboID.Size = New System.Drawing.Size(292, 19)
+        Me.cboID.TabIndex = 1
+        Me.cboID.PropBag = "<?xml version=""1.0""?><Blob><Styles type=""C1.Win.C1List.Design.ContextWrapper""><Da" & _
+        "ta>Group{AlignVert:Center;Border:None,,0, 0, 0, 0;BackColor:ControlDark;}Style2{" & _
+        "}Style5{}Style4{}Style7{}Style6{}EvenRow{BackColor:Aqua;}Selected{ForeColor:High" & _
+        "lightText;BackColor:Highlight;}Style3{}Inactive{ForeColor:InactiveCaptionText;Ba" & _
+        "ckColor:InactiveCaption;}Footer{}Caption{AlignHorz:Center;}Normal{Font:Microsoft" & _
+        " Sans Serif, 8.25pt;BackColor:Window;}HighlightRow{ForeColor:HighlightText;BackC" & _
+        "olor:Highlight;}Style1{}OddRow{}RecordSelector{AlignImage:Center;}Heading{Wrap:T" & _
+        "rue;BackColor:Control;Border:Flat,ControlDark,1, 1, 1, 1;ForeColor:ControlText;A" & _
+        "lignVert:Center;}Style8{}Style10{}Style11{}Style9{AlignHorz:Near;}</Data></Style" & _
+        "s><Splits><C1.Win.C1List.ListBoxView AllowColSelect=""False"" Name="""" CaptionHeigh" & _
+        "t=""17"" ColumnCaptionHeight=""17"" ColumnFooterHeight=""17"" VerticalScrollGroup=""1"" " & _
+        "HorizontalScrollGroup=""1""><ClientRect>0, 0, 118, 158</ClientRect><VScrollBar><Wi" & _
+        "dth>17</Width></VScrollBar><HScrollBar><Height>17</Height></HScrollBar><CaptionS" & _
+        "tyle parent=""Style2"" me=""Style9"" /><EvenRowStyle parent=""EvenRow"" me=""Style7"" />" & _
+        "<FooterStyle parent=""Footer"" me=""Style3"" /><GroupStyle parent=""Group"" me=""Style1" & _
+        "1"" /><HeadingStyle parent=""Heading"" me=""Style2"" /><HighLightRowStyle parent=""Hig" & _
+        "hlightRow"" me=""Style6"" /><InactiveStyle parent=""Inactive"" me=""Style4"" /><OddRowS" & _
+        "tyle parent=""OddRow"" me=""Style8"" /><RecordSelectorStyle parent=""RecordSelector"" " & _
+        "me=""Style10"" /><SelectedStyle parent=""Selected"" me=""Style5"" /><Style parent="""" m" & _
+        "e=""Normal"" /></C1.Win.C1List.ListBoxView></Splits><NamedStyles><Style parent="""" " & _
+        "me=""Normal"" /><Style parent=""Normal"" me=""Heading"" /><Style parent=""Heading"" me=""" & _
+        "Footer"" /><Style parent=""Heading"" me=""Caption"" /><Style parent=""Heading"" me=""Ina" & _
+        "ctive"" /><Style parent=""Normal"" me=""Selected"" /><Style parent=""Normal"" me=""Highl" & _
+        "ightRow"" /><Style parent=""Normal"" me=""EvenRow"" /><Style parent=""Normal"" me=""OddR" & _
+        "ow"" /><Style parent=""Heading"" me=""RecordSelector"" /><Style parent=""Caption"" me=""" & _
+        "Group"" /></NamedStyles><vertSplits>1</vertSplits><horzSplits>1</horzSplits><Layo" & _
+        "ut>Modified</Layout><DefaultRecSelWidth>17</DefaultRecSelWidth></Blob>"
+        '
+        'btnElegirRepresentante
+        '
+        Me.btnElegirRepresentante.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.btnElegirRepresentante.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft
+        Me.btnElegirRepresentante.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.btnElegirRepresentante.Location = New System.Drawing.Point(144, 24)
+        Me.btnElegirRepresentante.Name = "btnElegirRepresentante"
+        Me.btnElegirRepresentante.Size = New System.Drawing.Size(24, 20)
+        Me.btnElegirRepresentante.TabIndex = 214
+        Me.btnElegirRepresentante.Text = "..."
+        Me.btnElegirRepresentante.Visible = False
+        '
+        'lblComision
+        '
+        Me.lblComision.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.lblComision.Location = New System.Drawing.Point(12, 396)
+        Me.lblComision.Name = "lblComision"
+        Me.lblComision.Size = New System.Drawing.Size(76, 20)
+        Me.lblComision.TabIndex = 213
+        Me.lblComision.Text = "Comisió"
+        Me.lblComision.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        '
+        'txtPROV
+        '
+        Me.txtPROV.Location = New System.Drawing.Point(92, 180)
+        Me.txtPROV.MaxLength = 35
+        Me.txtPROV.Name = "txtPROV"
+        Me.txtPROV.Size = New System.Drawing.Size(292, 20)
+        Me.txtPROV.TabIndex = 4
+        Me.txtPROV.Tag = Nothing
+        '
+        'txtPOB
+        '
+        Me.txtPOB.Location = New System.Drawing.Point(92, 208)
+        Me.txtPOB.MaxLength = 35
+        Me.txtPOB.Name = "txtPOB"
+        Me.txtPOB.Size = New System.Drawing.Size(292, 20)
+        Me.txtPOB.TabIndex = 5
+        Me.txtPOB.Tag = Nothing
+        '
+        'lblCodigoRepresentante
+        '
+        Me.lblCodigoRepresentante.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.lblCodigoRepresentante.Location = New System.Drawing.Point(12, 24)
+        Me.lblCodigoRepresentante.Name = "lblCodigoRepresentante"
+        Me.lblCodigoRepresentante.Size = New System.Drawing.Size(76, 20)
+        Me.lblCodigoRepresentante.TabIndex = 193
+        Me.lblCodigoRepresentante.Text = "Codi"
+        Me.lblCodigoRepresentante.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        '
+        'txtCP
+        '
+        Me.txtCP.Location = New System.Drawing.Point(92, 152)
+        Me.txtCP.MaxLength = 5
+        Me.txtCP.Name = "txtCP"
+        Me.txtCP.Size = New System.Drawing.Size(292, 20)
+        Me.txtCP.TabIndex = 3
+        Me.txtCP.Tag = Nothing
+        '
+        'txtDOM
+        '
+        Me.txtDOM.Location = New System.Drawing.Point(92, 80)
+        Me.txtDOM.MaxLength = 35
+        Me.txtDOM.Multiline = True
+        Me.txtDOM.Name = "txtDOM"
+        Me.txtDOM.Size = New System.Drawing.Size(292, 60)
+        Me.txtDOM.TabIndex = 2
+        Me.txtDOM.Tag = Nothing
+        '
+        'txtNIF
+        '
+        Me.txtNIF.Location = New System.Drawing.Point(92, 264)
+        Me.txtNIF.MaxLength = 15
+        Me.txtNIF.Name = "txtNIF"
+        Me.txtNIF.Size = New System.Drawing.Size(292, 20)
+        Me.txtNIF.TabIndex = 6
+        Me.txtNIF.Tag = Nothing
+        '
+        'lblFax
+        '
+        Me.lblFax.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.lblFax.Location = New System.Drawing.Point(12, 340)
+        Me.lblFax.Name = "lblFax"
+        Me.lblFax.Size = New System.Drawing.Size(76, 20)
+        Me.lblFax.TabIndex = 209
+        Me.lblFax.Text = "Fax"
+        Me.lblFax.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        '
+        'txtTEL
+        '
+        Me.txtTEL.Location = New System.Drawing.Point(92, 288)
+        Me.txtTEL.MaxLength = 20
+        Me.txtTEL.Name = "txtTEL"
+        Me.txtTEL.Size = New System.Drawing.Size(292, 20)
+        Me.txtTEL.TabIndex = 7
+        Me.txtTEL.Tag = Nothing
+        '
+        'lblProvincia
+        '
+        Me.lblProvincia.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.lblProvincia.Location = New System.Drawing.Point(12, 180)
+        Me.lblProvincia.Name = "lblProvincia"
+        Me.lblProvincia.Size = New System.Drawing.Size(76, 20)
+        Me.lblProvincia.TabIndex = 200
+        Me.lblProvincia.Text = "Provincia"
+        Me.lblProvincia.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        '
+        'lblPoblacion
+        '
+        Me.lblPoblacion.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.lblPoblacion.Location = New System.Drawing.Point(12, 208)
+        Me.lblPoblacion.Name = "lblPoblacion"
+        Me.lblPoblacion.Size = New System.Drawing.Size(76, 20)
+        Me.lblPoblacion.TabIndex = 207
+        Me.lblPoblacion.Text = "Població"
+        Me.lblPoblacion.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        '
+        'lblNIF
+        '
+        Me.lblNIF.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.lblNIF.Location = New System.Drawing.Point(12, 264)
+        Me.lblNIF.Name = "lblNIF"
+        Me.lblNIF.Size = New System.Drawing.Size(76, 20)
+        Me.lblNIF.TabIndex = 201
+        Me.lblNIF.Text = "N.I.F."
+        Me.lblNIF.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        '
+        'txtFAX
+        '
+        Me.txtFAX.Location = New System.Drawing.Point(92, 340)
+        Me.txtFAX.MaxLength = 20
+        Me.txtFAX.Name = "txtFAX"
+        Me.txtFAX.Size = New System.Drawing.Size(292, 20)
+        Me.txtFAX.TabIndex = 8
+        Me.txtFAX.Tag = Nothing
+        '
+        'lblDomicilio
+        '
+        Me.lblDomicilio.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.lblDomicilio.Location = New System.Drawing.Point(12, 84)
+        Me.lblDomicilio.Name = "lblDomicilio"
+        Me.lblDomicilio.Size = New System.Drawing.Size(76, 20)
+        Me.lblDomicilio.TabIndex = 195
+        Me.lblDomicilio.Text = "Domicili"
+        Me.lblDomicilio.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        '
+        'lblCP
+        '
+        Me.lblCP.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.lblCP.Location = New System.Drawing.Point(12, 152)
+        Me.lblCP.Name = "lblCP"
+        Me.lblCP.Size = New System.Drawing.Size(76, 20)
+        Me.lblCP.TabIndex = 199
+        Me.lblCP.Text = "C. Postal"
+        Me.lblCP.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        '
+        'txtCOMIS
+        '
+        Me.txtCOMIS.Location = New System.Drawing.Point(92, 396)
+        Me.txtCOMIS.Name = "txtCOMIS"
+        Me.txtCOMIS.Size = New System.Drawing.Size(48, 20)
+        Me.txtCOMIS.TabIndex = 9
+        Me.txtCOMIS.Tag = Nothing
+        '
+        'lblNombreRepresentante
+        '
+        Me.lblNombreRepresentante.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.lblNombreRepresentante.Location = New System.Drawing.Point(12, 48)
+        Me.lblNombreRepresentante.Name = "lblNombreRepresentante"
+        Me.lblNombreRepresentante.Size = New System.Drawing.Size(76, 20)
+        Me.lblNombreRepresentante.TabIndex = 194
+        Me.lblNombreRepresentante.Text = "Nom"
+        Me.lblNombreRepresentante.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        '
+        'lblObservaciones
+        '
+        Me.lblObservaciones.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.lblObservaciones.Location = New System.Drawing.Point(444, 12)
+        Me.lblObservaciones.Name = "lblObservaciones"
+        Me.lblObservaciones.Size = New System.Drawing.Size(80, 23)
+        Me.lblObservaciones.TabIndex = 205
+        Me.lblObservaciones.Text = "Observacions"
+        '
+        'txtOBSERV
+        '
+        Me.txtOBSERV.Location = New System.Drawing.Point(444, 40)
+        Me.txtOBSERV.Multiline = True
+        Me.txtOBSERV.Name = "txtOBSERV"
+        Me.txtOBSERV.ScrollBars = System.Windows.Forms.ScrollBars.Vertical
+        Me.txtOBSERV.Size = New System.Drawing.Size(408, 396)
+        Me.txtOBSERV.TabIndex = 0
+        Me.txtOBSERV.Tag = Nothing
+        '
+        'tabPageComisiones
+        '
+        Me.tabPageComisiones.BackColor = System.Drawing.Color.FromArgb(CType(197, Byte), CType(180, Byte), CType(207, Byte))
+        Me.tabPageComisiones.Controls.Add(Me.lblTotalComisionDespuesImpuestos)
+        Me.tabPageComisiones.Controls.Add(Me.txtTotalComisionImpuestos)
+        Me.tabPageComisiones.Controls.Add(Me.lblIRPF)
+        Me.tabPageComisiones.Controls.Add(Me.txtIRPF)
+        Me.tabPageComisiones.Controls.Add(Me.lblIVAfactura)
+        Me.tabPageComisiones.Controls.Add(Me.lblFechaFactura)
+        Me.tabPageComisiones.Controls.Add(Me.lblFactura)
+        Me.tabPageComisiones.Controls.Add(Me.txtIVA)
+        Me.tabPageComisiones.Controls.Add(Me.dtpFactura)
+        Me.tabPageComisiones.Controls.Add(Me.txtFactura)
+        Me.tabPageComisiones.Controls.Add(Me.cboEmpresaEnvio)
+        Me.tabPageComisiones.Controls.Add(Me.lblEmpresa)
+        Me.tabPageComisiones.Controls.Add(Me.XpButton1)
+        Me.tabPageComisiones.Controls.Add(Me.btnExportarExcel)
+        Me.tabPageComisiones.Controls.Add(Me.lblTotalComision)
+        Me.tabPageComisiones.Controls.Add(Me.lblTotalBase)
+        Me.tabPageComisiones.Controls.Add(Me.txtTotalComis)
+        Me.tabPageComisiones.Controls.Add(Me.txtTotalBase)
+        Me.tabPageComisiones.Controls.Add(Me.btnGenerarComisiones)
+        Me.tabPageComisiones.Controls.Add(Me.lblImpReciboAFecha)
+        Me.tabPageComisiones.Controls.Add(Me.lblImpReciboDeFecha)
+        Me.tabPageComisiones.Controls.Add(Me.dtpAFecha)
+        Me.tabPageComisiones.Controls.Add(Me.dtpDeFecha)
+        Me.tabPageComisiones.Controls.Add(Me.dgConsumos)
+        Me.tabPageComisiones.Location = New System.Drawing.Point(4, 22)
+        Me.tabPageComisiones.Name = "tabPageComisiones"
+        Me.tabPageComisiones.Size = New System.Drawing.Size(856, 458)
+        Me.tabPageComisiones.TabIndex = 1
+        Me.tabPageComisiones.Text = "Comisions"
+        '
+        'lblTotalComisionDespuesImpuestos
+        '
+        Me.lblTotalComisionDespuesImpuestos.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.lblTotalComisionDespuesImpuestos.Location = New System.Drawing.Point(204, 396)
+        Me.lblTotalComisionDespuesImpuestos.Name = "lblTotalComisionDespuesImpuestos"
+        Me.lblTotalComisionDespuesImpuestos.Size = New System.Drawing.Size(208, 20)
+        Me.lblTotalComisionDespuesImpuestos.TabIndex = 382
+        Me.lblTotalComisionDespuesImpuestos.Text = "Total Comissió Després Impostos"
+        Me.lblTotalComisionDespuesImpuestos.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        Me.lblTotalComisionDespuesImpuestos.Visible = False
+        '
+        'txtTotalComisionImpuestos
+        '
+        Me.txtTotalComisionImpuestos.BackColor = System.Drawing.Color.FromArgb(CType(224, Byte), CType(211, Byte), CType(120, Byte))
+        Me.txtTotalComisionImpuestos.Location = New System.Drawing.Point(416, 396)
+        Me.txtTotalComisionImpuestos.MaxLength = 35
+        Me.txtTotalComisionImpuestos.Name = "txtTotalComisionImpuestos"
+        Me.txtTotalComisionImpuestos.Size = New System.Drawing.Size(124, 20)
+        Me.txtTotalComisionImpuestos.TabIndex = 381
+        Me.txtTotalComisionImpuestos.Tag = Nothing
+        Me.txtTotalComisionImpuestos.Visible = False
+        '
+        'lblIRPF
+        '
+        Me.lblIRPF.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.lblIRPF.Location = New System.Drawing.Point(264, 424)
+        Me.lblIRPF.Name = "lblIRPF"
+        Me.lblIRPF.Size = New System.Drawing.Size(88, 20)
+        Me.lblIRPF.TabIndex = 380
+        Me.lblIRPF.Text = "% I.R.P.F."
+        Me.lblIRPF.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        Me.lblIRPF.Visible = False
+        '
+        'txtIRPF
+        '
+        Me.txtIRPF.Location = New System.Drawing.Point(352, 424)
+        Me.txtIRPF.MaxLength = 35
+        Me.txtIRPF.Name = "txtIRPF"
+        Me.txtIRPF.Size = New System.Drawing.Size(92, 20)
+        Me.txtIRPF.TabIndex = 379
+        Me.txtIRPF.Tag = Nothing
+        Me.txtIRPF.Value = "15"
+        Me.txtIRPF.Visible = False
+        '
+        'lblIVAfactura
+        '
+        Me.lblIVAfactura.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.lblIVAfactura.Location = New System.Drawing.Point(76, 424)
+        Me.lblIVAfactura.Name = "lblIVAfactura"
+        Me.lblIVAfactura.Size = New System.Drawing.Size(88, 20)
+        Me.lblIVAfactura.TabIndex = 378
+        Me.lblIVAfactura.Text = "% IVA"
+        Me.lblIVAfactura.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        Me.lblIVAfactura.Visible = False
+        '
+        'lblFechaFactura
+        '
+        Me.lblFechaFactura.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.lblFechaFactura.Location = New System.Drawing.Point(264, 368)
+        Me.lblFechaFactura.Name = "lblFechaFactura"
+        Me.lblFechaFactura.Size = New System.Drawing.Size(88, 20)
+        Me.lblFechaFactura.TabIndex = 377
+        Me.lblFechaFactura.Text = "Data Factura"
+        Me.lblFechaFactura.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        Me.lblFechaFactura.Visible = False
+        '
+        'lblFactura
+        '
+        Me.lblFactura.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.lblFactura.Location = New System.Drawing.Point(76, 368)
+        Me.lblFactura.Name = "lblFactura"
+        Me.lblFactura.Size = New System.Drawing.Size(88, 20)
+        Me.lblFactura.TabIndex = 376
+        Me.lblFactura.Text = "Factura"
+        Me.lblFactura.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        Me.lblFactura.Visible = False
+        '
+        'txtIVA
+        '
+        Me.txtIVA.Location = New System.Drawing.Point(164, 424)
+        Me.txtIVA.MaxLength = 35
+        Me.txtIVA.Name = "txtIVA"
+        Me.txtIVA.Size = New System.Drawing.Size(92, 20)
+        Me.txtIVA.TabIndex = 375
+        Me.txtIVA.Tag = Nothing
+        Me.txtIVA.Value = "16"
+        Me.txtIVA.Visible = False
+        '
+        'dtpFactura
+        '
+        '
+        'dtpFactura.Calendar
+        '
+        Me.dtpFactura.Calendar.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.dtpFactura.FormatType = C1.Win.C1Input.FormatTypeEnum.ShortDate
+        Me.dtpFactura.Location = New System.Drawing.Point(352, 368)
+        Me.dtpFactura.Name = "dtpFactura"
+        Me.dtpFactura.Size = New System.Drawing.Size(128, 20)
+        Me.dtpFactura.TabIndex = 374
+        Me.dtpFactura.Tag = Nothing
+        Me.dtpFactura.Visible = False
+        '
+        'txtFactura
+        '
+        Me.txtFactura.Location = New System.Drawing.Point(164, 368)
+        Me.txtFactura.MaxLength = 35
+        Me.txtFactura.Name = "txtFactura"
+        Me.txtFactura.Size = New System.Drawing.Size(92, 20)
+        Me.txtFactura.TabIndex = 373
+        Me.txtFactura.Tag = Nothing
+        Me.txtFactura.Visible = False
+        '
+        'cboEmpresaEnvio
+        '
+        Me.cboEmpresaEnvio.AddItemSeparator = Microsoft.VisualBasic.ChrW(59)
+        Me.cboEmpresaEnvio.Caption = ""
+        Me.cboEmpresaEnvio.CaptionHeight = 17
+        Me.cboEmpresaEnvio.CharacterCasing = System.Windows.Forms.CharacterCasing.Normal
+        Me.cboEmpresaEnvio.ColumnCaptionHeight = 17
+        Me.cboEmpresaEnvio.ColumnFooterHeight = 17
+        Me.cboEmpresaEnvio.ContentHeight = 16
+        Me.cboEmpresaEnvio.DeadAreaBackColor = System.Drawing.Color.Empty
+        Me.cboEmpresaEnvio.EditorBackColor = System.Drawing.SystemColors.Window
+        Me.cboEmpresaEnvio.EditorFont = New System.Drawing.Font("Tahoma", 8.25!)
+        Me.cboEmpresaEnvio.EditorForeColor = System.Drawing.SystemColors.WindowText
+        Me.cboEmpresaEnvio.EditorHeight = 16
+        Me.cboEmpresaEnvio.GapHeight = 2
+        Me.cboEmpresaEnvio.Images.Add(CType(resources.GetObject("resource1"), System.Drawing.Image))
+        Me.cboEmpresaEnvio.ItemHeight = 15
+        Me.cboEmpresaEnvio.Location = New System.Drawing.Point(344, 44)
+        Me.cboEmpresaEnvio.MatchEntryTimeout = CType(2000, Long)
+        Me.cboEmpresaEnvio.MaxDropDownItems = CType(5, Short)
+        Me.cboEmpresaEnvio.MaxLength = 32767
+        Me.cboEmpresaEnvio.MouseCursor = System.Windows.Forms.Cursors.Default
+        Me.cboEmpresaEnvio.Name = "cboEmpresaEnvio"
+        'Me.cbo.PartialRightColumn = False
+        Me.cboEmpresaEnvio.RowDivider.Color = System.Drawing.Color.DarkGray
+        Me.cboEmpresaEnvio.RowDivider.Style = C1.Win.C1List.LineStyleEnum.None
+        Me.cboEmpresaEnvio.RowSubDividerColor = System.Drawing.Color.DarkGray
+        Me.cboEmpresaEnvio.Size = New System.Drawing.Size(121, 22)
+        Me.cboEmpresaEnvio.TabIndex = 372
+        Me.cboEmpresaEnvio.PropBag = "<?xml version=""1.0""?><Blob><Styles type=""C1.Win.C1List.Design.ContextWrapper""><Da" & _
+        "ta>Group{BackColor:ControlDark;Border:None,,0, 0, 0, 0;AlignVert:Center;}Style2{" & _
+        "}Style5{}Style4{}Style7{}Style6{}EvenRow{BackColor:Aqua;}Selected{ForeColor:High" & _
+        "lightText;BackColor:Highlight;}Style3{}Inactive{ForeColor:InactiveCaptionText;Ba" & _
+        "ckColor:InactiveCaption;}Footer{}Caption{AlignHorz:Center;}Normal{}HighlightRow{" & _
+        "ForeColor:HighlightText;BackColor:Highlight;}Style9{AlignHorz:Near;}OddRow{}Reco" & _
+        "rdSelector{AlignImage:Center;}Heading{Wrap:True;AlignVert:Center;Border:Raised,," & _
+        "1, 1, 1, 1;ForeColor:ControlText;BackColor:Control;}Style8{}Style10{}Style11{}St" & _
+        "yle1{}</Data></Styles><Splits><C1.Win.C1List.ListBoxView AllowColSelect=""False"" " & _
+        "Name="""" CaptionHeight=""17"" ColumnCaptionHeight=""17"" ColumnFooterHeight=""17"" Vert" & _
+        "icalScrollGroup=""1"" HorizontalScrollGroup=""1""><ClientRect>0, 0, 116, 156</Client" & _
+        "Rect><VScrollBar><Width>17</Width></VScrollBar><HScrollBar><Height>17</Height></" & _
+        "HScrollBar><CaptionStyle parent=""Style2"" me=""Style9"" /><EvenRowStyle parent=""Eve" & _
+        "nRow"" me=""Style7"" /><FooterStyle parent=""Footer"" me=""Style3"" /><GroupStyle paren" & _
+        "t=""Group"" me=""Style11"" /><HeadingStyle parent=""Heading"" me=""Style2"" /><HighLight" & _
+        "RowStyle parent=""HighlightRow"" me=""Style6"" /><InactiveStyle parent=""Inactive"" me" & _
+        "=""Style4"" /><OddRowStyle parent=""OddRow"" me=""Style8"" /><RecordSelectorStyle pare" & _
+        "nt=""RecordSelector"" me=""Style10"" /><SelectedStyle parent=""Selected"" me=""Style5"" " & _
+        "/><Style parent=""Normal"" me=""Style1"" /></C1.Win.C1List.ListBoxView></Splits><Nam" & _
+        "edStyles><Style parent="""" me=""Normal"" /><Style parent=""Normal"" me=""Heading"" /><S" & _
+        "tyle parent=""Heading"" me=""Footer"" /><Style parent=""Heading"" me=""Caption"" /><Styl" & _
+        "e parent=""Heading"" me=""Inactive"" /><Style parent=""Normal"" me=""Selected"" /><Style" & _
+        " parent=""Normal"" me=""HighlightRow"" /><Style parent=""Normal"" me=""EvenRow"" /><Styl" & _
+        "e parent=""Normal"" me=""OddRow"" /><Style parent=""Heading"" me=""RecordSelector"" /><S" & _
+        "tyle parent=""Caption"" me=""Group"" /></NamedStyles><vertSplits>1</vertSplits><horz" & _
+        "Splits>1</horzSplits><Layout>Modified</Layout><DefaultRecSelWidth>17</DefaultRec" & _
+        "SelWidth></Blob>"
+        '
+        'lblEmpresa
+        '
+        Me.lblEmpresa.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.lblEmpresa.Location = New System.Drawing.Point(260, 48)
+        Me.lblEmpresa.Name = "lblEmpresa"
+        Me.lblEmpresa.Size = New System.Drawing.Size(80, 20)
+        Me.lblEmpresa.TabIndex = 371
+        Me.lblEmpresa.Text = "Empresa"
+        Me.lblEmpresa.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        '
+        'XpButton1
+        '
+        Me.XpButton1.Anchor = System.Windows.Forms.AnchorStyles.Top
+        Me.XpButton1.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.XpButton1.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft
+        Me.XpButton1.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.XpButton1.Location = New System.Drawing.Point(540, 420)
+        Me.XpButton1.Name = "XpButton1"
+        Me.XpButton1.Size = New System.Drawing.Size(164, 28)
+        Me.XpButton1.TabIndex = 245
+        Me.XpButton1.TabStop = False
+        Me.XpButton1.Text = "Imprimir Factura Representant"
+        Me.XpButton1.Visible = False
+        '
+        'btnExportarExcel
+        '
+        Me.btnExportarExcel.Anchor = System.Windows.Forms.AnchorStyles.Top
+        Me.btnExportarExcel.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.btnExportarExcel.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft
+        Me.btnExportarExcel.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.btnExportarExcel.Location = New System.Drawing.Point(716, 420)
+        Me.btnExportarExcel.Name = "btnExportarExcel"
+        Me.btnExportarExcel.Size = New System.Drawing.Size(124, 28)
+        Me.btnExportarExcel.TabIndex = 243
+        Me.btnExportarExcel.TabStop = False
+        Me.btnExportarExcel.Text = "Exportar Llistat Excel"
+        '
+        'lblTotalComision
+        '
+        Me.lblTotalComision.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.lblTotalComision.Location = New System.Drawing.Point(624, 340)
+        Me.lblTotalComision.Name = "lblTotalComision"
+        Me.lblTotalComision.Size = New System.Drawing.Size(88, 20)
+        Me.lblTotalComision.TabIndex = 242
+        Me.lblTotalComision.Text = "Total Comissió"
+        Me.lblTotalComision.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        '
+        'lblTotalBase
+        '
+        Me.lblTotalBase.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.lblTotalBase.Location = New System.Drawing.Point(396, 340)
+        Me.lblTotalBase.Name = "lblTotalBase"
+        Me.lblTotalBase.Size = New System.Drawing.Size(88, 20)
+        Me.lblTotalBase.TabIndex = 241
+        Me.lblTotalBase.Text = "Total Base"
+        Me.lblTotalBase.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        '
+        'txtTotalComis
+        '
+        Me.txtTotalComis.BackColor = System.Drawing.Color.FromArgb(CType(224, Byte), CType(211, Byte), CType(120, Byte))
+        Me.txtTotalComis.Location = New System.Drawing.Point(716, 340)
+        Me.txtTotalComis.MaxLength = 35
+        Me.txtTotalComis.Name = "txtTotalComis"
+        Me.txtTotalComis.Size = New System.Drawing.Size(124, 20)
+        Me.txtTotalComis.TabIndex = 240
+        Me.txtTotalComis.Tag = Nothing
+        '
+        'txtTotalBase
+        '
+        Me.txtTotalBase.BackColor = System.Drawing.Color.FromArgb(CType(224, Byte), CType(211, Byte), CType(120, Byte))
+        Me.txtTotalBase.Location = New System.Drawing.Point(488, 340)
+        Me.txtTotalBase.MaxLength = 5
+        Me.txtTotalBase.Name = "txtTotalBase"
+        Me.txtTotalBase.Size = New System.Drawing.Size(124, 20)
+        Me.txtTotalBase.TabIndex = 239
+        Me.txtTotalBase.Tag = Nothing
+        '
+        'btnGenerarComisiones
+        '
+        Me.btnGenerarComisiones.Anchor = System.Windows.Forms.AnchorStyles.Top
+        Me.btnGenerarComisiones.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.btnGenerarComisiones.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft
+        Me.btnGenerarComisiones.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.btnGenerarComisiones.Location = New System.Drawing.Point(480, 44)
+        Me.btnGenerarComisiones.Name = "btnGenerarComisiones"
+        Me.btnGenerarComisiones.Size = New System.Drawing.Size(104, 48)
+        Me.btnGenerarComisiones.TabIndex = 237
+        Me.btnGenerarComisiones.TabStop = False
+        Me.btnGenerarComisiones.Text = "Generar Comisions"
+        '
+        'lblImpReciboAFecha
+        '
+        Me.lblImpReciboAFecha.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.lblImpReciboAFecha.Location = New System.Drawing.Point(16, 72)
+        Me.lblImpReciboAFecha.Name = "lblImpReciboAFecha"
+        Me.lblImpReciboAFecha.Size = New System.Drawing.Size(88, 20)
+        Me.lblImpReciboAFecha.TabIndex = 236
+        Me.lblImpReciboAFecha.Text = "A Data"
+        Me.lblImpReciboAFecha.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        '
+        'lblImpReciboDeFecha
+        '
+        Me.lblImpReciboDeFecha.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.lblImpReciboDeFecha.Location = New System.Drawing.Point(16, 48)
+        Me.lblImpReciboDeFecha.Name = "lblImpReciboDeFecha"
+        Me.lblImpReciboDeFecha.Size = New System.Drawing.Size(88, 20)
+        Me.lblImpReciboDeFecha.TabIndex = 235
+        Me.lblImpReciboDeFecha.Text = "De Data"
+        Me.lblImpReciboDeFecha.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        '
+        'dtpAFecha
+        '
+        '
+        'dtpAFecha.Calendar
+        '
+        Me.dtpAFecha.Calendar.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.dtpAFecha.FormatType = C1.Win.C1Input.FormatTypeEnum.ShortDate
+        Me.dtpAFecha.Location = New System.Drawing.Point(112, 72)
+        Me.dtpAFecha.Name = "dtpAFecha"
+        Me.dtpAFecha.Size = New System.Drawing.Size(148, 20)
+        Me.dtpAFecha.TabIndex = 234
+        Me.dtpAFecha.Tag = Nothing
+        '
+        'dtpDeFecha
+        '
+        '
+        'dtpDeFecha.Calendar
+        '
+        Me.dtpDeFecha.Calendar.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.dtpDeFecha.FormatType = C1.Win.C1Input.FormatTypeEnum.ShortDate
+        Me.dtpDeFecha.Location = New System.Drawing.Point(112, 48)
+        Me.dtpDeFecha.Name = "dtpDeFecha"
+        Me.dtpDeFecha.Size = New System.Drawing.Size(148, 20)
+        Me.dtpDeFecha.TabIndex = 233
+        Me.dtpDeFecha.Tag = Nothing
+        '
+        'dgConsumos
+        '
+        Me.dgConsumos.AllowAddNew = True
+        Me.dgConsumos.AllowColMove = False
+        Me.dgConsumos.AllowColSelect = False
+        Me.dgConsumos.AllowDelete = True
+        Me.dgConsumos.AllowRowSizing = C1.Win.C1TrueDBGrid.RowSizingEnum.None
+        Me.dgConsumos.AllowSort = False
+        Me.dgConsumos.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.dgConsumos.Caption = "Llistat de COMISIONS per REPRESENTANT"
+        Me.dgConsumos.CaptionHeight = 17
+        Me.dgConsumos.FlatStyle = C1.Win.C1TrueDBGrid.FlatModeEnum.System
+        Me.dgConsumos.Font = New System.Drawing.Font("Tahoma", 9.75!)
+        Me.dgConsumos.GroupByCaption = "Drag a column header here to group by that column"
+        Me.dgConsumos.Images.Add(CType(resources.GetObject("resource2"), System.Drawing.Image))
+        Me.dgConsumos.Location = New System.Drawing.Point(16, 96)
+        Me.dgConsumos.MarqueeStyle = C1.Win.C1TrueDBGrid.MarqueeEnum.DottedRowBorder
+        Me.dgConsumos.Name = "dgConsumos"
+        Me.dgConsumos.PreviewInfo.Location = New System.Drawing.Point(0, 0)
+        Me.dgConsumos.PreviewInfo.Size = New System.Drawing.Size(0, 0)
+        Me.dgConsumos.PreviewInfo.ZoomFactor = 75
+        Me.dgConsumos.RecordSelectorWidth = 17
+        Me.dgConsumos.RowDivider.Color = System.Drawing.Color.DarkGray
+        Me.dgConsumos.RowDivider.Style = C1.Win.C1TrueDBGrid.LineStyleEnum.Single
+        Me.dgConsumos.RowHeight = 15
+        Me.dgConsumos.RowSubDividerColor = System.Drawing.Color.DarkGray
+        Me.dgConsumos.Size = New System.Drawing.Size(824, 236)
+        Me.dgConsumos.SpringMode = True
+        Me.dgConsumos.TabAction = C1.Win.C1TrueDBGrid.TabActionEnum.GridNavigation
+        Me.dgConsumos.TabIndex = 232
+        Me.dgConsumos.Text = "C1TrueDBGrid1"
+        Me.dgConsumos.WrapCellPointer = True
+        Me.dgConsumos.PropBag = "<?xml version=""1.0""?><Blob><Styles type=""C1.Win.C1TrueDBGrid.Design.ContextWrappe" & _
+        "r""><Data>Group{AlignVert:Center;Border:None,,0, 0, 0, 0;BackColor:ControlDark;}S" & _
+        "tyle12{}Style13{}Style5{}Style4{}Style7{}Style6{}EvenRow{BackColor:Aqua;}Selecte" & _
+        "d{ForeColor:HighlightText;BackColor:192, 192, 0;}Heading{Wrap:True;BackColor:Con" & _
+        "trol;Border:Raised,,1, 1, 1, 1;ForeColor:ControlText;AlignVert:Center;}Inactive{" & _
+        "ForeColor:InactiveCaptionText;BackColor:InactiveCaption;}FilterBar{}OddRow{}Foot" & _
+        "er{}Caption{AlignHorz:Center;ForeColor:HotTrack;}Normal{Font:Tahoma, 9.75pt;}Sty" & _
+        "le10{AlignHorz:Near;}HighlightRow{ForeColor:HighlightText;BackColor:Highlight;}E" & _
+        "ditor{}Style11{}RecordSelector{AlignImage:Center;}Style9{}Style8{}Style3{}Style2" & _
+        "{}Style14{}Style15{}Style1{}</Data></Styles><Splits><C1.Win.C1TrueDBGrid.MergeVi" & _
+        "ew AllowColMove=""False"" AllowColSelect=""False"" Name="""" AllowRowSizing=""None"" Cap" & _
+        "tionHeight=""17"" ColumnCaptionHeight=""17"" ColumnFooterHeight=""17"" MarqueeStyle=""D" & _
+        "ottedRowBorder"" RecordSelectorWidth=""17"" DefRecSelWidth=""17"" VerticalScrollGroup" & _
+        "=""1"" HorizontalScrollGroup=""1"" SpringMode=""True""><CaptionStyle parent=""Style2"" m" & _
+        "e=""Style10"" /><EditorStyle parent=""Editor"" me=""Style5"" /><EvenRowStyle parent=""E" & _
+        "venRow"" me=""Style8"" /><FilterBarStyle parent=""FilterBar"" me=""Style13"" /><FooterS" & _
+        "tyle parent=""Footer"" me=""Style3"" /><GroupStyle parent=""Group"" me=""Style12"" /><He" & _
+        "adingStyle parent=""Heading"" me=""Style2"" /><HighLightRowStyle parent=""HighlightRo" & _
+        "w"" me=""Style7"" /><InactiveStyle parent=""Inactive"" me=""Style4"" /><OddRowStyle par" & _
+        "ent=""OddRow"" me=""Style9"" /><RecordSelectorStyle parent=""RecordSelector"" me=""Styl" & _
+        "e11"" /><SelectedStyle parent=""Selected"" me=""Style6"" /><Style parent=""Normal"" me=" & _
+        """Style1"" /><ClientRect>0, 17, 820, 215</ClientRect><BorderSide>0</BorderSide></C" & _
+        "1.Win.C1TrueDBGrid.MergeView></Splits><NamedStyles><Style parent="""" me=""Normal"" " & _
+        "/><Style parent=""Normal"" me=""Heading"" /><Style parent=""Heading"" me=""Footer"" /><S" & _
+        "tyle parent=""Heading"" me=""Caption"" /><Style parent=""Heading"" me=""Inactive"" /><St" & _
+        "yle parent=""Normal"" me=""Selected"" /><Style parent=""Normal"" me=""Editor"" /><Style " & _
+        "parent=""Normal"" me=""HighlightRow"" /><Style parent=""Normal"" me=""EvenRow"" /><Style" & _
+        " parent=""Normal"" me=""OddRow"" /><Style parent=""Heading"" me=""RecordSelector"" /><St" & _
+        "yle parent=""Normal"" me=""FilterBar"" /><Style parent=""Caption"" me=""Group"" /></Name" & _
+        "dStyles><vertSplits>1</vertSplits><horzSplits>1</horzSplits><Layout>Modified</La" & _
+        "yout><DefaultRecSelWidth>17</DefaultRecSelWidth><ClientArea>0, 0, 820, 232</Clie" & _
+        "ntArea><PrintPageHeaderStyle parent="""" me=""Style14"" /><PrintPageFooterStyle pare" & _
+        "nt="""" me=""Style15"" /></Blob>"
+        '
+        'frmRepresentantesForm
+        '
+        Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
+        Me.BackColor = System.Drawing.Color.FromArgb(CType(197, Byte), CType(180, Byte), CType(207, Byte))
+        Me.ClientSize = New System.Drawing.Size(894, 576)
+        Me.Controls.Add(Me.tabControlRepresentantes)
+        Me.Cursor = System.Windows.Forms.Cursors.Default
+        Me.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!)
+        Me.KeyPreview = True
+        Me.Name = "frmRepresentantesForm"
+        Me.Text = " Representants"
+        Me.Controls.SetChildIndex(Me.sbtipo, 0)
+        Me.Controls.SetChildIndex(Me.btnActualizar, 0)
+        Me.Controls.SetChildIndex(Me.btnNuevo, 0)
+        Me.Controls.SetChildIndex(Me.btnBorrar, 0)
+        Me.Controls.SetChildIndex(Me.btnTancar, 0)
+        Me.Controls.SetChildIndex(Me.btnUltimo, 0)
+        Me.Controls.SetChildIndex(Me.btnPrimero, 0)
+        Me.Controls.SetChildIndex(Me.btnAnterior, 0)
+        Me.Controls.SetChildIndex(Me.btnSiguiente, 0)
+        Me.Controls.SetChildIndex(Me.btnRecargar, 0)
+        Me.Controls.SetChildIndex(Me.btnVerLista, 0)
+        Me.Controls.SetChildIndex(Me.btnModificar, 0)
+        Me.Controls.SetChildIndex(Me.cboSeleccionCentro, 0)
+        Me.Controls.SetChildIndex(Me.tabControlRepresentantes, 0)
+        Me.tabControlRepresentantes.ResumeLayout(False)
+        Me.tabPageRepresentantes.ResumeLayout(False)
+        Me.GroupBox1.ResumeLayout(False)
+        CType(Me.txtPAIS, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.txtEMAIL, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.txtTEL2, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.txtCODI, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.cboID, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.txtPROV, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.txtPOB, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.txtCP, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.txtDOM, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.txtNIF, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.txtTEL, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.txtFAX, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.txtCOMIS, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.txtOBSERV, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.tabPageComisiones.ResumeLayout(False)
+        CType(Me.txtTotalComisionImpuestos, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.txtIRPF, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.txtIVA, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.dtpFactura, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.txtFactura, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.cboEmpresaEnvio, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.txtTotalComis, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.txtTotalBase, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.dtpAFecha, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.dtpDeFecha, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.dgConsumos, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.ResumeLayout(False)
+
+    End Sub
+
+#End Region
+
+    Shared frmChildForm As frmRepresentantesForm
+    Public Shared Function GetInstance() As frmRepresentantesForm
+        If frmChildForm Is Nothing Then
+            frmChildForm = New frmRepresentantesForm
+        End If
+        Return frmChildForm
+    End Function
+
+#Region "VARIABLES"
+
+    Public registroActual As clsRepresentante
+
+#End Region
+
+#Region "INICIALIZAR"
+
+    Private Sub IniciarForm(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
+        Try
+            Cursor = Cursors.WaitCursor
+            cargando = True
+            tabla = tablaRepresentantes
+
+            registroActual = New clsRepresentante(ds.Tables(tabla), "C", BindingContext)
+            HacerBindings()
+            'registroActual.tabla.AcceptChanges()
+            PonerModificables(soloLectura)
+            PonerHandlersErroresParaGrids()
+            PSBTIPO(registroActual.centro) : cargando = False
+            dtpDeFecha.Value = Date.Now.AddMonths(-3)
+            dtpAFecha.Value = Date.Now
+            cboEmpresaEnvio.SelectedValue = empresaPorDefecto
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+        Cursor = Cursors.Default
+    End Sub
+    Private Sub HacerBindings()
+        Try
+            cboID.DataBindings.Add(New Binding("Text", registroActual.dvForm, "NOM"))
+            AñadirBinding(txtCODI, registroActual.dvForm, "CODI")
+            AñadirBindingCombo(cboEmpresaEnvio, dtFiliales, "CODI", "DESCRI")
+            AñadirBindingCombo(cboID, registroActual.dvIdentificadores, CCRepres, CNRepres)
+            HacerBindingsTodos(registroActual.dvForm)
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+
+#End Region
+
+#Region "MODIFICAR DB"
+
+    Private Sub ActualizarOrigen()
+        Try
+            If editando Then
+                editando = False
+                PonerModificables(soloLectura)
+            End If
+            If EsRegistroNuevo Then
+                editando = True : PSBTIPO(registroActual.centro)
+                PonerControlesNuevo(True)
+                EsRegistroNuevo = False
+                'MoverActual()
+            End If
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Friend Overrides Sub btnActualizar_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) 'Handles btnActualizar.Click
+        Try
+            cargando = True
+            If registroActual.TieneCambios Then
+                Select Case MessageBox.Show(rm.GetString("QUIERECONFIRMARLOSCAMBIOS"), rm.GetString("INFORMACION"), MessageBoxButtons.YesNoCancel)
+                    Case DialogResult.Cancel
+                        cargando = False
+                        Exit Sub
+                    Case DialogResult.No
+                        registroActual.tabla.RejectChanges()
+                        cargando = False
+                        Exit Sub
+                End Select
+            End If
+            registroActual.ActualizarOrigen() : ActualizarOrigen()
+            PSBTIPO(registroActual.centro) : cargando = False
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Friend Overrides Sub btnBorrar_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) 'Handles btnBorrar.Click
+        Try
+            If MessageBox.Show(rm.GetString("BorrarRepresentante"), rm.GetString("ConfirmacionEliminacion"), MessageBoxButtons.YesNo) = DialogResult.Yes Then
+                editando = True
+                registroActual.borrar()
+                ActualizarOrigen()
+                editando = False
+            End If
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Friend Overrides Sub btnNuevo_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) 'Handles btnNuevo.Click
+        Try
+            cargando = True
+            PonerModificables(modificable)
+            EsRegistroNuevo = True
+            PonerControlesNuevo(False)
+            registroActual.NuevoRegistro()
+            PSBTIPO(registroActual.centro) : cargando = False
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+
+    End Sub
+    Friend Overrides Sub btnModificar_Click(ByVal sender As Object, ByVal e As System.EventArgs) 'Handles btnModificar.Click
+        Try
+            If Not editando Then
+                cargando = True
+                editando = True
+                PonerModificables(modificable)
+                PSBTIPO(registroActual.centro)
+                cargando = False
+            End If
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+
+#End Region
+
+#Region "ESPECÍFICO"
+
+#End Region
+
+#Region "IMPRESIÓN"
+
+#End Region
+
+#Region "COMUNES"
+
+    Private Sub btnVerLista_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnVerLista.Click
+        Try
+            Cursor = Cursors.WaitCursor
+            Dim f As frmRepresentantesLista = frmRepresentantesLista.GetInstance(esListado)
+            f.MdiParent = Me.MdiParent
+            AddHandler f.Closed, AddressOf CType(Me.MdiParent, frmPrincipal).childCerrado
+            AddHandler f.Load, AddressOf CType(Me.MdiParent, frmPrincipal).childAbierto : AddHandler f.Activated, AddressOf CType(Me.MdiParent, frmPrincipal).childOcultandoMostrando
+            f.Show()
+            f.BringToFront()
+            Cursor = Cursors.Default
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub PonerControlesNuevo(ByVal b As Boolean)
+        Try
+
+            If Not b Then
+                btnActualizar.Text = rm.GetString("CONFIRMAR")
+            Else
+                btnActualizar.Text = rm.GetString("ACTUALIZAR")
+            End If
+            ModiNuev(b)
+            cboID.AutoCompletion = Not editando
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub PonerModificables(Optional ByVal b As Boolean = False)
+        Try
+            PonerMod(b)
+            If Not b Then : cboID.DataSource = Nothing
+            Else : AñadirBindingCombo(cboID, registroActual.dvIdentificadores, CCRepres, CNRepres) : registroActual.tabla.AcceptChanges() : End If
+
+            cboID.LimitToList = b
+            cboID.SuperBack = b
+            txtCODI.ReadOnly = editando Or EsRegistroNuevo
+            ModiNuev(b)
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Friend Sub btnRecargar_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnRecargar.Click
+        Try
+            cargando = True
+            registroActual.ActualizarOrigen()
+            registroActual.CambiarAReg(nzn(txtCODI.Text, 0), iraregistro)
+            cargando = False
+
+        Catch ex As Exception
+            LOG(ex.ToString) : CCN() : cargando = False
+        End Try
+    End Sub
+
+#End Region
+
+#Region "DESPLAZARSE"
+
+    Protected Friend Overrides Sub btnPrimero_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) 'Handles btnPrimero.Click
+        Try
+            cargando = True
+            registroActual.PrimeroReg() : ActualizarOrigen()
+            PSBTIPO(registroActual.centro) : cargando = False
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Friend Overrides Sub btnUltimo_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) 'Handles btnUltimo.Click
+        Try
+            cargando = True
+            registroActual.UltimoReg() : ActualizarOrigen()
+            PSBTIPO(registroActual.centro) : cargando = False
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Friend Overrides Sub btnAnterior_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) 'Handles btnAnterior.Click
+        Try
+            cargando = True
+            registroActual.AnteriorReg() : ActualizarOrigen()
+            PSBTIPO(registroActual.centro) : cargando = False
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Friend Overrides Sub btnSiguiente_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) 'Handles btnSiguiente.Click
+        Try
+            cargando = True
+            registroActual.SiguienteReg() : ActualizarOrigen()
+            PSBTIPO(registroActual.centro) : cargando = False
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+
+#End Region
+
+#Region "SELECCIÓN REGISTRO"
+
+    Private Sub btnElegirRepresentante_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnElegirRepresentante.Click
+        Try
+            Cursor = Cursors.WaitCursor
+            Dim f As frmRepresentantesLista = frmRepresentantesLista.GetInstance(esEleccion)
+            f.ShowDialog()
+            Cursor = Cursors.Default
+            If Not f.dr Is Nothing Then registroActual.CambiarAReg(f.dr("CODI"), iraregistro)
+            f = Nothing
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub cboID_ItemChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles cboID.RowChange
+        Dim SQL As String
+        Try
+            If consulta() Then
+                cargando = True
+                registroActual.CambiarAReg(ponercontrabarrasreal(cboID.WillChangeToValue), iraregistro)
+                PSBTIPO(registroActual.centro) : cargando = False
+            End If
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub txtCODI_Validated(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtCODI.Validated
+        If Not cargando Then
+            cargando = True
+            ValidarCambio()
+            cargando = False
+        End If
+    End Sub
+    Private Sub txtID_KeyPress(ByVal sender As System.Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles txtCODI.KeyDown
+        Try
+            If consulta() Then
+                cargando = True
+                If e.KeyCode = Keys.Enter OrElse e.KeyCode = Keys.Tab Then
+                    ValidarCambio()
+                Else
+                    BindingContext(registroActual.dvForm).SuspendBinding()
+                    PSBTIPO(registroActual.centro)
+                End If
+                cargando = False
+            End If
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub ValidarCambio()
+        Try
+            If Not EsRegistroNuevo AndAlso Not editando Then
+                Dim IDAbuscar As Integer
+                cargando = True
+                IDAbuscar = nzn(txtCODI.Text, 0)
+                BindingContext(registroActual.dvForm).ResumeBinding()
+                registroActual.CambiarAReg(IDAbuscar, iraregistro)
+                PSBTIPO(registroActual.centro) : cargando = False
+            Else
+                If EsRegistroNuevo Then
+                    'BindingContext(clienteActual.dvForm).SuspendBinding()
+                    If ExisteID(tabla, nzn(txtCODI.Text, -1), registroActual.centro) Then 'clienteActual.dvForm.Find(nzn(txtID.Text, 0)) <> -1 Then
+                        MessageBox.Show(rm.GetString("CODIGOYAEXISTENTE"), "", MessageBoxButtons.OK)
+                        txtCODI.Focus()
+                        BindingContext(registroActual.dvForm).ResumeBinding()
+                    End If
+                End If
+            End If
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Sub
+    Private Sub cboID_KeyPress(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyPressEventArgs) Handles cboID.KeyPress
+        Try
+            If editando Or EsRegistroNuevo Then
+                cboID.AutoCompletion = False
+            Else
+                cboID.AutoCompletion = True
+            End If
+
+        Catch ex As Exception
+            MessageBox.Show(ex.ToString)
+        End Try
+    End Sub
+
+#Region "SELECCION CENTRO"
+
+    Private Sub cboSeleccion_ItemChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles cboSeleccionCentro.SelectionChangeCommitted
+        Try
+            If consulta() Then
+                cargando = True
+                registroActual.cambioCentro(nz(cboSeleccionCentro.SelectedValue, empresaPorDefecto), primero)
+                'registroActual.tabla.AcceptChanges()
+                cboSeleccionCentro.SelectedValue = registroActual.centro
+                cargando = False
+            Else
+                If EsRegistroNuevo And Not cargando Then
+                    cargando = True
+                    registroActual.centro = nz(cboSeleccionCentro.SelectedValue, empresaPorDefecto)
+                    registroActual.tabla.Clear()
+                    registroActual.NuevoRegistro()
+                    PSBTIPO(registroActual.centro)
+                    cargando = False
+                End If
+            End If
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+
+#End Region
+
+#End Region
+
+#Region "ELECCIONES"
+
+#End Region
+
+    Private Sub frm_Closed(ByVal sender As Object, ByVal e As System.EventArgs) Handles MyBase.Closed
+        GrabaParametro(registroActual.CODI, "representante")
+    End Sub
+
+    Private Sub IniciarDGConsumos()
+        Dim i As Integer
+        Try
+            OcultarColumnasDG(dgConsumos)
+            i = 0
+            PPCol2("FRA", dgConsumos, rm.GetString("FACTURA"), "", True, 150, False, C1.Win.C1TrueDBGrid.PresentationEnum.Normal, False, 150, i, False, Nothing, False)
+            i = 1
+            PPCol2("DATA", dgConsumos, rm.GetString("FECHA"), "Short Date", True, 150, False, C1.Win.C1TrueDBGrid.PresentationEnum.Normal, False, 150, i, False, Nothing, False)
+            i = 2
+            PPCol2("NOMCLIENT", dgConsumos, rm.GetString("CLIENTE"), "", True, 150, False, C1.Win.C1TrueDBGrid.PresentationEnum.Normal, False, 150, i, False, Nothing, False)
+            i = 3
+            PPCol2("BASE1", dgConsumos, rm.GetString("BASE"), "#,##0.00", True, 100, False, C1.Win.C1TrueDBGrid.PresentationEnum.Normal, False, 70, i, False, Nothing, False)
+            i = 4
+            PPCol2("COMIS", dgConsumos, "%", "#,##0.00", True, 250, False, C1.Win.C1TrueDBGrid.PresentationEnum.Normal, False, 70, i, False, Nothing, False)
+            i = i + 1
+            PPCol2("TOTALCOMIS", dgConsumos, rm.GetString("COMISION"), "#,##0.00", True, 100, False, C1.Win.C1TrueDBGrid.PresentationEnum.Normal, False, 70, i, False, Nothing, False)
+            AutoSizeCC(dgConsumos)
+            'Los colores son los mismos que hemos cargado en detalle colores.
+            'Por lo que hay que copiar los elementos del combo de detalle de colores
+            'al nuevo
+            'CargarColoresregistroActualAnulaciones(ts.GridColumnStyles(CType("COLOR", Object)).columncombobox)
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub btnGenerarRecibo_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnGenerarComisiones.Click
+        Dim totalIVA, totalIRPF As Double
+        Try
+            registroActual.generarComisiones(nz(dtpDeFecha.Value, Date.Now, False, True), nz(dtpAFecha.Value, Date.Now, False, True), nz(txtIVA.Value, 0, True), nz(txtIRPF.Value, 0, True))
+            registroActual.dtComisiones.DefaultView.Sort = "FRA DESC"
+            dgConsumos.SetDataBinding(registroActual.dtComisiones.DefaultView, "")
+            IniciarDGConsumos()
+            txtTotalBase.Value = Format(nzn(sumaTotal("BASE1", registroActual.dtComisiones.DefaultView), 0), "#,##0.00")
+            txtTotalComis.Value = Format(nzn(sumaTotal("TOTALCOMIS", registroActual.dtComisiones.DefaultView), 0), "#,##0.00")
+            totalIVA = txtTotalBase.Value * txtIVA.Value
+            totalIRPF = txtTotalBase.Value * txtIRPF.Value
+            txtTotalComisionImpuestos.Value = txtTotalBase.Value - totalIRPF + totalIVA
+
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+
+    End Sub
+
+    Private Sub btnExportarExcel_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnExportarExcel.Click
+        Try
+            Dim xls As New ExcelDirecto.ExcelDirecto
+            Dim l As New ListBox
+            Dim i As Integer
+            For i = 0 To dgConsumos.Splits(0).DisplayColumns.Count - 1
+                l.Items.Add(dgConsumos.Splits(0).DisplayColumns(i).DataColumn.DataField)
+            Next
+            Dim clsa As New clsArrays
+            xls.CrearExcel(dgConsumos, "Comisions REPRESENTANT", True)
+
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+
+    End Sub
+
+    Private Sub tabPageComisiones_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles tabPageComisiones.Click
+
+    End Sub
+
+    Private Sub XpButton1_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles XpButton1.Click
+
+    End Sub
+End Class

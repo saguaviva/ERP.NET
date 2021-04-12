@@ -1,0 +1,3731 @@
+<?xml version="1.0" standalone="yes" ?>
+<xs:schema id="ds11" xmlns="" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata"
+	xmlns:msprop="urn:schemas-microsoft-com:xml-msprop">
+	<xs:element name="ds11" msdata:IsDataSet="true" msdata:Locale="es-ES">
+		<xs:complexType>
+			<xs:choice maxOccurs="unbounded">
+				<xs:element name="acabatsteixits">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="ACABAT" default="">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="255" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="prove" type="xs:int" default="0" />
+							<xs:element name="TEIXIT" default="">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="10" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="CENTRO" default="C">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="1" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="NOMPROVE" type="xs:string" minOccurs="0" />
+							<xs:element name="ORDEN" type="xs:int" minOccurs="0" />
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="anul">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="ORDRE" type="xs:double" default="0" />
+							<xs:element name="EXPEDICIO" type="xs:double" minOccurs="0" />
+							<xs:element name="FABRICACIO" type="xs:double" minOccurs="0" />
+							<xs:element name="COLOR" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="10" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="LINEA" type="xs:int" default="0" />
+							<xs:element name="COL" type="xs:double" minOccurs="0" />
+							<xs:element name="ORIGEN" type="xs:double" minOccurs="0" />
+							<xs:element name="TALLA" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="3" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="UNIT" type="xs:double" minOccurs="0" />
+							<xs:element name="MOTIU" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="50" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="CENTRO" default="C">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="1" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="bancs">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="CODI" default="0000">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="4" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="DESCRIPCIO" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="255" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="LOGO" type="xs:base64Binary" minOccurs="0" />
+							<xs:element name="CENTRO" default="C">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="1" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="IBAN" type="xs:string" minOccurs="0" />
+							<xs:element name="SWIFT" type="xs:string" minOccurs="0" />
+							<xs:element name="NUMCUENTA" type="xs:string" minOccurs="0" />
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="cactur">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="TIPUS" default="">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="1" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="DOCUMENT" default="">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="1" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="FRA" type="xs:int" default="0" />
+							<xs:element name="prove" type="xs:int" minOccurs="0" />
+							<xs:element name="NRO" type="xs:int" minOccurs="0" />
+							<xs:element name="DATA" type="xs:date" minOccurs="0" />
+							<xs:element name="DATAENTREGA" type="xs:date" minOccurs="0" />
+							<xs:element name="BASE1" type="xs:double" minOccurs="0" />
+							<xs:element name="P_IVA1" type="xs:double" minOccurs="0" />
+							<xs:element name="IVA1" type="xs:double" minOccurs="0" />
+							<xs:element name="TOTAL" type="xs:double" minOccurs="0" />
+							<xs:element name="P_DTE" type="xs:double" minOccurs="0" />
+							<xs:element name="DTE1" type="xs:double" minOccurs="0" />
+							<xs:element name="BRUT1" type="xs:double" minOccurs="0" />
+							<xs:element name="TRASPAS" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:boolean"></xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="P_RE1" type="xs:double" minOccurs="0" />
+							<xs:element name="RE1" type="xs:double" minOccurs="0" />
+							<xs:element name="VENCIM" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="1" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="TRASPASF" type="xs:short" minOccurs="0" />
+							<xs:element name="OBSERV" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="16777215" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="CENTRO" default="C">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="1" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="NOMPROVE" type="xs:string" minOccurs="0" />
+							<xs:element name="COMANDAMOSTRA" type="xs:int" minOccurs="0" />
+							<xs:element name="TALLER" type="xs:int" minOccurs="0" />
+							<xs:element name="NOMTALLER" type="xs:string" minOccurs="0" />
+							<xs:element name="ORDENFABCOMP" type="xs:int" minOccurs="0" />
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="adres">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="CODI" type="xs:int" default="0" />
+							<xs:element name="DOM" default="">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="255" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="PROV" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="255" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="POB" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="255" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="CP" type="xs:int" minOccurs="0" />
+							<xs:element name="TEL" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="255" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="FAX" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="255" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="PAIS" type="xs:string" minOccurs="0" />
+							<xs:element name="CENTRO" default="C">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="1" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="NOM" type="xs:string" minOccurs="0" />
+							<xs:element name="CONTACTE" type="xs:string" minOccurs="0" />
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="clients">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="CODI" type="xs:int" default="0" />
+							<xs:element name="CENTRO" default="C">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="1" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="NOM" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="35" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="DOM" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="255" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="CP" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="15" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="TEL" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="20" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="FAX" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="20" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="POB" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="30" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="PROV" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="30" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="NIF" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="16" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="NOTES" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="65535" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="CONTACTE" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="40" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="FORMA" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="8" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="DIA1" type="xs:int" minOccurs="0" />
+							<xs:element name="DIA2" type="xs:int" minOccurs="0" />
+							<xs:element name="DIA3" type="xs:int" minOccurs="0" />
+							<xs:element name="BANC" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="4" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="TEL2" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="255" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="PORTSDEBUTS" type="xs:boolean" default="false" />
+							<xs:element name="COFI" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="4" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="OFI" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="30" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="DC" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="2" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="CTA" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="10" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="IVA" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="8" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="TRANS" type="xs:int" minOccurs="0" />
+							<xs:element name="SUBCTA" type="xs:double" minOccurs="0" />
+							<xs:element name="TRASPAS" type="xs:boolean" default="false" />
+							<xs:element name="CARTERA" type="xs:boolean" default="false" />
+							<xs:element name="REPRES" type="xs:int" minOccurs="0" />
+							<xs:element name="MONEDA" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="1" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="PORTSPAGATS" type="xs:boolean" default="false" />
+							<xs:element name="DTOFORMA" type="xs:double" minOccurs="0" />
+							<xs:element name="PAIS" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="35" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="WEB" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="255" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="EMAIL1" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="255" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="EMAIL2" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="255" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="NOMFORMA" type="xs:string" minOccurs="0" />
+							<xs:element name="NOMBANC" type="xs:string" minOccurs="0" />
+							<xs:element name="NOMTRANS" type="xs:string" minOccurs="0" />
+							<xs:element name="NOMREPRES" type="xs:string" minOccurs="0" />
+							<xs:element name="NUMEROPROVE" type="xs:string" minOccurs="0" />
+							<xs:element name="MESESCOMPLETOS" type="xs:boolean" minOccurs="0" default="false" />
+							<xs:element name="INCOTERM" type="xs:string" minOccurs="0" />
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="color">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="MOSTRA" default="">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="10" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="GRADUACION" type="xs:int" minOccurs="0" />
+							<xs:element name="TALLA" default="">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="10" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="LINEA" type="xs:int" default="0" />
+							<xs:element name="COLOR" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="10" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="FIL" type="xs:double" minOccurs="0" />
+							<xs:element name="TEIXIT" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="10" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="prove" type="xs:double" minOccurs="0" />
+							<xs:element name="CAPS" type="xs:double" minOccurs="0" />
+							<xs:element name="PASSADES" type="xs:double" minOccurs="0" />
+							<xs:element name="CONSUM" type="xs:double" minOccurs="0" />
+							<xs:element name="PREU" type="xs:double" minOccurs="0" />
+							<xs:element name="IMPORT" type="xs:double" minOccurs="0" />
+							<xs:element name="COLORM" default="">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="10" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="CLIENT" type="xs:int" default="0" />
+							<xs:element name="CENTRO" default="C">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="1" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="NOMPROVE" type="xs:string" minOccurs="0" />
+							<xs:element name="NOMCLIENT" type="xs:string" minOccurs="0" />
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="cordre">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="ORDRE" type="xs:double" default="0" />
+							<xs:element name="CENTRO" default="C">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="1" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="TEMPORADA" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="50" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="EXPEDICIO" type="xs:double" minOccurs="0" />
+							<xs:element name="ENTRADA" type="xs:date" minOccurs="0" />
+							<xs:element name="PREVISTA" type="xs:date" minOccurs="0" />
+							<xs:element name="FINAL" type="xs:date" minOccurs="0" />
+							<xs:element name="MODEL" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="10" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="CLIENT" type="xs:int" minOccurs="0" />
+							<xs:element name="SERIE" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="10" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="ALBARA" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="10" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="OBSERV" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="16777215" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="PREU" type="xs:double" minOccurs="0" />
+							<xs:element name="FET" type="xs:short" minOccurs="0" />
+							<xs:element name="ALB" type="xs:boolean" default="false" minOccurs="0" />
+							<xs:element name="MOS" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="1" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="TALLA01" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="3" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="TALLA02" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="3" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="TALLA03" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="3" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="TALLA04" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="3" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="TALLA05" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="3" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="TALLA06" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="3" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="TALLA07" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="3" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="TALLA08" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="3" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="TALLA09" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="3" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="TALLA10" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="3" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="REPRES" type="xs:int" minOccurs="0" />
+							<xs:element name="COMIS" type="xs:double" minOccurs="0" />
+							<xs:element name="NOMCLIENT" type="xs:string" minOccurs="0" />
+							<xs:element name="NOMREPRES" type="xs:string" minOccurs="0" />
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="dacabats">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="CODI" default="">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="255" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="prove" type="xs:int" default="0" />
+							<xs:element name="PREUK" type="xs:double" default="0" />
+							<xs:element name="PREUM" type="xs:double" default="0" />
+							<xs:element name="CENTRO" default="C">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="1" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="NOMPROVE" type="xs:string" minOccurs="0" />
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="dcactu">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="CENTRO" default="C">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="1" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="TIPUS" default="">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="1" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="DOCUMENT" default="">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="1" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="FRA" type="xs:int" default="0" />
+							<xs:element name="NLINEA" type="xs:int" default="0" />
+							<xs:element name="ARTICLE" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="10" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="DESCRI" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="50" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="COLOR" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="10" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="TALLA" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="10" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="UNITATS" type="xs:double" minOccurs="0" />
+							<xs:element name="PREU" type="xs:double" minOccurs="0" />
+							<xs:element name="DTE" type="xs:double" minOccurs="0" />
+							<xs:element name="IMPORT" type="xs:double" minOccurs="0" />
+							<xs:element name="COMAN" type="xs:int" minOccurs="0" />
+							<xs:element name="ALBAR" type="xs:int" minOccurs="0" />
+							<xs:element name="FACTURA" type="xs:int" minOccurs="0" />
+							<xs:element name="KM" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="1" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="REBUT" type="xs:double" default="0" />
+							<xs:element name="PERREBRE" type="xs:double" default="0" minOccurs="0" />
+							<xs:element name="ESTOC" type="xs:boolean" default="false" />
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="dcacturebuts">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="FRA" type="xs:int" default="0" />
+							<xs:element name="TIPUS" default="">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="1" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="DOCUMENT" default="">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="1" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="DATA" type="xs:date" />
+							<xs:element name="QUANTITAT" type="xs:double" minOccurs="0" />
+							<xs:element name="KM" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="1" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="ALBARA" default="">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="50" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="SUMATESTOC" type="xs:boolean" default="false" minOccurs="0" />
+							<xs:element name="NLINEA" type="xs:int" default="0" />
+							<xs:element name="CENTRO" default="C">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="1" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="dcfactutrasp">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="FRA" type="xs:double" default="0" />
+							<xs:element name="TIPUS" default="">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="1" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="DOCUMENT" default="">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="1" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="DATA" type="xs:date" />
+							<xs:element name="QUANTITAT" type="xs:double" minOccurs="0" />
+							<xs:element name="NLINEA" type="xs:int" default="0" />
+							<xs:element name="ALINEA" type="xs:integer" default="0" />
+							<xs:element name="TRASPASADA" type="xs:boolean" default="false" minOccurs="0" />
+							<xs:element name="VC" default="">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="1" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="COMAN" type="xs:double" default="0" />
+							<xs:element name="ALBAR" type="xs:double" default="0" />
+							<xs:element name="CENTRO" default="C">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="1" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="TALLA01" type="xs:double" minOccurs="0" />
+							<xs:element name="TALLA02" type="xs:double" minOccurs="0" />
+							<xs:element name="TALLA03" type="xs:double" minOccurs="0" />
+							<xs:element name="TALLA04" type="xs:double" minOccurs="0" />
+							<xs:element name="TALLA05" type="xs:double" minOccurs="0" />
+							<xs:element name="TALLA06" type="xs:double" minOccurs="0" />
+							<xs:element name="TALLA07" type="xs:double" minOccurs="0" />
+							<xs:element name="TALLA08" type="xs:double" minOccurs="0" />
+							<xs:element name="TALLA09" type="xs:double" minOccurs="0" />
+							<xs:element name="TALLA10" type="xs:double" minOccurs="0" />
+							<xs:element name="TALLER" type="xs:integer" minOccurs="0" />
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="ddispos">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="CENTRO" default="C">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="1" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="DESCRIPCIO" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="255" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="LINEA" type="xs:int" default="0" />
+							<xs:element name="DISPOS" type="xs:int" default="0" />
+							<xs:element name="TEJEDOR" type="xs:int" minOccurs="0" />
+							<xs:element name="NALBARAN" default="">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="11" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="TEJIDO" default="">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="10" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="COMPOS" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="255" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="NPIEZAS" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="255" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="TOTALPIEZAS" type="xs:double" minOccurs="0" />
+							<xs:element name="TOTALKG" type="xs:double" minOccurs="0" />
+							<xs:element name="ACABADO" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="255" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="ANCHO" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="255" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="GRAMAJE" type="xs:double" minOccurs="0" />
+							<xs:element name="RENDIMIENTO" type="xs:double" minOccurs="0" />
+							<xs:element name="SERVIDO" type="xs:boolean" default="false" />
+							<xs:element name="DISPUESTO" type="xs:boolean" default="false" />
+							<xs:element name="NOMTEJEDOR" type="xs:string" minOccurs="0" />
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="bancscuentas">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="BANC" type="xs:int" default="0" />
+							<xs:element name="CUENTA" default="">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="255" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="CENTRO" default="C">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="1" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="NOMBANC" type="xs:string" minOccurs="0" />
+							<xs:element name="TIPO" type="xs:string" minOccurs="0" />
+							<xs:element name="DOM" type="xs:string" minOccurs="0" />
+							<xs:element name="PROV" type="xs:string" minOccurs="0" />
+							<xs:element name="POB" type="xs:string" minOccurs="0" />
+							<xs:element name="CP" type="xs:string" minOccurs="0" />
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="dfactu">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="TIPUS" default="">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="1" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="DOCUMENT" default="">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="1" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="FRA" type="xs:int" default="0" />
+							<xs:element name="CENTRO" default="C">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="1" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="NLINEA" type="xs:int" default="0" />
+							<xs:element name="MOSTRA" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="10" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="DESCRI" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="50" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="TALLA" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="10" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="UNITATS" type="xs:double" minOccurs="0" />
+							<xs:element name="PREU" type="xs:double" minOccurs="0" />
+							<xs:element name="DTE" type="xs:double" minOccurs="0" />
+							<xs:element name="IMPORT" type="xs:double" minOccurs="0" />
+							<xs:element name="COMAN" type="xs:double" minOccurs="0" />
+							<xs:element name="ALBAR" type="xs:double" minOccurs="0" />
+							<xs:element name="FACTURA" type="xs:double" minOccurs="0" />
+							<xs:element name="ESTOC" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:boolean"></xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="COLOR" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="10" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="KM" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="1" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="NTRAS" type="xs:int" minOccurs="0" />
+							<xs:element name="PERREBRE" type="xs:double" minOccurs="0" />
+							<xs:element name="REBUT" type="xs:double" minOccurs="0" />
+							<xs:element name="ALBARA" type="xs:string" minOccurs="0" nillable="true" />
+							<xs:element name="EXPEDICIO" type="xs:double" minOccurs="0" nillable="true" />
+							<xs:element name="ORDRE" type="xs:double" minOccurs="0" nillable="true" />
+							<xs:element name="SERIE" type="xs:string" minOccurs="0" nillable="true" />
+							<xs:element name="TALLA01" type="xs:double" minOccurs="0" nillable="true" />
+							<xs:element name="TALLA02" type="xs:double" minOccurs="0" nillable="true" />
+							<xs:element name="TALLA03" type="xs:double" minOccurs="0" nillable="true" />
+							<xs:element name="TALLA04" type="xs:double" minOccurs="0" nillable="true" />
+							<xs:element name="TALLA05" type="xs:double" minOccurs="0" nillable="true" />
+							<xs:element name="TALLA06" type="xs:double" minOccurs="0" nillable="true" />
+							<xs:element name="TALLA07" type="xs:double" minOccurs="0" nillable="true" />
+							<xs:element name="TALLA08" type="xs:double" minOccurs="0" nillable="true" />
+							<xs:element name="TALLA09" type="xs:double" minOccurs="0" nillable="true" />
+							<xs:element name="TALLA10" type="xs:double" nillable="true" />
+							<xs:element name="TARA1" type="xs:double" minOccurs="0" nillable="true" />
+							<xs:element name="TARA2" type="xs:double" minOccurs="0" nillable="true" />
+							<xs:element name="TARA3" type="xs:double" minOccurs="0" nillable="true" />
+							<xs:element name="TARA4" type="xs:double" minOccurs="0" nillable="true" />
+							<xs:element name="TARA5" type="xs:double" minOccurs="0" nillable="true" />
+							<xs:element name="TARA6" type="xs:double" minOccurs="0" nillable="true" />
+							<xs:element name="TARA7" type="xs:double" minOccurs="0" nillable="true" />
+							<xs:element name="TARA8" type="xs:double" minOccurs="0" nillable="true" />
+							<xs:element name="TARA9" type="xs:double" minOccurs="0" nillable="true" />
+							<xs:element name="TARA10" type="xs:double" minOccurs="0" nillable="true" />
+							<xs:element name="TEMPORADA" type="xs:string" minOccurs="0" nillable="true" />
+							<xs:element name="TTALLA01" type="xs:string" minOccurs="0" nillable="true" />
+							<xs:element name="TTALLA02" type="xs:string" minOccurs="0" nillable="true" />
+							<xs:element name="TTALLA03" type="xs:string" minOccurs="0" nillable="true" />
+							<xs:element name="TTALLA04" type="xs:string" minOccurs="0" nillable="true" />
+							<xs:element name="TTALLA05" type="xs:string" minOccurs="0" nillable="true" />
+							<xs:element name="TTALLA06" type="xs:string" minOccurs="0" nillable="true" />
+							<xs:element name="TTALLA07" type="xs:string" minOccurs="0" nillable="true" />
+							<xs:element name="TTALLA08" type="xs:string" minOccurs="0" nillable="true" />
+							<xs:element name="TTALLA09" type="xs:string" minOccurs="0" nillable="true" />
+							<xs:element name="TTALLA10" type="xs:string" minOccurs="0" nillable="true" />
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="dfacturebuts">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="FRA" type="xs:long" default="0" />
+							<xs:element name="TIPUS" default="">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="1" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="DOCUMENT" default="">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="1" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="DATA" type="xs:date" />
+							<xs:element name="QUANTITAT" type="xs:double" minOccurs="0" />
+							<xs:element name="KM" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="1" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="ALBARA" default="">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="50" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="SUMATESTOC" type="xs:boolean" default="false" minOccurs="0" />
+							<xs:element name="NLINEA" type="xs:int" default="0" />
+							<xs:element name="CENTRO" default="C">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="1" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="TALLA01" type="xs:double" minOccurs="0" />
+							<xs:element name="TALLA02" type="xs:double" minOccurs="0" />
+							<xs:element name="TALLA03" type="xs:double" minOccurs="0" />
+							<xs:element name="TALLA04" type="xs:double" minOccurs="0" />
+							<xs:element name="TALLA05" type="xs:double" minOccurs="0" />
+							<xs:element name="TALLA06" type="xs:double" minOccurs="0" />
+							<xs:element name="TALLA07" type="xs:double" minOccurs="0" />
+							<xs:element name="TALLA08" type="xs:double" minOccurs="0" />
+							<xs:element name="TALLA09" type="xs:double" minOccurs="0" />
+							<xs:element name="TALLA10" type="xs:double" minOccurs="0" />
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="dfaturimpresion">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="FRA" type="xs:int" default="0" />
+							<xs:element name="DESCRIDETALLE" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="255" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="NOMBREDETALLE" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="255" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="TIPUS" default="">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="1" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="DOCUMENT" default="">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="1" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="CENTRO" default="C">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="1" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="NLINEA" type="xs:int" default="0" />
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="dispos">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="CODI" type="xs:int" default="0" />
+							<xs:element name="CODICLIENT" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="255" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="CENTRO" default="C">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="1" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="ANY" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="11" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="IDDISPOS" type="xs:string" minOccurs="0" />
+							<xs:element name="FECHA" type="xs:date" minOccurs="0" />
+							<xs:element name="DRECEPCION" type="xs:date" minOccurs="0" />
+							<xs:element name="ACABADOR" type="xs:long" minOccurs="0" />
+							<xs:element name="ANULADA" type="xs:boolean" default="false" />
+							<xs:element name="CLIENT" type="xs:int" minOccurs="0" />
+							<xs:element name="OBSERV" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="65535" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="COLORCLIENTE" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="25" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="TOTALPIEZAS" type="xs:int" minOccurs="0" />
+							<xs:element name="TOTALKG" type="xs:double" minOccurs="0" />
+							<xs:element name="COLOR" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="10" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="RECIBIDO" type="xs:boolean" default="false" />
+							<xs:element name="COMANDA" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="255" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="NOMACABADOR" type="xs:string" minOccurs="0" />
+							<xs:element name="NOMCLIENT" type="xs:string" minOccurs="0" />
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="dremesas">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="REMESA" type="xs:int" default="0" />
+							<xs:element name="REMES" type="xs:boolean" default="false" />
+							<xs:element name="VENCIM" type="xs:date" minOccurs="0" />
+							<xs:element name="IMPORT" type="xs:double" minOccurs="0" />
+							<xs:element name="LINEA" type="xs:int" default="0" />
+							<xs:element name="NEFECTO" type="xs:int" minOccurs="0" />
+							<xs:element name="CLIENT" type="xs:int" minOccurs="0" />
+							<xs:element name="CENTRO" default="C">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="1" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="NOMCLIENT" type="xs:string" minOccurs="0" />
+							<xs:element name="DELINEA" type="xs:integer" minOccurs="0" />
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="emails">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="CODI" type="xs:int" default="0" />
+							<xs:element name="EMAIL" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="255" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="TIPUS" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="1" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="CENTRO" default="C">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="1" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="errores">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="ERROR" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="255" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="FECHA" type="xs:date" minOccurs="0" />
+							<xs:element name="SOLUCIONADO" type="xs:boolean" default="false" minOccurs="0" />
+							<xs:element name="FORMULARIO" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="65535" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="DESCRI" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="16777215" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="CENTRO" default="C">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="1" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="CODI" msdata:AutoIncrement="true" type="xs:int" />
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="factur">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="TIPUS" default="">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="1" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="DOCUMENT" default="">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="1" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="FRA" type="xs:int" default="0" />
+							<xs:element name="CLIENT" type="xs:int" minOccurs="0" />
+							<xs:element name="DATA" type="xs:date" minOccurs="0" />
+							<xs:element name="BASE1" type="xs:double" minOccurs="0" />
+							<xs:element name="P_IVA1" type="xs:double" minOccurs="0" />
+							<xs:element name="IVA1" type="xs:double" minOccurs="0" />
+							<xs:element name="TOTAL" type="xs:double" minOccurs="0" />
+							<xs:element name="P_DTE" type="xs:double" minOccurs="0" />
+							<xs:element name="DTE1" type="xs:double" minOccurs="0" />
+							<xs:element name="BRUT1" type="xs:double" minOccurs="0" />
+							<xs:element name="TRASPAS" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:boolean"></xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="P_RE1" type="xs:double" minOccurs="0" />
+							<xs:element name="RE1" type="xs:double" minOccurs="0" />
+							<xs:element name="VENCIM" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="1" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="TRASPASF" type="xs:short" minOccurs="0" />
+							<xs:element name="OBSERV" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="16777215" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="REPRES" type="xs:int" minOccurs="0" />
+							<xs:element name="COMIS" type="xs:double" minOccurs="0" />
+							<xs:element name="CENTRO" default="C">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="1" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="NOMCLIENT" type="xs:string" minOccurs="0" />
+							<xs:element name="NOMREPRES" type="xs:string" minOccurs="0" />
+							<xs:element name="ORDRE" type="xs:double" minOccurs="0" />
+							<xs:element name="PREU" type="xs:double" minOccurs="0" />
+							<xs:element name="ALBCLI" type="xs:string" minOccurs="0" />
+							<xs:element name="TALLA01" type="xs:string" minOccurs="0" />
+							<xs:element name="TALLA02" type="xs:string" minOccurs="0" />
+							<xs:element name="TALLA03" type="xs:string" minOccurs="0" />
+							<xs:element name="TALLA04" type="xs:string" minOccurs="0" />
+							<xs:element name="TALLA05" type="xs:string" minOccurs="0" />
+							<xs:element name="TALLA06" type="xs:string" minOccurs="0" />
+							<xs:element name="TALLA07" type="xs:string" minOccurs="0" />
+							<xs:element name="TALLA08" type="xs:string" minOccurs="0" />
+							<xs:element name="TALLA09" type="xs:string" minOccurs="0" />
+							<xs:element name="TALLA10" type="xs:string" minOccurs="0" />
+							<xs:element name="MODEL" type="xs:string" minOccurs="0" />
+							<xs:element name="SERIE" type="xs:string" minOccurs="0" />
+							<xs:element name="TEMPORADA" type="xs:string" minOccurs="0" />
+							<xs:element name="EXPEDICIO" type="xs:double" minOccurs="0" />
+							<xs:element name="DOM" type="xs:string" minOccurs="0" />
+							<xs:element name="INCOTERM" type="xs:string" minOccurs="0" />
+							<xs:element name="SEMANAS" type="xs:int" minOccurs="0" />
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="facturimpresion">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="FRA" type="xs:int" default="0" />
+							<xs:element name="TEXTO2" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="65535" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="TEXTO1" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="65535" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="TEXTO3" type="xs:string" minOccurs="0" />
+							<xs:element name="TIPUS" default="">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="1" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="DOCUMENT" default="">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="1" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="CENTRO" default="C">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="1" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="fases">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="MODEL" default="">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="10" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="SERIE" default="">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="10" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="NLINEA" type="xs:int" default="0" />
+							<xs:element name="DESCRI" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="50" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="BASE" type="xs:double" minOccurs="0" />
+							<xs:element name="PREU" type="xs:double" minOccurs="0" />
+							<xs:element name="LINNOU" type="xs:int" default="0" />
+							<xs:element name="CENTRO" default="C">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="1" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="feines">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="ORDRE" type="xs:double" default="0" />
+							<xs:element name="FET" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="1" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="LINEA" type="xs:int" default="0" />
+							<xs:element name="CODI" type="xs:int" minOccurs="0" />
+							<xs:element name="TALLER" type="xs:int" minOccurs="0" />
+							<xs:element name="SORTIDA" type="xs:date" minOccurs="0" />
+							<xs:element name="PREVISTA" type="xs:date" minOccurs="0" />
+							<xs:element name="FINAL" type="xs:date" minOccurs="0" />
+							<xs:element name="CENTRO" default="C">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="1" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="NOMTALLER" type="xs:string" minOccurs="0" />
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="fil">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="CODI" default="">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="10" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="DESCRI" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="50" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="PREU" type="xs:double" minOccurs="0" />
+							<xs:element name="prove" type="xs:integer" default="0" />
+							<xs:element name="COST" type="xs:double" minOccurs="0" />
+							<xs:element name="OBSERV" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="16777215" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="IVA" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="8" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="CENTRO" default="C">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="1" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="NOMPROVE" type="xs:string" minOccurs="0" />
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="filcol">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="TIPUS" default="">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="1" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="FIL" default="">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="10" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="prove" type="xs:int" default="0" />
+							<xs:element name="CENTRO" default="C">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="1" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="COLOR" default="">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="10" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="ACTUAL" type="xs:double" minOccurs="0" />
+							<xs:element name="MINIM" type="xs:double" minOccurs="0" />
+							<xs:element name="PREU" type="xs:double" minOccurs="0" />
+							<xs:element name="TINTAR" type="xs:double" minOccurs="0" />
+							<xs:element name="METRES" type="xs:double" minOccurs="0" />
+							<xs:element name="KG" type="xs:double" minOccurs="0" />
+							<xs:element name="OBSERV" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="20" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="NOMPROVE" type="xs:string" minOccurs="0" />
+							<xs:element name="PREUCOST" type="xs:double" minOccurs="0" />
+							<xs:element name="MEDIDA" type="xs:string" minOccurs="0" msprop:nullValue="_empty" />
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="filiales">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="CODI" default="">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="1" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="DESCRI" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="255" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="CENTRO" default="C">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="1" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="DOM" type="xs:string" minOccurs="0" />
+							<xs:element name="PROV" type="xs:string" minOccurs="0" />
+							<xs:element name="POB" type="xs:string" minOccurs="0" />
+							<xs:element name="TEL1" type="xs:string" minOccurs="0" />
+							<xs:element name="TEL2" type="xs:string" minOccurs="0" />
+							<xs:element name="FAX" minOccurs="0" type="xs:string" />
+							<xs:element name="OBSERV" type="xs:string" minOccurs="0" />
+							<xs:element name="CP" type="xs:string" minOccurs="0" />
+							<xs:element name="EMAIL1" type="xs:string" minOccurs="0" />
+							<xs:element name="EMAIL2" type="xs:string" minOccurs="0" />
+							<xs:element name="WEB" type="xs:string" minOccurs="0" />
+							<xs:element name="PAIS" type="xs:string" minOccurs="0" />
+							<xs:element name="NIF" type="xs:string" minOccurs="0" />
+							<xs:element name="LOGO" type="xs:base64Binary" minOccurs="0" />
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="forni">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="CODI" default="">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="35" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="DESCRI" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="35" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="PREU" type="xs:double" minOccurs="0" />
+							<xs:element name="prove" type="xs:int" minOccurs="0" />
+							<xs:element name="REFPRO" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="35" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="CLIENT" type="xs:int" minOccurs="0" />
+							<xs:element name="MODEL" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="35" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="SERIE" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="35" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="TEMPORADA" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="35" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="CENTRO" default="C">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="1" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="NOMPROVE" type="xs:string" minOccurs="0" />
+							<xs:element name="NOMCLIENT" type="xs:string" minOccurs="0" />
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="forpag">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="CODI" default="">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="20" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="DESCRIPCIO" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="255" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="Nro" type="xs:int" minOccurs="0" />
+							<xs:element name="V_1" type="xs:int" minOccurs="0" />
+							<xs:element name="Dies" type="xs:int" minOccurs="0" />
+							<xs:element name="CENTRO" default="C">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="1" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="ESTRANSFERENCIA" type="xs:boolean" minOccurs="0" />
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="iva">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="CODI" default="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="10" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="DESCRIPCIO" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="255" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="IVA" type="xs:double" default="0" />
+							<xs:element name="RE" type="xs:double" minOccurs="0" />
+							<xs:element name="CENTRO" default="C">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="1" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="maq">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="MOSTRA" default="">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="10" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="DATA" type="xs:date" minOccurs="0" />
+							<xs:element name="NOTAS" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="65535" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="DISCO" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="255" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="TALLA" default="">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="10" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="AGULLES" type="xs:double" minOccurs="0" />
+							<xs:element name="DAVANT" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="20" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="DARRERA" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="20" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="VELOSITAT" type="xs:double" minOccurs="0" />
+							<xs:element name="TEMPS" type="xs:double" minOccurs="0" />
+							<xs:element name="IMPORT" type="xs:double" minOccurs="0" />
+							<xs:element name="COLOR" default="">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="10" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="CLIENT" type="xs:long" default="0" />
+							<xs:element name="CENTRO" default="C">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="1" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="NOMCLIENT" type="xs:string" minOccurs="0" />
+							<xs:element name="CORTES" type="xs:string" minOccurs="0" />
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="maqui">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="CODI" type="xs:int" default="0" />
+							<xs:element name="CENTRO" default="C">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="1" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="DESCRI" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="35" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="PREU" type="xs:double" minOccurs="0" />
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="mattei">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="TEIXIT" default="">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="10" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="COMP" default="">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="10" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="PER" type="xs:int" minOccurs="0" />
+							<xs:element name="prove" type="xs:int" default="0" />
+							<xs:element name="PREU" type="xs:double" minOccurs="0" />
+							<xs:element name="IMPORT" type="xs:double" minOccurs="0" />
+							<xs:element name="CENTRO" default="C">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="1" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="NOMPROVE" type="xs:string" minOccurs="0" />
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="mforni">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="MODEL" default="">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="10" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="TEMPORADA" default="">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="255" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="CLIENT" type="xs:long" default="0" />
+							<xs:element name="CENTRO" default="C">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="1" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="SERIE" default="">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="10" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="NLINEA" msdata:AutoIncrement="true" type="xs:long" />
+							<xs:element name="IMPORT" type="xs:double" minOccurs="0" />
+							<xs:element name="FORNI" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="10" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="UNITATS" type="xs:double" minOccurs="0" />
+							<xs:element name="NOMCLIENT" type="xs:string" minOccurs="0" />
+							<xs:element name="MEDIDA" type="xs:string" minOccurs="0" />
+							<xs:element name="PREU" type="xs:double" minOccurs="0" />
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="modcol">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="CENTRO" default="C">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="1" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="MODEL" default="">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="10" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="SERIE" default="">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="10" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="TEMPORADA" default="">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="15" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="CLIENT" type="xs:int" default="0" />
+							<xs:element name="MODCOL" default="">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="10" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="TITULO" default="">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="25" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="COLTITULO" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="15" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="NOMCLIENT" type="xs:string" minOccurs="0" />
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="models">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="CODI" default="">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="10" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="SERIE" default="">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="10" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="CLIENT" type="xs:int" default="0" />
+							<xs:element name="TEMPORADA" default="">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="8" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="CENTRO" default="C">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="1" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="TEIXIT" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="10" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="DESCRI" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="50" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="prove" type="xs:int" minOccurs="0" />
+							<xs:element name="AMPLE" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="20" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="TINT" type="xs:int" minOccurs="0" />
+							<xs:element name="ACA" type="xs:int" minOccurs="0" />
+							<xs:element name="ESTAM" type="xs:int" minOccurs="0" />
+							<xs:element name="RENDIM" type="xs:double" minOccurs="0" />
+							<xs:element name="CONFEC" type="xs:int" minOccurs="0" />
+							<xs:element name="FORNITURA" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="20" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="CESTAM" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="20" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="CESTAM2" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="20" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="NESTAM" type="xs:double" minOccurs="0" />
+							<xs:element name="NESTAM2" type="xs:double" minOccurs="0" />
+							<xs:element name="NCONFEC" type="xs:double" minOccurs="0" />
+							<xs:element name="NPLANXA" type="xs:double" minOccurs="0" />
+							<xs:element name="NREPAS" type="xs:double" minOccurs="0" />
+							<xs:element name="QTRANS" type="xs:double" minOccurs="0" />
+							<xs:element name="NTRANS" type="xs:double" minOccurs="0" />
+							<xs:element name="QFLOCAT" type="xs:double" minOccurs="0" />
+							<xs:element name="NFLOCAT" type="xs:double" minOccurs="0" />
+							<xs:element name="QBRODAT" type="xs:double" minOccurs="0" />
+							<xs:element name="NBRODAT" type="xs:double" minOccurs="0" />
+							<xs:element name="NESTAMP" type="xs:double" minOccurs="0" />
+							<xs:element name="NTINTP" type="xs:double" minOccurs="0" />
+							<xs:element name="NACAP" type="xs:double" minOccurs="0" />
+							<xs:element name="NFORNITURA" type="xs:double" minOccurs="0" />
+							<xs:element name="COST" type="xs:double" minOccurs="0" />
+							<xs:element name="MARGE" type="xs:double" minOccurs="0" />
+							<xs:element name="VENDA" type="xs:double" minOccurs="0" />
+							<xs:element name="OBSERV" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="16777215" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="IVA" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="8" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="TALLA01" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="3" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="TALLA02" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="3" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="TALLA03" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="3" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="TALLA04" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="3" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="TALLA05" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="3" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="TALLA06" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="3" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="TALLA07" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="3" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="TALLA08" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="3" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="TALLA09" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="3" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="TALLA10" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="3" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="NPACK" type="xs:double" minOccurs="0" />
+							<xs:element name="CODIMODEL" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="15" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="NOMCLIENT" type="xs:string" minOccurs="0" />
+							<xs:element name="NOMPROVE" type="xs:string" minOccurs="0" />
+							<xs:element name="NOMTINT" type="xs:string" minOccurs="0" />
+							<xs:element name="NOMACA" type="xs:string" minOccurs="0" />
+							<xs:element name="NOMESTAM" type="xs:string" minOccurs="0" />
+							<xs:element name="NOMCONFEC" type="xs:string" minOccurs="0" />
+							<xs:element name="DESCRITEIXIT" type="xs:string" minOccurs="0" />
+							<xs:element name="MANIPULACION" type="xs:double" minOccurs="0" />
+							<xs:element name="VENDAFINAL" type="xs:double" minOccurs="0" />
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="modelsescandallo">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="MODEL" default="">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="10" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="CLIENT" type="xs:int" default="0" />
+							<xs:element name="TEMPORADA" default="">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="8" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="CENTRO" default="C">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="1" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="SERIE" default="">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="10" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="TITULO" default="">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="35" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="TEIXIT" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="10" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="CONSUM" type="xs:double" minOccurs="0" />
+							<xs:element name="PREU" type="xs:double" minOccurs="0" />
+							<xs:element name="COST" type="xs:double" minOccurs="0" />
+							<xs:element name="NOMCLIENT" type="xs:string" minOccurs="0" />
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="modelsfotos">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="FOTO" type="xs:base64Binary" minOccurs="0" />
+							<xs:element name="TEMPORADA" default="">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="10" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="SERIE" default="">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="10" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="CLIENT" type="xs:int" default="0" />
+							<xs:element name="MODEL" default="">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="15" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="CENTRO" default="C">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="1" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="NOMCLIENT" type="xs:string" minOccurs="0" />
+							<xs:element name="CODIGOIMAGEN" type="xs:string" minOccurs="0" />
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="modstk">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="MODEL" default="">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="10" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="CLIENT" type="xs:int" default="0" />
+							<xs:element name="SERIE" default="">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="10" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="CENTRO" default="C">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="1" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="TEMPORADA" default="">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="15" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="COLOR" default="">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="10" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="TALLA" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="3" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="TALLA01" type="xs:double" minOccurs="0" />
+							<xs:element name="TALLA02" type="xs:double" minOccurs="0" />
+							<xs:element name="TALLA03" type="xs:double" minOccurs="0" />
+							<xs:element name="TALLA04" type="xs:double" minOccurs="0" />
+							<xs:element name="TALLA05" type="xs:double" minOccurs="0" />
+							<xs:element name="TALLA06" type="xs:double" minOccurs="0" />
+							<xs:element name="TALLA07" type="xs:double" minOccurs="0" />
+							<xs:element name="TALLA08" type="xs:double" minOccurs="0" />
+							<xs:element name="TALLA09" type="xs:double" minOccurs="0" />
+							<xs:element name="TALLA10" type="xs:double" minOccurs="0" />
+							<xs:element name="NOMCLIENT" type="xs:string" minOccurs="0" />
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="mostres">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="CODI" default="">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="10" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="DESCRI" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="35" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="CLIENT" type="xs:int" default="0" />
+							<xs:element name="REFE" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="10" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="TEMP" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="8" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="MAQUINA" type="xs:double" minOccurs="0" />
+							<xs:element name="MARGE" type="xs:double" minOccurs="0" />
+							<xs:element name="IVA" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="8" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="OBSERV" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="16777215" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="COMPO" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="40" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="PREU" type="xs:double" minOccurs="0" />
+							<xs:element name="CENTRO" default="C">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="1" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="NOMCLIENT" type="xs:string" minOccurs="0" />
+							<xs:element name="NOMMAQUI" type="xs:string" minOccurs="0" />
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="ordre">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="ORDRE" type="xs:double" default="0" />
+							<xs:element name="LINEA" msdata:AutoIncrement="false" type="xs:int" />
+							<xs:element name="CENTRO" default="C">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="1" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="EXPEDICIO" type="xs:double" minOccurs="0" />
+							<xs:element name="FABRICACIO" type="xs:double" minOccurs="0" />
+							<xs:element name="COLOR" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="10" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="TALL1" type="xs:double" minOccurs="0" />
+							<xs:element name="TALL2" type="xs:double" minOccurs="0" />
+							<xs:element name="TALL3" type="xs:double" minOccurs="0" />
+							<xs:element name="TALL4" type="xs:double" minOccurs="0" />
+							<xs:element name="TALL5" type="xs:double" minOccurs="0" />
+							<xs:element name="TALL6" type="xs:double" minOccurs="0" />
+							<xs:element name="TALL7" type="xs:double" minOccurs="0" />
+							<xs:element name="TALL8" type="xs:double" minOccurs="0" />
+							<xs:element name="TALL9" type="xs:double" minOccurs="0" />
+							<xs:element name="TALL10" type="xs:double" minOccurs="0" />
+							<xs:element name="TARA1" type="xs:double" minOccurs="0" />
+							<xs:element name="TARA2" type="xs:double" minOccurs="0" />
+							<xs:element name="TARA3" type="xs:double" minOccurs="0" />
+							<xs:element name="TARA4" type="xs:double" minOccurs="0" />
+							<xs:element name="TARA5" type="xs:double" minOccurs="0" />
+							<xs:element name="TARA6" type="xs:double" minOccurs="0" />
+							<xs:element name="TARA7" type="xs:double" minOccurs="0" />
+							<xs:element name="TARA8" type="xs:double" minOccurs="0" />
+							<xs:element name="TARA9" type="xs:double" minOccurs="0" />
+							<xs:element name="TARA10" type="xs:double" minOccurs="0" />
+							<xs:element name="ALB1" type="xs:double" minOccurs="0" />
+							<xs:element name="ALB2" type="xs:double" minOccurs="0" />
+							<xs:element name="ALB3" type="xs:double" minOccurs="0" />
+							<xs:element name="ALB4" type="xs:double" minOccurs="0" />
+							<xs:element name="ALB5" type="xs:double" minOccurs="0" />
+							<xs:element name="ALB6" type="xs:double" minOccurs="0" />
+							<xs:element name="ALB7" type="xs:double" minOccurs="0" />
+							<xs:element name="ALB8" type="xs:double" minOccurs="0" />
+							<xs:element name="ALB9" type="xs:double" minOccurs="0" />
+							<xs:element name="ALB10" type="xs:double" minOccurs="0" />
+							<xs:element name="ESTOC" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="1" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="QUANTITAT" type="xs:int" default="0" minOccurs="0" />
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="paises">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="CODI" type="xs:short" default="0" />
+							<xs:element name="NOM" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="255" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="CENTRO" default="C">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="1" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="prove">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="CODI" type="xs:int" default="0" />
+							<xs:element name="TEL2" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="255" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="CENTRO" default="C">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="1" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="NOM" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="255" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="DOM" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="255" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="CP" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="255" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="TEL" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="255" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="FAX" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="255" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="POB" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="255" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="PROV" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="255" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="NIF" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="255" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="NOTES" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="255" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="CONTACTE" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="255" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="FORMA" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="255" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="DIA1" type="xs:int" minOccurs="0" />
+							<xs:element name="DIA2" type="xs:int" minOccurs="0" />
+							<xs:element name="DIA3" type="xs:int" minOccurs="0" />
+							<xs:element name="BANC" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="255" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="COFI" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="255" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="OFI" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="255" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="DC" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="255" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="CTA" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="255" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="IVA" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="255" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="SUBCTA" type="xs:double" minOccurs="0" />
+							<xs:element name="TRASPAS" type="xs:boolean" default="false" />
+							<xs:element name="WEB" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="255" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="EMAIL1" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="255" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="EMAIL2" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="255" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="PAIS" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="255" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="NOMFORMA" type="xs:string" minOccurs="0" />
+							<xs:element name="NOMBANC" type="xs:string" minOccurs="0" />
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="remesas">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="CODI" type="xs:int" default="0" />
+							<xs:element name="COBRO" type="xs:boolean" default="false" />
+							<xs:element name="OFICINA" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="255" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="REMESOR" type="xs:int" minOccurs="0" />
+							<xs:element name="FECHA" type="xs:date" minOccurs="0" />
+							<xs:element name="TOTAL" type="xs:double" minOccurs="0" />
+							<xs:element name="BANC" type="xs:string" minOccurs="0" />
+							<xs:element name="CENTRO" default="C">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="1" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="LINEA" type="xs:string" minOccurs="0" />
+							<xs:element name="DESCUENTO" type="xs:boolean" minOccurs="0" nillable="false" default="1" />
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="remesascuentas">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="REMESA" type="xs:int" default="0" />
+							<xs:element name="CENTRO" default="C">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="1" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="CUENTA" type="xs:string" minOccurs="0" />
+							<xs:element name="TIPO" type="xs:string" minOccurs="0" />
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="repres">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="CODI" type="xs:int" default="0" />
+							<xs:element name="TEL2" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="255" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="CENTRO" default="C">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="1" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="NOM" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="35" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="DOM" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="35" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="POB" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="35" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="CP" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="5" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="PROV" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="35" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="TEL" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="20" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="FAX" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="20" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="NIF" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="15" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="OBSERV" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="16777215" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="FORMAT" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="16777215" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="COMIS" type="xs:double" minOccurs="0" />
+							<xs:element name="PAIS" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="255" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="WEB" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="255" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="EMAIL1" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="255" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="EMAIL2" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="255" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="talla">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="MOSTRA" default="">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="10" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="TALLA" default="">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="10" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="DESCRI" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="255" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="COST" type="xs:double" minOccurs="0" />
+							<xs:element name="VENDA" type="xs:double" minOccurs="0" />
+							<xs:element name="COLOR" default="">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="10" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="CLIENT" type="xs:int" default="0" />
+							<xs:element name="CENTRO" default="C">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="1" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="NOMCLIENT" type="xs:string" minOccurs="0" />
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="tallers">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="CODI" type="xs:int" default="0" />
+							<xs:element name="CENTRO" default="C">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="1" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="NOM" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="35" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="DOM" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="35" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="POB" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="35" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="CP" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="5" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="PROV" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="35" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="TEL" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="20" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="FAX" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="20" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="NIF" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="15" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="OBSERV" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="16777215" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="FORMAT" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="16777215" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="WEB" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="255" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="EMAIL1" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="255" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="EMAIL2" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="255" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="PAIS" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="255" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="teixits">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="CODI" default="">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="10" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="CENTRO" default="C">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="1" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="DESCRI" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="35" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="NRO" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="50" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="MAQUI" type="xs:double" minOccurs="0" />
+							<xs:element name="MATERIA" type="xs:double" minOccurs="0" />
+							<xs:element name="OBSERV" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="16777215" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="IVA" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="8" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="TEIXIDOR" type="xs:double" minOccurs="0" />
+							<xs:element name="PTEIXIR" type="xs:double" minOccurs="0" />
+							<xs:element name="ESTAMPADOR" type="xs:double" minOccurs="0" nillable="true" />
+							<xs:element name="PESTAM" type="xs:double" minOccurs="0" />
+							<xs:element name="ACABADOR" type="xs:double" minOccurs="0" />
+							<xs:element name="PACA" type="xs:double" default="0" minOccurs="0" />
+							<xs:element name="CRU" type="xs:double" default="0" minOccurs="0" />
+							<xs:element name="AMPLE" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="20" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="RENDIMENT" type="xs:double" default="1" minOccurs="0" />
+							<xs:element name="MARGE" type="xs:double" default="0" minOccurs="0" />
+							<xs:element name="GRAMA" type="xs:double" default="0" minOccurs="0" />
+							<xs:element name="PREUM" type="xs:double" default="0" minOccurs="0" />
+							<xs:element name="PREUK" type="xs:double" default="0" minOccurs="0" />
+							<xs:element name="STCRUM" type="xs:double" default="0" />
+							<xs:element name="STDISPM" type="xs:double" default="0" />
+							<xs:element name="STCRUK" type="xs:double" default="0" />
+							<xs:element name="STDISPK" type="xs:double" default="0" />
+							<xs:element name="PREUPERMODEL" type="xs:double" default="0" minOccurs="0" />
+							<xs:element name="NOMMAQUI" type="xs:string" minOccurs="0" />
+							<xs:element name="NOMTEIXIDOR" type="xs:string" minOccurs="0" />
+							<xs:element name="NOMESTAMPADOR" type="xs:string" minOccurs="0" />
+							<xs:element name="NOMACABADOR" type="xs:string" minOccurs="0" />
+							<xs:element name="ACABAT" type="xs:string" minOccurs="0" />
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="temporadas">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="CODI" default="">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="15" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="DESCRI" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="255" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="CENTRO" default="C">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="1" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="trans">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="CODI" type="xs:int" default="0" />
+							<xs:element name="TEL2" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="255" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="WEB" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="255" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="NOM" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="35" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="DOM" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="35" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="POB" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="35" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="CP" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="5" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="PROV" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="35" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="TEL" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="20" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="FAX" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="20" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="NIF" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="15" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="OBSERV" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="16777215" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="FORMAT" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="16777215" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="EMAIL" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="255" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="CENTRO" default="C">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="1" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="treballs">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="CODI" type="xs:int" default="0" />
+							<xs:element name="DESCRI" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="35" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="CENTRO" default="C">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="1" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="vencim">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="COMVEN" default="">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="1" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="TIPUS" default="">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="1" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="DOCUMENT" default="">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="1" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="FRA" type="xs:int" default="0" />
+							<xs:element name="EMISSIO" type="xs:date" minOccurs="0" />
+							<xs:element name="VENCIM" type="xs:date" minOccurs="0" />
+							<xs:element name="LIN" type="xs:int" default="0" />
+							<xs:element name="IMPORT" type="xs:double" minOccurs="0" />
+							<xs:element name="REMES" type="xs:boolean" default="false" />
+							<xs:element name="CENTRO" default="C">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="1" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="coloresdipos">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="COLOR" type="xs:string" minOccurs="0" />
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="mmani">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="MODEL" default="">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="10" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="SERIE" default="">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="10" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="TEMPORADA" default="">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="10" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="CLIENT" type="xs:integer" />
+							<xs:element name="PREU" type="xs:double" nillable="false" />
+							<xs:element name="DESCRI" default="" nillable="false">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="45" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="CODI" default="" nillable="false">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="45" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="NLINEA" type="xs:integer" />
+							<xs:element name="CENTRO" default="">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="1" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="vencim1">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="COMVEN" default="">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="1" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="TIPUS" default="">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="1" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="DOCUMENT" default="">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="1" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="FRA" type="xs:int" default="0" />
+							<xs:element name="EMISSIO" type="xs:date" minOccurs="0" />
+							<xs:element name="VENCIM" type="xs:date" minOccurs="0" />
+							<xs:element name="LIN" type="xs:int" default="0" />
+							<xs:element name="IMPORT" type="xs:double" minOccurs="0" />
+							<xs:element name="REMES" type="xs:boolean" default="false" />
+							<xs:element name="CENTRO" default="C">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:maxLength value="1" />
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="PARAMETROS">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="TIPO" type="xs:string" minOccurs="0" />
+							<xs:element name="CONTENIDO" type="xs:string" minOccurs="0" />
+							<xs:element name="DESCRIPCION" type="xs:string" minOccurs="0" />
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="incoterm">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="NOMBRE" type="xs:string" minOccurs="0" />
+							<xs:element name="DESCRI" type="xs:string" minOccurs="0" />
+							<xs:element name="CENTRO" type="xs:string" minOccurs="0" default="C" />
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+			</xs:choice>
+		</xs:complexType>
+		<xs:unique name="Constraint1" msdata:PrimaryKey="true">
+			<xs:selector xpath=".//acabatsteixits" />
+			<xs:field xpath="ACABAT" />
+			<xs:field xpath="prove" />
+			<xs:field xpath="TEIXIT" />
+			<xs:field xpath="CENTRO" />
+		</xs:unique>
+		<xs:unique name="anul_Constraint1" msdata:ConstraintName="Constraint1" msdata:PrimaryKey="true">
+			<xs:selector xpath=".//anul" />
+			<xs:field xpath="ORDRE" />
+			<xs:field xpath="LINEA" />
+			<xs:field xpath="CENTRO" />
+		</xs:unique>
+		<xs:unique name="bancs_Constraint1" msdata:ConstraintName="Constraint1" msdata:PrimaryKey="true">
+			<xs:selector xpath=".//bancs" />
+			<xs:field xpath="CODI" />
+			<xs:field xpath="CENTRO" />
+		</xs:unique>
+		<xs:unique name="cactur_Constraint1" msdata:ConstraintName="Constraint1" msdata:PrimaryKey="true">
+			<xs:selector xpath=".//cactur" />
+			<xs:field xpath="TIPUS" />
+			<xs:field xpath="DOCUMENT" />
+			<xs:field xpath="FRA" />
+			<xs:field xpath="CENTRO" />
+		</xs:unique>
+		<xs:unique name="clientdireccions_Constraint1" msdata:ConstraintName="Constraint1" msdata:PrimaryKey="true">
+			<xs:selector xpath=".//adres" />
+			<xs:field xpath="CODI" />
+			<xs:field xpath="DOM" />
+			<xs:field xpath="CENTRO" />
+		</xs:unique>
+		<xs:unique name="clients_Constraint1" msdata:ConstraintName="Constraint1" msdata:PrimaryKey="true">
+			<xs:selector xpath=".//clients" />
+			<xs:field xpath="CODI" />
+			<xs:field xpath="CENTRO" />
+		</xs:unique>
+		<xs:unique name="color_Constraint1" msdata:ConstraintName="Constraint1" msdata:PrimaryKey="true">
+			<xs:selector xpath=".//color" />
+			<xs:field xpath="MOSTRA" />
+			<xs:field xpath="TALLA" />
+			<xs:field xpath="LINEA" />
+			<xs:field xpath="COLORM" />
+			<xs:field xpath="CLIENT" />
+			<xs:field xpath="CENTRO" />
+		</xs:unique>
+		<xs:unique name="cordre_Constraint1" msdata:ConstraintName="Constraint1" msdata:PrimaryKey="true">
+			<xs:selector xpath=".//cordre" />
+			<xs:field xpath="ORDRE" />
+			<xs:field xpath="CENTRO" />
+		</xs:unique>
+		<xs:unique name="dacabats_Constraint1" msdata:ConstraintName="Constraint1" msdata:PrimaryKey="true">
+			<xs:selector xpath=".//dacabats" />
+			<xs:field xpath="CODI" />
+			<xs:field xpath="prove" />
+			<xs:field xpath="CENTRO" />
+		</xs:unique>
+		<xs:unique name="dcactu_Constraint1" msdata:ConstraintName="Constraint1" msdata:PrimaryKey="true">
+			<xs:selector xpath=".//dcactu" />
+			<xs:field xpath="CENTRO" />
+			<xs:field xpath="TIPUS" />
+			<xs:field xpath="DOCUMENT" />
+			<xs:field xpath="FRA" />
+			<xs:field xpath="NLINEA" />
+		</xs:unique>
+		<xs:unique name="dcacturebuts_Constraint1" msdata:ConstraintName="Constraint1" msdata:PrimaryKey="true">
+			<xs:selector xpath=".//dcacturebuts" />
+			<xs:field xpath="FRA" />
+			<xs:field xpath="TIPUS" />
+			<xs:field xpath="DOCUMENT" />
+			<xs:field xpath="DATA" />
+			<xs:field xpath="ALBARA" />
+			<xs:field xpath="NLINEA" />
+			<xs:field xpath="CENTRO" />
+		</xs:unique>
+		<xs:unique name="dcfactutrasp_Constraint1" msdata:ConstraintName="Constraint1" msdata:PrimaryKey="true">
+			<xs:selector xpath=".//dcfactutrasp" />
+			<xs:field xpath="TIPUS" />
+			<xs:field xpath="DOCUMENT" />
+			<xs:field xpath="NLINEA" />
+			<xs:field xpath="ALINEA" />
+			<xs:field xpath="VC" />
+			<xs:field xpath="COMAN" />
+			<xs:field xpath="ALBAR" />
+			<xs:field xpath="CENTRO" />
+			<xs:field xpath="FRA" />
+		</xs:unique>
+		<xs:unique name="ddispos_Constraint1" msdata:ConstraintName="Constraint1" msdata:PrimaryKey="true">
+			<xs:selector xpath=".//ddispos" />
+			<xs:field xpath="CENTRO" />
+			<xs:field xpath="LINEA" />
+			<xs:field xpath="DISPOS" />
+		</xs:unique>
+		<xs:unique name="debitobancos_Constraint1" msdata:ConstraintName="Constraint1" msdata:PrimaryKey="true">
+			<xs:selector xpath=".//bancscuentas" />
+			<xs:field xpath="BANC" />
+			<xs:field xpath="CUENTA" />
+			<xs:field xpath="CENTRO" />
+		</xs:unique>
+		<xs:unique name="dfactu_Constraint1" msdata:ConstraintName="Constraint1" msdata:PrimaryKey="true">
+			<xs:selector xpath=".//dfactu" />
+			<xs:field xpath="DOCUMENT" />
+			<xs:field xpath="FRA" />
+			<xs:field xpath="CENTRO" />
+			<xs:field xpath="NLINEA" />
+			<xs:field xpath="TIPUS" />
+		</xs:unique>
+		<xs:unique name="dfacturebuts_Constraint1" msdata:ConstraintName="Constraint1" msdata:PrimaryKey="true">
+			<xs:selector xpath=".//dfacturebuts" />
+			<xs:field xpath="FRA" />
+			<xs:field xpath="TIPUS" />
+			<xs:field xpath="DOCUMENT" />
+			<xs:field xpath="DATA" />
+			<xs:field xpath="ALBARA" />
+			<xs:field xpath="NLINEA" />
+			<xs:field xpath="CENTRO" />
+		</xs:unique>
+		<xs:unique name="dfaturimpresion_Constraint1" msdata:ConstraintName="Constraint1" msdata:PrimaryKey="true">
+			<xs:selector xpath=".//dfaturimpresion" />
+			<xs:field xpath="FRA" />
+			<xs:field xpath="TIPUS" />
+			<xs:field xpath="DOCUMENT" />
+			<xs:field xpath="CENTRO" />
+			<xs:field xpath="NLINEA" />
+		</xs:unique>
+		<xs:unique name="dispos_Constraint1" msdata:ConstraintName="Constraint1" msdata:PrimaryKey="true">
+			<xs:selector xpath=".//dispos" />
+			<xs:field xpath="CODI" />
+			<xs:field xpath="CENTRO" />
+		</xs:unique>
+		<xs:unique name="dremesas_Constraint1" msdata:ConstraintName="Constraint1" msdata:PrimaryKey="true">
+			<xs:selector xpath=".//dremesas" />
+			<xs:field xpath="REMESA" />
+			<xs:field xpath="LINEA" />
+			<xs:field xpath="CENTRO" />
+		</xs:unique>
+		<xs:unique name="emails_Constraint1" msdata:ConstraintName="Constraint1" msdata:PrimaryKey="true">
+			<xs:selector xpath=".//emails" />
+			<xs:field xpath="CODI" />
+			<xs:field xpath="CENTRO" />
+		</xs:unique>
+		<xs:unique name="errores_Constraint1" msdata:ConstraintName="Constraint1" msdata:PrimaryKey="true">
+			<xs:selector xpath=".//errores" />
+			<xs:field xpath="CENTRO" />
+			<xs:field xpath="CODI" />
+		</xs:unique>
+		<xs:unique name="factur_Constraint1" msdata:ConstraintName="Constraint1">
+			<xs:selector xpath=".//factur" />
+			<xs:field xpath="DOCUMENT" />
+			<xs:field xpath="FRA" />
+			<xs:field xpath="CENTRO" />
+			<xs:field xpath="TIPUS" />
+		</xs:unique>
+		<xs:unique name="facturimpresion_Constraint1" msdata:ConstraintName="Constraint1" msdata:PrimaryKey="true">
+			<xs:selector xpath=".//facturimpresion" />
+			<xs:field xpath="FRA" />
+			<xs:field xpath="TIPUS" />
+			<xs:field xpath="DOCUMENT" />
+			<xs:field xpath="CENTRO" />
+			<xs:field xpath="TEXTO1" />
+		</xs:unique>
+		<xs:unique name="fases_Constraint1" msdata:ConstraintName="Constraint1" msdata:PrimaryKey="true">
+			<xs:selector xpath=".//fases" />
+			<xs:field xpath="MODEL" />
+			<xs:field xpath="SERIE" />
+			<xs:field xpath="NLINEA" />
+			<xs:field xpath="LINNOU" />
+			<xs:field xpath="CENTRO" />
+		</xs:unique>
+		<xs:unique name="feines_Constraint1" msdata:ConstraintName="Constraint1" msdata:PrimaryKey="true">
+			<xs:selector xpath=".//feines" />
+			<xs:field xpath="ORDRE" />
+			<xs:field xpath="LINEA" />
+			<xs:field xpath="CENTRO" />
+		</xs:unique>
+		<xs:unique name="fil_Constraint1" msdata:ConstraintName="Constraint1" msdata:PrimaryKey="true">
+			<xs:selector xpath=".//fil" />
+			<xs:field xpath="CODI" />
+			<xs:field xpath="prove" />
+			<xs:field xpath="CENTRO" />
+		</xs:unique>
+		<xs:unique name="filcol_Constraint1" msdata:ConstraintName="Constraint1" msdata:PrimaryKey="true">
+			<xs:selector xpath=".//filcol" />
+			<xs:field xpath="TIPUS" />
+			<xs:field xpath="FIL" />
+			<xs:field xpath="prove" />
+			<xs:field xpath="CENTRO" />
+			<xs:field xpath="COLOR" />
+			<xs:field xpath="MEDIDA" />
+		</xs:unique>
+		<xs:unique name="filiales_Constraint1" msdata:ConstraintName="Constraint1" msdata:PrimaryKey="true">
+			<xs:selector xpath=".//filiales" />
+			<xs:field xpath="CODI" />
+		</xs:unique>
+		<xs:unique name="forni_Constraint1" msdata:ConstraintName="Constraint1" msdata:PrimaryKey="true">
+			<xs:selector xpath=".//forni" />
+			<xs:field xpath="CODI" />
+			<xs:field xpath="CENTRO" />
+		</xs:unique>
+		<xs:unique name="forpag_Constraint1" msdata:ConstraintName="Constraint1" msdata:PrimaryKey="true">
+			<xs:selector xpath=".//forpag" />
+			<xs:field xpath="CODI" />
+			<xs:field xpath="CENTRO" />
+		</xs:unique>
+		<xs:unique name="iva_Constraint1" msdata:ConstraintName="Constraint1" msdata:PrimaryKey="true">
+			<xs:selector xpath=".//iva" />
+			<xs:field xpath="CODI" />
+			<xs:field xpath="CENTRO" />
+		</xs:unique>
+		<xs:unique name="maq_Constraint1" msdata:ConstraintName="Constraint1" msdata:PrimaryKey="true">
+			<xs:selector xpath=".//maq" />
+			<xs:field xpath="MOSTRA" />
+			<xs:field xpath="TALLA" />
+			<xs:field xpath="COLOR" />
+			<xs:field xpath="CLIENT" />
+			<xs:field xpath="CENTRO" />
+		</xs:unique>
+		<xs:unique name="maqui_Constraint1" msdata:ConstraintName="Constraint1" msdata:PrimaryKey="true">
+			<xs:selector xpath=".//maqui" />
+			<xs:field xpath="CODI" />
+			<xs:field xpath="CENTRO" />
+		</xs:unique>
+		<xs:unique name="mattei_Constraint1" msdata:ConstraintName="Constraint1" msdata:PrimaryKey="true">
+			<xs:selector xpath=".//mattei" />
+			<xs:field xpath="TEIXIT" />
+			<xs:field xpath="COMP" />
+			<xs:field xpath="prove" />
+			<xs:field xpath="CENTRO" />
+		</xs:unique>
+		<xs:unique name="mforni_Constraint1" msdata:ConstraintName="Constraint1" msdata:PrimaryKey="true">
+			<xs:selector xpath=".//mforni" />
+			<xs:field xpath="MODEL" />
+			<xs:field xpath="TEMPORADA" />
+			<xs:field xpath="CLIENT" />
+			<xs:field xpath="CENTRO" />
+			<xs:field xpath="SERIE" />
+			<xs:field xpath="NLINEA" />
+		</xs:unique>
+		<xs:unique name="modcol_Constraint1" msdata:ConstraintName="Constraint1" msdata:PrimaryKey="true">
+			<xs:selector xpath=".//modcol" />
+			<xs:field xpath="CENTRO" />
+			<xs:field xpath="MODEL" />
+			<xs:field xpath="SERIE" />
+			<xs:field xpath="TEMPORADA" />
+			<xs:field xpath="CLIENT" />
+			<xs:field xpath="MODCOL" />
+			<xs:field xpath="TITULO" />
+		</xs:unique>
+		<xs:unique name="models_Constraint1" msdata:ConstraintName="Constraint1" msdata:PrimaryKey="true">
+			<xs:selector xpath=".//models" />
+			<xs:field xpath="CODI" />
+			<xs:field xpath="SERIE" />
+			<xs:field xpath="CLIENT" />
+			<xs:field xpath="TEMPORADA" />
+			<xs:field xpath="CENTRO" />
+		</xs:unique>
+		<xs:unique name="modelsescandallo_Constraint1" msdata:ConstraintName="Constraint1" msdata:PrimaryKey="true">
+			<xs:selector xpath=".//modelsescandallo" />
+			<xs:field xpath="MODEL" />
+			<xs:field xpath="CLIENT" />
+			<xs:field xpath="TEMPORADA" />
+			<xs:field xpath="CENTRO" />
+			<xs:field xpath="SERIE" />
+			<xs:field xpath="TITULO" />
+		</xs:unique>
+		<xs:unique name="modelsfotos_Constraint1" msdata:ConstraintName="Constraint1" msdata:PrimaryKey="true">
+			<xs:selector xpath=".//modelsfotos" />
+			<xs:field xpath="TEMPORADA" />
+			<xs:field xpath="SERIE" />
+			<xs:field xpath="CLIENT" />
+			<xs:field xpath="MODEL" />
+			<xs:field xpath="CENTRO" />
+			<xs:field xpath="CODIGOIMAGEN" />
+		</xs:unique>
+		<xs:unique name="modstk_Constraint1" msdata:ConstraintName="Constraint1" msdata:PrimaryKey="true">
+			<xs:selector xpath=".//modstk" />
+			<xs:field xpath="MODEL" />
+			<xs:field xpath="CLIENT" />
+			<xs:field xpath="SERIE" />
+			<xs:field xpath="CENTRO" />
+			<xs:field xpath="TEMPORADA" />
+			<xs:field xpath="COLOR" />
+		</xs:unique>
+		<xs:unique name="mostres_Constraint1" msdata:ConstraintName="Constraint1" msdata:PrimaryKey="true">
+			<xs:selector xpath=".//mostres" />
+			<xs:field xpath="CODI" />
+			<xs:field xpath="CLIENT" />
+			<xs:field xpath="CENTRO" />
+		</xs:unique>
+		<xs:unique name="ordre_Constraint1" msdata:ConstraintName="Constraint1" msdata:PrimaryKey="true">
+			<xs:selector xpath=".//ordre" />
+			<xs:field xpath="ORDRE" />
+			<xs:field xpath="LINEA" />
+			<xs:field xpath="CENTRO" />
+		</xs:unique>
+		<xs:unique name="paises_Constraint1" msdata:ConstraintName="Constraint1" msdata:PrimaryKey="true">
+			<xs:selector xpath=".//paises" />
+			<xs:field xpath="CODI" />
+			<xs:field xpath="CENTRO" />
+		</xs:unique>
+		<xs:unique name="prove_Constraint1" msdata:ConstraintName="Constraint1" msdata:PrimaryKey="true">
+			<xs:selector xpath=".//prove" />
+			<xs:field xpath="CODI" />
+			<xs:field xpath="CENTRO" />
+		</xs:unique>
+		<xs:unique name="remesas_Constraint1" msdata:ConstraintName="Constraint1" msdata:PrimaryKey="true">
+			<xs:selector xpath=".//remesas" />
+			<xs:field xpath="CODI" />
+			<xs:field xpath="CENTRO" />
+		</xs:unique>
+		<xs:unique name="remesascuentas_Constraint1" msdata:ConstraintName="Constraint1" msdata:PrimaryKey="true">
+			<xs:selector xpath=".//remesascuentas" />
+			<xs:field xpath="REMESA" />
+			<xs:field xpath="CENTRO" />
+			<xs:field xpath="CUENTA" />
+		</xs:unique>
+		<xs:unique name="repres_Constraint1" msdata:ConstraintName="Constraint1" msdata:PrimaryKey="true">
+			<xs:selector xpath=".//repres" />
+			<xs:field xpath="CODI" />
+			<xs:field xpath="CENTRO" />
+		</xs:unique>
+		<xs:unique name="talla_Constraint1" msdata:ConstraintName="Constraint1" msdata:PrimaryKey="true">
+			<xs:selector xpath=".//talla" />
+			<xs:field xpath="MOSTRA" />
+			<xs:field xpath="TALLA" />
+			<xs:field xpath="COLOR" />
+			<xs:field xpath="CLIENT" />
+			<xs:field xpath="CENTRO" />
+		</xs:unique>
+		<xs:unique name="tallers_Constraint1" msdata:ConstraintName="Constraint1" msdata:PrimaryKey="true">
+			<xs:selector xpath=".//tallers" />
+			<xs:field xpath="CODI" />
+			<xs:field xpath="CENTRO" />
+		</xs:unique>
+		<xs:unique name="teixits_Constraint1" msdata:ConstraintName="Constraint1" msdata:PrimaryKey="true">
+			<xs:selector xpath=".//teixits" />
+			<xs:field xpath="CODI" />
+			<xs:field xpath="CENTRO" />
+		</xs:unique>
+		<xs:unique name="temporadas_Constraint1" msdata:ConstraintName="Constraint1" msdata:PrimaryKey="true">
+			<xs:selector xpath=".//temporadas" />
+			<xs:field xpath="CODI" />
+			<xs:field xpath="CENTRO" />
+		</xs:unique>
+		<xs:unique name="trans_Constraint1" msdata:ConstraintName="Constraint1" msdata:PrimaryKey="true">
+			<xs:selector xpath=".//trans" />
+			<xs:field xpath="CODI" />
+			<xs:field xpath="CENTRO" />
+		</xs:unique>
+		<xs:unique name="treballs_Constraint1" msdata:ConstraintName="Constraint1" msdata:PrimaryKey="true">
+			<xs:selector xpath=".//treballs" />
+			<xs:field xpath="CODI" />
+			<xs:field xpath="CENTRO" />
+		</xs:unique>
+		<xs:unique name="vencim_Constraint1" msdata:ConstraintName="Constraint1" msdata:PrimaryKey="true">
+			<xs:selector xpath=".//vencim" />
+			<xs:field xpath="COMVEN" />
+			<xs:field xpath="TIPUS" />
+			<xs:field xpath="DOCUMENT" />
+			<xs:field xpath="FRA" />
+			<xs:field xpath="LIN" />
+			<xs:field xpath="CENTRO" />
+		</xs:unique>
+		<xs:key name="ds11Key1" msdata:PrimaryKey="true">
+			<xs:selector xpath=".//mmani" />
+			<xs:field xpath="MODEL" />
+			<xs:field xpath="SERIE" />
+			<xs:field xpath="TEMPORADA" />
+			<xs:field xpath="CLIENT" />
+			<xs:field xpath="NLINEA" />
+			<xs:field xpath="CENTRO" />
+		</xs:key>
+		<xs:key name="pkParametros" msdata:PrimaryKey="true">
+			<xs:selector xpath=".//PARAMETROS" />
+			<xs:field xpath="TIPO" />
+			<xs:field xpath="CONTENIDO" />
+		</xs:key>
+		<xs:key name="ds11Key2">
+			<xs:selector xpath=".//incoterm" />
+			<xs:field xpath="NOMBRE" />
+		</xs:key>
+	</xs:element>
+</xs:schema>

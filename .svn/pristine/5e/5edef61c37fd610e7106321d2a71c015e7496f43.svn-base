@@ -1,0 +1,261 @@
+Public Class frmListaOrdenesModelos
+    Inherits frmPlantillaLista
+
+
+#Region " Código generado por el Diseñador de Windows Forms "
+
+    Public Sub New()
+        MyBase.New()
+
+        'El Diseñador de Windows Forms requiere esta llamada.
+        InitializeComponent() : Dim tom As SMcMaster.TabOrderManager = New SMcMaster.TabOrderManager(Me) : tom.SetTabOrder(SMcMaster.TabOrderManager.TabScheme.AcrossFirst)
+
+        'Agregar cualquier inicialización después de la llamada a InitializeComponent()
+
+    End Sub
+
+    'Form reemplaza a Dispose para limpiar la lista de componentes.
+    Protected Overloads Overrides Sub Dispose(ByVal disposing As Boolean)
+        If disposing Then
+            If Not (components Is Nothing) Then
+                components.Dispose()
+            End If
+        End If
+       MyBase.Dispose(disposing)
+        frmChildForm = Nothing
+    End Sub
+
+    'Requerido por el Diseñador de Windows Forms
+    Private components As System.ComponentModel.IContainer
+
+    'NOTA: el Diseñador de Windows Forms requiere el siguiente procedimiento
+    'Puede modificarse utilizando el Diseñador de Windows Forms. 
+    'No lo modifique con el editor de código.
+    <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent() 
+        Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(frmListaOrdenesModelos))
+        '
+        'cboSeleccionCentro
+        '
+        Me.cboSeleccionCentro.Location = CType(resources.GetObject("cboSeleccionCentro.Location"), System.Drawing.Point)
+        Me.cboSeleccionCentro.Name = "cboSeleccionCentro"
+        '
+        'btnActualizar
+        '
+        Me.btnActualizar.Location = CType(resources.GetObject("btnActualizar.Location"), System.Drawing.Point)
+        Me.btnActualizar.Name = "btnActualizar"
+        Me.btnActualizar.Size = CType(resources.GetObject("btnActualizar.Size"), System.Drawing.Size)
+        '
+        'sbtipo
+        '
+        Me.sbtipo.FlatStyle = System.Windows.Forms.FlatStyle.System
+        Me.sbtipo.Location = CType(resources.GetObject("sbtipo.Location"), System.Drawing.Point)
+        Me.sbtipo.Name = "sbtipo"
+        Me.sbtipo.Size = CType(resources.GetObject("sbtipo.Size"), System.Drawing.Size)
+        '
+        'btnRecargar
+        '
+        Me.btnRecargar.Location = CType(resources.GetObject("btnRecargar.Location"), System.Drawing.Point)
+        Me.btnRecargar.Name = "btnRecargar"
+        Me.btnRecargar.Size = CType(resources.GetObject("btnRecargar.Size"), System.Drawing.Size)
+        '
+        'btnSiguiente
+        '
+        Me.btnSiguiente.Location = CType(resources.GetObject("btnSiguiente.Location"), System.Drawing.Point)
+        Me.btnSiguiente.Name = "btnSiguiente"
+        Me.btnSiguiente.Size = CType(resources.GetObject("btnSiguiente.Size"), System.Drawing.Size)
+        '
+        'btnAnterior
+        '
+        Me.btnAnterior.Location = CType(resources.GetObject("btnAnterior.Location"), System.Drawing.Point)
+        Me.btnAnterior.Name = "btnAnterior"
+        Me.btnAnterior.Size = CType(resources.GetObject("btnAnterior.Size"), System.Drawing.Size)
+        '
+        'btnPrimero
+        '
+        Me.btnPrimero.Location = CType(resources.GetObject("btnPrimero.Location"), System.Drawing.Point)
+        Me.btnPrimero.Name = "btnPrimero"
+        Me.btnPrimero.Size = CType(resources.GetObject("btnPrimero.Size"), System.Drawing.Size)
+        '
+        'btnUltimo
+        '
+        Me.btnUltimo.Location = CType(resources.GetObject("btnUltimo.Location"), System.Drawing.Point)
+        Me.btnUltimo.Name = "btnUltimo"
+        Me.btnUltimo.Size = CType(resources.GetObject("btnUltimo.Size"), System.Drawing.Size)
+        '
+        'btnModificar
+        '
+        Me.btnModificar.Location = CType(resources.GetObject("btnModificar.Location"), System.Drawing.Point)
+        Me.btnModificar.Name = "btnModificar"
+        Me.btnModificar.Size = CType(resources.GetObject("btnModificar.Size"), System.Drawing.Size)
+        '
+        'btnTancar
+        '
+        Me.btnTancar.Location = CType(resources.GetObject("btnTancar.Location"), System.Drawing.Point)
+        Me.btnTancar.Name = "btnTancar"
+        Me.btnTancar.Size = CType(resources.GetObject("btnTancar.Size"), System.Drawing.Size)
+        '
+        'btnBorrar
+        '
+        Me.btnBorrar.Location = CType(resources.GetObject("btnBorrar.Location"), System.Drawing.Point)
+        Me.btnBorrar.Name = "btnBorrar"
+        Me.btnBorrar.Size = CType(resources.GetObject("btnBorrar.Size"), System.Drawing.Size)
+        '
+        'btnNuevo
+        '
+        Me.btnNuevo.Location = CType(resources.GetObject("btnNuevo.Location"), System.Drawing.Point)
+        Me.btnNuevo.Name = "btnNuevo"
+        Me.btnNuevo.Size = CType(resources.GetObject("btnNuevo.Size"), System.Drawing.Size)
+        '
+        'btnVerLista
+        '
+        Me.btnVerLista.Location = CType(resources.GetObject("btnVerLista.Location"), System.Drawing.Point)
+        Me.btnVerLista.Name = "btnVerLista"
+        Me.btnVerLista.Size = CType(resources.GetObject("btnVerLista.Size"), System.Drawing.Size)
+        '
+        'frmListaOrdenesModelos
+        '
+        Me.AccessibleDescription = resources.GetString("$this.AccessibleDescription")
+        Me.AccessibleName = resources.GetString("$this.AccessibleName")
+        Me.AutoScaleBaseSize = CType(resources.GetObject("$this.AutoScaleBaseSize"), System.Drawing.Size)
+        Me.AutoScroll = CType(resources.GetObject("$this.AutoScroll"), Boolean)
+        Me.AutoScrollMargin = CType(resources.GetObject("$this.AutoScrollMargin"), System.Drawing.Size)
+        Me.AutoScrollMinSize = CType(resources.GetObject("$this.AutoScrollMinSize"), System.Drawing.Size)
+        Me.BackgroundImage = CType(resources.GetObject("$this.BackgroundImage"), System.Drawing.Image)
+        Me.ClientSize = CType(resources.GetObject("$this.ClientSize"), System.Drawing.Size)
+        Me.Enabled = CType(resources.GetObject("$this.Enabled"), Boolean)
+        Me.Font = CType(resources.GetObject("$this.Font"), System.Drawing.Font)
+        Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
+        Me.ImeMode = CType(resources.GetObject("$this.ImeMode"), System.Windows.Forms.ImeMode)
+        Me.Location = CType(resources.GetObject("$this.Location"), System.Drawing.Point)
+        Me.MaximumSize = CType(resources.GetObject("$this.MaximumSize"), System.Drawing.Size)
+        Me.MinimumSize = CType(resources.GetObject("$this.MinimumSize"), System.Drawing.Size)
+        Me.Name = "frmListaOrdenesModelos"
+        Me.RightToLeft = CType(resources.GetObject("$this.RightToLeft"), System.Windows.Forms.RightToLeft)
+        Me.StartPosition = CType(resources.GetObject("$this.StartPosition"), System.Windows.Forms.FormStartPosition)
+        Me.Text = resources.GetString("$this.Text")
+
+    End Sub
+
+#End Region
+
+    Shared frmChildForm As frmListaOrdenesModelos
+    Public Shared Function GetInstance(ByVal esEleccionLista As Short) As frmListaOrdenesModelos
+        If frmChildForm Is Nothing Then
+            frmChildForm = New frmListaOrdenesModelos
+            frmChildForm.EsEleccionOListado = esEleccionLista
+        Else
+            If Not frmChildForm.EsEleccionOListado = esEleccionLista Then
+                frmChildForm = New frmListaOrdenesModelos
+                frmChildForm.EsEleccionOListado = esEleccionLista
+            End If
+        End If
+        Return frmChildForm
+    End Function
+
+    Friend Overrides Sub HacerArraysCampoNombre()
+        Dim a As New clsArrays
+
+        Try
+            With ArrayCampos
+                .Add("ORDRE", a.aOrdre)
+                .Add("MODEL", a.aModel)
+                .Add("SERIE", a.aSerie)
+                .Add("TEMPORADA", a.aTEMPORADA)
+                .Add("ENTRADA", a.aFECHAENTRADA)
+                .Add("PREVISTA", a.aFECHAPREVISTA)
+                .Add("FINAL", a.aFECHAFINAL)
+                .Add("CLIENT", a.aCLIENT)
+                .Add("NOMCENTRO", a.aNOMCENTRO)
+            End With
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Friend Overrides Sub CrearComandos()
+        Try
+            If EsEleccionOListado = esEleccion Then
+                cmdSelect.CommandText = "SELECT " & tabla & ".ORDRE, " & tabla & ".MODEL, " & _
+                                            " " & tabla & ".TEMPORADA, " & tabla & ".SERIE, " & _
+                                            " " & tabla & ".CLIENT, " & tabla & ".CENTRO, " & tabla & ".PREU, " & _
+                                            " " & tabla & ".TALLA01," & tabla & ".TALLA02," & tabla & ".TALLA03," & tabla & ".TALLA04, " & _
+                                            " " & tabla & ".TALLA05, " & tabla & ".TALLA06, " & tabla & ".TALLA07," & tabla & ".TALLA08," & tabla & ".TALLA09," & tabla & ".TALLA10," & _
+                                            " filiales.DESCRI AS NOMCENTRO " & _
+                                            " FROM " & tabla & " " & _
+                                            " LEFT JOIN filiales ON (filiales.CODI = " & tabla & ".CENTRO) "
+            Else
+                cmdSelect.CommandText = "SELECT " & tabla & ".*, " & _
+                                            " filiales.DESCRI AS NOMCENTRO " & _
+                                            " FROM " & tabla & " " & _
+                                            " LEFT JOIN filiales ON (filiales.CODI = " & tabla & ".CENTRO) "
+            End If
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub IniciarForm(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
+        Cursor = Cursors.WaitCursor
+        Try
+            tabla = tablaOrdenesModelos
+            textoListado = rm.GetString("LORDENESFAB")
+            IniciarListado()
+            dv.Sort = "ORDRE"
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+        Cursor = Cursors.Default
+    End Sub
+    Friend Overrides Sub btnFormulario_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
+
+        Try
+            Cursor = Cursors.WaitCursor
+            Dim f As frmOrdenesFabricacion = frmOrdenesFabricacion.GetInstance()
+            f.MdiParent = Me.MdiParent
+            AddHandler f.Closed, AddressOf CType(Me.MdiParent, frmPrincipal).childCerrado
+            AddHandler f.Load, AddressOf CType(Me.MdiParent, frmPrincipal).childAbierto : AddHandler f.Activated, AddressOf CType(Me.MdiParent, frmPrincipal).childOcultandoMostrando
+            f.Show()
+            f.BringToFront()
+            Cursor = Cursors.Default
+
+            Me.Close()
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+
+    End Sub
+
+    Friend Overrides Sub dg_DoubleClick(ByVal sender As Object, ByVal e As System.EventArgs)
+        Try
+            Cursor = Cursors.WaitCursor
+            If EsEleccionOListado = esEleccion Then
+                dr = dg.Item(dg.Row).Row
+                Me.Close()
+                frmChildForm = Nothing
+            Else
+                Dim f As frmOrdenesFabricacion = frmOrdenesFabricacion.GetInstance()
+                f.MdiParent = Me.MdiParent
+                AddHandler f.Closed, AddressOf CType(Me.MdiParent, frmPrincipal).childCerrado
+                AddHandler f.Load, AddressOf CType(Me.MdiParent, frmPrincipal).childAbierto : AddHandler f.Activated, AddressOf CType(Me.MdiParent, frmPrincipal).childOcultandoMostrando
+                Me.Visible = False
+                f.Show()
+                f.BringToFront()
+                Cursor = Cursors.Default
+                f.PAFActual.CambiarAReg(dg.Item(dg.Row, "ORDRE"), iraregistro)
+                Me.Close()
+            End If
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+
+    Private Sub btnCancelar_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnCancelar.Click
+        dr = Nothing
+        Me.Close()
+        frmChildForm = Nothing
+    End Sub
+
+End Class

@@ -1,0 +1,527 @@
+
+Entada de errores : 17:35:52 lunes, 03 de diciembre de 2018
+  :
+  :System.InvalidOperationException: El índice interno de DataTable está dañado: '5'.
+   en System.Data.RBTree`1.RBInsert(Int32 root_id, Int32 x_id, Int32 mainTreeNodeID, Int32 position, Boolean append)
+   en System.Data.RBTree`1.RBInsert(Int32 root_id, Int32 x_id, Int32 mainTreeNodeID, Int32 position, Boolean append)
+   en System.Data.Index.RecordStateChanged(Int32 oldRecord, DataViewRowState oldOldState, DataViewRowState oldNewState, Int32 newRecord, DataViewRowState newOldState, DataViewRowState newNewState)
+   en System.Data.DataTable.RecordStateChanged(Int32 record1, DataViewRowState oldState1, DataViewRowState newState1, Int32 record2, DataViewRowState oldState2, DataViewRowState newState2)
+   en System.Data.DataTable.SetNewRecordWorker(DataRow row, Int32 proposedRecord, DataRowAction action, Boolean isInMerge, Boolean suppressEnsurePropertyChanged, Int32 position, Boolean fireEvent, Exception& deferredException)
+   en System.Data.DataRow.EndEdit()
+   en System.Data.DataRow.set_Item(DataColumn column, Object value)
+   en clsHilo.set_PROVE(Int32 Value) en C:\erp\Productos\Articulos\Hilos\clsHilos.vb:línea 86
+   en frmHilos.btnElegirProveedor_Click(Object sender, EventArgs e) en C:\erp\Productos\Articulos\Hilos\frmHilos.vb:línea 1204
+-------------------------------
+
+Entada de errores : 17:38:50 lunes, 03 de diciembre de 2018
+  :
+  :System.InvalidOperationException: The connection is already open.
+   en MySql.Data.MySqlClient.ExceptionInterceptor.Throw(Exception exception)
+   en MySql.Data.MySqlClient.MySqlConnection.Open()
+   en frmHilos.CargarProveConHilos() en C:\erp\Productos\Articulos\Hilos\frmHilos.vb:línea 888
+-------------------------------
+
+Entada de errores : 15:38:39 martes, 04 de diciembre de 2018
+  :
+  :System.InvalidOperationException: The connection is already open.
+   en MySql.Data.MySqlClient.ExceptionInterceptor.Throw(Exception exception)
+   en MySql.Data.MySqlClient.MySqlConnection.Open()
+   en frmHilos.CargarProveConHilos() en C:\erp\Productos\Articulos\Hilos\frmHilos.vb:línea 888
+-------------------------------
+
+Entada de errores : 16:05:24 lunes, 07 de enero de 2019
+  :
+  :System.Runtime.InteropServices.COMException (0x800A03EC): No se puede obtener acceso a "F-1089.xls".
+   at Microsoft.Office.Interop.Excel._Workbook.SaveAs(Object Filename, Object FileFormat, Object Password, Object WriteResPassword, Object ReadOnlyRecommended, Object CreateBackup, XlSaveAsAccessMode AccessMode, Object ConflictResolution, Object AddToMru, Object TextCodepage, Object TextVisualLayout, Object Local)
+   at ExcelDirecto.ExcelDirecto.LiberarExcel(frCargando fcargando, String num) in C:\erp\Comun\Mis Clases\ExcelDirecto.vb:line 144
+-------------------------------
+
+Entada de errores : 16:21:39 lunes, 07 de enero de 2019
+  :
+  :System.Runtime.InteropServices.COMException (0x800A03EC): No se puede obtener acceso a "F-1089.xls".
+   at Microsoft.Office.Interop.Excel._Workbook.SaveAs(Object Filename, Object FileFormat, Object Password, Object WriteResPassword, Object ReadOnlyRecommended, Object CreateBackup, XlSaveAsAccessMode AccessMode, Object ConflictResolution, Object AddToMru, Object TextCodepage, Object TextVisualLayout, Object Local)
+   at ExcelDirecto.ExcelDirecto.LiberarExcel(frCargando fcargando, String num) in C:\erp\Comun\Mis Clases\ExcelDirecto.vb:line 144
+-------------------------------
+
+Entada de errores : 18:17:15 martes, 29 de enero de 2019
+  :
+  :MySql.Data.MySqlClient.MySqlException (0x80004005): Unknown column 'TALLAL' in 'where clause'
+   en MySql.Data.MySqlClient.MySqlStream.ReadPacket()
+   en MySql.Data.MySqlClient.NativeDriver.GetResult(Int32& affectedRow, Int32& insertedId)
+   en MySql.Data.MySqlClient.Driver.GetResult(Int32 statementId, Int32& affectedRows, Int32& insertedId)
+   en MySql.Data.MySqlClient.Driver.NextResult(Int32 statementId, Boolean force)
+   en MySql.Data.MySqlClient.MySqlDataReader.NextResult()
+   en MySql.Data.MySqlClient.MySqlCommand.ExecuteReader(CommandBehavior behavior)
+   en MySql.Data.MySqlClient.MySqlCommand.ExecuteReader()
+   en aura2k3.frmVentaPAFPlantilla.CrearConsumos() en C:\erp\Ventas\Venta\_frmVentaPAFPlantilla.vb:línea 5739
+-------------------------------
+
+Entada de errores : 18:17:17 martes, 29 de enero de 2019
+  :
+  :System.NullReferenceException: Referencia a objeto no establecida como instancia de un objeto.
+   en aura2k3.frmVentaPAFPlantilla.CrearConsumos() en C:\erp\Ventas\Venta\_frmVentaPAFPlantilla.vb:línea 5778
+   en aura2k3.frmVentaPAFPlantilla.tabControlPAFVentas_SelectedIndexChanged(Object sender, EventArgs e) en C:\erp\Ventas\Venta\_frmVentaPAFPlantilla.vb:línea 6528
+-------------------------------
+
+Entada de errores : 17:38:20 martes, 04 de junio de 2019
+  :
+  :System.ArgumentException: DataField or Caption not found
+   en C1.Win.C1TrueDBGrid.C1DisplayColumnCollection.get_Item(String name)
+   en clsFuncionesC1.PPCol2(String& nombre, C1TrueDBGrid& dg, String caption, String formatonumero, Boolean visible, Int32 minWidth, Boolean autosize, PresentationEnum& presentacion, Boolean boton, Int32 ancho, Int32 orden, Boolean permitirDimensionar, C1TrueDBDropdown truedrop, Boolean editable, Int32 split, AlignHorzEnum alineacion, Style estilo, String expresionRegularEstilo) en C:\erp\Comun\clsFuncionesC1.vb:línea 274
+-------------------------------
+
+Entada de errores : 17:38:44 martes, 04 de junio de 2019
+  :
+  :System.ArgumentException: DataField or Caption not found
+   en clsFuncionesC1.PPCol2(String& nombre, C1TrueDBGrid& dg, String caption, String formatonumero, Boolean visible, Int32 minWidth, Boolean autosize, PresentationEnum& presentacion, Boolean boton, Int32 ancho, Int32 orden, Boolean permitirDimensionar, C1TrueDBDropdown truedrop, Boolean editable, Int32 split, AlignHorzEnum alineacion, Style estilo, String expresionRegularEstilo) en C:\erp\Comun\clsFuncionesC1.vb:línea 331
+   en frmPagoForm2.HacerBindings() en C:\erp\formularios articulos\frmPagoForm2.vb:línea 229
+-------------------------------
+
+Entada de errores : 18:17:19 martes, 04 de junio de 2019
+  :
+  :System.ArgumentException: DataField or Caption not found
+   en C1.Win.C1TrueDBGrid.C1DisplayColumnCollection.get_Item(String name)
+   en clsFuncionesC1.PPCol2(String& nombre, C1TrueDBGrid& dg, String caption, String formatonumero, Boolean visible, Int32 minWidth, Boolean autosize, PresentationEnum& presentacion, Boolean boton, Int32 ancho, Int32 orden, Boolean permitirDimensionar, C1TrueDBDropdown truedrop, Boolean editable, Int32 split, AlignHorzEnum alineacion, Style estilo, String expresionRegularEstilo) en C:\erp\Comun\clsFuncionesC1.vb:línea 274
+-------------------------------
+
+Entada de errores : 18:17:45 martes, 04 de junio de 2019
+  :
+  :System.ArgumentException: DataField or Caption not found
+   en clsFuncionesC1.PPCol2(String& nombre, C1TrueDBGrid& dg, String caption, String formatonumero, Boolean visible, Int32 minWidth, Boolean autosize, PresentationEnum& presentacion, Boolean boton, Int32 ancho, Int32 orden, Boolean permitirDimensionar, C1TrueDBDropdown truedrop, Boolean editable, Int32 split, AlignHorzEnum alineacion, Style estilo, String expresionRegularEstilo) en C:\erp\Comun\clsFuncionesC1.vb:línea 331
+   en frmPagoForm2.HacerBindings() en C:\erp\formularios articulos\frmPagoForm2.vb:línea 229
+-------------------------------
+
+Entada de errores : 18:18:13 martes, 04 de junio de 2019
+  :
+  :System.ArgumentException: DataField or Caption not found
+   en C1.Win.C1TrueDBGrid.C1DisplayColumnCollection.get_Item(String name)
+   en clsFuncionesC1.PPCol2(String& nombre, C1TrueDBGrid& dg, String caption, String formatonumero, Boolean visible, Int32 minWidth, Boolean autosize, PresentationEnum& presentacion, Boolean boton, Int32 ancho, Int32 orden, Boolean permitirDimensionar, C1TrueDBDropdown truedrop, Boolean editable, Int32 split, AlignHorzEnum alineacion, Style estilo, String expresionRegularEstilo) en C:\erp\Comun\clsFuncionesC1.vb:línea 274
+-------------------------------
+
+Entada de errores : 13:10:26 lunes, 01 de julio de 2019
+  :
+  :System.ArgumentNullException: Value cannot be null.
+Parameter name: item
+   at System.Windows.Forms.ListBox.ObjectCollection.AddInternal(Object item)
+   at System.Windows.Forms.ListBox.ObjectCollection.Add(Object item)
+   at frmPlantillaLista.rellenarlista(ListBox& lst, String tabla, Hashtable ArrayCampos, Boolean tieneOrden) in C:\erp\Listados\_frmPlantillaLista.vb:line 732
+-------------------------------
+
+Entada de errores : 13:13:22 lunes, 01 de julio de 2019
+  :
+  :System.ArgumentNullException: Key cannot be null.
+Parameter name: key
+   at System.Collections.Hashtable.get_Item(Object key)
+   at frmPlantillaLista.InicializarDg2(String tabla, C1TrueDBGrid& dg, ListBox lstCampos, Hashtable arraycampos, DataView& dv, Font fuente, Boolean sololectura, Boolean tieneOrden)
+-------------------------------
+
+Entada de errores : 13:16:10 lunes, 01 de julio de 2019
+  :
+  :System.ArgumentNullException: Value cannot be null.
+Parameter name: item
+   at System.Windows.Forms.ListBox.ObjectCollection.AddInternal(Object item)
+   at System.Windows.Forms.ListBox.ObjectCollection.Add(Object item)
+   at frmPlantillaLista.rellenarlista(ListBox& lst, String tabla, Hashtable ArrayCampos, Boolean tieneOrden) in C:\erp\Listados\_frmPlantillaLista.vb:line 732
+-------------------------------
+
+Entada de errores : 13:16:16 lunes, 01 de julio de 2019
+  :
+  :System.ArgumentNullException: Key cannot be null.
+Parameter name: key
+   at System.Collections.Hashtable.get_Item(Object key)
+   at frmPlantillaLista.InicializarDg2(String tabla, C1TrueDBGrid& dg, ListBox lstCampos, Hashtable arraycampos, DataView& dv, Font fuente, Boolean sololectura, Boolean tieneOrden) in C:\erp\Listados\_frmPlantillaLista.vb:line 898
+-------------------------------
+
+Entada de errores : 13:16:17 lunes, 01 de julio de 2019
+  :
+  :System.ArgumentNullException: Key cannot be null.
+Parameter name: key
+   at System.Collections.Hashtable.get_Item(Object key)
+   at frmPlantillaLista.InicializarDg2(String tabla, C1TrueDBGrid& dg, ListBox lstCampos, Hashtable arraycampos, DataView& dv, Font fuente, Boolean sololectura, Boolean tieneOrden) in C:\erp\Listados\_frmPlantillaLista.vb:line 898
+-------------------------------
+
+Entada de errores : 13:16:17 lunes, 01 de julio de 2019
+  :
+  :System.ArgumentNullException: Key cannot be null.
+Parameter name: key
+   at System.Collections.Hashtable.get_Item(Object key)
+   at frmPlantillaLista.InicializarDg2(String tabla, C1TrueDBGrid& dg, ListBox lstCampos, Hashtable arraycampos, DataView& dv, Font fuente, Boolean sololectura, Boolean tieneOrden) in C:\erp\Listados\_frmPlantillaLista.vb:line 898
+-------------------------------
+
+Entada de errores : 13:16:17 lunes, 01 de julio de 2019
+  :
+  :System.ArgumentNullException: Key cannot be null.
+Parameter name: key
+   at System.Collections.Hashtable.get_Item(Object key)
+   at frmPlantillaLista.InicializarDg2(String tabla, C1TrueDBGrid& dg, ListBox lstCampos, Hashtable arraycampos, DataView& dv, Font fuente, Boolean sololectura, Boolean tieneOrden) in C:\erp\Listados\_frmPlantillaLista.vb:line 898
+-------------------------------
+
+Entada de errores : 13:16:18 lunes, 01 de julio de 2019
+  :
+  :System.ArgumentNullException: Key cannot be null.
+Parameter name: key
+   at System.Collections.Hashtable.get_Item(Object key)
+   at frmPlantillaLista.InicializarDg2(String tabla, C1TrueDBGrid& dg, ListBox lstCampos, Hashtable arraycampos, DataView& dv, Font fuente, Boolean sololectura, Boolean tieneOrden) in C:\erp\Listados\_frmPlantillaLista.vb:line 898
+-------------------------------
+
+Entada de errores : 13:16:18 lunes, 01 de julio de 2019
+  :
+  :System.ArgumentNullException: Key cannot be null.
+Parameter name: key
+   at System.Collections.Hashtable.get_Item(Object key)
+   at frmPlantillaLista.InicializarDg2(String tabla, C1TrueDBGrid& dg, ListBox lstCampos, Hashtable arraycampos, DataView& dv, Font fuente, Boolean sololectura, Boolean tieneOrden) in C:\erp\Listados\_frmPlantillaLista.vb:line 898
+-------------------------------
+
+Entada de errores : 13:16:18 lunes, 01 de julio de 2019
+  :
+  :System.ArgumentNullException: Key cannot be null.
+Parameter name: key
+   at System.Collections.Hashtable.get_Item(Object key)
+   at frmPlantillaLista.InicializarDg2(String tabla, C1TrueDBGrid& dg, ListBox lstCampos, Hashtable arraycampos, DataView& dv, Font fuente, Boolean sololectura, Boolean tieneOrden) in C:\erp\Listados\_frmPlantillaLista.vb:line 898
+-------------------------------
+
+Entada de errores : 13:16:18 lunes, 01 de julio de 2019
+  :
+  :System.ArgumentNullException: Key cannot be null.
+Parameter name: key
+   at System.Collections.Hashtable.get_Item(Object key)
+   at frmPlantillaLista.InicializarDg2(String tabla, C1TrueDBGrid& dg, ListBox lstCampos, Hashtable arraycampos, DataView& dv, Font fuente, Boolean sololectura, Boolean tieneOrden) in C:\erp\Listados\_frmPlantillaLista.vb:line 898
+-------------------------------
+
+Entada de errores : 13:16:18 lunes, 01 de julio de 2019
+  :
+  :System.ArgumentNullException: Key cannot be null.
+Parameter name: key
+   at System.Collections.Hashtable.get_Item(Object key)
+   at frmPlantillaLista.InicializarDg2(String tabla, C1TrueDBGrid& dg, ListBox lstCampos, Hashtable arraycampos, DataView& dv, Font fuente, Boolean sololectura, Boolean tieneOrden) in C:\erp\Listados\_frmPlantillaLista.vb:line 898
+-------------------------------
+
+Entada de errores : 13:16:18 lunes, 01 de julio de 2019
+  :
+  :System.ArgumentNullException: Key cannot be null.
+Parameter name: key
+   at System.Collections.Hashtable.get_Item(Object key)
+   at frmPlantillaLista.InicializarDg2(String tabla, C1TrueDBGrid& dg, ListBox lstCampos, Hashtable arraycampos, DataView& dv, Font fuente, Boolean sololectura, Boolean tieneOrden) in C:\erp\Listados\_frmPlantillaLista.vb:line 898
+-------------------------------
+
+Entada de errores : 13:16:19 lunes, 01 de julio de 2019
+  :
+  :System.ArgumentNullException: Key cannot be null.
+Parameter name: key
+   at System.Collections.Hashtable.get_Item(Object key)
+   at frmPlantillaLista.InicializarDg2(String tabla, C1TrueDBGrid& dg, ListBox lstCampos, Hashtable arraycampos, DataView& dv, Font fuente, Boolean sololectura, Boolean tieneOrden) in C:\erp\Listados\_frmPlantillaLista.vb:line 898
+-------------------------------
+
+Entada de errores : 13:16:19 lunes, 01 de julio de 2019
+  :
+  :System.ArgumentNullException: Key cannot be null.
+Parameter name: key
+   at System.Collections.Hashtable.get_Item(Object key)
+   at frmPlantillaLista.InicializarDg2(String tabla, C1TrueDBGrid& dg, ListBox lstCampos, Hashtable arraycampos, DataView& dv, Font fuente, Boolean sololectura, Boolean tieneOrden) in C:\erp\Listados\_frmPlantillaLista.vb:line 898
+-------------------------------
+
+Entada de errores : 13:16:19 lunes, 01 de julio de 2019
+  :
+  :System.ArgumentNullException: Key cannot be null.
+Parameter name: key
+   at System.Collections.Hashtable.get_Item(Object key)
+   at frmPlantillaLista.InicializarDg2(String tabla, C1TrueDBGrid& dg, ListBox lstCampos, Hashtable arraycampos, DataView& dv, Font fuente, Boolean sololectura, Boolean tieneOrden) in C:\erp\Listados\_frmPlantillaLista.vb:line 898
+-------------------------------
+
+Entada de errores : 13:16:19 lunes, 01 de julio de 2019
+  :
+  :System.ArgumentNullException: Key cannot be null.
+Parameter name: key
+   at System.Collections.Hashtable.get_Item(Object key)
+   at frmPlantillaLista.InicializarDg2(String tabla, C1TrueDBGrid& dg, ListBox lstCampos, Hashtable arraycampos, DataView& dv, Font fuente, Boolean sololectura, Boolean tieneOrden) in C:\erp\Listados\_frmPlantillaLista.vb:line 898
+-------------------------------
+
+Entada de errores : 13:16:19 lunes, 01 de julio de 2019
+  :
+  :System.ArgumentNullException: Key cannot be null.
+Parameter name: key
+   at System.Collections.Hashtable.get_Item(Object key)
+   at frmPlantillaLista.InicializarDg2(String tabla, C1TrueDBGrid& dg, ListBox lstCampos, Hashtable arraycampos, DataView& dv, Font fuente, Boolean sololectura, Boolean tieneOrden) in C:\erp\Listados\_frmPlantillaLista.vb:line 898
+-------------------------------
+
+Entada de errores : 13:16:19 lunes, 01 de julio de 2019
+  :
+  :System.ArgumentNullException: Key cannot be null.
+Parameter name: key
+   at System.Collections.Hashtable.get_Item(Object key)
+   at frmPlantillaLista.InicializarDg2(String tabla, C1TrueDBGrid& dg, ListBox lstCampos, Hashtable arraycampos, DataView& dv, Font fuente, Boolean sololectura, Boolean tieneOrden) in C:\erp\Listados\_frmPlantillaLista.vb:line 898
+-------------------------------
+
+Entada de errores : 13:16:20 lunes, 01 de julio de 2019
+  :
+  :System.ArgumentNullException: Key cannot be null.
+Parameter name: key
+   at System.Collections.Hashtable.get_Item(Object key)
+   at frmPlantillaLista.InicializarDg2(String tabla, C1TrueDBGrid& dg, ListBox lstCampos, Hashtable arraycampos, DataView& dv, Font fuente, Boolean sololectura, Boolean tieneOrden) in C:\erp\Listados\_frmPlantillaLista.vb:line 898
+-------------------------------
+
+Entada de errores : 13:16:20 lunes, 01 de julio de 2019
+  :
+  :System.ArgumentNullException: Key cannot be null.
+Parameter name: key
+   at System.Collections.Hashtable.get_Item(Object key)
+   at frmPlantillaLista.InicializarDg2(String tabla, C1TrueDBGrid& dg, ListBox lstCampos, Hashtable arraycampos, DataView& dv, Font fuente, Boolean sololectura, Boolean tieneOrden) in C:\erp\Listados\_frmPlantillaLista.vb:line 898
+-------------------------------
+
+Entada de errores : 13:16:20 lunes, 01 de julio de 2019
+  :
+  :System.ArgumentNullException: Key cannot be null.
+Parameter name: key
+   at System.Collections.Hashtable.get_Item(Object key)
+   at frmPlantillaLista.InicializarDg2(String tabla, C1TrueDBGrid& dg, ListBox lstCampos, Hashtable arraycampos, DataView& dv, Font fuente, Boolean sololectura, Boolean tieneOrden) in C:\erp\Listados\_frmPlantillaLista.vb:line 898
+-------------------------------
+
+Entada de errores : 13:16:21 lunes, 01 de julio de 2019
+  :
+  :System.ArgumentNullException: Value cannot be null.
+Parameter name: item
+   at System.Windows.Forms.ListBox.ObjectCollection.AddInternal(Object item)
+   at System.Windows.Forms.ListBox.ObjectCollection.Add(Object item)
+   at frmPlantillaLista.rellenarlista(ListBox& lst, String tabla, Hashtable ArrayCampos, Boolean tieneOrden) in C:\erp\Listados\_frmPlantillaLista.vb:line 732
+-------------------------------
+
+Entada de errores : 13:16:23 lunes, 01 de julio de 2019
+  :
+  :System.ArgumentNullException: Key cannot be null.
+Parameter name: key
+   at System.Collections.Hashtable.get_Item(Object key)
+   at frmPlantillaLista.InicializarDg2(String tabla, C1TrueDBGrid& dg, ListBox lstCampos, Hashtable arraycampos, DataView& dv, Font fuente, Boolean sololectura, Boolean tieneOrden) in C:\erp\Listados\_frmPlantillaLista.vb:line 898
+-------------------------------
+
+Entada de errores : 13:16:24 lunes, 01 de julio de 2019
+  :
+  :System.ArgumentNullException: Key cannot be null.
+Parameter name: key
+   at System.Collections.Hashtable.get_Item(Object key)
+   at frmPlantillaLista.InicializarDg2(String tabla, C1TrueDBGrid& dg, ListBox lstCampos, Hashtable arraycampos, DataView& dv, Font fuente, Boolean sololectura, Boolean tieneOrden) in C:\erp\Listados\_frmPlantillaLista.vb:line 898
+-------------------------------
+
+Entada de errores : 13:16:24 lunes, 01 de julio de 2019
+  :
+  :System.ArgumentNullException: Key cannot be null.
+Parameter name: key
+   at System.Collections.Hashtable.get_Item(Object key)
+   at frmPlantillaLista.InicializarDg2(String tabla, C1TrueDBGrid& dg, ListBox lstCampos, Hashtable arraycampos, DataView& dv, Font fuente, Boolean sololectura, Boolean tieneOrden) in C:\erp\Listados\_frmPlantillaLista.vb:line 898
+-------------------------------
+
+Entada de errores : 13:16:25 lunes, 01 de julio de 2019
+  :
+  :System.ArgumentNullException: Key cannot be null.
+Parameter name: key
+   at System.Collections.Hashtable.get_Item(Object key)
+   at frmPlantillaLista.InicializarDg2(String tabla, C1TrueDBGrid& dg, ListBox lstCampos, Hashtable arraycampos, DataView& dv, Font fuente, Boolean sololectura, Boolean tieneOrden) in C:\erp\Listados\_frmPlantillaLista.vb:line 898
+-------------------------------
+
+Entada de errores : 13:16:25 lunes, 01 de julio de 2019
+  :
+  :System.ArgumentNullException: Key cannot be null.
+Parameter name: key
+   at System.Collections.Hashtable.get_Item(Object key)
+   at frmPlantillaLista.InicializarDg2(String tabla, C1TrueDBGrid& dg, ListBox lstCampos, Hashtable arraycampos, DataView& dv, Font fuente, Boolean sololectura, Boolean tieneOrden) in C:\erp\Listados\_frmPlantillaLista.vb:line 898
+-------------------------------
+
+Entada de errores : 13:16:25 lunes, 01 de julio de 2019
+  :
+  :System.ArgumentNullException: Key cannot be null.
+Parameter name: key
+   at System.Collections.Hashtable.get_Item(Object key)
+   at frmPlantillaLista.InicializarDg2(String tabla, C1TrueDBGrid& dg, ListBox lstCampos, Hashtable arraycampos, DataView& dv, Font fuente, Boolean sololectura, Boolean tieneOrden) in C:\erp\Listados\_frmPlantillaLista.vb:line 898
+-------------------------------
+
+Entada de errores : 13:16:25 lunes, 01 de julio de 2019
+  :
+  :System.ArgumentNullException: Key cannot be null.
+Parameter name: key
+   at System.Collections.Hashtable.get_Item(Object key)
+   at frmPlantillaLista.InicializarDg2(String tabla, C1TrueDBGrid& dg, ListBox lstCampos, Hashtable arraycampos, DataView& dv, Font fuente, Boolean sololectura, Boolean tieneOrden) in C:\erp\Listados\_frmPlantillaLista.vb:line 898
+-------------------------------
+
+Entada de errores : 13:16:26 lunes, 01 de julio de 2019
+  :
+  :System.ArgumentNullException: Key cannot be null.
+Parameter name: key
+   at System.Collections.Hashtable.get_Item(Object key)
+   at frmPlantillaLista.InicializarDg2(String tabla, C1TrueDBGrid& dg, ListBox lstCampos, Hashtable arraycampos, DataView& dv, Font fuente, Boolean sololectura, Boolean tieneOrden) in C:\erp\Listados\_frmPlantillaLista.vb:line 898
+-------------------------------
+
+Entada de errores : 13:16:26 lunes, 01 de julio de 2019
+  :
+  :System.ArgumentNullException: Key cannot be null.
+Parameter name: key
+   at System.Collections.Hashtable.get_Item(Object key)
+   at frmPlantillaLista.InicializarDg2(String tabla, C1TrueDBGrid& dg, ListBox lstCampos, Hashtable arraycampos, DataView& dv, Font fuente, Boolean sololectura, Boolean tieneOrden) in C:\erp\Listados\_frmPlantillaLista.vb:line 898
+-------------------------------
+
+Entada de errores : 13:16:26 lunes, 01 de julio de 2019
+  :
+  :System.ArgumentNullException: Key cannot be null.
+Parameter name: key
+   at System.Collections.Hashtable.get_Item(Object key)
+   at frmPlantillaLista.InicializarDg2(String tabla, C1TrueDBGrid& dg, ListBox lstCampos, Hashtable arraycampos, DataView& dv, Font fuente, Boolean sololectura, Boolean tieneOrden) in C:\erp\Listados\_frmPlantillaLista.vb:line 898
+-------------------------------
+
+Entada de errores : 13:16:26 lunes, 01 de julio de 2019
+  :
+  :System.ArgumentNullException: Key cannot be null.
+Parameter name: key
+   at System.Collections.Hashtable.get_Item(Object key)
+   at frmPlantillaLista.InicializarDg2(String tabla, C1TrueDBGrid& dg, ListBox lstCampos, Hashtable arraycampos, DataView& dv, Font fuente, Boolean sololectura, Boolean tieneOrden) in C:\erp\Listados\_frmPlantillaLista.vb:line 898
+-------------------------------
+
+Entada de errores : 13:16:26 lunes, 01 de julio de 2019
+  :
+  :System.ArgumentNullException: Key cannot be null.
+Parameter name: key
+   at System.Collections.Hashtable.get_Item(Object key)
+   at frmPlantillaLista.InicializarDg2(String tabla, C1TrueDBGrid& dg, ListBox lstCampos, Hashtable arraycampos, DataView& dv, Font fuente, Boolean sololectura, Boolean tieneOrden) in C:\erp\Listados\_frmPlantillaLista.vb:line 898
+-------------------------------
+
+Entada de errores : 13:16:27 lunes, 01 de julio de 2019
+  :
+  :System.ArgumentNullException: Key cannot be null.
+Parameter name: key
+   at System.Collections.Hashtable.get_Item(Object key)
+   at frmPlantillaLista.InicializarDg2(String tabla, C1TrueDBGrid& dg, ListBox lstCampos, Hashtable arraycampos, DataView& dv, Font fuente, Boolean sololectura, Boolean tieneOrden) in C:\erp\Listados\_frmPlantillaLista.vb:line 898
+-------------------------------
+
+Entada de errores : 13:16:27 lunes, 01 de julio de 2019
+  :
+  :System.ArgumentNullException: Key cannot be null.
+Parameter name: key
+   at System.Collections.Hashtable.get_Item(Object key)
+   at frmPlantillaLista.InicializarDg2(String tabla, C1TrueDBGrid& dg, ListBox lstCampos, Hashtable arraycampos, DataView& dv, Font fuente, Boolean sololectura, Boolean tieneOrden) in C:\erp\Listados\_frmPlantillaLista.vb:line 898
+-------------------------------
+
+Entada de errores : 13:16:27 lunes, 01 de julio de 2019
+  :
+  :System.ArgumentNullException: Key cannot be null.
+Parameter name: key
+   at System.Collections.Hashtable.get_Item(Object key)
+   at frmPlantillaLista.InicializarDg2(String tabla, C1TrueDBGrid& dg, ListBox lstCampos, Hashtable arraycampos, DataView& dv, Font fuente, Boolean sololectura, Boolean tieneOrden) in C:\erp\Listados\_frmPlantillaLista.vb:line 898
+-------------------------------
+
+Entada de errores : 13:16:27 lunes, 01 de julio de 2019
+  :
+  :System.ArgumentNullException: Key cannot be null.
+Parameter name: key
+   at System.Collections.Hashtable.get_Item(Object key)
+   at frmPlantillaLista.InicializarDg2(String tabla, C1TrueDBGrid& dg, ListBox lstCampos, Hashtable arraycampos, DataView& dv, Font fuente, Boolean sololectura, Boolean tieneOrden) in C:\erp\Listados\_frmPlantillaLista.vb:line 898
+-------------------------------
+
+Entada de errores : 13:16:28 lunes, 01 de julio de 2019
+  :
+  :System.ArgumentNullException: Key cannot be null.
+Parameter name: key
+   at System.Collections.Hashtable.get_Item(Object key)
+   at frmPlantillaLista.InicializarDg2(String tabla, C1TrueDBGrid& dg, ListBox lstCampos, Hashtable arraycampos, DataView& dv, Font fuente, Boolean sololectura, Boolean tieneOrden) in C:\erp\Listados\_frmPlantillaLista.vb:line 898
+-------------------------------
+
+Entada de errores : 13:16:28 lunes, 01 de julio de 2019
+  :
+  :System.ArgumentNullException: Key cannot be null.
+Parameter name: key
+   at System.Collections.Hashtable.get_Item(Object key)
+   at frmPlantillaLista.InicializarDg2(String tabla, C1TrueDBGrid& dg, ListBox lstCampos, Hashtable arraycampos, DataView& dv, Font fuente, Boolean sololectura, Boolean tieneOrden) in C:\erp\Listados\_frmPlantillaLista.vb:line 898
+-------------------------------
+
+Entada de errores : 13:16:29 lunes, 01 de julio de 2019
+  :
+  :System.ArgumentNullException: Key cannot be null.
+Parameter name: key
+   at System.Collections.Hashtable.get_Item(Object key)
+   at frmPlantillaLista.InicializarDg2(String tabla, C1TrueDBGrid& dg, ListBox lstCampos, Hashtable arraycampos, DataView& dv, Font fuente, Boolean sololectura, Boolean tieneOrden) in C:\erp\Listados\_frmPlantillaLista.vb:line 898
+-------------------------------
+
+Entada de errores : 13:19:08 lunes, 01 de julio de 2019
+  :
+  :System.ArgumentNullException: Value cannot be null.
+Parameter name: item
+   at System.Windows.Forms.ListBox.ObjectCollection.AddInternal(Object item)
+   at System.Windows.Forms.ListBox.ObjectCollection.Add(Object item)
+   at frmPlantillaLista.rellenarlista(ListBox& lst, String tabla, Hashtable ArrayCampos, Boolean tieneOrden) in C:\erp\Listados\_frmPlantillaLista.vb:line 732
+-------------------------------
+
+Entada de errores : 15:17:38 martes, 16 de julio de 2019
+  :
+  :System.Data.ConstraintException: Failed to enable constraints. One or more rows contain values violating non-null, unique, or foreign-key constraints.
+   at System.Data.DataSet.EnableConstraints()
+   at System.Data.DataSet.set_EnforceConstraints(Boolean value)
+   at System.Data.DataTable.EndLoadData()
+   at System.Data.Common.DataAdapter.FillFromReader(DataSet dataset, DataTable datatable, String srcTable, DataReaderContainer dataReader, Int32 startRecord, Int32 maxRecords, DataColumn parentChapterColumn, Object parentChapterValue)
+   at System.Data.Common.DataAdapter.Fill(DataSet dataSet, String srcTable, IDataReader dataReader, Int32 startRecord, Int32 maxRecords)
+   at System.Data.Common.DbDataAdapter.FillInternal(DataSet dataset, DataTable[] datatables, Int32 startRecord, Int32 maxRecords, String srcTable, IDbCommand command, CommandBehavior behavior)
+   at System.Data.Common.DbDataAdapter.Fill(DataSet dataSet, Int32 startRecord, Int32 maxRecords, String srcTable, IDbCommand command, CommandBehavior behavior)
+   at System.Data.Common.DbDataAdapter.Fill(DataSet dataSet, String srcTable)
+   at frmPlantillaLista.IniciarListado() in C:\erp\Listados\_frmPlantillaLista.vb:line 442
+-------------------------------
+
+Entada de errores : 15:54:47 martes, 16 de julio de 2019
+  :
+  :System.Data.ConstraintException: Failed to enable constraints. One or more rows contain values violating non-null, unique, or foreign-key constraints.
+   at System.Data.DataSet.EnableConstraints()
+   at System.Data.DataSet.set_EnforceConstraints(Boolean value)
+   at System.Data.DataTable.EndLoadData()
+   at System.Data.Common.DataAdapter.FillFromReader(DataSet dataset, DataTable datatable, String srcTable, DataReaderContainer dataReader, Int32 startRecord, Int32 maxRecords, DataColumn parentChapterColumn, Object parentChapterValue)
+   at System.Data.Common.DataAdapter.Fill(DataSet dataSet, String srcTable, IDataReader dataReader, Int32 startRecord, Int32 maxRecords)
+   at System.Data.Common.DbDataAdapter.FillInternal(DataSet dataset, DataTable[] datatables, Int32 startRecord, Int32 maxRecords, String srcTable, IDbCommand command, CommandBehavior behavior)
+   at System.Data.Common.DbDataAdapter.Fill(DataSet dataSet, Int32 startRecord, Int32 maxRecords, String srcTable, IDbCommand command, CommandBehavior behavior)
+   at System.Data.Common.DbDataAdapter.Fill(DataSet dataSet, String srcTable)
+   at frmPlantillaLista.IniciarListado() in C:\erp\Listados\_frmPlantillaLista.vb:line 442
+-------------------------------
+
+Entada de errores : 16:09:33 martes, 16 de julio de 2019
+  :
+  :System.Data.DataException: DataTable must be set prior to using DataView.
+   at System.Data.DataView.CheckSort(String sort)
+   at System.Data.DataView.set_Sort(String value)
+   at frmPAFLista.IniciarForm(Object sender, EventArgs e) in C:\erp\Listados\Listados PAFP\frmListadoPAF.vb:line 335
+-------------------------------
+
+Entada de errores : 16:56:39 martes, 16 de julio de 2019
+  :
+  :System.Data.ConstraintException: Failed to enable constraints. One or more rows contain values violating non-null, unique, or foreign-key constraints.
+   at System.Data.DataSet.EnableConstraints()
+   at System.Data.DataSet.set_EnforceConstraints(Boolean value)
+   at System.Data.DataTable.EndLoadData()
+   at System.Data.Common.DataAdapter.FillFromReader(DataSet dataset, DataTable datatable, String srcTable, DataReaderContainer dataReader, Int32 startRecord, Int32 maxRecords, DataColumn parentChapterColumn, Object parentChapterValue)
+   at System.Data.Common.DataAdapter.Fill(DataSet dataSet, String srcTable, IDataReader dataReader, Int32 startRecord, Int32 maxRecords)
+   at System.Data.Common.DbDataAdapter.FillInternal(DataSet dataset, DataTable[] datatables, Int32 startRecord, Int32 maxRecords, String srcTable, IDbCommand command, CommandBehavior behavior)
+   at System.Data.Common.DbDataAdapter.Fill(DataSet dataSet, Int32 startRecord, Int32 maxRecords, String srcTable, IDbCommand command, CommandBehavior behavior)
+   at System.Data.Common.DbDataAdapter.Fill(DataSet dataSet, String srcTable)
+   at frmPlantillaLista.IniciarListado() in C:\erp\Listados\_frmPlantillaLista.vb:line 442
+-------------------------------
+
+Entada de errores : 16:56:40 martes, 16 de julio de 2019
+  :
+  :System.Data.DataException: DataTable must be set prior to using DataView.
+   at System.Data.DataView.CheckSort(String sort)
+   at System.Data.DataView.set_Sort(String value)
+   at frmPAFLista.IniciarForm(Object sender, EventArgs e) in C:\erp\Listados\Listados PAFP\frmListadoPAF.vb:line 335
+-------------------------------
+
+Entada de errores : 17:02:37 martes, 16 de julio de 2019
+  :
+  :System.Data.ConstraintException: Failed to enable constraints. One or more rows contain values violating non-null, unique, or foreign-key constraints.
+   at System.Data.DataSet.EnableConstraints()
+   at System.Data.DataSet.set_EnforceConstraints(Boolean value)
+   at System.Data.DataTable.EndLoadData()
+   at System.Data.Common.DataAdapter.FillFromReader(DataSet dataset, DataTable datatable, String srcTable, DataReaderContainer dataReader, Int32 startRecord, Int32 maxRecords, DataColumn parentChapterColumn, Object parentChapterValue)
+   at System.Data.Common.DataAdapter.Fill(DataSet dataSet, String srcTable, IDataReader dataReader, Int32 startRecord, Int32 maxRecords)
+   at System.Data.Common.DbDataAdapter.FillInternal(DataSet dataset, DataTable[] datatables, Int32 startRecord, Int32 maxRecords, String srcTable, IDbCommand command, CommandBehavior behavior)
+   at System.Data.Common.DbDataAdapter.Fill(DataSet dataSet, Int32 startRecord, Int32 maxRecords, String srcTable, IDbCommand command, CommandBehavior behavior)
+   at System.Data.Common.DbDataAdapter.Fill(DataSet dataSet, String srcTable)
+   at frmPlantillaLista.IniciarListado() in C:\erp\Listados\_frmPlantillaLista.vb:line 442
+-------------------------------
+
+Entada de errores : 17:04:18 martes, 16 de julio de 2019
+  :
+  :System.Data.DataException: DataTable must be set prior to using DataView.
+   at System.Data.DataView.CheckSort(String sort)
+   at System.Data.DataView.set_Sort(String value)
+   at frmPAFLista.IniciarForm(Object sender, EventArgs e) in C:\erp\Listados\Listados PAFP\frmListadoPAF.vb:line 335
+-------------------------------

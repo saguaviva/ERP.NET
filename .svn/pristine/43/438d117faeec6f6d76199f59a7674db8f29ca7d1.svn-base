@@ -1,0 +1,1172 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<root>
+	<!-- 
+    Microsoft ResX Schema 
+    
+    Version 1.3
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">1.3</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1">this is my long string</data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        [base64 mime encoded serialized .NET Framework object]
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        [base64 mime encoded string representing a byte array form of the .NET Framework object]
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used forserialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+	<xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+		<xsd:element name="root" msdata:IsDataSet="true">
+			<xsd:complexType>
+				<xsd:choice maxOccurs="unbounded">
+					<xsd:element name="data">
+						<xsd:complexType>
+							<xsd:sequence>
+								<xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+								<xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+							</xsd:sequence>
+							<xsd:attribute name="name" type="xsd:string" msdata:Ordinal="1" />
+							<xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+							<xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+						</xsd:complexType>
+					</xsd:element>
+					<xsd:element name="resheader">
+						<xsd:complexType>
+							<xsd:sequence>
+								<xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+							</xsd:sequence>
+							<xsd:attribute name="name" type="xsd:string" use="required" />
+						</xsd:complexType>
+					</xsd:element>
+				</xsd:choice>
+			</xsd:complexType>
+		</xsd:element>
+	</xsd:schema>
+	<resheader name="resmimetype">
+		<value>text/microsoft-resx</value>
+	</resheader>
+	<resheader name="version">
+		<value>1.3</value>
+	</resheader>
+	<resheader name="reader">
+		<value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=1.0.5000.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+	</resheader>
+	<resheader name="writer">
+		<value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=1.0.5000.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+	</resheader>
+	<data name="ABRKILOS">
+		<value>Kgs.</value>
+	</data>
+	<data name="ABRMETROS">
+		<value>Mts</value>
+	</data>
+	<data name="ACABADO">
+		<value>Acabado</value>
+	</data>
+	<data name="ACABADOS">
+		<value>Acabados</value>
+	</data>
+	<data name="ACTUAL">
+		<value>Actual</value>
+	</data>
+	<data name="ACTUALIZAR">
+		<value>Guardar (F6)</value>
+	</data>
+	<data name="AENTREGAHILOS">
+		<value>Albarán entrega hilos</value>
+	</data>
+	<data name="ALBARAN">
+		<value>Albarán</value>
+	</data>
+	<data name="ALBARANES">
+		<value>Albaranes</value>
+	</data>
+	<data name="ALBARANESENTREGA">
+		<value>Albranes de Entrega</value>
+	</data>
+	<data name="ALBARANESENTREGAHILOS">
+		<value>Albarán entrega Hilos</value>
+	</data>
+	<data name="ALBARANNOTRASP">
+		<value>Albarán NO TRASPASADO</value>
+	</data>
+	<data name="ALBARANPROVE">
+		<value>Albarán Proveedor</value>
+	</data>
+	<data name="ALBARANTEJIDO">
+		<value>Albarán Tejido - Complementos</value>
+	</data>
+	<data name="ALBDESTINONOCLIENTE">
+		<value>El albarán de destino no tiene este cliente</value>
+	</data>
+	<data name="ANCHO">
+		<value>Ancho</value>
+	</data>
+	<data name="Archivo">
+		<value>&amp;Archivo</value>
+	</data>
+	<data name="ARTICULO">
+		<value>Artículo</value>
+	</data>
+	<data name="Backup">
+		<value>Backup</value>
+	</data>
+	<data name="BANCO">
+		<value>Banco</value>
+	</data>
+	<data name="Bancos">
+		<value>Bancos / Cajas</value>
+	</data>
+	<data name="BASE">
+		<value>Base</value>
+	</data>
+	<data name="BaseDeDatos">
+		<value>Base de Datos</value>
+	</data>
+	<data name="BorrarActual">
+		<value>Quieres borrar el registro actual?</value>
+	</data>
+	<data name="BorrarBanco">
+		<value>Quieres borrar el banco actual?</value>
+	</data>
+	<data name="BorrarCliente">
+		<value>Quieres borrar este cliente</value>
+	</data>
+	<data name="BorrarDireccion">
+		<value>Quieres borrar la dirección?</value>
+	</data>
+	<data name="BorrarDisposicion">
+		<value>Quieres borrar la disposición?</value>
+	</data>
+	<data name="BorrarFormaPago">
+		<value>Quieres borrar la forma de pago?</value>
+	</data>
+	<data name="BorrarFornitura">
+		<value>Quieres borrar la fornitura actual?</value>
+	</data>
+	<data name="BorrarHilo">
+		<value>Quieres borrar el hilo actual?</value>
+	</data>
+	<data name="BorrarIVA">
+		<value>Quieres borrar el tipo de IVA actual?</value>
+	</data>
+	<data name="BorrarMaquina">
+		<value>Quieres borrar la máquina actual?</value>
+	</data>
+	<data name="BorrarModelo">
+		<value>Quieres borrar el modelo actual?</value>
+	</data>
+	<data name="BorrarComplemento">
+		<value>Quieres borrar la Complemento actual?</value>
+	</data>
+	<data name="BorrarOperacion">
+		<value>Quieres borrar la operación actual?</value>
+	</data>
+	<data name="BORRARPEDIDO">
+		<value>Borrar Pedido (F5)</value>
+	</data>
+	<data name="BorrarProveedor">
+		<value>Quieres borrar el proveedor actual?</value>
+	</data>
+	<data name="BorrarRepresentante">
+		<value>Quieres borrar el representante actual?</value>
+	</data>
+	<data name="BorrarTaller">
+		<value>Quieres borrar el taller actual?</value>
+	</data>
+	<data name="BorrarTejido">
+		<value>Quieres borrar el tejido actual?</value>
+	</data>
+	<data name="BorrarTransportista">
+		<value>Quieres borrar el transportista actual?</value>
+	</data>
+	<data name="BRUTO">
+		<value>Bruto</value>
+	</data>
+	<data name="CABOS">
+		<value>CABOS</value>
+	</data>
+	<data name="CANTIDAD">
+		<value>Cantidad</value>
+	</data>
+	<data name="CAPS">
+		<value>Cabezas</value>
+	</data>
+	<data name="Cascada">
+		<value>Cascada</value>
+	</data>
+	<data name="Castellano">
+		<value>Castellano</value>
+	</data>
+	<data name="Catalan">
+		<value>Catalán</value>
+	</data>
+	<data name="CCC">
+		<value>C.C.C.</value>
+	</data>
+	<data name="CerrarTodas">
+		<value>Cerrar Todas</value>
+	</data>
+	<data name="CICLOS">
+		<value>Ciclos</value>
+	</data>
+	<data name="CLIENTE">
+		<value>Cliente</value>
+	</data>
+	<data name="Clientes">
+		<value>Clientes</value>
+	</data>
+	<data name="CODIGO">
+		<value>Código</value>
+	</data>
+	<data name="COLOR">
+		<value>Color</value>
+	</data>
+	<data name="COMPOSICION">
+		<value>Composición</value>
+	</data>
+	<data name="Compras">
+		<value>Compras</value>
+	</data>
+	<data name="Conexion">
+		<value>Conexión</value>
+	</data>
+	<data name="CONFIRM">
+		<value>Confirmación</value>
+	</data>
+	<data name="CONFIRMACION">
+		<value>Confirmación eliminación</value>
+	</data>
+	<data name="CONFIRMACIONSALIR">
+		<value>Quieres salir de TEX.NET?</value>
+	</data>
+	<data name="CONFIRMAR">
+		<value>Confirmar (F6)</value>
+	</data>
+	<data name="CONFOMECLIENTE">
+		<value>Conforme Cliente</value>
+	</data>
+	<data name="CONSUM">
+		<value>Consumo</value>
+	</data>
+	<data name="CORTES">
+		<value>Cortes</value>
+	</data>
+	<data name="COSTE">
+		<value>Coste</value>
+	</data>
+	<data name="CUENTA">
+		<value>Cuenta</value>
+	</data>
+	<data name="DESCRIPCION">
+		<value>Descripción</value>
+	</data>
+	<data name="DESGLOSE">
+		<value>Desglose</value>
+	</data>
+	<data name="DIFERENCIA">
+		<value>Diferencia</value>
+	</data>
+	<data name="DIPOSRECIBIDAS">
+		<value>No todas las lineas de la disposición han sido recibas</value>
+	</data>
+	<data name="DIRECCION">
+		<value>Dirección</value>
+	</data>
+	<data name="DISCO">
+		<value>DISCO</value>
+	</data>
+	<data name="DISPOSDISPONER">
+		<value>Quieres disponer</value>
+	</data>
+	<data name="DISPOSDISPTEJIDO">
+		<value>KG de este tejido: </value>
+	</data>
+	<data name="Disposiciones">
+		<value>Disposiciones</value>
+	</data>
+	<data name="DISPUESTO">
+		<value>Dispuesto</value>
+	</data>
+	<data name="DTE">
+		<value>DTO</value>
+	</data>
+	<data name="EMISION">
+		<value>Emisión</value>
+	</data>
+	<data name="EnviarErrores">
+		<value>Enviar Errores</value>
+	</data>
+	<data name="ENVIARPORMAIL">
+		<value>Enviar por e-Mail</value>
+	</data>
+	<data name="Errores">
+		<value>Errores</value>
+	</data>
+	<data name="ESCOGERACABADOR">
+		<value>Primero has de elegir un acabador</value>
+	</data>
+	<data name="FACTURA">
+		<value>Factura</value>
+	</data>
+	<data name="FACTURAS">
+		<value>Facturas</value>
+	</data>
+	<data name="FACTURATEJIDO">
+		<value>Factura Tejido - Complemento</value>
+	</data>
+	<data name="FECHA">
+		<value>Fecha</value>
+	</data>
+	<data name="FICHATECNICA">
+		<value>Ficha Técnica Complementos</value>
+	</data>
+	<data name="FINAL">
+		<value>Final</value>
+	</data>
+	<data name="FORMADEPAGO">
+		<value>Forma de Pago </value>
+	</data>
+	<data name="FORNITURA">
+		<value>Fornitura</value>
+	</data>
+	<data name="FRA">
+		<value>Número</value>
+	</data>
+	<data name="GH">
+		<value>GH</value>
+	</data>
+	<data name="GRADUACION">
+		<value>Graduación</value>
+	</data>
+	<data name="GRAMAJE">
+		<value>Gramaje</value>
+	</data>
+	<data name="HILO">
+		<value>Hilo</value>
+	</data>
+	<data name="Hilos">
+		<value>Hilos</value>
+	</data>
+	<data name="Idioma">
+		<value>Idioma</value>
+	</data>
+	<data name="IMPORTE">
+		<value>Importe</value>
+	</data>
+	<data name="IMPORTEIVA">
+		<value>IMPORTE I.V.A.</value>
+	</data>
+	<data name="INFO">
+		<value>Información</value>
+	</data>
+	<data name="INTERVALONOVALIDO">
+		<value>Intervalo no válido</value>
+	</data>
+	<data name="IVA">
+		<value>I.V.A.</value>
+	</data>
+	<data name="Language">
+		<value>Spanish</value>
+	</data>
+	<data name="LFORNITURAS">
+		<value>Listado Fornituras</value>
+	</data>
+	<data name="LINEA">
+		<value>Línea</value>
+	</data>
+	<data name="LISTADO">
+		<value>Listado</value>
+	</data>
+	<data name="LISTDISPOSICION">
+		<value>Listado Disposiciones</value>
+	</data>
+	<data name="LCOMPLEMENTOS">
+		<value>Listado Complementos</value>
+	</data>
+	<data name="MAQ">
+		<value>Maq.</value>
+	</data>
+	<data name="MAQUINA">
+		<value>Maquina</value>
+	</data>
+	<data name="Maquinas">
+		<value>Máquinas</value>
+	</data>
+	<data name="MARGEN">
+		<value>Margen</value>
+	</data>
+	<data name="MATERIA">
+		<value>Materia</value>
+	</data>
+	<data name="METROS">
+		<value>Metros</value>
+	</data>
+	<data name="MinimizarTodas">
+		<value>Minimizar Todas</value>
+	</data>
+	<data name="MINIMO">
+		<value>Mínimo</value>
+	</data>
+	<data name="MODELO">
+		<value>Modelo</value>
+	</data>
+	<data name="Modelos">
+		<value>Modelos</value>
+	</data>
+	<data name="MOTIVO">
+		<value>Motivo</value>
+	</data>
+	<data name="Complemento">
+		<value>Complemento</value>
+	</data>
+	<data name="Complementos">
+		<value>Complementos</value>
+	</data>
+	<data name="NOEXISTEALBAR">
+		<value>No existe este albarán</value>
+	</data>
+	<data name="NOEXISTEBANCS">
+		<value>Banco inexistente</value>
+	</data>
+	<data name="NOEXISTEFIL">
+		<value>Hilo inexistente</value>
+	</data>
+	<data name="NOEXISTEFORPAG">
+		<value>Forma de Pago inexistente</value>
+	</data>
+	<data name="NOEXISTEIVA">
+		<value>IVA inexistente</value>
+	</data>
+	<data name="NOEXISTEMAQUI">
+		<value>Maquina inexistente</value>
+	</data>
+	<data name="NOEXISTEPROVE">
+		<value>Proveedor inexistente</value>
+	</data>
+	<data name="NOEXISTEREGISTRO">
+		<value>No existe ningún registro con este código</value>
+	</data>
+	<data name="NOEXISTEREPRES">
+		<value>Representante inexistente</value>
+	</data>
+	<data name="NOEXISTETALLERS">
+		<value>Taller inexistente</value>
+	</data>
+	<data name="NOEXISTETEIXIT">
+		<value>Tejido inexistente</value>
+	</data>
+	<data name="NOEXISTETRANS">
+		<value>Transportista inexistente</value>
+	</data>
+	<data name="NOMBREComplementoINCORRECTO">
+		<value>Nombre Complemento incorrecta</value>
+	</data>
+	<data name="NOMCLIENT">
+		<value>Nombre Cliente</value>
+	</data>
+	<data name="NOMPROVE">
+		<value>Nombre Proveedor</value>
+	</data>
+	<data name="NOMTALLER">
+		<value>Nombre Taller</value>
+	</data>
+	<data name="NOMTEJEDOR">
+		<value>Nombre Tejedor</value>
+	</data>
+	<data name="NOREGISTROENCENTRO">
+		<value>No existe registro en la empresa actual</value>
+	</data>
+	<data name="NOTRASPLINIASDOCTRAS">
+		<value>No se pueden traspasar líneas de un documento ya traspasado</value>
+	</data>
+	<data name="NPIEZAS">
+		<value>Nº Piezas</value>
+	</data>
+	<data name="NUEVOPEDIDO">
+		<value>Nuevo Pedido (F3)</value>
+	</data>
+	<data name="NUMALBARANES">
+		<value>Número de Albaranes</value>
+	</data>
+	<data name="NUMCTA">
+		<value>NUM. CTA.</value>
+	</data>
+	<data name="NUMDISPOS">
+		<value>Nº Disposición</value>
+	</data>
+	<data name="NUMFACTURAS">
+		<value>Número de Facturas</value>
+	</data>
+	<data name="NUMHILOS">
+		<value>Número de hilos</value>
+	</data>
+	<data name="NUMPEDIDOS">
+		<value>Número de Pedidos</value>
+	</data>
+	<data name="NUMPROFORMA">
+		<value>Número Facturas Proforma</value>
+	</data>
+	<data name="NUMTEJIDOS">
+		<value>Número de tejidos</value>
+	</data>
+	<data name="OBSERVACIONES">
+		<value>Observaciones</value>
+	</data>
+	<data name="Operaciones">
+		<value>Operaciones</value>
+	</data>
+	<data name="ORDEN">
+		<value>Orden</value>
+	</data>
+	<data name="OrdenesFabricacion">
+		<value>Ordenes de Fabricación</value>
+	</data>
+	<data name="ORDENCOMPLEMENTO">
+		<value>Orden Fabricación Complemento</value>
+	</data>
+	<data name="Organizacion">
+		<value>Organización</value>
+	</data>
+	<data name="P_IVA">
+		<value>% I.V.A.</value>
+	</data>
+	<data name="PASSADES">
+		<value>Pasadas</value>
+	</data>
+	<data name="PEDIDO">
+		<value>Pedido</value>
+	</data>
+	<data name="PEDIDOCOMPRAFORNI">
+		<value>Pedido Compra Fornitura</value>
+	</data>
+	<data name="PEDIDOCOMPRAHILO">
+		<value>Pedido Compra Hilo</value>
+	</data>
+	<data name="PEDIDOCOMPRATEJIDO">
+		<value>Pedido Compra Tejido</value>
+	</data>
+	<data name="PEDIDOFORNITURA">
+		<value>Pedido Fornitura</value>
+	</data>
+	<data name="PEDIDONOTRASP">
+		<value>Pedido NO TRASPASADO</value>
+	</data>
+	<data name="Pedidos">
+		<value>Pedidos</value>
+	</data>
+	<data name="PEDIDOTEJIDO">
+		<value>Pedido Tejidos Complementos</value>
+	</data>
+	<data name="PESOTOTAL">
+		<value>Peso Total</value>
+	</data>
+	<data name="PFORNI">
+		<value>Pedido Fornitura</value>
+	</data>
+	<data name="PHILO">
+		<value>Pedido Hilos</value>
+	</data>
+	<data name="POBLACION">
+		<value>Población</value>
+	</data>
+	<data name="PORMAYOR100">
+		<value>El campo % no puede ser superior a 100</value>
+	</data>
+	<data name="PORMAYOR100ESC">
+		<value>La suma de todos los % del escandallo no puede superar el 100%
+</value>
+	</data>
+	<data name="PORRECIBIR">
+		<value>Por Recibir</value>
+	</data>
+	<data name="PRECIO">
+		<value>Precio</value>
+	</data>
+	<data name="PRECIOKILOS">
+		<value>Precio Kilos</value>
+	</data>
+	<data name="PRECIOMETROS">
+		<value>Precio Metros</value>
+	</data>
+	<data name="PREUK">
+		<value>Precio Kg.</value>
+	</data>
+	<data name="PREUM">
+		<value>Precio Metro</value>
+	</data>
+	<data name="PREVISTA">
+		<value>Prevista</value>
+	</data>
+	<data name="PRIMERODISPONER">
+		<value>Este tejido no ha sido dispuesto todavía</value>
+	</data>
+	<data name="PROVEEDOR">
+		<value>Proveedor</value>
+	</data>
+	<data name="Proveedores">
+		<value>Proveedores</value>
+	</data>
+	<data name="PROVESINHILOS">
+		<value>Proveedor sin Hilos</value>
+	</data>
+	<data name="PTEJIDO">
+		<value>Pedido Tejido</value>
+	</data>
+	<data name="RE">
+		<value>R.E.</value>
+	</data>
+	<data name="RECEPCION">
+		<value>...</value>
+	</data>
+	<data name="RECIBIDO">
+		<value>Recibido</value>
+	</data>
+	<data name="REGISTRODUPLICADO">
+		<value>Registro Duplicado</value>
+	</data>
+	<data name="RENDIMIENTO">
+		<value>Rendimiento</value>
+	</data>
+	<data name="REPRESENTANTE">
+		<value>Representante</value>
+	</data>
+	<data name="Representantes">
+		<value>Representantes</value>
+	</data>
+	<data name="SALIDA">
+		<value>Salida</value>
+	</data>
+	<data name="Salir">
+		<value>Salir</value>
+	</data>
+	<data name="SERIE">
+		<value>Serie</value>
+	</data>
+	<data name="SERVIDO">
+		<value>Servido</value>
+	</data>
+	<data name="STCRUDOKILOS">
+		<value>Stock Crudo kgs.</value>
+	</data>
+	<data name="STCRUDOMETROS">
+		<value>Stock Crudo Metros</value>
+	</data>
+	<data name="STDISPKILOS">
+		<value>Stock Disp. kgs.</value>
+	</data>
+	<data name="STDISPMETROS">
+		<value>Stock Disp. Metros</value>
+	</data>
+	<data name="TALLA">
+		<value>Talla</value>
+	</data>
+	<data name="TALLAS">
+		<value>Tallas</value>
+	</data>
+	<data name="TALLER">
+		<value>Taller</value>
+	</data>
+	<data name="Talleres">
+		<value>Talleres</value>
+	</data>
+	<data name="TEJIDO">
+		<value>Tejido</value>
+	</data>
+	<data name="TEJIDOComplemento">
+		<value>Tejido - Complemento</value>
+	</data>
+	<data name="Tejidos">
+		<value>Tejidos</value>
+	</data>
+	<data name="TEMPORADA">
+		<value>Temporada</value>
+	</data>
+	<data name="Temporadas">
+		<value>Temporadas</value>
+	</data>
+	<data name="TIEMPOBAJADA">
+		<value>Tiempo de la Bajada</value>
+	</data>
+	<data name="TINTAR">
+		<value>Tintar</value>
+	</data>
+	<data name="TIPO">
+		<value>Tipo</value>
+	</data>
+	<data name="TipoDeIVA">
+		<value>Tipo de IVA</value>
+	</data>
+	<data name="TOTAL">
+		<value>Total</value>
+	</data>
+	<data name="TOTALKG">
+		<value>Total Kgs.</value>
+	</data>
+	<data name="TOTALPIEZAS">
+		<value>Total P.</value>
+	</data>
+	<data name="Transportistas">
+		<value>Transportistas</value>
+	</data>
+	<data name="TRASPASADO?">
+		<value>Traspasado?</value>
+	</data>
+	<data name="TRASPASOCOMPLETO">
+		<value>Traspaso Completo</value>
+	</data>
+	<data name="TTESCOJERHILO">
+		<value>Escoger Hilo</value>
+	</data>
+	<data name="TTESCOJERTEJIDO">
+		<value>Escoger tejido</value>
+	</data>
+	<data name="TTTRASPASORECEPCION">
+		<value>Traspasar línea a albarán de entrega</value>
+	</data>
+	<data name="UNIDADES">
+		<value>Unidades</value>
+	</data>
+	<data name="VELOCIDADCARRO">
+		<value>Velocidad Carro</value>
+	</data>
+	<data name="VENCIMIENTO">
+		<value>Vencimiento</value>
+	</data>
+	<data name="Ventana">
+		<value>Ventanas</value>
+	</data>
+	<data name="VENTAS">
+		<value>Ventas</value>
+	</data>
+	<data name="YATRASPASADO">
+		<value>Ya traspasado</value>
+	</data>
+	<data name="ERRORCN">
+		<value>Error conexión Base de Datos</value>
+	</data>
+	<data name="EMPRESA">
+		<value>Empresa</value>
+	</data>
+	<data name="NUMCOMPLEMENTOS">
+		<value>Número Complementos</value>
+	</data>
+	<data name="ELEGIRFICHA">
+		<value>Para abrir la ficha hacer doble click encima del registro</value>
+	</data>
+	<data name="NOM">
+		<value>Nombre</value>
+	</data>
+	<data name="NUMERO">
+		<value>Número</value>
+	</data>
+	<data name="NOMBRE">
+		<value>Nombre</value>
+	</data>
+	<data name="PAIS">
+		<value>Pais</value>
+	</data>
+	<data name="TELEFONO">
+		<value>Teléfono</value>
+	</data>
+	<data name="CONTACTO">
+		<value>Contacto</value>
+	</data>
+	<data name="CODIGOYAEXISTENTE">
+		<value>Código ya existente</value>
+	</data>
+	<data name="TANTOPORCIENTOINVALIDO">
+		<value>% Erroneo</value>
+	</data>
+	<data name="TEJEDOR">
+		<value>Tejedor</value>
+	</data>
+	<data name="ERRORELEGIRTEJEDORACABADOR">
+		<value>Ha de escoger el acabador y tejedor</value>
+	</data>
+	<data name="REMESADO">
+		<value>Remesado</value>
+	</data>
+	<data name="NUMEFECTO">
+		<value>Num Efecto</value>
+	</data>
+	<data name="CREDITO">
+		<value>Crédito</value>
+	</data>
+	<data name="DEBITO">
+		<value>Debito</value>
+	</data>
+	<data name="EFECTOYAREMETIDO">
+		<value>Efecto ya remetido</value>
+	</data>
+	<data name="ACABADOR">
+		<value>Acabador</value>
+	</data>
+	<data name="CLIENTESINMODELOS">
+		<value>Cliente sin modelos</value>
+	</data>
+	<data name="LMODELOS">
+		<value>Listado Modelos</value>
+	</data>
+	<data name="ESCOGEQUEIMPRIMIRPRIMERO">
+		<value>Se tiene que elegir que se quiere imprimir primero</value>
+	</data>
+	<data name="CODIGOINCORRECTO">
+		<value>Código incorrecto</value>
+	</data>
+	<data name="NOHAYSUFSTKCRU">
+		<value>NO HAY SUFICIENTE STOCK CRUDO DE ESTE TEJIDO</value>
+	</data>
+	<data name="NOHAYSUFSTKDISP">
+		<value>NO HAY SUFICIENTE STOCK DISPUESTO DE ESTE TEJIDO</value>
+	</data>
+	<data name="NUMBULTOSINCO">
+		<value>Número de bultos incorrecto</value>
+	</data>
+	<data name="CODIGOMODELOINCO">
+		<value>Código de modelo incorrecto</value>
+	</data>
+	<data name="CODIGOTEMPINCO">
+		<value>Código Temporada Incorrecto</value>
+	</data>
+	<data name="SEHAESCOGERCLIENTE">
+		<value>Se debe escoger un cliente</value>
+	</data>
+	<data name="ELMODELO">
+		<value>El modelo</value>
+	</data>
+	<data name="COLORMODELO">
+		<value>Color Modelo</value>
+	</data>
+	<data name="PIEZA">
+		<value>Pieza</value>
+	</data>
+	<data name="COLORPIEZA">
+		<value>Color Pieza</value>
+	</data>
+	<data name="BORRARLINEA">
+		<value>Quieres borrar la linea/s seleccionadas?</value>
+	</data>
+	<data name="ESCOGER">
+		<value>Elegir</value>
+	</data>
+	<data name="TOTALP">
+		<value>Total P.</value>
+	</data>
+	<data name="CONSUMO">
+		<value>Consumo</value>
+	</data>
+	<data name="AFACTURA">
+		<value>A Factura</value>
+	</data>
+	<data name="TRASPASADA">
+		<value>Traspasada</value>
+	</data>
+	<data name="PRECIOPARAMODELO">
+		<value>Precio para Modelo</value>
+	</data>
+	<data name="FORMATOINCORRECTO">
+		<value>Formato incorrecto</value>
+	</data>
+	<data name="FORMATOFECHAINCORRECTO">
+		<value>El formato de la fecha es incorrecto debe ser (DD/MM/AAAA)</value>
+	</data>
+	<data name="CODIGOTALLER">
+		<value>Código Taller</value>
+	</data>
+	<data name="CODIGOOPERACION">
+		<value>Código Operación</value>
+	</data>
+	<data name="SELECCIONAMASUNCOMPLEMENTO">
+		<value>Se tiene que seleccionar uno o mas Complementoas</value>
+	</data>
+	<data name="DOMICILIO">
+		<value>Domicilio</value>
+	</data>
+	<data name="FAX">
+		<value>FAX</value>
+	</data>
+	<data name="CP">
+		<value>CP</value>
+	</data>
+	<data name="NIF">
+		<value>NIF</value>
+	</data>
+	<data name="PROVINCIA">
+		<value>Provincia</value>
+	</data>
+	<data name="LORDENESFAB">
+		<value>Listado Ordenes Fabricación</value>
+	</data>
+	<data name="LCLIENTES">
+		<value>Listado Clientes</value>
+	</data>
+	<data name="LPROVEEDORES">
+		<value>Listado Proveedores</value>
+	</data>
+	<data name="LREPRESENTANTES">
+		<value>Listado Representantes</value>
+	</data>
+	<data name="LHILOS">
+		<value>Listado Hilos</value>
+	</data>
+	<data name="ACEPTAR">
+		<value>Aceptar</value>
+	</data>
+	<data name="CANCELAR">
+		<value>Cancelar</value>
+	</data>
+	<data name="LTALLERES">
+		<value>Listado Talleres</value>
+	</data>
+	<data name="LTRANSPORTISTAS">
+		<value>Listado Transportistas</value>
+	</data>
+	<data name="LOPERACIONES">
+		<value>Listado Operaciones</value>
+	</data>
+	<data name="LBANCOS">
+		<value>Listado Bancos</value>
+	</data>
+	<data name="KM">
+		<value>kgs/m.</value>
+	</data>
+	<data name="ABREVTEJIDO">
+		<value>TEJ</value>
+	</data>
+	<data name="ABREVCOMPLEMENTO">
+		<value>MUES</value>
+	</data>
+	<data name="KILOS">
+		<value>kilos</value>
+	</data>
+	<data name="LTEJIDOS">
+		<value>Listado Tejidos</value>
+	</data>
+	<data name="CONFELIMLINREMESA" mimetype="">
+		<value>Quieres eliminar de remesado este efecto?</value>
+	</data>
+	<data name="PLAZA">
+		<value>Plaza</value>
+	</data>
+	<data name="FACTURASPROFORMA">
+		<value>Facturas Proforma</value>
+	</data>
+	<data name="ORDENESMODELOS">
+		<value>Ordenes Fabricación Modelos</value>
+	</data>
+	<data name="PRECIOVENTA">
+		<value>Precio Venta</value>
+	</data>
+	<data name="AALBARAN">
+		<value>A Albarán</value>
+	</data>
+	<data name="DECLIENTE">
+		<value>De Cliente</value>
+	</data>
+	<data name="DEFECHA">
+		<value>De fecha</value>
+	</data>
+	<data name="DEPEDIDO">
+		<value>De Pedido</value>
+	</data>
+	<data name="CONFECHA">
+		<value>Con Fecha</value>
+	</data>
+	<data name="HASTACLIENTE">
+		<value>Hasta el Cliente</value>
+	</data>
+	<data name="HASTAFECHA">
+		<value>Hasta la Fecha</value>
+	</data>
+	<data name="HASTAPEDIDO">
+		<value>Hasta el Pedido</value>
+	</data>
+	<data name="PEDIDOVENTATEJIDOCOMPLEMENTO">
+		<value>Pedido Tejido Complemento</value>
+	</data>
+	<data name="PROFORMAVENTATEJIDOCOMPLEMENTO">
+		<value>Factura Proforma Tejido-Complemento</value>
+	</data>
+	<data name="REGISTROMERCANTILCOESPUNT">
+		<value>COESPUNT, S.L. -Reg. Mercantil de Barcelona, Hoja B-2756, Inscripción 1º, Folio 57, Tomo 20.191. Libro -, Sección -, -N.I.F. B-59-352.021</value>
+	</data>
+	<data name="REGISTROMERCANTILCYCO">
+		<value>CORTE Y CONFECCIÓN OLGA, S.L. - Reg. Mercantil de Barcelona, Tomo 26.153, Folio B-98717, Inscripción 2ª, B-60378551</value>
+	</data>
+	<data name="LINEASORDENFAB">
+		<value>ORDENES LÍNEAS FABRICACIÓN</value>
+	</data>
+	<data name="FACTURAPROFORMATEJIDOComplemento">
+		<value>Factura Proforma Tejido - Complemento</value>
+	</data>
+	<data name="ORDENMODELO">
+		<value>Orden de Fabricación Modelo</value>
+	</data>
+	<data name="ELEGIREMPRESA">
+		<value>Elija una empresa</value>
+	</data>
+	<data name="AFEGIRREBUT">
+		<value>Añadir Recibido</value>
+	</data>
+	<data name="PRECIOCOSTE">
+		<value>Precio Coste</value>
+	</data>
+	<data name="NUMEROPROVE">
+		<value>Nº Proveedor</value>
+	</data>
+	<data name="FECHAENTREGA">
+		<value>Fecha Entrega</value>
+	</data>
+	<data name="ALBARANYATRASPASADO">
+		<value>Albarán destino ya traspasado</value>
+	</data>
+	<data name="ORDENTRASPASADOOKALBARAN">
+		<value>ORDEN TRASAPASADO CORRECTAMENTE AL ALBARÁN:</value>
+	</data>
+	<data name="INFORMACION">
+		<value>Información</value>
+	</data>
+	<data name="ORDENYATRASPASADO">
+		<value>ORDEN YA TRASPASADO</value>
+	</data>
+	<data name="SELECIONAUNADIRECCION">
+		<value>Selecciona una dirección para el envio</value>
+	</data>
+	<data name="COMPLETADO">
+		<value>Completado</value>
+	</data>
+	<data name="TODOSLOSCLIENTES">
+		<value>Todos los clientes</value>
+	</data>
+	<data name="TODOSLOSPROVEEDORES">
+		<value>Todos los proveedores</value>
+	</data>
+	<data name="VERDESGLOSE">
+		<value>Ver desglose</value>
+	</data>
+	<data name="NOEXISTECLIENTS">
+		<value>Cliente inexistente</value>
+	</data>
+	<data name="FECHAFRADESTINOMENORALBARAN">
+		<value>La fecha del documento de destino es anterior al actual. Continuar igualmente?</value>
+	</data>
+	<data name="BASEIMPONIBLE">
+		<value>Base imponible</value>
+	</data>
+	<data name="FALTAPEDIDOCLIENTE">
+		<value>Se debe introducir el pedido del cliente</value>
+	</data>
+	<data name="QUIERECONFIRMARLOSCAMBIOS">
+		<value>Quiere confirmar los cambios?</value>
+	</data>
+	<data name="TRASOLINEA">
+		<value>Traspaso línea</value>
+	</data>
+	<data name="NOEXITEDOCDESTINO">
+		<value>No exite el documento de destino</value>
+	</data>
+	<data name="IMPORTIVA">
+		<value>Total con IVA</value>
+	</data>
+	<data name="ConfirmacionEliminacion">
+		<value>Confirmación</value>
+	</data>
+	<data name="TRASPASOAALBARAN">
+		<value>Traspaso a albarán</value>
+	</data>
+	<data name="HAYLINEASSINDISPONER">
+		<value>Hay líneas sin disponer</value>
+	</data>
+	<data name="MEDIDA">
+		<value>Medida</value>
+	</data>
+	<data name="FALTACLIENTE">
+		<value>Debes seleccionar un cliente</value>
+	</data>
+	<data name="FALTAPROVE">
+		<value>Se debe introducir un proveedor</value>
+	</data>
+	<data name="PROFORMA">
+		<value>Factura Proforma</value>
+	</data>
+	<data name="INCOTERM">
+		<value>Cond. Transport</value>
+	</data>
+	<data name="DIRECCIONENVIO">
+		<value>Dirección Envio</value>
+	</data>
+	<data name="COMPRADOR">
+		<value>Comprador</value>
+	</data>
+	<data name="PLAZOENTREGA">
+		<value>Plazo Entrega</value>
+	</data>
+	<data name="SEMANAS">
+		<value>Semanas</value>
+	</data>
+	<data name="CONCEPTO">
+		<value>Concepto</value>
+	</data>
+	<data name="VALOR">
+		<value>Valor</value>
+	</data>
+	<data name="DETALLE">
+		<value>Detalle</value>
+	</data>
+	<data name="MERCANCIAIVAEXCLUIDO">
+		<value>Mercancia exenta de IVA</value>
+	</data>
+	<data name="PACKING">
+		<value>Pack. List</value>
+	</data>
+	<data name="VALORACION">
+		<value>Valoración</value>
+	</data>
+	<data name="CODIGOTEJEDOR">
+		<value>Código Tejedor</value>
+	</data>
+</root>

@@ -1,0 +1,402 @@
+Imports MySql.Data.MySqlClient : Imports clsFuncionesLOG : Imports clsFuncionesC1 : Imports clsFuncionesUtiles : Imports clsConstantes
+Public Class clsComposicionTejido
+    Inherits clsADO
+
+#Region "VARIABLES"
+
+    Private m_Tejido As clsTejido
+    Friend dtProve As New DataTable("PROVE")
+    Friend hayCambios As Boolean
+
+#End Region
+
+#Region "CAMPOS"
+
+    Private mTEIXIT As String
+    Public Property TEIXIT() As String
+        Get
+            If PA = -1 Then Exit Property
+            Try
+                mTEIXIT = general.nz(dvForm(pa).Row("TEIXIT"), "")
+            Catch ex As Exception : End Try
+            Return general.nz(mTEIXIT, "")
+        End Get
+        Set(ByVal Value As String)
+            If PA = -1 Then Exit Property
+            If general.nz(Value, "") IsNot general.nz(TEIXIT, "") Then
+                mTEIXIT = general.nz(Value, "")
+                dvForm(PA).Row("TEIXIT") = general.nz(mTEIXIT, "") : guardarDV()
+            End If
+        End Set
+    End Property
+
+    Private mCOMP As String
+    Public Property COMP() As String
+        Get
+            If PA = -1 Then Exit Property
+            Try
+                mCOMP = general.nz(dvForm(pa).Row("COMP"), "")
+            Catch ex As Exception : End Try
+            Return general.nz(mCOMP, "")
+        End Get
+        Set(ByVal Value As String)
+            If PA = -1 Then Exit Property
+            If general.nz(Value, "") IsNot general.nz(COMP, "") Then
+                mCOMP = general.nz(Value, "")
+                dvForm(PA).Row("COMP") = general.nz(mCOMP, "") : guardarDV()
+            End If
+        End Set
+    End Property
+
+    Private mPER As Integer
+    Public Property PER() As Integer
+        Get
+            If PA = -1 Then Exit Property
+            Try
+                mPER = nzn(dvForm(pa).Row("PER"), 0)
+            Catch ex As Exception : End Try
+            Return nzn(mPER, 0)
+        End Get
+        Set(ByVal Value As Integer)
+            If PA = -1 Then Exit Property
+            If nzn(Value, 0) <> nzn(PER, 0) Then
+                mPER = nzn(Value, 0)
+                dvForm(pa).Row("PER") = nzn(mPER, 0) : guardarDV()
+            End If
+        End Set
+    End Property
+
+    Private mPROVE As Integer
+    Public Property PROVE() As Integer
+        Get
+            If PA = -1 Then Exit Property
+            Try
+                mPROVE = nzn(dvForm(pa).Row(tablaProveedores), 0)
+            Catch ex As Exception : End Try
+            Return nzn(mPROVE, 0)
+        End Get
+        Set(ByVal Value As Integer)
+            If PA = -1 Then Exit Property
+            If esCodigoExistente(dtProve, CCProve, Value) Then
+                If nzn(Value, 0) <> 0 Then
+                    mPROVE = nzn(Value, 0)
+                    dvForm(pa).Row("NOMPROVE") = general.OBN(Value, dtProve, CNProve)
+                    dvForm(pa).Row(tablaProveedores) = nzn(Value, 0) : guardarDV()
+                End If
+            Else
+                dvForm(pa).Row("PROVE") = 0
+
+                dvForm(pa).Row("NOMPROVE") = "" : guardarDV()
+                MessageBox.Show(rm.GetString("NOEXISTEPROVE"))
+            End If
+        End Set
+    End Property
+
+    Private mNOMPROVE As String
+    Public Property NOMPROVE() As String
+        Get
+            If PA = -1 Then Exit Property
+            Try
+                mNOMPROVE = general.nz(dvForm(pa).Row("NOMPROVE"), "")
+            Catch ex As Exception : End Try
+            Return general.nz(mNOMPROVE, "")
+        End Get
+        Set(ByVal Value As String)
+            If PA = -1 Then Exit Property
+            mNOMPROVE = general.nz(Value, "")
+            If tabla.GetChanges Is Nothing Then
+                dvForm(pa).Row("NOMPROVE") = general.nz(Value, "") : guardarDV()
+                tabla.AcceptChanges()
+            Else
+                dvForm(pa).Row("NOMPROVE") = general.nz(Value, "") : guardarDV()
+            End If
+        End Set
+    End Property
+
+    Private mPREU As Double
+    Public Property PREU() As Double
+        Get
+            If PA = -1 Then Exit Property
+            Try
+                mPREU = nzn(dvForm(pa).Row("PREU"), 0)
+            Catch ex As Exception : End Try
+            Return nzn(mPREU, 0)
+        End Get
+        Set(ByVal Value As Double)
+            If PA = -1 Then Exit Property
+            If nzn(Value, 0) <> nzn(PREU, 0) Then
+                mPREU = nzn(Value, 0)
+                dvForm(pa).Row("PREU") = nzn(mPREU, 0) : guardarDV()
+            End If
+        End Set
+    End Property
+
+    Private mIMPORT As Double
+    Public Property IMPORT() As Double
+        Get
+            If PA = -1 Then Exit Property
+            Try
+                mIMPORT = nzn(dvForm(pa).Row("IMPORT"), 0)
+            Catch ex As Exception : End Try
+            Return nzn(mIMPORT, 0)
+        End Get
+        Set(ByVal Value As Double)
+            If PA = -1 Then Exit Property
+            If nzn(Value, 0) <> nzn(IMPORT, 0) Then
+                mIMPORT = nzn(Value, 0)
+                dvForm(pa).Row("IMPORT") = nzn(mIMPORT, 0) : guardarDV()
+            End If
+        End Set
+    End Property
+
+#End Region
+
+    Public Sub New(ByVal tabla As DataTable, _
+                ByVal centro As String, ByRef bindingcontext As BindingContext, ByVal tejido As clsTejido)
+
+        MyBase.New(tabla, centro, bindingcontext, "ESDETALLE")
+        Dim sqlSel As String
+        Try
+            m_Tejido = tejido
+            dtProve = m_Tejido.dtProve
+
+            sqlSinWhere = "SELECT mattei.*, " & _
+                " prove.NOM as NOMPROVE,  " & _
+                " filiales.DESCRI AS NOMCENTRO " & _
+                " FROM mattei  " & _
+                " LEFT JOIN prove ON (mattei.prove = prove.codi) " & _
+                " LEFT JOIN filiales ON (filiales.CODI = mattei.CENTRO) "
+
+            sqlSel = sqlSinWhere & _
+                        " WHERE mattei.CENTRO = """ & m_Tejido.centro & """ AND TEIXIT = """ & general.NS(m_Tejido.CODI) & """ ORDER BY mattei.teixit"
+
+            cmdSel.CommandText = sqlSel
+            dvForm.Sort = "TEIXIT"
+            da.SelectCommand = cmdSel
+            da.Fill(tabla)
+
+            tabla.Columns.Add("ELEGIRCOMP")
+            PonerDefaults()
+            PonerHandlers()
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub PonerHandlers()
+        Try
+            AddHandler tabla.ColumnChanged, New DataColumnChangeEventHandler(AddressOf CanviarColumnaComposicion)
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub DormirHandlers()
+        Try
+            RemoveHandler tabla.ColumnChanged, New DataColumnChangeEventHandler(AddressOf CanviarColumnaComposicion)
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+
+#Region "ORGANIZAR"
+    Friend Overrides Function genWhere() As String
+        Try
+            Dim ret As String
+
+            ret = "WHERE " & tabla.TableName & ".CENTRO = """ & centro & """"
+
+            Return ret
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Function
+    Friend Overrides Function GenOrder() As String
+        Try
+            Return ""
+            'Return " ORDER BY TEMPORADA, CLIENT, SERIE, CODI "
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Function
+    Friend Overrides Function ObtenerNumeroRegistro(ByVal id As Object) As Integer
+        Dim cmd As New MySqlCommand(" SELECT " & _
+            " (SELECT COUNT(*) " & _
+            " FROM " & tabla.TableName & " AS M2 WHERE " & _
+            " M2.CODI < M1.CODI AND  " & WCNoTabla() & " ) AS rownum FROM " & tabla.TableName & " AS M1  WHERE CODI = """ & id & """ " & WC() & GenOrder(), cnn)
+        Try
+            Dim idx As Object = cmd.ExecuteScalar()
+            If idx Is Nothing Then Return -1
+            Return idx '- 1
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Function
+    Friend Overrides Function genWhereNumeroRegistros() As String
+        Try
+            Return genWhere()
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Function
+#End Region
+
+    Private Sub PonerDescripcionCoste()
+        Try
+            If Not COMP = "" Then
+                Dim dr() As DataRow = m_Tejido.dtHilos.Select("CODI = '" & COMP & "'")
+                If dr.Length > 0 Then
+                    PROVE = general.nz(dr(0).Item("PROVE"), "")
+                    NOMPROVE = general.nz(dr(0).Item("NOMPROVE"), "")
+                    PREU = nzn(dr(0).Item("COST"), 0)
+                End If
+
+            End If
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Friend Sub HacerCalculosLineas(ByVal cambioColumna As Boolean, ByVal columnaModificada As String)
+        Dim sumaTantosPorcientos As Double = 0
+        Dim i As Integer
+
+        Try
+            If hayCambios Then
+                'PonerDescripcionCoste()
+            End If
+            DormirHandlers()
+            With m_Tejido
+                For i = 0 To dvForm.Count - 1
+                    sumaTantosPorcientos = roundnum(sumaTotal("PER", dvForm), 2)
+                    If PER > 100 Then
+                        PER = 0.0
+                        MessageBox.Show(rm.GetString("PORMAYOR100"))
+                    Else
+                        If sumaTantosPorcientos > 100 Then
+                            PER = 0.0
+                            MessageBox.Show(rm.GetString("PORMAYOR100ESC"))
+                        Else
+                            IMPORT = roundnum(PREU * (PER / 100), 2)
+                            .MATERIA = roundnum(sumaTotal("IMPORT", dvForm), 2)
+                            .CRU = roundnum(.MATERIA + .PTEIXIR + .PESTAM + .PACA, 2)
+                        End If
+                    End If
+                Next
+            End With
+            PonerHandlers()
+
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub CanviarColumnaComposicion(ByVal sender As Object, ByVal e As DataColumnChangeEventArgs)
+        Try
+            HacerCalculosLineas(False, False)
+
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Friend Sub CambioDetalle(ByVal centro As String, ByVal tejido As clsTejido)
+        Dim sqlSel As String
+        Try
+            m_Tejido = tejido
+            Me.centro = centro
+            sqlSinWhere = "SELECT mattei.*, " & _
+                " prove.NOM as NOMPROVE,  " & _
+                " filiales.DESCRI AS NOMCENTRO " & _
+                " FROM mattei  " & _
+                " LEFT JOIN prove ON (mattei.prove = prove.codi) " & _
+                " LEFT JOIN filiales ON (filiales.CODI = mattei.CENTRO) "
+
+            sqlSel = sqlSinWhere & _
+                        " WHERE mattei.CENTRO = """ & m_Tejido.centro & """ AND TEIXIT = """ & general.NS(m_Tejido.CODI) & """ ORDER BY mattei.teixit"
+
+            cmdSel.CommandText = sqlSel
+            dvForm.Sort = "TEIXIT"
+            da.SelectCommand = cmdSel
+            tabla.Clear()
+            da.Fill(tabla)
+
+            PonerDefaults()
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub PonerDefaults()
+        Try
+            With dvForm
+                .Table.Columns("TEIXIT").DefaultValue = m_Tejido.CODI
+                .Table.Columns("CENTRO").DefaultValue = m_Tejido.centro
+                .Table.Columns("COMP").DefaultValue = ""
+                .Table.Columns("PER").DefaultValue = 0
+                .Table.Columns("PROVE").DefaultValue = 0
+                .Table.Columns("PREU").DefaultValue = 0
+                .Table.Columns("IMPORT").DefaultValue = 0
+                .Table.Columns("NOMPROVE").DefaultValue = ""
+                .Table.Columns("ELEGIRCOMP").DefaultValue = ""
+            End With
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Public Sub ActualizarDetalle()
+        Dim i As Integer
+        Dim cambio As Boolean = False
+        Try
+            For i = 0 To dvForm.Count - 1
+                'JP 17-05-2017
+                If general.nz(dvForm(i).Item("TEIXIT"), "") <> general.nz(m_Tejido.CODI, "") Then dvForm(i).Item("TEIXIT") = general.nz(m_Tejido.CODI, "") : cambio = True
+                If general.nz(dvForm(i).Item("CENTRO"), "") <> general.nz(m_Tejido.centro, "") Then dvForm(i).Item("CENTRO") = general.nz(m_Tejido.centro, "") : cambio = True
+                'If general.nz(dvForm(i).Item("TEIXIT"), "") IsNot general.nz(m_Tejido.CODI, "") Then dvForm(i).Item("TEIXIT") = general.nz(m_Tejido.CODI, "") : cambio = True
+                'If general.nz(dvForm(i).Item("CENTRO"), "") IsNot general.nz(m_Tejido.centro, "") Then dvForm(i).Item("CENTRO") = general.nz(m_Tejido.centro, "") : cambio = True
+            Next
+            If cambio Then guardarDV()
+
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Sub
+    Public Overrides Sub ActualizarOrigen(Optional ByVal nocerrar As Boolean = False, Optional ByVal hackDetalle As Boolean = False)
+        Try
+            ActualizarDetalle()
+            MyBase.ActualizarOrigen(True, True)
+
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Sub
+    Friend Function esColParaActualizarPrecio(ByVal columna As String) As Boolean
+        Try
+            Select Case columna
+                Case "COMP", "PROVE"
+                    Return True
+            End Select
+            Return False
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Function
+    Public Overrides Sub borrar()
+        BorrarActualDVDetalle()
+        'ActualizarOrigen()
+    End Sub
+    Friend Overrides Function TieneCambios() As Boolean
+        Try
+            guardarDV()
+            If Not tabla.GetChanges Is Nothing Then
+                Return True
+            Else
+                Return False
+            End If
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Function
+
+End Class

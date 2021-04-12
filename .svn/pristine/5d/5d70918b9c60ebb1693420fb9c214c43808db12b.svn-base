@@ -1,0 +1,171 @@
+Imports MySql.Data.MySqlClient : Imports clsFuncionesLOG : Imports clsFuncionesC1 : Imports clsFuncionesUtiles : Imports clsConstantes
+
+Public Class clsIncoterm
+    Inherits clsADO
+
+#Region "CAMPOS"
+
+    Private mNOMBRE As String
+    Public Property NOMBRE() As String
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mNOMBRE = general.nz(dvForm(PA).Row("NOMBRE"), "")
+            Catch ex As Exception : End Try
+            Return general.nz(mNOMBRE, "")
+        End Get
+        Set(ByVal Value As String)
+            If PA() = -1 Then Exit Property
+            If general.nz(Value, "") <> general.nz(NOMBRE, "") Then
+                mNOMBRE = general.nz(Value, "")
+                dvForm(PA).Row("NOMBRE") = general.nz(mNOMBRE, "") : guardarDV()
+            End If
+        End Set
+    End Property
+    Private mDESCRI As String
+    Public Property DESCRI() As String
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mDESCRI = general.nz(dvForm(PA).Row("DESCRI"), "")
+            Catch ex As Exception : End Try
+            Return general.nz(mDESCRI, "")
+        End Get
+        Set(ByVal Value As String)
+            If PA() = -1 Then Exit Property
+            If general.nz(Value, "") <> general.nz(DESCRI, "") Then
+                mDESCRI = general.nz(Value, "")
+                dvForm(PA).Row("DESCRI") = general.nz(mDESCRI, "") : guardarDV()
+            End If
+        End Set
+    End Property
+
+
+
+
+#End Region
+
+    Public Sub New(ByVal tabla As DataTable, _
+                ByVal centro As String, ByRef bindingcontext As BindingContext)
+
+        MyBase.New(tabla, centro, bindingcontext)
+        Dim sqlSel As String
+        Try
+
+            sqlSinWhere = "SELECT INCOTERM.*, " & _
+                     " filiales.DESCRI AS NOMCENTRO " & _
+                     " FROM INCOTERM " & _
+                     " LEFT JOIN filiales ON (filiales.CODI = INCOTERM.CENTRO) "
+            sqlSel = sqlSinWhere & _
+                        "  ORDER BY INCOTERM.NOMBRE "
+            cmdSel.CommandText = sqlSel
+            da.SelectCommand = cmdSel
+            da.Fill(tabla)
+
+
+        Catch ex As Exception
+            LOG(ex.ToString) : Cargando = False : ccn()
+        End Try
+    End Sub
+
+
+#Region "---DESPLAZAMIENTO---"
+
+
+    Public Overloads Sub SiguienteReg()
+        Try
+            MyBase.SiguienteReg()
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Public Overloads Sub AnteriorReg()
+        Try
+            MyBase.AnteriorReg()
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Public Overloads Sub UltimoReg()
+        Try
+            MyBase.UltimoReg()
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Public Overloads Sub PrimeroReg()
+        Try
+            MyBase.PrimeroReg()
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Public Overloads Sub CambiarAReg(ByVal id As String, ByVal accion As Integer)
+        Try
+            MyBase.CambiarAReg(id, "", accion)
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+
+#End Region
+
+    Friend Overrides Function TieneCambios() As Boolean
+        Try
+            guardarDV()
+            If Not tabla.GetChanges Is Nothing Then
+                Return True
+            Else
+                Return False
+            End If
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Function
+    Public Overloads Sub NuevoRegistro()
+        Try
+            MyBase.NuevoRegistro()
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Friend Overrides Function genWhere() As String
+        Try
+            Dim ret As String
+
+            ret = "" '"WHERE " & tabla.TableName & ".CENTRO = """ & centro & """"
+
+            Return ret
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Function
+    Friend Overrides Function GenOrder() As String
+        Try
+            Return ""
+            'Return " ORDER BY TEMPORADA, CLIENT, SERIE, CODI "
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Function
+    Friend Overrides Function ObtenerNumeroRegistro(ByVal id As Object) As Integer
+        Try
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Function
+    Friend Overrides Function genWhereNumeroRegistros() As String
+        Try
+            Return genWhere()
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Function
+End Class

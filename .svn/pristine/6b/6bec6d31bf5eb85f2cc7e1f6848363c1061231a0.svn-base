@@ -1,0 +1,1054 @@
+Imports MySql.Data.MySqlClient : Imports clsFuncionesLOG : Imports clsFuncionesC1 : Imports clsFuncionesUtiles : Imports clsConstantes : Imports clsOtrasFunciones
+Imports num2text.Guille.Num2Text
+
+Namespace aura2k3
+    
+    Public Class frmBase
+        Inherits System.Windows.Forms.Form
+
+#Region " Código generado por el Diseñador de Windows Forms "
+        Public Sub New()
+            MyBase.New()
+            'El Diseñador de Windows Forms requiere esta llamada.
+            cargando = True
+            InitializeComponent()
+            'Agregar cualquier inicialización después de la llamada a InitializeComponent()
+        End Sub
+        'Form reemplaza a Dispose para limpiar la lista de componentes.
+        Protected Overloads Overrides Sub Dispose(ByVal disposing As Boolean)
+            If disposing Then
+                If Not (components Is Nothing) Then
+                    components.Dispose()
+                End If
+            End If
+            MyBase.Dispose(disposing)
+
+        End Sub
+        'Requerido por el Diseñador de Windows Forms
+        Private components As System.ComponentModel.IContainer
+        'NOTA: el Diseñador de Windows Forms requiere el siguiente procedimiento
+        'Puede modificarse utilizando el Diseñador de Windows Forms. 
+        'No lo modifique con el editor de código.
+
+        Public WithEvents sbtipo As System.Windows.Forms.Label
+        Public WithEvents btnRecargar As C1.Win.C1Input.C1Button
+        Public WithEvents btnSiguiente As C1.Win.C1Input.C1Button
+        Public WithEvents btnAnterior As C1.Win.C1Input.C1Button
+        Public WithEvents btnPrimero As C1.Win.C1Input.C1Button
+        Public WithEvents btnUltimo As C1.Win.C1Input.C1Button
+        Public WithEvents btnModificar As C1.Win.C1Input.C1Button
+        Public WithEvents btnTancar As C1.Win.C1Input.C1Button
+        Public WithEvents btnBorrar As C1.Win.C1Input.C1Button
+        Public WithEvents btnNuevo As C1.Win.C1Input.C1Button
+        Public WithEvents btnActualizar As C1.Win.C1Input.C1Button
+        Public WithEvents btnVerLista As C1.Win.C1Input.C1Button
+        Public WithEvents cboSeleccionCentro As System.Windows.Forms.ComboBox
+
+
+        <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
+            Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmBase))
+            Me.sbtipo = New System.Windows.Forms.Label()
+            Me.btnModificar = New C1.Win.C1Input.C1Button()
+            Me.btnVerLista = New C1.Win.C1Input.C1Button()
+            Me.btnRecargar = New C1.Win.C1Input.C1Button()
+            Me.btnSiguiente = New C1.Win.C1Input.C1Button()
+            Me.btnAnterior = New C1.Win.C1Input.C1Button()
+            Me.btnPrimero = New C1.Win.C1Input.C1Button()
+            Me.btnUltimo = New C1.Win.C1Input.C1Button()
+            Me.btnTancar = New C1.Win.C1Input.C1Button()
+            Me.btnBorrar = New C1.Win.C1Input.C1Button()
+            Me.btnNuevo = New C1.Win.C1Input.C1Button()
+            Me.btnActualizar = New C1.Win.C1Input.C1Button()
+            Me.cboSeleccionCentro = New System.Windows.Forms.ComboBox()
+            CType(Me.btnModificar, System.ComponentModel.ISupportInitialize).BeginInit()
+            CType(Me.btnVerLista, System.ComponentModel.ISupportInitialize).BeginInit()
+            CType(Me.btnRecargar, System.ComponentModel.ISupportInitialize).BeginInit()
+            CType(Me.btnSiguiente, System.ComponentModel.ISupportInitialize).BeginInit()
+            CType(Me.btnAnterior, System.ComponentModel.ISupportInitialize).BeginInit()
+            CType(Me.btnPrimero, System.ComponentModel.ISupportInitialize).BeginInit()
+            CType(Me.btnUltimo, System.ComponentModel.ISupportInitialize).BeginInit()
+            CType(Me.btnTancar, System.ComponentModel.ISupportInitialize).BeginInit()
+            CType(Me.btnBorrar, System.ComponentModel.ISupportInitialize).BeginInit()
+            CType(Me.btnNuevo, System.ComponentModel.ISupportInitialize).BeginInit()
+            CType(Me.btnActualizar, System.ComponentModel.ISupportInitialize).BeginInit()
+            Me.SuspendLayout()
+            '
+            'sbtipo
+            '
+            Me.sbtipo.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+            Me.sbtipo.Font = New System.Drawing.Font("Arial", 8.25!, System.Drawing.FontStyle.Bold)
+            Me.sbtipo.ImeMode = System.Windows.Forms.ImeMode.NoControl
+            Me.sbtipo.Location = New System.Drawing.Point(0, 90)
+            Me.sbtipo.Name = "sbtipo"
+            Me.sbtipo.Size = New System.Drawing.Size(88, 16)
+            Me.sbtipo.TabIndex = 0
+            Me.sbtipo.Text = "asdfasdfasdfasdfsadfsadfasdfasdfasdfasdfasdf"
+            Me.sbtipo.Visible = False
+            '
+            'btnModificar
+            '
+            Me.btnModificar.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+            Me.btnModificar.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+            Me.btnModificar.Image = CType(resources.GetObject("btnModificar.Image"), System.Drawing.Image)
+            Me.btnModificar.ImeMode = System.Windows.Forms.ImeMode.NoControl
+            Me.btnModificar.Location = New System.Drawing.Point(135, 32)
+            Me.btnModificar.Name = "btnModificar"
+            Me.btnModificar.Size = New System.Drawing.Size(100, 23)
+            Me.btnModificar.TabIndex = 6
+            Me.btnModificar.TabStop = False
+            Me.btnModificar.Text = "Modificar (F4)"
+            Me.btnModificar.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText
+            Me.btnModificar.UseVisualStyleBackColor = True
+            Me.btnModificar.Visible = False
+            '
+            'btnVerLista
+            '
+            Me.btnVerLista.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Me.btnVerLista.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+            Me.btnVerLista.Image = CType(resources.GetObject("btnVerLista.Image"), System.Drawing.Image)
+            Me.btnVerLista.ImeMode = System.Windows.Forms.ImeMode.NoControl
+            Me.btnVerLista.Location = New System.Drawing.Point(596, 32)
+            Me.btnVerLista.Name = "btnVerLista"
+            Me.btnVerLista.Size = New System.Drawing.Size(80, 23)
+            Me.btnVerLista.TabIndex = 9
+            Me.btnVerLista.TabStop = False
+            Me.btnVerLista.Text = "Llistat"
+            Me.btnVerLista.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText
+            Me.btnVerLista.UseVisualStyleBackColor = True
+            Me.btnVerLista.Visible = False
+            '
+            'btnRecargar
+            '
+            Me.btnRecargar.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+            Me.btnRecargar.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+            Me.btnRecargar.Image = CType(resources.GetObject("btnRecargar.Image"), System.Drawing.Image)
+            Me.btnRecargar.ImeMode = System.Windows.Forms.ImeMode.NoControl
+            Me.btnRecargar.Location = New System.Drawing.Point(35, 55)
+            Me.btnRecargar.Name = "btnRecargar"
+            Me.btnRecargar.Size = New System.Drawing.Size(100, 23)
+            Me.btnRecargar.TabIndex = 1
+            Me.btnRecargar.TabStop = False
+            Me.btnRecargar.Text = "Recarregar"
+            Me.btnRecargar.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText
+            Me.btnRecargar.UseVisualStyleBackColor = True
+            Me.btnRecargar.Visible = False
+            '
+            'btnSiguiente
+            '
+            Me.btnSiguiente.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+            Me.btnSiguiente.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+            Me.btnSiguiente.Image = CType(resources.GetObject("btnSiguiente.Image"), System.Drawing.Image)
+            Me.btnSiguiente.ImageAlign = System.Drawing.ContentAlignment.MiddleRight
+            Me.btnSiguiente.ImeMode = System.Windows.Forms.ImeMode.NoControl
+            Me.btnSiguiente.Location = New System.Drawing.Point(317, 55)
+            Me.btnSiguiente.Name = "btnSiguiente"
+            Me.btnSiguiente.Size = New System.Drawing.Size(32, 23)
+            Me.btnSiguiente.TabIndex = 8
+            Me.btnSiguiente.TabStop = False
+            Me.btnSiguiente.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText
+            Me.btnSiguiente.UseVisualStyleBackColor = True
+            Me.btnSiguiente.Visible = False
+            '
+            'btnAnterior
+            '
+            Me.btnAnterior.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+            Me.btnAnterior.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+            Me.btnAnterior.Image = CType(resources.GetObject("btnAnterior.Image"), System.Drawing.Image)
+            Me.btnAnterior.ImeMode = System.Windows.Forms.ImeMode.NoControl
+            Me.btnAnterior.Location = New System.Drawing.Point(3, 55)
+            Me.btnAnterior.Name = "btnAnterior"
+            Me.btnAnterior.Size = New System.Drawing.Size(32, 23)
+            Me.btnAnterior.TabIndex = 4
+            Me.btnAnterior.TabStop = False
+            Me.btnAnterior.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText
+            Me.btnAnterior.UseVisualStyleBackColor = True
+            Me.btnAnterior.Visible = False
+            '
+            'btnPrimero
+            '
+            Me.btnPrimero.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+            Me.btnPrimero.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+            Me.btnPrimero.Image = CType(resources.GetObject("btnPrimero.Image"), System.Drawing.Image)
+            Me.btnPrimero.ImeMode = System.Windows.Forms.ImeMode.NoControl
+            Me.btnPrimero.Location = New System.Drawing.Point(3, 32)
+            Me.btnPrimero.Name = "btnPrimero"
+            Me.btnPrimero.Size = New System.Drawing.Size(32, 23)
+            Me.btnPrimero.TabIndex = 0
+            Me.btnPrimero.TabStop = False
+            Me.btnPrimero.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText
+            Me.btnPrimero.UseVisualStyleBackColor = True
+            Me.btnPrimero.Visible = False
+            '
+            'btnUltimo
+            '
+            Me.btnUltimo.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+            Me.btnUltimo.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+            Me.btnUltimo.Image = CType(resources.GetObject("btnUltimo.Image"), System.Drawing.Image)
+            Me.btnUltimo.ImageAlign = System.Drawing.ContentAlignment.MiddleRight
+            Me.btnUltimo.ImeMode = System.Windows.Forms.ImeMode.NoControl
+            Me.btnUltimo.Location = New System.Drawing.Point(317, 32)
+            Me.btnUltimo.Name = "btnUltimo"
+            Me.btnUltimo.Size = New System.Drawing.Size(32, 23)
+            Me.btnUltimo.TabIndex = 3
+            Me.btnUltimo.TabStop = False
+            Me.btnUltimo.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText
+            Me.btnUltimo.UseVisualStyleBackColor = True
+            Me.btnUltimo.Visible = False
+            '
+            'btnTancar
+            '
+            Me.btnTancar.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Me.btnTancar.DialogResult = System.Windows.Forms.DialogResult.Cancel
+            Me.btnTancar.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+            Me.btnTancar.Image = CType(resources.GetObject("btnTancar.Image"), System.Drawing.Image)
+            Me.btnTancar.ImeMode = System.Windows.Forms.ImeMode.NoControl
+            Me.btnTancar.Location = New System.Drawing.Point(596, 55)
+            Me.btnTancar.Name = "btnTancar"
+            Me.btnTancar.Size = New System.Drawing.Size(80, 23)
+            Me.btnTancar.TabIndex = 10
+            Me.btnTancar.TabStop = False
+            Me.btnTancar.Text = "Tancar"
+            Me.btnTancar.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText
+            Me.btnTancar.UseVisualStyleBackColor = True
+            Me.btnTancar.Visible = False
+            '
+            'btnBorrar
+            '
+            Me.btnBorrar.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+            Me.btnBorrar.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+            Me.btnBorrar.Image = CType(resources.GetObject("btnBorrar.Image"), System.Drawing.Image)
+            Me.btnBorrar.ImeMode = System.Windows.Forms.ImeMode.NoControl
+            Me.btnBorrar.Location = New System.Drawing.Point(135, 55)
+            Me.btnBorrar.Name = "btnBorrar"
+            Me.btnBorrar.Size = New System.Drawing.Size(100, 23)
+            Me.btnBorrar.TabIndex = 7
+            Me.btnBorrar.TabStop = False
+            Me.btnBorrar.Text = "Eliminar (F5)"
+            Me.btnBorrar.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText
+            Me.btnBorrar.UseVisualStyleBackColor = True
+            Me.btnBorrar.Visible = False
+            '
+            'btnNuevo
+            '
+            Me.btnNuevo.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+            Me.btnNuevo.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+            Me.btnNuevo.Image = CType(resources.GetObject("btnNuevo.Image"), System.Drawing.Image)
+            Me.btnNuevo.ImeMode = System.Windows.Forms.ImeMode.NoControl
+            Me.btnNuevo.Location = New System.Drawing.Point(235, 32)
+            Me.btnNuevo.Name = "btnNuevo"
+            Me.btnNuevo.Size = New System.Drawing.Size(82, 46)
+            Me.btnNuevo.TabIndex = 2
+            Me.btnNuevo.TabStop = False
+            Me.btnNuevo.Text = "Nou (F3)"
+            Me.btnNuevo.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText
+            Me.btnNuevo.UseVisualStyleBackColor = True
+            Me.btnNuevo.Visible = False
+            '
+            'btnActualizar
+            '
+            Me.btnActualizar.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+            Me.btnActualizar.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+            Me.btnActualizar.Image = CType(resources.GetObject("btnActualizar.Image"), System.Drawing.Image)
+            Me.btnActualizar.ImeMode = System.Windows.Forms.ImeMode.NoControl
+            Me.btnActualizar.Location = New System.Drawing.Point(35, 32)
+            Me.btnActualizar.Name = "btnActualizar"
+            Me.btnActualizar.Size = New System.Drawing.Size(100, 23)
+            Me.btnActualizar.TabIndex = 5
+            Me.btnActualizar.TabStop = False
+            Me.btnActualizar.Text = "Guardar (F6)"
+            Me.btnActualizar.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText
+            Me.btnActualizar.UseVisualStyleBackColor = True
+            Me.btnActualizar.Visible = False
+            '
+            'cboSeleccionCentro
+            '
+            Me.cboSeleccionCentro.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Me.cboSeleccionCentro.BackColor = System.Drawing.Color.White
+            Me.cboSeleccionCentro.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+            Me.cboSeleccionCentro.ItemHeight = 13
+            Me.cboSeleccionCentro.Location = New System.Drawing.Point(520, 6)
+            Me.cboSeleccionCentro.Name = "cboSeleccionCentro"
+            Me.cboSeleccionCentro.Size = New System.Drawing.Size(156, 21)
+            Me.cboSeleccionCentro.TabIndex = 11
+            '
+            'frmBase
+            '
+            Me.AutoScaleBaseSize = New System.Drawing.Size(5, 14)
+            Me.AutoScroll = True
+            Me.CancelButton = Me.btnTancar
+            Me.ClientSize = New System.Drawing.Size(684, 110)
+            Me.Controls.Add(Me.cboSeleccionCentro)
+            Me.Controls.Add(Me.btnModificar)
+            Me.Controls.Add(Me.btnVerLista)
+            Me.Controls.Add(Me.btnRecargar)
+            Me.Controls.Add(Me.btnSiguiente)
+            Me.Controls.Add(Me.btnAnterior)
+            Me.Controls.Add(Me.btnPrimero)
+            Me.Controls.Add(Me.btnUltimo)
+            Me.Controls.Add(Me.btnTancar)
+            Me.Controls.Add(Me.btnBorrar)
+            Me.Controls.Add(Me.btnNuevo)
+            Me.Controls.Add(Me.btnActualizar)
+            Me.Controls.Add(Me.sbtipo)
+            Me.Font = New System.Drawing.Font("Tahoma", 8.25!)
+            Me.Name = "frmBase"
+            Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
+            CType(Me.btnModificar, System.ComponentModel.ISupportInitialize).EndInit()
+            CType(Me.btnVerLista, System.ComponentModel.ISupportInitialize).EndInit()
+            CType(Me.btnRecargar, System.ComponentModel.ISupportInitialize).EndInit()
+            CType(Me.btnSiguiente, System.ComponentModel.ISupportInitialize).EndInit()
+            CType(Me.btnAnterior, System.ComponentModel.ISupportInitialize).EndInit()
+            CType(Me.btnPrimero, System.ComponentModel.ISupportInitialize).EndInit()
+            CType(Me.btnUltimo, System.ComponentModel.ISupportInitialize).EndInit()
+            CType(Me.btnTancar, System.ComponentModel.ISupportInitialize).EndInit()
+            CType(Me.btnBorrar, System.ComponentModel.ISupportInitialize).EndInit()
+            CType(Me.btnNuevo, System.ComponentModel.ISupportInitialize).EndInit()
+            CType(Me.btnActualizar, System.ComponentModel.ISupportInitialize).EndInit()
+            Me.ResumeLayout(False)
+
+        End Sub
+#End Region
+
+#Region "VARIABLES"
+
+        Public arrayTextBox As Control()
+        Public arrayEtiquetas As Control()
+        Public arrayBotones As Control()
+        Public arrayTabPages As Control()
+        Public arrayCheckBox As Control()
+        Public arrayCombos As Control()
+        Public arrayDateTime As Control()
+        Public arrayPictureBox As Control()
+        Public arrayListas As Control()
+        Public arrayGrids As Control()
+        Public arrayRadios As Control()
+        Public general As New clsFuncionesUtiles
+
+
+#Region "TABLAS"
+
+        'Friend dtFiliales As New DataTable
+        Friend dtIVA As New DataTable
+
+#End Region
+
+        Friend tabla As String
+        Friend ds As New aura2k3.ds11
+        Friend EsRegistroNuevo As Boolean = False
+        Friend editando As Boolean = False
+        Friend desplazando As Boolean = False
+        Friend empresa As Char = "C"
+        Friend cargando As Boolean = False
+
+#End Region
+
+#Region "FUNCIONES UTILES"
+
+        Friend Function PosActual(ByVal dv As DataView) As Integer
+            Try
+                If Me.BindingContext(dv).Position = -1 Then
+                    Return -1
+                    'MessageBox.Show("NO HI HA CAP REGISTRE")
+                Else
+                    Return Me.BindingContext(dv).Position()
+                End If
+
+            Catch ex As Exception
+                ' ex.Message = ""
+                LOG(ex.ToString) : cargando = False : CCN()
+            End Try
+        End Function
+
+#End Region
+
+#Region "INICIAR"
+
+        Private Sub frmBase_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
+            Try
+                Cursor = Cursors.WaitCursor
+                Me.arrayTextBox = New Control() {}
+                Me.arrayEtiquetas = New System.Windows.Forms.Control() {}
+                Me.arrayBotones = New System.Windows.Forms.Control() {}
+                Me.arrayGrids = New System.Windows.Forms.Control() {}
+                Me.arrayCheckBox = New System.Windows.Forms.Control() {}
+                Me.arrayCombos = New System.Windows.Forms.Control() {}
+                Me.arrayTabPages = New System.Windows.Forms.Control() {}
+                Me.arrayDateTime = New Control() {}
+                Me.arrayListas = New Control() {}
+                Me.arrayPictureBox = New Control() {}
+                Me.arrayRadios = New Control() {}
+
+                cargando = True
+                If TieneControles() Then
+                    ColocarSBTIPO()
+                    ColocarBotonesControl()
+                End If
+                cboSeleccionCentro.Visible = False
+                If DependeCentro() Then
+                    ColocarCBOCENTRO()
+                    AñadirBindingComboCentro()
+                End If
+                MaxDropCombos()
+
+                Cursor = Cursors.Default
+                cargando = False
+
+            Catch ex As Exception
+                LOG(ex.ToString) : cargando = False : CCN()
+            End Try
+        End Sub
+        Private Sub MaxDropCombos()
+            Dim i As Integer
+            Try
+                If Not arrayCombos Is Nothing Then
+
+                    For i = 0 To arrayCombos.Length - 1
+                        Select Case arrayCombos(i).GetType.ToString
+                            Case "C1.Win.C1List.C1Combo"
+                                DirectCast(arrayCombos(i), C1.Win.C1List.C1Combo).MaxDropDownItems = 10
+
+                            Case "System.Windows.Forms.ComboBox"
+                                DirectCast(arrayCombos(i), System.Windows.Forms.ComboBox).MaxDropDownItems = 10
+                        End Select
+                    Next
+                End If
+                If Not arrayGrids Is Nothing Then
+
+                    For i = 0 To arrayGrids.Length - 1
+                        If arrayGrids(i).GetType.ToString = "C1.Win.C1TrueDBGrid.C1TrueDBGrid" Then
+                            DirectCast(arrayGrids(i), C1.Win.C1TrueDBGrid.C1TrueDBGrid).TabAction = C1.Win.C1TrueDBGrid.TabActionEnum.GridNavigation
+                            DirectCast(arrayGrids(i), C1.Win.C1TrueDBGrid.C1TrueDBGrid).WrapCellPointer = True
+                        End If
+                    Next
+                End If
+            Catch ex As Exception
+                LOG(ex.ToString)
+            End Try
+        End Sub
+        Friend Sub PonerHandlersErroresParaGrids()
+            Dim i As Integer
+            Try
+                For i = 0 To arrayGrids.Length - 1
+                    If arrayGrids(i).GetType.ToString = "C1.Win.C1TrueDBGrid.C1TrueDBGrid" Then
+                        AddHandler DirectCast(arrayGrids(i), C1.Win.C1TrueDBGrid.C1TrueDBGrid).Error, AddressOf Errores_DG
+                        AddHandler DirectCast(arrayGrids(i), C1.Win.C1TrueDBGrid.C1TrueDBGrid).BeforeColUpdate, AddressOf validando
+                    End If
+                Next
+
+            Catch ex As Exception
+                LOG(ex.ToString)
+            End Try
+        End Sub
+        Private Sub validando(ByVal sender As Object, ByVal e As C1.Win.C1TrueDBGrid.BeforeColUpdateEventArgs)
+            Try
+                If e.Column.DataColumn.NumberFormat <> "" Then
+                    With e.Column.DataColumn
+                        If .Text.LastIndexOf(".") <> -1 Then
+                            'Dim sb As New System.Text.StringBuilder(.Text)
+                            '.Text = sb.Replace(".", ",", .Text.LastIndexOf("."), .Text.Length).ToString
+                            .Text = .Text.Replace(".", ",")
+                        End If
+                    End With
+                End If
+
+            Catch ex As Exception
+                LOG(ex.ToString)
+            End Try
+        End Sub
+
+        Friend Sub CrearBindingIVA(ByRef comboIVA As C1.Win.C1List.C1Combo, ByVal dv As DataView, Optional ByVal nocerrar As Boolean = False)
+            Dim drNULL As DataRow
+            Try
+                CargaTabla(tablaIVA, "CODI", CNIVA, dtIVA, nocerrar)
+                drNULL = dtIVA.NewRow
+                drNULL("CODI") = "Article"
+                drNULL("DESCRIPCIO") = "Article"
+                dtIVA.Rows.Add(drNULL)
+                AñadirBinding(comboIVA, dv, "IVA")
+                AñadirBindingCombo(comboIVA, dtIVA, "CODI", "CODI")
+
+            Catch ex As Exception
+                LOG(ex.ToString) : CCN()
+            End Try
+        End Sub
+        Friend Sub AutoSizeControles()
+            Dim i As Integer
+            Try
+                For i = 0 To arrayCombos.Length - 1
+                    Select Case arrayCombos(i).GetType.ToString
+                        Case "C1.Win.C1List.C1Combo"
+                            AutosizeColumnasCombo(DirectCast(arrayCombos(i), C1.Win.C1List.C1Combo))
+                        Case "System.Windows.Forms.ComboBox"
+                            'DirectCast(arrayCombos(i), System.Windows.Forms.ComboBox).MaxDropDownItems = 10
+                    End Select
+                Next
+
+            Catch ex As Exception
+                LOG(ex.ToString)
+            End Try
+        End Sub
+        Private Function noEsID(ByVal campo As String) As Boolean
+            Try
+                Select Case campo
+                    Case "FRA" : Return False
+                    Case "CLIENT" : Return False
+                    Case "ORDRE" : Return False
+                    Case "PROVE" : Return False
+                    Case "TALLER" : Return False
+                    Case "TRANS" : Return False
+                    Case "ACABADOR", "TEIXIDOR", "ESTAMPADOR" : Return False
+                End Select
+                Return True
+
+            Catch ex As Exception
+                LOG(ex.ToString)
+            End Try
+        End Function
+        Friend Sub HacerBindingsTodos(ByVal dvform As DataView)
+            Dim i As Integer
+            Try
+                For i = 0 To arrayTextBox.Length - 1
+                    If dvform.Table.Columns.Contains(DirectCast(arrayTextBox(i).Name, String).Substring(3)) Then
+                        'Hay que hacer un binding al textbox
+                        If arrayTextBox(i).DataBindings.Count = 0 Then
+                            AñadirBinding(arrayTextBox(i), dvform, arrayTextBox(i).Name.Substring(3).ToUpper, "Value")
+                            If dvform.Table.Columns(arrayTextBox(i).Name.Substring(3).ToUpper).MaxLength > 0 Then DirectCast(arrayTextBox(i), Object).MaxLength = dvform.Table.Columns(arrayTextBox(i).Name.Substring(3).ToUpper).MaxLength
+                            If dvform.Table.Columns(arrayTextBox(i).Name.Substring(3).ToUpper).DataType Is GetType(Integer) Then
+                                'ForzarTextBoxEntero(DirectCast(arrayTextBox(i), Object))
+                                If noEsID(arrayTextBox(i).Name.Substring(3).ToUpper) Then
+                                    Try
+                                        DirectCast(arrayTextBox(i), C1.Win.C1Input.C1TextBox).DataType = GetType(System.Int64)
+                                        DirectCast(arrayTextBox(i), C1.Win.C1Input.C1TextBox).FormatType = C1.Win.C1Input.FormatTypeEnum.CustomFormat
+                                        DirectCast(arrayTextBox(i), C1.Win.C1Input.C1TextBox).CustomFormat = "###,###,###,###,##0"
+
+                                    Catch ex As Exception : LOG(ex.ToString) : End Try
+                                End If
+                            End If
+                            If dvform.Table.Columns(arrayTextBox(i).Name.Substring(3).ToUpper).DataType Is GetType(Double) Then
+                                'ForzarTextBoxDoble(DirectCast(arrayTextBox(i), Object))
+                                If noEsID(arrayTextBox(i).Name.Substring(3).ToUpper) Then
+                                    Try
+                                        DirectCast(arrayTextBox(i), C1.Win.C1Input.C1TextBox).DataType = GetType(System.Double)
+                                        DirectCast(arrayTextBox(i), C1.Win.C1Input.C1TextBox).FormatType = C1.Win.C1Input.FormatTypeEnum.CustomFormat
+                                        DirectCast(arrayTextBox(i), C1.Win.C1Input.C1TextBox).CustomFormat = "###,###,###,###,##0.00"
+                                    Catch ex As Exception : LOG(ex.ToString) : End Try
+                                End If
+                            End If
+                        End If
+                    End If
+                Next
+                For i = 0 To arrayCombos.Length - 1
+                    If dvform.Table.Columns.Contains(DirectCast(arrayCombos(i).Name, String).Substring(3)) Then
+                        'Hay que hacer un binding al combo
+                        If arrayCombos(i).DataBindings.Count = 0 Then
+                            AñadirBinding(arrayCombos(i), dvform, arrayCombos(i).Name.Substring(3).ToUpper)
+                            If dvform.Table.Columns(arrayCombos(i).Name.Substring(3).ToUpper).MaxLength > 0 Then DirectCast(arrayCombos(i), Object).MaxLength = dvform.Table.Columns(arrayCombos(i).Name.Substring(3).ToUpper).MaxLength
+                        End If
+                    End If
+                Next
+                For i = 0 To arrayDateTime.Length - 1
+                    If dvform.Table.Columns.Contains(DirectCast(arrayDateTime(i).Name, String).Substring(3)) Then
+                        If arrayDateTime(i).DataBindings.Count = 0 Then
+                            AñadirBinding(arrayDateTime(i), dvform, arrayDateTime(i).Name.Substring(3).ToUpper, "Value")
+                        End If
+                    End If
+                Next
+                For i = 0 To arrayCheckBox.Length - 1
+                    If dvform.Table.Columns.Contains(DirectCast(arrayCheckBox(i).Name, String).Substring(3)) Then
+                        If arrayCheckBox(i).DataBindings.Count = 0 Then
+                            AñadirBinding(arrayCheckBox(i), dvform, arrayCheckBox(i).Name.Substring(3).ToUpper, "Checked")
+                        End If
+                    End If
+                Next
+                For i = 0 To arrayPictureBox.Length - 1
+                    If dvform.Table.Columns.Contains(DirectCast(arrayPictureBox(i).Name, String).Substring(3)) Then
+                        If arrayPictureBox(i).DataBindings.Count = 0 Then
+                            Dim bdPhoto As Binding = New Binding("Image", dvform, arrayPictureBox(i).Name.Substring(3).ToUpper)
+                            AddHandler bdPhoto.Format, New ConvertEventHandler(AddressOf PictureFormat)
+                            arrayPictureBox(i).DataBindings.Add(bdPhoto)
+                        End If
+                    End If
+                Next
+                For i = 0 To arrayRadios.Length - 1
+                    If dvform.Table.Columns.Contains(DirectCast(arrayRadios(i).Name, String).Substring(3)) Then
+                        If arrayRadios(i).DataBindings.Count = 0 Then
+                            AñadirBinding(arrayRadios(i), dvform, arrayRadios(i).Name.Substring(3).ToUpper, "Checked")
+                        End If
+                    End If
+                Next
+
+            Catch ex As Exception
+                LOG(ex.ToString)
+            End Try
+        End Sub
+
+#End Region
+
+#Region "MODIFICAR"
+
+        Friend Sub PonerMod(ByVal b As Boolean)
+            Dim i As Integer
+            Try
+                'arrayBotones.SetEnabled(Not b)
+                For i = 0 To arrayBotones.Length - 1
+                    DirectCast(arrayBotones(i), Control).Enabled = Not b
+                Next
+                'arrayCheckBox.SetEnabled(Not b)
+                For i = 0 To arrayCheckBox.Length - 1
+                    DirectCast(arrayCheckBox(i), Control).Enabled = Not b
+                Next
+                'arrayCombos.SetReadOnly(b)
+                'arrayCombos.SetAutoCompletion(True)
+                'arrayCombos.SetProperty("LimitToList", b)
+                For i = 0 To arrayCombos.Length - 1
+                    Select Case arrayCombos(i).GetType.ToString
+                        Case "C1.Win.C1List.C1Combo"
+                            DirectCast(arrayCombos(i), C1.Win.C1List.C1Combo).ReadOnly = b
+                            DirectCast(arrayCombos(i), C1.Win.C1List.C1Combo).AutoCompletion = True
+                            DirectCast(arrayCombos(i), C1.Win.C1List.C1Combo).LimitToList = b
+                        Case "System.Windows.Forms.ComboBox"
+                            MsgBox("error mod como")
+                            'DirectCast(arrayCombos(i), ComboBox).ReadOnly = b
+                            'DirectCast(arrayCombos(i), ComboBox).AutoCompletion = True
+                            'DirectCast(arrayCombos(i), ComboBox).LimitToList = b
+                    End Select
+
+                Next
+
+
+                'arrayDateTime.SetReadOnly(b)
+                ''arrayDateTime.Enabled = Not b
+
+                For i = 0 To arrayDateTime.Length - 1
+                    DirectCast(arrayDateTime(i), C1.Win.C1Input.C1DateEdit).ReadOnly = b
+                    DirectCast(arrayDateTime(i), C1.Win.C1Input.C1DateEdit).Enabled = Not b
+                Next
+
+                'arrayRadios.SetEnabled(Not b)
+                For i = 0 To arrayRadios.Length - 1
+                    DirectCast(arrayRadios(i), C1.Win.C1Input.C1DateEdit).Enabled = Not b
+                Next
+                For i = 0 To arrayGrids.Length - 1
+                    If arrayGrids(i).GetType.ToString = "C1.Win.C1TrueDBGrid.C1TrueDBGrid" Then
+                        DirectCast(arrayGrids(i), C1.Win.C1TrueDBGrid.C1TrueDBGrid).AllowUpdate = Not b
+                        DirectCast(arrayGrids(i), C1.Win.C1TrueDBGrid.C1TrueDBGrid).AllowAddNew = Not b
+                        DirectCast(arrayGrids(i), C1.Win.C1TrueDBGrid.C1TrueDBGrid).AllowRowSelect = Not b
+                        DirectCast(arrayGrids(i), C1.Win.C1TrueDBGrid.C1TrueDBGrid).AllowDelete = Not b
+                    End If
+                Next
+                'arrayTextBox.SetReadOnly(b)
+
+                For i = 0 To arrayTextBox.Length - 1
+                    DirectCast(arrayTextBox(i), C1.Win.C1Input.C1TextBox).ReadOnly = b
+                Next
+
+                'arrayListas.SetEnabled(Not b)
+                For i = 0 To arrayListas.Length - 1
+                    DirectCast(arrayListas(i), Control).Enabled = b
+                Next
+            Catch ex As Exception
+                LOG(ex.ToString) : cargando = False : CCN()
+            End Try
+        End Sub
+        Friend Sub ModiNuev(ByVal b As Boolean)
+            Try
+                btnSiguiente.Enabled = b
+                btnModificar.Enabled = b
+                btnAnterior.Enabled = b
+                btnUltimo.Enabled = b
+                btnPrimero.Enabled = b
+                btnNuevo.Enabled = b
+                btnBorrar.Enabled = b
+                btnRecargar.Enabled = b
+                btnVerLista.Enabled = b
+                btnTancar.Enabled = b
+
+            Catch ex As Exception
+                LOG(ex.ToString)
+            End Try
+        End Sub
+        Public Function PuedoModificar() As Boolean
+            Return Not consulta() AndAlso Not cargando
+        End Function
+        Public Function consulta() As Boolean
+            Return (cargando = False AndAlso Not EsRegistroNuevo AndAlso Not editando)
+        End Function
+
+#End Region
+
+#Region "DESPLAZAMIENTO"
+
+        Friend Overridable Sub btnModificar_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnModificar.Click
+        End Sub
+        Friend Overridable Sub btnActualizar_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnActualizar.Click
+        End Sub
+        Friend Overridable Sub btnAnterior_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnAnterior.Click
+        End Sub
+        Protected Friend Overridable Sub btnPrimero_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnPrimero.Click
+        End Sub
+        Friend Overridable Sub btnUltimo_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnUltimo.Click
+        End Sub
+        Friend Overridable Sub btnNuevo_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnNuevo.Click
+        End Sub
+        Friend Overridable Sub btnBorrar_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnBorrar.Click
+        End Sub
+        Friend Overridable Sub btnSiguiente_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnSiguiente.Click
+        End Sub
+        'Friend Overridable Sub cboSeleccionCentro_SelectionChangeCommitted(ByVal sender As System.Object, ByVal e As System.EventArgs)
+        'End Sub
+        Friend Sub btnTancar_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnTancar.Click
+            Me.Close()
+        End Sub
+        Friend Sub PSBTIPO(ByVal centro As Char) 'Optional ByVal centre As String = "-", Optional ByVal centro As Char = "C")
+            Try
+                If editando Then
+                    sbtipo.Text = "MODIFICANT"
+                    sbtipo.ForeColor = Color.Orange
+                End If
+                If EsRegistroNuevo Then
+                    sbtipo.Text = "ALTA"
+                    sbtipo.ForeColor = Color.Red
+                End If
+                If Not editando And Not EsRegistroNuevo Then
+                    sbtipo.Text = "CONSULTA"
+                    sbtipo.ForeColor = Color.Green
+                End If
+                cboSeleccionCentro.SelectedValue = centro
+
+                'If centre = "-" Then
+                '    cboSeleccionCentro.SelectedValue = centro
+                'Else
+                '    cboSeleccionCentro.SelectedValue = centre
+                'End If
+
+            Catch ex As Exception
+                LOG(ex.ToString) : cargando = False : CCN()
+            End Try
+        End Sub
+
+#End Region
+
+#Region "PONER CONTROLES"
+
+        Private Sub ColocarSBTIPO()
+            Dim p As Point
+            p.X = 5
+            p.Y = Me.Size.Height - 50
+            sbtipo.Visible = True
+            sbtipo.FlatStyle = FlatStyle.System
+            sbtipo.Enabled = True
+            sbtipo.Text = ""
+            sbtipo.Location = p
+        End Sub
+        Private Sub ColocarBoton(ByVal btn As Button, ByVal p As Point)
+            btn.Visible = True
+            btn.Enabled = True
+            btn.Show()
+            btn.BringToFront()
+            btn.Location = p
+        End Sub
+        Private Sub ColocarBotonesControl()
+            Dim p As Point
+            Dim w As Integer = Me.Size.Width
+            Dim wi As Integer = 70
+            Dim h As Integer = Me.Size.Height - 55
+            'Dim h As Integer = Me.Size.Height - 70
+            Dim h2 As Integer = h - btnPrimero.Height
+            ColocarBoton(btnPrimero, New Point(wi, h2))
+            ColocarBoton(btnActualizar, New Point(wi + btnPrimero.Width, h2))
+            ColocarBoton(btnModificar, New Point(wi + btnPrimero.Width + btnActualizar.Width, h2))
+            ColocarBoton(btnNuevo, New Point(wi + btnPrimero.Width + btnModificar.Width + btnActualizar.Width, h2))
+            ColocarBoton(btnUltimo, New Point(wi + btnPrimero.Width + btnActualizar.Width + btnNuevo.Width + btnModificar.Width, h2))
+            ColocarBoton(btnAnterior, New Point(wi, h))
+            ColocarBoton(btnRecargar, New Point(wi + btnPrimero.Width, h))
+            ColocarBoton(btnBorrar, New Point(wi + btnRecargar.Width + btnAnterior.Width, h))
+            ColocarBoton(btnSiguiente, New Point(wi + btnAnterior.Width + btnRecargar.Width + btnBorrar.Width + btnNuevo.Width, h))
+            If TieneListado() Then
+                ColocarBoton(btnVerLista, New Point(w - btnVerLista.Width - 25, h2))
+            End If
+            ColocarBoton(btnTancar, New Point(w - btnTancar.Width - 25, h))
+        End Sub
+        Private Function TieneListado() As Boolean
+            Select Case Me.Name
+                Case "frmTejidoCompraAlbaran", "frmTejidoCompraPedido", "frmVentaFactura", "frmVentaFacturaProforma", "frmTejidoVentaAlbaran", "frmTejidoVentaPedido"
+                    Return True
+                Case "frmForniturasCompraPedido", "frmMuestrasComprasAlbaran", "frmMuestrasComprasPedido", "frmMuestrasOrdenes"
+                    Return True
+                Case "frmEmpresas"
+                    Return True
+            End Select
+            Return True
+        End Function
+        Private Sub ColocarCBOCENTRO()
+            Dim p As Point
+            Select Case Me.Name
+                Case "frmOrdenesFabricacion"
+                    p.X = Me.Size.Width - cboSeleccionCentro.Size.Width - 48
+                    p.Y = 15
+                Case "frmTejidoVentaAlbaran", "frmVentaFactura", "frmVentaFacturaProforma", "frmVentaPedido"
+                    p.X = Me.Size.Width - cboSeleccionCentro.Size.Width - 25
+                    p.Y = 24
+                Case Else
+                    p.X = Me.Size.Width - cboSeleccionCentro.Size.Width - 10
+                    p.Y = 5
+            End Select
+
+            cboSeleccionCentro.Size = New System.Drawing.Size(158, 21)
+            cboSeleccionCentro.Visible = True
+            cboSeleccionCentro.Enabled = True
+            cboSeleccionCentro.Show()
+            cboSeleccionCentro.BringToFront()
+            cboSeleccionCentro.Location = p
+        End Sub
+
+#End Region
+
+#Region "TECLAS"
+
+        Friend Sub TeclaKeyUp(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles MyBase.KeyUp
+            Dim tecla As String = e.KeyCode.ToString
+            Try
+                If Not cargando Then
+
+                    If esTeclaValida(tecla) Then
+                        Select Case tecla
+                            Case Keys.PageDown.ToString
+                                If consulta() Then
+                                    btnSiguiente_Click(Nothing, Nothing) : End If
+                            Case Keys.PageUp.ToString
+                                If consulta() Then : btnAnterior_Click(Nothing, Nothing) : End If
+                            Case Keys.Home.ToString
+                                If consulta() Then : btnPrimero_Click(Nothing, Nothing) : End If
+                            Case Keys.End.ToString
+                                If consulta() Then : btnUltimo_Click(Nothing, Nothing) : End If
+                            Case Keys.F3.ToString
+                                If consulta() Then : btnNuevo_Click(Nothing, Nothing) : End If
+                            Case Keys.F4.ToString
+                                If Not EsRegistroNuevo Then : btnModificar_Click(Nothing, Nothing) : End If
+                            Case Keys.F5.ToString
+                                If Not EsRegistroNuevo Then : btnBorrar_Click(Nothing, Nothing) : End If
+                            Case Keys.F6.ToString
+                                btnActualizar_Click(Nothing, Nothing)
+
+                                'Case Keys.F2.ToString : btnElegirCliente_Click(nothing, nothing)
+                        End Select
+                    End If
+                End If
+            Catch ex As Exception
+                LOG(ex.ToString) : cargando = False : CCN()
+            End Try
+        End Sub
+        Private Sub AñadirBindingComboCentro()
+            Dim i As Integer
+            Try
+                If Not DesignMode Then
+                    With cboSeleccionCentro
+                        .DataSource = dtFiliales
+                        .ValueMember = CCFiliales
+                        .DisplayMember = CNFiliales
+                    End With
+                    'For i = 0 To dtFiliales.Rows.Count - 1
+                    'cboSeleccionCentro.AddItem
+                    'Next
+                End If
+            Catch ex As Exception
+                LOG(ex.ToString) : cargando = False : CCN()
+            End Try
+        End Sub
+        Private Function TieneControles() As Boolean
+            Select Case Me.Name
+                Case "frmCompraPAFPlantilla", "frmVentaPAFPlantilla", _
+                        "frmClientesForm", _
+                        "frmRepresentantesForm", _
+                        "frmProveedoresForm", _
+                        "frmTransportistasForm", _
+                        "frmClientes2", _
+                        "frmEmpresas"
+                    Return True
+                Case "frmTejidoCompraAlbaran", _
+                        "frmTejidoCompraPedido", _
+                        "frmVentaFactura", _
+                        "frmVentaFacturaProforma", _
+                        "frmTejidoVentaAlbaran", _
+                        "frmTejidoVentaPedido", _
+                        "frmHilosComprasPedido", _
+                        "frmHilosComprasAlbaran"
+                    Return True
+                Case "frmForniturasCompraPedido", "frmIVAForm", "frmOrdenesFabricacion", "frmMuestrasComprasAlbaran", "frmMuestrasComprasPedido", "frmMuestrasOrdenes"
+                    Return True
+                Case "frmMaquinasForm", "frmOperacionesForm", "frmTalleresForm", "frmFornituras", "frmPagoForm"
+                    Return True
+                Case "frmMuestras", "frmTejidos", "frmModelos", "frmHilos", "frmDisposicion"
+                    Return True
+                Case "frmErrores", "frmRemesas", "frmBancosForm", "frmAlbaranesModelos", "frmFacturasModelos"
+                    Return True
+            End Select
+            Return False
+        End Function
+        Private Function DependeCentro() As Boolean
+            Try
+                Select Case Me.Name
+
+                    Case "frmClientesForm", _
+                            "frmTalleresForm", _
+                            "frmRepresentantesForm", _
+                            "frmProveedoresForm", _
+                            "frmTransportistasForm"
+                        Return False
+
+                    Case "frmVentaPAFPlantilla", _
+                            "frmTejidoCompraPedido", "frmRemesas", "frmElegirPAFP"
+                        Return True
+
+                    Case "frmTejidoCompraAlbaran", _
+                            "frmTejidoCompraPedido", _
+                            "frmVentaFactura", _
+                            "frmVentaFacturaProforma", _
+                            "frmTejidoVentaAlbaran", _
+                            "frmTejidoVentaPedido"
+                        Return True
+
+                    Case "frmForniturasCompraPedido", _
+                            "frmOrdenesFabricacion", _
+                            "frmMuestrasComprasAlbaran", _
+                            "frmMuestrasComprasPedido", _
+                            "frmMuestrasOrdenes", _
+                            "frmAlbaranesModelos", _
+                            "frmFacturasModelos", _
+                            "frmModelos", "frmMuestras", "frmHilos", "frmTejidos", "frmFornituras"
+                        Return True
+
+                    Case "frmPrincipal"
+                        Return False
+
+                    Case "frmCompraPAFPlantilla" : Return True
+
+                End Select
+                Return False
+
+            Catch ex As Exception
+                LOG(ex.ToString) : cargando = False : CCN()
+            End Try
+        End Function
+
+#End Region
+
+#Region "ORGANIZAR"
+
+        Private Sub frmBase_Closing(ByVal sender As Object, ByVal e As System.ComponentModel.CancelEventArgs) Handles MyBase.Closing
+            btnActualizar_Click(Nothing, Nothing) : cargando = True
+        End Sub
+        Friend Function ObtenerFiladeColumnasC1(ByVal columna As Object, ByVal dt As DataTable) As DataRow
+            Dim i As Integer
+            Dim dr As DataRow
+            Try
+                dr = dt.NewRow
+                For i = 0 To columna.Count - 1
+                    dr(columna(i).DataField) = columna(i).Value
+                Next
+                Return dr
+            Catch ex As Exception
+                LOG(ex.ToString)
+            End Try
+        End Function
+        Friend Sub PictureFormat(ByVal sender As Object, ByVal e As ConvertEventArgs)
+            Try
+                If Not e.Value Is Nothing AndAlso Not IsDBNull(e.Value) Then
+                    Dim img() As Byte = CType(e.Value, Byte())
+                    Dim ms As IO.MemoryStream = New IO.MemoryStream
+                    ms.Write(img, 0, img.Length)
+                    Dim bmp As Bitmap = New Bitmap(ms)
+                    ms.Close()
+                    e.Value = bmp
+                Else
+                    Dim bmp As Bitmap = New Bitmap(CurDir() & "\nada.bmp")
+                    e.Value = bmp
+                End If
+
+            Catch ex As Exception
+                'Dim bmp As Bitmap = New Bitmap(curdir & "\nada.bmp")
+                'e.Value = bmp
+                LOG(ex.ToString) : cargando = False : CCN()
+            End Try
+        End Sub
+        Private Sub BindingFormatting(ByVal sender As Object, ByVal e As System.Windows.Forms.ConvertEventArgs)
+            Try
+                HaciendoFormatBinding = True
+                If TypeOf e.Value Is Double OrElse TypeOf e.Value Is Integer Then
+                    Select Case e.Value.GetType.ToString
+                        Case GetType(Double).ToString
+                            Dim s As String = CType(e.Value, String)
+                            If s Is Nothing OrElse s = String.Empty Then
+                                e.Value = Nothing
+                            Else
+                                e.Value = Format(e.Value, "#,##0.00")
+                            End If
+                        Case GetType(Integer).ToString
+                            Dim s As String = CType(e.Value, String)
+                            If s Is Nothing OrElse s = String.Empty Then
+                                e.Value = Nothing
+                            Else
+                                e.Value = Format(e.Value, "#,##0")
+                            End If
+
+                    End Select
+                End If
+                HaciendoFormatBinding = False
+
+            Catch ex As Exception
+                LOG(ex.ToString)
+            End Try
+        End Sub
+
+        Friend Sub Errores_DG(ByVal sender As Object, ByVal e As C1.Win.C1TrueDBGrid.ErrorEventArgs)
+            Try
+                If e.Exception.Message.IndexOf("Input string was not in a correct format.") > -1 Then
+                    MessageBox.Show(rm.GetString("FORMATOINCORRECTO"))
+                    e.Handled = True
+                End If
+                If e.Exception.Message.ToUpper.IndexOf("STRING WAS NOT RECOGNIZED AS A VALID DATETIME.") > -1 Then
+                    MessageBox.Show(rm.GetString("FORMATOFECHAINCORRECTO"))
+                    e.Handled = True
+                End If
+
+            Catch ex As Exception
+                LOG(ex.ToString)
+            End Try
+        End Sub
+
+
+#End Region
+
+        Protected Overrides Sub OnKeyUp(ByVal e As System.Windows.Forms.KeyEventArgs)
+            If e.KeyCode = Keys.Enter Then
+                If TypeOf Me.ActiveControl Is C1.Win.C1TrueDBGrid.C1TrueDBGrid Then GoTo salir2
+
+                If TypeOf Me.ActiveControl Is TextBox OrElse TypeOf Me.ActiveControl Is C1.Win.C1Input.C1TextBox Then
+                    Dim tb As Object
+                    If TypeOf Me.ActiveControl Is TextBox Then
+                        tb = DirectCast(Me.ActiveControl, TextBox)
+                    Else
+                        tb = DirectCast(Me.ActiveControl, C1.Win.C1Input.C1TextBox)
+                    End If
+                    If tb.Multiline Then
+                        If TypeOf Me.ActiveControl Is C1.Win.C1Input.C1TextBox Then
+                            If tb.ReadOnly = True Then
+                                GoTo salir
+                            End If
+                        End If
+                        e.Handled = False
+                        MyBase.OnKeyUp(e)
+                        Exit Sub
+                    End If
+
+                End If
+salir:          e.Handled = True
+                Me.ProcessTabKey(Not e.Shift)
+            Else
+salir2:         e.Handled = False
+                MyBase.OnKeyUp(e)
+            End If
+        End Sub
+
+    End Class
+End Namespace

@@ -1,0 +1,475 @@
+Imports MySql.Data.MySqlClient : Imports clsFuncionesLOG : Imports clsFuncionesC1 : Imports clsFuncionesUtiles : Imports clsConstantes
+
+Public Class frmNumeracion
+    Inherits aura2k3.frmBase
+
+#Region " Código generado por el Diseñador de Windows Forms "
+
+    Public Sub New()
+        MyBase.New()
+
+        'El Diseñador de Windows Forms requiere esta llamada.
+        InitializeComponent()
+
+        'Agregar cualquier inicialización después de la llamada a InitializeComponent()
+
+    End Sub
+
+    'Form reemplaza a Dispose para limpiar la lista de componentes.
+    Protected Overloads Overrides Sub Dispose(ByVal disposing As Boolean)
+        If disposing Then
+            If Not (components Is Nothing) Then
+                components.Dispose()
+            End If
+        End If
+        MyBase.Dispose(disposing)
+        frmChildForm = Nothing
+    End Sub
+
+    'Requerido por el Diseñador de Windows Forms
+    Private components As System.ComponentModel.IContainer
+
+    'NOTA: el Diseñador de Windows Forms requiere el siguiente procedimiento
+    'Puede modificarse utilizando el Diseñador de Windows Forms. 
+    'No lo modifique con el editor de código.
+    Friend WithEvents dgNumeraciones As C1.Win.C1TrueDBGrid.C1TrueDBGrid
+    Friend WithEvents btnAceptar As C1.Win.C1Input.C1Button
+    Friend WithEvents txtCodigoDispos As System.Windows.Forms.TextBox
+    Friend WithEvents txtAnyDispos As System.Windows.Forms.TextBox
+    Friend WithEvents GroupBox1 As System.Windows.Forms.GroupBox
+    <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
+        Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(frmNumeracion))
+        Me.dgNumeraciones = New C1.Win.C1TrueDBGrid.C1TrueDBGrid
+        Me.btnAceptar = New C1.Win.C1Input.C1Button
+        Me.txtCodigoDispos = New System.Windows.Forms.TextBox
+        Me.txtAnyDispos = New System.Windows.Forms.TextBox
+        Me.GroupBox1 = New System.Windows.Forms.GroupBox
+        CType(Me.dgNumeraciones, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.GroupBox1.SuspendLayout()
+        Me.SuspendLayout()
+        '
+        'btnNuevo
+        '
+        Me.btnNuevo.Location = New System.Drawing.Point(248, 745)
+        Me.btnNuevo.Name = "btnNuevo"
+        Me.btnNuevo.Size = New System.Drawing.Size(82, 37)
+        '
+        'btnActualizar
+        '
+        Me.btnActualizar.Location = New System.Drawing.Point(60, 745)
+        Me.btnActualizar.Name = "btnActualizar"
+        Me.btnActualizar.Size = New System.Drawing.Size(90, 19)
+        '
+        'btnBorrar
+        '
+        Me.btnBorrar.Location = New System.Drawing.Point(150, 764)
+        Me.btnBorrar.Name = "btnBorrar"
+        Me.btnBorrar.Size = New System.Drawing.Size(98, 18)
+        '
+        'btnVerLista
+        '
+        Me.btnVerLista.Location = New System.Drawing.Point(858, 745)
+        Me.btnVerLista.Name = "btnVerLista"
+        Me.btnVerLista.Size = New System.Drawing.Size(72, 19)
+        '
+        'cboSeleccionCentro
+        '
+        Me.cboSeleccionCentro.Location = New System.Drawing.Point(280, 7)
+        Me.cboSeleccionCentro.Name = "cboSeleccionCentro"
+        '
+        'btnTancar
+        '
+        Me.btnTancar.Location = New System.Drawing.Point(858, 764)
+        Me.btnTancar.Name = "btnTancar"
+        Me.btnTancar.Size = New System.Drawing.Size(72, 18)
+        '
+        'btnModificar
+        '
+        Me.btnModificar.Location = New System.Drawing.Point(150, 745)
+        Me.btnModificar.Name = "btnModificar"
+        Me.btnModificar.Size = New System.Drawing.Size(98, 19)
+        '
+        'btnUltimo
+        '
+        Me.btnUltimo.Location = New System.Drawing.Point(330, 745)
+        Me.btnUltimo.Name = "btnUltimo"
+        Me.btnUltimo.Size = New System.Drawing.Size(32, 19)
+        '
+        'sbtipo
+        '
+        Me.sbtipo.Location = New System.Drawing.Point(0, 786)
+        Me.sbtipo.Name = "sbtipo"
+        Me.sbtipo.Size = New System.Drawing.Size(88, 15)
+        '
+        'btnPrimero
+        '
+        Me.btnPrimero.Location = New System.Drawing.Point(28, 745)
+        Me.btnPrimero.Name = "btnPrimero"
+        Me.btnPrimero.Size = New System.Drawing.Size(32, 19)
+        '
+        'btnRecargar
+        '
+        Me.btnRecargar.Location = New System.Drawing.Point(60, 764)
+        Me.btnRecargar.Name = "btnRecargar"
+        Me.btnRecargar.Size = New System.Drawing.Size(90, 18)
+        '
+        'btnSiguiente
+        '
+        Me.btnSiguiente.Location = New System.Drawing.Point(330, 764)
+        Me.btnSiguiente.Name = "btnSiguiente"
+        Me.btnSiguiente.Size = New System.Drawing.Size(32, 18)
+        '
+        'btnAnterior
+        '
+        Me.btnAnterior.Location = New System.Drawing.Point(28, 764)
+        Me.btnAnterior.Name = "btnAnterior"
+        Me.btnAnterior.Size = New System.Drawing.Size(32, 18)
+        '
+        'dgNumeraciones
+        '
+        Me.dgNumeraciones.AllowAddNew = True
+        Me.dgNumeraciones.AllowDelete = True
+        Me.dgNumeraciones.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.dgNumeraciones.CaptionHeight = 17
+        Me.dgNumeraciones.FlatStyle = C1.Win.C1TrueDBGrid.FlatModeEnum.System
+        Me.dgNumeraciones.GroupByCaption = "Drag a column header here to group by that column"
+        Me.dgNumeraciones.Images.Add(CType(resources.GetObject("resource"), System.Drawing.Image))
+        Me.dgNumeraciones.Location = New System.Drawing.Point(8, 8)
+        Me.dgNumeraciones.MarqueeStyle = C1.Win.C1TrueDBGrid.MarqueeEnum.DottedCellBorder
+        Me.dgNumeraciones.Name = "dgNumeraciones"
+        Me.dgNumeraciones.PreviewInfo.Location = New System.Drawing.Point(0, 0)
+        Me.dgNumeraciones.PreviewInfo.Size = New System.Drawing.Size(0, 0)
+        Me.dgNumeraciones.PreviewInfo.ZoomFactor = 75
+        Me.dgNumeraciones.RecordSelectorWidth = 17
+        Me.dgNumeraciones.RowDivider.Color = System.Drawing.Color.DarkGray
+        Me.dgNumeraciones.RowDivider.Style = C1.Win.C1TrueDBGrid.LineStyleEnum.Single
+        Me.dgNumeraciones.RowHeight = 15
+        Me.dgNumeraciones.RowSubDividerColor = System.Drawing.Color.DarkGray
+        Me.dgNumeraciones.Size = New System.Drawing.Size(568, 392)
+        Me.dgNumeraciones.TabAction = C1.Win.C1TrueDBGrid.TabActionEnum.GridNavigation
+        Me.dgNumeraciones.TabIndex = 14
+        Me.dgNumeraciones.Text = "C1TrueDBGrid1"
+        Me.dgNumeraciones.WrapCellPointer = True
+        Me.dgNumeraciones.PropBag = "<?xml version=""1.0""?><Blob><Styles type=""C1.Win.C1TrueDBGrid.Design.ContextWrappe" & _
+        "r""><Data>Group{BackColor:ControlDark;Border:None,,0, 0, 0, 0;AlignVert:Center;}E" & _
+        "ditor{}Style2{}Style5{}Style4{}Style7{}Style6{}EvenRow{BackColor:Aqua;}Selected{" & _
+        "ForeColor:HighlightText;BackColor:Highlight;}Style3{}Inactive{ForeColor:Inactive" & _
+        "CaptionText;BackColor:InactiveCaption;}FilterBar{}Footer{}Caption{AlignHorz:Cent" & _
+        "er;}Style9{}Normal{Font:Microsoft Sans Serif, 8.25pt;}HighlightRow{ForeColor:Hig" & _
+        "hlightText;BackColor:Highlight;}Style14{}OddRow{}RecordSelector{AlignImage:Cente" & _
+        "r;}Style15{}Heading{Wrap:True;AlignVert:Center;Border:Raised,,1, 1, 1, 1;ForeCol" & _
+        "or:ControlText;BackColor:Control;}Style8{}Style10{AlignHorz:Near;}Style11{}Style" & _
+        "12{}Style13{}Style1{}</Data></Styles><Splits><C1.Win.C1TrueDBGrid.MergeView Name" & _
+        "="""" CaptionHeight=""17"" ColumnCaptionHeight=""17"" ColumnFooterHeight=""17"" MarqueeS" & _
+        "tyle=""DottedCellBorder"" RecordSelectorWidth=""17"" DefRecSelWidth=""17"" VerticalScr" & _
+        "ollGroup=""1"" HorizontalScrollGroup=""1""><CaptionStyle parent=""Style2"" me=""Style10" & _
+        """ /><EditorStyle parent=""Editor"" me=""Style5"" /><EvenRowStyle parent=""EvenRow"" me" & _
+        "=""Style8"" /><FilterBarStyle parent=""FilterBar"" me=""Style13"" /><FooterStyle paren" & _
+        "t=""Footer"" me=""Style3"" /><GroupStyle parent=""Group"" me=""Style12"" /><HeadingStyle" & _
+        " parent=""Heading"" me=""Style2"" /><HighLightRowStyle parent=""HighlightRow"" me=""Sty" & _
+        "le7"" /><InactiveStyle parent=""Inactive"" me=""Style4"" /><OddRowStyle parent=""OddRo" & _
+        "w"" me=""Style9"" /><RecordSelectorStyle parent=""RecordSelector"" me=""Style11"" /><Se" & _
+        "lectedStyle parent=""Selected"" me=""Style6"" /><Style parent=""Normal"" me=""Style1"" /" & _
+        "><ClientRect>0, 0, 564, 388</ClientRect><BorderSide>0</BorderSide></C1.Win.C1Tru" & _
+        "eDBGrid.MergeView></Splits><NamedStyles><Style parent="""" me=""Normal"" /><Style pa" & _
+        "rent=""Normal"" me=""Heading"" /><Style parent=""Heading"" me=""Footer"" /><Style parent" & _
+        "=""Heading"" me=""Caption"" /><Style parent=""Heading"" me=""Inactive"" /><Style parent=" & _
+        """Normal"" me=""Selected"" /><Style parent=""Normal"" me=""Editor"" /><Style parent=""Nor" & _
+        "mal"" me=""HighlightRow"" /><Style parent=""Normal"" me=""EvenRow"" /><Style parent=""No" & _
+        "rmal"" me=""OddRow"" /><Style parent=""Heading"" me=""RecordSelector"" /><Style parent=" & _
+        """Normal"" me=""FilterBar"" /><Style parent=""Caption"" me=""Group"" /></NamedStyles><ve" & _
+        "rtSplits>1</vertSplits><horzSplits>1</horzSplits><Layout>None</Layout><DefaultRe" & _
+        "cSelWidth>17</DefaultRecSelWidth><ClientArea>0, 0, 564, 388</ClientArea><PrintPa" & _
+        "geHeaderStyle parent="""" me=""Style14"" /><PrintPageFooterStyle parent="""" me=""Style" & _
+        "15"" /></Blob>"
+        '
+        'btnAceptar
+        '
+        Me.btnAceptar.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnAceptar.DialogResult = System.Windows.Forms.DialogResult.Cancel
+        Me.btnAceptar.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.btnAceptar.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft
+        Me.btnAceptar.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.btnAceptar.Location = New System.Drawing.Point(496, 463)
+        Me.btnAceptar.Name = "btnAceptar"
+        Me.btnAceptar.TabIndex = 13
+        Me.btnAceptar.Text = "Acceptar"
+        '
+        'txtCodigoDispos
+        '
+        Me.txtCodigoDispos.Location = New System.Drawing.Point(88, 24)
+        Me.txtCodigoDispos.Name = "txtCodigoDispos"
+        Me.txtCodigoDispos.TabIndex = 15
+        Me.txtCodigoDispos.Text = "TextBox1"
+        '
+        'txtAnyDispos
+        '
+        Me.txtAnyDispos.Location = New System.Drawing.Point(192, 24)
+        Me.txtAnyDispos.Name = "txtAnyDispos"
+        Me.txtAnyDispos.TabIndex = 16
+        Me.txtAnyDispos.Text = "TextBox2"
+        '
+        'GroupBox1
+        '
+        Me.GroupBox1.Controls.Add(Me.txtCodigoDispos)
+        Me.GroupBox1.Controls.Add(Me.txtAnyDispos)
+        Me.GroupBox1.Location = New System.Drawing.Point(16, 416)
+        Me.GroupBox1.Name = "GroupBox1"
+        Me.GroupBox1.Size = New System.Drawing.Size(312, 56)
+        Me.GroupBox1.TabIndex = 17
+        Me.GroupBox1.TabStop = False
+        Me.GroupBox1.Text = "Numeració Disposicions"
+        '
+        'frmNumeracion
+        '
+        Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
+        Me.ClientSize = New System.Drawing.Size(592, 494)
+        Me.Controls.Add(Me.GroupBox1)
+        Me.Controls.Add(Me.dgNumeraciones)
+        Me.Controls.Add(Me.btnAceptar)
+        Me.Cursor = System.Windows.Forms.Cursors.Default
+        Me.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!)
+        Me.Name = "frmNumeracion"
+        Me.Text = "Numeracions"
+        Me.Controls.SetChildIndex(Me.sbtipo, 0)
+        Me.Controls.SetChildIndex(Me.btnActualizar, 0)
+        Me.Controls.SetChildIndex(Me.btnNuevo, 0)
+        Me.Controls.SetChildIndex(Me.btnBorrar, 0)
+        Me.Controls.SetChildIndex(Me.btnTancar, 0)
+        Me.Controls.SetChildIndex(Me.btnUltimo, 0)
+        Me.Controls.SetChildIndex(Me.btnPrimero, 0)
+        Me.Controls.SetChildIndex(Me.btnAnterior, 0)
+        Me.Controls.SetChildIndex(Me.btnSiguiente, 0)
+        Me.Controls.SetChildIndex(Me.btnRecargar, 0)
+        Me.Controls.SetChildIndex(Me.btnVerLista, 0)
+        Me.Controls.SetChildIndex(Me.btnModificar, 0)
+        Me.Controls.SetChildIndex(Me.cboSeleccionCentro, 0)
+        Me.Controls.SetChildIndex(Me.btnAceptar, 0)
+        Me.Controls.SetChildIndex(Me.dgNumeraciones, 0)
+        Me.Controls.SetChildIndex(Me.GroupBox1, 0)
+        CType(Me.dgNumeraciones, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.GroupBox1.ResumeLayout(False)
+        Me.ResumeLayout(False)
+
+    End Sub
+
+#End Region
+
+#Region "VARIABLES"
+
+    Private dtNum As New DataTable
+    Private cmdSelect As New MySqlCommand
+    Private daSinBuild As New MySqlDataAdapter
+    Private cmdUpdate As New MySqlCommand
+    Private cmdDelete As New MySqlCommand
+    Private cmdInsert As New MySqlCommand
+
+
+#End Region
+
+    Shared frmChildForm As frmNumeracion
+    Public Shared Function GetInstance() As frmNumeracion
+        If frmChildForm Is Nothing Then
+            frmChildForm = New frmNumeracion
+
+        End If
+        Return frmChildForm
+    End Function
+
+    Private Sub IniciarForm(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
+        Try
+            CargarDisposiciones()
+            Cursor = Cursors.WaitCursor
+            cmdSelect.Connection = cnn
+            daSinBuild.SelectCommand = cmdSelect
+            CargarNumeraciones()
+            PonerHandlersErroresParaGrids()
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+        Cursor = Cursors.Default
+    End Sub
+    Private Sub CargarDisposiciones()
+        txtCodigoDispos.Text = DLookUp("CODI", "NUMERACIONES", "TABLA = ""DISPOS "" ")
+        txtAnyDispos.Text = DLookUp("DESCRI", "NUMERACIONES", "TABLA = ""DISPOS "" ")
+    End Sub
+    Private Sub CargarNumeraciones()
+        Dim i As Integer
+        Try
+
+            cmdSelect.CommandText = "SELECT " & _
+                                        " NUMERACIONES.*, " & _
+                                        " FILIALES.DESCRI AS NOMCENTRO " & _
+                                        " FROM NUMERACIONES " & _
+                                        " LEFT JOIN FILIALES ON (FILIALES.CODI = NUMERACIONES.CENTRO) WHERE TABLA <> ""DISPOS"" "
+            'cmdInsert.CommandText = "INSERT INTO NUMERACIONES (CODI, DESCRI, CENTRO) VALUES (@pCODI, @pDESCRI, @pCENTRO)"
+            'cmdDelete.CommandText = "DELETE FROM NUMERACIONES WHERE CODI = @piCODI AND @piCENTRO"
+            cmdUpdate.CommandText = "UPDATE NUMERACIONES " & _
+                                        " SET CODI = @pCODI " & _
+                                        " WHERE CODI = @piCODI AND " & _
+                                        " CENTRO = @piCENTRO AND " & _
+                                        " TABLA = @piTABLA AND " & _
+                                        " DOCUMENT = @piDOCUMENT AND " & _
+                                        " TIPUS = @piTIPUS"
+            cmdUpdate.Connection = cnn
+
+            daSinBuild.UpdateCommand = cmdUpdate
+
+
+            añadirParametro(cmdUpdate, "double", "CODI")
+            cmdUpdate.Parameters.Add(New MySqlParameter("piDOCUMENT", MySql.Data.MySqlClient.MySqlDbType.VarChar, 0, ParameterDirection.Input, True, CType(0, Byte), CType(0, Byte), "DOCUMENT", DataRowVersion.Original, Nothing))
+            cmdUpdate.Parameters.Add(New MySqlParameter("piTIPUS", MySql.Data.MySqlClient.MySqlDbType.VarChar, 0, ParameterDirection.Input, True, CType(0, Byte), CType(0, Byte), "TIPUS", DataRowVersion.Original, Nothing))
+            cmdUpdate.Parameters.Add(New MySqlParameter("piCODI", MySql.Data.MySqlClient.MySqlDbType.Double, 0, ParameterDirection.Input, True, CType(0, Byte), CType(0, Byte), "CODI", DataRowVersion.Original, Nothing))
+            cmdUpdate.Parameters.Add(New MySqlParameter("piCENTRO", MySql.Data.MySqlClient.MySqlDbType.VarChar, 0, ParameterDirection.Input, True, CType(0, Byte), CType(0, Byte), "CENTRO", DataRowVersion.Original, Nothing))
+            cmdUpdate.Parameters.Add(New MySqlParameter("piTABLA", MySql.Data.MySqlClient.MySqlDbType.VarChar, 0, ParameterDirection.Input, True, CType(0, Byte), CType(0, Byte), "TABLA", DataRowVersion.Original, Nothing))
+
+            daSinBuild.Fill(dtNum)
+            dgNumeraciones.SetDataBinding(dtNum, "")
+
+            PonerNombreTablas()
+            OcultarColumnasDG(dgNumeraciones)
+            i = 0
+            'En lugar de la tabla hay que poner la descripcion
+            PPCol2("DESCRI", dgNumeraciones, rm.GetString("DESCRI"), "", True, _
+                           150, False, C1.Win.C1TrueDBGrid.PresentationEnum.Normal, False, 150, i, False, Nothing, False)
+            i = i + 1
+            PPCol2("NOMCENTRO", dgNumeraciones, rm.GetString("NOMCENTRO"), "", True, _
+                           150, False, C1.Win.C1TrueDBGrid.PresentationEnum.Normal, False, 150, i, False, Nothing, False)
+            i = i + 1
+            PPCol2("CODI", dgNumeraciones, rm.GetString("CODIGO"), "", True, _
+                           100, False, C1.Win.C1TrueDBGrid.PresentationEnum.Normal, False, 100, i, False)
+            AutoSizeCC(dgNumeraciones)
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Function obtenerNombreDeTabla(ByVal tablaa As String, ByVal tipo As String, ByVal documento As String)
+        Try
+            Select Case tablaa
+                Case "CACTUR"
+                    Select Case documento
+                        Case OrdenFabComplementos : Return rm.GetString("ORDENCOMPLEMENTO")
+
+                        Case Pedido
+                            Select Case tipo
+                                Case Tejido : Return rm.GetString("PEDIDOCOMPRATEJIDO")
+                                Case Muestra, Fornitura : Return rm.GetString("PEDIDOCOMPRAHILO")
+                            End Select
+
+                            'Albaran entrega hilos
+                        Case Albaran : Return rm.GetString("ALBARANESENTREGAHILOS")
+
+                    End Select
+
+                Case "FACTUR"
+                    Select Case documento
+                        Case Pedido : Return rm.GetString("PEDIDOTEJIDO")
+                        Case Albaran : Return rm.GetString("ALBARANES")
+                        Case Factura : Return rm.GetString("FACTURAS")
+                        Case Proforma : Return rm.GetString("FACTURASPROFORMA")
+                    End Select
+                    'Solo ordenes modelos
+                Case "ORDRE" : Return rm.GetString("ORDENESMODELOS")
+
+            End Select
+
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Function
+    Private Sub PonerNombreTablas()
+        Dim i As Integer
+        Try
+            For i = 0 To dtNum.Rows.Count - 1
+                dtNum.Rows(i).Item("DESCRI") = obtenerNombreDeTabla(dtNum.Rows(i).Item("TABLA"), dtNum.Rows(i).Item("TIPUS"), dtNum.Rows(i).Item("DOCUMENT"))
+            Next
+            dtNum.AcceptChanges()
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Friend Sub guardarDV(ByVal dv As DataView)
+        Dim bm As BindingManagerBase
+        Dim drv As DataRowView
+        Try
+            bm = BindingContext(dv)
+            If Not bm.Count = 0 Then
+                drv = CType(bm.Current, DataRowView)
+                drv.EndEdit()
+            End If
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub btnAceptar_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnAceptar.Click
+        Try
+            If Not dtNum.GetChanges Is Nothing Then
+                ACN()
+                daSinBuild.Update(dtNum)
+            End If
+            ActualizarDispos()
+            CCN()
+            Me.Close()
+            Me.Dispose()
+
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Sub
+
+
+#Region "OVERRIDES"
+
+    Friend Overrides Sub btnActualizar_Click(ByVal sender As Object, ByVal e As System.EventArgs)
+
+    End Sub
+    Friend Overrides Sub btnAnterior_Click(ByVal sender As Object, ByVal e As System.EventArgs)
+
+    End Sub
+    Friend Overrides Sub btnBorrar_Click(ByVal sender As Object, ByVal e As System.EventArgs)
+
+    End Sub
+    Friend Overrides Sub btnModificar_Click(ByVal sender As Object, ByVal e As System.EventArgs)
+
+    End Sub
+    Friend Overrides Sub btnNuevo_Click(ByVal sender As Object, ByVal e As System.EventArgs)
+
+    End Sub
+    Protected Friend Overrides Sub btnPrimero_Click(ByVal sender As Object, ByVal e As System.EventArgs)
+
+    End Sub
+    Friend Overrides Sub btnSiguiente_Click(ByVal sender As Object, ByVal e As System.EventArgs)
+
+    End Sub
+    Friend Overrides Sub btnUltimo_Click(ByVal sender As Object, ByVal e As System.EventArgs)
+
+    End Sub
+
+#End Region
+
+    Private Sub ActualizarDispos()
+        Try
+            Dim cmd As New MySqlCommand("UPDATE NUMERACIONES SET CODI = '" & general.nz(Val(txtCodigoDispos.Text), 0) & "', DESCRI = """ & general.nz(txtAnyDispos.Text, "") & """ WHERE TABLA = ""DISPOS"" ", cnn)
+            ACN()
+            cmd.ExecuteNonQuery()
+            CCN()
+
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Sub
+    Private Sub frmNumeracion_Closing(ByVal sender As Object, ByVal e As System.ComponentModel.CancelEventArgs) Handles MyBase.Closing
+        Try
+            '            ActualizarDispos()
+
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Sub
+End Class

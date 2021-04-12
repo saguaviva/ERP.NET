@@ -1,0 +1,330 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>C1.Win.FlexChart.Extended.4</name>
+    </assembly>
+    <members>
+        <member name="T:C1.Chart.IColorAxis">
+            <summary>
+            Color axis interface.
+            </summary>
+        </member>
+        <member name="M:C1.Chart.IColorAxis.GetScale">
+            <summary>
+            Gets the associated color scale.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:C1.Chart.IColorAxis.CreateGradientBrush(System.Int32,System.Int32,C1.Chart._Point,C1.Chart._Point,C1.Chart._Rect)">
+            <summary>
+            Creates platform specific gradient brush.
+            </summary>
+            <param name="clr1"></param>
+            <param name="clr2"></param>
+            <param name="pt1"></param>
+            <param name="pt2"></param>
+            <param name="r"></param>
+            <returns></returns>
+        </member>
+        <member name="T:C1.Chart.IColorScale">
+            <summary>
+            Color scale interface.
+            </summary>
+        </member>
+        <member name="M:C1.Chart.IColorScale.Convert(System.Double)">
+            <summary>
+            Converts value to argb color.
+            </summary>
+            <param name="value"></param>
+            <returns></returns>
+        </member>
+        <member name="P:C1.Chart.IColorScale.Axis">
+            <summary>
+            Gets the color axis.
+            </summary>
+        </member>
+        <member name="T:C1.Chart.GradientColorScaleBase">
+            <summary>
+            Base class for gradient color scale.
+            </summary>
+        </member>
+        <member name="M:C1.Chart.GradientColorScaleBase.GetColors">
+            <summary>
+            Gets the list of colors.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="P:C1.Chart.GradientColorScaleBase.Min">
+            <summary>
+            Gets the minimum data value.
+            </summary>
+        </member>
+        <member name="P:C1.Chart.GradientColorScaleBase.Max">
+            <summary>
+            Gets the maximum data value.
+            </summary>
+        </member>
+        <member name="T:C1.Chart.DiscreteColorScaleBase">
+            <summary>
+            Base class for discrete color scale.
+            </summary>
+        </member>
+        <member name="T:C1.Chart.DiscreteColorScaleBase.IInterval">
+            <summary>
+            Interface for discrete interval.
+            </summary>
+        </member>
+        <member name="P:C1.Chart.DiscreteColorScaleBase.IInterval.Min">
+            <summary>
+            Gets the minimum of interval.
+            </summary>
+        </member>
+        <member name="P:C1.Chart.DiscreteColorScaleBase.IInterval.Max">
+            <summary>
+            Gets the maximum of interval.
+            </summary>
+        </member>
+        <member name="P:C1.Chart.DiscreteColorScaleBase.IInterval.Color">
+            <summary>
+            Gets argb color of interval.
+            </summary>
+        </member>
+        <member name="P:C1.Chart.DiscreteColorScaleBase.IInterval.Name">
+            <summary>
+            Gets the interval name.
+            </summary>
+        </member>
+        <member name="M:C1.Chart.DiscreteColorScaleBase.GetIntervals">
+            <summary>
+            Gets the list of intervals.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:C1.Chart.IHeatmap">
+            <summary>
+            Heatmap series interface.
+            </summary>
+        </member>
+        <member name="P:C1.Chart.IHeatmap.ColorScale">
+            <summary>
+            Get the color scale.
+            </summary>
+        </member>
+        <member name="P:C1.Chart.IHeatmap.StartX">
+            <summary>
+            Gets the starting x-value.
+            </summary>
+        </member>
+        <member name="P:C1.Chart.IHeatmap.StartY">
+            <summary>
+            Gets the starting y-value.
+            </summary>
+        </member>
+        <member name="P:C1.Chart.IHeatmap.StepX">
+            <summary>
+            Gets the x-step.
+            </summary>
+        </member>
+        <member name="P:C1.Chart.IHeatmap.StepY">
+            <summary>
+            Gets the y-step.
+            </summary>
+        </member>
+        <member name="F:C1.Util.Licensing.VersionConst.VerString">
+            <summary>
+            WinForms version string representation (4 dot-delimited numbers).
+            </summary>
+        </member>
+        <member name="F:C1.Util.Licensing.VersionConst.VersionStr">
+            <summary>
+            Same as <see cref="F:C1.Util.Licensing.VersionConst.VerString"/>.
+            </summary>
+        </member>
+        <member name="F:C1.Util.Licensing.VersionConst.VerAsmName">
+            <summary>
+            For .NET 4.0 version only, used for designer assembly names.
+            </summary>
+        </member>
+        <member name="T:C1.Util.Licensing.AssemblyNames">
+            <summary>
+            Specifies assembly name parts, used by AssemblyCommonInfo to generate actual assembly names.
+            </summary>
+        </member>
+        <member name="T:C1.Win.Chart.Extended.Heatmap">
+            <summary>
+            Represents heatmap series that displays 2D data array using color variations.
+            </summary>
+            <remarks>
+            The heatmap series can use DataTable as data source. You can specify the list of column names (comma-separated) in BindingX property.
+            If BindingX is not set the heatmap uses data from all columns with double data type.
+            </remarks>
+            <example>
+            The following code creates heatmap series and add it to the chart.
+            <code>
+            var hmap = new Heatmap();
+            hmap.DataSource = new double [,] { { 0, 0.5 }, {0.5, 1 }, { 1, 0.4 }, { 0.5, 1 } };
+            hmap.ColorScale = new GradientColorScale() { Min = 0, Max = 1, Colors = new List&lt;Color&gt; { Color.White, Color.Red } };
+            chart.Series.Add(hmap);
+            chart.AxisX.DataSource = new string[] {"Q1", "Q2", "Q3", "Q4" };
+            chart.AxisY.DataSource = new string[] { "Region 1", "Region 2" };
+            </code>
+            </example>
+        </member>
+        <member name="M:C1.Win.Chart.Extended.Heatmap.#ctor">
+            <summary>
+            Creates an instance of Heatmap class.
+            </summary>
+        </member>
+        <member name="P:C1.Win.Chart.Extended.Heatmap.StartX">
+            <summary>
+            Gets or sets the starting data x-value. The default value is -0.5.
+            </summary>
+        </member>
+        <member name="P:C1.Win.Chart.Extended.Heatmap.StartY">
+            <summary>
+            Gets or sets the starting data y-value. The default value is -0.5.
+            </summary>
+        </member>
+        <member name="P:C1.Win.Chart.Extended.Heatmap.StepX">
+            <summary>
+            Gets or sets the data step by x-coordinate. The default value is 1.
+            </summary>
+        </member>
+        <member name="P:C1.Win.Chart.Extended.Heatmap.StepY">
+            <summary>
+            Gets or sets the data step by y-coordinate. The default value is 1.
+            </summary>
+        </member>
+        <member name="P:C1.Win.Chart.Extended.Heatmap.ColorScale">
+            <summary>
+            Gets or sets the color scale for the heatmap. The color scale defines trasformation from data value to color.
+            </summary>
+        </member>
+        <member name="M:C1.Win.Chart.Extended.Heatmap.OnRendering(C1.Chart.IRenderEngine)">
+            <summary>
+            Called before element is rendered.
+            </summary>
+            <param name="engine"></param>
+            <returns></returns>
+        </member>
+        <member name="M:C1.Win.Chart.Extended.Heatmap.GetValues(System.Int32)">
+            <summary>
+            Gets the data values.
+            </summary>
+            <param name="dim"></param>
+            <returns></returns>
+        </member>
+        <member name="M:C1.Win.Chart.Extended.Heatmap.GetChartType">
+            <summary>
+            Gets the series chart type.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:C1.Win.Chart.Extended.Heatmap.GetItem(System.Int32)">
+            <summary>
+            Gets the data item.
+            </summary>
+            <param name="i"></param>
+            <returns></returns>
+        </member>
+        <member name="T:C1.Win.Chart.Extended.ColorAxis">
+            <summary>
+            Reperesents gradient color axis.
+            </summary>
+        </member>
+        <member name="M:C1.Win.Chart.Extended.ColorAxis.#ctor">
+            <summary>
+            Creates an instance of ColorAxis class.
+            </summary>
+        </member>
+        <member name="P:C1.Win.Chart.Extended.ColorAxis.AxisType">
+            <summary>
+            Gets the axis type.
+            </summary>
+        </member>
+        <member name="M:C1.Win.Chart.Extended.ColorAxis.GetHeight(C1.Chart.IRenderEngine,System.Double)">
+            <summary>
+            Gets the axis height.
+            </summary>
+            <param name="engine"></param>
+            <param name="maxWidth"></param>
+            <returns></returns>
+        </member>
+        <member name="T:C1.Win.Chart.Extended.GradientColorScale">
+            <summary>
+            Gradient color scale.
+            </summary>
+        </member>
+        <member name="P:C1.Win.Chart.Extended.GradientColorScale.Colors">
+            <summary>
+            Get or sets the list of colors for the scale.
+            </summary>
+        </member>
+        <member name="P:C1.Win.Chart.Extended.GradientColorScale.Axis">
+            <summary>
+            Gets or sets the color axis for the scale.
+            </summary>
+        </member>
+        <member name="M:C1.Win.Chart.Extended.GradientColorScale.GetColors">
+            <summary>
+             Gets the list of colors.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:C1.Win.Chart.Extended.DiscreteColorScale">
+            <summary>
+            Repsesents descrete color scale.
+            </summary>
+        </member>
+        <member name="T:C1.Win.Chart.Extended.DiscreteColorScale.Interval">
+            <summary>
+            Represents an interval for descrete color scale.
+            </summary>
+        </member>
+        <member name="P:C1.Win.Chart.Extended.DiscreteColorScale.Interval.Color">
+            <summary>
+            Gets or set the color of the interval.
+            </summary>
+        </member>
+        <member name="P:C1.Win.Chart.Extended.DiscreteColorScale.Interval.Max">
+            <summary>
+            Gets or sets the maximum of the interval.
+            </summary>
+        </member>
+        <member name="P:C1.Win.Chart.Extended.DiscreteColorScale.Interval.Min">
+            <summary>
+            Gets or sets the minimum of the interval.
+            </summary>
+        </member>
+        <member name="P:C1.Win.Chart.Extended.DiscreteColorScale.Interval.Name">
+            <summary>
+            Gets or sets the name of the interval. The name is displayed in the chart legend.
+            </summary>
+        </member>
+        <member name="M:C1.Win.Chart.Extended.DiscreteColorScale.Interval.#ctor(System.Double,System.Double,System.Drawing.Color,System.String)">
+            <summary>
+            Creates an instance of Interval class.
+            </summary>
+            <param name="min"></param>
+            <param name="max"></param>
+            <param name="color"></param>
+            <param name="name"></param>
+        </member>
+        <member name="P:C1.Win.Chart.Extended.DiscreteColorScale.Intervals">
+            <summary>
+            Gets or sets the collection of intervals defining the discrete color scale.
+            </summary>
+        </member>
+        <member name="M:C1.Win.Chart.Extended.DiscreteColorScale.GetIntervals">
+            <summary>
+            Gets the interval list.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:C1.Win.Chart.Extended.Strings">
+            <summary>
+            Static class containing UI strings used by the designer.
+            </summary>
+        </member>
+    </members>
+</doc>

@@ -1,0 +1,262 @@
+'!!!!!!!! HAY QUE HACERLO CON EL CAMBIO DETALLE
+
+Imports CoreLab.MySql
+Public Class clsAcabados
+    Inherits clsADO
+
+#Region "CAMPOS"
+
+    Private mCODI As String
+    Public Property CODI() As String
+        Get
+            If PA = -1 Then Exit Property
+            Try
+                mCODI = nz(dvForm(pa).Row("CODI"), "")
+            Catch ex As Exception : End Try
+            Return nz(mCODI, "")
+        End Get
+        Set(ByVal Value As String)
+            If PA = -1 Then Exit Property
+            If nz(Value, "") <> nz(CODI, "") Then
+                mCODI = nz(Value, "")
+                dvForm(pa).Row("CODI") = nz(mCODI, "") : guardarDV()
+            End If
+        End Set
+    End Property
+
+    Private mPROVE As Integer
+    Public Property PROVE() As Integer
+        Get
+            If PA = -1 Then Exit Property
+            Try
+                mPROVE = nzn(dvForm(pa).Row(tablaProveedores), 0)
+            Catch ex As Exception : End Try
+            Return nzn(mPROVE, 0)
+        End Get
+        Set(ByVal Value As Integer)
+            If PA = -1 Then Exit Property
+            If esCodigoExistente(dtProve, CCProve, Value) Then
+                If nzn(Value, 0) <> 0 Then
+                    mPROVE = nzn(Value, 0)
+                    dvForm(pa).Row("NOMPROVE") = OBN(Value, dtProve, CNProve)
+                    dvForm(pa).Row(tablaProveedores) = nzn(Value, 0) : guardarDV()
+                End If
+            Else
+                dvForm(pa).Row("PROVE") = 0
+
+                dvForm(pa).Row("NOMPROVE") = "" : guardarDV()
+                MessageBox.Show(rm.GetString("NOEXISTEPROVE"))
+            End If
+        End Set
+    End Property
+
+    Private mNOMPROVE As String
+    Public Property NOMPROVE() As String
+        Get
+            If PA = -1 Then Exit Property
+            Try
+                mNOMPROVE = nz(dvForm(pa).Row("NOMPROVE"), "")
+            Catch ex As Exception : End Try
+            Return nz(mNOMPROVE, "")
+        End Get
+        Set(ByVal Value As String)
+            If PA = -1 Then Exit Property
+            mNOMPROVE = nz(Value, "")
+            If tabla.GetChanges Is Nothing Then
+                dvForm(pa).Row("NOMPROVE") = nz(Value, "") : guardarDV()
+                tabla.AcceptChanges()
+            Else
+                dvForm(pa).Row("NOMPROVE") = nz(Value, "") : guardarDV()
+            End If
+        End Set
+    End Property
+
+    Private mPREUK As Double
+    Public Property PREUK() As Double
+        Get
+            If PA = -1 Then Exit Property
+            Try
+                mPREUK = nzn(dvForm(pa).Row("PREUK"), 0)
+            Catch ex As Exception : End Try
+            Return nzn(mPREUK, 0)
+        End Get
+        Set(ByVal Value As Double)
+            If PA = -1 Then Exit Property
+            If nzn(Value, 0) <> nzn(PREUK, 0) Then
+                mPREUK = nzn(Value, 0)
+                dvForm(pa).Row("PREUK") = nzn(mPREUK, 0) : guardarDV()
+            End If
+        End Set
+    End Property
+
+    Private mPREUM As Double
+    Public Property PREUM() As Double
+        Get
+            If PA = -1 Then Exit Property
+            Try
+                mPREUM = nzn(dvForm(pa).Row("PREUM"), 0)
+            Catch ex As Exception : End Try
+            Return nzn(mPREUM, 0)
+        End Get
+        Set(ByVal Value As Double)
+            If PA = -1 Then Exit Property
+            If nzn(Value, 0) <> nzn(PREUM, 0) Then
+                mPREUM = nzn(Value, 0)
+                dvForm(pa).Row("PREUM") = nzn(mPREUM, 0) : guardarDV()
+            End If
+        End Set
+    End Property
+
+#End Region
+
+#Region "VARIABLES"
+
+    Private dtClients As New DataTable("CLIENTS")
+    Friend dtProve As New DataTable("PROVE")
+
+#End Region
+
+    Public Sub New(ByVal tabla As DataTable, _
+                ByVal centro As String, ByRef bindingcontext As BindingContext)
+
+        MyBase.New(tabla, centro, bindingcontext)
+        Dim sqlSel As String
+        Try
+
+            sqlSinWhere = "SELECT dacabats.*, " & _
+                            " filiales.DESCRI AS NOMCENTRO " & _
+                            " FROM dacabats " & _
+                            " LEFT JOIN filiales ON (filiales.CODI = dacabats.CENTRO) "
+            sqlSel = sqlSinWhere & _
+                        " WHERE dacabats.CENTRO = """ & centro & """ ORDER BY dacabats.CODI "
+            '" LIMIT 1"
+            cmdSel.CommandText = sqlSel
+
+            da.SelectCommand = cmdSel
+            da.Fill(tabla)
+            PonerHandlers()
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : ccn()
+        End Try
+    End Sub
+    Private Sub PonerHandlers()
+        Try
+            AddHandler tabla.ColumnChanged, New DataColumnChangeEventHandler(AddressOf CanviarColumna)
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub DormirHandlers()
+        Try
+            RemoveHandler tabla.ColumnChanged, New DataColumnChangeEventHandler(AddressOf CanviarColumna)
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub CanviarColumna(ByVal sender As Object, ByVal e As DataColumnChangeEventArgs)
+        Try
+            DormirHandlers()
+            If e.Column.ColumnName = "PREUK" Then
+                If PREUK <> 0 Then PREUM = 0
+            End If
+            If e.Column.ColumnName = "PREUM" Then
+                If PREUM <> 0 Then PREUK = 0
+            End If
+            PonerHandlers()
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Protected Friend Overrides Sub BorrarActualDV(Optional ByVal NOCERRAR As Boolean = False)
+        Dim i As Integer
+        Dim dr1 As DataRow
+        Try
+            Dim dr(dvForm.Count - 1) As DataRow
+            For i = 0 To dvForm.Count - 1
+                dr(i) = dvForm(i).Row
+            Next
+            For Each dr1 In dr
+                dr1.Delete()
+            Next
+            ActualizarOrigen()
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+            CCN()
+        End Try
+
+    End Sub
+
+#Region "OVERRIDES"
+
+    Friend Overrides Function TieneCambios() As Boolean
+        Try
+            guardarDV()
+            If Not tabla.GetChanges Is Nothing Then
+                Return True
+            Else
+                Return False
+            End If
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Function
+    Public Overrides Sub borrar()
+        Try
+            'Este borra todas las lineas
+            BorrarActualDV()
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Friend Overrides Function genWhere() As String
+        Try
+            Dim ret As String
+
+            ret = "WHERE " & tabla.TableName & ".CENTRO = """ & centro & """"
+
+            Return ret
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Function
+    Friend Overrides Function GenOrder() As String
+        Try
+            Return ""
+            'Return " ORDER BY TEMPORADA, CLIENT, SERIE, CODI "
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Function
+    Friend Overrides Function ObtenerNumeroRegistro(ByVal id As Object) As Integer
+        If id Is Nothing Then
+            id = CODI
+        End If
+        Dim cmd As New MySqlCommand(" SELECT " & _
+            " (SELECT COUNT(*) " & _
+            " FROM " & tabla.TableName & " AS M2 WHERE " & _
+            " M2.CODI < M1.CODI AND  " & WCNoTabla() & " ) AS rownum FROM " & tabla.TableName & " AS M1  WHERE CODI = """ & id & """ AND " & WCNoTabla() & GenOrder(), cnn)
+        Try
+            Dim idx As Object = cmd.ExecuteScalar()
+            If idx Is Nothing Then Return -1
+
+            Return idx '- 1
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Function
+    Friend Overrides Function genWhereNumeroRegistros() As String
+        Try
+            Return genWhere()
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Function
+
+#End Region
+
+End Class

@@ -1,0 +1,358 @@
+Imports CoreLab.MySql
+
+Public Class frmTemporadas
+    Inherits aura2k3.frmBase
+
+
+#Region " Código generado por el Diseñador de Windows Forms "
+
+    Public Sub New()
+        MyBase.New()
+
+        'El Diseñador de Windows Forms requiere esta llamada.
+        InitializeComponent() : Dim tom As SMcMaster.TabOrderManager = New SMcMaster.TabOrderManager(Me) : tom.SetTabOrder(SMcMaster.TabOrderManager.TabScheme.AcrossFirst)
+
+        'Agregar cualquier inicialización después de la llamada a InitializeComponent()
+
+    End Sub
+
+    'Form reemplaza a Dispose para limpiar la lista de componentes.
+    Protected Overloads Overrides Sub Dispose(ByVal disposing As Boolean)
+        '! Seal for less overhead - Can declare NotInheritable Class
+        If disposing Then
+            If Not (components Is Nothing) Then
+                components.Dispose()
+            End If
+        End If
+       MyBase.Dispose(disposing)
+        frmChildForm = Nothing
+    End Sub
+
+    'Requerido por el Diseñador de Windows Forms
+    Private components As System.ComponentModel.IContainer
+
+    'NOTA: el Diseñador de Windows Forms requiere el siguiente procedimiento
+    'Puede modificarse utilizando el Diseñador de Windows Forms. 
+    'No lo modifique con el editor de código.
+
+
+
+    Friend WithEvents btnAceptar As NETXP.Controls.XPButton 
+    Friend WithEvents dgTemporadas As C1.Win.C1TrueDBGrid.C1TrueDBGrid
+    <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent() 
+        Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(frmTemporadas))
+        Me.btnAceptar = New NETXP.Controls.XPButton
+        Me.dgTemporadas = New C1.Win.C1TrueDBGrid.C1TrueDBGrid
+        CType(Me.dgTemporadas, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.SuspendLayout()
+        '
+        'cboSeleccionCentro
+        '
+        Me.cboSeleccionCentro.Name = "cboSeleccionCentro"
+        '
+        'btnVerLista
+        '
+        Me.btnVerLista.Name = "btnVerLista"
+        '
+        'btnActualizar
+        '
+        Me.btnActualizar.Name = "btnActualizar"
+        '
+        'btnNuevo
+        '
+        Me.btnNuevo.Name = "btnNuevo"
+        '
+        'btnBorrar
+        '
+        Me.btnBorrar.Name = "btnBorrar"
+        '
+        'btnTancar
+        '
+        Me.btnTancar.Name = "btnTancar"
+        '
+        'btnModificar
+        '
+        Me.btnModificar.Name = "btnModificar"
+        '
+        'btnUltimo
+        '
+        Me.btnUltimo.Name = "btnUltimo"
+        '
+        'btnPrimero
+        '
+        Me.btnPrimero.Name = "btnPrimero"
+        '
+        'btnAnterior
+        '
+        Me.btnAnterior.Name = "btnAnterior"
+        '
+        'btnSiguiente
+        '
+        Me.btnSiguiente.Name = "btnSiguiente"
+        '
+        'btnRecargar
+        '
+        Me.btnRecargar.Name = "btnRecargar"
+        '
+        'sbtipo
+        '
+        Me.sbtipo.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.sbtipo.Location = New System.Drawing.Point(5, 144)
+        Me.sbtipo.Name = "sbtipo"
+        Me.sbtipo.Text = ""
+        '
+        'btnAceptar
+        '
+        Me.btnAceptar.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnAceptar.DialogResult = System.Windows.Forms.DialogResult.Cancel
+        Me.btnAceptar.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.btnAceptar.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft
+        Me.btnAceptar.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.btnAceptar.Location = New System.Drawing.Point(501, 368)
+        Me.btnAceptar.Name = "btnAceptar"
+        Me.btnAceptar.TabIndex = 1
+        Me.btnAceptar.Text = "Acceptar"
+        '
+        'dgTemporadas
+        '
+        Me.dgTemporadas.AllowAddNew = True
+        Me.dgTemporadas.AllowDelete = True
+        Me.dgTemporadas.CaptionHeight = 17
+        Me.dgTemporadas.FlatStyle = C1.Win.C1TrueDBGrid.FlatModeEnum.System
+        Me.dgTemporadas.GroupByCaption = "Drag a column header here to group by that column"
+        Me.dgTemporadas.Images.Add(CType(resources.GetObject("resource"), System.Drawing.Image))
+        Me.dgTemporadas.Location = New System.Drawing.Point(8, 8)
+        Me.dgTemporadas.MarqueeStyle = C1.Win.C1TrueDBGrid.MarqueeEnum.DottedCellBorder
+        Me.dgTemporadas.Name = "dgTemporadas"
+        Me.dgTemporadas.PreviewInfo.Location = New System.Drawing.Point(0, 0)
+        Me.dgTemporadas.PreviewInfo.Size = New System.Drawing.Size(0, 0)
+        Me.dgTemporadas.PreviewInfo.ZoomFactor = 75
+        Me.dgTemporadas.RecordSelectorWidth = 17
+        Me.dgTemporadas.RowDivider.Color = System.Drawing.Color.DarkGray
+        Me.dgTemporadas.RowDivider.Style = C1.Win.C1TrueDBGrid.LineStyleEnum.Single
+        Me.dgTemporadas.RowHeight = 15
+        Me.dgTemporadas.RowSubDividerColor = System.Drawing.Color.DarkGray
+        Me.dgTemporadas.Size = New System.Drawing.Size(568, 344)
+        Me.dgTemporadas.TabAction = C1.Win.C1TrueDBGrid.TabActionEnum.GridNavigation
+        Me.dgTemporadas.TabIndex = 12
+        Me.dgTemporadas.Text = "C1TrueDBGrid1"
+        Me.dgTemporadas.WrapCellPointer = True
+        Me.dgTemporadas.PropBag = "<?xml version=""1.0""?><Blob><Styles type=""C1.Win.C1TrueDBGrid.Design.ContextWrappe" & _
+        "r""><Data>Group{AlignVert:Center;Border:None,,0, 0, 0, 0;BackColor:ControlDark;}E" & _
+        "ditor{}Style2{}Style5{}Style4{}Style7{}Style6{}EvenRow{BackColor:Aqua;}Selected{" & _
+        "ForeColor:HighlightText;BackColor:Highlight;}Style3{}Inactive{ForeColor:Inactive" & _
+        "CaptionText;BackColor:InactiveCaption;}FilterBar{}Footer{}Caption{AlignHorz:Cent" & _
+        "er;}Style1{}Normal{Font:Microsoft Sans Serif, 8.25pt;}HighlightRow{ForeColor:Hig" & _
+        "hlightText;BackColor:Highlight;}Style12{}OddRow{}RecordSelector{AlignImage:Cente" & _
+        "r;}Style13{}Heading{Wrap:True;BackColor:Control;Border:Raised,,1, 1, 1, 1;ForeCo" & _
+        "lor:ControlText;AlignVert:Center;}Style8{}Style10{AlignHorz:Near;}Style11{}Style" & _
+        "14{}Style15{}Style9{}</Data></Styles><Splits><C1.Win.C1TrueDBGrid.MergeView Name" & _
+        "="""" CaptionHeight=""17"" ColumnCaptionHeight=""17"" ColumnFooterHeight=""17"" MarqueeS" & _
+        "tyle=""DottedCellBorder"" RecordSelectorWidth=""17"" DefRecSelWidth=""17"" VerticalScr" & _
+        "ollGroup=""1"" HorizontalScrollGroup=""1""><CaptionStyle parent=""Style2"" me=""Style10" & _
+        """ /><EditorStyle parent=""Editor"" me=""Style5"" /><EvenRowStyle parent=""EvenRow"" me" & _
+        "=""Style8"" /><FilterBarStyle parent=""FilterBar"" me=""Style13"" /><FooterStyle paren" & _
+        "t=""Footer"" me=""Style3"" /><GroupStyle parent=""Group"" me=""Style12"" /><HeadingStyle" & _
+        " parent=""Heading"" me=""Style2"" /><HighLightRowStyle parent=""HighlightRow"" me=""Sty" & _
+        "le7"" /><InactiveStyle parent=""Inactive"" me=""Style4"" /><OddRowStyle parent=""OddRo" & _
+        "w"" me=""Style9"" /><RecordSelectorStyle parent=""RecordSelector"" me=""Style11"" /><Se" & _
+        "lectedStyle parent=""Selected"" me=""Style6"" /><Style parent=""Normal"" me=""Style1"" /" & _
+        "><ClientRect>0, 0, 564, 340</ClientRect><BorderSide>0</BorderSide></C1.Win.C1Tru" & _
+        "eDBGrid.MergeView></Splits><NamedStyles><Style parent="""" me=""Normal"" /><Style pa" & _
+        "rent=""Normal"" me=""Heading"" /><Style parent=""Heading"" me=""Footer"" /><Style parent" & _
+        "=""Heading"" me=""Caption"" /><Style parent=""Heading"" me=""Inactive"" /><Style parent=" & _
+        """Normal"" me=""Selected"" /><Style parent=""Normal"" me=""Editor"" /><Style parent=""Nor" & _
+        "mal"" me=""HighlightRow"" /><Style parent=""Normal"" me=""EvenRow"" /><Style parent=""No" & _
+        "rmal"" me=""OddRow"" /><Style parent=""Heading"" me=""RecordSelector"" /><Style parent=" & _
+        """Normal"" me=""FilterBar"" /><Style parent=""Caption"" me=""Group"" /></NamedStyles><ve" & _
+        "rtSplits>1</vertSplits><horzSplits>1</horzSplits><Layout>None</Layout><DefaultRe" & _
+        "cSelWidth>17</DefaultRecSelWidth><ClientArea>0, 0, 564, 340</ClientArea><PrintPa" & _
+        "geHeaderStyle parent="""" me=""Style14"" /><PrintPageFooterStyle parent="""" me=""Style" & _
+        "15"" /></Blob>"
+        '
+        'frmTemporadas
+        '
+        Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
+        Me.CancelButton = Me.btnAceptar
+        Me.ClientSize = New System.Drawing.Size(592, 405)
+        Me.Controls.Add(Me.dgTemporadas)
+        Me.Controls.Add(Me.btnAceptar)
+        Me.Cursor = System.Windows.Forms.Cursors.Default
+        Me.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!)
+        Me.Name = "frmTemporadas"
+        Me.Text = "Temporades"
+        Me.Controls.SetChildIndex(Me.cboSeleccionCentro, 0)
+        Me.Controls.SetChildIndex(Me.sbtipo, 0)
+        Me.Controls.SetChildIndex(Me.btnActualizar, 0)
+        Me.Controls.SetChildIndex(Me.btnNuevo, 0)
+        Me.Controls.SetChildIndex(Me.btnBorrar, 0)
+        Me.Controls.SetChildIndex(Me.btnTancar, 0)
+        Me.Controls.SetChildIndex(Me.btnUltimo, 0)
+        Me.Controls.SetChildIndex(Me.btnPrimero, 0)
+        Me.Controls.SetChildIndex(Me.btnAnterior, 0)
+        Me.Controls.SetChildIndex(Me.btnSiguiente, 0)
+        Me.Controls.SetChildIndex(Me.btnRecargar, 0)
+        Me.Controls.SetChildIndex(Me.btnVerLista, 0)
+        Me.Controls.SetChildIndex(Me.btnModificar, 0)
+        Me.Controls.SetChildIndex(Me.btnAceptar, 0)
+        Me.Controls.SetChildIndex(Me.dgTemporadas, 0)
+        CType(Me.dgTemporadas, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.ResumeLayout(False)
+
+    End Sub
+
+#End Region
+
+#Region "VARIABLES"
+
+    Private dvTemporadas As New DataView
+    Private cmdSelect As New MySqlCommand
+    Private daSinBuild As New MySqlDataAdapter
+    Private cmdUpdate As New MySqlCommand
+    Private cmdDelete As New MySqlCommand
+    Private cmdInsert As New MySqlCommand
+
+
+#End Region
+
+    Shared frmChildForm As frmTemporadas
+    Public Shared Function GetInstance() As frmTemporadas
+        If frmChildForm Is Nothing Then
+            frmChildForm = New frmTemporadas
+            
+        End If
+        Return frmChildForm
+    End Function
+
+    Private Sub IniciarForm(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
+        Try
+            Cursor = Cursors.WaitCursor
+            cmdSelect.Connection = cnn
+            daSinBuild.SelectCommand = cmdSelect
+            CargarTemporadas()
+            PonerHandlersErroresParaGrids()
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = false : ccn()
+        End Try
+        Cursor = Cursors.Default
+    End Sub
+    Private Sub CargarTemporadas()
+        Dim i As Integer
+        Try
+
+            cmdSelect.CommandText = "SELECT * FROM TEMPORADAS"
+            cmdInsert.CommandText = "INSERT INTO TEMPORADAS (CODI, DESCRI, CENTRO) VALUES (:pCODI, :pDESCRI, :pCENTRO)"
+            cmdDelete.CommandText = "DELETE FROM TEMPORDAS WHERE CODI = :piCODI AND :piCENTRO"
+            cmdUpdate.CommandText = "UPDATE TEMPORADAS SET CODI = :pCODI, DESCRI = :pDESCRI WHERE CODI = :piCODI AND :piCENTRO"
+            cmdInsert.Connection = cnn
+            cmdUpdate.Connection = cnn
+            cmdDelete.Connection = cnn
+
+            daSinBuild.InsertCommand = cmdInsert
+            daSinBuild.DeleteCommand = cmdDelete
+            daSinBuild.UpdateCommand = cmdUpdate
+
+            añadirParametro(cmdInsert, "text", "CODI")
+            añadirParametro(cmdInsert, "text", "DESCRI")
+            añadirParametro(cmdInsert, "varchar", "CENTRO")
+
+
+            cmdUpdate.Parameters.Add(New MySqlParameter("piCODI", CoreLab.MySql.MySqlType.VarChar, 0, ParameterDirection.Input, True, CType(0, Byte), CType(0, Byte), "CODI", DataRowVersion.Original, Nothing))
+            cmdUpdate.Parameters.Add(New MySqlParameter("piCENTRO", CoreLab.MySql.MySqlType.VarChar, 0, ParameterDirection.Input, True, CType(0, Byte), CType(0, Byte), "CENTRO", DataRowVersion.Original, Nothing))
+
+            cmdDelete.Parameters.Add(New MySqlParameter("piCODI", CoreLab.MySql.MySqlType.VarChar, 0, ParameterDirection.Input, True, CType(0, Byte), CType(0, Byte), "CODI", DataRowVersion.Original, Nothing))
+            cmdDelete.Parameters.Add(New MySqlParameter("piCENTRO", CoreLab.MySql.MySqlType.VarChar, 0, ParameterDirection.Input, True, CType(0, Byte), CType(0, Byte), "CENTRO", DataRowVersion.Original, Nothing))
+
+            daSinBuild.Fill(ds.Tables(tablaTemporadas))
+            dvTemporadas = ds.Tables(tablaTemporadas).DefaultView
+            dvTemporadas.Table.Columns("CENTRO").DefaultValue = "C" '!!!!!!! 'nz(centro, empresaPorDefecto)
+            dvTemporadas.Sort = "CODI"
+            dgTemporadas.SetDataBinding(dvTemporadas, "")
+
+            OcultarColumnasDG(dgTemporadas)
+            i = 0
+            PPCol2("CODI", dgTemporadas, rm.GetString("CODIGO"), "", True, _
+                           100, False, C1.Win.C1TrueDBGrid.PresentationEnum.Normal, False, 100, i, False)
+            i = i + 1
+            PPCol2("DESCRI", dgTemporadas, rm.GetString("DESCRIPCION"), "", True, _
+                           250, False, C1.Win.C1TrueDBGrid.PresentationEnum.Normal, False, 250, i, False)
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : ccn()
+        End Try
+    End Sub
+    Friend Sub guardarDV(ByVal dv As DataView)
+        Dim bm As BindingManagerBase
+        Dim drv As DataRowView
+        Try
+            bm = BindingContext(dv)
+            If Not bm.Count = 0 Then
+                drv = CType(bm.Current, DataRowView)
+                drv.EndEdit()
+            End If
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : ccn()
+        End Try
+    End Sub
+    Private Sub btnAceptar_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnAceptar.Click
+        guardarDV(dvTemporadas)
+
+        If Not ds.Tables(tablaTemporadas).GetChanges Is Nothing Then
+
+            ACN()
+            daSinBuild.Update(ds.Tables(tablaTemporadas))
+            ccn()
+            ds.Tables(tablaTemporadas).AcceptChanges()
+        End If
+
+        Me.Close()
+    End Sub
+
+    Friend Overrides Sub btnActualizar_Click(ByVal sender As Object, ByVal e As System.EventArgs)
+
+    End Sub
+
+    Friend Overrides Sub btnAnterior_Click(ByVal sender As Object, ByVal e As System.EventArgs)
+
+    End Sub
+
+    Friend Overrides Sub btnBorrar_Click(ByVal sender As Object, ByVal e As System.EventArgs)
+
+    End Sub
+
+    Friend Overrides Sub btnModificar_Click(ByVal sender As Object, ByVal e As System.EventArgs)
+
+    End Sub
+
+    Friend Overrides Sub btnNuevo_Click(ByVal sender As Object, ByVal e As System.EventArgs)
+
+    End Sub
+
+   Protected Friend Overrides Sub btnPrimero_Click(ByVal sender As Object, ByVal e As System.EventArgs)
+
+    End Sub
+
+    Friend Overrides Sub btnSiguiente_Click(ByVal sender As Object, ByVal e As System.EventArgs)
+
+    End Sub
+
+    Friend Overrides Sub btnUltimo_Click(ByVal sender As Object, ByVal e As System.EventArgs)
+
+    End Sub
+
+    Private Sub dgTemporadas_BeforeDelete(ByVal sender As Object, ByVal e As C1.Win.C1TrueDBGrid.CancelEventArgs) Handles dgTemporadas.BeforeDelete
+        Try
+            If MessageBox.Show(rm.GetString("BORRARLINEA"), rm.GetString("ConfirmacionEliminacion"), MessageBoxButtons.YesNo) = DialogResult.Yes Then
+                e.Cancel = False
+            Else
+                e.Cancel = True
+            End If
+
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Sub
+
+End Class
+

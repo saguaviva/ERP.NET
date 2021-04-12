@@ -1,0 +1,855 @@
+Imports MySql.Data.MySqlClient : Imports clsFuncionesLOG : Imports clsFuncionesC1 : Imports clsFuncionesUtiles : Imports clsConstantes : Imports clsOtrasFunciones
+
+Public Class clsArrays
+
+    Friend aOrdre(3) As String
+    Friend aNIF(3) As String
+    Friend aFra(3) As String
+    Friend aCP(3) As String
+    Friend aDOM(3) As String
+    Friend aTEL(3) As String
+    Friend aModel(3) As String
+    Friend aPOB(3) As String
+    Friend aPROV(3) As String
+    Friend aSerie(3) As String
+    Friend aTEMPORADA(3) As String
+    Friend aFAX(3) As String
+    Friend aCLIENT(3) As String
+    Friend aCODIGO(3) As String
+    Friend aSTDISPK(3) As String
+    Friend aFecha(3) As String
+    Friend aFECHAENTRADA(3) As String
+    Friend aFECHAPREVISTA(3) As String
+    Friend aFECHAFINAL(3) As String
+    Friend aSTCRUK(3) As String
+    Friend aSTDISPM(3) As String
+    Friend aSTCRU(3) As String
+    Friend aGRAMA(3) As String
+    Friend aMarge(3) As String
+    Friend aRendiment(3) As String
+    Friend aAmple(3) As String
+    Friend aPreuk(3) As String
+    Friend aCOLOR(3) As String
+    Friend aPreum(3) As String
+    Friend aPreu(3) As String
+    Friend aDescri(3) As String
+    Friend aDESCRIPCIO(3) As String
+    Friend aIDDispos(3) As String
+    Friend aPedido(3) As String
+    Friend aTEJIDO(3) As String
+    Friend aProve(3) As String
+    Friend aALBARAN(3) As String
+    Friend aNOMCLIENT(3) As String
+    Friend aNOMCENTRO(3) As String
+    friend aNOMREPRES(3) As String
+    Friend aNOM(3) As String
+    Friend aNOMPROVE(3) As String
+    Friend aNOMTEIXIDOR(3) As String
+    Friend aNOMTALLER(3) As String
+
+    Public Sub New()
+        aOrdre(0) = "ORDRE"
+        aOrdre(1) = rm.GetString("ORDEN")
+        aOrdre(2) = "integer"
+
+        aFra(0) = "FRA"
+        aFra(1) = rm.GetString("NUMERO")
+        aFra(2) = "integer"
+
+        aModel(0) = "MODEL"
+        aModel(1) = rm.GetString("MODELO")
+        aModel(2) = "string"
+
+        aDOM(0) = "DOM"
+        aDOM(1) = rm.GetString("DOMICILIO")
+        aDOM(2) = "string"
+
+        aPOB(0) = "POB"
+        aPOB(1) = rm.GetString("POBLACION")
+        aPOB(2) = "string"
+
+        aNIF(0) = "NIF"
+        aNIF(1) = rm.GetString("NIF")
+        aNIF(2) = "string"
+
+        aPROV(0) = "PROV"
+        aPROV(1) = rm.GetString("PROVINCIA")
+        aPROV(2) = "string"
+
+        aTEL(0) = "TEL"
+        aTEL(1) = rm.GetString("TELEFONO")
+        aTEL(2) = "string"
+
+        aFAX(0) = "FAX"
+        aFAX(1) = rm.GetString("FAX")
+        aFAX(2) = "string"
+
+        aNOMTEIXIDOR(0) = "NOMTEIXIDOR"
+        aNOMTEIXIDOR(1) = rm.GetString("NOMTEJEDOR")
+        aNOMTEIXIDOR(2) = "string"
+
+        aCP(0) = "CP"
+        aCP(1) = rm.GetString("CP")
+        aCP(2) = "integer"
+
+        aNOM(0) = "NOM"
+        aNOM(1) = rm.GetString("NOMBRE")
+        aNOM(2) = "string"
+
+        aNOMCENTRO(0) = "NOMCENTRO"
+        aNOMCENTRO(1) = rm.GetString("EMPRESA")
+        aNOMCENTRO(2) = "string"
+
+        aTEMPORADA(0) = "TEMPORADA"
+        aTEMPORADA(1) = rm.GetString("TEMPORADA")
+        aTEMPORADA(2) = "string"
+
+        aCLIENT(0) = "CLIENT"
+        aCLIENT(1) = rm.GetString("CLIENTE")
+        aCLIENT(2) = "string"
+
+        aNOMCLIENT(0) = "NOMCLIENT"
+        aNOMCLIENT(1) = rm.GetString("NOMCLIENT")
+        aNOMCLIENT(2) = "string"
+
+        aNOMPROVE(0) = "NOMPROVE"
+        aNOMPROVE(1) = rm.GetString("NOMPROVE")
+        aNOMPROVE(2) = "string"
+
+        aNOMREPRES(0) = "NOMREPRES"
+        Dim general1 As new clsFuncionesUtiles 
+        aNOMREPRES(1) = general1.nz(rm.GetString("NOMREPRES"),"Nom presentant")
+        aNOMREPRES(2) = "string"
+
+        aNOMTALLER(0) = "NOMTALLER"
+        aNOMTALLER(1) = rm.GetString("NOMTALLER")
+        aNOMTALLER(2) = "string"
+
+        aSerie(0) = "SERIE"
+        aSerie(1) = rm.GetString("SERIE")
+        aSerie(2) = "string"
+
+        aCODIGO(0) = "CODI"
+        aCODIGO(1) = rm.GetString("CODIGO")
+        aCODIGO(2) = "string"
+
+        aDescri(0) = "DESCRI"
+        aDescri(1) = rm.GetString("DESCRIPCION")
+        aDescri(2) = "string"
+
+        aDESCRIPCIO(0) = "DESCRIPCIO"
+        aDESCRIPCIO(1) = rm.GetString("DESCRIPCION")
+        aDESCRIPCIO(2) = "string"
+
+        aPreum(0) = "PREUM"
+        aPreum(1) = rm.GetString("PRECIOMETROS")
+        aPreum(2) = "double"
+
+        aCOLOR(0) = "COLOR"
+        aCOLOR(1) = rm.GetString("COLOR")
+        aCOLOR(2) = "string"
+
+        aPreuk(0) = "PREUK"
+        aPreuk(1) = rm.GetString("PRECIOKILOS")
+        aPreuk(2) = "double"
+
+        aPreu(0) = "PREU"
+        aPreu(1) = rm.GetString("PRECIO")
+        aPreu(2) = "double"
+
+        aAmple(0) = "AMPLE"
+        aAmple(1) = rm.GetString("ANCHO")
+        aAmple(2) = "string"
+
+        aRendiment(0) = "RENDIMENT"
+        aRendiment(1) = rm.GetString("RENDIMIENTO")
+        aRendiment(2) = "double"
+
+        aMarge(0) = "MARGE"
+        aMarge(1) = rm.GetString("MARGEN")
+        aMarge(2) = "double"
+
+        aGRAMA(0) = "GRAMA"
+        aGRAMA(1) = rm.GetString("GRAMAJE")
+        aGRAMA(2) = "double"
+
+        aSTCRU(0) = "STRCRU"
+        aSTCRU(1) = rm.GetString("STCRUDOMETROS")
+        aSTCRU(2) = "double"
+
+        aSTDISPM(0) = "STDISPM"
+        aSTDISPM(1) = rm.GetString("STDISPMETROS")
+        aSTDISPM(2) = "double"
+
+        aSTCRUK(0) = "STCRUK"
+        aSTCRUK(1) = rm.GetString("STCRUDOKILOS")
+        aSTCRUK(2) = "double"
+
+        aSTDISPK(0) = "STDISPK"
+        aSTDISPK(1) = rm.GetString("STDISPKILOS")
+        aSTDISPK(2) = "double"
+
+        '-- DIPOSICIONES
+
+        aIDDispos(0) = "IDDISPOS"
+        aIDDispos(1) = rm.GetString("NUMDISPOS")
+        aIDDispos(2) = "integer"
+
+        aPedido(0) = "COMANDA"
+        aPedido(1) = rm.GetString("PEDIDO")
+        aPedido(2) = "string"
+
+        aTEJIDO(0) = "TEJIDO"
+        aTEJIDO(1) = rm.GetString("TEJIDO")
+        aTEJIDO(2) = "string"
+
+        aProve(0) = "PROVEEDOR"
+        aProve(1) = rm.GetString("PROVEEDOR")
+        aProve(2) = "string"
+
+        aALBARAN(0) = "ALBARAN"
+        aALBARAN(1) = rm.GetString("ALBARAN")
+        aALBARAN(2) = "string"
+
+        aFecha(0) = "DATA"
+        aFecha(1) = "Data"
+        aFecha(2) = "date"
+
+        aFECHAPREVISTA(0) = "PREVISTA"
+        aFECHAPREVISTA(1) = "Data Prevista"
+        aFECHAPREVISTA(2) = "date"
+
+        aFECHAENTRADA(0) = "ENTRADA"
+        aFECHAENTRADA(1) = "Data Entrada"
+        aFECHAENTRADA(2) = "date"
+
+        aFECHAFINAL(0) = "FINAL"
+        aFECHAFINAL(1) = "Data Final"
+        aFECHAFINAL(2) = "date"
+
+    End Sub
+
+    Public Function ObtenerArrayCamposProveedores() As Hashtable
+        Try
+            Dim arrayCampos As New Hashtable
+            With arrayCampos
+
+                .Add("CODI", aCODIGO)
+                .Add("NOM", aNOM)
+                .Add("CP", aCP)
+                .Add("DOM", aDOM)
+                .Add("TEL", aTEL)
+                .Add("FAX", aFAX)
+                .Add("POB", aPOB)
+                .Add("PROV", aPROV)
+                .Add("NIF", aNIF)
+                .Add("NOMCENTRO", aNOMCENTRO)
+
+                Dim aContacto(3) As String
+                aContacto(0) = "CONTACTE"
+                aContacto(1) = "Contacte"
+                aContacto(2) = "string"
+
+                Dim aForma(3) As String
+                aForma(0) = "FORMA"
+                aForma(1) = "Forma pag"
+                aForma(2) = "string"
+
+                Dim aIVA(3) As String
+                aIVA(0) = "IVA"
+                aIVA(1) = "IVA"
+                aIVA(2) = "string"
+
+                Dim aPAIS(3) As String
+                aPAIS(0) = "PAIS"
+                aPAIS(1) = "PAIS"
+                aPAIS(2) = "string"
+                'Faltan banco y repres pq solo pone el codigo solucion???
+
+            End With
+            Return arrayCampos
+
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Function
+    Public Function ObtenerArrayCamposTransportistas() As Hashtable
+        Try
+            Dim arrayCampos As New Hashtable
+            With arrayCampos
+                Dim aCodigo(3) As String
+                aCodigo(0) = "CODI"
+                aCodigo(1) = "Codi"
+                aCodigo(2) = "string"
+                .Add(CCClients, aCodigo)
+
+                Dim aNombre(3) As String
+                aNombre(0) = "NOM"
+                aNombre(1) = "Nom"
+                aNombre(2) = "string"
+                .Add("NOM", aNombre)
+
+
+                Dim aCP(3) As String
+                aCP(0) = "CP"
+                aCP(1) = "C.P."
+                aCP(2) = "integer"
+                .Add("CP", aCP)
+
+                Dim aDomicilio(3) As String
+                aDomicilio(0) = "DOM"
+                aDomicilio(1) = "Domicili"
+                aDomicilio(2) = "string"
+                .Add("DOM", aDomicilio)
+
+                Dim aTelefono(3) As String
+                aTelefono(0) = "TEL"
+                aTelefono(1) = "Telefon"
+                aTelefono(2) = "string"
+                .Add("TEL", aTelefono)
+
+                Dim aFax(3) As String
+                aFax(0) = "FAX"
+                aFax(1) = "FAX"
+                aFax(2) = "string"
+                .Add("FAX", aFax)
+
+                Dim aPoblacion(3) As String
+                aPoblacion(0) = "POB"
+                aPoblacion(1) = "Població"
+                aPoblacion(2) = "string"
+                .Add("POB", aPoblacion)
+
+                Dim aProvincia(3) As String
+                aProvincia(0) = "PROV"
+                aProvincia(1) = "Provincia"
+                aProvincia(2) = "string"
+                .Add("PROV", aProvincia)
+
+                Dim aPAIS(3) As String
+                aPAIS(0) = "NOMPAIS"
+                aPAIS(1) = "NOMPAIS"
+                aPAIS(2) = "string"
+                .Add("NOMPAIS", aPAIS)
+
+                Dim aNIF(3) As String
+                aNIF(0) = "NIF"
+                aNIF(1) = "NIF"
+                aNIF(2) = "string"
+                .Add("NIF", aNIF)
+
+                Dim aContacto(3) As String
+                aContacto(0) = "CONTACTE"
+                aContacto(1) = "Contacte"
+                aContacto(2) = "string"
+                .Add("CONTACTE", aContacto)
+
+                Dim aForma(3) As String
+                aForma(0) = "FORMA"
+                aForma(1) = "Forma pag"
+                aForma(2) = "string"
+                .Add("FORMA", aForma)
+
+                Dim aIVA(3) As String
+                aIVA(0) = "IVA"
+                aIVA(1) = "IVA"
+                aIVA(2) = "string"
+                .Add("IVA", aIVA)
+                'Faltan banco y repres pq solo pone el codigo solucion???
+            End With
+            Return arrayCampos
+
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Function
+    Public Function ObtenerArrayCamposOperaciones() As Hashtable
+        Try
+            Dim arrayCampos As New Hashtable
+            With arrayCampos
+
+                Dim aCodigo(3) As String
+                aCodigo(0) = "CODI"
+                aCodigo(1) = "Codi"
+                aCodigo(2) = "string"
+                .Add("CODI", aCodigo)
+
+                Dim aNombre(3) As String
+                aNombre(0) = "DESCRI"
+                aNombre(1) = rm.GetString("DESCRIPCION")
+                aNombre(2) = "string"
+                .Add("DESCRI", aNombre)
+
+            End With
+            Return arrayCampos
+
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Function
+    Public Function ObtenerArrayCamposForpag() As Hashtable
+        Try
+            Dim arrayCampos As New Hashtable
+            With arrayCampos
+
+                Dim aCodigo(3) As String
+                aCodigo(0) = "CODI"
+                aCodigo(1) = "Codi"
+                aCodigo(2) = "string"
+                .Add("CODI", aCodigo)
+
+                Dim aNombre(3) As String
+                aNombre(0) = "DESCRIPCIO"
+                aNombre(1) = "Descripcio"
+                aNombre(2) = "string"
+                .Add("DESCRIPCIO", aNombre)
+            End With
+            Return arrayCampos
+
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Function
+    Public Function ObtenerArrayCamposRepresentantes() As Hashtable
+        Try
+            Dim arrayCampos As New Hashtable
+            With arrayCampos
+
+                Dim aCodigo(3) As String
+                aCodigo(0) = "CODI"
+                aCodigo(1) = "Codi"
+                aCodigo(2) = "string"
+                .Add("CODI", aCodigo)
+
+                Dim aNombre(3) As String
+                aNombre(0) = "NOM"
+                aNombre(1) = "Nom"
+                aNombre(2) = "string"
+                .Add("NOM", aNombre)
+
+
+                Dim aCP(3) As String
+                aCP(0) = "CP"
+                aCP(1) = "C.P."
+                aCP(2) = "integer"
+                .Add("CP", aCP)
+
+                Dim aDomicilio(3) As String
+                aDomicilio(0) = "DOM"
+                aDomicilio(1) = "Domicili"
+                aDomicilio(2) = "string"
+                .Add("DOM", aDomicilio)
+
+                Dim aTelefono(3) As String
+                aTelefono(0) = "TEL"
+                aTelefono(1) = "Telefon"
+                aTelefono(2) = "string"
+                .Add("TEL", aTelefono)
+
+                Dim aFax(3) As String
+                aFax(0) = "FAX"
+                aFax(1) = "FAX"
+                aFax(2) = "string"
+                .Add("FAX", aFax)
+
+                Dim aPoblacion(3) As String
+                aPoblacion(0) = "POB"
+                aPoblacion(1) = "Població"
+                aPoblacion(2) = "string"
+                .Add("POB", aPoblacion)
+
+                Dim aProvincia(3) As String
+                aProvincia(0) = "PROV"
+                aProvincia(1) = "Provincia"
+                aProvincia(2) = "string"
+                .Add("PROV", aProvincia)
+
+                Dim aNIF(3) As String
+                aNIF(0) = "NIF"
+                aNIF(1) = "NIF"
+                aNIF(2) = "string"
+                .Add("NIF", aNIF)
+
+                '! Variable written only: aContacto
+                Dim aContacto(3) As String
+                aContacto(0) = "CONTACTE"
+                aContacto(1) = "Contacte"
+                aContacto(2) = "string"
+
+                '! Variable written only: aForma
+                Dim aForma(3) As String
+                aForma(0) = "FORMA"
+                aForma(1) = "Forma pag"
+                aForma(2) = "string"
+
+                '! Variable written only: aIVA
+                Dim aIVA(3) As String
+                aIVA(0) = "IVA"
+                aIVA(1) = "IVA"
+                aIVA(2) = "string"
+
+                '! Variable written only: aPAIS
+                Dim aPAIS(3) As String
+                aPAIS(0) = "PAIS"
+                aPAIS(1) = "PAIS"
+                aPAIS(2) = "string"
+                'Faltan banco y repres pq solo pone el codigo solucion???
+
+            End With
+            Return arrayCampos
+
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Function
+    Public Function ObtenerArrayCamposRepresentantesComisiones() As Hashtable
+        Try
+            Dim arrayCampos As New Hashtable
+            With arrayCampos
+                'PPCol2("FRA", dgConsumos, rm.GetString("FACTURA"), "", True, 150, False, C1.Win.C1TrueDBGrid.PresentationEnum.Normal, False, 150, i, False, Nothing, False)
+                'i = 1
+                'PPCol2("DATA", dgConsumos, rm.GetString("FECHA"), "Short Date", True, 150, False, C1.Win.C1TrueDBGrid.PresentationEnum.Normal, False, 150, i, False, Nothing, False)
+                'i = 2
+                'PPCol2("NOMCLIENT", dgConsumos, rm.GetString("CLIENTE"), "", True, 150, False, C1.Win.C1TrueDBGrid.PresentationEnum.Normal, False, 150, i, False, Nothing, False)
+                'i = 3
+                'PPCol2("BASE1", dgConsumos, rm.GetString("BASE"), "#,##0.00", True, 100, False, C1.Win.C1TrueDBGrid.PresentationEnum.Normal, False, 70, i, False, Nothing, False)
+                'i = 4
+                'PPCol2("COMIS", dgConsumos, "%", "#,##0.00", True, 250, False, C1.Win.C1TrueDBGrid.PresentationEnum.Normal, False, 70, i, False, Nothing, False)
+                'i = i + 1
+                'PPCol2("TOTALCOMIS", dgConsumos, rm.GetString("COMISION"), "#,##0.00", True, 100, False, C1.Win.C1TrueDBGrid.PresentationEnum.Normal, False, 70, i, False, Nothing, False)
+
+                Dim aFRA(3) As String
+                aFRA(0) = "FRA"
+                aFRA(1) = rm.GetString("FACTURA")
+                aFRA(2) = "integer"
+                .Add("FRA", aFRA)
+
+                Dim aDATA(3) As String
+                aDATA(0) = "DATA"
+                aDATA(1) = rm.GetString("FECHA")
+                aDATA(2) = "string"
+
+                .Add("NOMCLIENT", aNOMCLIENT)
+
+                Dim aBASE1(3) As String
+                aBASE1(0) = "BASE1"
+                aBASE1(1) = "Base"
+                aBASE1(2) = "double"
+                .Add("BASE1", aBASE1)
+
+                Dim aCOMIS(3) As String
+                aCOMIS(0) = "COMIS"
+                aCOMIS(1) = rm.GetString("COMISION")
+                aCOMIS(2) = "double"
+                .Add("COMIS", aCOMIS)
+
+                Dim aTOTALCOMIS(3) As String
+                aTOTALCOMIS(0) = "TOTALCOMIS"
+                aTOTALCOMIS(1) = "Total " & rm.GetString("COMISION")
+                aTOTALCOMIS(2) = "double"
+                .Add("TOTALCOMIS", aTOTALCOMIS)
+
+            End With
+            Return arrayCampos
+
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Function
+    Public Function ObtenerArrayCamposTalleres() As Hashtable
+        Try
+            Dim arrayCampos As New Hashtable
+            Dim aCodigo(3) As String
+            aCodigo(0) = "CODI"
+            aCodigo(1) = "Codi"
+            aCodigo(2) = "integer"
+            aCodigo(3) = 1
+
+            Dim aNombre(3) As String
+            aNombre(0) = "NOM"
+            aNombre(1) = "Nom"
+            aNombre(2) = "string"
+            aNombre(3) = 2
+
+            Dim aCP(3) As String
+            Dim aDomicilio(3) As String
+            Dim aTelefono(3) As String
+            Dim aFax(3) As String
+            Dim aPoblacion(3) As String
+            Dim aProvincia(3) As String
+            Dim aNIF(3) As String
+            Dim aContacto(3) As String
+            Dim aForma(3) As String
+            Dim aIVA(3) As String
+
+
+
+            aDomicilio(0) = "DOM"
+            aDomicilio(1) = "Domicili"
+            aDomicilio(2) = "string"
+            aDomicilio(3) = 3
+
+            aTelefono(0) = "TEL"
+            aTelefono(1) = "Telefon"
+            aTelefono(2) = "string"
+
+            aFax(0) = "FAX"
+            aFax(1) = "FAX"
+            aFax(2) = "string"
+
+            aCP(0) = "CP"
+            aCP(1) = "C.P."
+            aCP(2) = "integer"
+
+            aPoblacion(0) = "POB"
+            aPoblacion(1) = "Població"
+            aPoblacion(2) = "string"
+
+            aProvincia(0) = "PROV"
+            aProvincia(1) = "Provincia"
+            aProvincia(2) = "string"
+            aNIF(0) = "NIF"
+            aNIF(1) = "NIF"
+            aNIF(2) = "string"
+
+            aContacto(0) = "CONTACTE"
+            aContacto(1) = "Contacte"
+            aContacto(2) = "string"
+
+            aForma(0) = "FORMA"
+            aForma(1) = "Forma pag"
+            aForma(2) = "string"
+
+            aIVA(0) = "IVA"
+            aIVA(1) = "IVA"
+            aIVA(2) = "string"
+
+            'Faltan banco y repres pq solo pone el codigo solucion???
+            With arrayCampos
+                .Add(CCTallers, aCodigo)
+                .Add(CNTallers, aNombre)
+                .Add("DOM", aDomicilio)
+                .Add("CP", aCP)
+                .Add("TEL", aTelefono)
+                .Add("FAX", aFax)
+                .Add("POB", aPoblacion)
+                .Add("PROV", aProvincia)
+                .Add("NIF", aNIF)
+                .Add("CONTACTE", aContacto)
+                .Add("IVA", aIVA)
+                .Add("FORMA", aForma)
+
+                Dim aNOMCENTRO(3) As String
+                aNOMCENTRO(0) = "NOMCENTRO"
+                aNOMCENTRO(1) = rm.GetString("EMPRESA")
+                aNOMCENTRO(2) = "string"
+                .Add("NOMCENTRO", aNOMCENTRO)
+            End With
+            Return arrayCampos
+
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Function
+    Public Function ObtenerArrayCamposTejidos() As Hashtable
+        Try
+            Dim arrayCampos As New Hashtable
+            With arrayCampos
+
+                Dim aCodigo(3) As String
+                aCodigo(0) = "CODI"
+                aCodigo(1) = "Codi"
+                aCodigo(2) = "string"
+                .Add("CODI", aCodigo)
+
+                Dim aDescri(3) As String
+                aDescri(0) = "DESCRI"
+                aDescri(1) = rm.GetString("DESCRIPCION")
+                aDescri(2) = "string"
+                .Add("DESCRI", aDescri)
+
+                Dim aPreum(3) As String
+                aPreum(0) = "PREUM"
+                aPreum(1) = "Preu Metres"
+                aPreum(2) = "double"
+                .Add("PREUM", aPreum)
+
+                Dim aPreuk(3) As String
+                aPreuk(0) = "PREUK"
+                aPreuk(1) = "Preu Quilos"
+                aPreuk(2) = "double"
+                .Add("PREUk", aPreuk)
+
+                Dim aAmple(3) As String
+                aAmple(0) = "AMPLE"
+                aAmple(1) = "Ample"
+                aAmple(2) = "string"
+                .Add("AMPLE", aAmple)
+
+                Dim aRendiment(3) As String
+                aRendiment(0) = "RENDIMENT"
+                aRendiment(1) = "Rendiment"
+                aRendiment(2) = "double"
+                .Add("RENDIMENT", aRendiment)
+
+                Dim aMarge(3) As String
+                aMarge(0) = "MARGE"
+                aMarge(1) = "Marge"
+                aMarge(2) = "double"
+                .Add("MARGE", aMarge)
+
+                Dim aGRAMA(3) As String
+                aGRAMA(0) = "GRAMA"
+                aGRAMA(1) = "Gramatge"
+                aGRAMA(2) = "double"
+                .Add("GRAMA", aGRAMA)
+
+                Dim aSTCRU(3) As String
+                aSTCRU(0) = "STRCRU"
+                aSTCRU(1) = "Stock Cru Metres"
+                aSTCRU(2) = "double"
+                .Add("STRCRU", aSTCRU)
+
+                Dim aSTDISPM(3) As String
+                aSTDISPM(0) = "STDISPM"
+                aSTDISPM(1) = "Stock Dispos Metres"
+                aSTDISPM(2) = "double"
+                .Add("STDISPM", aSTDISPM)
+
+                Dim aSTCRUK(3) As String
+                aSTCRUK(0) = "STCRUK"
+                aSTCRUK(1) = "Stock Cru Quilos"
+                aSTCRUK(2) = "double"
+                .Add("STCRUK", aSTCRUK)
+
+                Dim aSTDISPK(3) As String
+                aSTDISPK(0) = "STDISPK"
+                aSTDISPK(1) = "Marge"
+                aSTDISPK(2) = "double"
+                .Add("STDISPK", aSTDISPK)
+
+            End With
+            Return arrayCampos
+
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Function
+    Public Function ObtenerArrayCamposClientes() As Hashtable
+        Try
+            Dim arrayCampos As New Hashtable
+            With arrayCampos
+
+                Dim aCodigo(3) As String
+                aCodigo(0) = "CODI"
+                aCodigo(1) = "Codi"
+                aCodigo(2) = "string"
+                .Add(CCClients, aCodigo)
+
+                Dim aNombre(3) As String
+                aNombre(0) = "NOM"
+                aNombre(1) = "Nom"
+                aNombre(2) = "string"
+                .Add(CNClients, aNombre)
+
+
+                Dim aCP(3) As String
+                aCP(0) = "CP"
+                aCP(1) = "C.P."
+                aCP(2) = "integer"
+                .Add("CP", aCP)
+
+                Dim aDomicilio(3) As String
+                aDomicilio(0) = "DOM"
+                aDomicilio(1) = "Domicili"
+                aDomicilio(2) = "string"
+                .Add("DOM", aDomicilio)
+
+                Dim aTelefono(3) As String
+                aTelefono(0) = "TEL"
+                aTelefono(1) = "Telefon"
+                aTelefono(2) = "string"
+                .Add("TEL", aTelefono)
+
+                Dim aFax(3) As String
+                aFax(0) = "FAX"
+                aFax(1) = "FAX"
+                aFax(2) = "string"
+                .Add("FAX", aFax)
+
+                Dim aPoblacion(3) As String
+                aPoblacion(0) = "POB"
+                aPoblacion(1) = "Població"
+                aPoblacion(2) = "string"
+                .Add("POB", aPoblacion)
+
+                Dim aProvincia(3) As String
+                aProvincia(0) = "PROV"
+                aProvincia(1) = "Provincia"
+                aProvincia(2) = "string"
+                .Add("PROV", aProvincia)
+
+                Dim aPAIS(3) As String
+                aPAIS(0) = "PAIS"
+                aPAIS(1) = "Pais"
+                aPAIS(2) = "string"
+                .Add("PAIS", aPAIS)
+
+                Dim aNIF(3) As String
+                aNIF(0) = "NIF"
+                aNIF(1) = "NIF"
+                aNIF(2) = "string"
+                .Add("NIF", aNIF)
+
+                Dim aContacto(3) As String
+                aContacto(0) = "CONTACTE"
+                aContacto(1) = "Contacte"
+                aContacto(2) = "string"
+                .Add("CONTACTE", aContacto)
+
+                Dim aForma(3) As String
+                aForma(0) = "FORMA"
+                aForma(1) = "Forma pag"
+                aForma(2) = "string"
+                .Add("FORMA", aForma)
+
+                Dim aDIA1(3) As String
+                aDIA1(0) = "DIA1"
+                aDIA1(1) = "DIA1"
+                aDIA1(2) = "integer"
+                .Add("DIA1", aDIA1)
+
+                Dim aDIA2(3) As String
+                aDIA2(0) = "DIA2"
+                aDIA2(1) = "DIA2"
+                aDIA2(2) = "integer"
+                .Add("DIA2", aDIA2)
+
+                Dim aDIA3(3) As String
+                aDIA3(0) = "DIA3"
+                aDIA3(1) = "DIA3"
+                aDIA3(2) = "integer"
+                .Add("DIA3", aDIA3)
+
+                Dim aIVA(3) As String
+                aIVA(0) = "IVA"
+                aIVA(1) = "IVA"
+                aIVA(2) = "string"
+                .Add("IVA", aIVA)
+
+                Dim aNOMCENTRO(3) As String
+                aNOMCENTRO(0) = "NOMCENTRO"
+                aNOMCENTRO(1) = rm.GetString("EMPRESA")
+                aNOMCENTRO(2) = "string"
+                .Add("NOMCENTRO", aNOMCENTRO)
+
+                'Faltan banco y repres pq solo pone el codigo solucion???
+
+            End With
+            Return arrayCampos
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Function
+
+End Class

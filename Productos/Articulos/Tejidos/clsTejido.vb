@@ -1,0 +1,1902 @@
+Imports MySql.Data.MySqlClient : Imports clsFuncionesLOG : Imports clsFuncionesC1 : Imports clsFuncionesUtiles : Imports clsConstantes
+
+Public Class clsTejido
+    Inherits clsADO
+
+#Region "VARIABLES"
+
+    Public acabados As clsAcabadosTejidos
+    Public cartaColores As clsCartaColoresTejido
+    Public composicion As clsComposicionTejido
+    Friend dtMaqui As New DataTable("MAQ")
+    Friend dtTallers As New DataTable("TALLERS")
+    Friend dtProve As New DataTable("PROVE")
+    Friend dtHilos As New DataTable("FIL")
+    Friend dtIVA As New DataTable("IVA")
+    Friend dvHilos As New DataView
+    Friend pasarDeTodo As Boolean = False
+    Friend dtValoracion As New DataTable
+
+#End Region
+
+#Region "CAMPOS"
+
+    '+--------------+--------------+------+-----+---------+-------+
+    '| Field        | Type         | Null | Key | Default | Extra |
+    '+--------------+--------------+------+-----+---------+-------+
+    '| CODI         | varchar(10)  | NO   | PRI |         |       |
+    '| CENTRO       | char(1)      | NO   | PRI | C       |       |
+    '| DESCRI       | varchar(35)  | YES  |     |         |       |
+    '| NRO          | varchar(50)  | YES  |     |         |       |
+    '| MAQUI        | int(22)      | YES  |     | 0       |       |
+    '| MATERIA      | double       | YES  |     | 0       |       |
+    '| OBSERV       | mediumtext   | YES  |     | NULL    |       |
+    '| IVA          | varchar(8)   | YES  |     |         |       |
+    '| TEIXIDOR     | double       | YES  |     | NULL    |       |
+    '| PTEIXIR      | double       | YES  |     | 0       |       |
+    '| ESTAMPADOR   | double       | YES  |     | NULL    |       |
+    '| PESTAM       | double       | YES  |     | NULL    |       |
+    '| ACABADOR     | int(22)      | YES  |     | NULL    |       |
+    '| ACABAT       | varchar(50)  | YES  |     | NULL    |       |
+    '| PACA         | double       | YES  |     | NULL    |       |
+    '| CRU          | double       | YES  |     | NULL    |       |
+    '| AMPLE        | varchar(20)  | YES  |     | NULL    |       |
+    '| RENDIMENT    | double       | YES  |     | NULL    |       |
+    '| MARGE        | double       | YES  |     | NULL    |       |
+    '| GRAMA        | double       | YES  |     | NULL    |       |
+    '| PREUM        | double       | YES  |     | NULL    |       |
+    '| PREUK        | double       | YES  |     | NULL    |       |
+    '| STCRUM       | double(15,3) | NO   |     | 0.000   |       |
+    '| STDISPM      | double(15,3) | NO   |     | 0.000   |       |
+    '| STCRUK       | double(15,3) | NO   |     | 0.000   |       |
+    '| STDISPK      | double(15,3) | NO   |     | 0.000   |       |
+    '| PREUPERMODEL | double(15,2) | YES  |     | NULL    |       |
+    '| TUBULAR      | BIT          | YES  |     | 0       |       |
+    '| AMPLE2       | double       | YES  |     | 0       |       |
+    '+--------------+--------------+------+-----+---------+-------+
+    '27 rows
+
+    Private mCODI As String
+    Public Property CODI() As String
+        Get
+            If PA = -1 Then Exit Property
+            Try
+                mCODI = general.nz(dvForm(pa).Row("CODI"), "")
+            Catch ex As Exception : End Try
+            Return general.nz(mCODI, "")
+        End Get
+        Set(ByVal Value As String)
+            If PA = -1 Then Exit Property
+            If general.nz(Value, "") <> general.nz(CODI, "") Then
+                mCODI = general.nz(Value, "")
+                dvForm(pa).Row("CODI") = general.nz(mCODI, "") : guardarDV()
+            End If
+        End Set
+    End Property
+
+    Private mDESCRI As String
+    Public Property DESCRI() As String
+        Get
+            If PA = -1 Then Exit Property
+            Try
+                mDESCRI = general.nz(dvForm(pa).Row("DESCRI"), "")
+            Catch ex As Exception : End Try
+            Return general.nz(mDESCRI, "")
+        End Get
+        Set(ByVal Value As String)
+            If PA = -1 Then Exit Property
+            If general.nz(Value, "") <> general.nz(DESCRI, "") Then
+                mDESCRI = general.nz(Value, "")
+                dvForm(pa).Row("DESCRI") = general.nz(mDESCRI, "") : guardarDV()
+            End If
+        End Set
+    End Property
+
+    Private mNRO As String
+    Public Property NRO() As String
+        Get
+            If PA = -1 Then Exit Property
+            Try
+                mNRO = general.nz(dvForm(pa).Row("NRO"), "")
+            Catch ex As Exception : End Try
+            Return general.nz(mNRO, "")
+        End Get
+        Set(ByVal Value As String)
+            If PA = -1 Then Exit Property
+            If general.nz(Value, "") <> general.nz(NRO, "") Then
+                mNRO = general.nz(Value, "")
+                dvForm(pa).Row("NRO") = general.nz(mNRO, "") : guardarDV()
+            End If
+        End Set
+    End Property
+
+    Private mMAQUI As Integer
+    Public Property MAQUI() As Integer
+        Get
+            If PA = -1 Then Exit Property
+            Try
+                mMAQUI = nzn(dvForm(pa).Row("MAQUI"), 0)
+            Catch ex As Exception : End Try
+            Return nzn(mMAQUI, 0)
+        End Get
+        Set(ByVal Value As Integer)
+            If PA = -1 Then Exit Property
+            If esCodigoExistente(dtMaqui, CCMaqui, Value) Then
+                If nzn(Value, 0) <> 0 Then
+                    mMAQUI = nzn(Value, 0)
+                    dvForm(pa).Row("NOMMAQUI") = general.OBN(Value, dtMaqui, CNMaqui)
+                    dvForm(pa).Row("MAQUI") = nzn(Value, 0) : guardarDV()
+                Else
+                    dvForm(pa).Row("MAQUI") = DBNull.Value
+
+                    dvForm(pa).Row("NOMMAQUI") = "" : guardarDV()
+                End If
+            Else
+                dvForm(pa).Row("MAQUI") = DBNull.Value
+
+                dvForm(pa).Row("NOMMAQUI") = "" : guardarDV()
+                MessageBox.Show(rm.GetString("NOEXISTEMAQUI"))
+            End If
+        End Set
+    End Property
+
+    Private mNOMMAQUI As String
+    Public Property NOMMAQUI() As String
+        Get
+            If PA = -1 Then Exit Property
+            Try
+                mNOMMAQUI = general.nz(dvForm(pa).Row("NOMMAQUI"), "")
+            Catch ex As Exception : End Try
+            Return general.nz(mNOMMAQUI, "")
+        End Get
+        Set(ByVal Value As String)
+            If PA = -1 Then Exit Property
+            mNOMMAQUI = general.nz(Value, "")
+            If tabla.GetChanges Is Nothing Then
+                dvForm(pa).Row("NOMMAQUI") = general.nz(Value, "") : guardarDV()
+                tabla.AcceptChanges()
+            Else
+                dvForm(pa).Row("NOMMAQUI") = general.nz(Value, "") : guardarDV()
+            End If
+        End Set
+    End Property
+
+    Private mMATERIA As Double
+    Public Property MATERIA() As Double
+        Get
+            If PA = -1 Then Exit Property
+            Try
+                mMATERIA = nzn(dvForm(pa).Row("MATERIA"), 0)
+            Catch ex As Exception : End Try
+            Return nzn(mMATERIA, 0)
+        End Get
+        Set(ByVal Value As Double)
+            If PA = -1 Then Exit Property
+            If nzn(Value, 0) <> nzn(MATERIA, 0) Then
+                mMATERIA = nzn(Value, 0)
+                dvForm(pa).Row("MATERIA") = nzn(mMATERIA, 0) : guardarDV()
+            End If
+        End Set
+    End Property
+
+    Private mOBSERV As String
+    Public Property OBSERV() As String
+        Get
+            If PA = -1 Then Exit Property
+            Try
+                mOBSERV = general.nz(dvForm(pa).Row("OBSERV"), "")
+            Catch ex As Exception : End Try
+            Return general.nz(mOBSERV, "")
+        End Get
+        Set(ByVal Value As String)
+            If PA = -1 Then Exit Property
+            If general.nz(Value, "") <> general.nz(OBSERV, "") Then
+                mOBSERV = general.nz(Value, "")
+                dvForm(pa).Row("OBSERV") = general.nz(mOBSERV, "") : guardarDV()
+            End If
+        End Set
+    End Property
+
+    Private mIVA As String
+    Public Property IVA() As String
+        Get
+            If PA = -1 Then Exit Property
+            Try
+                mIVA = general.nz(dvForm(pa).Row("IVA"), "")
+            Catch ex As Exception : End Try
+            Return general.nz(mIVA, "")
+        End Get
+        Set(ByVal Value As String)
+            If PA = -1 Then Exit Property
+            If general.nz(Value, "") <> general.nz(IVA, "") Then
+                mIVA = general.nz(Value, "")
+                dvForm(pa).Row("IVA") = general.nz(mIVA, "") : guardarDV()
+            End If
+        End Set
+    End Property
+
+    Private mTEIXIDOR As Double
+    Public Property TEIXIDOR() As Double
+        Get
+            If PA = -1 Then Exit Property
+            Try
+                mTEIXIDOR = nzn(dvForm(pa).Row("TEIXIDOR"), 0)
+            Catch ex As Exception : End Try
+            Return nzn(mTEIXIDOR, 0)
+        End Get
+        Set(ByVal Value As Double)
+            If PA = -1 Then Exit Property
+            If esCodigoExistente(dtTallers, CCTallers, Value) Then
+                If nzn(Value, 0) <> 0 Then
+                    mTEIXIDOR = nzn(Value, 0)
+                    dvForm(pa).Row("NOMTEIXIDOR") = general.OBN(Value, dtTallers, CNTallers)
+                    dvForm(pa).Row("TEIXIDOR") = nzn(Value, 0) : guardarDV()
+                Else
+                    dvForm(pa).Row("TEIXIDOR") = DBNull.Value
+                    dvForm(PA).Row("NOMTEIXIDOR") = "" : guardarDV()
+                End If
+            Else
+                dvForm(pa).Row("TEIXIDOR") = DBNull.Value
+                dvForm(PA).Row("NOMTEIXIDOR") = "" : guardarDV()
+                MessageBox.Show(rm.GetString("NOEXISTETALLERS"))
+            End If
+        End Set
+    End Property
+
+    Private mNOMTEIXIDOR As String
+    Public Property NOMTEIXIDOR() As String
+        Get
+            If PA = -1 Then Exit Property
+            Try
+                mNOMTEIXIDOR = general.nz(dvForm(pa).Row("NOMTEIXIDOR"), "")
+            Catch ex As Exception : End Try
+            Return general.nz(mNOMTEIXIDOR, "")
+        End Get
+        Set(ByVal Value As String)
+            If PA = -1 Then Exit Property
+            mNOMTEIXIDOR = general.nz(Value, "")
+            If tabla.GetChanges Is Nothing Then
+                dvForm(pa).Row("NOMTEIXIDOR") = general.nz(Value, "") : guardarDV()
+                tabla.AcceptChanges()
+            Else
+                dvForm(pa).Row("NOMTEIXIDOR") = general.nz(Value, "") : guardarDV()
+            End If
+        End Set
+    End Property
+
+    Private mPTEIXIR As Double
+    Public Property PTEIXIR() As Double
+        Get
+            If PA = -1 Then Exit Property
+            Try
+                mPTEIXIR = nzn(dvForm(pa).Row("PTEIXIR"), 0)
+            Catch ex As Exception : End Try
+            Return nzn(mPTEIXIR, 0)
+        End Get
+        Set(ByVal Value As Double)
+            If PA = -1 Then Exit Property
+            If nzn(Value, 0) <> nzn(PTEIXIR, 0) Then
+                mPTEIXIR = nzn(Value, 0)
+                dvForm(pa).Row("PTEIXIR") = nzn(mPTEIXIR, 0) : guardarDV()
+            End If
+        End Set
+    End Property
+
+    Private mESTAMPADOR As Double
+    Public Property ESTAMPADOR() As Double
+        Get
+            If PA = -1 Then Exit Property
+            Try
+                mESTAMPADOR = nzn(dvForm(pa).Row("ESTAMPADOR"), 0)
+            Catch ex As Exception : End Try
+            Return nzn(mESTAMPADOR, 0)
+        End Get
+        Set(ByVal Value As Double)
+            If PA = -1 Then Exit Property
+            If esCodigoExistente(dtTallers, CCTallers, Value) Then
+                If nzn(Value, 0) <> 0 Then
+                    mESTAMPADOR = nzn(Value, 0)
+                    dvForm(pa).Row("NOMESTAMPADOR") = general.OBN(Value, dtTallers, CNTallers)
+                    dvForm(pa).Row("ESTAMPADOR") = nzn(Value, 0) : guardarDV()
+                Else
+                    dvForm(pa).Row("ESTAMPADOR") = DBNull.Value
+
+                    dvForm(pa).Row("NOMESTAMPADOR") = "" : guardarDV()
+                End If
+            Else
+                dvForm(pa).Row("ESTAMPADOR") = DBNull.Value
+
+                dvForm(pa).Row("NOMESTAMPADOR") = "" : guardarDV()
+                MessageBox.Show(rm.GetString("NOEXISTETALLERS"))
+            End If
+        End Set
+    End Property
+
+    Private mNOMESTAMPADOR As String
+    Public Property NOMESTAMPADOR() As String
+        Get
+            If PA = -1 Then Exit Property
+            Try
+                mNOMESTAMPADOR = general.nz(dvForm(pa).Row("NOMESTAMPADOR"), "")
+            Catch ex As Exception : End Try
+            Return general.nz(mNOMESTAMPADOR, "")
+        End Get
+        Set(ByVal Value As String)
+            If PA = -1 Then Exit Property
+            mNOMESTAMPADOR = general.nz(Value, "")
+            If tabla.GetChanges Is Nothing Then
+                dvForm(pa).Row("NOMESTAMPADOR") = general.nz(Value, "") : guardarDV()
+                tabla.AcceptChanges()
+            Else
+                dvForm(pa).Row("NOMESTAMPADOR") = general.nz(Value, "") : guardarDV()
+            End If
+        End Set
+    End Property
+
+    Private mPESTAM As Double
+    Public Property PESTAM() As Double
+        Get
+            If PA = -1 Then Exit Property
+            Try
+                mPESTAM = nzn(dvForm(pa).Row("PESTAM"), 0)
+            Catch ex As Exception : End Try
+            Return nzn(mPESTAM, 0)
+        End Get
+        Set(ByVal Value As Double)
+            If PA = -1 Then Exit Property
+            If nzn(Value, 0) <> nzn(PESTAM, 0) Then
+                mPESTAM = nzn(Value, 0)
+                dvForm(pa).Row("PESTAM") = nzn(mPESTAM, 0) : guardarDV()
+            End If
+        End Set
+    End Property
+
+    Private mACABADOR As Integer
+    Public Property ACABADOR() As Integer
+        Get
+            If PA = -1 Then Exit Property
+            Try
+                mACABADOR = nzn(dvForm(pa).Row("ACABADOR"), 0)
+            Catch ex As Exception : End Try
+            Return nzn(mACABADOR, 0)
+        End Get
+        Set(ByVal Value As Integer)
+            If PA = -1 Then Exit Property
+            If esCodigoExistente(dtTallers, CCTallers, Value) Then
+                If nzn(Value, 0) <> 0 Then
+                    mACABADOR = nzn(Value, 0)
+                    dvForm(pa).Row("NOMACABADOR") = general.OBN(Value, dtTallers, CNTallers)
+                    dvForm(pa).Row("ACABADOR") = nzn(Value, 0) : guardarDV()
+                Else
+                    dvForm(pa).Row("ACABADOR") = DBNull.Value
+
+                    dvForm(pa).Row("NOMACABADOR") = "" : guardarDV()
+                End If
+            Else
+                dvForm(pa).Row("ACABADOR") = DBNull.Value
+
+                dvForm(pa).Row("NOMACABADOR") = "" : guardarDV()
+                MessageBox.Show(rm.GetString("NOEXISTETALLERS"))
+            End If
+        End Set
+    End Property
+
+    Private mNOMACABADOR As String
+    Public Property NOMACABADOR() As String
+        Get
+            If PA = -1 Then Exit Property
+            Try
+                mNOMACABADOR = general.nz(dvForm(pa).Row("NOMACABADOR"), "")
+            Catch ex As Exception : End Try
+            Return general.nz(mNOMACABADOR, "")
+        End Get
+        Set(ByVal Value As String)
+            If PA = -1 Then Exit Property
+            mNOMACABADOR = general.nz(Value, "")
+            If tabla.GetChanges Is Nothing Then
+                dvForm(pa).Row("NOMACABADOR") = general.nz(Value, "") : guardarDV()
+                tabla.AcceptChanges()
+            Else
+                dvForm(pa).Row("NOMACABADOR") = general.nz(Value, "") : guardarDV()
+            End If
+        End Set
+    End Property
+
+    Private mACABAT As String
+    Public Property ACABAT() As String
+        Get
+            If PA = -1 Then Exit Property
+            Try
+                mACABAT = general.nz(dvForm(pa).Row("ACABAT"), "")
+            Catch ex As Exception : End Try
+            Return general.nz(mACABAT, "")
+        End Get
+        Set(ByVal Value As String)
+            If PA = -1 Then Exit Property
+            If general.nz(Value, "") <> general.nz(ACABAT, "") Then
+                mACABAT = general.nz(Value, "")
+                dvForm(pa).Row("ACABAT") = general.nz(mACABAT, "") : guardarDV()
+            End If
+        End Set
+    End Property
+
+    Private mPACA As Double
+    Public Property PACA() As Double
+        Get
+            If PA = -1 Then Exit Property
+            Try
+                mPACA = nzn(dvForm(pa).Row("PACA"), 0)
+            Catch ex As Exception : End Try
+            Return nzn(mPACA, 0)
+        End Get
+        Set(ByVal Value As Double)
+            If PA = -1 Then Exit Property
+            If nzn(Value, 0) <> nzn(PACA, 0) Then
+                mPACA = nzn(Value, 0)
+                dvForm(pa).Row("PACA") = nzn(mPACA, 0) : guardarDV()
+            End If
+        End Set
+    End Property
+
+    Private mCRU As Double
+    Public Property CRU() As Double
+        Get
+            If PA = -1 Then Exit Property
+            Try
+                mCRU = nzn(dvForm(pa).Row("CRU"), 0)
+            Catch ex As Exception : End Try
+            Return nzn(mCRU, 0)
+        End Get
+        Set(ByVal Value As Double)
+            If PA = -1 Then Exit Property
+            If nzn(Value, 0) <> nzn(CRU, 0) Then
+                mCRU = nzn(Value, 0)
+                dvForm(pa).Row("CRU") = nzn(mCRU, 0) : guardarDV()
+            End If
+        End Set
+    End Property
+
+    Private mAMPLE As String
+    Public Property AMPLE() As String
+        Get
+            If PA = -1 Then Exit Property
+            Try
+                mAMPLE = general.nz(dvForm(pa).Row("AMPLE"), "")
+            Catch ex As Exception : End Try
+            Return general.nz(mAMPLE, "")
+        End Get
+        Set(ByVal Value As String)
+            If PA = -1 Then Exit Property
+            If general.nz(Value, "") <> general.nz(AMPLE, "") Then
+                mAMPLE = general.nz(Value, "")
+                dvForm(pa).Row("AMPLE") = general.nz(mAMPLE, "") : guardarDV()
+            End If
+        End Set
+    End Property
+
+    Private mRENDIMENT As Double
+    Public Property RENDIMENT() As Double
+        Get
+            If PA = -1 Then Exit Property
+            Try
+                mRENDIMENT = nzn(dvForm(pa).Row("RENDIMENT"), 0)
+            Catch ex As Exception : End Try
+            Return nzn(mRENDIMENT, 0)
+        End Get
+        Set(ByVal Value As Double)
+            If PA = -1 Then Exit Property
+            If nzn(Value, 0) <> nzn(RENDIMENT, 0) Then
+                mRENDIMENT = nzn(Value, 0)
+                dvForm(pa).Row("RENDIMENT") = nzn(mRENDIMENT, 0) : guardarDV()
+            End If
+        End Set
+    End Property
+
+    Private mMARGE As Double
+    Public Property MARGE() As Double
+        Get
+            If PA = -1 Then Exit Property
+            Try
+                mMARGE = nzn(dvForm(pa).Row("MARGE"), 0)
+            Catch ex As Exception : End Try
+            Return nzn(mMARGE, 0)
+        End Get
+        Set(ByVal Value As Double)
+            If PA = -1 Then Exit Property
+            If nzn(Value, 0) <> nzn(MARGE, 0) Then
+                mMARGE = nzn(Value, 0)
+                dvForm(pa).Row("MARGE") = nzn(mMARGE, 0) : guardarDV()
+            End If
+        End Set
+    End Property
+
+    Private mGRAMA As Double
+    Public Property GRAMA() As Double
+        Get
+            If PA = -1 Then Exit Property
+            Try
+                mGRAMA = nzn(dvForm(pa).Row("GRAMA"), 0)
+            Catch ex As Exception : End Try
+            Return nzn(mGRAMA, 0)
+        End Get
+        Set(ByVal Value As Double)
+            If PA = -1 Then Exit Property
+            If nzn(Value, 0) <> nzn(GRAMA, 0) Then
+                mGRAMA = nzn(Value, 0)
+                dvForm(pa).Row("GRAMA") = nzn(mGRAMA, 0) : guardarDV()
+            End If
+        End Set
+    End Property
+
+    Private mPREUM As Double
+    Public Property PREUM() As Double
+        Get
+            If PA = -1 Then Exit Property
+            Try
+                mPREUM = nzn(dvForm(pa).Row("PREUM"), 0)
+            Catch ex As Exception : End Try
+            Return nzn(mPREUM, 0)
+        End Get
+        Set(ByVal Value As Double)
+            If PA = -1 Then Exit Property
+            If nzn(Value, 0) <> nzn(PREUM, 0) Then
+                mPREUM = nzn(Value, 0)
+                dvForm(pa).Row("PREUM") = nzn(mPREUM, 0) : guardarDV()
+            End If
+        End Set
+    End Property
+
+    Private mPREUK As Double
+    Public Property PREUK() As Double
+        Get
+            If PA = -1 Then Exit Property
+            Try
+                mPREUK = nzn(dvForm(pa).Row("PREUK"), 0)
+            Catch ex As Exception : End Try
+            Return nzn(mPREUK, 0)
+        End Get
+        Set(ByVal Value As Double)
+            If PA = -1 Then Exit Property
+            If nzn(Value, 0) <> nzn(PREUK, 0) Then
+                mPREUK = nzn(Value, 0)
+                dvForm(pa).Row("PREUK") = nzn(mPREUK, 0) : guardarDV()
+            End If
+        End Set
+    End Property
+
+    Private mSTCRUM As Double
+    Public Property STCRUM() As Double
+        Get
+            If PA = -1 Then Exit Property
+            Try
+                mSTCRUM = nzn(dvForm(pa).Row("STCRUM"), 0)
+            Catch ex As Exception : End Try
+            Return nzn(mSTCRUM, 0)
+        End Get
+        Set(ByVal Value As Double)
+            If PA = -1 Then Exit Property
+            If nzn(Value, 0) <> nzn(STCRUM, 0) Then
+                mSTCRUM = nzn(Value, 0)
+                dvForm(pa).Row("STCRUM") = nzn(mSTCRUM, 0) : guardarDV()
+            End If
+        End Set
+    End Property
+
+    Private mSTDISPM As Double
+    Public Property STDISPM() As Double
+        Get
+            If PA = -1 Then Exit Property
+            Try
+                mSTDISPM = nzn(dvForm(pa).Row("STDISPM"), 0)
+            Catch ex As Exception : End Try
+            Return nzn(mSTDISPM, 0)
+        End Get
+        Set(ByVal Value As Double)
+            If PA = -1 Then Exit Property
+            If nzn(Value, 0) <> nzn(STDISPM, 0) Then
+                mSTDISPM = nzn(Value, 0)
+                dvForm(pa).Row("STDISPM") = nzn(mSTDISPM, 0) : guardarDV()
+            End If
+        End Set
+    End Property
+
+    Private mSTCRUK As Double
+    Public Property STCRUK() As Double
+        Get
+            If PA = -1 Then Exit Property
+            Try
+                mSTCRUK = nzn(dvForm(pa).Row("STCRUK"), 0)
+            Catch ex As Exception : End Try
+            Return nzn(mSTCRUK, 0)
+        End Get
+        Set(ByVal Value As Double)
+            If PA = -1 Then Exit Property
+            If nzn(Value, 0) <> nzn(STCRUK, 0) Then
+                mSTCRUK = nzn(Value, 0)
+                dvForm(pa).Row("STCRUK") = nzn(mSTCRUK, 0) : guardarDV()
+            End If
+        End Set
+    End Property
+
+    Private mSTDISPK As Double
+    Public Property STDISPK() As Double
+        Get
+            If PA = -1 Then Exit Property
+            Try
+                mSTDISPK = nzn(dvForm(pa).Row("STDISPK"), 0)
+            Catch ex As Exception : End Try
+            Return nzn(mSTDISPK, 0)
+        End Get
+        Set(ByVal Value As Double)
+            If PA = -1 Then Exit Property
+            If nzn(Value, 0) <> nzn(STDISPK, 0) Then
+                mSTDISPK = nzn(Value, 0)
+                dvForm(pa).Row("STDISPK") = nzn(mSTDISPK, 0) : guardarDV()
+            End If
+        End Set
+    End Property
+
+    Private mPREUPERMODEL As Double
+    Public Property PREUPERMODEL() As Double
+        Get
+            If PA = -1 Then Exit Property
+            Try
+                mPREUPERMODEL = nzn(dvForm(pa).Row("PREUPERMODEL"), 0)
+            Catch ex As Exception : End Try
+            Return nzn(mPREUPERMODEL, 0)
+        End Get
+        Set(ByVal Value As Double)
+            If PA = -1 Then Exit Property
+            If nzn(Value, 0) <> nzn(PREUPERMODEL, 0) Then
+                mPREUPERMODEL = nzn(Value, 0)
+                dvForm(pa).Row("PREUPERMODEL") = nzn(mPREUPERMODEL, 0) : guardarDV()
+            End If
+        End Set
+    End Property
+
+    Private mTUBULAR As Boolean
+    Public Property TUBULAR() As Boolean
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mTUBULAR = nzn(dvForm(PA).Row("TUBULAR"), 0)
+            Catch ex As Exception : End Try
+            Return nzn(mTUBULAR, 0)
+        End Get
+        Set(ByVal Value As Boolean)
+            If PA() = -1 Then Exit Property
+            If nzn(Value, 0) <> nzn(TUBULAR, 0) Then
+                mTUBULAR = nzn(Value, 0)
+                dvForm(PA).Row("TUBULAR") = nzn(mTUBULAR, 0) : guardarDV()
+            End If
+        End Set
+    End Property
+
+    Private mAMPLENOU As Double
+    Public Property AMPLENOU() As Double
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mAMPLENOU = nzn(dvForm(PA).Row("AMPLENOU"), 0)
+            Catch ex As Exception : End Try
+            Return nzn(mAMPLENOU, 0)
+        End Get
+        Set(ByVal Value As Double)
+            If PA() = -1 Then Exit Property
+            If nzn(Value, 0) <> nzn(AMPLENOU, 0) Then
+                mAMPLENOU = nzn(Value, 0)
+                dvForm(PA).Row("AMPLENOU") = nzn(mAMPLENOU, 0) : guardarDV()
+            End If
+        End Set
+    End Property
+
+    Private mCOMPOSICIO As String
+    Public Property COMPOSICIO() As String
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mCOMPOSICIO = general.nz(dvForm(PA).Row("COMPOSICIO"), "")
+            Catch ex As Exception : End Try
+            Return general.nz(mCOMPOSICIO, "")
+        End Get
+        Set(ByVal Value As String)
+            If PA() = -1 Then Exit Property
+            If general.nz(Value, "") <> general.nz(COMPOSICIO, "") Then
+                mCOMPOSICIO = general.nz(Value, "")
+                dvForm(PA).Row("COMPOSICIO") = general.nz(mCOMPOSICIO, "") : guardarDV()
+            End If
+        End Set
+    End Property
+
+    Private mNCCODE As String
+    Public Property NCCODE() As String
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mNCCODE = general.nz(dvForm(PA).Row("NCCODE"), "")
+            Catch ex As Exception : End Try
+            Return general.nz(mNCCODE, "")
+        End Get
+        Set(ByVal Value As String)
+            If PA() = -1 Then Exit Property
+            If general.nz(Value, "") <> general.nz(NCCODE, "") Then
+                mNCCODE = general.nz(Value, "")
+                dvForm(PA).Row("NCCODE") = general.nz(mNCCODE, "") : guardarDV()
+            End If
+        End Set
+    End Property
+
+    Private mMLINEAL As Double
+    Public Property MLINEAL() As Double
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mMLINEAL = nzn(dvForm(PA).Row("MLINEAL"), 0)
+            Catch ex As Exception : End Try
+            Return nzn(mMLINEAL, 0)
+        End Get
+        Set(ByVal Value As Double)
+            If PA() = -1 Then Exit Property
+            If nzn(Value, 0) <> nzn(MLINEAL, 0) Then
+                mMLINEAL = nzn(Value, 0)
+                dvForm(PA).Row("MLINEAL") = nzn(mMLINEAL, 0) : guardarDV()
+            End If
+        End Set
+    End Property
+    'Private mCODI As String
+    'Public Property CODI() As String
+    '    Get
+    '        If PA = -1 Then Exit Property
+    '        Try
+    '            mCODI =general.nz(dvForm(pa).Row("CODI"), "")
+    '        Catch ex As Exception : End Try
+    '        Return general.nz(mCODI, "")
+    '    End Get
+    '    Set(ByVal Value As String)
+    '        If PA = -1 Then Exit Property
+    '        If general.nz(Value, "") <>general.nz(CODI, "") Then
+    '            mCODI =general.nz(Value, "")
+    '            dvForm(pa).Row("CODI") =general.nz(mCODI, "") : guardarDV()
+    '        End If
+    '    End Set
+    'End Property
+
+    'Private mDESCRI As String
+    'Public Property DESCRI() As String
+    '    Get
+    '        If PA = -1 Then Exit Property
+    '        Try
+    '            mDESCRI =general.nz(dvForm(pa).Row("DESCRI"), "")
+    '        Catch ex As Exception : End Try
+    '        Return general.nz(mDESCRI, "")
+    '    End Get
+    '    Set(ByVal Value As String)
+    '        If PA = -1 Then Exit Property
+    '        If general.nz(Value, "") <>general.nz(DESCRI, "") Then
+    '            mDESCRI =general.nz(Value, "")
+    '            dvForm(pa).Row("DESCRI") =general.nz(mDESCRI, "") : guardarDV()
+    '        End If
+    '    End Set
+    'End Property
+
+    'Private mNRO As String
+    'Public Property NRO() As String
+    '    Get
+    '        If PA = -1 Then Exit Property
+    '        Try
+    '            mNRO =general.nz(dvForm(pa).Row("NRO"), "")
+    '        Catch ex As Exception : End Try
+    '        Return general.nz(mNRO, "")
+    '    End Get
+    '    Set(ByVal Value As String)
+    '        If PA = -1 Then Exit Property
+    '        If general.nz(Value, "") <>general.nz(NRO, "") Then
+    '            mNRO =general.nz(Value, "")
+    '            dvForm(pa).Row("NRO") =general.nz(mNRO, "") : guardarDV()
+    '        End If
+    '    End Set
+    'End Property
+
+    'Private mMAQUI As Double
+    'Public Property MAQUI() As Double
+    '    Get
+    '        If PA = -1 Then Exit Property
+    '        Try
+    '            mMAQUI = nzn(dvForm(pa).Row("MAQUI"), 0)
+    '        Catch ex As Exception : End Try
+    '        Return nzn(mMAQUI, 0)
+    '    End Get
+    '    Set(ByVal Value As Double)
+    '        If PA = -1 Then Exit Property
+    '        If esCodigoExistente(dtMaqui, CCMaqui, Value) Then
+    '            If nzn(Value, 0) <> 0 Then
+    '                mMAQUI = nzn(Value, 0)
+    '                dvForm(pa).Row("NOMMAQUI") = general.OBN(Value, dtMaqui, CNMaqui)
+    '                dvForm(pa).Row("MAQUI") = nzn(Value, 0) : guardarDV()
+    '            End If
+    '        Else
+    '            dvForm(pa).Row("MAQUI") = DBNull.Value
+
+    '            dvForm(pa).Row("NOMMAQUI") = "" : guardarDV()
+    '            MessageBox.Show(RM.GetString("NOEXISTEMAQUI"))
+    '        End If
+    '    End Set
+    'End Property
+
+    'Private mNOMMAQUI As String
+    'Public Property NOMMAQUI() As String
+    '    Get
+    '        If PA = -1 Then Exit Property
+    '        Try
+    '            mNOMMAQUI =general.nz(dvForm(pa).Row("NOMMAQUI"), "")
+    '        Catch ex As Exception : End Try
+    '        Return general.nz(mNOMMAQUI, "")
+    '    End Get
+    '    Set(ByVal Value As String)
+    '        If PA = -1 Then Exit Property
+    '        mNOMMAQUI =general.nz(Value, "")
+    '        If tabla.GetChanges Is Nothing Then
+    '            dvForm(pa).Row("NOMMAQUI") =general.nz(Value, "") : guardarDV()
+    '            tabla.AcceptChanges()
+    '        Else
+    '            dvForm(pa).Row("NOMMAQUI") =general.nz(Value, "") : guardarDV()
+    '        End If
+    '    End Set
+    'End Property
+
+    'Private mMATERIA As Double
+    'Public Property MATERIA() As Double
+    '    Get
+    '        If PA = -1 Then Exit Property
+    '        Try
+    '            mMATERIA = nzn(dvForm(pa).Row("MATERIA"), 0)
+    '        Catch ex As Exception : End Try
+    '        Return nzn(mMATERIA, 0)
+    '    End Get
+    '    Set(ByVal Value As Double)
+    '        If PA = -1 Then Exit Property
+    '        If nzn(Value, 0) <> nzn(MATERIA, 0) Then
+    '            mMATERIA = nzn(Value, 0)
+    '            dvForm(pa).Row("MATERIA") = nzn(mMATERIA, 0) : guardarDV()
+    '        End If
+    '    End Set
+    'End Property
+
+    'Private mOBSERV As String
+    'Public Property OBSERV() As String
+    '    Get
+    '        If PA = -1 Then Exit Property
+    '        Try
+    '            mOBSERV =general.nz(dvForm(pa).Row("OBSERV"), "")
+    '        Catch ex As Exception : End Try
+    '        Return general.nz(mOBSERV, "")
+    '    End Get
+    '    Set(ByVal Value As String)
+    '        If PA = -1 Then Exit Property
+    '        If general.nz(Value, "") <>general.nz(OBSERV, "") Then
+    '            mOBSERV =general.nz(Value, "")
+    '            dvForm(pa).Row("OBSERV") =general.nz(mOBSERV, "") : guardarDV()
+    '        End If
+    '    End Set
+    'End Property
+
+    'Private mIVA As String
+    'Public Property IVA() As String
+    '    Get
+    '        If PA = -1 Then Exit Property
+    '        Try
+    '            mIVA =general.nz(dvForm(pa).Row("IVA"), "")
+    '        Catch ex As Exception : End Try
+    '        Return general.nz(mIVA, "")
+    '    End Get
+    '    Set(ByVal Value As String)
+    '        If PA = -1 Then Exit Property
+    '        If general.nz(Value, "") <>general.nz(IVA, "") Then
+    '            mIVA =general.nz(Value, "")
+    '            dvForm(pa).Row("IVA") =general.nz(mIVA, "") : guardarDV()
+    '        End If
+    '    End Set
+    'End Property
+
+    'Private mTEIXIDOR As Double
+    'Public Property TEIXIDOR() As Double
+    '    Get
+    '        If PA = -1 Then Exit Property
+    '        Try
+    '            mTEIXIDOR = nzn(dvForm(pa).Row("TEIXIDOR"), 0)
+    '        Catch ex As Exception : End Try
+    '        Return nzn(mTEIXIDOR, 0)
+    '    End Get
+    '    Set(ByVal Value As Double)
+    '        If PA = -1 Then Exit Property
+    '        If esCodigoExistente(dtTallers, CCTallers, Value) Then
+    '            If nzn(Value, 0) <> 0 Then
+    '                mTEIXIDOR = nzn(Value, 0)
+    '                dvForm(pa).Row("NOMTEIXIDOR") = general.OBN(Value, dtTallers, CNTallers)
+    '                dvForm(pa).Row("TEIXIDOR") = nzn(Value, 0) : guardarDV()
+    '            End If
+    '        Else
+    '            dvForm(pa).Row("TEIXIDOR") = DBNull.Value
+
+    '            dvForm(pa).Row("NOMTEIXIDOR") = "" : guardarDV()
+    '            MessageBox.Show(RM.GetString("NOEXISTETALLERS"))
+    '        End If
+    '    End Set
+    'End Property
+
+    'Private mNOMTEIXIDOR As String
+    'Public Property NOMTEIXIDOR() As String
+    '    Get
+    '        If PA = -1 Then Exit Property
+    '        Try
+    '            mNOMTEIXIDOR =general.nz(dvForm(pa).Row("NOMTEIXIDOR"), "")
+    '        Catch ex As Exception : End Try
+    '        Return general.nz(mNOMTEIXIDOR, "")
+    '    End Get
+    '    Set(ByVal Value As String)
+    '        If PA = -1 Then Exit Property
+    '        mNOMTEIXIDOR =general.nz(Value, "")
+    '        If tabla.GetChanges Is Nothing Then
+    '            dvForm(pa).Row("NOMTEIXIDOR") =general.nz(Value, "") : guardarDV()
+    '            tabla.AcceptChanges()
+    '        Else
+    '            dvForm(pa).Row("NOMTEIXIDOR") =general.nz(Value, "") : guardarDV()
+    '        End If
+    '    End Set
+    'End Property
+
+    'Private mPTEIXIR As Double
+    'Public Property PTEIXIR() As Double
+    '    Get
+    '        If PA = -1 Then Exit Property
+    '        Try
+    '            mPTEIXIR = nzn(dvForm(pa).Row("PTEIXIR"), 0)
+    '        Catch ex As Exception : End Try
+    '        Return nzn(mPTEIXIR, 0)
+    '    End Get
+    '    Set(ByVal Value As Double)
+    '        If PA = -1 Then Exit Property
+    '        If nzn(Value, 0) <> nzn(PTEIXIR, 0) Then
+    '            mPTEIXIR = nzn(Value, 0)
+    '            dvForm(pa).Row("PTEIXIR") = nzn(mPTEIXIR, 0) : guardarDV()
+    '        End If
+    '    End Set
+    'End Property
+
+    'Private mESTAMPADOR As Double
+    'Public Property ESTAMPADOR() As Double
+    '    Get
+    '        If PA = -1 Then Exit Property
+    '        Try
+    '            mESTAMPADOR = nzn(dvForm(pa).Row("ESTAMPADOR"), 0)
+    '        Catch ex As Exception : End Try
+    '        Return nzn(mESTAMPADOR, 0)
+    '    End Get
+    '    Set(ByVal Value As Double)
+    '        If PA = -1 Then Exit Property
+    '        If esCodigoExistente(dtTallers, CCTallers, Value) Then
+    '            If nzn(Value, 0) <> 0 Then
+    '                mESTAMPADOR = nzn(Value, 0)
+    '                dvForm(pa).Row("NOMESTAMPADOR") = general.OBN(Value, dtTallers, CNTallers)
+    '                dvForm(pa).Row("ESTAMPADOR") = nzn(Value, 0) : guardarDV()
+    '            Else
+
+    '            End If
+    '        Else
+    '            dvForm(pa).Row("ESTAMPADOR") = DBNull.Value
+
+    '            dvForm(pa).Row("NOMESTAMPADOR") = "" : guardarDV()
+    '            MessageBox.Show(RM.GetString("NOEXISTETALLERS"))
+    '        End If
+    '    End Set
+    'End Property
+
+    'Private mNOMESTAMPADOR As String
+    'Public Property NOMESTAMPADOR() As String
+    '    Get
+    '        If PA = -1 Then Exit Property
+    '        Try
+    '            mNOMESTAMPADOR =general.nz(dvForm(pa).Row("NOMESTAMPADOR"), "")
+    '        Catch ex As Exception : End Try
+    '        Return general.nz(mNOMESTAMPADOR, "")
+    '    End Get
+    '    Set(ByVal Value As String)
+    '        If PA = -1 Then Exit Property
+    '        mNOMESTAMPADOR =general.nz(Value, "")
+    '        If tabla.GetChanges Is Nothing Then
+    '            dvForm(pa).Row("NOMESTAMPADOR") =general.nz(Value, "") : guardarDV()
+    '            tabla.AcceptChanges()
+    '        Else
+    '            dvForm(pa).Row("NOMESTAMPADOR") =general.nz(Value, "") : guardarDV()
+    '        End If
+    '    End Set
+    'End Property
+
+    'Private mPESTAM As Double
+    'Public Property PESTAM() As Double
+    '    Get
+    '        If PA = -1 Then Exit Property
+    '        Try
+    '            mPESTAM = nzn(dvForm(pa).Row("PESTAM"), 0)
+    '        Catch ex As Exception : End Try
+    '        Return nzn(mPESTAM, 0)
+    '    End Get
+    '    Set(ByVal Value As Double)
+    '        If PA = -1 Then Exit Property
+    '        If nzn(Value, 0) <> nzn(PESTAM, 0) Then
+    '            mPESTAM = nzn(Value, 0)
+    '            dvForm(pa).Row("PESTAM") = nzn(mPESTAM, 0) : guardarDV()
+    '        End If
+    '    End Set
+    'End Property
+
+    'Private mACABADOR As Integer
+    'Public Property ACABADOR() As Integer
+    '    Get
+    '        If PA = -1 Then Exit Property
+    '        Try
+    '            mACABADOR = nzn(dvForm(pa).Row("ACABADOR"), 0)
+    '        Catch ex As Exception : End Try
+    '        Return nzn(mACABADOR, 0)
+    '    End Get
+    '    Set(ByVal Value As Integer)
+    '        If PA = -1 Then Exit Property
+    '        If esCodigoExistente(dtTallers, CCTallers, Value) Then
+    '            If nzn(Value, 0) <> 0 Then
+    '                mACABADOR = nzn(Value, 0)
+    '                dvForm(pa).Row("NOMACABADOR") = general.OBN(Value, dtTallers, CNTallers)
+    '                dvForm(pa).Row("ACABADOR") = nzn(Value, 0) : guardarDV()
+    '            End If
+    '        Else
+    '            dvForm(pa).Row("ACABADOR") = DBNull.Value
+
+    '            dvForm(pa).Row("NOMACABADOR") = "" : guardarDV()
+    '            MessageBox.Show(rm.GetString("NOEXISTETALLERS"))
+    '        End If
+    '    End Set
+    'End Property
+
+    'Private mNOMACABADOR As String
+    'Public Property NOMACABADOR() As String
+    '    Get
+    '        If PA = -1 Then Exit Property
+    '        Try
+    '            mNOMACABADOR =general.nz(dvForm(pa).Row("NOMACABADOR"), "")
+    '        Catch ex As Exception : End Try
+    '        Return general.nz(mNOMACABADOR, "")
+    '    End Get
+    '    Set(ByVal Value As String)
+    '        If PA = -1 Then Exit Property
+    '        mNOMACABADOR =general.nz(Value, "")
+    '        If tabla.GetChanges Is Nothing Then
+    '            dvForm(pa).Row("NOMACABADOR") =general.nz(Value, "") : guardarDV()
+    '            tabla.AcceptChanges()
+    '        Else
+    '            dvForm(pa).Row("NOMACABADOR") =general.nz(Value, "") : guardarDV()
+    '        End If
+    '    End Set
+    'End Property
+
+    'Private mACABAT As String
+    'Public Property ACABAT() As String
+    '    Get
+    '        If PA = -1 Then Exit Property
+    '        Try
+    '            mACABAT =general.nz(dvForm(pa).Row("ACABAT"), "")
+    '        Catch ex As Exception : End Try
+    '        Return general.nz(mACABAT, "")
+    '    End Get
+    '    Set(ByVal Value As String)
+    '        If PA = -1 Then Exit Property
+    '        If general.nz(Value, "") <>general.nz(ACABAT, "") Then
+    '            mACABAT =general.nz(Value, "")
+    '            dvForm(pa).Row("ACABAT") =general.nz(mACABAT, "") : guardarDV()
+    '        End If
+    '    End Set
+    'End Property
+
+    'Private mPACA As Double
+    'Public Property PACA() As Double
+    '    Get
+    '        If PA = -1 Then Exit Property
+    '        Try
+    '            mPACA = nzn(dvForm(pa).Row("PACA"), 0)
+    '        Catch ex As Exception : End Try
+    '        Return nzn(mPACA, 0)
+    '    End Get
+    '    Set(ByVal Value As Double)
+    '        If PA = -1 Then Exit Property
+    '        If nzn(Value, 0) <> nzn(PACA, 0) Then
+    '            mPACA = nzn(Value, 0)
+    '            dvForm(pa).Row("PACA") = nzn(mPACA, 0) : guardarDV()
+    '        End If
+    '    End Set
+    'End Property
+
+    'Private mCRU As Double
+    'Public Property CRU() As Double
+    '    Get
+    '        If PA = -1 Then Exit Property
+    '        Try
+    '            mCRU = nzn(dvForm(pa).Row("CRU"), 0)
+    '        Catch ex As Exception : End Try
+    '        Return nzn(mCRU, 0)
+    '    End Get
+    '    Set(ByVal Value As Double)
+    '        If PA = -1 Then Exit Property
+    '        If nzn(Value, 0) <> nzn(CRU, 0) Then
+    '            mCRU = nzn(Value, 0)
+    '            dvForm(pa).Row("CRU") = nzn(mCRU, 0) : guardarDV()
+    '        End If
+    '    End Set
+    'End Property
+
+    'Private mAMPLE As String
+    'Public Property AMPLE() As String
+    '    Get
+    '        If PA = -1 Then Exit Property
+    '        Try
+    '            mAMPLE =general.nz(dvForm(pa).Row("AMPLE"), "")
+    '        Catch ex As Exception : End Try
+    '        Return general.nz(mAMPLE, "")
+    '    End Get
+    '    Set(ByVal Value As String)
+    '        If PA = -1 Then Exit Property
+    '        If general.nz(Value, "") <>general.nz(AMPLE, "") Then
+    '            mAMPLE =general.nz(Value, "")
+    '            dvForm(pa).Row("AMPLE") =general.nz(mAMPLE, "") : guardarDV()
+    '        End If
+    '    End Set
+    'End Property
+
+    'Private mRENDIMENT As Double
+    'Public Property RENDIMENT() As Double
+    '    Get
+    '        If PA = -1 Then Exit Property
+    '        Try
+    '            mRENDIMENT = nzn(dvForm(pa).Row("RENDIMENT"), 0)
+    '        Catch ex As Exception : End Try
+    '        Return nzn(mRENDIMENT, 0)
+    '    End Get
+    '    Set(ByVal Value As Double)
+    '        If PA = -1 Then Exit Property
+    '        If nzn(Value, 0) <> nzn(RENDIMENT, 0) Then
+    '            mRENDIMENT = nzn(Value, 0)
+    '            dvForm(pa).Row("RENDIMENT") = nzn(mRENDIMENT, 0) : guardarDV()
+    '        End If
+    '    End Set
+    'End Property
+
+    'Private mMARGE As Double
+    'Public Property MARGE() As Double
+    '    Get
+    '        If PA = -1 Then Exit Property
+    '        Try
+    '            mMARGE = nzn(dvForm(pa).Row("MARGE"), 0)
+    '        Catch ex As Exception : End Try
+    '        Return nzn(mMARGE, 0)
+    '    End Get
+    '    Set(ByVal Value As Double)
+    '        If PA = -1 Then Exit Property
+    '        If nzn(Value, 0) <> nzn(MARGE, 0) Then
+    '            mMARGE = nzn(Value, 0)
+    '            dvForm(pa).Row("MARGE") = nzn(mMARGE, 0) : guardarDV()
+    '        End If
+    '    End Set
+    'End Property
+
+    'Private mGRAMA As Double
+    'Public Property GRAMA() As Double
+    '    Get
+    '        If PA = -1 Then Exit Property
+    '        Try
+    '            mGRAMA = nzn(dvForm(pa).Row("GRAMA"), 0)
+    '        Catch ex As Exception : End Try
+    '        Return nzn(mGRAMA, 0)
+    '    End Get
+    '    Set(ByVal Value As Double)
+    '        If PA = -1 Then Exit Property
+    '        If nzn(Value, 0) <> nzn(GRAMA, 0) Then
+    '            mGRAMA = nzn(Value, 0)
+    '            dvForm(pa).Row("GRAMA") = nzn(mGRAMA, 0) : guardarDV()
+    '        End If
+    '    End Set
+    'End Property
+
+    'Private mPREUM As Double
+    'Public Property PREUM() As Double
+    '    Get
+    '        If PA = -1 Then Exit Property
+    '        Try
+    '            mPREUM = nzn(dvForm(pa).Row("PREUM"), 0)
+    '        Catch ex As Exception : End Try
+    '        Return nzn(mPREUM, 0)
+    '    End Get
+    '    Set(ByVal Value As Double)
+    '        If PA = -1 Then Exit Property
+    '        If nzn(Value, 0) <> nzn(PREUM, 0) Then
+    '            mPREUM = nzn(Value, 0)
+    '            dvForm(pa).Row("PREUM") = nzn(mPREUM, 0) : guardarDV()
+    '        End If
+    '    End Set
+    'End Property
+
+    'Private mPREUK As Double
+    'Public Property PREUK() As Double
+    '    Get
+    '        If PA = -1 Then Exit Property
+    '        Try
+    '            mPREUK = nzn(dvForm(pa).Row("PREUK"), 0)
+    '        Catch ex As Exception : End Try
+    '        Return nzn(mPREUK, 0)
+    '    End Get
+    '    Set(ByVal Value As Double)
+    '        If PA = -1 Then Exit Property
+    '        If nzn(Value, 0) <> nzn(PREUK, 0) Then
+    '            mPREUK = nzn(Value, 0)
+    '            dvForm(pa).Row("PREUK") = nzn(mPREUK, 0) : guardarDV()
+    '        End If
+    '    End Set
+    'End Property
+
+    'Private mSTCRUM As Double
+    'Public Property STCRUM() As Double
+    '    Get
+    '        If PA = -1 Then Exit Property
+    '        Try
+    '            mSTCRUM = nzn(dvForm(pa).Row("STCRUM"), 0)
+    '        Catch ex As Exception : End Try
+    '        Return nzn(mSTCRUM, 0)
+    '    End Get
+    '    Set(ByVal Value As Double)
+    '        If PA = -1 Then Exit Property
+    '        If nzn(Value, 0) <> nzn(STCRUM, 0) Then
+    '            mSTCRUM = nzn(Value, 0)
+    '            dvForm(pa).Row("STCRUM") = nzn(mSTCRUM, 0) : guardarDV()
+    '        End If
+    '    End Set
+    'End Property
+
+    'Private mSTDISPM As Double
+    'Public Property STDISPM() As Double
+    '    Get
+    '        If PA = -1 Then Exit Property
+    '        Try
+    '            mSTDISPM = nzn(dvForm(pa).Row("STDISPM"), 0)
+    '        Catch ex As Exception : End Try
+    '        Return nzn(mSTDISPM, 0)
+    '    End Get
+    '    Set(ByVal Value As Double)
+    '        If PA = -1 Then Exit Property
+    '        If nzn(Value, 0) <> nzn(STDISPM, 0) Then
+    '            mSTDISPM = nzn(Value, 0)
+    '            dvForm(pa).Row("STDISPM") = nzn(mSTDISPM, 0) : guardarDV()
+    '        End If
+    '    End Set
+    'End Property
+
+    'Private mSTCRUK As Double
+    'Public Property STCRUK() As Double
+    '    Get
+    '        If PA = -1 Then Exit Property
+    '        Try
+    '            mSTCRUK = nzn(dvForm(pa).Row("STCRUK"), 0)
+    '        Catch ex As Exception : End Try
+    '        Return nzn(mSTCRUK, 0)
+    '    End Get
+    '    Set(ByVal Value As Double)
+    '        If PA = -1 Then Exit Property
+    '        If nzn(Value, 0) <> nzn(STCRUK, 0) Then
+    '            mSTCRUK = nzn(Value, 0)
+    '            dvForm(pa).Row("STCRUK") = nzn(mSTCRUK, 0) : guardarDV()
+    '        End If
+    '    End Set
+    'End Property
+
+    'Private mSTDISPK As Double
+    'Public Property STDISPK() As Double
+    '    Get
+    '        If PA = -1 Then Exit Property
+    '        Try
+    '            mSTDISPK = nzn(dvForm(pa).Row("STDISPK"), 0)
+    '        Catch ex As Exception : End Try
+    '        Return nzn(mSTDISPK, 0)
+    '    End Get
+    '    Set(ByVal Value As Double)
+    '        If PA = -1 Then Exit Property
+    '        If nzn(Value, 0) <> nzn(STDISPK, 0) Then
+    '            mSTDISPK = nzn(Value, 0)
+    '            dvForm(pa).Row("STDISPK") = nzn(mSTDISPK, 0) : guardarDV()
+    '        End If
+    '    End Set
+    'End Property
+
+    'Private mPREUPERMODEL As Double
+    'Public Property PREUPERMODEL() As Double
+    '    Get
+    '        If PA = -1 Then Exit Property
+    '        Try
+    '            mPREUPERMODEL = nzn(dvForm(pa).Row("PREUPERMODEL"), 0)
+    '        Catch ex As Exception : End Try
+    '        Return nzn(mPREUPERMODEL, 0)
+    '    End Get
+    '    Set(ByVal Value As Double)
+    '        If PA = -1 Then Exit Property
+    '        If nzn(Value, 0) <> nzn(PREUPERMODEL, 0) Then
+    '            mPREUPERMODEL = nzn(Value, 0)
+    '            dvForm(pa).Row("PREUPERMODEL") = nzn(mPREUPERMODEL, 0) : guardarDV()
+    '        End If
+    '    End Set
+    'End Property
+
+#End Region
+
+    Public Sub New(ByVal tabla As DataTable, _
+                ByVal centro As String, ByRef bindingcontext As BindingContext)
+
+        MyBase.New(tabla, centro, bindingcontext, "CODI")
+        Dim sqlSel As String
+        Try
+            'GENERICO
+            sqlSinWhere = "SELECT teixits.* " & _
+                        " FROM teixits "
+            Try
+                UltimoCodigo = CargaParametro("tejido")
+                numeroRegistroActual = ObtenerNumeroRegistro(UltimoCodigo)
+                If numeroRegistroActual = -1 Then
+                    numeroRegistroActual = 0
+                    sqlSel = sqlSinWhere & _
+                            " WHERE teixits.CENTRO = """ & centro & """ ORDER BY teixits.CODI " & _
+                            " LIMIT 1"
+                Else
+                    sqlSel = sqlSinWhere & _
+                              " WHERE teixits.CENTRO = """ & centro & """ AND teixits.CODI = """ & UltimoCodigo & """ ORDER BY teixits.CODI " & _
+                              " LIMIT 1"
+                End If
+
+            Catch ex As Exception
+                sqlSel = sqlSinWhere & _
+                            " WHERE teixits.CENTRO = """ & centro & """ ORDER BY teixits.CODI " & _
+                            " LIMIT 1"
+            End Try
+
+
+            cmdSel.CommandText = sqlSel
+            da.SelectCommand = cmdSel
+            da.Fill(tabla)
+
+            CargarIdentificadores()
+            CargarTablas()
+
+            cartaColores = New clsCartaColoresTejido(New aura2k3.ds11.filcolDataTable, centro, bc, Me)
+            composicion = New clsComposicionTejido(New aura2k3.ds11.matteiDataTable, centro, bc, Me)
+            acabados = New clsAcabadosTejidos(New aura2k3.ds11.acabatsteixitsDataTable, centro, bc, Me)
+
+            PonerNombres()
+            DespertarHandlers()
+
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+
+    Public Overrides Sub CargarIdentificadores()
+        Try
+            CargaTabla(tablaTejidos, CCTeixits, CNTeixits, dtIdentificadores, True)
+            dtIdentificadores.Columns(CCTeixits).Caption = rm.GetString("CODIGO")
+            dtIdentificadores.Columns(CNTeixits).Caption = rm.GetString("DESCRIPCION")
+            dvIdentificadores.RowFilter = "CENTRO = '" & centro & "' "
+            dvIdentificadores.Sort = CCTeixits
+
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Sub
+
+#Region "DESPLAZAMIENTO"
+
+    Public Overloads Sub SiguienteReg()
+        Try
+            MyBase.SiguienteReg()
+            MoverActual()
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Public Overloads Sub AnteriorReg()
+        Try
+            MyBase.AnteriorReg()
+            MoverActual()
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Public Overloads Sub UltimoReg()
+        Try
+            MyBase.UltimoReg()
+            MoverActual()
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Public Overloads Sub PrimeroReg()
+        Try
+            MyBase.PrimeroReg()
+            MoverActual()
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Public Overloads Sub CambiarAReg(ByVal id As String, ByVal accion As Integer)
+        Dim sql As String
+        Try
+            sql = "SELECT CODI FROM teixits WHERE (CENTRO = """ & centro & """ AND NOM = """ & id & """)"
+            MyBase.CambiarAReg(id, "", accion)
+            MoverActual()
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub MoverActual()
+        Try
+            guardarDV()
+
+            cartaColores.CambioDetalle(Me.centro, Me)
+            composicion.CambioDetalle(Me.centro, Me)
+            acabados.CambioDetalle(Me.centro, Me)
+            PonerNombres()
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+
+#End Region
+
+#Region "ORGANIZAR"
+
+    Private Sub DespertarHandlers()
+        AddHandler tabla.ColumnChanged, New DataColumnChangeEventHandler(AddressOf CanviarColumnaTejidos)
+    End Sub
+    Private Sub DormirHandlers()
+        RemoveHandler tabla.ColumnChanged, New DataColumnChangeEventHandler(AddressOf CanviarColumnaTejidos)
+    End Sub
+
+    Public Sub HacerCalculos(ByVal calcularTodo As Boolean)
+
+        Dim i As Integer
+        Dim total As Double = 0
+        Dim actualizarDetalle As Boolean = False
+        Try
+            If pasarDeTodo = False Then
+                DormirHandlers()
+                cartaColores.DormirHandlers()
+                guardarDV()
+                acabados.PonerPrecioAcabados()
+                If Not tabla.GetChanges Is Nothing OrElse Not cartaColores.tabla.GetChanges Is Nothing OrElse Not composicion.tabla.GetChanges Is Nothing Then
+
+                    total = sumaTotal("IMPORT", composicion.dvForm)
+                    If MATERIA <> total Then
+                        If calcularTodo Then MATERIA = total
+                        'Esto para que pueda poner el total materia manualmente
+                        actualizarDetalle = True
+                    End If
+
+                    total = roundnum(MATERIA + PTEIXIR + PESTAM + PACA, 2)
+                    If CRU <> total Then
+                        CRU = total
+                        actualizarDetalle = True
+                    End If
+
+                    'Calculos colores
+                    For i = 0 To cartaColores.dvForm.Count - 1
+                        'With cartaColores.dvForm(i)
+                        If cartaColores.dvForm(i).Item("PREU") <> roundnum(CRU + nzn(cartaColores.dvForm(i).Item("TINTAR"), 0), 2) Then
+                            cartaColores.dvForm(i).Item("PREU") = roundnum(CRU + nzn(cartaColores.dvForm(i).Item("TINTAR"), 0), 2)
+                            cartaColores.guardarDV()
+                        End If
+
+                        If cartaColores.dvForm(i).Item("KG") <> roundnum(nzn(cartaColores.dvForm(i).Item("PREU"), 0) / (1 - MARGE / 100), 2) Then
+                            cartaColores.dvForm(i).Item("KG") = roundnum(nzn(cartaColores.dvForm(i).Item("PREU"), 0) / (1 - MARGE / 100), 2)
+                            cartaColores.guardarDV()
+                        End If
+                        'If .Item("METRES") <> roundnum(nzn(.Item("KG"), 0) / IIf(RENDIMENT = 0, 1, RENDIMENT), 2) Then
+                        '    .Item("METRES") = roundnum(nzn(.Item("KG"), 0) / IIf(RENDIMENT = 0, 1, RENDIMENT), 2)
+                        '    cartaColores.guardarDV()
+                        'End If
+                        If cartaColores.dvForm(i).Item("METRES") <> roundnum(nzn(cartaColores.dvForm(i).Item("PREU"), 0) / (1 - MARGE / 100) / IIf(RENDIMENT = 0, 1, RENDIMENT), 2) Then
+                            cartaColores.dvForm(i).Item("METRES") = roundnum(nzn(cartaColores.dvForm(i).Item("PREU"), 0) / (1 - MARGE / 100) / IIf(RENDIMENT = 0, 1, RENDIMENT), 2)
+                            cartaColores.guardarDV()
+                        End If
+                        'End With
+                    Next
+                End If
+                DespertarHandlers()
+                cartaColores.DespertarHandlers()
+            End If
+
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub CanviarColumnaTejidos(ByVal sender As Object, ByVal e As DataColumnChangeEventArgs)
+        Try
+            HacerCalculos(False)
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub CargarTablas()
+        Try
+            CargaTabla("maqui", "CODI", "DESCRI", dtMaqui, True)
+            CargaTabla(tablaTalleres, CCTallers, CNTallers, dtTallers, True, centro)
+            CargaTabla(tablaProveedores, CCProve, CNProve, dtProve, True)
+            CargaTabla("IVA", "CODI", "DESCRIPCIO", dtIVA, True, centro)
+            CargaTablaHilos()
+
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Sub
+    Private Sub CargaTablaHilos()
+        Dim a As New ArrayList
+        Dim i As Integer
+        Try
+            a.Add(CCFil)
+            a.Add(CNFil)
+            a.Add("COST")
+            a.Add("PROVE")
+            CargaTabla(tablaHilos, a, dtHilos, True)
+            If Not dtHilos.Columns.Contains("NOMPROVE") Then
+                dtHilos.Columns.Add("NOMPROVE")
+            End If
+            'Los strings que se vean correctamte en el cboid
+            dtHilos.Columns("NOMPROVE").Caption = rm.GetString("NOMPROVE")
+            dtHilos.Columns("CODI").Caption = rm.GetString("CODIGO")
+            dtHilos.Columns("COST").Caption = rm.GetString("COSTE")
+            dtHilos.Columns("DESCRI").Caption = rm.GetString("DESCRIPCION")
+
+            'Le ponemos los nombres a los proveedores
+            For i = 0 To dtHilos.Rows.Count - 1
+                dtHilos.Rows(i).Item("NOMPROVE") = general.OBN(dtHilos.Rows(i).Item("PROVE"), dtProve)
+            Next
+
+            dvHilos = dtHilos.DefaultView
+            dvHilos.Sort = CCFil
+            dvHilos.RowFilter = "CENTRO = '" & centro & "' "
+
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Sub
+    Public Sub RecalcularRendimiento()
+        Try
+
+            STDISPK = roundnum(STDISPM * RENDIMENT, 2)
+            STCRUK = roundnum(STCRUM * RENDIMENT, 2)
+            STCRUM = roundnum(STCRUK / RENDIMENT, 2)
+            STDISPM = roundnum(STDISPK / RENDIMENT, 2)
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Public Overloads Sub NuevoRegistro()
+        'Try
+        'MyBase.NuevoRegistro()
+        '    MoverActual()
+        'Catch ex As Exception
+        '    LOG(ex.ToString) : cargando = False : CCN()
+        'End Try
+        Dim drNew As DataRow
+        Try
+            ActualizarOrigen()
+            tabla.Clear()
+            drNew = tabla.NewRow()
+
+            drNew.Item("CODI") = ""
+            drNew.Item("CENTRO") = centro
+            drNew.Item("TUBULAR") = 0
+
+            tabla.Rows.Add(drNew)
+            numeroRegistros = numeroRegistros + 1
+            Try
+                guardarDV()
+            Catch ex As Exception
+            End Try
+            MoverActual()
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+
+    Public Overrides Sub ActualizarOrigen(Optional ByVal nocerrar As Boolean = False, Optional ByVal hackDetalle As Boolean = False)
+        Try
+
+            MyBase.ActualizarOrigen(True)
+            cartaColores.ActualizarOrigen(True, True)
+            acabados.ActualizarOrigen(True, True)
+            composicion.ActualizarOrigen(True, True)
+            MoverActual()
+
+        Catch ex As Exception
+            Throw ex
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Public Overloads Sub borrar()
+        Try
+            MyBase.borrar()
+            cartaColores.borrar()
+            composicion.borrar()
+            acabados.borrar()
+            ActualizarOrigen()
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+
+#End Region
+
+#Region "PONERNOMBRES"
+
+    Friend Overrides Sub PonerNombres()
+        Dim aceptarCambiosAlFinal As Boolean = False
+        Try
+            If tabla.GetChanges Is Nothing Then aceptarCambiosAlFinal = True
+            NOMACABADOR = general.OBN(ACABADOR, dtTallers)
+            NOMTEIXIDOR = general.OBN(TEIXIDOR, dtTallers)
+            NOMESTAMPADOR = general.OBN(ESTAMPADOR, dtTallers)
+            NOMMAQUI = general.OBN(MAQUI, dtMaqui, "DESCRI")
+            If aceptarCambiosAlFinal AndAlso (Not tabla.GetChanges Is Nothing) Then tabla.AcceptChanges()
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False
+        End Try
+    End Sub
+
+#End Region
+
+#Region "OVERRIDES"
+
+    Friend Overrides Function TieneCambios() As Boolean
+        Try
+            guardarDV()
+            If Not tabla.GetChanges Is Nothing OrElse cartaColores.TieneCambios OrElse acabados.TieneCambios Then
+                Return True
+            Else
+                Return False
+            End If
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Function
+    Friend Overrides Function genWhere() As String
+        Try
+            Dim ret As String
+
+            ret = "WHERE " & tabla.TableName & ".CENTRO = """ & centro & """"
+
+            Return ret
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Function
+    Friend Overrides Function GenOrder() As String
+        Try
+            Return " ORDER BY CODI "
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Function
+    Friend Overrides Function ObtenerNumeroRegistro(ByVal id As Object) As Integer
+        If id Is Nothing Then
+            id = CODI
+        End If
+
+        Dim cmd As New MySqlCommand(" SELECT " & _
+           " (SELECT COUNT(*) " & _
+           " FROM " & tabla.TableName & " AS M2 WHERE " & _
+           " M2.CODI < M1.CODI AND  " & WCNoTabla() & " ) AS rownum FROM " & tabla.TableName & " AS M1  WHERE CODI = """ & id & """ AND " & WCNoTabla() & GenOrder(), cnn)
+        Try
+            Dim idx As Object = cmd.ExecuteScalar()
+            If idx Is Nothing Then Return -1
+            Return idx '- 1
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Function
+    Friend Overrides Function genWhereNumeroRegistros() As String
+        Try
+            Return genWhere()
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Function
+
+#End Region
+
+#Region "IMPRESION"
+
+    Private Function CrearTablaFichaTecnica() As DataTable
+        Try
+            'Ahora con direcciones de envio
+            Dim dt As New DataTable("FICHATECNICATEJIDOS")
+            Dim dr As DataRow
+            Dim i As Integer
+            dt.Columns.Add(New DataColumn("CODI"))
+            dt.Columns("CODI").DefaultValue = CODI
+
+            dt.Columns.Add(New DataColumn("DESCRI"))
+            dt.Columns("DESCRI").DefaultValue = DESCRI
+
+            dt.Columns.Add(New DataColumn("ANCHO"))
+            dt.Columns("ANCHO").DefaultValue = AMPLE
+
+            'dt.Columns.Add(New DataColumn("ANCHO"))
+            'dt.Columns("ANCHO2").DefaultValue = AMPLE2
+
+            dt.Columns.Add(New DataColumn("COMPOSICION"))
+            dt.Columns("COMPOSICION").DefaultValue = NRO
+
+            dt.Columns.Add(New DataColumn("RENDIMIENTO"))
+            dt.Columns("RENDIMIENTO").DefaultValue = RENDIMENT
+
+            dt.Columns.Add(New DataColumn("GRAMAJE"))
+            dt.Columns("GRAMAJE").DefaultValue = GRAMA
+
+            dt.Columns.Add(New DataColumn("PRECIOPRODUCCION"))
+            dt.Columns("PRECIOPRODUCCION").DefaultValue = PREUM
+
+            dt.Columns.Add(New DataColumn("PRECIOMUESTRARIO"))
+            dt.Columns("PRECIOMUESTRARIO").DefaultValue = PREUPERMODEL
+
+            dr = dt.NewRow
+            dt.Rows.Add(dr)
+
+            Dim dsTEMPORAL As New DataSet
+            dsTEMPORAL.Tables.Add(dt)
+            dsTEMPORAL.WriteXml(CurDir() & "\tablas.xml")
+            Return dt
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Function
+    Public Function imprimirFicha() As Drawing.Printing.PrintDocument
+        Try
+            Dim c1r As New C1.C1Report.C1Report
+            c1r.Load(CurDir() & "\informes\informes.xml", "FICHATECNICATEJIDOS")
+            c1r.DataSource.Recordset = CrearTablaFichaTecnica()
+            Return (c1r.Document)
+
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Function
+
+#Region "IMPRESION ETIQUETAS"
+    Private Function CrearTablaEtiquetas(ByVal CANTIDAD As Integer) As DataTable
+        Try
+            'Ahora con direcciones de envio
+            Dim dt As New DataTable("ETIQUETASTEJIDO")
+            Dim dr As DataRow
+            Dim i As Integer
+            dt.Columns.Add(New DataColumn("CODI"))
+            dt.Columns("CODI").DefaultValue = CODI
+
+            dt.Columns.Add(New DataColumn("COMPOSICION"))
+            dt.Columns("COMPOSICION").DefaultValue = NRO
+
+            dt.Columns.Add(New DataColumn("ANCHO"))
+            dt.Columns("ANCHO").DefaultValue = AMPLE
+
+            'dt.Columns.Add(New DataColumn("ANCHO"))
+            'dt.Columns("ANCHO").DefaultValue = AMPLE2
+
+            dt.Columns.Add(New DataColumn("RENDIMIENTO"))
+            dt.Columns("RENDIMIENTO").DefaultValue = RENDIMENT
+
+            dt.Columns.Add(New DataColumn("GRAMAJE"))
+            dt.Columns("GRAMAJE").DefaultValue = GRAMA
+
+            dt.Columns.Add(New DataColumn("PRECIOMETRO"))
+            dt.Columns("PRECIOMETRO").DefaultValue = PREUM
+
+            dt.Columns.Add(New DataColumn("PRECIOKG"))
+            dt.Columns("PRECIOKG").DefaultValue = PREUK
+
+            dt.Columns.Add(New DataColumn("PRECIOUNIDAD"))
+            dt.Columns("PRECIOUNIDAD").DefaultValue = ""
+
+            For i = 0 To CANTIDAD - 1
+                dr = dt.NewRow
+                dt.Rows.Add(dr)
+            Next
+            Dim dsTEMPORAL As New DataSet
+            dsTEMPORAL.Tables.Add(dt)
+            dsTEMPORAL.WriteXml(CurDir() & "\c1.xml")
+            Return dt
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Function
+    Public Function imprimirEtiquetas(ByVal cantidad As Integer) As Drawing.Printing.PrintDocument
+        Try
+            Dim c1r As New C1.C1Report.C1Report
+            c1r.Load(CurDir() & "\informes\informes.xml", "ETIQUETASTEJIDO")
+            c1r.Layout.CustomHeight = AltoEtiquetaTejido * twins2mm * cantidad
+            c1r.DataSource.Recordset = CrearTablaEtiquetas(cantidad)
+            'c1r.Document.Print()
+            Return c1r.Document
+
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Function
+
+#End Region
+#End Region
+
+    Public Overloads Function cambioCentro(ByVal centro As Char, ByVal iralregistro As Integer) As Boolean
+        Try
+            If MyBase.cambioCentro(centro, iralregistro) Then
+                MoverActual()
+                Return True
+            Else
+                Return False
+            End If
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Function
+    ' Generar la tabla dtValoracion
+
+    Public Sub GenerarValoracionStock()
+        Dim strSQL As String
+        Dim cmdSelect As MySqlCommand
+
+        strSQL = "SELECT CODIGOTEJIDO, " &
+                        " STCRUK AS STOCKTOTALCRUDO, " &
+                        " STCRUK * CRU AS VALORSTOCKCRUDO, " &
+                        " DESCRI, " &
+                        " CODIGOTEJEDOR, " &
+                        " NOMBRETEJEDOR, " &
+                        " SUM(SUMASTOCK) AS STOCKTOTAL, " &
+                        " SUM(VALORACION) AS VALORACION " &
+                        " FROM (SELECT ROUND(SUM(ACTUAL) * FILCOL.METRES,2) AS VALORACION, " &
+                        " SUM(ACTUAL) AS SUMASTOCK, " &
+                        " TEIXITS.TEIXIDOR AS CODIGOTEJEDOR, TEIXITS.STCRUK, TEIXITS.CRU," &
+                        " PROVE.NOM AS NOMBRETEJEDOR, " &
+                        " TEIXITS.CODI AS CODIGOTEJIDO, " &
+                        " TEIXITS.DESCRI " &
+                        " FROM FILCOL RIGHT JOIN TEIXITS ON (FILCOL.FIL = TEIXITS.CODI AND TEIXITS.CENTRO = FILCOL.CENTRO) LEFT JOIN PROVE ON PROVE.CODI = TEIXITS.TEIXIDOR WHERE FILCOL.TIPUS = ""T"" AND FILCOL.CENTRO = """ & centro & """ GROUP BY FILCOL.FIL, FILCOL.COLOR) AS TOTAL GROUP BY CODIGOTEJIDO"
+
+        cmdSelect = New MySqlCommand(strSQL, cnn)
+        ACN()
+        Dim da As New MySqlDataAdapter(cmdSelect)
+        dtValoracion = New DataTable("dtValoracion")
+        da.Fill(dtValoracion)
+        'dtValoracion = New DataTable(cmdSelect)
+        'dtValoracion.Fill()
+        CCN()
+    End Sub
+
+    Public Sub MetroLineal(ample As Double, gramtge As Double)
+        If ample <> 0 And gramtge <> 0 Then
+            MLINEAL = CDbl(gramtge * IIf(TUBULAR, ample * 2, ample))
+        Else
+            MLINEAL = 0
+        End If
+    End Sub
+End Class

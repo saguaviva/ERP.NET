@@ -1,0 +1,1474 @@
+Imports CoreLab.MySql
+Imports Access = Microsoft.Office.Interop.Access
+
+Public Class frmDesgloseMuestraColorMaquina
+    Inherits aura2k3.frmBase
+
+#Region " Código generado por el Diseñador de Windows Forms "
+
+    Public Sub New()
+        MyBase.New()
+
+        'El Diseñador de Windows Forms requiere esta llamada.
+        InitializeComponent() : Dim tom As SMcMaster.TabOrderManager = New SMcMaster.TabOrderManager(Me) : tom.SetTabOrder(SMcMaster.TabOrderManager.TabScheme.AcrossFirst)
+
+        'Agregar cualquier inicialización después de la llamada a InitializeComponent()
+
+    End Sub
+
+    'Form reemplaza a Dispose para limpiar la lista de componentes.
+    Protected Overloads Overrides Sub Dispose(ByVal disposing As Boolean)
+        If disposing Then
+            If Not (components Is Nothing) Then
+                components.Dispose()
+            End If
+        End If
+       MyBase.Dispose(disposing)
+    End Sub
+
+    'Requerido por el Diseñador de Windows Forms
+    Private components As System.ComponentModel.IContainer
+
+    'NOTA: el Diseñador de Windows Forms requiere el siguiente procedimiento
+    'Puede modificarse utilizando el Diseñador de Windows Forms. 
+    'No lo modifique con el editor de código.
+    Friend WithEvents lblCodiMostra As Label
+    Friend WithEvents lblCliente As Label
+
+    Friend WithEvents lblBanc As Label
+    Friend WithEvents lblVelocidad As Label
+    Friend WithEvents lblAgujas As Label
+    Friend WithEvents lblImporte As Label
+    Friend WithEvents lblTalla As Label
+    Friend WithEvents lblColor As Label
+    Friend WithEvents lblDescripcionMuestra As Label
+
+    Friend WithEvents GroupBox1 As System.Windows.Forms.GroupBox
+    Friend WithEvents GroupBox2 As System.Windows.Forms.GroupBox
+    Friend WithEvents lblDiskette As Label
+    Friend WithEvents dgDesglose As C1.Win.C1TrueDBGrid.C1TrueDBGrid
+    Friend WithEvents cboHilos As C1.Win.C1TrueDBGrid.C1TrueDBDropdown
+    Friend WithEvents cboColores As C1.Win.C1TrueDBGrid.C1TrueDBDropdown
+    Friend WithEvents cboProveedores As C1.Win.C1TrueDBGrid.C1TrueDBDropdown
+    Friend WithEvents btnAceptar As NETXP.Controls.XPButton
+    Friend WithEvents lblDesglose As System.Windows.Forms.Label
+    Friend WithEvents txtNOMMAQUI As C1.Win.C1Input.C1TextBox
+    Friend WithEvents txtMAQUINA As C1.Win.C1Input.C1TextBox
+    Friend WithEvents txtAGULLES As C1.Win.C1Input.C1TextBox
+    Friend WithEvents txtVELOSITAT As C1.Win.C1Input.C1TextBox
+    Friend WithEvents txtDISCO As C1.Win.C1Input.C1TextBox
+    Friend WithEvents txtTEMPS As C1.Win.C1Input.C1TextBox
+    Friend WithEvents txtIMPORT As C1.Win.C1Input.C1TextBox
+    Friend WithEvents txtCLIENT As C1.Win.C1Input.C1TextBox
+    Friend WithEvents txtNOMCLIENT As C1.Win.C1Input.C1TextBox
+    Friend WithEvents txtCODI As C1.Win.C1Input.C1TextBox
+    Friend WithEvents txtTALLA As C1.Win.C1Input.C1TextBox
+    Friend WithEvents txtCOLOR As C1.Win.C1Input.C1TextBox
+    Friend WithEvents dtpDATA As C1.Win.C1Input.C1DateEdit
+    Friend WithEvents txtNOTAS As C1.Win.C1Input.C1TextBox
+    Friend WithEvents TabControl1 As System.Windows.Forms.TabControl
+    Friend WithEvents TabPage1 As System.Windows.Forms.TabPage
+    Friend WithEvents TabPage2 As System.Windows.Forms.TabPage
+    Friend WithEvents ppFitxa As C1.Win.C1PrintPreview.C1PrintPreview
+    Friend WithEvents c1pBtnFileOpen1 As C1.Win.C1PrintPreview.PreviewToolBarButton
+    Friend WithEvents c1pBtnFileSave1 As C1.Win.C1PrintPreview.PreviewToolBarButton
+    Friend WithEvents c1pBtnFilePrint1 As C1.Win.C1PrintPreview.PreviewToolBarButton
+    Friend WithEvents c1pBtnPageSetup1 As C1.Win.C1PrintPreview.PreviewToolBarButton
+    Friend WithEvents c1pBtnReflow1 As C1.Win.C1PrintPreview.PreviewToolBarButton
+    Friend WithEvents c1pBtnStop1 As C1.Win.C1PrintPreview.PreviewToolBarButton
+    Friend WithEvents c1pBtnDocInfo1 As C1.Win.C1PrintPreview.PreviewToolBarButton
+    Friend WithEvents c1pBtnSeparator1 As C1.Win.C1PrintPreview.PreviewToolBarButton
+    Friend WithEvents c1pBtnShowNavigationBar1 As C1.Win.C1PrintPreview.PreviewToolBarButton
+    Friend WithEvents c1pBtnSeparator2 As C1.Win.C1PrintPreview.PreviewToolBarButton
+    Friend WithEvents c1pBtnMouseHand1 As C1.Win.C1PrintPreview.PreviewToolBarButton
+    Friend WithEvents c1pBtnMouseZoom1 As C1.Win.C1PrintPreview.PreviewToolBarButton
+    Friend WithEvents c1pBtnMouseZoomOut1 As C1.Win.C1PrintPreview.PreviewToolBarButton
+    Friend WithEvents c1pBtnMouseSelect1 As C1.Win.C1PrintPreview.PreviewToolBarButton
+    Friend WithEvents c1pBtnFindText1 As C1.Win.C1PrintPreview.PreviewToolBarButton
+    Friend WithEvents c1pBtnSeparator3 As C1.Win.C1PrintPreview.PreviewToolBarButton
+    Friend WithEvents c1pBtnGoFirst1 As C1.Win.C1PrintPreview.PreviewToolBarButton
+    Friend WithEvents c1pBtnGoPrev1 As C1.Win.C1PrintPreview.PreviewToolBarButton
+    Friend WithEvents c1pBtnGoNext1 As C1.Win.C1PrintPreview.PreviewToolBarButton
+    Friend WithEvents c1pBtnGoLast1 As C1.Win.C1PrintPreview.PreviewToolBarButton
+    Friend WithEvents c1pBtnSeparator4 As C1.Win.C1PrintPreview.PreviewToolBarButton
+    Friend WithEvents c1pBtnHistoryPrev1 As C1.Win.C1PrintPreview.PreviewToolBarButton
+    Friend WithEvents c1pBtnHistoryNext1 As C1.Win.C1PrintPreview.PreviewToolBarButton
+    Friend WithEvents c1pBtnSeparator5 As C1.Win.C1PrintPreview.PreviewToolBarButton
+    Friend WithEvents c1pBtnZoomOut1 As C1.Win.C1PrintPreview.PreviewToolBarButton
+    Friend WithEvents c1pBtnZoomIn1 As C1.Win.C1PrintPreview.PreviewToolBarButton
+    Friend WithEvents c1pBtnSeparator6 As C1.Win.C1PrintPreview.PreviewToolBarButton
+    Friend WithEvents c1pBtnViewActualSize1 As C1.Win.C1PrintPreview.PreviewToolBarButton
+    Friend WithEvents c1pBtnViewFullPage1 As C1.Win.C1PrintPreview.PreviewToolBarButton
+    Friend WithEvents c1pBtnViewPageWidth1 As C1.Win.C1PrintPreview.PreviewToolBarButton
+    Friend WithEvents c1pBtnViewTwoPages1 As C1.Win.C1PrintPreview.PreviewToolBarButton
+    Friend WithEvents c1pBtnViewFourPages1 As C1.Win.C1PrintPreview.PreviewToolBarButton
+    Friend WithEvents c1pBtnSeparator7 As C1.Win.C1PrintPreview.PreviewToolBarButton
+    Friend WithEvents c1pBtnHelp1 As C1.Win.C1PrintPreview.PreviewToolBarButton
+    Friend WithEvents lblTiempoMaquina As System.Windows.Forms.Label
+    Friend WithEvents txtCORTES As C1.Win.C1Input.C1TextBox
+    Friend WithEvents lblCORTES As System.Windows.Forms.Label
+    Friend WithEvents txtDESCRIP As C1.Win.C1Input.C1TextBox
+    <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
+        Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(frmDesgloseMuestraColorMaquina))
+        Me.lblCodiMostra = New System.Windows.Forms.Label
+        Me.lblCliente = New System.Windows.Forms.Label
+        Me.lblDesglose = New System.Windows.Forms.Label
+        Me.lblBanc = New System.Windows.Forms.Label
+        Me.lblVelocidad = New System.Windows.Forms.Label
+        Me.lblAgujas = New System.Windows.Forms.Label
+        Me.lblImporte = New System.Windows.Forms.Label
+        Me.lblTalla = New System.Windows.Forms.Label
+        Me.lblColor = New System.Windows.Forms.Label
+        Me.lblDescripcionMuestra = New System.Windows.Forms.Label
+        Me.GroupBox1 = New System.Windows.Forms.GroupBox
+        Me.txtCODI = New C1.Win.C1Input.C1TextBox
+        Me.txtNOMCLIENT = New C1.Win.C1Input.C1TextBox
+        Me.txtCLIENT = New C1.Win.C1Input.C1TextBox
+        Me.dtpDATA = New C1.Win.C1Input.C1DateEdit
+        Me.GroupBox2 = New System.Windows.Forms.GroupBox
+        Me.txtCORTES = New C1.Win.C1Input.C1TextBox
+        Me.lblCORTES = New System.Windows.Forms.Label
+        Me.lblTiempoMaquina = New System.Windows.Forms.Label
+        Me.txtIMPORT = New C1.Win.C1Input.C1TextBox
+        Me.txtTEMPS = New C1.Win.C1Input.C1TextBox
+        Me.txtDISCO = New C1.Win.C1Input.C1TextBox
+        Me.txtVELOSITAT = New C1.Win.C1Input.C1TextBox
+        Me.txtAGULLES = New C1.Win.C1Input.C1TextBox
+        Me.txtMAQUINA = New C1.Win.C1Input.C1TextBox
+        Me.txtNOMMAQUI = New C1.Win.C1Input.C1TextBox
+        Me.lblDiskette = New System.Windows.Forms.Label
+        Me.cboHilos = New C1.Win.C1TrueDBGrid.C1TrueDBDropdown
+        Me.dgDesglose = New C1.Win.C1TrueDBGrid.C1TrueDBGrid
+        Me.cboColores = New C1.Win.C1TrueDBGrid.C1TrueDBDropdown
+        Me.cboProveedores = New C1.Win.C1TrueDBGrid.C1TrueDBDropdown
+        Me.btnAceptar = New NETXP.Controls.XPButton
+        Me.txtDESCRIP = New C1.Win.C1Input.C1TextBox
+        Me.txtTALLA = New C1.Win.C1Input.C1TextBox
+        Me.txtCOLOR = New C1.Win.C1Input.C1TextBox
+        Me.txtNOTAS = New C1.Win.C1Input.C1TextBox
+        Me.TabControl1 = New System.Windows.Forms.TabControl
+        Me.TabPage1 = New System.Windows.Forms.TabPage
+        Me.TabPage2 = New System.Windows.Forms.TabPage
+        Me.ppFitxa = New C1.Win.C1PrintPreview.C1PrintPreview
+        Me.c1pBtnFileOpen1 = New C1.Win.C1PrintPreview.PreviewToolBarButton
+        Me.c1pBtnFileSave1 = New C1.Win.C1PrintPreview.PreviewToolBarButton
+        Me.c1pBtnFilePrint1 = New C1.Win.C1PrintPreview.PreviewToolBarButton
+        Me.c1pBtnPageSetup1 = New C1.Win.C1PrintPreview.PreviewToolBarButton
+        Me.c1pBtnReflow1 = New C1.Win.C1PrintPreview.PreviewToolBarButton
+        Me.c1pBtnStop1 = New C1.Win.C1PrintPreview.PreviewToolBarButton
+        Me.c1pBtnDocInfo1 = New C1.Win.C1PrintPreview.PreviewToolBarButton
+        Me.c1pBtnSeparator1 = New C1.Win.C1PrintPreview.PreviewToolBarButton
+        Me.c1pBtnShowNavigationBar1 = New C1.Win.C1PrintPreview.PreviewToolBarButton
+        Me.c1pBtnSeparator2 = New C1.Win.C1PrintPreview.PreviewToolBarButton
+        Me.c1pBtnMouseHand1 = New C1.Win.C1PrintPreview.PreviewToolBarButton
+        Me.c1pBtnMouseZoom1 = New C1.Win.C1PrintPreview.PreviewToolBarButton
+        Me.c1pBtnMouseZoomOut1 = New C1.Win.C1PrintPreview.PreviewToolBarButton
+        Me.c1pBtnMouseSelect1 = New C1.Win.C1PrintPreview.PreviewToolBarButton
+        Me.c1pBtnFindText1 = New C1.Win.C1PrintPreview.PreviewToolBarButton
+        Me.c1pBtnSeparator3 = New C1.Win.C1PrintPreview.PreviewToolBarButton
+        Me.c1pBtnGoFirst1 = New C1.Win.C1PrintPreview.PreviewToolBarButton
+        Me.c1pBtnGoPrev1 = New C1.Win.C1PrintPreview.PreviewToolBarButton
+        Me.c1pBtnGoNext1 = New C1.Win.C1PrintPreview.PreviewToolBarButton
+        Me.c1pBtnGoLast1 = New C1.Win.C1PrintPreview.PreviewToolBarButton
+        Me.c1pBtnSeparator4 = New C1.Win.C1PrintPreview.PreviewToolBarButton
+        Me.c1pBtnHistoryPrev1 = New C1.Win.C1PrintPreview.PreviewToolBarButton
+        Me.c1pBtnHistoryNext1 = New C1.Win.C1PrintPreview.PreviewToolBarButton
+        Me.c1pBtnSeparator5 = New C1.Win.C1PrintPreview.PreviewToolBarButton
+        Me.c1pBtnZoomOut1 = New C1.Win.C1PrintPreview.PreviewToolBarButton
+        Me.c1pBtnZoomIn1 = New C1.Win.C1PrintPreview.PreviewToolBarButton
+        Me.c1pBtnSeparator6 = New C1.Win.C1PrintPreview.PreviewToolBarButton
+        Me.c1pBtnViewActualSize1 = New C1.Win.C1PrintPreview.PreviewToolBarButton
+        Me.c1pBtnViewFullPage1 = New C1.Win.C1PrintPreview.PreviewToolBarButton
+        Me.c1pBtnViewPageWidth1 = New C1.Win.C1PrintPreview.PreviewToolBarButton
+        Me.c1pBtnViewTwoPages1 = New C1.Win.C1PrintPreview.PreviewToolBarButton
+        Me.c1pBtnViewFourPages1 = New C1.Win.C1PrintPreview.PreviewToolBarButton
+        Me.c1pBtnSeparator7 = New C1.Win.C1PrintPreview.PreviewToolBarButton
+        Me.c1pBtnHelp1 = New C1.Win.C1PrintPreview.PreviewToolBarButton
+        Me.GroupBox1.SuspendLayout()
+        CType(Me.txtCODI, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.txtNOMCLIENT, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.txtCLIENT, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.dtpDATA, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.GroupBox2.SuspendLayout()
+        CType(Me.txtCORTES, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.txtIMPORT, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.txtTEMPS, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.txtDISCO, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.txtVELOSITAT, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.txtAGULLES, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.txtMAQUINA, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.txtNOMMAQUI, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.cboHilos, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.dgDesglose, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.cboColores, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.cboProveedores, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.txtDESCRIP, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.txtTALLA, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.txtCOLOR, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.txtNOTAS, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.TabControl1.SuspendLayout()
+        Me.TabPage1.SuspendLayout()
+        Me.TabPage2.SuspendLayout()
+        CType(Me.ppFitxa, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.SuspendLayout()
+        '
+        'cboSeleccionCentro
+        '
+        Me.cboSeleccionCentro.Name = "cboSeleccionCentro"
+        '
+        'btnVerLista
+        '
+        Me.btnVerLista.Location = New System.Drawing.Point(374, 74)
+        Me.btnVerLista.Name = "btnVerLista"
+        '
+        'btnActualizar
+        '
+        Me.btnActualizar.Location = New System.Drawing.Point(60, 74)
+        Me.btnActualizar.Name = "btnActualizar"
+        '
+        'btnNuevo
+        '
+        Me.btnNuevo.Location = New System.Drawing.Point(248, 74)
+        Me.btnNuevo.Name = "btnNuevo"
+        '
+        'btnBorrar
+        '
+        Me.btnBorrar.Location = New System.Drawing.Point(150, 94)
+        Me.btnBorrar.Name = "btnBorrar"
+        '
+        'btnTancar
+        '
+        Me.btnTancar.Location = New System.Drawing.Point(374, 94)
+        Me.btnTancar.Name = "btnTancar"
+        '
+        'btnModificar
+        '
+        Me.btnModificar.Location = New System.Drawing.Point(150, 74)
+        Me.btnModificar.Name = "btnModificar"
+        '
+        'btnUltimo
+        '
+        Me.btnUltimo.Location = New System.Drawing.Point(330, 74)
+        Me.btnUltimo.Name = "btnUltimo"
+        '
+        'btnPrimero
+        '
+        Me.btnPrimero.Location = New System.Drawing.Point(28, 74)
+        Me.btnPrimero.Name = "btnPrimero"
+        '
+        'arrayGrids
+        '
+        Me.arrayGrids.Controls.AddRange(New System.Windows.Forms.Control() {Me.dgDesglose})
+        '
+        'arrayTextBox
+        '
+        Me.arrayTextBox.Controls.AddRange(New System.Windows.Forms.Control() {Me.txtAGULLES, Me.txtCLIENT, Me.txtCODI, Me.txtCOLOR, Me.txtDESCRIP, Me.txtDISCO, Me.txtIMPORT, Me.txtMAQUINA, Me.txtNOMCLIENT, Me.txtNOMMAQUI, Me.txtNOTAS, Me.txtTALLA, Me.txtTEMPS, Me.txtVELOSITAT, Me.txtCORTES})
+        '
+        'btnAnterior
+        '
+        Me.btnAnterior.Location = New System.Drawing.Point(28, 94)
+        Me.btnAnterior.Name = "btnAnterior"
+        '
+        'btnSiguiente
+        '
+        Me.btnSiguiente.Location = New System.Drawing.Point(330, 94)
+        Me.btnSiguiente.Name = "btnSiguiente"
+        '
+        'arrayDateTime
+        '
+        Me.arrayDateTime.Controls.AddRange(New System.Windows.Forms.Control() {Me.dtpDATA})
+        '
+        'btnRecargar
+        '
+        Me.btnRecargar.Location = New System.Drawing.Point(60, 94)
+        Me.btnRecargar.Name = "btnRecargar"
+        '
+        'sbtipo
+        '
+        Me.sbtipo.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.sbtipo.Location = New System.Drawing.Point(4, 201)
+        Me.sbtipo.Name = "sbtipo"
+        Me.sbtipo.Text = ""
+        '
+        'lblCodiMostra
+        '
+        Me.lblCodiMostra.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.lblCodiMostra.Location = New System.Drawing.Point(16, 48)
+        Me.lblCodiMostra.Name = "lblCodiMostra"
+        Me.lblCodiMostra.Size = New System.Drawing.Size(70, 20)
+        Me.lblCodiMostra.TabIndex = 1
+        Me.lblCodiMostra.Text = "Codi Mostra"
+        Me.lblCodiMostra.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
+        '
+        'lblCliente
+        '
+        Me.lblCliente.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.lblCliente.Location = New System.Drawing.Point(16, 20)
+        Me.lblCliente.Name = "lblCliente"
+        Me.lblCliente.Size = New System.Drawing.Size(70, 20)
+        Me.lblCliente.TabIndex = 202
+        Me.lblCliente.Text = "Client"
+        Me.lblCliente.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
+        '
+        'lblDesglose
+        '
+        Me.lblDesglose.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.lblDesglose.Location = New System.Drawing.Point(20, 124)
+        Me.lblDesglose.Name = "lblDesglose"
+        Me.lblDesglose.Size = New System.Drawing.Size(300, 16)
+        Me.lblDesglose.TabIndex = 205
+        Me.lblDesglose.Text = "Desglòs de FILS, per MOSTRA COLOR i TALLA"
+        '
+        'lblBanc
+        '
+        Me.lblBanc.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.lblBanc.Location = New System.Drawing.Point(16, 28)
+        Me.lblBanc.Name = "lblBanc"
+        Me.lblBanc.Size = New System.Drawing.Size(70, 20)
+        Me.lblBanc.TabIndex = 209
+        Me.lblBanc.Text = "Màquina"
+        Me.lblBanc.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
+        '
+        'lblVelocidad
+        '
+        Me.lblVelocidad.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.lblVelocidad.Location = New System.Drawing.Point(16, 76)
+        Me.lblVelocidad.Name = "lblVelocidad"
+        Me.lblVelocidad.Size = New System.Drawing.Size(70, 20)
+        Me.lblVelocidad.TabIndex = 216
+        Me.lblVelocidad.Text = "Velocitat"
+        Me.lblVelocidad.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
+        '
+        'lblAgujas
+        '
+        Me.lblAgujas.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.lblAgujas.Location = New System.Drawing.Point(16, 52)
+        Me.lblAgujas.Name = "lblAgujas"
+        Me.lblAgujas.Size = New System.Drawing.Size(70, 20)
+        Me.lblAgujas.TabIndex = 219
+        Me.lblAgujas.Text = "Agulles"
+        Me.lblAgujas.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
+        '
+        'lblImporte
+        '
+        Me.lblImporte.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.lblImporte.Location = New System.Drawing.Point(452, 100)
+        Me.lblImporte.Name = "lblImporte"
+        Me.lblImporte.Size = New System.Drawing.Size(100, 20)
+        Me.lblImporte.TabIndex = 221
+        Me.lblImporte.Text = "Import"
+        Me.lblImporte.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
+        '
+        'lblTalla
+        '
+        Me.lblTalla.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.lblTalla.Location = New System.Drawing.Point(140, 144)
+        Me.lblTalla.Name = "lblTalla"
+        Me.lblTalla.Size = New System.Drawing.Size(100, 15)
+        Me.lblTalla.TabIndex = 224
+        Me.lblTalla.Text = "Talla"
+        '
+        'lblColor
+        '
+        Me.lblColor.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.lblColor.Location = New System.Drawing.Point(20, 144)
+        Me.lblColor.Name = "lblColor"
+        Me.lblColor.Size = New System.Drawing.Size(100, 15)
+        Me.lblColor.TabIndex = 227
+        Me.lblColor.Text = "Color"
+        '
+        'lblDescripcionMuestra
+        '
+        Me.lblDescripcionMuestra.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.lblDescripcionMuestra.Location = New System.Drawing.Point(264, 144)
+        Me.lblDescripcionMuestra.Name = "lblDescripcionMuestra"
+        Me.lblDescripcionMuestra.Size = New System.Drawing.Size(68, 15)
+        Me.lblDescripcionMuestra.TabIndex = 231
+        Me.lblDescripcionMuestra.Text = "Descripció"
+        '
+        'GroupBox1
+        '
+        Me.GroupBox1.Controls.Add(Me.txtCODI)
+        Me.GroupBox1.Controls.Add(Me.txtNOMCLIENT)
+        Me.GroupBox1.Controls.Add(Me.txtCLIENT)
+        Me.GroupBox1.Controls.Add(Me.lblCodiMostra)
+        Me.GroupBox1.Controls.Add(Me.lblCliente)
+        Me.GroupBox1.Controls.Add(Me.dtpDATA)
+        Me.GroupBox1.Location = New System.Drawing.Point(8, 4)
+        Me.GroupBox1.Name = "GroupBox1"
+        Me.GroupBox1.Size = New System.Drawing.Size(456, 78)
+        Me.GroupBox1.TabIndex = 236
+        Me.GroupBox1.TabStop = False
+        '
+        'txtCODI
+        '
+        Me.txtCODI.Location = New System.Drawing.Point(92, 48)
+        Me.txtCODI.Name = "txtCODI"
+        Me.txtCODI.Size = New System.Drawing.Size(72, 20)
+        Me.txtCODI.TabIndex = 235
+        Me.txtCODI.Tag = Nothing
+        '
+        'txtNOMCLIENT
+        '
+        Me.txtNOMCLIENT.Location = New System.Drawing.Point(160, 20)
+        Me.txtNOMCLIENT.Name = "txtNOMCLIENT"
+        Me.txtNOMCLIENT.Size = New System.Drawing.Size(284, 20)
+        Me.txtNOMCLIENT.TabIndex = 234
+        Me.txtNOMCLIENT.Tag = Nothing
+        '
+        'txtCLIENT
+        '
+        Me.txtCLIENT.Location = New System.Drawing.Point(92, 20)
+        Me.txtCLIENT.Name = "txtCLIENT"
+        Me.txtCLIENT.Size = New System.Drawing.Size(60, 20)
+        Me.txtCLIENT.TabIndex = 233
+        Me.txtCLIENT.Tag = Nothing
+        '
+        'dtpDATA
+        '
+        '
+        'dtpDATA.Calendar
+        '
+        Me.dtpDATA.Calendar.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.dtpDATA.DisableOnNoData = False
+        Me.dtpDATA.EmptyAsNull = True
+        Me.dtpDATA.FormatType = C1.Win.C1Input.FormatTypeEnum.ShortDate
+        Me.dtpDATA.Location = New System.Drawing.Point(168, 48)
+        Me.dtpDATA.Name = "dtpDATA"
+        Me.dtpDATA.Size = New System.Drawing.Size(148, 20)
+        Me.dtpDATA.TabIndex = 277
+        Me.dtpDATA.Tag = Nothing
+        '
+        'GroupBox2
+        '
+        Me.GroupBox2.Anchor = System.Windows.Forms.AnchorStyles.Bottom
+        Me.GroupBox2.Controls.Add(Me.txtCORTES)
+        Me.GroupBox2.Controls.Add(Me.lblCORTES)
+        Me.GroupBox2.Controls.Add(Me.lblTiempoMaquina)
+        Me.GroupBox2.Controls.Add(Me.txtIMPORT)
+        Me.GroupBox2.Controls.Add(Me.txtTEMPS)
+        Me.GroupBox2.Controls.Add(Me.txtDISCO)
+        Me.GroupBox2.Controls.Add(Me.txtVELOSITAT)
+        Me.GroupBox2.Controls.Add(Me.txtAGULLES)
+        Me.GroupBox2.Controls.Add(Me.txtMAQUINA)
+        Me.GroupBox2.Controls.Add(Me.txtNOMMAQUI)
+        Me.GroupBox2.Controls.Add(Me.lblDiskette)
+        Me.GroupBox2.Controls.Add(Me.lblBanc)
+        Me.GroupBox2.Controls.Add(Me.lblVelocidad)
+        Me.GroupBox2.Controls.Add(Me.lblAgujas)
+        Me.GroupBox2.Controls.Add(Me.lblImporte)
+        Me.GroupBox2.Location = New System.Drawing.Point(8, 424)
+        Me.GroupBox2.Name = "GroupBox2"
+        Me.GroupBox2.Size = New System.Drawing.Size(668, 137)
+        Me.GroupBox2.TabIndex = 6
+        Me.GroupBox2.TabStop = False
+        Me.GroupBox2.Text = "Maquina"
+        '
+        'txtCORTES
+        '
+        Me.txtCORTES.Location = New System.Drawing.Point(288, 52)
+        Me.txtCORTES.Name = "txtCORTES"
+        Me.txtCORTES.TabIndex = 235
+        Me.txtCORTES.Tag = Nothing
+        '
+        'lblCORTES
+        '
+        Me.lblCORTES.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.lblCORTES.Location = New System.Drawing.Point(208, 52)
+        Me.lblCORTES.Name = "lblCORTES"
+        Me.lblCORTES.Size = New System.Drawing.Size(70, 20)
+        Me.lblCORTES.TabIndex = 234
+        Me.lblCORTES.Text = "Cortes"
+        Me.lblCORTES.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
+        '
+        'lblTiempoMaquina
+        '
+        Me.lblTiempoMaquina.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.lblTiempoMaquina.Location = New System.Drawing.Point(452, 76)
+        Me.lblTiempoMaquina.Name = "lblTiempoMaquina"
+        Me.lblTiempoMaquina.Size = New System.Drawing.Size(100, 20)
+        Me.lblTiempoMaquina.TabIndex = 233
+        Me.lblTiempoMaquina.Text = "Temps màquina"
+        Me.lblTiempoMaquina.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
+        '
+        'txtIMPORT
+        '
+        Me.txtIMPORT.Location = New System.Drawing.Point(556, 100)
+        Me.txtIMPORT.Name = "txtIMPORT"
+        Me.txtIMPORT.Size = New System.Drawing.Size(68, 20)
+        Me.txtIMPORT.TabIndex = 232
+        Me.txtIMPORT.Tag = Nothing
+        '
+        'txtTEMPS
+        '
+        Me.txtTEMPS.Location = New System.Drawing.Point(556, 76)
+        Me.txtTEMPS.Name = "txtTEMPS"
+        Me.txtTEMPS.Size = New System.Drawing.Size(68, 20)
+        Me.txtTEMPS.TabIndex = 231
+        Me.txtTEMPS.Tag = Nothing
+        '
+        'txtDISCO
+        '
+        Me.txtDISCO.Location = New System.Drawing.Point(96, 100)
+        Me.txtDISCO.Name = "txtDISCO"
+        Me.txtDISCO.TabIndex = 230
+        Me.txtDISCO.Tag = Nothing
+        '
+        'txtVELOSITAT
+        '
+        Me.txtVELOSITAT.Location = New System.Drawing.Point(96, 76)
+        Me.txtVELOSITAT.Name = "txtVELOSITAT"
+        Me.txtVELOSITAT.TabIndex = 229
+        Me.txtVELOSITAT.Tag = Nothing
+        '
+        'txtAGULLES
+        '
+        Me.txtAGULLES.Location = New System.Drawing.Point(96, 52)
+        Me.txtAGULLES.Name = "txtAGULLES"
+        Me.txtAGULLES.TabIndex = 228
+        Me.txtAGULLES.Tag = Nothing
+        '
+        'txtMAQUINA
+        '
+        Me.txtMAQUINA.Location = New System.Drawing.Point(96, 28)
+        Me.txtMAQUINA.Name = "txtMAQUINA"
+        Me.txtMAQUINA.Size = New System.Drawing.Size(40, 20)
+        Me.txtMAQUINA.TabIndex = 227
+        Me.txtMAQUINA.Tag = Nothing
+        '
+        'txtNOMMAQUI
+        '
+        Me.txtNOMMAQUI.Location = New System.Drawing.Point(140, 28)
+        Me.txtNOMMAQUI.Name = "txtNOMMAQUI"
+        Me.txtNOMMAQUI.Size = New System.Drawing.Size(304, 20)
+        Me.txtNOMMAQUI.TabIndex = 226
+        Me.txtNOMMAQUI.Tag = Nothing
+        '
+        'lblDiskette
+        '
+        Me.lblDiskette.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.lblDiskette.Location = New System.Drawing.Point(16, 100)
+        Me.lblDiskette.Name = "lblDiskette"
+        Me.lblDiskette.Size = New System.Drawing.Size(70, 20)
+        Me.lblDiskette.TabIndex = 225
+        Me.lblDiskette.Text = "DISKETTE"
+        Me.lblDiskette.TextAlign = System.Drawing.ContentAlignment.MiddleCenter
+        '
+        'cboHilos
+        '
+        Me.cboHilos.AllowColMove = True
+        Me.cboHilos.AllowColSelect = True
+        Me.cboHilos.AllowRowSizing = C1.Win.C1TrueDBGrid.RowSizingEnum.AllRows
+        Me.cboHilos.AlternatingRows = True
+        Me.cboHilos.CaptionHeight = 17
+        Me.cboHilos.ColumnCaptionHeight = 17
+        Me.cboHilos.ColumnFooterHeight = 17
+        Me.cboHilos.FetchRowStyles = False
+        Me.cboHilos.Images.Add(CType(resources.GetObject("resource"), System.Drawing.Image))
+        Me.cboHilos.Location = New System.Drawing.Point(40, 192)
+        Me.cboHilos.Name = "cboHilos"
+        Me.cboHilos.RowDivider.Color = System.Drawing.Color.DarkGray
+        Me.cboHilos.RowDivider.Style = C1.Win.C1TrueDBGrid.LineStyleEnum.Single
+        Me.cboHilos.RowHeight = 15
+        Me.cboHilos.RowSubDividerColor = System.Drawing.Color.DarkGray
+        Me.cboHilos.ScrollTips = False
+        Me.cboHilos.Size = New System.Drawing.Size(280, 144)
+        Me.cboHilos.TabIndex = 267
+        Me.cboHilos.TabStop = False
+        Me.cboHilos.Text = "C1TrueDBDropdown1"
+        Me.cboHilos.ValueTranslate = True
+        Me.cboHilos.Visible = False
+        Me.cboHilos.PropBag = "<?xml version=""1.0""?><Blob><Styles type=""C1.Win.C1TrueDBGrid.Design.ContextWrappe" & _
+        "r""><Data>Group{AlignVert:Center;Border:None,,0, 0, 0, 0;BackColor:ControlDark;}E" & _
+        "ditor{}Style2{}Style5{}Style4{}Style7{}Style6{}EvenRow{BackColor:Aqua;}Selected{" & _
+        "ForeColor:HighlightText;BackColor:Highlight;}Style3{}Inactive{ForeColor:Inactive" & _
+        "CaptionText;BackColor:InactiveCaption;}FilterBar{}Footer{}Caption{AlignHorz:Cent" & _
+        "er;}Normal{Font:Microsoft Sans Serif, 8.25pt;}HighlightRow{ForeColor:HighlightTe" & _
+        "xt;BackColor:Highlight;}Style1{}OddRow{}RecordSelector{AlignImage:Center;}Headin" & _
+        "g{Wrap:True;BackColor:Control;Border:Raised,,1, 1, 1, 1;ForeColor:ControlText;Al" & _
+        "ignVert:Center;}Style8{}Style10{AlignHorz:Near;}Style11{}Style12{}Style13{}Style" & _
+        "9{}</Data></Styles><Splits><C1.Win.C1TrueDBGrid.DropdownView Name="""" Alternating" & _
+        "RowStyle=""True"" CaptionHeight=""17"" ColumnCaptionHeight=""17"" ColumnFooterHeight=""" & _
+        "17"" MarqueeStyle=""DottedCellBorder"" RecordSelectorWidth=""17"" DefRecSelWidth=""17""" & _
+        " RecordSelectors=""False"" VerticalScrollGroup=""1"" HorizontalScrollGroup=""1""><Capt" & _
+        "ionStyle parent=""Style2"" me=""Style10"" /><EditorStyle parent=""Editor"" me=""Style5""" & _
+        " /><EvenRowStyle parent=""EvenRow"" me=""Style8"" /><FilterBarStyle parent=""FilterBa" & _
+        "r"" me=""Style13"" /><FooterStyle parent=""Footer"" me=""Style3"" /><GroupStyle parent=" & _
+        """Group"" me=""Style12"" /><HeadingStyle parent=""Heading"" me=""Style2"" /><HighLightRo" & _
+        "wStyle parent=""HighlightRow"" me=""Style7"" /><InactiveStyle parent=""Inactive"" me=""" & _
+        "Style4"" /><OddRowStyle parent=""OddRow"" me=""Style9"" /><RecordSelectorStyle parent" & _
+        "=""RecordSelector"" me=""Style11"" /><SelectedStyle parent=""Selected"" me=""Style6"" />" & _
+        "<Style parent=""Normal"" me=""Style1"" /><ClientRect>0, 0, 276, 140</ClientRect><Bor" & _
+        "derSide>0</BorderSide></C1.Win.C1TrueDBGrid.DropdownView></Splits><NamedStyles><" & _
+        "Style parent="""" me=""Normal"" /><Style parent=""Normal"" me=""Heading"" /><Style paren" & _
+        "t=""Heading"" me=""Footer"" /><Style parent=""Heading"" me=""Caption"" /><Style parent=""" & _
+        "Heading"" me=""Inactive"" /><Style parent=""Normal"" me=""Selected"" /><Style parent=""N" & _
+        "ormal"" me=""Editor"" /><Style parent=""Normal"" me=""HighlightRow"" /><Style parent=""N" & _
+        "ormal"" me=""EvenRow"" /><Style parent=""Normal"" me=""OddRow"" /><Style parent=""Headin" & _
+        "g"" me=""RecordSelector"" /><Style parent=""Normal"" me=""FilterBar"" /><Style parent=""" & _
+        "Caption"" me=""Group"" /></NamedStyles><vertSplits>1</vertSplits><horzSplits>1</hor" & _
+        "zSplits><Layout>None</Layout><DefaultRecSelWidth>17</DefaultRecSelWidth><ClientA" & _
+        "rea>0, 0, 276, 140</ClientArea></Blob>"
+        '
+        'dgDesglose
+        '
+        Me.dgDesglose.AllowAddNew = True
+        Me.dgDesglose.AllowDelete = True
+        Me.dgDesglose.AllowRowSizing = C1.Win.C1TrueDBGrid.RowSizingEnum.None
+        Me.dgDesglose.AllowSort = False
+        Me.dgDesglose.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.dgDesglose.CaptionHeight = 17
+        Me.dgDesglose.ExtendRightColumn = True
+        Me.dgDesglose.FlatStyle = C1.Win.C1TrueDBGrid.FlatModeEnum.System
+        Me.dgDesglose.Font = New System.Drawing.Font("Tahoma", 8.25!)
+        Me.dgDesglose.GroupByCaption = "Drag a column header here to group by that column"
+        Me.dgDesglose.Images.Add(CType(resources.GetObject("resource1"), System.Drawing.Image))
+        Me.dgDesglose.Location = New System.Drawing.Point(0, 184)
+        Me.dgDesglose.MarqueeStyle = C1.Win.C1TrueDBGrid.MarqueeEnum.HighlightRowRaiseCell
+        Me.dgDesglose.Name = "dgDesglose"
+        Me.dgDesglose.PreviewInfo.Location = New System.Drawing.Point(0, 0)
+        Me.dgDesglose.PreviewInfo.Size = New System.Drawing.Size(0, 0)
+        Me.dgDesglose.PreviewInfo.ZoomFactor = 75
+        Me.dgDesglose.RecordSelectorWidth = 17
+        Me.dgDesglose.RowDivider.Color = System.Drawing.Color.DarkGray
+        Me.dgDesglose.RowDivider.Style = C1.Win.C1TrueDBGrid.LineStyleEnum.Single
+        Me.dgDesglose.RowHeight = 15
+        Me.dgDesglose.RowSubDividerColor = System.Drawing.Color.DarkGray
+        Me.dgDesglose.Size = New System.Drawing.Size(968, 236)
+        Me.dgDesglose.SpringMode = True
+        Me.dgDesglose.TabAction = C1.Win.C1TrueDBGrid.TabActionEnum.GridNavigation
+        Me.dgDesglose.TabIndex = 266
+        Me.dgDesglose.Text = "C1TrueDBGrid1"
+        Me.dgDesglose.WrapCellPointer = True
+        Me.dgDesglose.PropBag = "<?xml version=""1.0""?><Blob><Styles type=""C1.Win.C1TrueDBGrid.Design.ContextWrappe" & _
+        "r""><Data>Group{AlignVert:Center;Border:None,,0, 0, 0, 0;BackColor:ControlDark;}S" & _
+        "tyle12{}Style13{}Style5{}Style4{}Style7{}Style6{}EvenRow{BackColor:Aqua;}Selecte" & _
+        "d{ForeColor:HighlightText;BackColor:Highlight;}Heading{Wrap:True;BackColor:Contr" & _
+        "ol;Border:Raised,,1, 1, 1, 1;ForeColor:ControlText;AlignVert:Center;}Inactive{Fo" & _
+        "reColor:InactiveCaptionText;BackColor:InactiveCaption;}FilterBar{}OddRow{}Footer" & _
+        "{}Caption{AlignHorz:Center;}Normal{Font:Tahoma, 7.25pt;}Style10{AlignHorz:Near;}" & _
+        "HighlightRow{ForeColor:HighlightText;BackColor:Highlight;}Editor{}Style11{}Recor" & _
+        "dSelector{AlignImage:Center;}Style9{}Style8{}Style3{}Style2{}Style14{}Style15{}S" & _
+        "tyle1{}</Data></Styles><Splits><C1.Win.C1TrueDBGrid.MergeView Name="""" AllowRowSi" & _
+        "zing=""None"" CaptionHeight=""17"" ColumnCaptionHeight=""17"" ColumnFooterHeight=""17"" " & _
+        "ExtendRightColumn=""True"" MarqueeStyle=""HighlightRowRaiseCell"" RecordSelectorWidt" & _
+        "h=""17"" DefRecSelWidth=""17"" VerticalScrollGroup=""1"" HorizontalScrollGroup=""1"" Spr" & _
+        "ingMode=""True""><CaptionStyle parent=""Style2"" me=""Style10"" /><EditorStyle parent=" & _
+        """Editor"" me=""Style5"" /><EvenRowStyle parent=""EvenRow"" me=""Style8"" /><FilterBarSt" & _
+        "yle parent=""FilterBar"" me=""Style13"" /><FooterStyle parent=""Footer"" me=""Style3"" /" & _
+        "><GroupStyle parent=""Group"" me=""Style12"" /><HeadingStyle parent=""Heading"" me=""St" & _
+        "yle2"" /><HighLightRowStyle parent=""HighlightRow"" me=""Style7"" /><InactiveStyle pa" & _
+        "rent=""Inactive"" me=""Style4"" /><OddRowStyle parent=""OddRow"" me=""Style9"" /><Record" & _
+        "SelectorStyle parent=""RecordSelector"" me=""Style11"" /><SelectedStyle parent=""Sele" & _
+        "cted"" me=""Style6"" /><Style parent=""Normal"" me=""Style1"" /><ClientRect>0, 0, 964, " & _
+        "232</ClientRect><BorderSide>0</BorderSide></C1.Win.C1TrueDBGrid.MergeView></Spli" & _
+        "ts><NamedStyles><Style parent="""" me=""Normal"" /><Style parent=""Normal"" me=""Headin" & _
+        "g"" /><Style parent=""Heading"" me=""Footer"" /><Style parent=""Heading"" me=""Caption"" " & _
+        "/><Style parent=""Heading"" me=""Inactive"" /><Style parent=""Normal"" me=""Selected"" /" & _
+        "><Style parent=""Normal"" me=""Editor"" /><Style parent=""Normal"" me=""HighlightRow"" /" & _
+        "><Style parent=""Normal"" me=""EvenRow"" /><Style parent=""Normal"" me=""OddRow"" /><Sty" & _
+        "le parent=""Heading"" me=""RecordSelector"" /><Style parent=""Normal"" me=""FilterBar"" " & _
+        "/><Style parent=""Caption"" me=""Group"" /></NamedStyles><vertSplits>1</vertSplits><" & _
+        "horzSplits>1</horzSplits><Layout>Modified</Layout><DefaultRecSelWidth>17</Defaul" & _
+        "tRecSelWidth><ClientArea>0, 0, 964, 232</ClientArea><PrintPageHeaderStyle parent" & _
+        "="""" me=""Style14"" /><PrintPageFooterStyle parent="""" me=""Style15"" /></Blob>"
+        '
+        'cboColores
+        '
+        Me.cboColores.AllowColMove = True
+        Me.cboColores.AllowColSelect = True
+        Me.cboColores.AllowRowSizing = C1.Win.C1TrueDBGrid.RowSizingEnum.AllRows
+        Me.cboColores.AlternatingRows = True
+        Me.cboColores.CaptionHeight = 17
+        Me.cboColores.ColumnCaptionHeight = 17
+        Me.cboColores.ColumnFooterHeight = 17
+        Me.cboColores.FetchRowStyles = False
+        Me.cboColores.Images.Add(CType(resources.GetObject("resource2"), System.Drawing.Image))
+        Me.cboColores.Location = New System.Drawing.Point(368, 212)
+        Me.cboColores.Name = "cboColores"
+        Me.cboColores.RowDivider.Color = System.Drawing.Color.DarkGray
+        Me.cboColores.RowDivider.Style = C1.Win.C1TrueDBGrid.LineStyleEnum.Single
+        Me.cboColores.RowHeight = 15
+        Me.cboColores.RowSubDividerColor = System.Drawing.Color.DarkGray
+        Me.cboColores.ScrollTips = False
+        Me.cboColores.Size = New System.Drawing.Size(280, 144)
+        Me.cboColores.TabIndex = 269
+        Me.cboColores.TabStop = False
+        Me.cboColores.Text = "C1TrueDBDropdown1"
+        Me.cboColores.ValueTranslate = True
+        Me.cboColores.Visible = False
+        Me.cboColores.PropBag = "<?xml version=""1.0""?><Blob><Styles type=""C1.Win.C1TrueDBGrid.Design.ContextWrappe" & _
+        "r""><Data>Group{BackColor:ControlDark;Border:None,,0, 0, 0, 0;AlignVert:Center;}E" & _
+        "ditor{}Style2{}Style5{}Style4{}Style7{}Style6{}EvenRow{BackColor:Aqua;}Selected{" & _
+        "ForeColor:HighlightText;BackColor:Highlight;}Style3{}Inactive{ForeColor:Inactive" & _
+        "CaptionText;BackColor:InactiveCaption;}FilterBar{}Footer{}Caption{AlignHorz:Cent" & _
+        "er;}Normal{Font:Microsoft Sans Serif, 8.25pt;}HighlightRow{ForeColor:HighlightTe" & _
+        "xt;BackColor:Highlight;}Style9{}OddRow{}RecordSelector{AlignImage:Center;}Headin" & _
+        "g{Wrap:True;AlignVert:Center;Border:Raised,,1, 1, 1, 1;ForeColor:ControlText;Bac" & _
+        "kColor:Control;}Style8{}Style10{AlignHorz:Near;}Style11{}Style12{}Style13{}Style" & _
+        "1{}</Data></Styles><Splits><C1.Win.C1TrueDBGrid.DropdownView Name="""" Alternating" & _
+        "RowStyle=""True"" CaptionHeight=""17"" ColumnCaptionHeight=""17"" ColumnFooterHeight=""" & _
+        "17"" MarqueeStyle=""DottedCellBorder"" RecordSelectorWidth=""17"" DefRecSelWidth=""17""" & _
+        " RecordSelectors=""False"" VerticalScrollGroup=""1"" HorizontalScrollGroup=""1""><Capt" & _
+        "ionStyle parent=""Style2"" me=""Style10"" /><EditorStyle parent=""Editor"" me=""Style5""" & _
+        " /><EvenRowStyle parent=""EvenRow"" me=""Style8"" /><FilterBarStyle parent=""FilterBa" & _
+        "r"" me=""Style13"" /><FooterStyle parent=""Footer"" me=""Style3"" /><GroupStyle parent=" & _
+        """Group"" me=""Style12"" /><HeadingStyle parent=""Heading"" me=""Style2"" /><HighLightRo" & _
+        "wStyle parent=""HighlightRow"" me=""Style7"" /><InactiveStyle parent=""Inactive"" me=""" & _
+        "Style4"" /><OddRowStyle parent=""OddRow"" me=""Style9"" /><RecordSelectorStyle parent" & _
+        "=""RecordSelector"" me=""Style11"" /><SelectedStyle parent=""Selected"" me=""Style6"" />" & _
+        "<Style parent=""Normal"" me=""Style1"" /><ClientRect>0, 0, 276, 140</ClientRect><Bor" & _
+        "derSide>0</BorderSide></C1.Win.C1TrueDBGrid.DropdownView></Splits><NamedStyles><" & _
+        "Style parent="""" me=""Normal"" /><Style parent=""Normal"" me=""Heading"" /><Style paren" & _
+        "t=""Heading"" me=""Footer"" /><Style parent=""Heading"" me=""Caption"" /><Style parent=""" & _
+        "Heading"" me=""Inactive"" /><Style parent=""Normal"" me=""Selected"" /><Style parent=""N" & _
+        "ormal"" me=""Editor"" /><Style parent=""Normal"" me=""HighlightRow"" /><Style parent=""N" & _
+        "ormal"" me=""EvenRow"" /><Style parent=""Normal"" me=""OddRow"" /><Style parent=""Headin" & _
+        "g"" me=""RecordSelector"" /><Style parent=""Normal"" me=""FilterBar"" /><Style parent=""" & _
+        "Caption"" me=""Group"" /></NamedStyles><vertSplits>1</vertSplits><horzSplits>1</hor" & _
+        "zSplits><Layout>None</Layout><DefaultRecSelWidth>17</DefaultRecSelWidth><ClientA" & _
+        "rea>0, 0, 276, 140</ClientArea></Blob>"
+        '
+        'cboProveedores
+        '
+        Me.cboProveedores.AllowColMove = True
+        Me.cboProveedores.AllowColSelect = True
+        Me.cboProveedores.AllowRowSizing = C1.Win.C1TrueDBGrid.RowSizingEnum.AllRows
+        Me.cboProveedores.AlternatingRows = True
+        Me.cboProveedores.CaptionHeight = 17
+        Me.cboProveedores.ColumnCaptionHeight = 17
+        Me.cboProveedores.ColumnFooterHeight = 17
+        Me.cboProveedores.FetchRowStyles = False
+        Me.cboProveedores.Images.Add(CType(resources.GetObject("resource3"), System.Drawing.Image))
+        Me.cboProveedores.Location = New System.Drawing.Point(664, 216)
+        Me.cboProveedores.Name = "cboProveedores"
+        Me.cboProveedores.RowDivider.Color = System.Drawing.Color.DarkGray
+        Me.cboProveedores.RowDivider.Style = C1.Win.C1TrueDBGrid.LineStyleEnum.Single
+        Me.cboProveedores.RowHeight = 15
+        Me.cboProveedores.RowSubDividerColor = System.Drawing.Color.DarkGray
+        Me.cboProveedores.ScrollTips = False
+        Me.cboProveedores.Size = New System.Drawing.Size(280, 144)
+        Me.cboProveedores.TabIndex = 270
+        Me.cboProveedores.TabStop = False
+        Me.cboProveedores.Text = "C1TrueDBDropdown1"
+        Me.cboProveedores.ValueTranslate = True
+        Me.cboProveedores.Visible = False
+        Me.cboProveedores.PropBag = "<?xml version=""1.0""?><Blob><Styles type=""C1.Win.C1TrueDBGrid.Design.ContextWrappe" & _
+        "r""><Data>Group{BackColor:ControlDark;Border:None,,0, 0, 0, 0;AlignVert:Center;}E" & _
+        "ditor{}Style2{}Style5{}Style4{}Style7{}Style6{}EvenRow{BackColor:Aqua;}Selected{" & _
+        "ForeColor:HighlightText;BackColor:Highlight;}Style3{}Inactive{ForeColor:Inactive" & _
+        "CaptionText;BackColor:InactiveCaption;}FilterBar{}Footer{}Caption{AlignHorz:Cent" & _
+        "er;}Normal{Font:Microsoft Sans Serif, 8.25pt;}HighlightRow{ForeColor:HighlightTe" & _
+        "xt;BackColor:Highlight;}Style9{}OddRow{}RecordSelector{AlignImage:Center;}Headin" & _
+        "g{Wrap:True;AlignVert:Center;Border:Raised,,1, 1, 1, 1;ForeColor:ControlText;Bac" & _
+        "kColor:Control;}Style8{}Style10{AlignHorz:Near;}Style11{}Style12{}Style13{}Style" & _
+        "1{}</Data></Styles><Splits><C1.Win.C1TrueDBGrid.DropdownView Name="""" Alternating" & _
+        "RowStyle=""True"" CaptionHeight=""17"" ColumnCaptionHeight=""17"" ColumnFooterHeight=""" & _
+        "17"" MarqueeStyle=""DottedCellBorder"" RecordSelectorWidth=""17"" DefRecSelWidth=""17""" & _
+        " RecordSelectors=""False"" VerticalScrollGroup=""1"" HorizontalScrollGroup=""1""><Capt" & _
+        "ionStyle parent=""Style2"" me=""Style10"" /><EditorStyle parent=""Editor"" me=""Style5""" & _
+        " /><EvenRowStyle parent=""EvenRow"" me=""Style8"" /><FilterBarStyle parent=""FilterBa" & _
+        "r"" me=""Style13"" /><FooterStyle parent=""Footer"" me=""Style3"" /><GroupStyle parent=" & _
+        """Group"" me=""Style12"" /><HeadingStyle parent=""Heading"" me=""Style2"" /><HighLightRo" & _
+        "wStyle parent=""HighlightRow"" me=""Style7"" /><InactiveStyle parent=""Inactive"" me=""" & _
+        "Style4"" /><OddRowStyle parent=""OddRow"" me=""Style9"" /><RecordSelectorStyle parent" & _
+        "=""RecordSelector"" me=""Style11"" /><SelectedStyle parent=""Selected"" me=""Style6"" />" & _
+        "<Style parent=""Normal"" me=""Style1"" /><ClientRect>0, 0, 276, 140</ClientRect><Bor" & _
+        "derSide>0</BorderSide></C1.Win.C1TrueDBGrid.DropdownView></Splits><NamedStyles><" & _
+        "Style parent="""" me=""Normal"" /><Style parent=""Normal"" me=""Heading"" /><Style paren" & _
+        "t=""Heading"" me=""Footer"" /><Style parent=""Heading"" me=""Caption"" /><Style parent=""" & _
+        "Heading"" me=""Inactive"" /><Style parent=""Normal"" me=""Selected"" /><Style parent=""N" & _
+        "ormal"" me=""Editor"" /><Style parent=""Normal"" me=""HighlightRow"" /><Style parent=""N" & _
+        "ormal"" me=""EvenRow"" /><Style parent=""Normal"" me=""OddRow"" /><Style parent=""Headin" & _
+        "g"" me=""RecordSelector"" /><Style parent=""Normal"" me=""FilterBar"" /><Style parent=""" & _
+        "Caption"" me=""Group"" /></NamedStyles><vertSplits>1</vertSplits><horzSplits>1</hor" & _
+        "zSplits><Layout>None</Layout><DefaultRecSelWidth>17</DefaultRecSelWidth><ClientA" & _
+        "rea>0, 0, 276, 140</ClientArea></Blob>"
+        '
+        'btnAceptar
+        '
+        Me.btnAceptar.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.btnAceptar.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft
+        Me.btnAceptar.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.btnAceptar.Location = New System.Drawing.Point(888, 500)
+        Me.btnAceptar.Name = "btnAceptar"
+        Me.btnAceptar.Size = New System.Drawing.Size(75, 20)
+        Me.btnAceptar.TabIndex = 271
+        Me.btnAceptar.Text = "Acceptar"
+        '
+        'txtDESCRIP
+        '
+        Me.txtDESCRIP.Location = New System.Drawing.Point(260, 160)
+        Me.txtDESCRIP.Name = "txtDESCRIP"
+        Me.txtDESCRIP.Size = New System.Drawing.Size(320, 20)
+        Me.txtDESCRIP.TabIndex = 274
+        Me.txtDESCRIP.Tag = Nothing
+        '
+        'txtTALLA
+        '
+        Me.txtTALLA.Location = New System.Drawing.Point(136, 160)
+        Me.txtTALLA.Name = "txtTALLA"
+        Me.txtTALLA.TabIndex = 275
+        Me.txtTALLA.Tag = Nothing
+        '
+        'txtCOLOR
+        '
+        Me.txtCOLOR.Location = New System.Drawing.Point(20, 160)
+        Me.txtCOLOR.Name = "txtCOLOR"
+        Me.txtCOLOR.TabIndex = 276
+        Me.txtCOLOR.Tag = Nothing
+        '
+        'txtNOTAS
+        '
+        Me.txtNOTAS.Location = New System.Drawing.Point(472, 4)
+        Me.txtNOTAS.Multiline = True
+        Me.txtNOTAS.Name = "txtNOTAS"
+        Me.txtNOTAS.ScrollBars = System.Windows.Forms.ScrollBars.Vertical
+        Me.txtNOTAS.Size = New System.Drawing.Size(488, 136)
+        Me.txtNOTAS.TabIndex = 278
+        Me.txtNOTAS.Tag = Nothing
+        '
+        'TabControl1
+        '
+        Me.TabControl1.Controls.Add(Me.TabPage1)
+        Me.TabControl1.Controls.Add(Me.TabPage2)
+        Me.TabControl1.ItemSize = New System.Drawing.Size(76, 18)
+        Me.TabControl1.Location = New System.Drawing.Point(4, 4)
+        Me.TabControl1.Name = "TabControl1"
+        Me.TabControl1.SelectedIndex = 0
+        Me.TabControl1.Size = New System.Drawing.Size(984, 588)
+        Me.TabControl1.TabIndex = 279
+        '
+        'TabPage1
+        '
+        Me.TabPage1.Controls.Add(Me.GroupBox2)
+        Me.TabPage1.Controls.Add(Me.dgDesglose)
+        Me.TabPage1.Controls.Add(Me.txtNOTAS)
+        Me.TabPage1.Controls.Add(Me.GroupBox1)
+        Me.TabPage1.Controls.Add(Me.cboHilos)
+        Me.TabPage1.Controls.Add(Me.lblDesglose)
+        Me.TabPage1.Controls.Add(Me.txtDESCRIP)
+        Me.TabPage1.Controls.Add(Me.txtTALLA)
+        Me.TabPage1.Controls.Add(Me.txtCOLOR)
+        Me.TabPage1.Controls.Add(Me.lblColor)
+        Me.TabPage1.Controls.Add(Me.cboProveedores)
+        Me.TabPage1.Controls.Add(Me.lblDescripcionMuestra)
+        Me.TabPage1.Controls.Add(Me.lblTalla)
+        Me.TabPage1.Controls.Add(Me.cboColores)
+        Me.TabPage1.Controls.Add(Me.btnAceptar)
+        Me.TabPage1.Location = New System.Drawing.Point(4, 22)
+        Me.TabPage1.Name = "TabPage1"
+        Me.TabPage1.Size = New System.Drawing.Size(976, 562)
+        Me.TabPage1.TabIndex = 0
+        Me.TabPage1.Text = "Fitxa Tècnica"
+        '
+        'TabPage2
+        '
+        Me.TabPage2.Controls.Add(Me.ppFitxa)
+        Me.TabPage2.Location = New System.Drawing.Point(4, 22)
+        Me.TabPage2.Name = "TabPage2"
+        Me.TabPage2.Size = New System.Drawing.Size(976, 562)
+        Me.TabPage2.TabIndex = 1
+        Me.TabPage2.Text = "Impresio"
+        '
+        'ppFitxa
+        '
+        Me.ppFitxa.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.ppFitxa.C1DPageSettings = "color:False;landscape:False;margins:100,100,100,100;papersize:827,1169,QQA0AA=="
+        Me.ppFitxa.ExportOptions.Content = New C1.Win.C1PrintPreview.ExporterOptions() {New C1.Win.C1PrintPreview.ExporterOptions("XlsExportProvider", "C1.C1PrintDocument.Export.XlsOptionsForm", True, False)}
+        Me.ppFitxa.Location = New System.Drawing.Point(4, 8)
+        Me.ppFitxa.Name = "ppFitxa"
+        Me.ppFitxa.NavigationBar.Cursor = System.Windows.Forms.Cursors.Default
+        Me.ppFitxa.NavigationBar.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!)
+        Me.ppFitxa.NavigationBar.OutlineView.Cursor = System.Windows.Forms.Cursors.Default
+        Me.ppFitxa.NavigationBar.OutlineView.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!)
+        Me.ppFitxa.NavigationBar.OutlineView.Indent = 19
+        Me.ppFitxa.NavigationBar.OutlineView.ItemHeight = 16
+        Me.ppFitxa.NavigationBar.OutlineView.TabIndex = 0
+        Me.ppFitxa.NavigationBar.OutlineView.Visible = False
+        Me.ppFitxa.NavigationBar.Padding = New System.Drawing.Point(6, 3)
+        Me.ppFitxa.NavigationBar.TabIndex = 2
+        Me.ppFitxa.NavigationBar.ThumbnailsView.AutoArrange = True
+        Me.ppFitxa.NavigationBar.ThumbnailsView.Cursor = System.Windows.Forms.Cursors.Default
+        Me.ppFitxa.NavigationBar.ThumbnailsView.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!)
+        Me.ppFitxa.NavigationBar.ThumbnailsView.TabIndex = 0
+        Me.ppFitxa.NavigationBar.ThumbnailsView.Visible = False
+        Me.ppFitxa.NavigationBar.Visible = False
+        Me.ppFitxa.NavigationBar.Width = 160
+        Me.ppFitxa.Size = New System.Drawing.Size(956, 536)
+        Me.ppFitxa.Splitter.Cursor = System.Windows.Forms.Cursors.VSplit
+        Me.ppFitxa.Splitter.Width = 3
+        Me.ppFitxa.StatusBar.Cursor = System.Windows.Forms.Cursors.Default
+        Me.ppFitxa.StatusBar.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!)
+        Me.ppFitxa.StatusBar.TabIndex = 4
+        Me.ppFitxa.TabIndex = 241
+        Me.ppFitxa.ToolBar.Buttons.AddRange(New System.Windows.Forms.ToolBarButton() {Me.c1pBtnFileOpen1, Me.c1pBtnFileSave1, Me.c1pBtnFilePrint1, Me.c1pBtnPageSetup1, Me.c1pBtnReflow1, Me.c1pBtnStop1, Me.c1pBtnDocInfo1, Me.c1pBtnSeparator1, Me.c1pBtnShowNavigationBar1, Me.c1pBtnSeparator2, Me.c1pBtnMouseHand1, Me.c1pBtnMouseZoom1, Me.c1pBtnMouseZoomOut1, Me.c1pBtnMouseSelect1, Me.c1pBtnFindText1, Me.c1pBtnSeparator3, Me.c1pBtnGoFirst1, Me.c1pBtnGoPrev1, Me.c1pBtnGoNext1, Me.c1pBtnGoLast1, Me.c1pBtnSeparator4, Me.c1pBtnHistoryPrev1, Me.c1pBtnHistoryNext1, Me.c1pBtnSeparator5, Me.c1pBtnZoomOut1, Me.c1pBtnZoomIn1, Me.c1pBtnSeparator6, Me.c1pBtnViewActualSize1, Me.c1pBtnViewFullPage1, Me.c1pBtnViewPageWidth1, Me.c1pBtnViewTwoPages1, Me.c1pBtnViewFourPages1, Me.c1pBtnSeparator7, Me.c1pBtnHelp1})
+        Me.ppFitxa.ToolBar.Cursor = System.Windows.Forms.Cursors.Default
+        Me.ppFitxa.ToolBar.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!)
+        Me.ppFitxa.ToolBar.ImageSet = C1.Win.C1PrintPreview.ToolBarImageSetEnum.XpStyle16
+        '
+        'c1pBtnFileOpen1
+        '
+        Me.c1pBtnFileOpen1.Action = C1.Win.C1PrintPreview.ToolBarButtonActionEnum.FileOpen
+        Me.c1pBtnFileOpen1.ImageIndex = 0
+        Me.c1pBtnFileOpen1.ToolTipText = "File Open"
+        Me.c1pBtnFileOpen1.Visible = False
+        '
+        'c1pBtnFileSave1
+        '
+        Me.c1pBtnFileSave1.Action = C1.Win.C1PrintPreview.ToolBarButtonActionEnum.FileSave
+        Me.c1pBtnFileSave1.ImageIndex = 1
+        Me.c1pBtnFileSave1.ToolTipText = "File Save"
+        '
+        'c1pBtnFilePrint1
+        '
+        Me.c1pBtnFilePrint1.Action = C1.Win.C1PrintPreview.ToolBarButtonActionEnum.FilePrint
+        Me.c1pBtnFilePrint1.ImageIndex = 2
+        Me.c1pBtnFilePrint1.ToolTipText = "Print"
+        '
+        'c1pBtnPageSetup1
+        '
+        Me.c1pBtnPageSetup1.Action = C1.Win.C1PrintPreview.ToolBarButtonActionEnum.PageSetup
+        Me.c1pBtnPageSetup1.ImageIndex = 3
+        Me.c1pBtnPageSetup1.ToolTipText = "Page Setup"
+        '
+        'c1pBtnReflow1
+        '
+        Me.c1pBtnReflow1.Action = C1.Win.C1PrintPreview.ToolBarButtonActionEnum.Reflow
+        Me.c1pBtnReflow1.ImageIndex = 4
+        Me.c1pBtnReflow1.ToolTipText = "Reflow"
+        Me.c1pBtnReflow1.Visible = False
+        '
+        'c1pBtnStop1
+        '
+        Me.c1pBtnStop1.Action = C1.Win.C1PrintPreview.ToolBarButtonActionEnum.Stop
+        Me.c1pBtnStop1.ImageIndex = 5
+        Me.c1pBtnStop1.ToolTipText = "Stop"
+        Me.c1pBtnStop1.Visible = False
+        '
+        'c1pBtnDocInfo1
+        '
+        Me.c1pBtnDocInfo1.Action = C1.Win.C1PrintPreview.ToolBarButtonActionEnum.DocInfo
+        Me.c1pBtnDocInfo1.Enabled = False
+        Me.c1pBtnDocInfo1.ImageIndex = 26
+        Me.c1pBtnDocInfo1.ToolTipText = "Document information"
+        Me.c1pBtnDocInfo1.Visible = False
+        '
+        'c1pBtnSeparator1
+        '
+        Me.c1pBtnSeparator1.Action = C1.Win.C1PrintPreview.ToolBarButtonActionEnum.None
+        Me.c1pBtnSeparator1.Style = System.Windows.Forms.ToolBarButtonStyle.Separator
+        Me.c1pBtnSeparator1.Visible = False
+        '
+        'c1pBtnShowNavigationBar1
+        '
+        Me.c1pBtnShowNavigationBar1.Action = C1.Win.C1PrintPreview.ToolBarButtonActionEnum.ShowNavigationBar
+        Me.c1pBtnShowNavigationBar1.ImageIndex = 6
+        Me.c1pBtnShowNavigationBar1.Style = System.Windows.Forms.ToolBarButtonStyle.ToggleButton
+        Me.c1pBtnShowNavigationBar1.ToolTipText = "Show Navigation Bar"
+        Me.c1pBtnShowNavigationBar1.Visible = False
+        '
+        'c1pBtnSeparator2
+        '
+        Me.c1pBtnSeparator2.Action = C1.Win.C1PrintPreview.ToolBarButtonActionEnum.None
+        Me.c1pBtnSeparator2.Style = System.Windows.Forms.ToolBarButtonStyle.Separator
+        Me.c1pBtnSeparator2.Visible = False
+        '
+        'c1pBtnMouseHand1
+        '
+        Me.c1pBtnMouseHand1.Action = C1.Win.C1PrintPreview.ToolBarButtonActionEnum.MouseHand
+        Me.c1pBtnMouseHand1.ImageIndex = 7
+        Me.c1pBtnMouseHand1.Pushed = True
+        Me.c1pBtnMouseHand1.Style = System.Windows.Forms.ToolBarButtonStyle.ToggleButton
+        Me.c1pBtnMouseHand1.ToolTipText = "Hand Tool"
+        Me.c1pBtnMouseHand1.Visible = False
+        '
+        'c1pBtnMouseZoom1
+        '
+        Me.c1pBtnMouseZoom1.Action = C1.Win.C1PrintPreview.ToolBarButtonActionEnum.MouseZoom
+        Me.c1pBtnMouseZoom1.ImageIndex = 8
+        Me.c1pBtnMouseZoom1.Style = System.Windows.Forms.ToolBarButtonStyle.DropDownButton
+        Me.c1pBtnMouseZoom1.ToolTipText = "Zoom In Tool"
+        '
+        'c1pBtnMouseZoomOut1
+        '
+        Me.c1pBtnMouseZoomOut1.Action = C1.Win.C1PrintPreview.ToolBarButtonActionEnum.MouseZoomOut
+        Me.c1pBtnMouseZoomOut1.ImageIndex = 25
+        Me.c1pBtnMouseZoomOut1.Style = System.Windows.Forms.ToolBarButtonStyle.DropDownButton
+        Me.c1pBtnMouseZoomOut1.ToolTipText = "Zoom Out Tool"
+        Me.c1pBtnMouseZoomOut1.Visible = False
+        '
+        'c1pBtnMouseSelect1
+        '
+        Me.c1pBtnMouseSelect1.Action = C1.Win.C1PrintPreview.ToolBarButtonActionEnum.MouseSelect
+        Me.c1pBtnMouseSelect1.ImageIndex = 9
+        Me.c1pBtnMouseSelect1.Style = System.Windows.Forms.ToolBarButtonStyle.ToggleButton
+        Me.c1pBtnMouseSelect1.ToolTipText = "Select Text"
+        Me.c1pBtnMouseSelect1.Visible = False
+        '
+        'c1pBtnFindText1
+        '
+        Me.c1pBtnFindText1.Action = C1.Win.C1PrintPreview.ToolBarButtonActionEnum.FindText
+        Me.c1pBtnFindText1.ImageIndex = 10
+        Me.c1pBtnFindText1.ToolTipText = "Find Text"
+        Me.c1pBtnFindText1.Visible = False
+        '
+        'c1pBtnSeparator3
+        '
+        Me.c1pBtnSeparator3.Action = C1.Win.C1PrintPreview.ToolBarButtonActionEnum.None
+        Me.c1pBtnSeparator3.Style = System.Windows.Forms.ToolBarButtonStyle.Separator
+        Me.c1pBtnSeparator3.Visible = False
+        '
+        'c1pBtnGoFirst1
+        '
+        Me.c1pBtnGoFirst1.Action = C1.Win.C1PrintPreview.ToolBarButtonActionEnum.GoFirst
+        Me.c1pBtnGoFirst1.Enabled = False
+        Me.c1pBtnGoFirst1.ImageIndex = 11
+        Me.c1pBtnGoFirst1.ToolTipText = "First Page"
+        Me.c1pBtnGoFirst1.Visible = False
+        '
+        'c1pBtnGoPrev1
+        '
+        Me.c1pBtnGoPrev1.Action = C1.Win.C1PrintPreview.ToolBarButtonActionEnum.GoPrev
+        Me.c1pBtnGoPrev1.Enabled = False
+        Me.c1pBtnGoPrev1.ImageIndex = 12
+        Me.c1pBtnGoPrev1.ToolTipText = "Previous Page"
+        Me.c1pBtnGoPrev1.Visible = False
+        '
+        'c1pBtnGoNext1
+        '
+        Me.c1pBtnGoNext1.Action = C1.Win.C1PrintPreview.ToolBarButtonActionEnum.GoNext
+        Me.c1pBtnGoNext1.ImageIndex = 13
+        Me.c1pBtnGoNext1.ToolTipText = "Next Page"
+        Me.c1pBtnGoNext1.Visible = False
+        '
+        'c1pBtnGoLast1
+        '
+        Me.c1pBtnGoLast1.Action = C1.Win.C1PrintPreview.ToolBarButtonActionEnum.GoLast
+        Me.c1pBtnGoLast1.ImageIndex = 14
+        Me.c1pBtnGoLast1.ToolTipText = "Last Page"
+        Me.c1pBtnGoLast1.Visible = False
+        '
+        'c1pBtnSeparator4
+        '
+        Me.c1pBtnSeparator4.Action = C1.Win.C1PrintPreview.ToolBarButtonActionEnum.None
+        Me.c1pBtnSeparator4.Style = System.Windows.Forms.ToolBarButtonStyle.Separator
+        Me.c1pBtnSeparator4.Visible = False
+        '
+        'c1pBtnHistoryPrev1
+        '
+        Me.c1pBtnHistoryPrev1.Action = C1.Win.C1PrintPreview.ToolBarButtonActionEnum.HistoryPrev
+        Me.c1pBtnHistoryPrev1.Enabled = False
+        Me.c1pBtnHistoryPrev1.ImageIndex = 15
+        Me.c1pBtnHistoryPrev1.Style = System.Windows.Forms.ToolBarButtonStyle.DropDownButton
+        Me.c1pBtnHistoryPrev1.ToolTipText = "Previous View"
+        Me.c1pBtnHistoryPrev1.Visible = False
+        '
+        'c1pBtnHistoryNext1
+        '
+        Me.c1pBtnHistoryNext1.Action = C1.Win.C1PrintPreview.ToolBarButtonActionEnum.HistoryNext
+        Me.c1pBtnHistoryNext1.Enabled = False
+        Me.c1pBtnHistoryNext1.ImageIndex = 16
+        Me.c1pBtnHistoryNext1.Style = System.Windows.Forms.ToolBarButtonStyle.DropDownButton
+        Me.c1pBtnHistoryNext1.ToolTipText = "Next View"
+        Me.c1pBtnHistoryNext1.Visible = False
+        '
+        'c1pBtnSeparator5
+        '
+        Me.c1pBtnSeparator5.Action = C1.Win.C1PrintPreview.ToolBarButtonActionEnum.None
+        Me.c1pBtnSeparator5.Style = System.Windows.Forms.ToolBarButtonStyle.Separator
+        Me.c1pBtnSeparator5.Visible = False
+        '
+        'c1pBtnZoomOut1
+        '
+        Me.c1pBtnZoomOut1.Action = C1.Win.C1PrintPreview.ToolBarButtonActionEnum.ZoomOut
+        Me.c1pBtnZoomOut1.ImageIndex = 17
+        Me.c1pBtnZoomOut1.ToolTipText = "Zoom Out"
+        Me.c1pBtnZoomOut1.Visible = False
+        '
+        'c1pBtnZoomIn1
+        '
+        Me.c1pBtnZoomIn1.Action = C1.Win.C1PrintPreview.ToolBarButtonActionEnum.ZoomIn
+        Me.c1pBtnZoomIn1.ImageIndex = 18
+        Me.c1pBtnZoomIn1.ToolTipText = "Zoom In"
+        Me.c1pBtnZoomIn1.Visible = False
+        '
+        'c1pBtnSeparator6
+        '
+        Me.c1pBtnSeparator6.Action = C1.Win.C1PrintPreview.ToolBarButtonActionEnum.None
+        Me.c1pBtnSeparator6.Style = System.Windows.Forms.ToolBarButtonStyle.Separator
+        Me.c1pBtnSeparator6.Visible = False
+        '
+        'c1pBtnViewActualSize1
+        '
+        Me.c1pBtnViewActualSize1.Action = C1.Win.C1PrintPreview.ToolBarButtonActionEnum.ViewActualSize
+        Me.c1pBtnViewActualSize1.ImageIndex = 19
+        Me.c1pBtnViewActualSize1.Style = System.Windows.Forms.ToolBarButtonStyle.ToggleButton
+        Me.c1pBtnViewActualSize1.ToolTipText = "Actual Size"
+        Me.c1pBtnViewActualSize1.Visible = False
+        '
+        'c1pBtnViewFullPage1
+        '
+        Me.c1pBtnViewFullPage1.Action = C1.Win.C1PrintPreview.ToolBarButtonActionEnum.ViewFullPage
+        Me.c1pBtnViewFullPage1.ImageIndex = 20
+        Me.c1pBtnViewFullPage1.Pushed = True
+        Me.c1pBtnViewFullPage1.Style = System.Windows.Forms.ToolBarButtonStyle.ToggleButton
+        Me.c1pBtnViewFullPage1.ToolTipText = "Full Page"
+        Me.c1pBtnViewFullPage1.Visible = False
+        '
+        'c1pBtnViewPageWidth1
+        '
+        Me.c1pBtnViewPageWidth1.Action = C1.Win.C1PrintPreview.ToolBarButtonActionEnum.ViewPageWidth
+        Me.c1pBtnViewPageWidth1.ImageIndex = 21
+        Me.c1pBtnViewPageWidth1.Style = System.Windows.Forms.ToolBarButtonStyle.ToggleButton
+        Me.c1pBtnViewPageWidth1.ToolTipText = "Page Width"
+        Me.c1pBtnViewPageWidth1.Visible = False
+        '
+        'c1pBtnViewTwoPages1
+        '
+        Me.c1pBtnViewTwoPages1.Action = C1.Win.C1PrintPreview.ToolBarButtonActionEnum.ViewTwoPages
+        Me.c1pBtnViewTwoPages1.ImageIndex = 22
+        Me.c1pBtnViewTwoPages1.Style = System.Windows.Forms.ToolBarButtonStyle.ToggleButton
+        Me.c1pBtnViewTwoPages1.ToolTipText = "Two Pages"
+        Me.c1pBtnViewTwoPages1.Visible = False
+        '
+        'c1pBtnViewFourPages1
+        '
+        Me.c1pBtnViewFourPages1.Action = C1.Win.C1PrintPreview.ToolBarButtonActionEnum.ViewFourPages
+        Me.c1pBtnViewFourPages1.ImageIndex = 23
+        Me.c1pBtnViewFourPages1.Style = System.Windows.Forms.ToolBarButtonStyle.DropDownButton
+        Me.c1pBtnViewFourPages1.ToolTipText = "Four Pages"
+        Me.c1pBtnViewFourPages1.Visible = False
+        '
+        'c1pBtnSeparator7
+        '
+        Me.c1pBtnSeparator7.Action = C1.Win.C1PrintPreview.ToolBarButtonActionEnum.None
+        Me.c1pBtnSeparator7.Style = System.Windows.Forms.ToolBarButtonStyle.Separator
+        Me.c1pBtnSeparator7.Visible = False
+        '
+        'c1pBtnHelp1
+        '
+        Me.c1pBtnHelp1.Action = C1.Win.C1PrintPreview.ToolBarButtonActionEnum.Help
+        Me.c1pBtnHelp1.ImageIndex = 24
+        Me.c1pBtnHelp1.ToolTipText = "Help"
+        Me.c1pBtnHelp1.Visible = False
+        '
+        'frmDesgloseMuestraColorMaquina
+        '
+        Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
+        Me.ClientSize = New System.Drawing.Size(992, 596)
+        Me.Controls.Add(Me.TabControl1)
+        Me.Cursor = System.Windows.Forms.Cursors.Default
+        Me.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!)
+        Me.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.KeyPreview = True
+        Me.Name = "frmDesgloseMuestraColorMaquina"
+        Me.Text = "Fitxa técnica mostres"
+        Me.Controls.SetChildIndex(Me.cboSeleccionCentro, 0)
+        Me.Controls.SetChildIndex(Me.sbtipo, 0)
+        Me.Controls.SetChildIndex(Me.btnActualizar, 0)
+        Me.Controls.SetChildIndex(Me.btnNuevo, 0)
+        Me.Controls.SetChildIndex(Me.btnBorrar, 0)
+        Me.Controls.SetChildIndex(Me.btnTancar, 0)
+        Me.Controls.SetChildIndex(Me.btnUltimo, 0)
+        Me.Controls.SetChildIndex(Me.btnPrimero, 0)
+        Me.Controls.SetChildIndex(Me.btnAnterior, 0)
+        Me.Controls.SetChildIndex(Me.btnSiguiente, 0)
+        Me.Controls.SetChildIndex(Me.btnRecargar, 0)
+        Me.Controls.SetChildIndex(Me.btnVerLista, 0)
+        Me.Controls.SetChildIndex(Me.btnModificar, 0)
+        Me.Controls.SetChildIndex(Me.TabControl1, 0)
+        Me.GroupBox1.ResumeLayout(False)
+        CType(Me.txtCODI, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.txtNOMCLIENT, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.txtCLIENT, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.dtpDATA, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.GroupBox2.ResumeLayout(False)
+        CType(Me.txtCORTES, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.txtIMPORT, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.txtTEMPS, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.txtDISCO, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.txtVELOSITAT, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.txtAGULLES, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.txtMAQUINA, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.txtNOMMAQUI, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.cboHilos, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.dgDesglose, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.cboColores, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.cboProveedores, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.txtDESCRIP, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.txtTALLA, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.txtCOLOR, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.txtNOTAS, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.TabControl1.ResumeLayout(False)
+        Me.TabPage1.ResumeLayout(False)
+        Me.TabPage2.ResumeLayout(False)
+        CType(Me.ppFitxa, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.ResumeLayout(False)
+
+    End Sub
+
+#End Region
+
+#Region "VARIABLES"
+
+    Public desglose As clsDesgloseMuestra
+    Public maquina As clsMaquinasMuestra
+    Public muestra As clsMuestra
+
+    Private bindingManagerLineas As BindingManagerBase
+
+#End Region
+
+#Region "INICIALIZACION"
+
+    Private Sub IniciarForm(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
+        Cursor = Cursors.WaitCursor
+        Try
+            editando = True
+            desglose = New clsDesgloseMuestra(ds.Tables("color"), muestra.centro, Me.BindingContext, Me.muestra, maquina)
+            maquina = New clsMaquinasMuestra(ds.Tables(tablaMaq), muestra.centro, Me.BindingContext, Me.muestra, Me.desglose)
+            desglose.m_Maquina = maquina
+
+            'Cargamos los hilos que seleccionaremos
+            HacerBindings()
+            InicializarDGDesglose()
+            PonerHandlersErroresParaGrids()
+            dgDesglose.Splits(0).DisplayColumns("CONSUM").DataColumn.FooterText = sumaTotal("CONSUM", desglose.dvForm)
+            bindingManagerLineas = BindingContext(dgDesglose.DataSource)
+            txtCLIENT.ReadOnly = True
+            txtCODI.ReadOnly = True
+            txtCOLOR.ReadOnly = True
+            txtDESCRIP.ReadOnly = True
+            txtTALLA.ReadOnly = True
+            txtNOMCLIENT.ReadOnly = True
+            txtMAQUINA.ReadOnly = True
+            txtNOMMAQUI.ReadOnly = True
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = false : ccn()
+        End Try
+        Cursor = Cursors.Default
+    End Sub
+    Private Sub HacerBindings()
+        Try
+            HacerBindingsTodos(muestra.dvForm)
+            txtDESCRIP.Value = muestra.cartaColores.DESCRI
+            txtCOLOR.Value = muestra.cartaColores.COLOR
+            txtTALLA.Value = muestra.cartaColores.TALLA
+
+            'HacerBindingsTodos(muestra.cartaColores.dvForm)
+            HacerBindingsTodos(maquina.dvForm)
+
+            dgDesglose.SetDataBinding(desglose.dvForm, "")
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+
+#End Region
+
+#Region "ORGANIZAR"
+           
+    Private Sub txtTiempoMaquina_Validated(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles txtTEMPS.Validated
+        Try
+            If PuedoModificar() Then : cargando = True : desglose.ValidarTiempoMaq() : cargando = False : End If
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+
+    End Sub
+    Private Sub btnCerrar_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnTancar.Click
+        Try
+            Close()
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub dgDesglose_ButtonClick(ByVal sender As Object, ByVal e As C1.Win.C1TrueDBGrid.ColEventArgs) Handles dgDesglose.ButtonClick
+        If Not cargando And editando Then
+            If e.Column.DataColumn.DataField = "ELEGIRHILO" Then
+
+                cargando = True
+                Cursor = Cursors.WaitCursor
+                Dim f As frmHilosLista = frmHilosLista.GetInstance(esEleccion, desglose.centro)
+                f.ShowDialog()
+                Cursor = Cursors.Default
+                dgDesglose.EditActive = True
+                If Not f.dr Is Nothing Then
+                    desglose.TEIXIT = nz(f.dr("CODI"), "")
+                    desglose.PROVE = nz(f.dr("PROVE"), 0)
+                    desglose.PREU = nzn(f.dr("PREU"), 0)
+                    desglose.CargarColores()
+                    AutosizeColumnasTrueDBDropdown(cboColores)
+                    AutosizeColumnasTrueDBDropdown(cboProveedores)
+                End If
+                f = Nothing
+                cargando = False
+
+            End If
+        End If
+    End Sub
+    Private Sub dgDesglose_AfterColUpdate(ByVal sender As Object, ByVal e As C1.Win.C1TrueDBGrid.ColEventArgs) Handles dgDesglose.AfterColUpdate
+        Dim columna As String = e.Column.DataColumn.DataField
+        Try
+            If PuedoModificar() Then
+                cargando = True
+                dgDesglose.UpdateData()
+                Select Case columna
+                    Case "TEIXIT"
+                        desglose.ponerProveedores()
+                        desglose.PROVE = nzn(cboProveedores.Columns(tablaProveedores).Value, 0)
+                        desglose.CargarColores()
+                        AutosizeColumnasTrueDBDropdown(cboColores)
+                        AutosizeColumnasTrueDBDropdown(cboProveedores)
+
+                    Case "COLOR"
+                        desglose.COLOR = nz(cboColores.Columns("COLOR").Value, "")
+                        desglose.PREU = nzn(cboColores.Columns("COST").Value, 0)
+                End Select
+                cargando = False
+                AutoSizeCC(dgDesglose)
+                dgDesglose.Splits(0).DisplayColumns("CONSUM").DataColumn.FooterText = sumaTotal("CONSUM", desglose.dvForm)
+            End If
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False
+        End Try
+    End Sub
+    Private Sub btnAceptar_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnAceptar.Click
+        Try
+            desglose.ActualizarOrigen()
+            maquina.ActualizarOrigen()
+            Me.Close()
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+
+#End Region
+
+#Region "INICIALIZACION"
+
+    Private Sub InicializarDGDesglose()
+        Dim i As Integer
+        Try
+            OcultarColumnasDG(dgDesglose)
+
+            i = 1
+            PPCol2("TEIXIT", dgDesglose, rm.GetString("HILO") & " ", "", True, 125, False, C1.Win.C1TrueDBGrid.PresentationEnum.ComboBox, False, 125, i, False, cboHilos)
+            AñadirBindingCombo(cboHilos, desglose.dtTeixits.DefaultView, CCFil, CCFil)
+
+            i = i + 1
+            PPCol2("ELEGIRHILO", dgDesglose, "", "", True, 20, False, C1.Win.C1TrueDBGrid.PresentationEnum.Normal, True, 20, i, False)
+
+            'i = i + 1
+            'PPCol2(tablaProveedores, dgDesglose, rm.GetString("PROVEEDOR"), "", True, 60, False, C1.Win.C1TrueDBGrid.PresentationEnum.Normal, False, 60, 0, False)
+
+            i = i + 1
+            PPCol2("NOMPROVE", dgDesglose, rm.GetString("NOMPROVE"), "", True, 250, False, C1.Win.C1TrueDBGrid.PresentationEnum.Normal, False, 250, i, True) ', cboProveedores)
+            AñadirBindingCombo(cboProveedores, desglose.dvProveedores, "NOMPROVE", "NOMPROVE")
+
+            i = i + 1
+            PPCol2("COLOR", dgDesglose, rm.GetString("COLOR"), "", True, 125, False, C1.Win.C1TrueDBGrid.PresentationEnum.ComboBox, False, 125, i, False, cboColores)
+            AñadirBindingCombo(cboColores, desglose.dtColores, "COLOR", "COLOR")
+
+            i = i + 1
+            PPCol2("FIL", dgDesglose, "GH", "#,##0.00", True, 50, False, C1.Win.C1TrueDBGrid.PresentationEnum.Normal, False, 50, i, False)
+
+            i = i + 1
+            PPCol2("CAPS", dgDesglose, rm.GetString("CAPS"), "#,##0.00", True, 50, False, C1.Win.C1TrueDBGrid.PresentationEnum.Normal, False, 50, i, False)
+
+            i = i + 1
+            PPCol2("PASSADES", dgDesglose, rm.GetString("PASSADES"), "#,##0.00", True, 50, False, C1.Win.C1TrueDBGrid.PresentationEnum.Normal, False, 50, i, False)
+
+            i = i + 1
+            PPCol2("GRADUACION", dgDesglose, rm.GetString("GRADUACION"), "#,##0.00", True, 50, False, C1.Win.C1TrueDBGrid.PresentationEnum.Normal, False, 50, i, False)
+
+            i = i + 1
+            PPCol2("CONSUM", dgDesglose, rm.GetString("CONSUM"), "#0.000", True, 50, False, C1.Win.C1TrueDBGrid.PresentationEnum.Normal, False, 50, i, False)
+
+            i = i + 1
+            PPCol2("PREU", dgDesglose, rm.GetString("PRECIO"), "#,##0.00", True, 50, False, C1.Win.C1TrueDBGrid.PresentationEnum.Normal, False, 50, i, False)
+
+            i = i + 1
+            PPCol2("IMPORT", dgDesglose, rm.GetString("IMPORTE"), "#,##0.00", True, 50, False, C1.Win.C1TrueDBGrid.PresentationEnum.Normal, False, 50, i, False)
+
+            dgDesglose.Splits(0).DisplayColumns("CONSUM").FetchStyle = True
+            dgDesglose.ColumnFooters = True
+
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = false : ccn()
+        End Try
+
+    End Sub
+
+#End Region
+
+#Region "MODIFICAR BD"
+
+    Friend Overrides Sub btnActualizar_Click(ByVal sender As Object, ByVal e As System.EventArgs)
+
+    End Sub
+    Friend Overrides Sub btnBorrar_Click(ByVal sender As Object, ByVal e As System.EventArgs)
+
+    End Sub
+    Friend Overrides Sub btnModificar_Click(ByVal sender As Object, ByVal e As System.EventArgs)
+
+    End Sub
+    Friend Overrides Sub btnNuevo_Click(ByVal sender As Object, ByVal e As System.EventArgs)
+
+    End Sub
+
+#End Region
+
+#Region "IMPRESION"
+    Private Sub TabControl1_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles TabControl1.SelectedIndexChanged
+        If TabControl1.SelectedTab Is TabPage2 Then
+            ppFitxa.Document = desglose.ImprimirFichaTecnica()
+        End If
+    End Sub
+#End Region
+
+#Region "ELECCIONES"
+
+#End Region
+
+#Region "DESPLAZAMIENTO"
+
+    Friend Overrides Sub btnAnterior_Click(ByVal sender As Object, ByVal e As System.EventArgs)
+
+    End Sub
+    Friend Overrides Sub btnSiguiente_Click(ByVal sender As Object, ByVal e As System.EventArgs)
+
+    End Sub
+    Friend Overrides Sub btnUltimo_Click(ByVal sender As Object, ByVal e As System.EventArgs)
+
+    End Sub
+    Protected Friend Overrides Sub btnPrimero_Click(ByVal sender As Object, ByVal e As System.EventArgs)
+
+    End Sub
+
+#End Region
+
+    Private Sub dgDesglose_BeforeDelete(ByVal sender As Object, ByVal e As C1.Win.C1TrueDBGrid.CancelEventArgs) Handles dgDesglose.BeforeDelete
+        Try
+            If MessageBox.Show(rm.GetString("BORRARLINEA"), rm.GetString("ConfirmacionEliminacion"), MessageBoxButtons.YesNo) = DialogResult.Yes Then
+                e.Cancel = False
+            Else
+                e.Cancel = True
+            End If
+
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Sub
+
+End Class

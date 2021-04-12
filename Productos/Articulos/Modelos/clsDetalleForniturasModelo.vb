@@ -1,0 +1,548 @@
+Imports MySql.Data.MySqlClient : Imports clsFuncionesLOG : Imports clsFuncionesC1 : Imports clsFuncionesUtiles : Imports clsConstantes
+Public Class clsDetalleForniturasModelo
+    Inherits clsADO
+
+#Region "CAMPOS"
+
+    Private mMODEL As String
+    Public Property MODEL() As String
+        Get
+            If PA = -1 Then Exit Property
+            Try
+                mMODEL = general.nz(dvForm(pa).Row("MODEL"), "")
+            Catch ex As Exception : End Try
+            Return general.nz(mMODEL, "")
+        End Get
+        Set(ByVal Value As String)
+            If PA = -1 Then Exit Property
+            If general.nz(Value, "") <> general.nz(MODEL, "") Then
+                mMODEL = general.nz(Value, "")
+                dvForm(pa).Row("MODEL") = general.nz(mMODEL, "") : GuardarDV()
+            End If
+        End Set
+    End Property
+
+    Private mTEMPORADA As String
+    Public Property TEMPORADA() As String
+        Get
+            If PA = -1 Then Exit Property
+            Try
+                mTEMPORADA = general.nz(dvForm(pa).Row("TEMPORADA"), "")
+            Catch ex As Exception : End Try
+            Return general.nz(mTEMPORADA, "")
+        End Get
+        Set(ByVal Value As String)
+            If PA = -1 Then Exit Property
+            If general.nz(Value, "") <> general.nz(TEMPORADA, "") Then
+                mTEMPORADA = general.nz(Value, "")
+                dvForm(pa).Row("TEMPORADA") = general.nz(mTEMPORADA, "") : GuardarDV()
+            End If
+        End Set
+    End Property
+
+    Private mMEDIDA As String
+    Public Property MEDIDA() As String
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mMEDIDA = general.nz(dvForm(PA).Row("MEDIDA"), "")
+            Catch ex As Exception : End Try
+            Return general.nz(mMEDIDA, "")
+        End Get
+        Set(ByVal Value As String)
+            If PA() = -1 Then Exit Property
+            If general.nz(Value, "") <> general.nz(MEDIDA, "") Then
+                mMEDIDA = general.nz(Value, "")
+                dvForm(PA).Row("MEDIDA") = general.nz(mMEDIDA, "") : guardarDV()
+            End If
+        End Set
+    End Property
+
+    Private mCLIENT As Integer
+    Public Property CLIENT() As Integer
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mCLIENT = nzn(dvForm(PA).Row("CLIENT"), 0)
+            Catch ex As Exception : End Try
+            Return nzn(mCLIENT, 0)
+        End Get
+        Set(ByVal Value As Integer)
+            If PA() = -1 Then Exit Property
+            If esCodigoExistente(dtClients, CCClients, Value) Then
+                If nzn(Value, 0) <> 0 Then
+                    mCLIENT = nzn(Value, 0)
+                    dvForm(PA).Row("NOMCLIENT") = general.OBN(Value, dtClients, CNClients)
+                    dvForm(PA).Row("CLIENT") = nzn(Value, 0) : guardarDV()
+                End If
+            Else
+                dvForm(PA).Row("CLIENT") = 0
+
+                dvForm(PA).Row("NOMCLIENT") = "" : guardarDV()
+                MessageBox.Show(rm.GetString("NOEXISTECLIENTS"))
+            End If
+        End Set
+    End Property
+
+    Private mNOMCLIENT As String
+    Public Property NOMCLIENT() As String
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mNOMCLIENT = general.nz(dvForm(PA).Row("NOMCLIENT"), "")
+            Catch ex As Exception : End Try
+            Return general.nz(mNOMCLIENT, "")
+        End Get
+        Set(ByVal Value As String)
+            If PA() = -1 Then Exit Property
+            mNOMCLIENT = general.nz(Value, "")
+            If tabla.GetChanges Is Nothing Then
+                dvForm(PA).Row("NOMCLIENT") = general.nz(Value, "") : guardarDV()
+                tabla.AcceptChanges()
+            Else
+                dvForm(PA).Row("NOMCLIENT") = general.nz(Value, "") : guardarDV()
+            End If
+        End Set
+    End Property
+
+    Private mSERIE As String
+    Public Property SERIE() As String
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mSERIE = general.nz(dvForm(PA).Row("SERIE"), "")
+            Catch ex As Exception : End Try
+            Return general.nz(mSERIE, "")
+        End Get
+        Set(ByVal Value As String)
+            If PA() = -1 Then Exit Property
+            If general.nz(Value, "") <> general.nz(SERIE, "") Then
+                mSERIE = general.nz(Value, "")
+                dvForm(PA).Row("SERIE") = general.nz(mSERIE, "") : guardarDV()
+            End If
+        End Set
+    End Property
+
+    Private mNLINEA As Integer
+    Public Property NLINEA() As Integer
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mNLINEA = nzn(dvForm(PA).Row("NLINEA"), 0)
+            Catch ex As Exception : End Try
+            Return nzn(mNLINEA, 0)
+        End Get
+        Set(ByVal Value As Integer)
+            If PA() = -1 Then Exit Property
+            If nzn(Value, 0) <> nzn(NLINEA, 0) Then
+                mNLINEA = nzn(Value, 0)
+                dvForm(PA).Row("NLINEA") = nzn(mNLINEA, 0) : guardarDV()
+            End If
+        End Set
+    End Property
+
+    Private mIMPORT As Double
+    Public Property IMPORT() As Double
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mIMPORT = nzn(dvForm(PA).Row("IMPORT"), 0)
+            Catch ex As Exception : End Try
+            Return nzn(mIMPORT, 0)
+        End Get
+        Set(ByVal Value As Double)
+            If PA() = -1 Then Exit Property
+            If nzn(Value, 0) <> nzn(IMPORT, 0) Then
+                mIMPORT = nzn(Value, 0)
+                dvForm(PA).Row("IMPORT") = nzn(mIMPORT, 0) : guardarDV()
+            End If
+        End Set
+    End Property
+
+    Private mFORNI As String
+    Public Property FORNI() As String
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mFORNI = general.nz(dvForm(PA).Row("FORNI"), "")
+            Catch ex As Exception : End Try
+            Return general.nz(mFORNI, "")
+        End Get
+        Set(ByVal Value As String)
+            If PA() = -1 Then Exit Property
+            If general.nz(Value, "") <> general.nz(FORNI, "") Then
+                mFORNI = general.nz(Value, "")
+                dvForm(PA).Row("FORNI") = general.nz(mFORNI, "") : guardarDV()
+            End If
+        End Set
+    End Property
+
+    Private mUNITATS As Double
+    Public Property UNITATS() As Double
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mUNITATS = nzn(dvForm(PA).Row("UNITATS"), 0)
+            Catch ex As Exception : End Try
+            Return nzn(mUNITATS, 0)
+        End Get
+        Set(ByVal Value As Double)
+            If PA() = -1 Then Exit Property
+            If nzn(Value, 0) <> nzn(UNITATS, 0) Then
+                mUNITATS = nzn(Value, 0)
+                dvForm(PA).Row("UNITATS") = nzn(mUNITATS, 0) : guardarDV()
+            End If
+        End Set
+    End Property
+
+#End Region
+
+#Region "CAMPOS PROPIOS"
+
+    Private mPREU As Double
+    Public Property PREU() As Double
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mPREU = nzn(dvForm(PA).Row("PREU"), 0)
+            Catch ex As Exception : End Try
+            Return nzn(mPREU, 0)
+        End Get
+        Set(ByVal Value As Double)
+            If PA() = -1 Then Exit Property
+            If nzn(Value, 0) <> nzn(PREU, 0) Then
+                mPREU = nzn(Value, 0)
+                dvForm(PA).Row("PREU") = nzn(mPREU, 0) : guardarDV()
+            End If
+        End Set
+    End Property
+
+#End Region
+
+#Region "VARIABLES"
+
+    Friend dtClients As New DataTable("CLIENTS")
+    Friend modelo As clsModelo
+    Friend dtMedidas As New DataTable
+
+#End Region
+
+    Friend Sub RowChanged(ByVal sender As Object, ByVal e As System.data.DataRowChangeEventArgs)
+
+        Try
+            modelo.DormirHandlers()
+            If NLINEA = 10000 Then
+                Try
+                    If dvForm(dvForm.Count - 2).Item("NLINEA") = -1 Then
+                        NLINEA = 1
+                    Else
+                        NLINEA = dvForm(dvForm.Count - 2).Item("NLINEA") + 1
+                    End If
+
+                Catch ex As Exception
+                    NLINEA = 1
+                End Try
+            End If
+            modelo.DespertarHandlers()
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Public Sub New(ByVal tabla As DataTable, _
+            ByVal centro As String, ByRef bindingcontext As BindingContext, ByVal mode As clsModelo)
+
+        MyBase.New(tabla, centro, bindingcontext)
+        Dim sqlSel As String
+        Try
+            modelo = mode
+            sqlSinWhere = "SELECT mforni.*, " & _
+                    " " & tablaFornituras & ".descri " & _
+                    " FROM " & tablaForniturasModelos & " " & _
+                    " LEFT JOIN " & tablaFornituras & " ON (" & tablaFornituras & ".codi = mforni.FORNI) "
+
+
+            sqlSel = sqlSinWhere & " WHERE MFORNI.MODEL = """ & modelo.CODI & """ AND " & _
+                            " MFORNI.TEMPORADA = """ & modelo.TEMPORADA & """ AND " & _
+                            " MFORNI.SERIE = """ & modelo.SERIE & """ AND " & _
+                            " MFORNI.CLIENT = """ & modelo.CLIENT & """ AND " & _
+                            " MFORNI.CENTRO = """ & modelo.centro & """ ORDER BY nlinea "
+
+            cmdSel.CommandText = sqlSel
+            dvForm.Sort = "NLINEA"
+            da.SelectCommand = cmdSel
+            da.Fill(tabla)
+            tabla.Columns.Add(New DataColumn("ELEGIRFORNITURA"))
+            PonerDefaults()
+            CrearTablaMedidas()
+            AddHandler tabla.RowChanged, AddressOf RowChanged
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Friend Sub CambioDetalle(ByVal centro As String, ByVal mode As clsModelo)
+        Try
+            Dim sqlSel As String
+            modelo = mode
+            Me.centro = centro
+            sqlSel = sqlSinWhere & _
+                            " WHERE  MFORNI.MODEL = """ & modelo.CODI & """ AND " & _
+                            "  MFORNI.TEMPORADA = """ & modelo.TEMPORADA & """ AND " & _
+                            "  MFORNI.SERIE = """ & modelo.SERIE & """ AND " & _
+                            "  MFORNI.CLIENT = """ & modelo.CLIENT & """ AND " & _
+                            "  MFORNI.CENTRO = """ & modelo.centro & """ ORDER BY nlinea "
+
+            cmdSel.CommandText = sqlSel
+            dvForm.Sort = "NLINEA"
+            da.SelectCommand = cmdSel
+            tabla.Clear()
+            da.Fill(tabla)
+
+            PonerDefaults()
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub PonerDefaults()
+        Try
+            With dvForm
+                .Table.Columns("MODEL").DefaultValue = modelo.CODI
+                .Table.Columns("CLIENT").DefaultValue = modelo.CLIENT
+                .Table.Columns("SERIE").DefaultValue = modelo.SERIE
+                .Table.Columns("TEMPORADA").DefaultValue = modelo.TEMPORADA
+                .Table.Columns("UNITATS").DefaultValue = 0
+                .Table.Columns("PREU").DefaultValue = 0
+                .Table.Columns("FORNI").DefaultValue = ""
+                .Table.Columns("CENTRO").DefaultValue = modelo.centro
+            End With
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Public Sub ActualizarDetalle()
+        Dim i As Integer
+        Dim cambio As Boolean = False
+        Try
+            For i = 0 To dvForm.Count - 1
+                If general.nz(dvForm(i).Item("MODEL"), "") <> general.nz(modelo.CODI, 0) Then dvForm(i).Item("MODEL") = general.nz(modelo.CODI, 0) : cambio = True
+                If general.nz(dvForm(i).Item("SERIE"), "") <> general.nz(modelo.SERIE, "") Then dvForm(i).Item("SERIE") = general.nz(modelo.SERIE, "") : cambio = True
+                If general.nz(dvForm(i).Item("TEMPORADA"), "") <> general.nz(modelo.TEMPORADA, "") Then dvForm(i).Item("TEMPORADA") = general.nz(modelo.TEMPORADA, "") : cambio = True
+                If general.nz(dvForm(i).Item("CENTRO"), "") <> general.nz(modelo.centro, "") Then dvForm(i).Item("CENTRO") = general.nz(modelo.centro, "") : cambio = True
+            Next
+            If cambio Then guardarDV()
+
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Sub
+    Public Overrides Sub ActualizarOrigen(Optional ByVal nocerrar As Boolean = False, Optional ByVal hackDetalle As Boolean = False)
+        Try
+            ActualizarDetalle()
+            MyBase.ActualizarOrigen(True, True)
+
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Sub
+
+#Region "OVERRIDES"
+
+    Friend Overrides Function TieneCambios() As Boolean
+        Try
+            guardarDV()
+            If Not tabla.GetChanges Is Nothing Then
+                Return True
+            Else
+                Return False
+            End If
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Function
+    Public Overrides Sub borrar()
+        Try
+            BorrarActualDVDetalle()
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Friend Overrides Function genWhere() As String
+        Try
+            Dim ret As String
+            ret = "WHERE " & tabla.TableName & ".CENTRO = """ & centro & """"
+            Return ret
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Function
+    Friend Overrides Function GenOrder() As String
+        Try
+            Return ""
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Function
+    Friend Overrides Function ObtenerNumeroRegistro(ByVal id As Object) As Integer
+        If id Is Nothing Then
+            id = FORNI
+        End If
+        Dim cmd As New MySqlCommand(" SELECT " & _
+           " (SELECT COUNT(*) " & _
+           " FROM " & tabla.TableName & " AS M2 WHERE " & _
+           " M2.CODI < M1.CODI AND  " & WCNoTabla() & " ) AS rownum FROM " & tabla.TableName & " AS M1  WHERE CODI = """ & id & """ AND " & WCNoTabla() & GenOrder(), cnn)
+        Try
+            Dim idx As Object = cmd.ExecuteScalar()
+            If idx Is Nothing Then Return -1
+            Return idx '- 1
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Function
+    Friend Overrides Function genWhereNumeroRegistros() As String
+        Try
+            Return genWhere()
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Function
+
+#End Region
+
+    Public Function esColParaActualizarPrecio(ByVal col As String) As Boolean
+        Try
+            If col = "MEDIDA" Then
+                Return True
+            Else
+                Return False
+            End If
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False
+        End Try
+    End Function
+    Private Sub CrearTablaMedidas()
+        Try
+            dtMedidas.Clear()
+            dtMedidas.Columns.Clear()
+            Dim dc1 As New DataColumn("MEDIDA")
+            dc1.Caption = rm.GetString("MEDIDA")
+            dtMedidas.Columns.Add(dc1)
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False
+        End Try
+    End Sub
+    Private Sub CargarMedidasForni()
+        Dim strSQL As String
+        Dim cmdSelect As New MySqlCommand
+        Dim daReader As MySqlDataReader
+        Dim dr As DataRow
+        Try
+
+            cmdSelect.Connection = cnn
+            strSQL = "SELECT color FROM " & tablaHiloColores & " WHERE (TIPUS =""O"" AND FIL = """ & FORNI & """ AND CENTRO = """ & modelo.centro & """ ) ORDER BY color"
+            cmdSelect.CommandText = strSQL
+            ACN()
+            daReader = cmdSelect.ExecuteReader
+            dtMedidas.Rows.Clear()
+
+            While daReader.Read
+                dr = dtMedidas.NewRow
+                dr("MEDIDA") = daReader("COLOR")
+                dtMedidas.Rows.Add(dr)
+            End While
+            daReader.Close()
+            CCN()
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+
+    End Sub
+    Private Sub CambioForni()
+        Try
+            MEDIDA = "" : PREU = 0 : IMPORT = 0
+            Dim dr() As DataRow = modelo.dtForni.Select("CODI = '" & FORNI & "'")
+            If dr.Length > 0 Then
+                'DESCRI =general.nz(dr(0).Item("DESCRI"), "")
+            End If
+            CargarMedidasForni()
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Function CamposParaObtenerPrecioRellenos() As Boolean
+        Try
+            If MEDIDA <> "" AndAlso FORNI <> "" Then
+                Return True
+            End If
+            'Si llegamos aqui no podemos poner precio
+            Return False
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False
+        End Try
+    End Function
+
+    Private Sub PonerPrecioForni()
+        Dim cmdSelect As MySqlCommand
+        Try
+            If Not modelo.dtForni.DefaultView.Find(FORNI) = -1 Then
+                cmdSelect = New MySqlCommand("SELECT PREU " & _
+                        " FROM " & tablaHiloColores & "  " & _
+                        " WHERE (" & _
+                        " TIPUS =""O"" AND " & _
+                        " FIL = """ & FORNI & """ " & _
+                        " AND COLOR = """ & MEDIDA & """ " & _
+                        " AND CENTRO = """ & modelo.centro & """)", cnn)
+                ACN()
+                PREU = cmdSelect.ExecuteScalar
+                CCN()
+            End If
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Public Sub HacerCalculos(ByVal columnaModificada As String, Optional ByVal forzarActualizarPrecios As Boolean = False)
+        Dim unidades As Double
+        Dim recibido As Double
+        Dim porrecibir As Double
+        Try
+            modelo.DormirHandlers()
+            guardarDV()
+
+            Select Case columnaModificada
+                'Case "MEDIDA"
+                'Le cargamos las medidas ya que es una foni diferente
+                'CambioForni()
+
+            Case "FORNI"
+                    CambioForni()
+
+            End Select
+
+            If esColParaActualizarPrecio(columnaModificada) AndAlso CamposParaObtenerPrecioRellenos() Then PonerPrecioForni()
+
+            IMPORT = roundnum(PREU * UNITATS, 2)
+
+
+            modelo.DespertarHandlers()
+            'hayCambios = False
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+
+End Class

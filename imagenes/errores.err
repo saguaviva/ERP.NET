@@ -1,0 +1,144 @@
+
+Entada de errores : 11:32:11 miércoles, 20 de julio de 2005
+  :
+  :System.IndexOutOfRangeException: El índice 0 no es negativo y es inferior al recuento total de filas.
+   at System.Data.DataView.GetElement(Int32 index)
+   at System.Data.DataView.get_Item(Int32 recordIndex)
+   at clsImpresionPAFPO.ImprimirRecibos(Double FRA1, Double FRA2, DateTime FECHA1, DateTime FECHA2, Boolean TenerEnCuentaFechas) in C:\aura2k3\aura2k3\clases\PAF\clsImpresionPAFPO.vb:line 2230
+-------------------------------
+
+Entada de errores : 11:32:12 miércoles, 20 de julio de 2005
+  :
+  :System.NullReferenceException: Referencia a objeto no establecida como instancia de un objeto.
+   at clsImpresionPAFPO.ImprimirRecibos(Double FRA1, Double FRA2, DateTime FECHA1, DateTime FECHA2, Boolean TenerEnCuentaFechas) in C:\aura2k3\aura2k3\clases\PAF\clsImpresionPAFPO.vb:line 2244
+   at clsPAFVenta.ImprimirRecibos(Double FRA1, Double FRA2, DateTime FECHA1, DateTime FECHA2, Boolean conIntervaloFechas) in C:\aura2k3\aura2k3\clases\PAF\Venta\clsPAFVenta.vb:line 2432
+-------------------------------
+
+Entada de errores : 11:33:40 miércoles, 20 de julio de 2005
+  :
+  :System.InvalidCastException: La conversión del tipo 'DBNull' al tipo 'Integer' no es válida.
+   at Microsoft.VisualBasic.CompilerServices.IntegerType.FromObject(Object Value)
+   at clsImpresionPAFPO.CrearTablaRecibos(Double FRA1, Double FRA2, DateTime FECHA1, DateTime FECHA2, Boolean TenerEnCuentaFechas) in C:\aura2k3\aura2k3\clases\PAF\clsImpresionPAFPO.vb:line 2191
+-------------------------------
+
+Entada de errores : 11:33:40 miércoles, 20 de julio de 2005
+  :
+  :System.NullReferenceException: Referencia a objeto no establecida como instancia de un objeto.
+   at clsImpresionPAFPO.CrearTablaRecibos(Double FRA1, Double FRA2, DateTime FECHA1, DateTime FECHA2, Boolean TenerEnCuentaFechas) in C:\aura2k3\aura2k3\clases\PAF\clsImpresionPAFPO.vb:line 2222
+   at clsImpresionPAFPO.ImprimirRecibos(Double FRA1, Double FRA2, DateTime FECHA1, DateTime FECHA2, Boolean TenerEnCuentaFechas) in C:\aura2k3\aura2k3\clases\PAF\clsImpresionPAFPO.vb:line 2239
+-------------------------------
+
+Entada de errores : 11:33:41 miércoles, 20 de julio de 2005
+  :
+  :System.NullReferenceException: Referencia a objeto no establecida como instancia de un objeto.
+   at clsImpresionPAFPO.ImprimirRecibos(Double FRA1, Double FRA2, DateTime FECHA1, DateTime FECHA2, Boolean TenerEnCuentaFechas) in C:\aura2k3\aura2k3\clases\PAF\clsImpresionPAFPO.vb:line 2244
+   at clsPAFVenta.ImprimirRecibos(Double FRA1, Double FRA2, DateTime FECHA1, DateTime FECHA2, Boolean conIntervaloFechas) in C:\aura2k3\aura2k3\clases\PAF\Venta\clsPAFVenta.vb:line 2432
+-------------------------------
+
+Entada de errores : 11:34:39 miércoles, 20 de julio de 2005
+  :
+  :System.IO.IOException: El proceso no puede obtener acceso al archivo "C:\aura2k3\aura2k3\bin\informes\informes.xml" porque está siendo utilizado en otro proceso.
+   at System.IO.__Error.WinIOError(Int32 errorCode, String str)
+   at System.IO.FileStream..ctor(String path, FileMode mode, FileAccess access, FileShare share, Int32 bufferSize, Boolean useAsync, String msgPath, Boolean bFromProxy)
+   at System.IO.FileStream..ctor(String path, FileMode mode, FileAccess access, FileShare share)
+   at System.Xml.XmlDownloadManager.GetStream(Uri uri, ICredentials credentials)
+   at System.Xml.XmlUrlResolver.GetEntity(Uri absoluteUri, String role, Type ofObjectToReturn)
+   at System.Xml.XmlTextReader.CreateScanner()
+   at System.Xml.XmlTextReader.Init()
+   at System.Xml.XmlTextReader.Read()
+   at System.Xml.XmlValidatingReader.ReadWithCollectTextToken()
+   at System.Xml.XmlValidatingReader.Read()
+   at System.Xml.XmlLoader.Load(XmlDocument doc, XmlReader reader, Boolean preserveWhitespace)
+   at System.Xml.XmlDocument.Load(XmlReader reader)
+   at System.Xml.XmlDocument.Load(String filename)
+   at C1.Win.C1Report.C1Report.Load(String fileName, String reportName)
+   at clsImpresionPAFPO.ImprimirRecibos(Double FRA1, Double FRA2, DateTime FECHA1, DateTime FECHA2, Boolean TenerEnCuentaFechas) in C:\aura2k3\aura2k3\clases\PAF\clsImpresionPAFPO.vb:line 2232
+-------------------------------
+
+Entada de errores : 11:34:40 miércoles, 20 de julio de 2005
+  :
+  :System.NullReferenceException: Referencia a objeto no establecida como instancia de un objeto.
+   at clsImpresionPAFPO.ImprimirRecibos(Double FRA1, Double FRA2, DateTime FECHA1, DateTime FECHA2, Boolean TenerEnCuentaFechas) in C:\aura2k3\aura2k3\clases\PAF\clsImpresionPAFPO.vb:line 2244
+   at clsPAFVenta.ImprimirRecibos(Double FRA1, Double FRA2, DateTime FECHA1, DateTime FECHA2, Boolean conIntervaloFechas) in C:\aura2k3\aura2k3\clases\PAF\Venta\clsPAFVenta.vb:line 2432
+-------------------------------
+
+Entada de errores : 11:35:01 miércoles, 20 de julio de 2005
+  :
+  :System.IO.IOException: El proceso no puede obtener acceso al archivo "C:\aura2k3\aura2k3\bin\informes\informes.xml" porque está siendo utilizado en otro proceso.
+   at System.IO.__Error.WinIOError(Int32 errorCode, String str)
+   at System.IO.FileStream..ctor(String path, FileMode mode, FileAccess access, FileShare share, Int32 bufferSize, Boolean useAsync, String msgPath, Boolean bFromProxy)
+   at System.IO.FileStream..ctor(String path, FileMode mode, FileAccess access, FileShare share)
+   at System.Xml.XmlDownloadManager.GetStream(Uri uri, ICredentials credentials)
+   at System.Xml.XmlUrlResolver.GetEntity(Uri absoluteUri, String role, Type ofObjectToReturn)
+   at System.Xml.XmlTextReader.CreateScanner()
+   at System.Xml.XmlTextReader.Init()
+   at System.Xml.XmlTextReader.Read()
+   at System.Xml.XmlValidatingReader.ReadWithCollectTextToken()
+   at System.Xml.XmlValidatingReader.Read()
+   at System.Xml.XmlLoader.Load(XmlDocument doc, XmlReader reader, Boolean preserveWhitespace)
+   at System.Xml.XmlDocument.Load(XmlReader reader)
+   at System.Xml.XmlDocument.Load(String filename)
+   at C1.Win.C1Report.C1Report.Load(String fileName, String reportName)
+   at clsImpresionPAFPO.ImprimirRecibos(Double FRA1, Double FRA2, DateTime FECHA1, DateTime FECHA2, Boolean TenerEnCuentaFechas) in C:\aura2k3\aura2k3\clases\PAF\clsImpresionPAFPO.vb:line 2232
+-------------------------------
+
+Entada de errores : 11:35:02 miércoles, 20 de julio de 2005
+  :
+  :System.NullReferenceException: Referencia a objeto no establecida como instancia de un objeto.
+   at clsImpresionPAFPO.ImprimirRecibos(Double FRA1, Double FRA2, DateTime FECHA1, DateTime FECHA2, Boolean TenerEnCuentaFechas) in C:\aura2k3\aura2k3\clases\PAF\clsImpresionPAFPO.vb:line 2244
+   at clsPAFVenta.ImprimirRecibos(Double FRA1, Double FRA2, DateTime FECHA1, DateTime FECHA2, Boolean conIntervaloFechas) in C:\aura2k3\aura2k3\clases\PAF\Venta\clsPAFVenta.vb:line 2432
+-------------------------------
+
+Entada de errores : 11:37:04 miércoles, 20 de julio de 2005
+  :
+  :System.IO.IOException: El proceso no puede obtener acceso al archivo "C:\aura2k3\aura2k3\bin\informes\informes.xml" porque está siendo utilizado en otro proceso.
+   at System.IO.__Error.WinIOError(Int32 errorCode, String str)
+   at System.IO.FileStream..ctor(String path, FileMode mode, FileAccess access, FileShare share, Int32 bufferSize, Boolean useAsync, String msgPath, Boolean bFromProxy)
+   at System.IO.FileStream..ctor(String path, FileMode mode, FileAccess access, FileShare share)
+   at System.Xml.XmlDownloadManager.GetStream(Uri uri, ICredentials credentials)
+   at System.Xml.XmlUrlResolver.GetEntity(Uri absoluteUri, String role, Type ofObjectToReturn)
+   at System.Xml.XmlTextReader.CreateScanner()
+   at System.Xml.XmlTextReader.Init()
+   at System.Xml.XmlTextReader.Read()
+   at System.Xml.XmlValidatingReader.ReadWithCollectTextToken()
+   at System.Xml.XmlValidatingReader.Read()
+   at System.Xml.XmlLoader.Load(XmlDocument doc, XmlReader reader, Boolean preserveWhitespace)
+   at System.Xml.XmlDocument.Load(XmlReader reader)
+   at System.Xml.XmlDocument.Load(String filename)
+   at C1.Win.C1Report.C1Report.Load(String fileName, String reportName)
+   at clsImpresionPAFPO.ImprimirRecibos(Double FRA1, Double FRA2, DateTime FECHA1, DateTime FECHA2, Boolean TenerEnCuentaFechas) in C:\aura2k3\aura2k3\clases\PAF\clsImpresionPAFPO.vb:line 2232
+-------------------------------
+
+Entada de errores : 11:37:05 miércoles, 20 de julio de 2005
+  :
+  :System.NullReferenceException: Referencia a objeto no establecida como instancia de un objeto.
+   at clsImpresionPAFPO.ImprimirRecibos(Double FRA1, Double FRA2, DateTime FECHA1, DateTime FECHA2, Boolean TenerEnCuentaFechas) in C:\aura2k3\aura2k3\clases\PAF\clsImpresionPAFPO.vb:line 2244
+   at clsPAFVenta.ImprimirRecibos(Double FRA1, Double FRA2, DateTime FECHA1, DateTime FECHA2, Boolean conIntervaloFechas) in C:\aura2k3\aura2k3\clases\PAF\Venta\clsPAFVenta.vb:line 2432
+-------------------------------
+
+Entada de errores : 11:49:56 miércoles, 20 de julio de 2005
+  :
+  :System.IO.IOException: El proceso no puede obtener acceso al archivo "C:\aura2k3\aura2k3\bin\informes\informes.xml" porque está siendo utilizado en otro proceso.
+   at System.IO.__Error.WinIOError(Int32 errorCode, String str)
+   at System.IO.FileStream..ctor(String path, FileMode mode, FileAccess access, FileShare share, Int32 bufferSize, Boolean useAsync, String msgPath, Boolean bFromProxy)
+   at System.IO.FileStream..ctor(String path, FileMode mode, FileAccess access, FileShare share)
+   at System.Xml.XmlDownloadManager.GetStream(Uri uri, ICredentials credentials)
+   at System.Xml.XmlUrlResolver.GetEntity(Uri absoluteUri, String role, Type ofObjectToReturn)
+   at System.Xml.XmlTextReader.CreateScanner()
+   at System.Xml.XmlTextReader.Init()
+   at System.Xml.XmlTextReader.Read()
+   at System.Xml.XmlValidatingReader.ReadWithCollectTextToken()
+   at System.Xml.XmlValidatingReader.Read()
+   at System.Xml.XmlLoader.Load(XmlDocument doc, XmlReader reader, Boolean preserveWhitespace)
+   at System.Xml.XmlDocument.Load(XmlReader reader)
+   at System.Xml.XmlDocument.Load(String filename)
+   at C1.Win.C1Report.C1Report.Load(String fileName, String reportName)
+   at clsImpresionPAFPO.ImprimirRecibos(Double FRA1, Double FRA2, DateTime FECHA1, DateTime FECHA2, Boolean TenerEnCuentaFechas) in C:\aura2k3\aura2k3\clases\PAF\clsImpresionPAFPO.vb:line 2234
+-------------------------------
+
+Entada de errores : 11:49:57 miércoles, 20 de julio de 2005
+  :
+  :System.NullReferenceException: Referencia a objeto no establecida como instancia de un objeto.
+   at clsImpresionPAFPO.ImprimirRecibos(Double FRA1, Double FRA2, DateTime FECHA1, DateTime FECHA2, Boolean TenerEnCuentaFechas) in C:\aura2k3\aura2k3\clases\PAF\clsImpresionPAFPO.vb:line 2244
+   at clsPAFVenta.ImprimirRecibos(Double FRA1, Double FRA2, DateTime FECHA1, DateTime FECHA2, Boolean conIntervaloFechas) in C:\aura2k3\aura2k3\clases\PAF\Venta\clsPAFVenta.vb:line 2432
+-------------------------------

@@ -1,0 +1,1272 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="AALBARAN" xml:space="preserve">
+    <value>A Waybill</value>
+  </data>
+  <data name="ABREVCOMPLEMENTO" xml:space="preserve">
+    <value>MUES</value>
+  </data>
+  <data name="ABREVTEJIDO" xml:space="preserve">
+    <value>TEJ</value>
+  </data>
+  <data name="ABRKILOS" xml:space="preserve">
+    <value>Kgs.</value>
+  </data>
+  <data name="ABRMETROS" xml:space="preserve">
+    <value>mts</value>
+  </data>
+  <data name="ACABADO" xml:space="preserve">
+    <value>Finish</value>
+  </data>
+  <data name="ACABADOR" xml:space="preserve">
+    <value>Finisher</value>
+  </data>
+  <data name="ACABADOS" xml:space="preserve">
+    <value>finishes</value>
+  </data>
+  <data name="ACEPTAR" xml:space="preserve">
+    <value>Accept</value>
+  </data>
+  <data name="ACTUAL" xml:space="preserve">
+    <value>Current</value>
+  </data>
+  <data name="ACTUALIZAR" xml:space="preserve">
+    <value>Save (F6)</value>
+  </data>
+  <data name="AENTREGAHILOS" xml:space="preserve">
+    <value>Waybill delivery threads</value>
+  </data>
+  <data name="AFACTURA" xml:space="preserve">
+    <value>A Bill</value>
+  </data>
+  <data name="AFEGIRREBUT" xml:space="preserve">
+    <value>Add Received</value>
+  </data>
+  <data name="ALBARAN" xml:space="preserve">
+    <value>Delivery Note</value>
+  </data>
+  <data name="ALBARANES" xml:space="preserve">
+    <value>Notes Deliveriy</value>
+  </data>
+  <data name="ALBARANESENTREGA" xml:space="preserve">
+    <value>Delivery Albranes</value>
+  </data>
+  <data name="ALBARANESENTREGAHILOS" xml:space="preserve">
+    <value>Delivery waybill Threads</value>
+  </data>
+  <data name="ALBARANNOTRASP" xml:space="preserve">
+    <value>Waybill NOT TRANSFERRED</value>
+  </data>
+  <data name="ALBARANPROVE" xml:space="preserve">
+    <value>Supplier delivery note</value>
+  </data>
+  <data name="ALBARANTEJIDO" xml:space="preserve">
+    <value>Waybill fabric - Accessories</value>
+  </data>
+  <data name="ALBARANYATRASPASADO" xml:space="preserve">
+    <value>They waybill destination and pierced</value>
+  </data>
+  <data name="ALBDESTINONOCLIENTE" xml:space="preserve">
+    <value>The waybill destination does not have this client</value>
+  </data>
+  <data name="ANCHO" xml:space="preserve">
+    <value>Width</value>
+  </data>
+  <data name="Archivo" xml:space="preserve">
+    <value>&amp;Archive</value>
+  </data>
+  <data name="ARTICULO" xml:space="preserve">
+    <value>Article</value>
+  </data>
+  <data name="Backup" xml:space="preserve">
+    <value>Backup</value>
+  </data>
+  <data name="BANCO" xml:space="preserve">
+    <value>Bank</value>
+  </data>
+  <data name="Bancos" xml:space="preserve">
+    <value>Banks / Boxes</value>
+  </data>
+  <data name="BASE" xml:space="preserve">
+    <value>Base</value>
+  </data>
+  <data name="BaseDeDatos" xml:space="preserve">
+    <value>Database</value>
+  </data>
+  <data name="BASEIMPONIBLE" xml:space="preserve">
+    <value>Tax Basis</value>
+  </data>
+  <data name="BorrarActual" xml:space="preserve">
+    <value>You want to delete the current record?</value>
+  </data>
+  <data name="BorrarBanco" xml:space="preserve">
+    <value>You want to delete the current bank?</value>
+  </data>
+  <data name="BorrarCliente" xml:space="preserve">
+    <value>You want to delete this customer</value>
+  </data>
+  <data name="BorrarComplemento" xml:space="preserve">
+    <value>You want to delete the current complement?</value>
+  </data>
+  <data name="BorrarDireccion" xml:space="preserve">
+    <value>You want to delete the address?</value>
+  </data>
+  <data name="BorrarDisposicion" xml:space="preserve">
+    <value>You want to delete the provision?</value>
+  </data>
+  <data name="BorrarFormaPago" xml:space="preserve">
+    <value>You want to delete the form of payment?</value>
+  </data>
+  <data name="BorrarFornitura" xml:space="preserve">
+    <value>You want to delete the current fornitura?</value>
+  </data>
+  <data name="BorrarHilo" xml:space="preserve">
+    <value>You want to delete the current thread?</value>
+  </data>
+  <data name="BorrarIVA" xml:space="preserve">
+    <value>You want to delete the current VAT?</value>
+  </data>
+  <data name="BORRARLINEA" xml:space="preserve">
+    <value>You want to delete the line / s selected?</value>
+  </data>
+  <data name="BorrarMaquina" xml:space="preserve">
+    <value>You want to delete the current machine?</value>
+  </data>
+  <data name="BorrarModelo" xml:space="preserve">
+    <value>You want to delete the current model?</value>
+  </data>
+  <data name="BorrarOperacion" xml:space="preserve">
+    <value>You want to delete the current operation?</value>
+  </data>
+  <data name="BORRARPEDIDO" xml:space="preserve">
+    <value>Delete Order (F5)</value>
+  </data>
+  <data name="BorrarProveedor" xml:space="preserve">
+    <value>You want to delete the current provider?</value>
+  </data>
+  <data name="BorrarRepresentante" xml:space="preserve">
+    <value>You want to delete the current representative?</value>
+  </data>
+  <data name="BorrarTaller" xml:space="preserve">
+    <value>You want to delete the current workshop?</value>
+  </data>
+  <data name="BorrarTejido" xml:space="preserve">
+    <value>You want to delete the current tissue?</value>
+  </data>
+  <data name="BorrarTransportista" xml:space="preserve">
+    <value>You want to delete the current carrier?</value>
+  </data>
+  <data name="BRUTO" xml:space="preserve">
+    <value>Gross</value>
+  </data>
+  <data name="CABOS" xml:space="preserve">
+    <value>CABOS</value>
+  </data>
+  <data name="CANCELAR" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="CANTIDAD" xml:space="preserve">
+    <value>Units</value>
+  </data>
+  <data name="CAPS" xml:space="preserve">
+    <value>heads</value>
+  </data>
+  <data name="Cascada" xml:space="preserve">
+    <value>Waterfall</value>
+  </data>
+  <data name="Castellano" xml:space="preserve">
+    <value>Spanish</value>
+  </data>
+  <data name="Catalan" xml:space="preserve">
+    <value>Catalan</value>
+  </data>
+  <data name="CCC" xml:space="preserve">
+    <value>C.C.C.</value>
+  </data>
+  <data name="CerrarTodas" xml:space="preserve">
+    <value>Close All</value>
+  </data>
+  <data name="CICLOS" xml:space="preserve">
+    <value>cycles</value>
+  </data>
+  <data name="CLIENTE" xml:space="preserve">
+    <value>Customer</value>
+  </data>
+  <data name="Clientes" xml:space="preserve">
+    <value>customers</value>
+  </data>
+  <data name="CLIENTESINMODELOS" xml:space="preserve">
+    <value>Client without models</value>
+  </data>
+  <data name="CODIGO" xml:space="preserve">
+    <value>Code</value>
+  </data>
+  <data name="CODIGOINCORRECTO" xml:space="preserve">
+    <value>Incorrect code</value>
+  </data>
+  <data name="CODIGOMODELOINCO" xml:space="preserve">
+    <value>Wrong model code</value>
+  </data>
+  <data name="CODIGOOPERACION" xml:space="preserve">
+    <value>Operation code</value>
+  </data>
+  <data name="CODIGOPROVEEDOR" xml:space="preserve">
+    <value>Provider code</value>
+  </data>
+  <data name="CODIGOTALLER" xml:space="preserve">
+    <value>Workshop code</value>
+  </data>
+  <data name="CODIGOTEJEDOR" xml:space="preserve">
+    <value>Waver code</value>
+  </data>
+  <data name="CODIGOTEMPINCO" xml:space="preserve">
+    <value>Wrong code Season</value>
+  </data>
+  <data name="CODIGOYAEXISTENTE" xml:space="preserve">
+    <value>Existing code</value>
+  </data>
+  <data name="COLOR" xml:space="preserve">
+    <value>Colour</value>
+  </data>
+  <data name="COLORMODELO" xml:space="preserve">
+    <value>Color Model</value>
+  </data>
+  <data name="COLORPIEZA" xml:space="preserve">
+    <value>Color Piece</value>
+  </data>
+  <data name="Complemento" xml:space="preserve">
+    <value>Complement</value>
+  </data>
+  <data name="Complementos" xml:space="preserve">
+    <value>Accessories</value>
+  </data>
+  <data name="COMPLETADO" xml:space="preserve">
+    <value>completed</value>
+  </data>
+  <data name="COMPOSICION" xml:space="preserve">
+    <value>Composition</value>
+  </data>
+  <data name="COMPRADOR" xml:space="preserve">
+    <value>BUYER</value>
+  </data>
+  <data name="Compras" xml:space="preserve">
+    <value>purchases</value>
+  </data>
+  <data name="CONCEPTO" xml:space="preserve">
+    <value>Concept</value>
+  </data>
+  <data name="Conexion" xml:space="preserve">
+    <value>Connection</value>
+  </data>
+  <data name="CONFECHA" xml:space="preserve">
+    <value>With date</value>
+  </data>
+  <data name="CONFELIMLINREMESA" xml:space="preserve">
+    <value>You want remitted remove this effect?</value>
+  </data>
+  <data name="CONFIRM" xml:space="preserve">
+    <value>Confirmation</value>
+  </data>
+  <data name="CONFIRMACION" xml:space="preserve">
+    <value>removal confirmation</value>
+  </data>
+  <data name="ConfirmacionEliminacion" xml:space="preserve">
+    <value>Confirmation</value>
+  </data>
+  <data name="CONFIRMACIONSALIR" xml:space="preserve">
+    <value>You want to leave TEX.NET?</value>
+  </data>
+  <data name="CONFIRMAR" xml:space="preserve">
+    <value>Confirm (F6)</value>
+  </data>
+  <data name="CONFOMECLIENTE" xml:space="preserve">
+    <value>Client's Approval</value>
+  </data>
+  <data name="CONSUM" xml:space="preserve">
+    <value>Consumption</value>
+  </data>
+  <data name="CONSUMO" xml:space="preserve">
+    <value>Consumption</value>
+  </data>
+  <data name="CONTACTO" xml:space="preserve">
+    <value>Contact</value>
+  </data>
+  <data name="CORTES" xml:space="preserve">
+    <value>Cuts</value>
+  </data>
+  <data name="COSTE" xml:space="preserve">
+    <value>Cost</value>
+  </data>
+  <data name="CP" xml:space="preserve">
+    <value>CP</value>
+  </data>
+  <data name="CREDITO" xml:space="preserve">
+    <value>Credit</value>
+  </data>
+  <data name="CUENTA" xml:space="preserve">
+    <value>Bill</value>
+  </data>
+  <data name="DEBITO" xml:space="preserve">
+    <value>Debit</value>
+  </data>
+  <data name="DECLIENTE" xml:space="preserve">
+    <value>Customer</value>
+  </data>
+  <data name="DEFECHA" xml:space="preserve">
+    <value>Of date</value>
+  </data>
+  <data name="DEPEDIDO" xml:space="preserve">
+    <value>From order</value>
+  </data>
+  <data name="DESCRIPCION" xml:space="preserve">
+    <value>description</value>
+  </data>
+  <data name="DESGLOSE" xml:space="preserve">
+    <value>Breakdown</value>
+  </data>
+  <data name="DETALLE" xml:space="preserve">
+    <value>detail</value>
+  </data>
+  <data name="DIFERENCIA" xml:space="preserve">
+    <value>Difference</value>
+  </data>
+  <data name="DIPOSRECIBIDAS" xml:space="preserve">
+    <value>Not all lines of the arrangement have been receive</value>
+  </data>
+  <data name="DIRECCION" xml:space="preserve">
+    <value>address</value>
+  </data>
+  <data name="DIRECCIONENVIO" xml:space="preserve">
+    <value>Delivery Address</value>
+  </data>
+  <data name="DISCO" xml:space="preserve">
+    <value>DISK</value>
+  </data>
+  <data name="DISPOSDISPONER" xml:space="preserve">
+    <value>You want to have</value>
+  </data>
+  <data name="DISPOSDISPTEJIDO" xml:space="preserve">
+    <value>This tissue KG:</value>
+  </data>
+  <data name="Disposiciones" xml:space="preserve">
+    <value>provisions</value>
+  </data>
+  <data name="DISPUESTO" xml:space="preserve">
+    <value>Ready</value>
+  </data>
+  <data name="DOMICILIO" xml:space="preserve">
+    <value>Home</value>
+  </data>
+  <data name="DTE" xml:space="preserve">
+    <value>Discount</value>
+  </data>
+  <data name="EFECTOYAREMETIDO" xml:space="preserve">
+    <value>Effect and tucked</value>
+  </data>
+  <data name="ELEGIREMPRESA" xml:space="preserve">
+    <value>Choose a company</value>
+  </data>
+  <data name="ELEGIRFICHA" xml:space="preserve">
+    <value>To open the tab double click above the record</value>
+  </data>
+  <data name="ELMODELO" xml:space="preserve">
+    <value>The model</value>
+  </data>
+  <data name="EMISION" xml:space="preserve">
+    <value>Emission</value>
+  </data>
+  <data name="EMPRESA" xml:space="preserve">
+    <value>Company</value>
+  </data>
+  <data name="EnviarErrores" xml:space="preserve">
+    <value>Send Errors</value>
+  </data>
+  <data name="ENVIARPORMAIL" xml:space="preserve">
+    <value>Send by e-Mail</value>
+  </data>
+  <data name="ERRORCN" xml:space="preserve">
+    <value>Database Connection Error</value>
+  </data>
+  <data name="ERRORELEGIRTEJEDORACABADOR" xml:space="preserve">
+    <value>He has to choose the finisher and weaver</value>
+  </data>
+  <data name="Errores" xml:space="preserve">
+    <value>Mistakes</value>
+  </data>
+  <data name="ESCOGEQUEIMPRIMIRPRIMERO" xml:space="preserve">
+    <value>You have to choose who you want to print first</value>
+  </data>
+  <data name="ESCOGER" xml:space="preserve">
+    <value>To choose</value>
+  </data>
+  <data name="ESCOGERACABADOR" xml:space="preserve">
+    <value>First you have to choose a finisher</value>
+  </data>
+  <data name="FACTURA" xml:space="preserve">
+    <value>Invoice</value>
+  </data>
+  <data name="FACTURAPROFORMATEJIDOComplemento" xml:space="preserve">
+    <value>Proforma invoice fabric - Complement</value>
+  </data>
+  <data name="FACTURAS" xml:space="preserve">
+    <value>Invoices</value>
+  </data>
+  <data name="FACTURASPROFORMA" xml:space="preserve">
+    <value>Proforma invoices</value>
+  </data>
+  <data name="FACTURATEJIDO" xml:space="preserve">
+    <value>Tissue bill - Complement</value>
+  </data>
+  <data name="FALTACLIENTE" xml:space="preserve">
+    <value>You must select a client</value>
+  </data>
+  <data name="FALTAPEDIDOCLIENTE" xml:space="preserve">
+    <value>You must enter a customer's order</value>
+  </data>
+  <data name="FALTAPROVE" xml:space="preserve">
+    <value>You must enter a supplier</value>
+  </data>
+  <data name="FAX" xml:space="preserve">
+    <value>FAX</value>
+  </data>
+  <data name="FECHA" xml:space="preserve">
+    <value>Date</value>
+  </data>
+  <data name="FECHAENTREGA" xml:space="preserve">
+    <value>Deliver date</value>
+  </data>
+  <data name="FECHAFRADESTINOMENORALBARAN" xml:space="preserve">
+    <value>The target document date is prior to the current. also continue?</value>
+  </data>
+  <data name="FICHATECNICA" xml:space="preserve">
+    <value>Technical Accessories</value>
+  </data>
+  <data name="FINAL" xml:space="preserve">
+    <value>Final</value>
+  </data>
+  <data name="FORMADEPAGO" xml:space="preserve">
+    <value>Payment</value>
+  </data>
+  <data name="FORMATOFECHAINCORRECTO" xml:space="preserve">
+    <value>The date format is incorrect should be (DD / MM / YYYY)</value>
+  </data>
+  <data name="FORMATOINCORRECTO" xml:space="preserve">
+    <value>Incorrect format</value>
+  </data>
+  <data name="FORNITURA" xml:space="preserve">
+    <value>fornitura</value>
+  </data>
+  <data name="FRA" xml:space="preserve">
+    <value>Number</value>
+  </data>
+  <data name="GH" xml:space="preserve">
+    <value>GH</value>
+  </data>
+  <data name="GRADUACION" xml:space="preserve">
+    <value>Graduation</value>
+  </data>
+  <data name="GRAMAJE" xml:space="preserve">
+    <value>grammage</value>
+  </data>
+  <data name="HASTACLIENTE" xml:space="preserve">
+    <value>To the Customer</value>
+  </data>
+  <data name="HASTAFECHA" xml:space="preserve">
+    <value>Till the date</value>
+  </data>
+  <data name="HASTAPEDIDO" xml:space="preserve">
+    <value>To Order</value>
+  </data>
+  <data name="HAYLINEASSINDISPONER" xml:space="preserve">
+    <value>There are no available lines</value>
+  </data>
+  <data name="HILO" xml:space="preserve">
+    <value>Thread</value>
+  </data>
+  <data name="Hilos" xml:space="preserve">
+    <value>threads</value>
+  </data>
+  <data name="IBAN" xml:space="preserve">
+    <value>IBAN</value>
+  </data>
+  <data name="Idioma" xml:space="preserve">
+    <value>Language</value>
+  </data>
+  <data name="IMPORTE" xml:space="preserve">
+    <value>Total</value>
+  </data>
+  <data name="IMPORTEIVA" xml:space="preserve">
+    <value>AMOUNT I.V.A.</value>
+  </data>
+  <data name="IMPORTIVA" xml:space="preserve">
+    <value>Total VAT</value>
+  </data>
+  <data name="INCOTERM" xml:space="preserve">
+    <value>Terms of Delivery</value>
+  </data>
+  <data name="INFO" xml:space="preserve">
+    <value>Information</value>
+  </data>
+  <data name="INFORMACION" xml:space="preserve">
+    <value>Information</value>
+  </data>
+  <data name="INTERVALONOVALIDO" xml:space="preserve">
+    <value>Invalid range</value>
+  </data>
+  <data name="IVA" xml:space="preserve">
+    <value>I.V.A.</value>
+  </data>
+  <data name="KILOS" xml:space="preserve">
+    <value>kilos</value>
+  </data>
+  <data name="KM" xml:space="preserve">
+    <value>kg / m.</value>
+  </data>
+  <data name="Language" xml:space="preserve">
+    <value>Inglés</value>
+  </data>
+  <data name="LBANCOS" xml:space="preserve">
+    <value>Banks List</value>
+  </data>
+  <data name="LCLIENTES" xml:space="preserve">
+    <value>Customers List</value>
+  </data>
+  <data name="LCOMPLEMENTOS" xml:space="preserve">
+    <value>Accessories List</value>
+  </data>
+  <data name="LFORNITURAS" xml:space="preserve">
+    <value>List Fornituras</value>
+  </data>
+  <data name="LHILOS" xml:space="preserve">
+    <value>List Threads</value>
+  </data>
+  <data name="LINEA" xml:space="preserve">
+    <value>line</value>
+  </data>
+  <data name="LINEASORDENFAB" xml:space="preserve">
+    <value>ORDERS MANUFACTURING LINES</value>
+  </data>
+  <data name="LISTADO" xml:space="preserve">
+    <value>List</value>
+  </data>
+  <data name="LISTDISPOSICION" xml:space="preserve">
+    <value>provisions List</value>
+  </data>
+  <data name="LMODELOS" xml:space="preserve">
+    <value>List Models</value>
+  </data>
+  <data name="LOPERACIONES" xml:space="preserve">
+    <value>List Operations</value>
+  </data>
+  <data name="LORDENESFAB" xml:space="preserve">
+    <value>Manufacturing Orders List</value>
+  </data>
+  <data name="LPROVEEDORES" xml:space="preserve">
+    <value>Providers List</value>
+  </data>
+  <data name="LREPRESENTANTES" xml:space="preserve">
+    <value>Representatives List</value>
+  </data>
+  <data name="LTALLERES" xml:space="preserve">
+    <value>List Workshops</value>
+  </data>
+  <data name="LTEJIDOS" xml:space="preserve">
+    <value>List fabrics</value>
+  </data>
+  <data name="LTRANSPORTISTAS" xml:space="preserve">
+    <value>Shippers List</value>
+  </data>
+  <data name="MAQ" xml:space="preserve">
+    <value>Maq.</value>
+  </data>
+  <data name="MAQUINA" xml:space="preserve">
+    <value>Machine</value>
+  </data>
+  <data name="Maquinas" xml:space="preserve">
+    <value>Machines</value>
+  </data>
+  <data name="MARGEN" xml:space="preserve">
+    <value>Margin</value>
+  </data>
+  <data name="MATERIA" xml:space="preserve">
+    <value>Matter</value>
+  </data>
+  <data name="MEDIDA" xml:space="preserve">
+    <value>Measure</value>
+  </data>
+  <data name="MERCANCIAIVAEXCLUIDO" xml:space="preserve">
+    <value>Prices Exclude VAT</value>
+  </data>
+  <data name="METROS" xml:space="preserve">
+    <value>meters</value>
+  </data>
+  <data name="MinimizarTodas" xml:space="preserve">
+    <value>Close All</value>
+  </data>
+  <data name="MINIMO" xml:space="preserve">
+    <value>Minimum</value>
+  </data>
+  <data name="MODELO" xml:space="preserve">
+    <value>Model</value>
+  </data>
+  <data name="Modelos" xml:space="preserve">
+    <value>models</value>
+  </data>
+  <data name="MOTIVO" xml:space="preserve">
+    <value>Reason</value>
+  </data>
+  <data name="NIF" xml:space="preserve">
+    <value>NIF</value>
+  </data>
+  <data name="NOEXISTEALBAR" xml:space="preserve">
+    <value>No such Waybill</value>
+  </data>
+  <data name="NOEXISTEBANCS" xml:space="preserve">
+    <value>nonexistent bank</value>
+  </data>
+  <data name="NOEXISTECLIENTS" xml:space="preserve">
+    <value>nonexistent client</value>
+  </data>
+  <data name="NOEXISTEFIL" xml:space="preserve">
+    <value>nonexistent thread</value>
+  </data>
+  <data name="NOEXISTEFORPAG" xml:space="preserve">
+    <value>Payment nonexistent form</value>
+  </data>
+  <data name="NOEXISTEIVA" xml:space="preserve">
+    <value>VAT nonexistent</value>
+  </data>
+  <data name="NOEXISTEMAQUI" xml:space="preserve">
+    <value>nonexistent machine</value>
+  </data>
+  <data name="NOEXISTEPROVE" xml:space="preserve">
+    <value>nonexistent supplier</value>
+  </data>
+  <data name="NOEXISTEREGISTRO" xml:space="preserve">
+    <value>There is no record with this code</value>
+  </data>
+  <data name="NOEXISTEREPRES" xml:space="preserve">
+    <value>representative nonexistent</value>
+  </data>
+  <data name="NOEXISTETALLERS" xml:space="preserve">
+    <value>nonexistent workshop</value>
+  </data>
+  <data name="NOEXISTETEIXIT" xml:space="preserve">
+    <value>tissue nonexistent</value>
+  </data>
+  <data name="NOEXISTETRANS" xml:space="preserve">
+    <value>carrier nonexistent</value>
+  </data>
+  <data name="NOEXITEDOCDESTINO" xml:space="preserve">
+    <value>No exite the target document</value>
+  </data>
+  <data name="NOHAYSUFSTKCRU" xml:space="preserve">
+    <value>NOT ENOUGH OIL STOCK OF THIS TISSUE</value>
+  </data>
+  <data name="NOHAYSUFSTKDISP" xml:space="preserve">
+    <value>WILLING NOT ENOUGH STOCK OF THIS TISSUE</value>
+  </data>
+  <data name="NOM" xml:space="preserve">
+    <value>First name</value>
+  </data>
+  <data name="NOMBRE" xml:space="preserve">
+    <value>First name</value>
+  </data>
+  <data name="NOMBREComplementoINCORRECTO" xml:space="preserve">
+    <value>Complement wrong name</value>
+  </data>
+  <data name="NOMCLIENT" xml:space="preserve">
+    <value>Client name</value>
+  </data>
+  <data name="NOMPROVE" xml:space="preserve">
+    <value>name Supplier</value>
+  </data>
+  <data name="NOMTALLER" xml:space="preserve">
+    <value>name Workshop</value>
+  </data>
+  <data name="NOMTEJEDOR" xml:space="preserve">
+    <value>name Tejedor</value>
+  </data>
+  <data name="NOREGISTROENCENTRO" xml:space="preserve">
+    <value>There is no record in the current business</value>
+  </data>
+  <data name="NOTRASPLINIASDOCTRAS" xml:space="preserve">
+    <value>You can not transfer lines of a document already pierced</value>
+  </data>
+  <data name="NPIEZAS" xml:space="preserve">
+    <value>No. Parts</value>
+  </data>
+  <data name="NUEVOPEDIDO" xml:space="preserve">
+    <value>New Order (F3)</value>
+  </data>
+  <data name="NUMALBARANES" xml:space="preserve">
+    <value>Number of AWB</value>
+  </data>
+  <data name="NUMBULTOSINCO" xml:space="preserve">
+    <value>Wrong Number of packages</value>
+  </data>
+  <data name="NUMCOMPLEMENTOS" xml:space="preserve">
+    <value>number Accessories</value>
+  </data>
+  <data name="NUMCTA" xml:space="preserve">
+    <value>NUM. CTA.</value>
+  </data>
+  <data name="NUMDISPOS" xml:space="preserve">
+    <value>Provision No.</value>
+  </data>
+  <data name="NUMEFECTO" xml:space="preserve">
+    <value>Num Effect</value>
+  </data>
+  <data name="NUMERO" xml:space="preserve">
+    <value>Number</value>
+  </data>
+  <data name="NUMEROPROVE" xml:space="preserve">
+    <value>Dealer N</value>
+  </data>
+  <data name="NUMFACTURAS" xml:space="preserve">
+    <value>Number of Bills</value>
+  </data>
+  <data name="NUMHILOS" xml:space="preserve">
+    <value>Number of threads</value>
+  </data>
+  <data name="NUMPEDIDOS" xml:space="preserve">
+    <value>Number of Orders</value>
+  </data>
+  <data name="NUMPROFORMA" xml:space="preserve">
+    <value>Proforma Invoice Number</value>
+  </data>
+  <data name="NUMTEJIDOS" xml:space="preserve">
+    <value>Number of tissues</value>
+  </data>
+  <data name="OBSERVACIONES" xml:space="preserve">
+    <value>Observations</value>
+  </data>
+  <data name="Operaciones" xml:space="preserve">
+    <value>Operations</value>
+  </data>
+  <data name="ORDEN" xml:space="preserve">
+    <value>Order</value>
+  </data>
+  <data name="ORDENCOMPLEMENTO" xml:space="preserve">
+    <value>Complement Production Order</value>
+  </data>
+  <data name="OrdenesFabricacion" xml:space="preserve">
+    <value>Manufacturing orders</value>
+  </data>
+  <data name="ORDENESMODELOS" xml:space="preserve">
+    <value>Manufacturing orders Models</value>
+  </data>
+  <data name="ORDENMODELO" xml:space="preserve">
+    <value>Order Manufacturing Model</value>
+  </data>
+  <data name="ORDENTRASPASADOOKALBARAN" xml:space="preserve">
+    <value>ORDER CORRECTLY TO THE DELIVERY NOTE TRASAPASADO:</value>
+  </data>
+  <data name="ORDENYATRASPASADO" xml:space="preserve">
+    <value>ORDER AND TRANSFERRED</value>
+  </data>
+  <data name="Organizacion" xml:space="preserve">
+    <value>Organization</value>
+  </data>
+  <data name="PACKING" xml:space="preserve">
+    <value>P.List</value>
+  </data>
+  <data name="PAIS" xml:space="preserve">
+    <value>Country</value>
+  </data>
+  <data name="PASSADES" xml:space="preserve">
+    <value>past</value>
+  </data>
+  <data name="PEDIDO" xml:space="preserve">
+    <value>Order</value>
+  </data>
+  <data name="PEDIDOCOMPRAFORNI" xml:space="preserve">
+    <value>Purchase Order Fornitura</value>
+  </data>
+  <data name="PEDIDOCOMPRAHILO" xml:space="preserve">
+    <value>Purchase Order Hilo</value>
+  </data>
+  <data name="PEDIDOCOMPRATEJIDO" xml:space="preserve">
+    <value>Tissue Purchase Order</value>
+  </data>
+  <data name="PEDIDOFORNITURA" xml:space="preserve">
+    <value>order Fornitura</value>
+  </data>
+  <data name="PEDIDONOTRASP" xml:space="preserve">
+    <value>Order not transgressed</value>
+  </data>
+  <data name="Pedidos" xml:space="preserve">
+    <value>Orders</value>
+  </data>
+  <data name="PEDIDOTEJIDO" xml:space="preserve">
+    <value>Order Fabrics Accessories</value>
+  </data>
+  <data name="PEDIDOVENTATEJIDOCOMPLEMENTO" xml:space="preserve">
+    <value>Tissue order Complement</value>
+  </data>
+  <data name="PESOTOTAL" xml:space="preserve">
+    <value>Total weight</value>
+  </data>
+  <data name="PFORNI" xml:space="preserve">
+    <value>order Fornitura</value>
+  </data>
+  <data name="PHILO" xml:space="preserve">
+    <value>order Threads</value>
+  </data>
+  <data name="PIEZA" xml:space="preserve">
+    <value>Piece</value>
+  </data>
+  <data name="PLAZA" xml:space="preserve">
+    <value>Square</value>
+  </data>
+  <data name="PLAZOENTREGA" xml:space="preserve">
+    <value>Delivery Time</value>
+  </data>
+  <data name="POBLACION" xml:space="preserve">
+    <value>Population</value>
+  </data>
+  <data name="PORMAYOR100" xml:space="preserve">
+    <value>Field% can not exceed 100</value>
+  </data>
+  <data name="PORMAYOR100ESC" xml:space="preserve">
+    <value>The sum of all% of the lead can not exceed 100%</value>
+  </data>
+  <data name="PORRECIBIR" xml:space="preserve">
+    <value>For recieving</value>
+  </data>
+  <data name="PRECIO" xml:space="preserve">
+    <value>Price</value>
+  </data>
+  <data name="PRECIOCOSTE" xml:space="preserve">
+    <value>Price cost</value>
+  </data>
+  <data name="PRECIOKILOS" xml:space="preserve">
+    <value>Price Kilos</value>
+  </data>
+  <data name="PRECIOMETROS" xml:space="preserve">
+    <value>Price Meters</value>
+  </data>
+  <data name="PRECIOPARAMODELO" xml:space="preserve">
+    <value>Price For Model</value>
+  </data>
+  <data name="PRECIOVENTA" xml:space="preserve">
+    <value>Sale price</value>
+  </data>
+  <data name="PREUK" xml:space="preserve">
+    <value>Price Kg.</value>
+  </data>
+  <data name="PREUM" xml:space="preserve">
+    <value>Price Metro</value>
+  </data>
+  <data name="PREVISTA" xml:space="preserve">
+    <value>Preview</value>
+  </data>
+  <data name="PRIMERODISPONER" xml:space="preserve">
+    <value>This fabric has not been arranged yet</value>
+  </data>
+  <data name="PROFORMA" xml:space="preserve">
+    <value>Proforma invoice</value>
+  </data>
+  <data name="PROFORMAVENTATEJIDOCOMPLEMENTO" xml:space="preserve">
+    <value>Proforma invoice Tissue-Complement</value>
+  </data>
+  <data name="PROVEEDOR" xml:space="preserve">
+    <value>Dealer</value>
+  </data>
+  <data name="Proveedores" xml:space="preserve">
+    <value>Dealers</value>
+  </data>
+  <data name="PROVESINHILOS" xml:space="preserve">
+    <value>Wireless provider</value>
+  </data>
+  <data name="PROVINCIA" xml:space="preserve">
+    <value>Province</value>
+  </data>
+  <data name="PTEJIDO" xml:space="preserve">
+    <value>order fabric</value>
+  </data>
+  <data name="P_IVA" xml:space="preserve">
+    <value>% VAT</value>
+  </data>
+  <data name="QUIERECONFIRMARLOSCAMBIOS" xml:space="preserve">
+    <value>You want to confirm the changes?</value>
+  </data>
+  <data name="RE" xml:space="preserve">
+    <value>RE.</value>
+  </data>
+  <data name="RECEPCION" xml:space="preserve">
+    <value>...</value>
+  </data>
+  <data name="RECIBIDO" xml:space="preserve">
+    <value>Received</value>
+  </data>
+  <data name="REGISTRODUPLICADO" xml:space="preserve">
+    <value>Duplicate record</value>
+  </data>
+  <data name="REGISTROMERCANTILCOESPUNT" xml:space="preserve">
+    <value>COESPUNT, S.L. -Reg. Mercantil de Barcelona, ​​Page B-2756, Inscription 1, Folio 57, Tomo 20.191. Book - Section - -VAT B-59-352021</value>
+  </data>
+  <data name="REGISTROMERCANTILCOMPLETEX" xml:space="preserve">
+    <value>COMPLETEX '09, S.L. -Reg. Mercantil de Barcelona, ​​Page B-390021, Inscription 1, Folio 128, Tomo 41,317. Book - Section - VAT ESB65123424</value>
+  </data>
+  <data name="REGISTROMERCANTILCYCO" xml:space="preserve">
+    <value>OLGA dressmaking, S.L. - Reg. Mercantil de Barcelona, ​​Volume 26,153, Sheet B-98717, Entry 2, VAT ESB60378551</value>
+  </data>
+  <data name="REGISTROMERCANTILINFINIPUNT" xml:space="preserve">
+    <value>INFINITPUNT, S.L. - Reg. Mercantil de Barcelona, ​​Tomo 42931, Folio 181, Sheet B 419631, Inscription 1, VAT ESB65600298</value>
+  </data>
+  <data name="REMESADO" xml:space="preserve">
+    <value>remitted</value>
+  </data>
+  <data name="RENDIMIENTO" xml:space="preserve">
+    <value>Performance</value>
+  </data>
+  <data name="REPRESENTANTE" xml:space="preserve">
+    <value>Representative</value>
+  </data>
+  <data name="Representantes" xml:space="preserve">
+    <value>representatives</value>
+  </data>
+  <data name="SALIDA" xml:space="preserve">
+    <value>Departure</value>
+  </data>
+  <data name="Salir" xml:space="preserve">
+    <value>Get out</value>
+  </data>
+  <data name="SEHAESCOGERCLIENTE" xml:space="preserve">
+    <value>You should choose a client</value>
+  </data>
+  <data name="SELECCIONAMASUNCOMPLEMENTO" xml:space="preserve">
+    <value>You have to select one or more Complementoas</value>
+  </data>
+  <data name="SELECIONAUNADIRECCION" xml:space="preserve">
+    <value>Select an address for sending</value>
+  </data>
+  <data name="SEMANAS" xml:space="preserve">
+    <value>Weeks</value>
+  </data>
+  <data name="SERIE" xml:space="preserve">
+    <value>Series</value>
+  </data>
+  <data name="SERVIDO" xml:space="preserve">
+    <value>served</value>
+  </data>
+  <data name="STCRUDOKILOS" xml:space="preserve">
+    <value>Stock Crudo kgs.</value>
+  </data>
+  <data name="STCRUDOMETROS" xml:space="preserve">
+    <value>Stock Crudo Meters</value>
+  </data>
+  <data name="STDISPKILOS" xml:space="preserve">
+    <value>Stock Disp. kgs.</value>
+  </data>
+  <data name="STDISPMETROS" xml:space="preserve">
+    <value>Stock Disp. Meters</value>
+  </data>
+  <data name="SWIFT" xml:space="preserve">
+    <value>SWIFT</value>
+  </data>
+  <data name="TALLA" xml:space="preserve">
+    <value>size</value>
+  </data>
+  <data name="TALLAS" xml:space="preserve">
+    <value>sizes</value>
+  </data>
+  <data name="TALLER" xml:space="preserve">
+    <value>Workshop</value>
+  </data>
+  <data name="Talleres" xml:space="preserve">
+    <value>Workshops</value>
+  </data>
+  <data name="TANTOPORCIENTOINVALIDO" xml:space="preserve">
+    <value>% wrong</value>
+  </data>
+  <data name="TEJEDOR" xml:space="preserve">
+    <value>Weaver</value>
+  </data>
+  <data name="TEJIDO" xml:space="preserve">
+    <value>Tissue</value>
+  </data>
+  <data name="TEJIDOComplemento" xml:space="preserve">
+    <value>Fabric - Complement</value>
+  </data>
+  <data name="Tejidos" xml:space="preserve">
+    <value>fabrics</value>
+  </data>
+  <data name="TELEFONO" xml:space="preserve">
+    <value>Phone</value>
+  </data>
+  <data name="TEMPORADA" xml:space="preserve">
+    <value>Season</value>
+  </data>
+  <data name="Temporadas" xml:space="preserve">
+    <value>seasons</value>
+  </data>
+  <data name="TIEMPOBAJADA" xml:space="preserve">
+    <value>Down Time</value>
+  </data>
+  <data name="TINTAR" xml:space="preserve">
+    <value>Tintar</value>
+  </data>
+  <data name="TIPO" xml:space="preserve">
+    <value>Kind</value>
+  </data>
+  <data name="TipoDeIVA" xml:space="preserve">
+    <value>VAT Type</value>
+  </data>
+  <data name="TODOSLOSCLIENTES" xml:space="preserve">
+    <value>All customers</value>
+  </data>
+  <data name="TODOSLOSPROVEEDORES" xml:space="preserve">
+    <value>All providers</value>
+  </data>
+  <data name="TOTAL" xml:space="preserve">
+    <value>Amount</value>
+  </data>
+  <data name="TOTALKG" xml:space="preserve">
+    <value>Total Kgs.</value>
+  </data>
+  <data name="TOTALP" xml:space="preserve">
+    <value>Total P.</value>
+  </data>
+  <data name="TOTALPIEZAS" xml:space="preserve">
+    <value>Total P.</value>
+  </data>
+  <data name="Transportistas" xml:space="preserve">
+    <value>carriers</value>
+  </data>
+  <data name="TRASOLINEA" xml:space="preserve">
+    <value>Transfer line</value>
+  </data>
+  <data name="TRASPASADA" xml:space="preserve">
+    <value>Transfixed</value>
+  </data>
+  <data name="TRASPASADO?" xml:space="preserve">
+    <value>Pierced?</value>
+  </data>
+  <data name="TRASPASOAALBARAN" xml:space="preserve">
+    <value>Transfer to delivery note</value>
+  </data>
+  <data name="TRASPASOCOMPLETO" xml:space="preserve">
+    <value>Full transfer</value>
+  </data>
+  <data name="TTESCOJERHILO" xml:space="preserve">
+    <value>choose Hilo</value>
+  </data>
+  <data name="TTESCOJERTEJIDO" xml:space="preserve">
+    <value>choose fabric</value>
+  </data>
+  <data name="TTTRASPASORECEPCION" xml:space="preserve">
+    <value>Transfer line delivery note</value>
+  </data>
+  <data name="UNIDADES" xml:space="preserve">
+    <value>units</value>
+  </data>
+  <data name="VALOR" xml:space="preserve">
+    <value>Value</value>
+  </data>
+  <data name="VELOCIDADCARRO" xml:space="preserve">
+    <value>speed Cart</value>
+  </data>
+  <data name="VENCIMIENTO" xml:space="preserve">
+    <value>Due date</value>
+  </data>
+  <data name="Ventana" xml:space="preserve">
+    <value>Window</value>
+  </data>
+  <data name="VENTAS" xml:space="preserve">
+    <value>sales</value>
+  </data>
+  <data name="VERDESGLOSE" xml:space="preserve">
+    <value>see breakdown</value>
+  </data>
+  <data name="YATRASPASADO" xml:space="preserve">
+    <value>And pierced</value>
+  </data>
+  <data name="SUBTOTAL" xml:space="preserve">
+    <value>Subtotal</value>
+  </data>
+  <data name="SUMASIGUE" xml:space="preserve">
+    <value>Sum and follow...</value>
+  </data>
+  <data name="STOCKINSUFICIENTE" xml:space="preserve">
+    <value>There is not enough stock of:</value>
+  </data>
+  <data name="TALLAH" xml:space="preserve">
+    <value>size H</value>
+  </data>
+  <data name="TALLAL" xml:space="preserve">
+    <value>size L</value>
+  </data>
+  <data name="COMPOSICIO" xml:space="preserve">
+    <value>Composition</value>
+  </data>
+  <data name="NCCODE" xml:space="preserve">
+    <value>NC code</value>
+  </data>
+  <data name="PESO" xml:space="preserve">
+    <value>Weight gr</value>
+  </data>
+  <data name="ABRIL" xml:space="preserve">
+    <value>APRIL</value>
+  </data>
+  <data name="AGOSTO" xml:space="preserve">
+    <value>AUGUST</value>
+  </data>
+  <data name="DICIEMBRE" xml:space="preserve">
+    <value>DECEMBER</value>
+  </data>
+  <data name="ENERO" xml:space="preserve">
+    <value>JANUARY</value>
+  </data>
+  <data name="FEBRERO" xml:space="preserve">
+    <value>FEBRUARY</value>
+  </data>
+  <data name="JULIO" xml:space="preserve">
+    <value>JULY</value>
+  </data>
+  <data name="JUNIO" xml:space="preserve">
+    <value>JUNE</value>
+  </data>
+  <data name="MARZO" xml:space="preserve">
+    <value>MARCH</value>
+  </data>
+  <data name="MAYO" xml:space="preserve">
+    <value>MAY</value>
+  </data>
+  <data name="NOVIEMBRE" xml:space="preserve">
+    <value>NOVEMBER</value>
+  </data>
+  <data name="OCTUBRE" xml:space="preserve">
+    <value>OCTOBER</value>
+  </data>
+  <data name="SEPTIEMBRE" xml:space="preserve">
+    <value>SEPTEMBER</value>
+  </data>
+  <data name="HIGH" xml:space="preserve">
+    <value>Height</value>
+  </data>
+  <data name="LENGTH" xml:space="preserve">
+    <value>Length</value>
+  </data>
+  <data name="CLIENTEBLOQUEADO" xml:space="preserve">
+    <value>The client is blocked</value>
+  </data>
+</root>

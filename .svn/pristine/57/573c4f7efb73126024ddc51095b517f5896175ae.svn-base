@@ -1,0 +1,506 @@
+Imports MySql.Data.MySqlClient : Imports clsFuncionesLOG : Imports clsFuncionesC1 : Imports clsFuncionesUtiles : Imports clsConstantes
+Public Class clsVencimientos
+    Inherits clsADO
+
+#Region "VARIABLES"
+
+    Public PAF As clsPAFVenta
+    Public PAFF As clsPAFVenta
+
+#End Region
+
+#Region "CAMPOS"
+
+    '+----------+---------------------+------+-----+---------+-------+
+    '| Field    | Type                | Null | Key | Default | Extra |
+    '+----------+---------------------+------+-----+---------+-------+
+    '| COMVEN   | char(1)             | NO   | PRI |         |       |
+    '| TIPUS    | char(1)             | NO   | PRI |         |       |
+    '| DOCUMENT | char(1)             | NO   | PRI |         |       |
+    '| FRA      | int(11)             | NO   | PRI | 0       |       |
+    '| EMISSIO  | datetime            | YES  |     | NULL    |       |
+    '| VENCIM   | datetime            | YES  |     | NULL    |       |
+    '| LIN      | int(11)             | NO   | PRI | 0       |       |
+    '| IMPORT   | double              | YES  |     | NULL    |       |
+    '| REMES    | tinyint(1) unsigned | NO   |     | 0       |       |
+    '| CENTRO   | char(1)             | NO   | PRI | C       |       |
+    '+----------+---------------------+------+-----+---------+-------+
+    '10 rows
+
+    Private mCOMVEN As String
+    Public Property COMVEN() As String
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mCOMVEN = general.nz(dvForm(PA).Row("COMVEN"), "")
+            Catch ex As Exception : End Try
+            Return general.nz(mCOMVEN, "")
+        End Get
+        Set(ByVal Value As String)
+            If PA() = -1 Then Exit Property
+            If general.nz(Value, "") <> general.nz(COMVEN, "") Then
+                mCOMVEN = general.nz(Value, "")
+                dvForm(PA).Row("COMVEN") = general.nz(mCOMVEN, "") : guardarDV()
+            End If
+        End Set
+    End Property
+
+    Private mTIPUS As String
+    Public Property TIPUS() As String
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mTIPUS = general.nz(dvForm(PA).Row("TIPUS"), "")
+            Catch ex As Exception : End Try
+            Return general.nz(mTIPUS, "")
+        End Get
+        Set(ByVal Value As String)
+            If PA() = -1 Then Exit Property
+            If general.nz(Value, "") <> general.nz(TIPUS, "") Then
+                mTIPUS = general.nz(Value, "")
+                dvForm(PA).Row("TIPUS") = general.nz(mTIPUS, "") : guardarDV()
+            End If
+        End Set
+    End Property
+
+    Private mDOCUMENT As String
+    Public Property DOCUMENT() As String
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mDOCUMENT = general.nz(dvForm(PA).Row("DOCUMENT"), "")
+            Catch ex As Exception : End Try
+            Return general.nz(mDOCUMENT, "")
+        End Get
+        Set(ByVal Value As String)
+            If PA() = -1 Then Exit Property
+            If general.nz(Value, "") <> general.nz(DOCUMENT, "") Then
+                mDOCUMENT = general.nz(Value, "")
+                dvForm(PA).Row("DOCUMENT") = general.nz(mDOCUMENT, "") : guardarDV()
+            End If
+        End Set
+    End Property
+
+    Private mFRA As Integer
+    Public Property FRA() As Integer
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mFRA = nzn(dvForm(PA).Row("FRA"), 0)
+            Catch ex As Exception : End Try
+            Return nzn(mFRA, 0)
+        End Get
+        Set(ByVal Value As Integer)
+            If PA() = -1 Then Exit Property
+            If nzn(Value, 0) <> nzn(FRA, 0) Then
+                mFRA = nzn(Value, 0)
+                dvForm(PA).Row("FRA") = nzn(mFRA, 0) : guardarDV()
+            End If
+        End Set
+    End Property
+
+    Private mEMISSIO As Date
+    Public Property EMISSIO() As Date
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mEMISSIO = dvForm(PA).Row("EMISSIO")
+            Catch ex As Exception : End Try
+            Return mEMISSIO
+        End Get
+        Set(ByVal Value As Date)
+            If PA() = -1 Then Exit Property
+            If Value <> EMISSIO Then
+                mEMISSIO = Value
+                dvForm(PA).Row("EMISSIO") = mEMISSIO : guardarDV()
+            End If
+        End Set
+    End Property
+
+    Private mVENCIM As Date
+    Public Property VENCIM() As Date
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mVENCIM = dvForm(PA).Row("VENCIM")
+            Catch ex As Exception : End Try
+            Return mVENCIM
+        End Get
+        Set(ByVal Value As Date)
+            If PA() = -1 Then Exit Property
+            If Value <> VENCIM Then
+                mVENCIM = Value
+                dvForm(PA).Row("VENCIM") = mVENCIM : guardarDV()
+            End If
+        End Set
+    End Property
+
+    Private mLIN As Integer
+    Public Property LIN() As Integer
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mLIN = nzn(dvForm(PA).Row("LIN"), 0)
+            Catch ex As Exception : End Try
+            Return nzn(mLIN, 0)
+        End Get
+        Set(ByVal Value As Integer)
+            If PA() = -1 Then Exit Property
+            If nzn(Value, 0) <> nzn(LIN, 0) Then
+                mLIN = nzn(Value, 0)
+                dvForm(PA).Row("LIN") = nzn(mLIN, 0) : guardarDV()
+            End If
+        End Set
+    End Property
+
+    Private mIMPORT As Double
+    Public Property IMPORT() As Double
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mIMPORT = nzn(dvForm(PA).Row("IMPORT"), 0)
+            Catch ex As Exception : End Try
+            Return nzn(mIMPORT, 0)
+        End Get
+        Set(ByVal Value As Double)
+            If PA() = -1 Then Exit Property
+            If nzn(Value, 0) <> nzn(IMPORT, 0) Then
+                mIMPORT = nzn(Value, 0)
+                dvForm(PA).Row("IMPORT") = nzn(mIMPORT, 0) : guardarDV()
+            End If
+        End Set
+    End Property
+
+    Private mREMES As Boolean
+    Public Property REMES() As Boolean
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mREMES = dvForm(PA).Row("REMES")
+            Catch ex As Exception : End Try
+            Return mREMES
+        End Get
+        Set(ByVal Value As Boolean)
+            If PA() = -1 Then Exit Property
+            If Value <> REMES Then
+                mREMES = Value
+                dvForm(PA).Row("REMES") = mREMES : guardarDV()
+            End If
+        End Set
+    End Property
+
+#End Region
+
+#Region "INICIAR"
+
+    Public Sub New(ByVal tabla As DataTable, _
+                    ByVal centro As String, ByRef bindingcontext As BindingContext, ByVal p As clsPAFVenta)
+
+        MyBase.New(tabla, centro, bindingcontext, "ESDETALLE")
+        Dim sqlSel As String
+        Try
+            PAF = p
+            sqlSinWhere = "SELECT VENCIM.*, " & _
+                            " filiales.DESCRI AS NOMCENTRO " & _
+                            " FROM VENCIM " & _
+                            " LEFT JOIN filiales ON (filiales.CODI = vencim.CENTRO) "
+
+            sqlSel = sqlSinWhere & _
+                        " WHERE VENCIM.FRA = """ & PAF.FRA & """ " & _
+                        " AND VENCIM.DOCUMENT = """ & PAF.DOCUMENT & """ " & _
+                        " AND VENCIM.CENTRO = """ & PAF.centro & """ ORDER BY vencim.FRA "
+
+            cmdSel.CommandText = sqlSel
+
+            da.SelectCommand = cmdSel
+            da.Fill(tabla)
+
+            dvForm.Sort = "LIN ASC"
+
+            Try : AddHandler tabla.RowChanged, AddressOf RowChanged : Catch : End Try
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub PonerDefaults()
+        Try
+            dvForm.Table.Columns("TIPUS").DefaultValue = PAF.TIPUS
+            dvForm.Table.Columns("DOCUMENT").DefaultValue = PAF.DOCUMENT
+            dvForm.Table.Columns("FRA").DefaultValue = PAF.FRA
+            dvForm.Table.Columns("COMVEN").DefaultValue = "V"
+            dvForm.Table.Columns("VENCIM").DefaultValue = PAF.DATA
+            dvForm.Table.Columns("EMISSIO").DefaultValue = PAF.DATA
+            dvForm.Table.Columns("LIN").DefaultValue = 10000
+            dvForm.Table.Columns("REMES").DefaultValue = False
+            dvForm.Table.Columns("CENTRO").DefaultValue = PAF.centro
+            dvForm.Table.Columns("IMPORT").DefaultValue = 0
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Friend Sub RowChanged(ByVal sender As Object, ByVal e As System.data.DataRowChangeEventArgs)
+
+        Try
+
+            If Not PAF.cargando Then
+                PAF.DormirHandlers()
+                If LIN = 10000 Then
+                    Try
+                        If dvForm(dvForm.Count - 2).Item("LIN") = -1 Then : LIN = 1
+                        Else : LIN = dvForm(dvForm.Count - 2).Item("LIN") + 1 : End If
+                    Catch ex As Exception
+                        LIN = 1
+                    End Try
+                End If
+                PAF.DespertarHandlers()
+            End If
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+
+#End Region
+
+#Region "OVERRIDES"
+    Friend Overrides Function genWhere() As String
+
+    End Function
+    Friend Overrides Function GenOrder() As String
+        Try
+            Return ""
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Function
+    Friend Overrides Function ObtenerNumeroRegistro(ByVal id As Object) As Integer
+
+    End Function
+    Friend Overrides Function genWhereNumeroRegistros() As String
+
+    End Function
+#End Region
+
+    Friend Sub CambioDetalle(ByVal centro As String, ByVal PA As clsPAFVenta)
+        Dim sqlSel As String
+        Try
+            PAF = PA
+            Me.centro = centro
+            sqlSel = sqlSinWhere & _
+                        " WHERE VENCIM.FRA = """ & PAF.FRA & """ " & _
+                        " AND VENCIM.DOCUMENT = """ & PAF.DOCUMENT & """ " & _
+                        " AND VENCIM.CENTRO = """ & PAF.centro & """ ORDER BY VENCIM.FRA "
+
+            cmdSel.CommandText = sqlSel
+            da.SelectCommand = cmdSel
+
+            tabla.Clear()
+            da.Fill(tabla)
+            dvForm.Sort = "LIN ASC"
+            PonerDefaults()
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Friend Sub CambioDetalle()
+        Dim sqlSel As String
+        Try
+            PAF = PAFF
+            sqlSel = sqlSinWhere & _
+                        " WHERE VENCIM.FRA = """ & PAF.FRA & """ " & _
+                        " AND VENCIM.DOCUMENT = """ & PAF.DOCUMENT & """ " & _
+                        " AND VENCIM.CENTRO = """ & PAF.centro & """ ORDER BY VENCIM.FRA "
+
+            cmdSel.CommandText = sqlSel
+            da.SelectCommand = cmdSel
+
+            tabla.Clear()
+            da.Fill(tabla)
+            dvForm.Sort = "LIN ASC"
+            PonerDefaults()
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Public Sub ActualizarDetalle()
+        Dim i As Integer
+        Dim cambio As Boolean = False
+        Try
+            For i = 0 To dvForm.Count - 1
+                'Ifgeneral.nz(dvForm(i).Item("TIPUS"), "") <>general.nz(PAF.TIPUS, "") Then dvForm(i).Item("TIPUS") =general.nz(PAF.TIPUS, "") : cambio = True
+                'Ifgeneral.nz(dvForm(i).Item("DOCUMENT"), "") <>general.nz(PAF.DOCUMENT, "") Then dvForm(i).Item("DOCUMENT") =general.nz(PAF.DOCUMENT, "") : cambio = True
+                If general.nz(dvForm(i).Item("FRA"), "") <> general.nz(PAF.FRA, "") Then dvForm(i).Item("FRA") = nzn(PAF.FRA, 0) : cambio = True
+                If general.nz(dvForm(i).Item("CENTRO"), "") <> general.nz(PAF.centro, "") Then dvForm(i).Item("CENTRO") = general.nz(PAF.centro, "") : cambio = True
+            Next
+            If cambio Then guardarDV()
+
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Sub
+    Public Overrides Sub ActualizarOrigen(Optional ByVal nocerrar As Boolean = False, Optional ByVal hackDetalle As Boolean = False)
+        Try
+            ActualizarDetalle()
+            MyBase.ActualizarOrigen(True, True)
+
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Sub
+    Private Function ObtenerFechaVencim(ByVal i As Integer, ByVal V_1 As Integer, ByVal dia1 As Integer, ByVal dia2 As Integer, ByVal dia3 As Integer, ByVal dies As Integer, ByVal fechaActual As Date) As Date
+        Dim diaActual As Integer
+        Dim masMeses As Integer
+        Try
+            If PAF.MESESCOMPLETOS Then
+                masMeses = Math.Round((V_1 + ((i - 1) * dies)) / 30, 0)
+                fechaActual = fechaActual.AddMonths(masMeses)
+            Else
+                fechaActual = fechaActual.AddDays(V_1 + ((i - 1) * dies))
+            End If
+
+            'If dia1 = 0 Then Return fechaActual
+
+            diaActual = fechaActual.Day
+            If diaActual < dia1 Then
+                fechaActual = fechaActual.AddDays(dia1 - diaActual)
+            Else
+                If diaActual < dia2 Then
+                    fechaActual = fechaActual.AddDays(dia2 - diaActual)
+                Else
+                    If diaActual < dia3 Then
+                        fechaActual = fechaActual.AddDays(dia3 - diaActual)
+                    Else
+                        '
+                        If dia1 = 0 Then
+                            'fechaActual = New Date(fechaActual.Year, fechaActual.Month, fechaActual.Day)
+                        Else
+                            fechaActual = fechaActual.AddMonths(1)
+                            If fechaActual.Month = 2 Then
+                                'Control del mes de febrero
+                                Dim diasMesFebrero As Integer
+                                diasMesFebrero = fechaActual.DaysInMonth(fechaActual.Year, fechaActual.Month)
+                                If dia1 > diasMesFebrero Then
+                                    fechaActual = New Date(fechaActual.Year, fechaActual.Month, dia1 - diasMesFebrero)
+                                Else
+                                    fechaActual = New Date(fechaActual.Year, fechaActual.Month, dia1)
+                                End If
+                            Else
+                                fechaActual = New Date(fechaActual.Year, fechaActual.Month, dia1)
+                            End If
+
+                        End If
+                    End If
+                End If
+            End If
+            If PAF.MESESCOMPLETOS = True Then
+                If dia1 = 0 Then
+                    'NO TIENE DÍAS DE PAGO
+                    'si es 15/03/05 le dara 14/03 hay q sumar 1
+                    'si es 31/03/05 le dara 30/03
+                    'fechaActual = fechaActual.AddDays(i)
+                End If
+            End If
+            Return fechaActual
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Function
+    Public Sub LimpiarActualesVencimientos()
+        'Dim dr As DataRow()
+        'Dim i, j As Integer
+        Try
+            BorrarActualDVDetalle(False)
+            'dr = tabla.Select("FRA = '" & PAF.FRA & "' AND CENTRO = '" & centro & "'") '  and COMVEN = 'V' AND TIPUS = '" & TIPO & "' AND DOCUMENT = '" & PAFActual.documento & "'")
+            'j = dr.GetLength(0)
+            'For i = 0 To j - 1
+            '    dr(i).Delete()
+            'Next
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Public Sub GenerarVencimientos()
+        Dim dr As DataRow
+        Dim importe As Double
+        Dim importe1 As Double
+
+        Dim i As Integer
+        Try
+            If dvForm.Count = 0 Then
+                importe1 = PAF.TOTAL / IIf(PAF.NUMEROPAG = 0, 1, PAF.NUMEROPAG)
+                importe = roundnum(importe1, 2)
+
+                If PAF.NUMEROPAG = 0 Then importe = PAF.TOTAL
+
+                LimpiarActualesVencimientos()
+
+                i = 1
+
+                If PAF.NUMEROPAG = 0 Then
+                    dr = tabla.NewRow
+                    dr("COMVEN") = "V"
+                    dr("CENTRO") = centro
+                    dr("LIN") = i
+                    dr("FRA") = PAF.FRA
+                    dr("TIPUS") = PAF.lineasVenta.TIPUS
+                    dr("DOCUMENT") = PAF.documento
+                    dr("IMPORT") = importe
+                    dr("EMISSIO") = PAF.DATA
+                    dr("VENCIM") = ObtenerFechaVencim(i, PAF.VEZ1FORPAG, PAF.DIA1, PAF.DIA2, PAF.DIA3, PAF.DIESPAG, PAF.DATA)
+                    tabla.Rows.Add(dr)
+                End If
+
+                For i = 1 To PAF.NUMEROPAG
+                    dr = tabla.NewRow
+                    dr("COMVEN") = "V"
+                    dr("CENTRO") = centro
+                    dr("LIN") = i
+                    dr("FRA") = PAF.FRA
+                    dr("TIPUS") = PAF.lineasVenta.TIPUS
+                    dr("DOCUMENT") = PAF.documento
+                    dr("IMPORT") = importe
+                    dr("EMISSIO") = PAF.DATA
+                    dr("VENCIM") = ObtenerFechaVencim(i, PAF.VEZ1FORPAG, PAF.DIA1, PAF.DIA2, PAF.DIA3, PAF.DIESPAG, PAF.DATA)
+                    tabla.Rows.Add(dr)
+                Next
+            End If
+
+            'Ajustamos el último céntimo
+            If dvForm.Count > 0 Then
+                importe = sumaTotal("IMPORT", dvForm)
+                If importe > PAF.TOTAL Then
+                    dvForm(0).Item("IMPORT") = dvForm(0).Item("IMPORT") - 0.01
+                Else
+                    If importe < PAF.TOTAL Then
+                        dvForm(0).Item("IMPORT") = dvForm(0).Item("IMPORT") + 0.01
+                    End If
+                End If
+
+            End If
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Friend Overrides Function TieneCambios() As Boolean
+        Try
+            guardarDV()
+            If Not tabla.GetChanges Is Nothing Then
+                Return True
+            Else
+                Return False
+            End If
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Function
+
+End Class

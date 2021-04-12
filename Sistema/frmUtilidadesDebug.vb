@@ -1,0 +1,2658 @@
+Imports MySql.Data.MySqlClient : Imports clsFuncionesLOG : Imports clsFuncionesC1 : Imports clsFuncionesUtiles : Imports clsConstantes : Imports clsOtrasFunciones
+Imports Excel = Microsoft.Office.Interop.Excel
+
+
+Public Class _00importador
+    Inherits aura2k3.frmBase
+
+#Region " Código generado por el Diseñador de Windows Forms "
+
+    Public Sub New()
+        MyBase.New()
+
+        'El Diseñador de Windows Forms requiere esta llamada.
+        InitializeComponent() : Dim tom As SMcMaster.TabOrderManager = New SMcMaster.TabOrderManager(Me) : tom.SetTabOrder(SMcMaster.TabOrderManager.TabScheme.AcrossFirst)
+
+        'Agregar cualquier inicialización después de la llamada a InitializeComponent()
+
+    End Sub
+
+    'Form reemplaza a Dispose para limpiar la lista de componentes.
+    Protected Overloads Overrides Sub Dispose(ByVal disposing As Boolean)
+        '! Seal for less overhead - Can declare NotInheritable Class
+        If disposing Then
+            If Not (components Is Nothing) Then
+                components.Dispose()
+            End If
+        End If
+        MyBase.Dispose(disposing)
+    End Sub
+
+    'Requerido por el Diseñador de Windows Forms
+    Private components As System.ComponentModel.IContainer
+
+
+    'NOTA: el Diseñador de Windows Forms requiere el siguiente procedimiento
+    'Puede modificarse utilizando el Diseñador de Windows Forms. 
+    'No lo modifique con el editor de código.
+
+    Friend WithEvents Button1 As C1.Win.C1Input.C1Button
+
+    Friend WithEvents Button2 As C1.Win.C1Input.C1Button
+
+    Friend WithEvents Button3 As C1.Win.C1Input.C1Button
+
+    Friend WithEvents Button4 As C1.Win.C1Input.C1Button
+
+    Friend WithEvents dirbox1 As Microsoft.VisualBasic.Compatibility.VB6.DirListBox
+
+    Friend WithEvents DriveListBox1 As Microsoft.VisualBasic.Compatibility.VB6.DriveListBox
+
+
+    Friend WithEvents FileListBox1 As Microsoft.VisualBasic.Compatibility.VB6.FileListBox
+    Friend WithEvents btnCrearDataSet As C1.Win.C1Input.C1Button
+    Friend WithEvents btnObtenerColumnasProperty As C1.Win.C1Input.C1Button
+    Friend WithEvents btnCrearESTRUC As C1.Win.C1Input.C1Button
+    Friend WithEvents Button5 As C1.Win.C1Input.C1Button
+    Friend WithEvents Button6 As C1.Win.C1Input.C1Button
+    Friend WithEvents TabControl1 As System.Windows.Forms.TabControl
+    Friend WithEvents TabPage1 As System.Windows.Forms.TabPage
+    Friend WithEvents TabPage2 As System.Windows.Forms.TabPage
+    Friend WithEvents txtDebug As C1.Win.C1Input.C1TextBox
+    Friend WithEvents Button7 As C1.Win.C1Input.C1Button
+    Friend WithEvents btnPrueba As System.Windows.Forms.Button
+    Friend WithEvents chkHackModelos As System.Windows.Forms.CheckBox
+    Friend WithEvents TabPage3 As System.Windows.Forms.TabPage
+    Friend WithEvents C1TrueDBGrid1 As C1.Win.C1TrueDBGrid.C1TrueDBGrid
+    Friend WithEvents Button8 As System.Windows.Forms.Button
+    Friend WithEvents btnConvertir As System.Windows.Forms.Button
+    Friend WithEvents lstTipoTablas As System.Windows.Forms.ListBox
+    <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
+        Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(_00importador))
+        Me.Button1 = New C1.Win.C1Input.C1Button
+        Me.Button2 = New C1.Win.C1Input.C1Button
+        Me.Button3 = New C1.Win.C1Input.C1Button
+        Me.Button4 = New C1.Win.C1Input.C1Button
+        Me.dirbox1 = New Microsoft.VisualBasic.Compatibility.VB6.DirListBox
+        Me.DriveListBox1 = New Microsoft.VisualBasic.Compatibility.VB6.DriveListBox
+        Me.FileListBox1 = New Microsoft.VisualBasic.Compatibility.VB6.FileListBox
+        Me.btnCrearDataSet = New C1.Win.C1Input.C1Button
+        Me.btnObtenerColumnasProperty = New C1.Win.C1Input.C1Button
+        Me.btnCrearESTRUC = New C1.Win.C1Input.C1Button
+        Me.Button5 = New C1.Win.C1Input.C1Button
+        Me.Button6 = New C1.Win.C1Input.C1Button
+        Me.TabControl1 = New System.Windows.Forms.TabControl
+        Me.TabPage1 = New System.Windows.Forms.TabPage
+        Me.chkHackModelos = New System.Windows.Forms.CheckBox
+        Me.btnPrueba = New System.Windows.Forms.Button
+        Me.TabPage2 = New System.Windows.Forms.TabPage
+        Me.Button7 = New C1.Win.C1Input.C1Button
+        Me.txtDebug = New C1.Win.C1Input.C1TextBox
+        Me.TabPage3 = New System.Windows.Forms.TabPage
+        Me.Button8 = New System.Windows.Forms.Button
+        Me.C1TrueDBGrid1 = New C1.Win.C1TrueDBGrid.C1TrueDBGrid
+        Me.btnConvertir = New System.Windows.Forms.Button
+        Me.lstTipoTablas = New System.Windows.Forms.ListBox
+        Me.TabControl1.SuspendLayout()
+        Me.TabPage1.SuspendLayout()
+        Me.TabPage2.SuspendLayout()
+        CType(Me.txtDebug, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.TabPage3.SuspendLayout()
+        CType(Me.C1TrueDBGrid1, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.SuspendLayout()
+        '
+        'sbtipo
+        '
+        Me.sbtipo.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.sbtipo.Location = New System.Drawing.Point(5, 534)
+        Me.sbtipo.Name = "sbtipo"
+        Me.sbtipo.Size = New System.Drawing.Size(88, 17)
+        Me.sbtipo.Text = ""
+        '
+        'btnRecargar
+        '
+        Me.btnRecargar.Location = New System.Drawing.Point(60, 279)
+        Me.btnRecargar.Name = "btnRecargar"
+        Me.btnRecargar.Size = New System.Drawing.Size(90, 18)
+        '
+        'btnSiguiente
+        '
+        Me.btnSiguiente.Location = New System.Drawing.Point(308, 297)
+        Me.btnSiguiente.Name = "btnSiguiente"
+        Me.btnSiguiente.Size = New System.Drawing.Size(32, 19)
+        '
+        'btnAnterior
+        '
+        Me.btnAnterior.Location = New System.Drawing.Point(28, 297)
+        Me.btnAnterior.Name = "btnAnterior"
+        Me.btnAnterior.Size = New System.Drawing.Size(32, 19)
+        '
+        'btnPrimero
+        '
+        Me.btnPrimero.Location = New System.Drawing.Point(28, 279)
+        Me.btnPrimero.Name = "btnPrimero"
+        Me.btnPrimero.Size = New System.Drawing.Size(32, 18)
+        '
+        'btnUltimo
+        '
+        Me.btnUltimo.Location = New System.Drawing.Point(308, 279)
+        Me.btnUltimo.Name = "btnUltimo"
+        Me.btnUltimo.Size = New System.Drawing.Size(32, 18)
+        '
+        'btnModificar
+        '
+        Me.btnModificar.Location = New System.Drawing.Point(148, 297)
+        Me.btnModificar.Name = "btnModificar"
+        Me.btnModificar.Size = New System.Drawing.Size(98, 19)
+        '
+        'btnTancar
+        '
+        Me.btnTancar.Location = New System.Drawing.Point(812, 297)
+        Me.btnTancar.Name = "btnTancar"
+        Me.btnTancar.Size = New System.Drawing.Size(72, 19)
+        '
+        'btnBorrar
+        '
+        Me.btnBorrar.Location = New System.Drawing.Point(228, 297)
+        Me.btnBorrar.Name = "btnBorrar"
+        Me.btnBorrar.Size = New System.Drawing.Size(98, 19)
+        '
+        'btnNuevo
+        '
+        Me.btnNuevo.Location = New System.Drawing.Point(148, 279)
+        Me.btnNuevo.Name = "btnNuevo"
+        Me.btnNuevo.Size = New System.Drawing.Size(82, 37)
+        '
+        'btnActualizar
+        '
+        Me.btnActualizar.Location = New System.Drawing.Point(60, 297)
+        Me.btnActualizar.Name = "btnActualizar"
+        Me.btnActualizar.Size = New System.Drawing.Size(90, 19)
+        '
+        'btnVerLista
+        '
+        Me.btnVerLista.Location = New System.Drawing.Point(812, 279)
+        Me.btnVerLista.Name = "btnVerLista"
+        Me.btnVerLista.Size = New System.Drawing.Size(72, 18)
+        '
+        'cboSeleccionCentro
+        '
+        Me.cboSeleccionCentro.Location = New System.Drawing.Point(280, 7)
+        Me.cboSeleccionCentro.Name = "cboSeleccionCentro"
+        '
+        'Button1
+        '
+        Me.Button1.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.Button1.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft
+        Me.Button1.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.Button1.Location = New System.Drawing.Point(48, 126)
+        Me.Button1.Name = "Button1"
+        Me.Button1.Size = New System.Drawing.Size(96, 22)
+        Me.Button1.TabIndex = 1
+        Me.Button1.Text = "Importar AURA"
+        '
+        'Button2
+        '
+        Me.Button2.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.Button2.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft
+        Me.Button2.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.Button2.Location = New System.Drawing.Point(48, 97)
+        Me.Button2.Name = "Button2"
+        Me.Button2.Size = New System.Drawing.Size(96, 21)
+        Me.Button2.TabIndex = 2
+        Me.Button2.Text = "BORRAR TODO"
+        '
+        'Button3
+        '
+        Me.Button3.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.Button3.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft
+        Me.Button3.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.Button3.Location = New System.Drawing.Point(48, 67)
+        Me.Button3.Name = "Button3"
+        Me.Button3.Size = New System.Drawing.Size(96, 21)
+        Me.Button3.TabIndex = 3
+        Me.Button3.Text = "Añadir CENTRO"
+        '
+        'Button4
+        '
+        Me.Button4.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.Button4.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft
+        Me.Button4.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.Button4.Location = New System.Drawing.Point(48, 267)
+        Me.Button4.Name = "Button4"
+        Me.Button4.Size = New System.Drawing.Size(96, 22)
+        Me.Button4.TabIndex = 4
+        Me.Button4.Text = "Arreglar BD"
+        '
+        'dirbox1
+        '
+        Me.dirbox1.IntegralHeight = False
+        Me.dirbox1.Location = New System.Drawing.Point(168, 45)
+        Me.dirbox1.Name = "dirbox1"
+        Me.dirbox1.Size = New System.Drawing.Size(184, 297)
+        Me.dirbox1.TabIndex = 7
+        '
+        'DriveListBox1
+        '
+        Me.DriveListBox1.Location = New System.Drawing.Point(168, 22)
+        Me.DriveListBox1.Name = "DriveListBox1"
+        Me.DriveListBox1.Size = New System.Drawing.Size(121, 21)
+        Me.DriveListBox1.TabIndex = 8
+        '
+        'FileListBox1
+        '
+        Me.FileListBox1.Location = New System.Drawing.Point(368, 45)
+        Me.FileListBox1.Name = "FileListBox1"
+        Me.FileListBox1.Pattern = "*.*"
+        Me.FileListBox1.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended
+        Me.FileListBox1.Size = New System.Drawing.Size(304, 277)
+        Me.FileListBox1.TabIndex = 9
+        '
+        'btnCrearDataSet
+        '
+        Me.btnCrearDataSet.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.btnCrearDataSet.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft
+        Me.btnCrearDataSet.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.btnCrearDataSet.Location = New System.Drawing.Point(48, 186)
+        Me.btnCrearDataSet.Name = "btnCrearDataSet"
+        Me.btnCrearDataSet.Size = New System.Drawing.Size(96, 22)
+        Me.btnCrearDataSet.TabIndex = 12
+        Me.btnCrearDataSet.Text = "Crear DATASET"
+        '
+        'btnObtenerColumnasProperty
+        '
+        Me.btnObtenerColumnasProperty.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.btnObtenerColumnasProperty.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft
+        Me.btnObtenerColumnasProperty.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.btnObtenerColumnasProperty.Location = New System.Drawing.Point(480, 334)
+        Me.btnObtenerColumnasProperty.Name = "btnObtenerColumnasProperty"
+        Me.btnObtenerColumnasProperty.Size = New System.Drawing.Size(192, 75)
+        Me.btnObtenerColumnasProperty.TabIndex = 13
+        Me.btnObtenerColumnasProperty.Text = "Copiar al portapapeles properties"
+        '
+        'btnCrearESTRUC
+        '
+        Me.btnCrearESTRUC.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.btnCrearESTRUC.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft
+        Me.btnCrearESTRUC.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.btnCrearESTRUC.Location = New System.Drawing.Point(48, 156)
+        Me.btnCrearESTRUC.Name = "btnCrearESTRUC"
+        Me.btnCrearESTRUC.Size = New System.Drawing.Size(96, 22)
+        Me.btnCrearESTRUC.TabIndex = 14
+        Me.btnCrearESTRUC.Text = "Crear estruc.sql"
+        '
+        'Button5
+        '
+        Me.Button5.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.Button5.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft
+        Me.Button5.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.Button5.Location = New System.Drawing.Point(48, 305)
+        Me.Button5.Name = "Button5"
+        Me.Button5.Size = New System.Drawing.Size(96, 44)
+        Me.Button5.TabIndex = 15
+        Me.Button5.Text = "Importar y volver a hacer estructura"
+        '
+        'Button6
+        '
+        Me.Button6.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.Button6.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft
+        Me.Button6.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.Button6.Location = New System.Drawing.Point(24, 15)
+        Me.Button6.Name = "Button6"
+        Me.Button6.Size = New System.Drawing.Size(136, 21)
+        Me.Button6.TabIndex = 16
+        Me.Button6.Text = "Importar Disposiciones"
+        '
+        'TabControl1
+        '
+        Me.TabControl1.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.TabControl1.Controls.Add(Me.TabPage1)
+        Me.TabControl1.Controls.Add(Me.TabPage2)
+        Me.TabControl1.Controls.Add(Me.TabPage3)
+        Me.TabControl1.ItemSize = New System.Drawing.Size(60, 18)
+        Me.TabControl1.Location = New System.Drawing.Point(0, 15)
+        Me.TabControl1.Name = "TabControl1"
+        Me.TabControl1.SelectedIndex = 0
+        Me.TabControl1.Size = New System.Drawing.Size(952, 512)
+        Me.TabControl1.TabIndex = 17
+        '
+        'TabPage1
+        '
+        Me.TabPage1.Controls.Add(Me.lstTipoTablas)
+        Me.TabPage1.Controls.Add(Me.btnConvertir)
+        Me.TabPage1.Controls.Add(Me.chkHackModelos)
+        Me.TabPage1.Controls.Add(Me.btnPrueba)
+        Me.TabPage1.Controls.Add(Me.btnCrearDataSet)
+        Me.TabPage1.Controls.Add(Me.btnObtenerColumnasProperty)
+        Me.TabPage1.Controls.Add(Me.btnCrearESTRUC)
+        Me.TabPage1.Controls.Add(Me.Button5)
+        Me.TabPage1.Controls.Add(Me.Button1)
+        Me.TabPage1.Controls.Add(Me.Button2)
+        Me.TabPage1.Controls.Add(Me.Button3)
+        Me.TabPage1.Controls.Add(Me.Button4)
+        Me.TabPage1.Controls.Add(Me.FileListBox1)
+        Me.TabPage1.Controls.Add(Me.dirbox1)
+        Me.TabPage1.Controls.Add(Me.DriveListBox1)
+        Me.TabPage1.Location = New System.Drawing.Point(4, 22)
+        Me.TabPage1.Name = "TabPage1"
+        Me.TabPage1.Size = New System.Drawing.Size(944, 486)
+        Me.TabPage1.TabIndex = 0
+        Me.TabPage1.Text = "TabPage1"
+        '
+        'chkHackModelos
+        '
+        Me.chkHackModelos.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.chkHackModelos.Location = New System.Drawing.Point(704, 56)
+        Me.chkHackModelos.Name = "chkHackModelos"
+        Me.chkHackModelos.TabIndex = 17
+        Me.chkHackModelos.Text = "HackModelos"
+        '
+        'btnPrueba
+        '
+        Me.btnPrueba.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.btnPrueba.Location = New System.Drawing.Point(808, 448)
+        Me.btnPrueba.Name = "btnPrueba"
+        Me.btnPrueba.Size = New System.Drawing.Size(80, 24)
+        Me.btnPrueba.TabIndex = 16
+        Me.btnPrueba.Text = "Prueba"
+        '
+        'TabPage2
+        '
+        Me.TabPage2.Controls.Add(Me.Button7)
+        Me.TabPage2.Controls.Add(Me.txtDebug)
+        Me.TabPage2.Controls.Add(Me.Button6)
+        Me.TabPage2.Location = New System.Drawing.Point(4, 22)
+        Me.TabPage2.Name = "TabPage2"
+        Me.TabPage2.Size = New System.Drawing.Size(944, 486)
+        Me.TabPage2.TabIndex = 1
+        Me.TabPage2.Text = "Acabados"
+        '
+        'Button7
+        '
+        Me.Button7.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.Button7.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft
+        Me.Button7.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.Button7.Location = New System.Drawing.Point(744, 15)
+        Me.Button7.Name = "Button7"
+        Me.Button7.Size = New System.Drawing.Size(136, 21)
+        Me.Button7.TabIndex = 18
+        Me.Button7.Text = "ACTUALITZAR"
+        '
+        'txtDebug
+        '
+        Me.txtDebug.Font = New System.Drawing.Font("Arial", 6.75!)
+        Me.txtDebug.Location = New System.Drawing.Point(24, 45)
+        Me.txtDebug.Multiline = True
+        Me.txtDebug.Name = "txtDebug"
+        Me.txtDebug.ScrollBars = System.Windows.Forms.ScrollBars.Vertical
+        Me.txtDebug.Size = New System.Drawing.Size(864, 430)
+        Me.txtDebug.TabIndex = 17
+        Me.txtDebug.Tag = Nothing
+        '
+        'TabPage3
+        '
+        Me.TabPage3.Controls.Add(Me.Button8)
+        Me.TabPage3.Controls.Add(Me.C1TrueDBGrid1)
+        Me.TabPage3.Location = New System.Drawing.Point(4, 22)
+        Me.TabPage3.Name = "TabPage3"
+        Me.TabPage3.Size = New System.Drawing.Size(944, 486)
+        Me.TabPage3.TabIndex = 2
+        Me.TabPage3.Text = "Errores"
+        '
+        'Button8
+        '
+        Me.Button8.Location = New System.Drawing.Point(776, 16)
+        Me.Button8.Name = "Button8"
+        Me.Button8.TabIndex = 1
+        Me.Button8.Text = "Exportar"
+        '
+        'C1TrueDBGrid1
+        '
+        Me.C1TrueDBGrid1.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                    Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.C1TrueDBGrid1.CaptionHeight = 17
+        Me.C1TrueDBGrid1.GroupByCaption = "Drag a column header here to group by that column"
+        Me.C1TrueDBGrid1.Images.Add(CType(resources.GetObject("resource"), System.Drawing.Image))
+        Me.C1TrueDBGrid1.Location = New System.Drawing.Point(16, 64)
+        Me.C1TrueDBGrid1.MarqueeStyle = C1.Win.C1TrueDBGrid.MarqueeEnum.DottedCellBorder
+        Me.C1TrueDBGrid1.Name = "C1TrueDBGrid1"
+        Me.C1TrueDBGrid1.PreviewInfo.Location = New System.Drawing.Point(0, 0)
+        Me.C1TrueDBGrid1.PreviewInfo.Size = New System.Drawing.Size(0, 0)
+        Me.C1TrueDBGrid1.PreviewInfo.ZoomFactor = 75
+        Me.C1TrueDBGrid1.RecordSelectorWidth = 17
+        Me.C1TrueDBGrid1.RowDivider.Color = System.Drawing.Color.DarkGray
+        Me.C1TrueDBGrid1.RowDivider.Style = C1.Win.C1TrueDBGrid.LineStyleEnum.Single
+        Me.C1TrueDBGrid1.RowHeight = 15
+        Me.C1TrueDBGrid1.RowSubDividerColor = System.Drawing.Color.DarkGray
+        Me.C1TrueDBGrid1.Size = New System.Drawing.Size(920, 400)
+        Me.C1TrueDBGrid1.TabIndex = 0
+        Me.C1TrueDBGrid1.Text = "C1TrueDBGrid1"
+        Me.C1TrueDBGrid1.PropBag = "<?xml version=""1.0""?><Blob><Styles type=""C1.Win.C1TrueDBGrid.Design.ContextWrappe" & _
+        "r""><Data>Group{BackColor:ControlDark;Border:None,,0, 0, 0, 0;AlignVert:Center;}E" & _
+        "ditor{}Style2{}Style5{}Style4{}Style7{}Style6{}EvenRow{BackColor:Aqua;}Selected{" & _
+        "ForeColor:HighlightText;BackColor:Highlight;}Style3{}Inactive{ForeColor:Inactive" & _
+        "CaptionText;BackColor:InactiveCaption;}FilterBar{}Footer{}Caption{AlignHorz:Cent" & _
+        "er;}Style9{}Normal{Font:Microsoft Sans Serif, 8.25pt;}HighlightRow{ForeColor:Hig" & _
+        "hlightText;BackColor:Highlight;}Style14{}OddRow{}RecordSelector{AlignImage:Cente" & _
+        "r;}Style15{}Heading{Wrap:True;AlignVert:Center;Border:Raised,,1, 1, 1, 1;ForeCol" & _
+        "or:ControlText;BackColor:Control;}Style8{}Style10{AlignHorz:Near;}Style11{}Style" & _
+        "12{}Style13{}Style1{}</Data></Styles><Splits><C1.Win.C1TrueDBGrid.MergeView Name" & _
+        "="""" CaptionHeight=""17"" ColumnCaptionHeight=""17"" ColumnFooterHeight=""17"" MarqueeS" & _
+        "tyle=""DottedCellBorder"" RecordSelectorWidth=""17"" DefRecSelWidth=""17"" VerticalScr" & _
+        "ollGroup=""1"" HorizontalScrollGroup=""1""><CaptionStyle parent=""Style2"" me=""Style10" & _
+        """ /><EditorStyle parent=""Editor"" me=""Style5"" /><EvenRowStyle parent=""EvenRow"" me" & _
+        "=""Style8"" /><FilterBarStyle parent=""FilterBar"" me=""Style13"" /><FooterStyle paren" & _
+        "t=""Footer"" me=""Style3"" /><GroupStyle parent=""Group"" me=""Style12"" /><HeadingStyle" & _
+        " parent=""Heading"" me=""Style2"" /><HighLightRowStyle parent=""HighlightRow"" me=""Sty" & _
+        "le7"" /><InactiveStyle parent=""Inactive"" me=""Style4"" /><OddRowStyle parent=""OddRo" & _
+        "w"" me=""Style9"" /><RecordSelectorStyle parent=""RecordSelector"" me=""Style11"" /><Se" & _
+        "lectedStyle parent=""Selected"" me=""Style6"" /><Style parent=""Normal"" me=""Style1"" /" & _
+        "><ClientRect>0, 0, 916, 396</ClientRect><BorderSide>0</BorderSide></C1.Win.C1Tru" & _
+        "eDBGrid.MergeView></Splits><NamedStyles><Style parent="""" me=""Normal"" /><Style pa" & _
+        "rent=""Normal"" me=""Heading"" /><Style parent=""Heading"" me=""Footer"" /><Style parent" & _
+        "=""Heading"" me=""Caption"" /><Style parent=""Heading"" me=""Inactive"" /><Style parent=" & _
+        """Normal"" me=""Selected"" /><Style parent=""Normal"" me=""Editor"" /><Style parent=""Nor" & _
+        "mal"" me=""HighlightRow"" /><Style parent=""Normal"" me=""EvenRow"" /><Style parent=""No" & _
+        "rmal"" me=""OddRow"" /><Style parent=""Heading"" me=""RecordSelector"" /><Style parent=" & _
+        """Normal"" me=""FilterBar"" /><Style parent=""Caption"" me=""Group"" /></NamedStyles><ve" & _
+        "rtSplits>1</vertSplits><horzSplits>1</horzSplits><Layout>None</Layout><DefaultRe" & _
+        "cSelWidth>17</DefaultRecSelWidth><ClientArea>0, 0, 916, 396</ClientArea><PrintPa" & _
+        "geHeaderStyle parent="""" me=""Style14"" /><PrintPageFooterStyle parent="""" me=""Style" & _
+        "15"" /></Blob>"
+        '
+        'btnConvertir
+        '
+        Me.btnConvertir.Location = New System.Drawing.Point(704, 168)
+        Me.btnConvertir.Name = "btnConvertir"
+        Me.btnConvertir.Size = New System.Drawing.Size(112, 24)
+        Me.btnConvertir.TabIndex = 18
+        Me.btnConvertir.Text = "Convertir Tablas A"
+        '
+        'lstTipoTablas
+        '
+        Me.lstTipoTablas.Items.AddRange(New Object() {"MyISAM", "InnoDB"})
+        Me.lstTipoTablas.Location = New System.Drawing.Point(832, 168)
+        Me.lstTipoTablas.Name = "lstTipoTablas"
+        Me.lstTipoTablas.Size = New System.Drawing.Size(80, 82)
+        Me.lstTipoTablas.TabIndex = 19
+        '
+        '_00importador
+        '
+        Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
+        Me.ClientSize = New System.Drawing.Size(960, 547)
+        Me.Controls.Add(Me.TabControl1)
+        Me.Cursor = System.Windows.Forms.Cursors.Default
+        Me.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!)
+        Me.Name = "_00importador"
+        Me.Text = "Utilidades MySQL"
+        Me.Controls.SetChildIndex(Me.cboSeleccionCentro, 0)
+        Me.Controls.SetChildIndex(Me.sbtipo, 0)
+        Me.Controls.SetChildIndex(Me.btnActualizar, 0)
+        Me.Controls.SetChildIndex(Me.btnNuevo, 0)
+        Me.Controls.SetChildIndex(Me.btnBorrar, 0)
+        Me.Controls.SetChildIndex(Me.btnTancar, 0)
+        Me.Controls.SetChildIndex(Me.btnUltimo, 0)
+        Me.Controls.SetChildIndex(Me.btnPrimero, 0)
+        Me.Controls.SetChildIndex(Me.btnAnterior, 0)
+        Me.Controls.SetChildIndex(Me.btnSiguiente, 0)
+        Me.Controls.SetChildIndex(Me.btnRecargar, 0)
+        Me.Controls.SetChildIndex(Me.btnVerLista, 0)
+        Me.Controls.SetChildIndex(Me.btnModificar, 0)
+        Me.Controls.SetChildIndex(Me.TabControl1, 0)
+        Me.TabControl1.ResumeLayout(False)
+        Me.TabPage1.ResumeLayout(False)
+        Me.TabPage2.ResumeLayout(False)
+        CType(Me.txtDebug, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.TabPage3.ResumeLayout(False)
+        CType(Me.C1TrueDBGrid1, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.ResumeLayout(False)
+
+    End Sub
+
+#End Region
+
+    Private txt As String = ""
+    Private ultimoTipo As String
+    Private ultimaFactura As Double
+    Private dtFacturas As New DataTable
+    Private directorioHack As String
+    Private directorioAura As String
+    Private dtModelos As DataTable
+    Private dvModelos As DataView
+    Private dtModelos2 As New DataTable
+    Private dvModelos2 As New DataView
+
+#Region "IMPORTAR AURA"
+
+    Private Function tieneSUBDIRS(ByVal nombre As String) As Boolean
+        Select Case nombre
+            Case "alba", "anul", "calba", "cfac", "cordre", "fac"
+                Return True
+            Case "fases", "feines", "mforni", "modcol", "models"
+                Return True
+            Case "modstk", "ordre"
+                Return True
+        End Select
+        Return False
+    End Function
+    Protected Friend Function GenerarSQLInsert(ByVal tabla As DataTable) As String
+        Dim i As Integer
+        Dim sqlIns
+        Try
+            sqlIns = "INSERT INTO " & tabla.TableName & " ("
+            For i = 0 To tabla.Columns.Count - 1
+                If Not esCampoConNombre(tabla.Columns(i).ColumnName) Then
+                    sqlIns = sqlIns & tabla.Columns(i).ColumnName & ","
+                End If
+            Next
+            sqlIns = sqlIns.Substring(0, sqlIns.Length - 1) & ") VALUES ("
+            'Ahora los parametros
+            For i = 0 To tabla.Columns.Count - 1
+                If Not esCampoConNombre(tabla.Columns(i).ColumnName) Then
+                    sqlIns = sqlIns & "@p" & tabla.Columns(i).ColumnName & ","
+                End If
+            Next
+            sqlIns = sqlIns.Substring(0, sqlIns.Length - 1) & ")"
+            Return sqlIns
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Function
+    Private Sub ArreglarTiposColumnas(ByVal tabla As String)
+        Try
+            Select Case tabla
+                Case "dcactu"
+                    ds.Tables("dcactu").Columns("ESTOC").DataType = GetType(String)
+                Case tablaClientes
+                    'ds.Tables(tabla).Columns("CARTERA").DataType = GetType(Boolean)
+                    'ds.Tables(tabla).Columns("TRASPAS").DataType = GetType(Boolean)
+                Case tablaProveedores
+                    'ds.Tables(tabla).Columns("TRASPAS").DataType = GetType(Boolean)
+
+            End Select
+
+        Catch ex As Exception
+            MessageBox.Show(ex.ToString)
+        End Try
+    End Sub
+    Private Sub quitarColumnasFacturas(ByRef dtTemporal As DataTable)
+        Try
+            Try : dtTemporal.Columns.Remove("BASE2") : Catch EX As Exception : End Try
+            Try : dtTemporal.Columns.Remove("BASE3") : Catch EX As Exception : End Try
+            Try : dtTemporal.Columns.Remove("BRUT2") : Catch EX As Exception : End Try
+            Try : dtTemporal.Columns.Remove("BRUT3") : Catch EX As Exception : End Try
+            Try : dtTemporal.Columns.Remove("DTE2") : Catch EX As Exception : End Try
+            Try : dtTemporal.Columns.Remove("DTE3") : Catch EX As Exception : End Try
+            Try : dtTemporal.Columns.Remove("IVA2") : Catch EX As Exception : End Try
+            Try : dtTemporal.Columns.Remove("IVA3") : Catch EX As Exception : End Try
+            Try : dtTemporal.Columns.Remove("RE2") : Catch EX As Exception : End Try
+            Try : dtTemporal.Columns.Remove("RE3") : Catch EX As Exception : End Try
+            Try : dtTemporal.Columns.Remove("P_RE2") : Catch EX As Exception : End Try
+            Try : dtTemporal.Columns.Remove("P_RE3") : Catch EX As Exception : End Try
+            Try : dtTemporal.Columns.Remove("P_DTE2") : Catch EX As Exception : End Try
+            Try : dtTemporal.Columns.Remove("P_DTE3") : Catch EX As Exception : End Try
+            Try : dtTemporal.Columns.Remove("P_IVA2") : Catch EX As Exception : End Try
+            Try : dtTemporal.Columns.Remove("P_IVA3") : Catch EX As Exception : End Try
+        Catch ex As Exception
+
+        End Try
+    End Sub
+    Private Sub QuitarColumnasModelos(ByRef dtTemporal As DataTable)
+        Try
+            Try : dtTemporal.Columns.Remove("CONCOLL") : Catch EX As Exception : End Try
+            Try : dtTemporal.Columns.Remove("CONPUNY") : Catch EX As Exception : End Try
+            Try : dtTemporal.Columns.Remove("CONCOS") : Catch EX As Exception : End Try
+            Try : dtTemporal.Columns.Remove("COLCOLL") : Catch EX As Exception : End Try
+            Try : dtTemporal.Columns.Remove("COLPUNY") : Catch EX As Exception : End Try
+            Try : dtTemporal.Columns.Remove("COLCOS") : Catch EX As Exception : End Try
+            Try : dtTemporal.Columns.Remove("PROCOLL") : Catch EX As Exception : End Try
+            Try : dtTemporal.Columns.Remove("PROPUNY") : Catch EX As Exception : End Try
+            Try : dtTemporal.Columns.Remove("PROCOS") : Catch EX As Exception : End Try
+            Try : dtTemporal.Columns.Remove("PCOLL") : Catch EX As Exception : End Try
+            Try : dtTemporal.Columns.Remove("PPUNY") : Catch EX As Exception : End Try
+            Try : dtTemporal.Columns.Remove("PCOS") : Catch EX As Exception : End Try
+            Try : dtTemporal.Columns.Remove("TEICOLL") : Catch EX As Exception : End Try
+            Try : dtTemporal.Columns.Remove("TEIPUNY") : Catch EX As Exception : End Try
+            Try : dtTemporal.Columns.Remove("TEICOS") : Catch EX As Exception : End Try
+            Try : dtTemporal.Columns.Remove("COSTCOLL") : Catch EX As Exception : End Try
+            Try : dtTemporal.Columns.Remove("COSTPUNY") : Catch EX As Exception : End Try
+            Try : dtTemporal.Columns.Remove("COSTCOS") : Catch EX As Exception : End Try
+            Try : dtTemporal.Columns.Remove("CON4") : Catch EX As Exception : End Try '.REM
+            Try : dtTemporal.Columns.Remove("CON5") : Catch EX As Exception : End Try
+            Try : dtTemporal.Columns.Remove("COL4") : Catch EX As Exception : End Try
+            Try : dtTemporal.Columns.Remove("COL5") : Catch EX As Exception : End Try
+            Try : dtTemporal.Columns.Remove("COLCOS") : Catch EX As Exception : End Try
+            Try : dtTemporal.Columns.Remove("PRO4") : Catch EX As Exception : End Try
+            Try : dtTemporal.Columns.Remove("PRO5") : Catch EX As Exception : End Try
+            Try : dtTemporal.Columns.Remove("PROCOS") : Catch EX As Exception : End Try
+            Try : dtTemporal.Columns.Remove("P4") : Catch EX As Exception : End Try
+            Try : dtTemporal.Columns.Remove("P5") : Catch EX As Exception : End Try
+            Try : dtTemporal.Columns.Remove("PCOS") : Catch EX As Exception : End Try
+            Try : dtTemporal.Columns.Remove("TEI4") : Catch EX As Exception : End Try
+            Try : dtTemporal.Columns.Remove("TEI5") : Catch EX As Exception : End Try
+            Try : dtTemporal.Columns.Remove("TEICOS") : Catch EX As Exception : End Try
+            Try : dtTemporal.Columns.Remove("TITOL1") : Catch EX As Exception : End Try
+            Try : dtTemporal.Columns.Remove("TITOL2") : Catch EX As Exception : End Try
+            Try : dtTemporal.Columns.Remove("TITOL3") : Catch EX As Exception : End Try
+            Try : dtTemporal.Columns.Remove("TITOL4") : Catch EX As Exception : End Try
+            Try : dtTemporal.Columns.Remove("TITOL5") : Catch EX As Exception : End Try
+        Catch ex As Exception
+
+        End Try
+    End Sub
+    Private Sub ImportarDirOArhivoSeleccionado(ByVal directorio As String, ByVal estemporada As Boolean, Optional ByVal temporada As String = "")
+        Dim adaptadorRellenarMYSQL As MySql.Data.MySqlClient.MySqlDataAdapter
+
+        Dim adaptadorLeerDBF As New Microsoft.Data.Odbc.OdbcDataAdapter
+        Dim conexionDBF As Microsoft.Data.Odbc.OdbcConnection
+        Dim cmdSelectDBF As New Microsoft.Data.Odbc.OdbcCommand
+
+        Dim tablas As ArrayList
+
+        Dim i, j, z As Integer
+
+        Dim drDBF, drMYSQL As DataRow
+        Dim importarTodo As Boolean = False
+        Dim importarTodo1 As Boolean = False
+
+        Dim dtTemporal As New DataTable
+
+        Dim tablaActual As String
+        Try
+
+            If temporada <> "ARREL" Then
+
+                conexionDBF = New Microsoft.Data.Odbc.OdbcConnection("DRIVER=Driver do Microsoft dBase (*.dbf);UID=admin;UserCommitSync=Yes;Threads=3;Statistics=0;SafeTransactions=0;PageTimeout=5;MaxScanRows=8;MaxBufferSize=2048;FIL=dBase III;DriverId=21;Deleted=0;DefaultDir=" & directorio & ";CollatingSequence=ASCII;")
+                directorioAura = directorio
+                cmdSelectDBF.Connection = conexionDBF
+                conexionDBF.Open()
+                ACN()
+
+                tablas = PonerTablasEnArray()
+
+                ds.EnforceConstraints = False
+
+                For i = 0 To tablas.Count - 1
+
+                    Try
+                        importarTodo = False : importarTodo1 = False
+                        If (FileListBox1.SelectedItems.Count = 0) Then : importarTodo = True : End If
+
+                        tablaActual = tablas(i)
+                        If FileListBox1.SelectedItem Is Nothing Then : importarTodo1 = True
+                        Else
+                            If tablaActual = CStr(FileListBox1.SelectedItem.Substring(0, FileListBox1.SelectedItem.Length - 4)).ToLower() Then
+                                importarTodo1 = True
+                            End If
+                        End If
+
+                        If (importarTodo Or importarTodo1) Then
+                            directorioHack = directorio
+                            'No se para que funciona
+                            ArreglarTiposColumnas(tablas(i))
+                            If tablaActual = "cfac" Then tablaActual = "factur"
+                            If tablaActual = "calba" Then tablaActual = "factur"
+                            If tablaActual = "fac" Then tablaActual = "dfactu"
+                            If tablaActual = "alba" Then tablaActual = "dfactu"
+                            If tablaActual = "vencim1" Then tablaActual = "vencim"
+                            If chkHackModelos.Checked = True Then
+                                If tablaActual = "models" Then tablaActual = "modelsescandallo"
+                            End If
+
+                            If tablas(i) = "dfactu" Or tablas(i) = "factur" Then
+                                If tablas(i) = "factur" Then
+                                    cmdSelectDBF.CommandText = "SELECT * FROM " & tablas(i) & " WHERE FRA > 3000 ORDER BY DATA DESC"
+                                Else
+                                    cmdSelectDBF.CommandText = "SELECT * FROM " & tablas(i) & " WHERE FRA > 3000 "
+                                End If
+                            Else
+                                cmdSelectDBF.CommandText = "SELECT * FROM " & tablas(i)
+                            End If
+                            If tablas(i) = "vencim1" Then
+                                cmdSelectDBF.CommandText = "SELECT * FROM vencim1 WHERE FRA > 40000 "
+                            End If
+                            adaptadorLeerDBF.SelectCommand = cmdSelectDBF
+                            dtTemporal.Clear()
+                            dtTemporal.Columns.Clear()
+                            adaptadorLeerDBF.ContinueUpdateOnError = True
+                            adaptadorLeerDBF.Fill(dtTemporal)
+
+                            adaptadorRellenarMYSQL = New MySql.Data.MySqlClient.MySqlDataAdapter("SELECT * FROM " & tablaActual, cnn)
+
+                            Try
+                                DirectCast(ds.Tables(tablaActual), DataTable).Clear()
+                                If tablas(i) = "models" Then
+                                    If chkHackModelos.Checked = False Then
+                                        QuitarColumnasModelos(dtTemporal)
+                                    End If
+                                End If
+                                If tablas(i) = "factur" OrElse tablas(i) = "cfac" OrElse tablas(i) = "cactur" Then quitarColumnasFacturas(dtTemporal)
+                                For j = 0 To dtTemporal.Rows.Count - 1
+                                    drDBF = dtTemporal.Rows(j)
+                                    If tablas(i).ToUpper = "MODCOL" Then
+                                        'Por cada columna he de crear una row
+                                        CrearInsertarColoresModelos(DirectCast(ds.Tables(tablaActual), DataTable), drMYSQL, drDBF)
+                                    End If
+                                    If tablas(i).ToUpper = "MODELS" AndAlso chkHackModelos.Checked = True Then
+                                        CrearInsertarColoresModelos2(DirectCast(ds.Tables(tablaActual), DataTable), drMYSQL, drDBF)
+                                    End If
+                                    If chkHackModelos.Checked = False Then
+                                        If (Not ArreglarRowAInsertar(drDBF, tablas(i), temporada) Is Nothing) Then
+                                            drMYSQL = DirectCast(ds.Tables(tablaActual), DataTable).NewRow
+                                            For z = 0 To dtTemporal.Columns.Count - 1
+                                                Select Case tablas(i)
+                                                    Case "calba"
+                                                        Select Case dtTemporal.Columns(z).ColumnName
+                                                            Case "NUMERO" : drMYSQL("FRA") = drDBF(dtTemporal.Columns(z).ColumnName)
+                                                            Case "FAC" : drMYSQL("TRASPAS") = drDBF(dtTemporal.Columns(z).ColumnName)
+                                                            Case Else : drMYSQL(dtTemporal.Columns(z).ColumnName) = drDBF(dtTemporal.Columns(z).ColumnName)
+                                                        End Select
+                                                    Case "alba"
+                                                        Select Case dtTemporal.Columns(z).ColumnName
+                                                            Case "NUMERO" : drMYSQL("FRA") = drDBF(dtTemporal.Columns(z).ColumnName)
+                                                            Case "LINEA" : drMYSQL("NLINEA") = drDBF(dtTemporal.Columns(z).ColumnName)
+                                                            Case "TALL1" : drMYSQL("TALLA01") = drDBF(dtTemporal.Columns(z).ColumnName)
+                                                            Case "TALL2" : drMYSQL("TALLA02") = drDBF(dtTemporal.Columns(z).ColumnName)
+                                                            Case "TALL3" : drMYSQL("TALLA03") = drDBF(dtTemporal.Columns(z).ColumnName)
+                                                            Case "TALL4" : drMYSQL("TALLA04") = drDBF(dtTemporal.Columns(z).ColumnName)
+                                                            Case "TALL5" : drMYSQL("TALLA05") = drDBF(dtTemporal.Columns(z).ColumnName)
+                                                            Case "TALL6" : drMYSQL("TALLA06") = drDBF(dtTemporal.Columns(z).ColumnName)
+                                                            Case "TALL7" : drMYSQL("TALLA07") = drDBF(dtTemporal.Columns(z).ColumnName)
+                                                            Case "TALL8" : drMYSQL("TALLA08") = drDBF(dtTemporal.Columns(z).ColumnName)
+                                                            Case "TALL9" : drMYSQL("TALLA09") = drDBF(dtTemporal.Columns(z).ColumnName)
+                                                            Case "TALL10" : drMYSQL("TALLA10") = drDBF(dtTemporal.Columns(z).ColumnName)
+                                                            Case "QUANTITAT" : drMYSQL("UNITATS") = drDBF(dtTemporal.Columns(z).ColumnName)
+                                                            Case Else : drMYSQL(dtTemporal.Columns(z).ColumnName) = drDBF(dtTemporal.Columns(z).ColumnName)
+                                                        End Select
+                                                    Case "fac"
+                                                        Select Case dtTemporal.Columns(z).ColumnName
+                                                            Case "MODEL" : drMYSQL("MOSTRA") = drDBF(dtTemporal.Columns(z).ColumnName)
+                                                            Case "LINEA" : drMYSQL("NLINEA") = drDBF(dtTemporal.Columns(z).ColumnName)
+                                                            Case "QUANT" : drMYSQL("UNITATS") = drDBF(dtTemporal.Columns(z).ColumnName)
+                                                            Case "ALBARA" : drMYSQL("ALBAR") = drDBF(dtTemporal.Columns(z).ColumnName)
+                                                            Case Else : drMYSQL(dtTemporal.Columns(z).ColumnName) = drDBF(dtTemporal.Columns(z).ColumnName)
+                                                        End Select
+                                                    Case Else
+                                                        Try
+                                                            drMYSQL(dtTemporal.Columns(z).ColumnName) = drDBF(dtTemporal.Columns(z).ColumnName)
+                                                        Catch ex As Exception
+
+                                                        End Try
+
+                                                End Select
+                                            Next
+                                            drMYSQL = ArreglarRowParaInsertarEnMySQL(drMYSQL, tablas(i), temporada)
+                                            DirectCast(ds.Tables(tablaActual), DataTable).Rows.Add(drMYSQL)
+                                        End If
+                                    End If
+                                Next
+
+                                adaptadorRellenarMYSQL.ContinueUpdateOnError = True
+                                adaptadorRellenarMYSQL.InsertCommand = New MySqlCommand(GenerarSQLInsert(ds.Tables(tablaActual)), cnn)
+
+                                QuitarRestricciones()
+                                AñadirParametros(adaptadorRellenarMYSQL.InsertCommand, ds.Tables(tablaActual))
+                                adaptadorRellenarMYSQL.Update(ds.Tables(tablaActual))
+
+                                If tablas(i).ToUpper = "MODELS" AndAlso chkHackModelos.Checked = True Then
+                                    tablaActual = "mmani"
+                                    DirectCast(ds.Tables(tablaActual), DataTable).Clear()
+                                    For j = 0 To dtTemporal.Rows.Count - 1
+                                        drDBF = dtTemporal.Rows(j)
+                                        CrearInsertarColoresModelos3(DirectCast(ds.Tables(tablaActual), DataTable), drMYSQL, drDBF)
+                                    Next
+                                    adaptadorRellenarMYSQL = New MySql.Data.MySqlClient.MySqlDataAdapter("SELECT * FROM " & tablaActual, cnn)
+                                    adaptadorRellenarMYSQL.InsertCommand = New MySqlCommand(GenerarSQLInsert(ds.Tables(tablaActual)), cnn)
+
+                                    QuitarRestricciones()
+                                    AñadirParametros(adaptadorRellenarMYSQL.InsertCommand, ds.Tables(tablaActual))
+                                    adaptadorRellenarMYSQL.Update(ds.Tables(tablaActual))
+                                End If
+                                adaptadorRellenarMYSQL = Nothing
+
+                            Catch ex As Exception
+                                LOG(EX.ToString)
+                                txt = txt & "==" & ex.ToString & " en " & tablas(i) & vbCrLf
+                                adaptadorRellenarMYSQL = Nothing
+                                'cmdbuild = Nothing
+                            End Try
+                        End If
+
+                    Catch ex As Exception
+                        LOG(EX.ToString, True)
+                        txt = txt & "==" & ex.ToString & " en " & tablas(i) & vbCrLf
+                    End Try
+                Next
+
+                ProcesarModelos()
+                cnn.Close()
+                conexionDBF.Close()
+
+                Clipboard.SetDataObject("", True)
+                Clipboard.SetDataObject(txt, True)
+            End If
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Sub
+
+
+    Private Sub cargaModelosDBF()
+        Try
+            Dim adaptadorRellenarMYSQL As New MySql.Data.MySqlClient.MySqlDataAdapter
+            Dim cmdsel As New MySqlCommand
+
+            Dim adaptadorLeerDBF As New Microsoft.Data.Odbc.OdbcDataAdapter
+            Dim conexionDBF As Microsoft.Data.Odbc.OdbcConnection
+            Dim cmdSelectDBF As New Microsoft.Data.Odbc.OdbcCommand
+
+
+            conexionDBF = New Microsoft.Data.Odbc.OdbcConnection("DRIVER=Driver do Microsoft dBase (*.dbf);UID=admin;UserCommitSync=Yes;Threads=3;Statistics=0;SafeTransactions=0;PageTimeout=5;MaxScanRows=8;MaxBufferSize=2048;FIL=dBase III;DriverId=21;Deleted=0;DefaultDir=" & directorioAura & ";CollatingSequence=ASCII;")
+            cmdSelectDBF.Connection = conexionDBF
+            conexionDBF.Open()
+            cmdSelectDBF.CommandText = "SELECT * FROM models "
+            adaptadorLeerDBF.SelectCommand = cmdSelectDBF
+            dtModelos = New DataTable
+            dvModelos = New DataView
+            adaptadorLeerDBF.Fill(dtModelos)
+            dvModelos = dtModelos.DefaultView
+            dvModelos.Sort = "CODI, SERIE"
+            conexionDBF.Close()
+
+            cmdsel.Connection = cnn
+            cmdsel.CommandText = "SELECT * FROM MODELS"
+            adaptadorRellenarMYSQL.SelectCommand = cmdsel
+            ACN()
+            adaptadorRellenarMYSQL.Fill(dtModelos2)
+            dvModelos2 = dtModelos2.DefaultView
+            dvModelos2.Sort = "CODI, SERIE"
+            CCN()
+
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Sub
+    Private Function obtenerCampoModeloDBF(ByVal campo As String, ByVal modelo As String, ByVal serie As String) As Object
+        Try
+            Dim s As String
+            Dim k(1) As Object
+            k(0) = modelo
+            k(1) = serie
+            If dvModelos.Find(k) = -1 Then Return ""
+
+            s = dvModelos(dvModelos.Find(k)).Item(campo)
+            Return s
+
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Function
+    Private Function obtenerCampoModeloMysql(ByVal campo As String, ByVal modelo As String, ByVal serie As String) As Object
+        Try
+            Dim s As String
+            Dim k(1) As Object
+            k(0) = modelo
+            k(1) = serie
+            If dvModelos2.Find(k) = -1 Then Return 0
+
+            s = dvModelos2(dvModelos2.Find(k)).Item(campo)
+            Return s
+
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Function
+    Private Sub CrearInsertarColoresModelos(ByVal dt As DataTable, ByVal dr As DataRow, ByVal drDBF As DataRow)
+        Dim drnueva As DataRow
+        Try
+
+            If general.nz(drDBF("COS"), "") <> "" Then
+                drnueva = dt.NewRow
+                drnueva("MODEL") = drDBF("MODEL")
+                drnueva("SERIE") = drDBF("SERIE")
+                drnueva("MODCOL") = drDBF("MODCOL")
+                drnueva("TITULO") = obtenerCampoModeloDBF("TITOL1", drDBF("MODEL"), drDBF("SERIE"))
+                drnueva("COLTITULO") = obtenerCampoModeloDBF("COLCOS", drDBF("MODEL"), drDBF("SERIE"))
+                drnueva("TEMPORADA") = "INSTINTO"
+                drnueva("CLIENT") = obtenerCampoModeloMysql("CLIENT", drDBF("MODEL"), drDBF("SERIE"))
+                drnueva("CENTRO") = "O"
+                dt.Rows.Add(drnueva)
+            End If
+            If general.nz(drDBF("COLL"), "") <> "" Then
+                drnueva = dt.NewRow
+                drnueva("MODEL") = drDBF("MODEL")
+                drnueva("SERIE") = drDBF("SERIE")
+                drnueva("MODCOL") = drDBF("MODCOL")
+                drnueva("TITULO") = obtenerCampoModeloDBF("TITOL2", drDBF("MODEL"), drDBF("SERIE"))
+                drnueva("COLTITULO") = obtenerCampoModeloDBF("COLCOLL", drDBF("MODEL"), drDBF("SERIE"))
+                drnueva("TEMPORADA") = "INSTINTO"
+                drnueva("CLIENT") = obtenerCampoModeloMysql("CLIENT", drDBF("MODEL"), drDBF("SERIE"))
+                drnueva("CENTRO") = "O"
+                dt.Rows.Add(drnueva)
+            End If
+            If general.nz(drDBF("PUNY"), "") <> "" Then
+
+                drnueva = dt.NewRow
+                drnueva("SERIE") = drDBF("SERIE")
+                drnueva("MODEL") = drDBF("MODEL")
+                drnueva("MODCOL") = drDBF("MODCOL")
+                drnueva("TITULO") = obtenerCampoModeloDBF("TITOL3", drDBF("MODEL"), drDBF("SERIE"))
+                drnueva("COLTITULO") = obtenerCampoModeloDBF("COLPUNY", drDBF("MODEL"), drDBF("SERIE"))
+                drnueva("TEMPORADA") = "INSTINTO"
+                drnueva("CLIENT") = obtenerCampoModeloMysql("CLIENT", drDBF("MODEL"), drDBF("SERIE"))
+                drnueva("CENTRO") = "O"
+                dt.Rows.Add(drnueva)
+            End If
+            If general.nz(drDBF("P4"), "") <> "" Then
+                drnueva = dt.NewRow
+                drnueva("MODEL") = drDBF("MODEL")
+                drnueva("SERIE") = drDBF("SERIE")
+                drnueva("MODCOL") = drDBF("MODCOL")
+                drnueva("TITULO") = obtenerCampoModeloDBF("TITOL4", drDBF("MODEL"), drDBF("SERIE"))
+                drnueva("COLTITULO") = obtenerCampoModeloDBF("COL4", drDBF("MODEL"), drDBF("SERIE"))
+                drnueva("TEMPORADA") = "INSTINTO"
+                drnueva("CLIENT") = obtenerCampoModeloMysql("CLIENT", drDBF("MODEL"), drDBF("SERIE"))
+                drnueva("CENTRO") = "O"
+            End If
+            If general.nz(drDBF("P5"), "") <> "" Then
+                drnueva = dt.NewRow
+                drnueva("SERIE") = drDBF("SERIE")
+                drnueva("MODEL") = drDBF("MODEL")
+                drnueva("MODCOL") = drDBF("MODCOL")
+                drnueva("TITULO") = obtenerCampoModeloDBF("TITOL5", drDBF("MODEL"), drDBF("SERIE"))
+                drnueva("COLTITULO") = obtenerCampoModeloDBF("COL5", drDBF("MODEL"), drDBF("SERIE"))
+                drnueva("TEMPORADA") = "INSTINTO"
+                drnueva("CLIENT") = obtenerCampoModeloMysql("CLIENT", drDBF("MODEL"), drDBF("SERIE"))
+                drnueva("CENTRO") = "O"
+                dt.Rows.Add(drnueva)
+            End If
+
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Sub
+    Private Sub CrearInsertarColoresModelos2(ByVal dt As DataTable, ByVal dr As DataRow, ByVal drDBF As DataRow)
+        Dim drnueva As DataRow
+        Try
+
+            If general.nz(drDBF("TITOL1"), "") <> "" Then
+                drnueva = dt.NewRow
+                drnueva("MODEL") = drDBF("CODI")
+                drnueva("SERIE") = drDBF("SERIE")
+                drnueva("TITULO") = obtenerCampoModeloDBF("TITOL1", drDBF("CODI"), drDBF("SERIE"))
+                drnueva("CONSUM") = obtenerCampoModeloDBF("CONCOS", drDBF("CODI"), drDBF("SERIE"))
+                drnueva("COST") = obtenerCampoModeloDBF("PCOS", drDBF("CODI"), drDBF("SERIE"))
+                drnueva("TEIXIT") = obtenerCampoModeloDBF("TEICOS", drDBF("CODI"), drDBF("SERIE"))
+                drnueva("TEMPORADA") = "INSTINTO"
+                drnueva("CLIENT") = obtenerCampoModeloMysql("CLIENT", drDBF("CODI"), drDBF("SERIE"))
+                drnueva("PREU") = GetCampoPrecioTejidoMetros(drnueva("TEIXIT"), GetCampoColor(drnueva("TITULO"), drnueva("MODEL"), drnueva("SERIE"), drnueva("CLIENT")))
+                drnueva("CENTRO") = "O"
+                dt.Rows.Add(drnueva)
+            End If
+            If general.nz(drDBF("TITOL2"), "") <> "" Then
+                drnueva = dt.NewRow
+                drnueva("MODEL") = drDBF("CODI")
+                drnueva("SERIE") = drDBF("SERIE")
+                drnueva("TITULO") = obtenerCampoModeloDBF("TITOL2", drDBF("CODI"), drDBF("SERIE"))
+                drnueva("CONSUM") = obtenerCampoModeloDBF("CONCOLL", drDBF("CODI"), drDBF("SERIE"))
+                drnueva("COST") = obtenerCampoModeloDBF("PCOLL", drDBF("CODI"), drDBF("SERIE"))
+                drnueva("TEIXIT") = obtenerCampoModeloDBF("TEICOLL", drDBF("CODI"), drDBF("SERIE"))
+                drnueva("TEMPORADA") = "INSTINTO"
+                drnueva("CLIENT") = obtenerCampoModeloMysql("CLIENT", drDBF("CODI"), drDBF("SERIE"))
+                drnueva("PREU") = GetCampoPrecioTejidoMetros(drnueva("TEIXIT"), GetCampoColor(drnueva("TITULO"), drnueva("MODEL"), drnueva("SERIE"), drnueva("CLIENT")))
+                drnueva("CENTRO") = "O"
+                dt.Rows.Add(drnueva)
+            End If
+            If general.nz(drDBF("TITOL3"), "") <> "" Then
+
+                drnueva = dt.NewRow
+                drnueva("SERIE") = drDBF("SERIE")
+                drnueva("MODEL") = drDBF("CODI")
+                drnueva("TITULO") = obtenerCampoModeloDBF("TITOL3", drDBF("CODI"), drDBF("SERIE"))
+                drnueva("CONSUM") = obtenerCampoModeloDBF("CONPUNY", drDBF("CODI"), drDBF("SERIE"))
+                drnueva("COST") = obtenerCampoModeloDBF("PPUNY", drDBF("CODI"), drDBF("SERIE"))
+                drnueva("TEIXIT") = obtenerCampoModeloDBF("TEIPUNY", drDBF("CODI"), drDBF("SERIE"))
+                drnueva("TEMPORADA") = "INSTINTO"
+                drnueva("CLIENT") = obtenerCampoModeloMysql("CLIENT", drDBF("CODI"), drDBF("SERIE"))
+                drnueva("PREU") = GetCampoPrecioTejidoMetros(drnueva("TEIXIT"), GetCampoColor(drnueva("TITULO"), drnueva("MODEL"), drnueva("SERIE"), drnueva("CLIENT")))
+                drnueva("CENTRO") = "O"
+                dt.Rows.Add(drnueva)
+            End If
+            If general.nz(drDBF("TITOL4"), "") <> "" Then
+                drnueva = dt.NewRow
+                drnueva("MODEL") = drDBF("CODI")
+                drnueva("SERIE") = drDBF("SERIE")
+                drnueva("TITULO") = obtenerCampoModeloDBF("TITOL4", drDBF("CODI"), drDBF("SERIE"))
+                drnueva("CONSUM") = obtenerCampoModeloDBF("CON4", drDBF("CODI"), drDBF("SERIE"))
+                drnueva("COST") = obtenerCampoModeloDBF("P4", drDBF("CODI"), drDBF("SERIE"))
+                drnueva("TEIXIT") = obtenerCampoModeloDBF("TEI4", drDBF("CODI"), drDBF("SERIE"))
+                drnueva("TEMPORADA") = "INSTINTO"
+                drnueva("CLIENT") = obtenerCampoModeloMysql("CLIENT", drDBF("CODI"), drDBF("SERIE"))
+                drnueva("PREU") = GetCampoPrecioTejidoMetros(drnueva("TEIXIT"), GetCampoColor(drnueva("TITULO"), drnueva("MODEL"), drnueva("SERIE"), drnueva("CLIENT")))
+                drnueva("CENTRO") = "O"
+            End If
+            If general.nz(drDBF("TITOL5"), "") <> "" Then
+                drnueva = dt.NewRow
+                drnueva("SERIE") = drDBF("SERIE")
+                drnueva("MODEL") = drDBF("CODI")
+                drnueva("TITULO") = obtenerCampoModeloDBF("TITOL5", drDBF("CODI"), drDBF("SERIE"))
+                drnueva("CONSUM") = obtenerCampoModeloDBF("CON5", drDBF("CODI"), drDBF("SERIE"))
+                drnueva("COST") = obtenerCampoModeloDBF("P5", drDBF("CODI"), drDBF("SERIE"))
+                drnueva("TEIXIT") = obtenerCampoModeloDBF("TEI5", drDBF("CODI"), drDBF("SERIE"))
+                drnueva("TEMPORADA") = "INSTINTO"
+                drnueva("CLIENT") = obtenerCampoModeloMysql("CLIENT", drDBF("CODI"), drDBF("SERIE"))
+                drnueva("PREU") = GetCampoPrecioTejidoMetros(drnueva("TEIXIT"), GetCampoColor(drnueva("TITULO"), drnueva("MODEL"), drnueva("SERIE"), drnueva("CLIENT")))
+                drnueva("CENTRO") = "O"
+                dt.Rows.Add(drnueva)
+            End If
+
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Sub
+    Private Sub CrearInsertarColoresModelos3(ByVal dt As DataTable, ByVal dr As DataRow, ByVal drDBF As DataRow)
+        Dim i As Integer
+        Dim drnueva As DataRow
+        Try
+            i = 1
+            If nzn(drDBF("NESTAM"), 0) <> 0 Then
+                drnueva = dt.NewRow
+                drnueva("MODEL") = drDBF("CODI")
+                drnueva("SERIE") = drDBF("SERIE")
+                drnueva("CLIENT") = obtenerCampoModeloMysql("CLIENT", drDBF("CODI"), drDBF("SERIE"))
+                drnueva("TEMPORADA") = "INSTINTO"
+                drnueva("NLINEA") = i
+                drnueva("CENTRO") = "O"
+
+                drnueva("CODI") = "Estampat teixt"
+                drnueva("DESCRI") = ""
+                drnueva("PREU") = drDBF("NESTAM")
+
+                dt.Rows.Add(drnueva)
+                i = i + 1
+            End If
+            If nzn(drDBF("NESTAM2"), 0) <> 0 Then
+                drnueva = dt.NewRow
+                drnueva("MODEL") = drDBF("CODI")
+                drnueva("SERIE") = drDBF("SERIE")
+                drnueva("CLIENT") = obtenerCampoModeloMysql("CLIENT", drDBF("CODI"), drDBF("SERIE"))
+                drnueva("TEMPORADA") = "INSTINTO"
+                drnueva("NLINEA") = i
+                drnueva("CENTRO") = "O"
+
+                drnueva("CODI") = "Estampat teixt 2"
+                drnueva("DESCRI") = ""
+                drnueva("PREU") = drDBF("NESTAM2")
+
+                dt.Rows.Add(drnueva)
+                i = i + 1
+            End If
+            If nzn(drDBF("NTRANS"), 0) <> 0 Then
+                drnueva = dt.NewRow
+                drnueva("MODEL") = drDBF("CODI")
+                drnueva("SERIE") = drDBF("SERIE")
+                drnueva("CLIENT") = obtenerCampoModeloMysql("CLIENT", drDBF("CODI"), drDBF("SERIE"))
+                drnueva("TEMPORADA") = "INSTINTO"
+                drnueva("NLINEA") = i
+                drnueva("CENTRO") = "O"
+
+                drnueva("CODI") = "Transfer"
+                drnueva("DESCRI") = ""
+                drnueva("PREU") = drDBF("NTRANS")
+
+                dt.Rows.Add(drnueva)
+                i = i + 1
+            End If
+            If nzn(drDBF("NFLOCAT"), 0) <> 0 Then
+                drnueva = dt.NewRow
+                drnueva("MODEL") = drDBF("CODI")
+                drnueva("SERIE") = drDBF("SERIE")
+                drnueva("CLIENT") = obtenerCampoModeloMysql("CLIENT", drDBF("CODI"), drDBF("SERIE"))
+                drnueva("TEMPORADA") = "INSTINTO"
+                drnueva("NLINEA") = i
+                drnueva("CENTRO") = "O"
+
+                drnueva("CODI") = "Flocat"
+                drnueva("DESCRI") = ""
+                drnueva("PREU") = drDBF("NFLOCAT")
+
+                dt.Rows.Add(drnueva)
+                i = i + 1
+            End If
+            If nzn(drDBF("NBRODAT"), 0) <> 0 Then
+                drnueva = dt.NewRow
+                drnueva("MODEL") = drDBF("CODI")
+                drnueva("SERIE") = drDBF("SERIE")
+                drnueva("CLIENT") = obtenerCampoModeloMysql("CLIENT", drDBF("CODI"), drDBF("SERIE"))
+                drnueva("TEMPORADA") = "INSTINTO"
+                drnueva("NLINEA") = i
+                drnueva("CENTRO") = "O"
+
+                drnueva("CODI") = "Brodat"
+                drnueva("DESCRI") = ""
+                drnueva("PREU") = drDBF("NBRODAT")
+
+                dt.Rows.Add(drnueva)
+                i = i + 1
+            End If
+            If nzn(drDBF("NESTAMP"), 0) <> 0 Then
+                drnueva = dt.NewRow
+                drnueva("MODEL") = drDBF("CODI")
+                drnueva("SERIE") = drDBF("SERIE")
+                drnueva("CLIENT") = obtenerCampoModeloMysql("CLIENT", drDBF("CODI"), drDBF("SERIE"))
+                drnueva("TEMPORADA") = "INSTINTO"
+                drnueva("NLINEA") = i
+                drnueva("CENTRO") = "O"
+
+                drnueva("CODI") = "Estampat de Prenda"
+                drnueva("DESCRI") = ""
+                drnueva("PREU") = drDBF("NESTAMP")
+
+                dt.Rows.Add(drnueva)
+                i = i + 1
+            End If
+            If nzn(drDBF("NTINTP"), 0) <> 0 Then
+                drnueva = dt.NewRow
+                drnueva("MODEL") = drDBF("CODI")
+                drnueva("SERIE") = drDBF("SERIE")
+                drnueva("CLIENT") = obtenerCampoModeloMysql("CLIENT", drDBF("CODI"), drDBF("SERIE"))
+                drnueva("TEMPORADA") = "INSTINTO"
+                drnueva("NLINEA") = i
+                drnueva("CENTRO") = "O"
+
+                drnueva("CODI") = "Tint Prenda"
+                drnueva("DESCRI") = ""
+                drnueva("PREU") = drDBF("NTINTP")
+
+                dt.Rows.Add(drnueva)
+                i = i + 1
+            End If
+            If nzn(drDBF("NACAP"), 0) <> 0 Then
+                drnueva = dt.NewRow
+                drnueva("MODEL") = drDBF("CODI")
+                drnueva("SERIE") = drDBF("SERIE")
+                drnueva("CLIENT") = obtenerCampoModeloMysql("CLIENT", drDBF("CODI"), drDBF("SERIE"))
+                drnueva("TEMPORADA") = "INSTINTO"
+                drnueva("NLINEA") = i
+                drnueva("CENTRO") = "O"
+
+                drnueva("CODI") = "Acabat Prenda"
+                drnueva("DESCRI") = ""
+                drnueva("PREU") = drDBF("NACAP")
+
+                dt.Rows.Add(drnueva)
+                i = i + 1
+            End If
+
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Sub
+    'drnueva("TITULO"), drnueva("MODEL"),drnueva("SERIE"), drnueva("CLIENT"))
+    Function GetCampoColor(ByVal titulo As String, ByVal modelo As String, ByVal serie As String, ByVal cliente As Integer) As String
+        Try
+            Dim cmdSel As New MySqlCommand
+            Dim s As String
+            cmdSel.Connection = cnn
+            ACN()
+            cmdSel.CommandText = "SELECT COLTITULO FROM MODCOL WHERE (" & _
+                    " MODEL = """ & modelo & """ AND " & _
+                    " CENTRO = ""O"" AND " & _
+                    " CLIENT = """ & cliente & """ AND " & _
+                    " TITULO = """ & titulo & """ AND " & _
+                    " TEMPORADA = ""INSTINTO"" AND " & _
+                    " SERIE = """ & serie & """)"
+            'ccn()
+            ACN()
+            s = cmdSel.ExecuteScalar
+            CCN()
+            Return s
+
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Function
+    Function GetCampoPrecioTejidoMetros(ByVal tejido As String, ByVal COLOR As String) As Double
+
+        Try
+            'Ahora la funcion solo vale si el identificador es codi
+            Dim cmdSel As New MySqlCommand
+            Dim s As Double
+            'cn2 = cnn.ConnectionString
+            cmdSel.Connection = cnn
+
+            cmdSel.CommandText = "SELECT METRES FROM FILCOL WHERE (FIL = """ & tejido & """ AND TIPUS = ""T"" AND COLOR = """ & COLOR & """)"
+            'ccn()
+            ACN()
+            s = cmdSel.ExecuteScalar
+            CCN()
+            Return s
+
+        Catch ex As Exception
+            LOG(ex.ToString) : CCN()
+        End Try
+    End Function
+    ''' -----------------------------------------------------------------------------
+    ''' <summary>
+    ''' Esta funcion debe poner los clientes en mforni, modcol y todas las tablas que identifiquen un modelo concreto
+    ''' </summary>
+    ''' <remarks>
+    ''' </remarks>
+    ''' <history>
+    ''' 	[Sergio]	17/05/2005	Created
+    ''' </history>
+    ''' -----------------------------------------------------------------------------
+    Private Sub ProcesarModelos()
+        Try
+            ACN()
+            Dim c As New MySqlCommand("UPDATE MFORNI LEFT JOIN MODELS ON " & _
+                    " (MODELS.CODI = MFORNI.MODEL AND " & _
+                    " MODELS.TEMPORADA = MFORNI.TEMPORADA AND " & _
+                    " MODELS.SERIE = MFORNI.SERIE) " & _
+                    " SET MFORNI.CLIENT = MODELS.CLIENT", cnn)
+            c.ExecuteNonQuery()
+
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Sub
+    Private Sub QuitarRestricciones()
+        Try
+            'Dim c as New MySqlCommand("
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Protected Sub añadirParametro2(ByRef cmd As MySqlCommand, ByVal tipo As String, ByVal campo As String)
+
+        Select Case tipo
+
+            Case "double" : cmd.Parameters.Add(New MySqlParameter("p" & campo, MySqlDbType.Double, 0, campo))
+            Case "varchar" : cmd.Parameters.Add(New MySqlParameter("p" & campo, MySqlDbType.VarChar, 0, campo))
+            Case "int" : cmd.Parameters.Add(New MySqlParameter("p" & campo, MySqlDbType.Int32, 0, campo))
+            Case "integer" : cmd.Parameters.Add(New MySqlParameter("p" & campo, MySqlDbType.Int32, 0, campo))
+            Case "tinyint" : cmd.Parameters.Add(New MySqlParameter("p" & campo, MySqlDbType.Int16, 0, campo))
+            Case "date" : cmd.Parameters.Add(New MySqlParameter("p" & campo, MySqlDbType.Date, 0, campo))
+            Case "text" : cmd.Parameters.Add(New MySqlParameter("p" & campo, MySqlDbType.Text, 0, campo))
+            Case "tinyintunsigned" : cmd.Parameters.Add(New MySqlParameter("p" & campo, MySqlDbType.Int16, 1, campo))
+            Case "blob" : cmd.Parameters.Add(New MySqlParameter("p" & campo, MySqlDbType.Blob, 0, campo))
+        End Select
+
+    End Sub
+    Protected Sub AñadirParametros(ByVal cmd As MySqlCommand, ByVal TABLA As DataTable)
+        Dim i As Integer
+        Try
+            For i = 0 To TABLA.Columns.Count - 1
+                If Not esCampoConNombre(TABLA.Columns(i).ColumnName) Then
+
+
+                    añadirParametro2(cmd, TipoNET2SQL(TABLA.Columns(i).DataType), TABLA.Columns(i).ColumnName)
+                End If
+            Next
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+
+    Private Sub InsertarCentros()
+        Try
+            Dim f As IO.File
+            Dim s As IO.StreamReader = f.OpenText(curdir & "\sqls\tablas.sql")
+            'REVISAR
+            Dim C As New MySqlScript() 's.ReadToEnd, cnn)
+            ACN()
+            C.Execute()
+            CCN()
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub ImportarAura_Click(ByVal sender As System.Object, _
+                                        ByVal e As System.EventArgs) Handles Button1.Click
+
+        directorioAura = dirbox1.Path
+        cargaModelosDBF()
+        ImportarDirOArhivoSeleccionado(dirbox1.Path, False, "")
+        'PonerNumeraciones()
+
+    End Sub
+    Private Sub PonerNumeraciones()
+        Dim strSQL As String
+        Dim dr As DataRow
+        Dim dtNum As New DATATABLE
+        Dim cmdSelect As MySql.Data.MySqlClient.MySqlCommand
+        Dim cmdBuilder As MySql.Data.MySqlClient.MySqlCommandBuilder
+        Dim daMYSQL As MySql.Data.MySqlClient.MySqlDataAdapter
+        Try
+
+            strSQL = "DELETE FROM NUMERACIONES"
+            cmdSelect = New MySql.Data.MySqlClient.MySqlCommand(strSQL, cnn)
+
+
+            ACN()
+            cmdSelect.ExecuteNonQuery()
+            strSQL = "SELECT * FROM NUMERACIONES"
+            cmdSelect = New MySql.Data.MySqlClient.MySqlCommand(strSQL, cnn)
+            daMYSQL = New MySql.Data.MySqlClient.MySqlDataAdapter(cmdSelect)
+            cmdBuilder = New MySql.Data.MySqlClient.MySqlCommandBuilder(daMYSQL)
+
+            daMYSQL.Fill(dtNum)
+            CCN()
+            'COESPUNT
+            '**********************************************************
+
+            dtNum.Columns("CENTRO").DefaultValue = "C"
+            dtNum.Columns("TIPUS").DefaultValue = "M"
+            dr = dtNum.NewRow
+
+            dr("TABLA") = "FACTUR"
+            dr("DOCUMENT") = Factura
+            dr("CODI") = GetNumeroUltimoPAF2(Factura, "C")
+            dtNum.Rows.Add(dr)
+
+            dr = dtNum.NewRow
+            dr("TABLA") = "FACTUR"
+            dr("DOCUMENT") = Albaran
+            dr("CODI") = GetNumeroUltimoPAF2(Albaran, "C")
+            dtNum.Rows.Add(dr)
+
+            dr = dtNum.NewRow
+            dr("TABLA") = "FACTUR"
+            dr("DOCUMENT") = Pedido
+            dr("CODI") = GetNumeroUltimoPAF2(Pedido, "C")
+            dtNum.Rows.Add(dr)
+
+            dr = dtNum.NewRow
+            dr("TABLA") = "FACTUR"
+            dr("DOCUMENT") = Proforma
+            dr("CODI") = GetNumeroUltimoPAF2(Proforma, "C")
+            dtNum.Rows.Add(dr)
+
+            'ORDENES MODELOS
+            dr = dtNum.NewRow
+            dr("TABLA") = "ORDRE"
+            dr("DOCUMENT") = OrdenModelos
+            dr("CODI") = 0 'GetNumeroUltimoPAF2Compra2(Orden, "M", "C")
+            dtNum.Rows.Add(dr)
+
+            'ORDENES MUESTRAS
+            dr = dtNum.NewRow
+            dr("TABLA") = "CACTUR"
+            dr("DOCUMENT") = OrdenFabComplementos
+            dr("CODI") = GetNumeroUltimoPAFCompra2(OrdenFabComplementos, "M", "C")
+            dtNum.Rows.Add(dr)
+
+            'ALBARANES ENTREGA HILOS
+            dr = dtNum.NewRow
+            dr("TABLA") = "CACTUR"
+            dr("DOCUMENT") = Albaran
+            dr("CODI") = GetNumeroUltimoPAFCompra2(Albaran, "M", "C")
+            dtNum.Rows.Add(dr)
+
+            'PEDIDOS COMPRA HILOS
+            dr = dtNum.NewRow
+            dr("TABLA") = "CACTUR"
+            dr("DOCUMENT") = Pedido
+            dr("CODI") = GetNumeroUltimoPAFCompra2(Pedido, "M", "C")
+            dtNum.Rows.Add(dr)
+
+            'PEDIDOS COMPRA TEJIDOS
+            dr = dtNum.NewRow
+            dr("TABLA") = "CACTUR"
+            dr("TIPUS") = "T"
+            dr("DOCUMENT") = Pedido
+            dr("CODI") = GetNumeroUltimoPAFCompra2(Pedido, "T", "C")
+            dtNum.Rows.Add(dr)
+
+
+            'CYCO          
+            '**********************************************************
+
+            dtNum.Columns("CENTRO").DefaultValue = "O"
+            dtNum.Columns("TIPUS").DefaultValue = "M"
+            dr = dtNum.NewRow
+
+            dr("TABLA") = "FACTUR"
+            dr("DOCUMENT") = Factura
+            dr("CODI") = GetNumeroUltimoPAF2(Factura, "O")
+            dtNum.Rows.Add(dr)
+
+            dr = dtNum.NewRow
+            dr("TABLA") = "FACTUR"
+            dr("DOCUMENT") = Albaran
+            dr("CODI") = GetNumeroUltimoPAF2(Albaran, "O")
+            dtNum.Rows.Add(dr)
+
+            dr = dtNum.NewRow
+            dr("TABLA") = "FACTUR"
+            dr("DOCUMENT") = Pedido
+            dr("CODI") = GetNumeroUltimoPAF2(Pedido, "O")
+            dtNum.Rows.Add(dr)
+
+            dr = dtNum.NewRow
+            dr("TABLA") = "FACTUR"
+            dr("DOCUMENT") = Proforma
+            dr("CODI") = GetNumeroUltimoPAF2(Proforma, "O")
+            dtNum.Rows.Add(dr)
+
+            'ORDENES MODELOS
+            dr = dtNum.NewRow
+            dr("TABLA") = "ORDRE"
+            dr("DOCUMENT") = OrdenModelos
+            dr("CODI") = GetNumeroUltimoPAFCompra2(OrdenModelos, "M", "O")
+            dtNum.Rows.Add(dr)
+
+            'ORDENES MUESTRAS
+            dr = dtNum.NewRow
+            dr("TABLA") = "CACTUR"
+            dr("DOCUMENT") = OrdenFabComplementos
+            dr("CODI") = GetNumeroUltimoPAFCompra2(OrdenFabComplementos, "M", "O")
+            dtNum.Rows.Add(dr)
+
+            'ALBARANES ENTREGA HILOS
+            dr = dtNum.NewRow
+            dr("TABLA") = "CACTUR"
+            dr("DOCUMENT") = Albaran
+            dr("CODI") = GetNumeroUltimoPAFCompra2(Albaran, "M", "O")
+            dtNum.Rows.Add(dr)
+
+            'PEDIDOS COMPRA HILOS
+            dr = dtNum.NewRow
+            dr("TABLA") = "CACTUR"
+            dr("DOCUMENT") = Pedido
+            dr("CODI") = GetNumeroUltimoPAFCompra2(Pedido, "M", "O")
+            dtNum.Rows.Add(dr)
+
+            'PEDIDOS COMPRA TEJIDOS
+            dr = dtNum.NewRow
+            dr("TABLA") = "CACTUR"
+            dr("TIPUS") = "T"
+            dr("DOCUMENT") = Pedido
+            dr("CODI") = GetNumeroUltimoPAFCompra2(Pedido, "T", "O")
+            dtNum.Rows.Add(dr)
+
+
+
+            daMYSQL.Update(dtNum)
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False
+        End Try
+    End Sub
+    Private Sub Button5_Click_1(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button5.Click
+        'Funcionita que importa el aura al tex.net
+        Dim f2 As IO.File
+        Dim s2 As IO.StreamReader = f2.OpenText(curdir & "\sqls\estruc.sql")
+        Dim C2 As New MySqlScript(cnn, s2.ReadToEnd)
+        cnn.Open()
+
+        C2.Execute()
+        cnn.Close()
+        InsertarCentros()
+    End Sub
+
+#End Region
+
+#Region "ORGANIZAR"
+
+    'Private Sub borrar_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button2.Click
+    '    Dim i As Integer
+    '    Dim cmdSelTablasMysql As New MySql.Data.MySqlClient.MySqlCommand("SHOW TABLES", cnn)
+    '    Dim dar As MySql.Data.MySqlClient.MySqlDataReader
+
+    '    ACN()
+    '    dar = cmdSelTablasMysql.ExecuteReader
+    '    Dim tablas As New ArrayList
+    '    While dar.Read
+    '        tablas.Add(dar(0))
+    '    End While
+    '    dar.Close()
+
+    '    For i = 0 To tablas.Count - 1
+    '        Dim cmddel As New MySql.Data.MySqlClient.MySqlCommand("DELETE FROM " & tablas(i), cnn)
+    '        cmddel.ExecuteNonQuery()
+    '    Next
+    '    CCN()
+    '    InsertarCentros()
+    'End Sub
+
+#Region "ARREGLOS FILAS"
+
+    Private Function ArreglarClientes(ByRef fila As DataRow)
+        Try
+            If IsDBNull(fila("CARTERA")) Then
+                fila("CARTERA") = False
+            Else
+                'Select Case fila("CARTERA")
+                '    Case "N"
+                '        fila("CARTERA") = False
+                '    Case "S"
+                '        fila("CARTERA") = True
+                'End Select
+            End If
+            If IsDBNull(fila("MESESCOMPLETOS")) Then
+                fila("MESESCOMPLETOS") = False
+            End If
+            If IsDBNull(fila("TRASPAS")) Then
+                fila("TRASPAS") = False
+            Else
+                'Select Case fila("TRASPAS")
+                '    Case "S"
+                '        fila("TRASPAS") = True
+                '    Case Else
+                '        fila("TRASPAS") = False
+                'End Select
+            End If
+
+
+            ' fila("PORTSDEBUTS") = False
+            ' fila("PORTSPAGATS") = False
+
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Function
+    Private Function ArreglarProveedores(ByRef fila As DataRow)
+        Try
+            If IsDBNull(fila("TRASPAS")) Then
+                fila("TRASPAS") = False
+            End If
+            Select Case fila("TRASPAS")
+                Case "S"
+                    fila("TRASPAS") = True
+                Case Else
+                    fila("TRASPAS") = False
+            End Select
+
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Function
+    Private Function ArreglarVentasCompras(ByRef fila As DataRow)
+        Dim yaModificado As Boolean = False
+        Try
+            If (IsDBNull(fila("TIPUS"))) Then
+                fila("TIPUS") = "M"
+                yaModificado = True
+            End If
+
+            If (fila("TIPUS") = "M") AndAlso yaModificado = False Then fila("TIPUS") = "T"
+
+            'If esCompraVenta = "V" Then fila("TIPUS") = "T"
+
+            Select Case general.nz(fila("TRASPAS"), "")
+                Case "", "N" : fila("TRASPAS") = False
+                Case "S" : fila("TRASPAS") = True
+            End Select
+
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Function
+    Private Function obtenerClienteModelo(ByVal modelo As String, ByVal serie As String, ByVal tempor As String)
+        Try
+            Return ""
+
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Function
+    Private Function ArreglarRowParaInsertarEnMySQL(ByVal fila As DataRow, ByVal tabla As String, Optional ByVal temporada As String = "") As DataRow
+        Try
+
+            If tieneSUBDIRS(tabla) AndAlso Not temporada = "" AndAlso fila.Table.Columns.Contains("TEMPORADA") Then
+                Try : fila("TEMPORADA") = temporada : Catch ex As Exception : LOG(ex.ToString) : End Try
+            End If
+
+            If Not temporada = "" Then
+                If fila.Table.Columns.Contains("CLIENT") Then
+                    If (IsDBNull(fila("CLIENT"))) Then
+                        fila("CLIENT") = obtenerClienteModelo(fila("MODEL"), fila("SERIE"), temporada)
+                        fila("TEMPORADA") = temporada
+                        fila("TITULO") = ""
+                    End If
+                End If
+            End If
+
+            Try
+                If fila.Table.Columns.Contains("CENTRO") Then
+                    If IsDBNull(fila("CENTRO")) Then fila("CENTRO") = "C"
+                End If
+
+            Catch ex As Exception
+                LOG(ex.ToString)
+            End Try
+
+            Select Case tabla.ToLower
+
+                Case "dcactu"
+                    fila("REBUT") = 0
+                    fila("PERREBRE") = fila("UNITATS")
+                    If (IsDBNull(fila("ESTOC"))) Then fila("ESTOC") = False
+                    If (fila("ESTOC") = "S") Then fila("ESTOC") = True
+                    If (fila("ESTOC") = "N") Then fila("ESTOC") = False
+
+                Case "clients"
+                    If IsDBNull(fila("MESESCOMPLETOS")) Then
+                        fila("MESESCOMPLETOS") = False
+                    End If
+                    ArreglarClientes(fila)
+
+                Case "vencim1"
+                    fila("CENTRO") = "O"
+
+                Case "cfac"
+                    fila("DOCUMENT") = Factura
+                    fila("TIPUS") = Prenda
+                    'Todas las prendas son de CYCO
+                    fila("CENTRO") = "O"
+
+                Case "ordre", "cordre"
+                    fila("CENTRO") = "O"
+
+                Case "fac"
+                    fila("DOCUMENT") = Factura
+                    fila("TIPUS") = Prenda
+                    'Todas las prendas son de CYCO
+                    fila("CENTRO") = "O"
+                    'No hay nada de estoc en fac
+                    fila("ESTOC") = 0
+
+                Case "alba"
+                    fila("DOCUMENT") = Albaran
+                    fila("TIPUS") = Prenda
+                    'Todas las prendas son de CYCO
+                    fila("CENTRO") = "O"
+
+                Case "calba"
+                    fila("DOCUMENT") = Albaran
+                    fila("TIPUS") = Prenda
+                    fila("CENTRO") = "O"
+                Case "factur"
+                    fila("TIPUS") = Tejido
+                Case "models"
+                    fila("CENTRO") = "O"
+            End Select
+
+            If fila.Table.Columns.Contains("TEMPORADA") And tabla <> "FORNI" Then
+                If fila.Table.Columns.Contains("TIPUS") Then
+                    If fila("TIPUS") = Prenda Then
+                        fila("TEMPORADA") = "INSTINTO"
+                    Else
+                        'Nada es nulo
+                    End If
+                Else
+                    fila("TEMPORADA") = "INSTINTO"
+                End If
+            End If
+            Return fila
+
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Function
+    Private Function QueTipoEsElPAF(ByVal fila As DataRow) As String
+        Dim ret As String
+        Dim d As New Microsoft.Data.Odbc.OdbcDataAdapter
+        Dim conexionDBF As Microsoft.Data.Odbc.OdbcConnection
+        Try
+            If dtFacturas.Rows.Count = 0 Then
+                conexionDBF = New Microsoft.Data.Odbc.OdbcConnection("DRIVER=Driver do Microsoft dBase (*.dbf);UID=admin;UserCommitSync=Yes;Threads=3;Statistics=0;SafeTransactions=0;PageTimeout=5;MaxScanRows=8;MaxBufferSize=2048;FIL=dBase III;DriverId=21;Deleted=0;DefaultDir=" & directorioHack & ";CollatingSequence=ASCII;")
+                Dim cmd As New Microsoft.Data.Odbc.OdbcCommand("SELECT FRA, DOCUMENT, TIPUS FROM FACTUR ", conexionDBF)
+                d.SelectCommand = cmd
+                ACN()
+                d.Fill(dtFacturas)
+                CCN()
+                dtFacturas.DefaultView.Sort = "FRA, DOCUMENT"
+            End If
+
+            Dim key(1) As String
+            key(0) = fila("FRA")
+            key(1) = fila("DOCUMENT")
+
+            Return general.nz(dtFacturas.DefaultView(dtFacturas.DefaultView.Find(key)).Item("TIPUS"), "M")
+
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Function
+    Private Function ArreglarDetalleVentas(ByRef fila As DataRow) As DataRow
+        Dim yaModificado As Boolean = False
+        Try
+            If (IsDBNull(fila("DOCUMENT"))) Then Return Nothing
+            If (fila("DOCUMENT") <> "A" And fila("DOCUMENT") <> "C" And fila("DOCUMENT") <> "F") Then Return Nothing
+            'Ifgeneral.nz(fila("TIPUS"), "M") <> QueTipoEsElPAF(fila) Then Return Nothing
+
+            If (IsDBNull(fila("TIPUS"))) Then
+                'Cuando llega aqui ya lo ha modificado en el factur, por lo que no se si originalmente era o no un tejido o muestra.
+                fila("TIPUS") = "M"
+                yaModificado = True
+            End If
+
+            If (fila("TIPUS") = "M") AndAlso yaModificado = False Then fila("TIPUS") = "T"
+
+            'Quiere decir que es un error de aura
+
+            If (IsDBNull(fila("ESTOC"))) Then fila("ESTOC") = False
+            If (fila("ESTOC") = "S") Then fila("ESTOC") = True
+            If (fila("ESTOC") = "N") Then fila("ESTOC") = False
+            Return fila
+
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Function
+    Private Function ArreglarDetalleCompras(ByRef fila As DataRow) As DataRow
+        Dim yaModificado As Boolean = False
+        Try
+            If (IsDBNull(fila("DOCUMENT"))) Then Return Nothing
+            If (fila("DOCUMENT") <> "A" And fila("DOCUMENT") <> "C" And fila("DOCUMENT") <> "F") Then Return Nothing
+
+            If (IsDBNull(fila("TIPUS"))) Then
+                fila("TIPUS") = "M"
+                yaModificado = True
+            End If
+            If (fila("TIPUS") = "M") AndAlso yaModificado = False Then fila("TIPUS") = "T"
+
+            If (IsDBNull(fila("ESTOC"))) Then fila("ESTOC") = False
+            If (fila("ESTOC") = "S") Then fila("ESTOC") = True
+            Return fila
+
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Function
+    Private Function ArreglarVentasModelos(ByRef fila As DataRow) As DataRow
+        Try
+            fila("DOCUMENT") = Factura
+            fila("TIPUS") = Prenda
+            Return fila
+
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Function
+
+    Private Function ArreglarVencimientos(ByRef fila As DataRow) As DataRow
+        Dim yaModificado As Boolean = False
+        Try
+            'If (IsDBNull(fila("REMES"))) Then
+            '    fila("REMES") = 0
+            'End If
+
+            If (IsDBNull(fila("TIPUS"))) Then
+                fila("TIPUS") = "M"
+                yaModificado = True
+            End If
+            If (fila("TIPUS") = "M") And yaModificado = False Then
+                fila("TIPUS") = "T"
+            End If
+            If (IsDBNull(fila("COMVEN"))) Then
+                Return Nothing
+            End If
+            If (fila("COMVEN") <> "C" And fila("COMVEN") <> "V") Then
+                Return Nothing
+            End If
+            If (IsDBNull(fila("DOCUMENT"))) Then
+                Return Nothing
+            End If
+
+            If (fila("DOCUMENT") <> "A" And fila("DOCUMENT") <> "C" And fila("DOCUMENT") <> "F") Then
+                Return Nothing
+            End If
+            Return fila
+
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Function
+    Private Function ArreglarRowAInsertar(ByRef fila As DataRow, _
+                                            ByVal tabla As String, _
+                                            Optional ByVal temporada As String = "") As DataRow
+        Try
+            'For i = 0 To fila.Table.Columns.Count - 1
+            '    If IsDBNull(fila(i)) Then
+            '    End If
+            'Next
+
+            If fila.Table.Columns.Contains("RE2") Then
+                If nzn(fila("RE2"), 0) = -1 Then
+                    fila("RE2") = 0
+                End If
+            End If
+            If fila.Table.Columns.Contains("RE3") Then
+                If nzn(fila("RE3"), 0) = -1 Then
+                    fila("RE3") = 0
+                End If
+            End If
+            If fila.Table.Columns.Contains("IVA") Then
+                If general.nz(fila("IVA"), "") = "16%" OrElse general.nz(fila("IVA"), "") = "" Then
+                    fila("IVA") = "NORMAL"
+                End If
+            End If
+
+            Select Case tabla
+                Case tablaClientes
+                    'ArreglarClientes(fila)
+
+                Case tablaProveedores
+                    ArreglarProveedores(fila)
+
+                Case "cactur"
+                    ArreglarVentasCompras(fila)
+
+                Case "factur"
+                    ArreglarVentasCompras(fila)
+
+                Case "dcactu"
+
+                    If ArreglarDetalleCompras(fila) Is Nothing Then
+                        Return Nothing
+                    End If
+
+                Case "dfactu"
+                    If ArreglarDetalleVentas(fila) Is Nothing Then
+                        Return Nothing
+                    End If
+
+                Case "teixits"
+                    If (IsDBNull(fila("PREUM"))) Then
+                        fila("PREUM") = 0
+                    End If
+                    If (IsDBNull(fila("PREUK"))) Then
+                        fila("PREUK") = 0
+                    End If
+
+                Case "modcol"
+                    'fila.Table.Columns.Remove("COS")
+                    'fila.Table.Columns.Remove("PUNY")
+                    'fila.Table.Columns.Remove("COLL")
+                    'fila.Table.Columns.Remove("P4")
+                    'fila.Table.Columns.Remove("P5")
+
+
+                Case "mattei"
+                    If (IsDBNull(fila("TEIXIT"))) Then
+                        Return Nothing
+                    End If
+
+                Case "vencim", "vencim1"
+                    If ArreglarVencimientos(fila) Is Nothing Then
+                        Return Nothing
+                    End If
+
+                Case "alba"
+                    If (IsDBNull(fila("ESTOC"))) Then fila("ESTOC") = False
+                    If (fila("ESTOC") = "S") Then fila("ESTOC") = True
+                    If (fila("ESTOC") = "N") Then fila("ESTOC") = False
+
+                    'ArreglarVentasModelos(fila)
+
+            End Select
+
+            Return fila
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Function
+
+#End Region
+
+    Private Sub AñadirColumnaCentro_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button3.Click
+        Dim cmdTABLAS As New MySqlCommand("SHOW TABLES")
+        Dim cmdINDEX As New MySqlCommand
+        Dim cmdINSERTCOL As New MySqlCommand
+        Dim cmdDROPINDEX As New MySqlCommand
+        Dim cmdINSERTINDEX As New MySqlCommand
+        Dim a As New ArrayList
+        Dim i As Integer
+        Dim mreadTABLAS As MySqlDataReader
+        Dim mreadINDEX As MySqlDataReader
+        Try
+            cmdTABLAS.Connection = cnn
+            cmdINSERTCOL.Connection = cnn
+            cmdDROPINDEX.Connection = cnn
+            cmdINSERTINDEX.Connection = cnn
+            cmdINDEX.Connection = cnn
+            ACN()
+            mreadTABLAS = cmdTABLAS.ExecuteReader
+
+            While mreadTABLAS.Read
+                a.Add(mreadTABLAS(0))
+            End While
+            mreadTABLAS.Close()
+            mreadTABLAS = Nothing
+            For i = 0 To a.Count - 1
+
+                'MessageBox.Show(mread(0))
+                cmdINSERTCOL.CommandText = "ALTER TABLE " & a(i) & "  ADD COLUMN CENTRO TINYINT(4) NOT NULL DEFAULT 0"
+                Try
+
+                    cmdINSERTCOL.ExecuteNonQuery()
+                    'Obtener la index
+                Catch ex As Exception
+                    LOG(ex.ToString) : cargando = False : CCN()
+                End Try
+                cmdINDEX.CommandText = "SHOW INDEX FROM " & a(i)
+                mreadINDEX = cmdINDEX.ExecuteReader
+                cmdINSERTINDEX.CommandText = "ALTER TABLE " & a(i) & " ADD PRIMARY KEY (CENTRO,"
+
+                While mreadINDEX.Read
+                    'Column_name
+                    If Not mreadINDEX("Column_name") = "CENTRO" Then
+
+                        cmdINSERTINDEX.CommandText = cmdINSERTINDEX.CommandText & " " & mreadINDEX("Column_name") & ","
+                    End If
+                End While
+                cmdINSERTINDEX.CommandText = cmdINSERTINDEX.CommandText.Substring(0, cmdINSERTINDEX.CommandText.Length - 1)
+
+                cmdINSERTINDEX.CommandText = cmdINSERTINDEX.CommandText & ")"
+                cmdDROPINDEX.CommandText = "ALTER TABLE " & a(i) & " DROP PRIMARY KEY"
+                'nos cargamos la primary actual
+                Try
+
+                    cmdDROPINDEX.ExecuteNonQuery()
+                    'hemos introducdo la primary key
+                Catch ex As Exception
+                    LOG(ex.ToString) : cargando = False : CCN()
+
+                    txt = txt & ex.ToString & vbCrLf
+                End Try
+
+                Try
+                    cmdINSERTINDEX.ExecuteNonQuery()
+
+                Catch ex As Exception
+                    LOG(ex.ToString) : cargando = False : CCN()
+
+                    txt = txt & ex.ToString & vbCrLf
+                End Try
+                mreadINDEX.Close()
+
+            Next
+            CCN()
+            MessageBox.Show(txt)
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+            txt = txt & ex.ToString & vbCrLf
+            CCN()
+        End Try
+    End Sub
+    Private Sub Button4_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button4.Click
+        Try
+            cnn.Open()
+            Dim cmd As New MySqlCommand
+            cmd.Connection = cnn
+            cmd.CommandText = "UPDATE DCACTU SET TIPUS = ""T"" WHERE TIPUS = ""M"""
+            cmd.ExecuteNonQuery()
+            cmd.CommandText = "UPDATE DCACTU SET TIPUS = ""M"" WHERE TIPUS IS NULL"
+            cmd.ExecuteNonQuery()
+            cmd.CommandText = "UPDATE CACTUR SET TIPUS = ""T"" WHERE TIPUS = ""M"""
+            cmd.ExecuteNonQuery()
+            cmd.CommandText = "UPDATE CACTUR SET TIPUS = ""M"" WHERE TIPUS IS NULL"
+            cmd.ExecuteNonQuery()
+
+            cmd.CommandText = "UPDATE DFACTU SET TIPUS = ""T"" WHERE TIPUS = ""M"""
+            cmd.ExecuteNonQuery()
+            cmd.CommandText = "UPDATE DFACTU SET TIPUS = ""M"" WHERE TIPUS IS NULL"
+            cmd.ExecuteNonQuery()
+            cmd.CommandText = "UPDATE FACTUR SET TIPUS = ""T"" WHERE TIPUS = ""M"""
+            cmd.ExecuteNonQuery()
+            cmd.CommandText = "UPDATE FACTUR SET TIPUS = ""M"" WHERE TIPUS IS NULL"
+            cmd.ExecuteNonQuery()
+
+            cmd.CommandText = "UPDATE TEIXITS SET PREU = 0 WHERE PREU IS NULL"
+            cmd.ExecuteNonQuery()
+
+            cmd.CommandText = "INSERT INTO ADRES (CLIENT, DOM, PROV, POB, CP, FAX, TEL, PAIS) SELECT clients.CODI, clients.DOM, clients.PROV, clients.POB, clients.CP, clients.FAX, clients.TEL, clients.PAIS FROM clients"
+            cnn.Close()
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub dirbox1_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles dirbox1.SelectedIndexChanged
+        FileListBox1.Path = dirbox1.Path
+    End Sub
+    Private Sub dirbox1_SelectedValueChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles dirbox1.SelectedValueChanged
+        FileListBox1.Path = dirbox1.Path
+    End Sub
+    Private Sub DriveListBox1_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles DriveListBox1.SelectedIndexChanged
+        dirbox1.Path = DriveListBox1.Drive
+    End Sub
+    Private Sub DriveListBox1_SelectionChangeCommitted(ByVal sender As Object, ByVal e As System.EventArgs) Handles DriveListBox1.SelectionChangeCommitted
+        dirbox1.Path = DriveListBox1.Drive
+    End Sub
+    Private Sub DriveListBox1_SelectedValueChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles DriveListBox1.SelectedValueChanged
+        dirbox1.Path = DriveListBox1.Drive
+    End Sub
+    Private Sub IniciarForm(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
+        FileListBox1.Pattern = "*.dbf"
+    End Sub
+    Private Function PonerTablasEnArray() As ArrayList
+        Dim d As MySqlDataReader
+        Dim a As New ArrayList
+        Dim cmdSelTablas As New MySqlCommand("SHOW TABLES", cnn)
+        Try
+            ACN()
+            d = cmdSelTablas.ExecuteReader()
+            a.Clear()
+            While d.Read
+                a.Add(d(0))
+            End While
+            d.Close()
+            CCN()
+            a.Add("cfac")
+            a.Add("calba")
+            a.Add("alba")
+            a.Add("fac")
+            Return a
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Function
+    'Private Sub btnCrearESTRUC_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnCrearESTRUC.Click
+    '    Cursor = Cursors.WaitCursor
+    '    Dim c As New MySql.Data.MySqlClient.MySqlDump
+    '    c.Connection = cnn
+    '    cnn.Open()
+    '    c.UseDelayedIns = True
+    '    c.IncludeDrop = True
+    '    c.IncludeDatabase = True
+    '    c.SchemaOnly = True
+    '    c.Backup()
+    '    Dim stream As IO.StreamWriter = New IO.StreamWriter(CurDir() & "\sqls\ESTRUC.SQL")
+    '    stream.WriteLine(c.DumpText)
+    '    stream.Close()
+
+    '    cnn.Close()
+    '    Cursor = Cursors.Default
+    'End Sub
+
+#End Region
+
+#Region "CREAR DATASET"
+
+    Private Sub PonerNOMCOL(ByRef dt As DataTable)
+        Dim i As Integer
+        Dim campo As String
+        For i = 0 To dt.Columns.Count - 1
+            campo = dt.Columns(i).ColumnName
+            If esCampoDeNombre(campo) Then
+                If campo = "MAQUINA" Then
+                    dt.Columns.Add("NOMMAQUI", GetType(String))
+                Else
+                    dt.Columns.Add("NOM" & campo, GetType(String))
+                End If
+            End If
+        Next
+    End Sub
+    Private Sub PonerBooleanos(ByVal dataset As DataSet, ByVal tabla As String)
+        Try
+            Dim i As Integer
+            dataset.Tables(tabla).Rows.Clear()
+            dataset.AcceptChanges()
+            With dataset.Tables(tabla).Columns
+                For i = 0 To .Count - 1
+
+                    If .Item(i).DataType.ToString = "System.Byte" Then
+                        .Item(i).DataType = GetType(Boolean)
+                    End If
+
+                Next
+            End With
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : ccn()
+        End Try
+    End Sub
+    Private Sub PonerRestriccionesTabla(ByRef dataset As DataSet, ByVal tabla As String)
+
+    End Sub
+    Private Sub Button5_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnCrearDataSet.Click
+        Try
+            Cursor = Cursors.WaitCursor
+            Dim aTablas As ArrayList = PonerTablasEnArray()
+            Dim ds As DataSet
+            Dim d As New MySqlDataAdapter
+            Dim c As MySqlCommand
+            Dim i As Integer
+            ACN()
+
+            ds = New DataSet("ds11")
+            For i = 0 To aTablas.Count - 1
+
+                c = New MySqlCommand("SELECT * FROM " & aTablas(i) & " LIMIT 0", cnn)
+                d.SelectCommand = c
+                d.MissingSchemaAction = MissingSchemaAction.AddWithKey
+                d.Fill(ds, aTablas(i))
+                PonerBooleanos(ds, aTablas(i))
+                PonerNOMCOL(ds.Tables(aTablas(i)))
+
+            Next
+            ccn()
+            ACN()
+            For i = 0 To aTablas.Count - 1
+
+                Dim cmd As New MySqlCommand("SHOW COLUMNS FROM " & aTablas(i), cnn)
+                Dim dar As MySqlDataReader
+
+                cmd.Connection = cnn
+                dar = cmd.ExecuteReader
+
+                While dar.Read
+
+                    With DirectCast(ds.Tables(aTablas(i)).Columns(dar("FIELD")), DataColumn)
+                        If .DataType.FullName = "System.Boolean" Then
+                            If nzn(dar("DEFAULT"), 0) = 0 Then : .DefaultValue = False
+                            Else : .DefaultValue = True : End If
+                        Else
+                            Try : .DefaultValue = dar("DEFAULT")
+                            Catch ex As Exception
+                                Debug.WriteLine(EX.ToString & " " & aTablas(i) & "-" & dar("FIELD"))
+                            End Try
+                        End If
+                    End With
+                End While
+                dar.Close()
+            Next
+
+            ds.AcceptChanges()
+            ds.WriteXmlSchema("C:\\erp\\Comun\\ds1.xsd")
+            'ds.WriteXmlSchema("c:\\aura2k3\\aura2k3\\ds1.xsd")
+            'For i = 0 To aTablas.Count - 1
+            '    PonerRestriccionesTabla(ds, aTablas(i))
+            'Next
+            CCN()
+            Cursor = Cursors.Default
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : ccn()
+        End Try
+    End Sub
+
+#End Region
+
+#Region "OBTENER COLUMNAS PROPERTY"
+
+    Private Function tratarTipo(ByVal tipo As String) As String
+        Dim i As Integer = tipo.IndexOf("(")
+        If i <= 0 Then
+            i = tipo.Length
+        End If
+        Return tipo.Substring(0, i)
+    End Function
+    Private Function esCampoConNombre(ByVal campo As String) As Boolean
+        Try
+            Select Case campo
+                Case "NOMACABADOR" : Return True
+                Case "NOMTEJEDOR" : Return True
+                Case "NOMTEIXIDOR" : Return True
+                Case "NOMPROVE" : Return True
+                Case "NOMCLIENT" : Return True
+                Case "DESCRITEIXIT" : Return True
+                Case "NOMREMESOR" : Return True
+                Case "NOMESTAMPADOR" : Return True
+                Case "NOMREPRES" : Return True
+                Case "NOMTRANS" : Return True
+                Case "NOMTALLER" : Return True
+                Case "NOMTINT" : Return True
+                Case "NOMMAQUI" : Return True
+                Case "NOMBANC" : Return True
+                Case "NOMCONFEC" : Return True
+                Case "NOMTINT" : Return True
+                Case "NOMACA" : Return True
+                Case "NOMESTAM" : Return True
+                    'Case "NOMIVA" : Return True
+                Case "NOMFORMA" : Return True
+            End Select
+            Return False
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : ccn()
+        End Try
+    End Function
+    Private Function PonerS(ByVal campo As String) As String
+        Select Case campo
+
+            Case "PROVE" : Return tablaProveedores
+            Case "CLIENT" : Return "CLIENTS"
+            Case "TALLER" : Return "TALLERS"
+
+            Case "ESTAMPADOR" : Return "TALLERS"
+            Case "ACABADOR" : Return "TALLERS"
+            Case "TEIXIDOR" : Return "TALLERS"
+            Case "TEJEDOR" : Return "TALLERS"
+
+            Case "CONFEC" : Return "TALLERS"
+            Case "TINT" : Return "TALLERS"
+            Case "ACA" : Return "TALLERS"
+            Case "ESTAM" : Return "TALLERS"
+
+            Case "REPRES" : Return "REPRES"
+            Case "TRANS" : Return "TRANS"
+            Case "MAQUI" : Return "MAQUI"
+            Case "MAQUINA" : Return "MAQUI"
+                'Case "IVA" : Return "IVA"
+            Case "FORMA" : Return "FORPAG"
+            Case "BANC" : Return "BANCS"
+                'Case "TEIXIT" : Return "TEIXITS"
+        End Select
+        MessageBox.Show("error")
+        Return campo
+
+    End Function
+
+    Private Function MySQL2NETTipo(ByVal tipo As String) As String
+        Try
+            tipo = tratarTipo(tipo)
+            Select Case tipo
+                Case "varchar" : Return "String"
+                Case "char" : Return "String"
+                Case "int" : Return "Integer"
+                Case "double" : Return "Double"
+                Case "tinyint" : Return "Boolean"
+                Case "date" : Return "Date"
+                Case "datetime" : Return "Date"
+                Case "tinytext" : Return "String"
+                Case "mediumtext" : Return "String"
+                Case "text" : Return "String"
+                Case "blob" : Return "Object"
+                Case "mediumblob" : Return "Object"
+                Case "longtext" : Return "String"
+
+            End Select
+            MessageBox.Show("TIPO " & tipo, "")
+            txt = txt & tipo & vbCrLf
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : ccn()
+        End Try
+    End Function
+    Private Function Poner0oVacio(ByVal tipo As String) As String
+        If tipo = "String" Then
+            Return """"""
+        End If
+        If tipo = "Integer" Or tipo = "Double" Then
+            Return 0
+        End If
+        Return """"""
+    End Function
+    Private Function ponernzpnzn(ByVal tipo As String, ByVal campo As String, Optional ByVal esSinM As Boolean = False) As String
+        If tipo = "String" Then
+            If campo = "Value" OrElse esSinM Then
+                Return "nz(" & campo & ", """")"
+            Else
+                Return "nz(m" & campo & ", """")"
+            End If
+        End If
+        If tipo = "Integer" Or tipo = "Double" Then
+            If campo = "Value" OrElse esSinM Then
+                Return "nzn(" & campo & ", 0)"
+            Else
+                Return "nzn(m" & campo & ", 0)"
+            End If
+        End If
+        If campo = "Value" OrElse esSinM Then
+            Return campo
+        Else
+            Return "m" & campo & ""
+        End If
+
+
+    End Function
+    Private Function ponernzpnzn2(ByVal tipo As String, ByVal campo As String) As String
+        If tipo = "String" Then
+
+            Return "nz(" & campo & ", """")"
+
+        End If
+        If tipo = "Integer" Or tipo = "Double" Then
+
+            Return "nzn(" & campo & ", 0)"
+
+        End If
+        Return campo
+
+    End Function
+
+#End Region
+
+#Region "GENERAR VARIABLES"
+
+    Private Function PonerTextoVariable(ByVal campo As String, ByVal tipo As String, ByVal tabla As String)
+        Try
+
+            Dim campo2 As String
+            campo2 = "dvForm(pa).Row(""" & campo & """)"
+            If esCampoConNombre(campo) Then
+                'DEL TIPO NOM...
+
+                Return "Private m" & campo & " As " & tipo & vbCrLf & _
+                    "Public Property " & campo & "() As " & tipo & vbCrLf & _
+                    "Get" & vbCrLf & _
+                    "If PA = -1 Then Exit Property" & vbCrLf & _
+                    "Try" & vbCrLf & _
+                    "m" & campo & " = " & ponernzpnzn2(tipo, campo2) & vbCrLf & _
+                    "Catch ex As Exception : End Try" & vbCrLf & _
+                    "Return " & ponernzpnzn(tipo, campo) & vbCrLf & _
+                    "End Get" & vbCrLf & _
+                    "Set(ByVal Value As " & tipo & ")" & vbCrLf & _
+                    "If PA = -1 Then Exit Property" & vbCrLf & _
+                    "m" & campo & " = " & ponernzpnzn(tipo, "Value") & vbCrLf & _
+                    "If tabla.GetChanges Is Nothing Then" & vbCrLf & _
+                    "dvForm(pa).Row(""" & campo & """) = " & ponernzpnzn(tipo, "Value") & " : GuardarDV()" & vbCrLf & _
+                    "tabla.AcceptChanges()" & vbCrLf & _
+                    "Else" & vbCrLf & _
+                    "dvForm(pa).Row(""" & campo & """) = " & ponernzpnzn(tipo, "Value") & " : GuardarDV()" & vbCrLf & _
+                    "End If" & vbCrLf & _
+                    "End Set" & vbCrLf & _
+                    "End Property" & vbCrLf & vbCrLf
+
+            Else
+                If esCampoDeNombre(campo) Then
+
+                    Return "Private m" & campo & " As " & tipo & vbCrLf & _
+                        "Public Property " & campo & "() As " & tipo & vbCrLf & _
+                        "Get" & vbCrLf & _
+                        "If PA = -1 Then Exit Property" & vbCrLf & _
+                        "Try" & vbCrLf & _
+                        "m" & campo & " = " & ponernzpnzn2(tipo, campo2) & vbCrLf & _
+                        "Catch ex As Exception : End Try" & vbCrLf & _
+                        "Return " & ponernzpnzn(tipo, campo) & vbCrLf & _
+                        "End Get" & vbCrLf & _
+                        "Set(ByVal Value As " & tipo & ")" & vbCrLf & _
+                        "If PA = -1 Then Exit Property" & vbCrLf & _
+                        "If esCodigoExistente(dt" & PonerS(campo) & ", CC" & PonerS(campo) & ", Value) Then" & vbCrLf & _
+                        "If " & ponernzpnzn(tipo, "Value") & " <> " & Poner0oVacio(tipo) & " Then " & vbCrLf & _
+                        "m" & campo & " = " & ponernzpnzn(tipo, "Value") & vbCrLf & _
+                        "dvForm(pa).Row(""NOM" & campo & """) = general.OBN(Value, dt" & PonerS(campo) & ", cnn" & PonerS(campo) & ")" & vbCrLf & _
+                        "dvForm(pa).Row(""" & campo & """) = " & ponernzpnzn(tipo, "Value") & " : GuardarDV()" & vbCrLf & _
+                        "Else" & vbCrLf & _
+                        PonerNullo(campo, tipo) & vbCrLf & _
+                        "dvForm(pa).Row(""NOM" & campo & """) = """" : GuardarDV()" & vbCrLf & _
+                        "End If" & vbCrLf & _
+                        "Else" & vbCrLf & _
+                        PonerNullo(campo, tipo) & vbCrLf & _
+                        "dvForm(pa).Row(""NOM" & campo & """) = """" : GuardarDV()" & vbCrLf & _
+                        "MessageBox.Show(rm.GetString(""NOEXISTE" & PonerS(campo) & """))" & vbCrLf & _
+                        "End If" & vbCrLf & _
+                        "End Set" & vbCrLf & _
+                        "End Property" & vbCrLf & vbCrLf
+
+                Else
+                    Return "Private m" & campo & " As " & tipo & vbCrLf & _
+                    "Public Property " & campo & "() As " & tipo & vbCrLf & _
+                    "Get" & vbCrLf & _
+                    "If PA = -1 Then Exit Property" & vbCrLf & _
+                    "Try" & vbCrLf & _
+                    "m" & campo & " = " & ponernzpnzn2(tipo, campo2) & vbCrLf & _
+                    "Catch ex As Exception : End Try" & vbCrLf & _
+                    "Return " & ponernzpnzn(tipo, campo) & vbCrLf & _
+                    "End Get" & vbCrLf & _
+                    "Set(ByVal Value As " & tipo & ")" & vbCrLf & _
+                    "If PA = -1 Then Exit Property" & vbCrLf & _
+                    "If " & ponernzpnzn(tipo, "Value") & " <> " & ponernzpnzn(tipo, campo, True) & " Then" & vbCrLf & _
+                    "m" & campo & " = " & ponernzpnzn(tipo, "Value") & vbCrLf & _
+                    "dvForm(pa).Row(""" & campo & """) = " & ponernzpnzn(tipo, campo) & " : GuardarDV()" & vbCrLf & _
+                    "End If" & vbCrLf & _
+                    "End Set" & vbCrLf & _
+                    "End Property" & vbCrLf & vbCrLf
+
+
+                End If
+
+            End If
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+
+    End Function
+    Private Function PonerNullo(ByVal campo As String, ByVal tipo As String) As String
+        If tipo = "Integer" Or tipo = "Double" Then
+            Return "dvForm(pa).Row(""" & campo & """) = DBNull.value" & vbCrLf
+        Else
+            Return "dvForm(pa).Row(""" & campo & """) = """"" & vbCrLf
+        End If
+    End Function
+    Private Function ponerVariablesTabla(ByVal tabla As String) As String
+        Dim s As String
+        Dim dar As MySqlDataReader
+        Dim campo As String
+        Dim tipo As String
+        Try
+            Dim cmd As New MySqlCommand("SHOW COLUMNS FROM " & tabla, cnn)
+            ACN()
+            dar = cmd.ExecuteReader
+            While dar.Read
+
+                campo = dar("Field")
+                tipo = MySQL2NETTipo(dar("Type"))
+                If Not campo = "CENTRO" Then
+                    s = s & PonerTextoVariable(campo, tipo, tabla)
+                    If esCampoDeNombre(campo) Then
+                        s = s & PonerTextoVariable("NOM" & campo, "String", tabla)
+                    End If
+                End If
+
+            End While
+            dar.Close()
+            CCN()
+            Return s
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Function
+    Private Sub btnObtenerColumnasProperty_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnObtenerColumnasProperty.Click
+        Try
+            Cursor = Cursors.WaitCursor
+            Dim aTablas As ArrayList = PonerTablasEnArray()
+            Dim s As String
+
+            Dim i As Integer
+            For i = 0 To aTablas.Count - 1
+                s = s & "===================TAABLA: " & aTablas(i) & vbCrLf
+                s = s & ponerVariablesTabla(aTablas(i))
+            Next
+            Clipboard.SetDataObject(s, True)
+            Cursor = Cursors.Default
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+
+#End Region
+
+    Private Sub ExportarAcabados_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button6.Click
+        Dim dr As DataRow
+        Dim dt As New aura2k3.ds11.dacabatsDataTable
+        Dim h As New Hashtable
+        Dim xls As New Excel.Application
+        Dim oBooks As Excel.Workbooks, oBook As Excel.Workbook
+        Dim oSheets As Excel.Sheets, oSheet As Excel.Worksheet
+        Dim i As Integer
+        Dim daadap As New MySqlDataAdapter
+
+        Dim acabados, a() As String
+        Dim f As New System.Windows.Forms.OpenFileDialog
+
+        Try
+
+            dr = dt.NewdacabatsRow
+
+            f.ShowDialog()
+
+            xls.Visible = False
+            oBooks = xls.Workbooks
+            oBooks.Open(f.FileName)
+            oBook = oBooks.Item(1)
+            oSheets = oBook.Worksheets
+            oSheet = CType(oSheets.Item(1), Excel.Worksheet)
+            MessageBox.Show(oSheet.Name)
+            For i = 1 To 300
+                Try
+                    If Not oSheet.Cells(i, 1).Value Is Nothing Then
+
+                        acabados = DirectCast(oSheet.Cells(i, 2), Excel.Range).Value
+                        If Not acabados Is Nothing OrElse general.nz(acabados, "") = "" Then
+                            a = acabados.Split("-")
+                            h.Add(oSheet.Cells(i, 1).Value, a)
+                        End If
+
+                    End If
+                Catch ex As Exception
+
+                End Try
+
+            Next
+            Dim dtAcabadosTejidos As New aura2k3.ds11.acabatsteixitsDataTable
+            Dim enume As IEnumerator
+            Dim enumeTejidos As IEnumerator
+            enumeTejidos = h.GetEnumerator
+
+            While enumeTejidos.MoveNext
+
+                a = enumeTejidos.Current.Value
+                enume = a.GetEnumerator
+                While enume.MoveNext
+                    dr = dtAcabadosTejidos.NewRow
+                    dr("CENTRO") = "C"
+                    dr(tablaProveedores) = 506
+                    dr("TEIXIT") = enumeTejidos.Current.key
+                    dr("ACABAT") = enume.Current
+                    dtAcabadosTejidos.Rows.Add(dr)
+                End While
+            End While
+
+            Dim cmd As New MySqlCommand
+            cmd.Connection = cnn
+            ACN()
+
+            'For i = 0 To dtAcabadosTejidos.Rows.Count - 1
+            '    cmd.CommandText = "INSERT INTO " & dtAcabadosTejidos.TableName & " (ACABAT, PROVE, TEIXIT, CENTRO) VALUES (" & _
+            '    " """ & dtAcabadosTejidos.Rows(i).Item("ACABAT") & """, " & _
+            '    " """ & dtAcabadosTejidos.Rows(i).Item(tablaProveedores) & """, " & _
+            '    " """ & dtAcabadosTejidos.Rows(i).Item("TEIXIT") & """, " & _
+            '    " ""C"") "
+            '    Try
+            '        ACN()
+            '        cmd.ExecuteNonQuery()
+            '        CCN()
+            '    Catch ex As Exception
+            '        LOG(ex.ToString) : cargando = False
+            '    End Try
+
+            'Next
+
+            Dim dar As MySqlDataReader
+            Dim cmd2 As New MySqlCommand("SELECT DISTINCT ACABAT FROM ACABATSTEIXITS", cnn)
+            dar = cmd2.ExecuteReader
+            Dim dt2 As New aura2k3.ds11.dacabatsDataTable
+
+
+            While dar.Read
+                dr = dt2.NewdacabatsRow
+                dr("CODI") = dar("ACABAT")
+                dr(tablaProveedores) = 506
+                dt2.Rows.Add(dr)
+            End While
+
+            For i = 0 To dt2.Rows.Count - 1
+                cmd.CommandText = "INSERT INTO " & dt2.TableName & " (CODI, PROVE, PREUK, PREUM, CENTRO) VALUES (" & _
+                " """ & dt2.Rows(i).Item("CODI") & """, " & _
+                " """ & dt2.Rows(i).Item(tablaProveedores) & """, " & _
+                " """ & dt2.Rows(i).Item("PREUK") & """, " & _
+                " """ & dt2.Rows(i).Item("PREUM") & """, " & _
+                " ""C"") "
+                Try
+                    ACN()
+                    cmd.ExecuteNonQuery()
+                    CCN()
+                Catch ex As Exception
+                    LOG(ex.ToString) : cargando = False
+                End Try
+
+            Next
+            dar.Close()
+            CCN()
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub Button7_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button7.Click
+        'txtDebug.Text = DumpLog()
+    End Sub
+    Private Sub btnPrueba_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnPrueba.Click
+        Try
+            Dim p As New clsImpresionPAFPO(Pedido, Tejido, Venta, Nothing, Nothing, False)
+            p.Prueba()
+
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Sub
+
+    Private Sub TabPage3_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles TabPage3.Click
+
+    End Sub
+
+    Private Sub TabControl1_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles TabControl1.SelectedIndexChanged
+        If TabControl1.SelectedTab Is TabPage3 Then
+            Dim dt As New DataTable '("SELECT * FROM ERRORES", cnn)
+            cnn.Open()
+            Dim cmdSelect As New MySqlCommand("SELECT * FROM ERRORES", cnn)
+            Dim da As New MySqlDataAdapter(cmdSelect)
+            da.Fill(dt)
+            cnn.Close()
+
+            C1TrueDBGrid1.SetDataBinding(dt, "")
+            C1TrueDBGrid1.AllowFilter = True
+            C1TrueDBGrid1.FilterBar = True
+
+            AutoSizeCC(C1TrueDBGrid1)
+        End If
+    End Sub
+
+    Private Sub Button8_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button8.Click
+        C1TrueDBGrid1.ExportToRTF("c:\erroes.rtf")
+    End Sub
+
+    Private Sub Button9_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnConvertir.Click
+        Try
+            Dim cmd As New MySqlCommand
+            Dim tablas As ArrayList
+            Dim i As Integer
+            Dim tipo As String
+
+            tablas = PonerTablasEnArray()
+            cmd.Connection = cnn
+            tipo = lstTipoTablas.SelectedItem
+            If tipo <> "InnoDB" And tipo <> "MyISAM" Then
+                MessageBox.Show("ERROR TIPO TABLA")
+                Exit Sub
+            End If
+            ACN()
+            For i = 0 To tablas.Count - 1
+                cmd.CommandText = "ALTER TABLE " & tablas(i) & " TYPE=" & tipo & ", COMMENT=''"
+                Try
+                    cmd.ExecuteNonQuery()
+                Catch ex As Exception
+                End Try
+            Next
+            CCN()
+
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Sub
+End Class
+

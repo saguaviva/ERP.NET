@@ -1,0 +1,303 @@
+Public Class frmActualizar
+    Inherits aura2k3.frmBase
+
+
+#Region " Código generado por el Diseñador de Windows Forms "
+
+    Public Sub New()
+        MyBase.New()
+
+        'El Diseñador de Windows Forms requiere esta llamada.
+        InitializeComponent() : Dim tom As SMcMaster.TabOrderManager = New SMcMaster.TabOrderManager(Me) : tom.SetTabOrder(SMcMaster.TabOrderManager.TabScheme.AcrossFirst)
+        'Dim ftp As New LumiSoft.Net.FTP.Client.FTP_Client
+
+
+        Try
+
+            ' ftp.Connect("intrad.dyndns.info", 21)
+            ' ftp.Authenticate("coespunt", "coespunt")
+            ' ftp.ReceiveFile("coespunt.zip", "coespunt.zip")
+            ' ftp.Disconnect()
+            ' AbrirActualizador()
+            ' Close()
+        Catch ex As Exception
+            MessageBox.Show("No hi ha actualització disponible")
+        End Try
+        'Agregar cualquier inicialización después de la llamada a InitializeComponent()
+
+    End Sub
+
+    'Form reemplaza a Dispose para limpiar la lista de componentes.
+    Protected Overloads Overrides Sub Dispose(ByVal disposing As Boolean)
+        '! Seal for less overhead - Can declare NotInheritable Class
+        If disposing Then
+            If Not (components Is Nothing) Then
+                components.Dispose()
+            End If
+        End If
+       MyBase.Dispose(disposing)
+    End Sub
+
+    'Requerido por el Diseñador de Windows Forms
+    Private components As System.ComponentModel.IContainer
+
+    'NOTA: el Diseñador de Windows Forms requiere el siguiente procedimiento
+    'Puede modificarse utilizando el Diseñador de Windows Forms. 
+    'No lo modifique con el editor de código.
+    Friend WithEvents C1Report1 As C1.Win.C1Report.C1Report
+    Friend WithEvents C1TextBox1 As C1.Win.C1Input.C1TextBox
+    Friend WithEvents C1TextBox2 As C1.Win.C1Input.C1TextBox
+    Friend WithEvents C1PictureBox1 As C1.Win.C1Input.C1PictureBox
+    Friend WithEvents C1Label1 As C1.Win.C1Input.C1Label
+    Friend WithEvents C1DbNavigator1 As C1.Win.C1Input.C1DbNavigator
+    Friend WithEvents C1DateEdit1 As C1.Win.C1Input.C1DateEdit
+    Friend WithEvents C1TextBox3 As C1.Win.C1Input.C1TextBox
+    <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
+        Me.C1Report1 = New C1.Win.C1Report.C1Report
+        Me.C1TextBox1 = New C1.Win.C1Input.C1TextBox
+        Me.C1TextBox2 = New C1.Win.C1Input.C1TextBox
+        Me.C1PictureBox1 = New C1.Win.C1Input.C1PictureBox
+        Me.C1Label1 = New C1.Win.C1Input.C1Label
+        Me.C1DbNavigator1 = New C1.Win.C1Input.C1DbNavigator
+        Me.C1DateEdit1 = New C1.Win.C1Input.C1DateEdit
+        Me.C1TextBox3 = New C1.Win.C1Input.C1TextBox
+        CType(Me.C1Report1, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.C1TextBox1, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.C1TextBox2, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.C1Label1, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.C1DbNavigator1, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.C1DateEdit1, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.C1TextBox3, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.SuspendLayout()
+        '
+        'cboSeleccionCentro
+        '
+        Me.cboSeleccionCentro.Location = New System.Drawing.Point(280, 7)
+        Me.cboSeleccionCentro.Name = "cboSeleccionCentro"
+        '
+        'btnVerLista
+        '
+        Me.btnVerLista.Location = New System.Drawing.Point(1937, 1353)
+        Me.btnVerLista.Name = "btnVerLista"
+        '
+        'btnActualizar
+        '
+        Me.btnActualizar.Location = New System.Drawing.Point(60, 1353)
+        Me.btnActualizar.Name = "btnActualizar"
+        '
+        'btnNuevo
+        '
+        Me.btnNuevo.Location = New System.Drawing.Point(248, 1353)
+        Me.btnNuevo.Name = "btnNuevo"
+        '
+        'btnBorrar
+        '
+        Me.btnBorrar.Location = New System.Drawing.Point(150, 1373)
+        Me.btnBorrar.Name = "btnBorrar"
+        '
+        'btnTancar
+        '
+        Me.btnTancar.Location = New System.Drawing.Point(1937, 1373)
+        Me.btnTancar.Name = "btnTancar"
+        '
+        'btnModificar
+        '
+        Me.btnModificar.Location = New System.Drawing.Point(150, 1353)
+        Me.btnModificar.Name = "btnModificar"
+        '
+        'btnUltimo
+        '
+        Me.btnUltimo.Location = New System.Drawing.Point(330, 1353)
+        Me.btnUltimo.Name = "btnUltimo"
+        '
+        'btnPrimero
+        '
+        Me.btnPrimero.Location = New System.Drawing.Point(28, 1353)
+        Me.btnPrimero.Name = "btnPrimero"
+        '
+        'btnAnterior
+        '
+        Me.btnAnterior.Location = New System.Drawing.Point(28, 1373)
+        Me.btnAnterior.Name = "btnAnterior"
+        '
+        'btnSiguiente
+        '
+        Me.btnSiguiente.Location = New System.Drawing.Point(330, 1373)
+        Me.btnSiguiente.Name = "btnSiguiente"
+        '
+        'btnRecargar
+        '
+        Me.btnRecargar.Location = New System.Drawing.Point(60, 1373)
+        Me.btnRecargar.Name = "btnRecargar"
+        '
+        'sbtipo
+        '
+        Me.sbtipo.FlatStyle = System.Windows.Forms.FlatStyle.System
+        Me.sbtipo.Location = New System.Drawing.Point(5, 1385)
+        Me.sbtipo.Name = "sbtipo"
+        Me.sbtipo.Text = ""
+        '
+        'C1Report1
+        '
+        Me.C1Report1.ReportDefinition = "<!--Report *** C1Report1 ***--><Report version=""2.5.20052.176""><Name>C1Report1</N" & _
+        "ame><DataSource /><Layout /><Font><Name>Arial</Name><Size>9</Size></Font><Groups" & _
+        " /><Sections><Section><Name>Detail</Name><Type>0</Type><Visible>0</Visible></Sec" & _
+        "tion><Section><Name>Header</Name><Type>1</Type><Visible>0</Visible></Section><Se" & _
+        "ction><Name>Footer</Name><Type>2</Type><Visible>0</Visible></Section><Section><N" & _
+        "ame>PageHeader</Name><Type>3</Type><Visible>0</Visible></Section><Section><Name>" & _
+        "PageFooter</Name><Type>4</Type><Visible>0</Visible></Section></Sections><Fields " & _
+        "/></Report>"
+        Me.C1Report1.ReportName = "C1Report1"
+        '
+        'C1TextBox1
+        '
+        Me.C1TextBox1.Location = New System.Drawing.Point(412, 245)
+        Me.C1TextBox1.Name = "C1TextBox1"
+        Me.C1TextBox1.TabIndex = 12
+        Me.C1TextBox1.Tag = Nothing
+        '
+        'C1TextBox2
+        '
+        Me.C1TextBox2.Location = New System.Drawing.Point(208, 41)
+        Me.C1TextBox2.Name = "C1TextBox2"
+        Me.C1TextBox2.TabIndex = 13
+        Me.C1TextBox2.Tag = Nothing
+        '
+        'C1PictureBox1
+        '
+        Me.C1PictureBox1.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.C1PictureBox1.Location = New System.Drawing.Point(448, 301)
+        Me.C1PictureBox1.Name = "C1PictureBox1"
+        Me.C1PictureBox1.Size = New System.Drawing.Size(100, 46)
+        Me.C1PictureBox1.TabIndex = 14
+        '
+        'C1Label1
+        '
+        Me.C1Label1.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.C1Label1.Location = New System.Drawing.Point(384, 78)
+        Me.C1Label1.Name = "C1Label1"
+        Me.C1Label1.Size = New System.Drawing.Size(100, 21)
+        Me.C1Label1.TabIndex = 15
+        Me.C1Label1.Tag = Nothing
+        '
+        'C1DbNavigator1
+        '
+        Me.C1DbNavigator1.Location = New System.Drawing.Point(368, 249)
+        Me.C1DbNavigator1.Name = "C1DbNavigator1"
+        Me.C1DbNavigator1.Size = New System.Drawing.Size(290, 22)
+        Me.C1DbNavigator1.TabIndex = 16
+        '
+        'C1DateEdit1
+        '
+        '
+        'C1DateEdit1.Calendar
+        '
+        Me.C1DateEdit1.Calendar.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.C1DateEdit1.Location = New System.Drawing.Point(-8, 134)
+        Me.C1DateEdit1.Name = "C1DateEdit1"
+        Me.C1DateEdit1.TabIndex = 17
+        Me.C1DateEdit1.Tag = Nothing
+        '
+        'C1TextBox3
+        '
+        Me.C1TextBox3.Location = New System.Drawing.Point(264, 156)
+        Me.C1TextBox3.Name = "C1TextBox3"
+        Me.C1TextBox3.TabIndex = 18
+        Me.C1TextBox3.Tag = Nothing
+        '
+        'frmActualizar
+        '
+        Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
+        Me.ClientSize = New System.Drawing.Size(814, 415)
+        Me.Controls.Add(Me.C1TextBox3)
+        Me.Controls.Add(Me.C1DateEdit1)
+        Me.Controls.Add(Me.C1DbNavigator1)
+        Me.Controls.Add(Me.C1Label1)
+        Me.Controls.Add(Me.C1PictureBox1)
+        Me.Controls.Add(Me.C1TextBox2)
+        Me.Controls.Add(Me.C1TextBox1)
+        Me.Cursor = System.Windows.Forms.Cursors.Default
+        Me.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!)
+        Me.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.Name = "frmActualizar"
+        Me.Text = "Actualitzar"
+        Me.Controls.SetChildIndex(Me.cboSeleccionCentro, 0)
+        Me.Controls.SetChildIndex(Me.C1TextBox1, 0)
+        Me.Controls.SetChildIndex(Me.C1TextBox2, 0)
+        Me.Controls.SetChildIndex(Me.C1PictureBox1, 0)
+        Me.Controls.SetChildIndex(Me.C1Label1, 0)
+        Me.Controls.SetChildIndex(Me.C1DbNavigator1, 0)
+        Me.Controls.SetChildIndex(Me.C1DateEdit1, 0)
+        Me.Controls.SetChildIndex(Me.C1TextBox3, 0)
+        Me.Controls.SetChildIndex(Me.sbtipo, 0)
+        Me.Controls.SetChildIndex(Me.btnActualizar, 0)
+        Me.Controls.SetChildIndex(Me.btnNuevo, 0)
+        Me.Controls.SetChildIndex(Me.btnBorrar, 0)
+        Me.Controls.SetChildIndex(Me.btnTancar, 0)
+        Me.Controls.SetChildIndex(Me.btnUltimo, 0)
+        Me.Controls.SetChildIndex(Me.btnPrimero, 0)
+        Me.Controls.SetChildIndex(Me.btnAnterior, 0)
+        Me.Controls.SetChildIndex(Me.btnSiguiente, 0)
+        Me.Controls.SetChildIndex(Me.btnRecargar, 0)
+        Me.Controls.SetChildIndex(Me.btnVerLista, 0)
+        Me.Controls.SetChildIndex(Me.btnModificar, 0)
+        CType(Me.C1Report1, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.C1TextBox1, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.C1TextBox2, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.C1Label1, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.C1DbNavigator1, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.C1DateEdit1, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.C1TextBox3, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.ResumeLayout(False)
+
+    End Sub
+
+#End Region
+
+#Region "ORGANIZAR"
+
+    Private Sub IniciarForm(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
+        Cursor = Cursors.WaitCursor
+        'Preguntar si nueva version
+        Dim nuevothread As New Process
+        nuevothread.Start("actualizador.exe")
+        Me.Close()
+        'Entonces cerrarse y llamar a actualizar
+        Cursor = Cursors.Default
+    End Sub
+
+#End Region
+
+    Friend Overrides Sub btnActualizar_Click(ByVal sender As Object, ByVal e As System.EventArgs)
+
+    End Sub
+
+    Friend Overrides Sub btnAnterior_Click(ByVal sender As Object, ByVal e As System.EventArgs)
+
+    End Sub
+
+    Friend Overrides Sub btnBorrar_Click(ByVal sender As Object, ByVal e As System.EventArgs)
+
+    End Sub
+
+    Friend Overrides Sub btnModificar_Click(ByVal sender As Object, ByVal e As System.EventArgs)
+
+    End Sub
+
+    Friend Overrides Sub btnNuevo_Click(ByVal sender As Object, ByVal e As System.EventArgs)
+
+    End Sub
+
+   Protected Friend Overrides Sub btnPrimero_Click(ByVal sender As Object, ByVal e As System.EventArgs)
+
+    End Sub
+
+    Friend Overrides Sub btnSiguiente_Click(ByVal sender As Object, ByVal e As System.EventArgs)
+
+    End Sub
+
+    Friend Overrides Sub btnUltimo_Click(ByVal sender As Object, ByVal e As System.EventArgs)
+
+    End Sub
+End Class
+

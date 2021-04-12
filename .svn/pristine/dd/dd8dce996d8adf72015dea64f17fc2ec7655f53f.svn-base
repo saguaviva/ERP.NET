@@ -1,0 +1,146 @@
+Imports MySql.Data.MySqlClient : Imports clsFuncionesLOG : Imports clsFuncionesC1 : Imports clsFuncionesUtiles : Imports clsConstantes : Imports clsOtrasFunciones
+
+Public Class frmAcabadorPorDefecto
+    Inherits System.Windows.Forms.Form
+
+#Region " Código generado por el Diseñador de Windows Forms "
+
+    Public Sub New(ByVal dtAcabador As DataTable)
+        MyBase.New()
+        dtAcabadores = dtAcabador
+
+        'El Diseñador de Windows Forms requiere esta llamada.
+        InitializeComponent()
+        lstAcabadores.DataSource = dtAcabadores
+        'Agregar cualquier inicialización después de la llamada a InitializeComponent()
+
+    End Sub
+
+    'Form reemplaza a Dispose para limpiar la lista de componentes.
+    Protected Overloads Overrides Sub Dispose(ByVal disposing As Boolean)
+        If disposing Then
+            If Not (components Is Nothing) Then
+                components.Dispose()
+            End If
+        End If
+        MyBase.Dispose(disposing)
+    End Sub
+
+    'Requerido por el Diseñador de Windows Forms
+    Private components As System.ComponentModel.IContainer
+
+    'NOTA: el Diseñador de Windows Forms requiere el siguiente procedimiento
+    'Puede modificarse utilizando el Diseñador de Windows Forms. 
+    'No lo modifique con el editor de código.
+    Friend WithEvents lstAcabadores As C1.Win.C1List.C1List
+    Friend WithEvents Button1 As System.Windows.Forms.Button
+    <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
+        Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(frmAcabadorPorDefecto))
+        Me.lstAcabadores = New C1.Win.C1List.C1List
+        Me.Button1 = New System.Windows.Forms.Button
+        CType(Me.lstAcabadores, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.SuspendLayout()
+        '
+        'lstAcabadores
+        '
+        Me.lstAcabadores.AddItemSeparator = Microsoft.VisualBasic.ChrW(59)
+        Me.lstAcabadores.Caption = ""
+        Me.lstAcabadores.CaptionHeight = 17
+        Me.lstAcabadores.ColumnCaptionHeight = 17
+        Me.lstAcabadores.ColumnFooterHeight = 17
+        Me.lstAcabadores.DeadAreaBackColor = System.Drawing.SystemColors.ControlDark
+        Me.lstAcabadores.Images.Add(CType(resources.GetObject("resource"), System.Drawing.Image))
+        Me.lstAcabadores.ItemHeight = 15
+        Me.lstAcabadores.Location = New System.Drawing.Point(8, 16)
+        Me.lstAcabadores.MatchEntryTimeout = CType(2000, Long)
+        Me.lstAcabadores.Name = "lstAcabadores"
+        'Me.lstAcabadores.PartialRightColumn = False
+        Me.lstAcabadores.RowDivider.Color = System.Drawing.Color.DarkGray
+        Me.lstAcabadores.RowDivider.Style = C1.Win.C1List.LineStyleEnum.None
+        Me.lstAcabadores.RowSubDividerColor = System.Drawing.Color.DarkGray
+        Me.lstAcabadores.SelectionMode = C1.Win.C1List.SelectionModeEnum.CheckBox
+        Me.lstAcabadores.Size = New System.Drawing.Size(328, 312)
+        Me.lstAcabadores.TabIndex = 0
+        Me.lstAcabadores.Text = "Acabadors"
+        Me.lstAcabadores.PropBag = "<?xml version=""1.0""?><Blob><Styles type=""C1.Win.C1List.Design.ContextWrapper""><Da" & _
+        "ta>Group{BackColor:ControlDark;Border:None,,0, 0, 0, 0;AlignVert:Center;}Style2{" & _
+        "}Style5{}Style4{}Style7{}Style6{}EvenRow{BackColor:Aqua;}Selected{ForeColor:High" & _
+        "lightText;BackColor:Highlight;}Style3{}Inactive{ForeColor:InactiveCaptionText;Ba" & _
+        "ckColor:InactiveCaption;}Footer{}Caption{AlignHorz:Center;}Normal{}HighlightRow{" & _
+        "ForeColor:HighlightText;BackColor:Highlight;}Style9{AlignHorz:Near;}OddRow{}Reco" & _
+        "rdSelector{AlignImage:Center;}Heading{Wrap:True;AlignVert:Center;Border:Raised,," & _
+        "1, 1, 1, 1;ForeColor:ControlText;BackColor:Control;}Style8{}Style10{}Style11{}St" & _
+        "yle1{}</Data></Styles><Splits><C1.Win.C1List.ListBoxView Name="""" CaptionHeight=""" & _
+        "17"" ColumnCaptionHeight=""17"" ColumnFooterHeight=""17"" VerticalScrollGroup=""1"" Hor" & _
+        "izontalScrollGroup=""1""><ClientRect>0, 0, 324, 308</ClientRect><VScrollBar><Width" & _
+        ">17</Width></VScrollBar><HScrollBar><Height>17</Height></HScrollBar><CaptionStyl" & _
+        "e parent=""Style2"" me=""Style9"" /><EvenRowStyle parent=""EvenRow"" me=""Style7"" /><Fo" & _
+        "oterStyle parent=""Footer"" me=""Style3"" /><GroupStyle parent=""Group"" me=""Style11"" " & _
+        "/><HeadingStyle parent=""Heading"" me=""Style2"" /><HighLightRowStyle parent=""Highli" & _
+        "ghtRow"" me=""Style6"" /><InactiveStyle parent=""Inactive"" me=""Style4"" /><OddRowStyl" & _
+        "e parent=""OddRow"" me=""Style8"" /><RecordSelectorStyle parent=""RecordSelector"" me=" & _
+        """Style10"" /><SelectedStyle parent=""Selected"" me=""Style5"" /><Style parent=""Normal" & _
+        """ me=""Style1"" /></C1.Win.C1List.ListBoxView></Splits><NamedStyles><Style parent=" & _
+        """"" me=""Normal"" /><Style parent=""Normal"" me=""Heading"" /><Style parent=""Heading"" m" & _
+        "e=""Footer"" /><Style parent=""Heading"" me=""Caption"" /><Style parent=""Heading"" me=""" & _
+        "Inactive"" /><Style parent=""Normal"" me=""Selected"" /><Style parent=""Normal"" me=""Hi" & _
+        "ghlightRow"" /><Style parent=""Normal"" me=""EvenRow"" /><Style parent=""Normal"" me=""O" & _
+        "ddRow"" /><Style parent=""Heading"" me=""RecordSelector"" /><Style parent=""Caption"" m" & _
+        "e=""Group"" /></NamedStyles><vertSplits>1</vertSplits><horzSplits>1</horzSplits><L" & _
+        "ayout>None</Layout><DefaultRecSelWidth>17</DefaultRecSelWidth></Blob>"
+        '
+        'Button1
+        '
+        Me.Button1.FlatStyle = System.Windows.Forms.FlatStyle.System
+        Me.Button1.Location = New System.Drawing.Point(248, 336)
+        Me.Button1.Name = "Button1"
+        Me.Button1.Size = New System.Drawing.Size(88, 24)
+        Me.Button1.TabIndex = 1
+        Me.Button1.Text = "Acceptar"
+        '
+        'frmAcabadorPorDefecto
+        '
+        Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
+        Me.ClientSize = New System.Drawing.Size(344, 366)
+        Me.Controls.Add(Me.Button1)
+        Me.Controls.Add(Me.lstAcabadores)
+        Me.Name = "frmAcabadorPorDefecto"
+        Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
+        Me.Text = "Acabador Per Defecte"
+        CType(Me.lstAcabadores, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.ResumeLayout(False)
+
+    End Sub
+
+#End Region
+
+    Private dtAcabadores As DataTable
+    Public acabadorSeleccionado As Integer
+
+    Private Sub frmAcabadorPorDefecto_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
+        Try
+            lstAcabadores.DataMember = "CODI"
+            Dim idx As Integer
+            dtAcabadores.DefaultView.Sort = "CODI"
+            idx = dtAcabadores.DefaultView.Find(CargaParametro("acabadorpordefecto"))
+            lstAcabadores.ColumnHeaders = False
+            lstAcabadores.SelectedIndex = idx
+
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Sub
+
+    Private Sub frmAcabadorPorDefecto_Closed(ByVal sender As Object, ByVal e As System.EventArgs) Handles MyBase.Closed
+        Try
+            GrabaParametro(lstAcabadores.Columns(0).Value, "acabadorpordefecto")
+
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Sub
+
+    Private Sub Button1_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button1.Click
+        Me.Close()
+    End Sub
+End Class

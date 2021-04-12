@@ -1,0 +1,531 @@
+Imports CoreLab.MySql
+
+
+
+Public Class frmOperacionesForm
+    Inherits aura2k3.frmBase
+
+#Region " Código generado por el Diseñador de Windows Forms "
+
+    Public Sub New()
+        MyBase.New()
+
+        'El Diseñador de Windows Forms requiere esta llamada.
+        InitializeComponent() : Dim tom As SMcMaster.TabOrderManager = New SMcMaster.TabOrderManager(Me) : tom.SetTabOrder(SMcMaster.TabOrderManager.TabScheme.AcrossFirst)
+
+        'Agregar cualquier inicialización después de la llamada a InitializeComponent()
+
+    End Sub
+
+    'Form reemplaza a Dispose para limpiar la lista de componentes.
+    Protected Overloads Overrides Sub Dispose(ByVal disposing As Boolean)
+        '! Seal for less overhead - Can declare NotInheritable Class
+        If disposing Then
+            If Not (components Is Nothing) Then
+                components.Dispose()
+            End If
+        End If
+       MyBase.Dispose(disposing)
+        frmChildForm = Nothing
+    End Sub
+
+    'Requerido por el Diseñador de Windows Forms
+    Private components As System.ComponentModel.IContainer
+
+    'NOTA: el Diseñador de Windows Forms requiere el siguiente procedimiento
+    'Puede modificarse utilizando el Diseñador de Windows Forms. 
+    'No lo modifique con el editor de código.
+    Friend WithEvents lblNombreIVA As Label
+    Friend WithEvents txtDescripcion As C1.Win.C1Input.C1TextBox
+    Friend WithEvents lblCodigoOperacion As Label
+    Friend WithEvents TabControl1 As System.Windows.Forms.TabControl
+    Friend WithEvents TabPage1 As System.Windows.Forms.TabPage
+    Friend WithEvents cboID As C1.Win.C1List.C1Combo
+
+    <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
+        Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(frmOperacionesForm))
+        Me.lblNombreIVA = New System.Windows.Forms.Label
+        Me.lblCodigoOperacion = New System.Windows.Forms.Label
+        Me.txtDescripcion = New C1.Win.C1Input.C1TextBox
+        Me.TabControl1 = New System.Windows.Forms.TabControl
+        Me.TabPage1 = New System.Windows.Forms.TabPage
+        Me.cboID = New C1.Win.C1List.C1Combo
+        CType(Me.txtDescripcion, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.TabControl1.SuspendLayout()
+        Me.TabPage1.SuspendLayout()
+        CType(Me.cboID, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.SuspendLayout()
+        '
+        'cboSeleccionCentro
+        '
+        Me.cboSeleccionCentro.Name = "cboSeleccionCentro"
+        '
+        'arrayTextBox
+        '
+        Me.arrayTextBox.Controls.AddRange(New System.Windows.Forms.Control() {Me.txtDescripcion})
+        '
+        'btnVerLista
+        '
+        Me.btnVerLista.Name = "btnVerLista"
+        '
+        'btnActualizar
+        '
+        Me.btnActualizar.Name = "btnActualizar"
+        '
+        'btnNuevo
+        '
+        Me.btnNuevo.Name = "btnNuevo"
+        '
+        'btnRecargar
+        '
+        Me.btnRecargar.Name = "btnRecargar"
+        '
+        'btnBorrar
+        '
+        Me.btnBorrar.Name = "btnBorrar"
+        '
+        'btnSiguiente
+        '
+        Me.btnSiguiente.Name = "btnSiguiente"
+        '
+        'btnAnterior
+        '
+        Me.btnAnterior.Name = "btnAnterior"
+        '
+        'btnPrimero
+        '
+        Me.btnPrimero.Name = "btnPrimero"
+        '
+        'btnUltimo
+        '
+        Me.btnUltimo.Name = "btnUltimo"
+        '
+        'btnModificar
+        '
+        Me.btnModificar.Name = "btnModificar"
+        '
+        'btnTancar
+        '
+        Me.btnTancar.Name = "btnTancar"
+        '
+        'sbtipo
+        '
+        Me.sbtipo.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.sbtipo.Location = New System.Drawing.Point(5, 144)
+        Me.sbtipo.Name = "sbtipo"
+        Me.sbtipo.Text = ""
+        '
+        'lblNombreIVA
+        '
+        Me.lblNombreIVA.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.lblNombreIVA.Location = New System.Drawing.Point(16, 60)
+        Me.lblNombreIVA.Name = "lblNombreIVA"
+        Me.lblNombreIVA.Size = New System.Drawing.Size(80, 18)
+        Me.lblNombreIVA.TabIndex = 207
+        Me.lblNombreIVA.Text = "Descripció"
+        Me.lblNombreIVA.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
+        '
+        'lblCodigoOperacion
+        '
+        Me.lblCodigoOperacion.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.lblCodigoOperacion.Location = New System.Drawing.Point(16, 32)
+        Me.lblCodigoOperacion.Name = "lblCodigoOperacion"
+        Me.lblCodigoOperacion.Size = New System.Drawing.Size(80, 19)
+        Me.lblCodigoOperacion.TabIndex = 206
+        Me.lblCodigoOperacion.Text = "Codi Operació"
+        Me.lblCodigoOperacion.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
+        '
+        'txtDescripcion
+        '
+        Me.txtDescripcion.Location = New System.Drawing.Point(100, 64)
+        Me.txtDescripcion.Name = "txtDescripcion"
+        Me.txtDescripcion.Size = New System.Drawing.Size(360, 20)
+        Me.txtDescripcion.TabIndex = 1
+        Me.txtDescripcion.Tag = Nothing
+        '
+        'TabControl1
+        '
+        Me.TabControl1.Controls.Add(Me.TabPage1)
+        Me.TabControl1.ItemSize = New System.Drawing.Size(55, 18)
+        Me.TabControl1.Location = New System.Drawing.Point(12, 8)
+        Me.TabControl1.Name = "TabControl1"
+        Me.TabControl1.SelectedIndex = 0
+        Me.TabControl1.Size = New System.Drawing.Size(484, 144)
+        Me.TabControl1.TabIndex = 208
+        '
+        'TabPage1
+        '
+        Me.TabPage1.Controls.Add(Me.cboID)
+        Me.TabPage1.Controls.Add(Me.txtDescripcion)
+        Me.TabPage1.Controls.Add(Me.lblNombreIVA)
+        Me.TabPage1.Controls.Add(Me.lblCodigoOperacion)
+        Me.TabPage1.Location = New System.Drawing.Point(4, 22)
+        Me.TabPage1.Name = "TabPage1"
+        Me.TabPage1.Size = New System.Drawing.Size(476, 118)
+        Me.TabPage1.TabIndex = 0
+        Me.TabPage1.Text = "Operació"
+        '
+        'cboID
+        '
+        Me.cboID.AddItemSeparator = Microsoft.VisualBasic.ChrW(59)
+        Me.cboID.AutoCompletion = True
+        Me.cboID.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+        Me.cboID.Caption = ""
+        Me.cboID.CaptionHeight = 17
+        Me.cboID.CharacterCasing = System.Windows.Forms.CharacterCasing.Normal
+        Me.cboID.ColumnCaptionHeight = 17
+        Me.cboID.ColumnFooterHeight = 17
+        Me.cboID.ContentHeight = 15
+        Me.cboID.Cursor = System.Windows.Forms.Cursors.Default
+        Me.cboID.DeadAreaBackColor = System.Drawing.Color.Empty
+        Me.cboID.EditorBackColor = System.Drawing.SystemColors.Window
+        Me.cboID.EditorFont = New System.Drawing.Font("Microsoft Sans Serif", 8.25!)
+        Me.cboID.EditorForeColor = System.Drawing.SystemColors.WindowText
+        Me.cboID.EditorHeight = 15
+        Me.cboID.FlatStyle = C1.Win.C1List.FlatModeEnum.System
+        Me.cboID.GapHeight = 2
+        Me.cboID.Images.Add(CType(resources.GetObject("resource"), System.Drawing.Image))
+        Me.cboID.ItemHeight = 15
+        Me.cboID.Location = New System.Drawing.Point(100, 32)
+        Me.cboID.MatchEntryTimeout = CType(100, Long)
+        Me.cboID.MaxDropDownItems = CType(15, Short)
+        Me.cboID.MaxLength = 32767
+        Me.cboID.MouseCursor = System.Windows.Forms.Cursors.Default
+        Me.cboID.Name = "cboID"
+        ''Me.cbo.PartialRightColumn = False
+        Me.cboID.RowDivider.Color = System.Drawing.Color.DarkGray
+        Me.cboID.RowDivider.Style = C1.Win.C1List.LineStyleEnum.None
+        Me.cboID.RowSubDividerColor = System.Drawing.Color.DarkGray
+        Me.cboID.Size = New System.Drawing.Size(124, 19)
+        Me.cboID.TabIndex = 395
+        Me.cboID.PropBag = "<?xml version=""1.0""?><Blob><Styles type=""C1.Win.C1List.Design.ContextWrapper""><Da" & _
+        "ta>Group{BackColor:ControlDark;Border:None,,0, 0, 0, 0;AlignVert:Center;}Style2{" & _
+        "}Style5{}Style4{}Style7{}Style6{}EvenRow{BackColor:Aqua;}Selected{ForeColor:High" & _
+        "lightText;BackColor:Highlight;}Style3{}Inactive{ForeColor:InactiveCaptionText;Ba" & _
+        "ckColor:InactiveCaption;}Footer{}Caption{AlignHorz:Center;}Normal{Font:Microsoft" & _
+        " Sans Serif, 8.25pt;BackColor:Window;}HighlightRow{ForeColor:HighlightText;BackC" & _
+        "olor:Highlight;}Style9{AlignHorz:Near;}OddRow{}RecordSelector{AlignImage:Center;" & _
+        "}Heading{Wrap:True;AlignVert:Center;Border:Flat,ControlDark,1, 1, 1, 1;ForeColor" & _
+        ":ControlText;BackColor:Control;}Style8{}Style10{}Style11{}Style1{}</Data></Style" & _
+        "s><Splits><C1.Win.C1List.ListBoxView AllowColSelect=""False"" Name="""" CaptionHeigh" & _
+        "t=""17"" ColumnCaptionHeight=""17"" ColumnFooterHeight=""17"" VerticalScrollGroup=""1"" " & _
+        "HorizontalScrollGroup=""1""><ClientRect>0, 0, 118, 158</ClientRect><VScrollBar><Wi" & _
+        "dth>17</Width></VScrollBar><HScrollBar><Height>17</Height></HScrollBar><CaptionS" & _
+        "tyle parent=""Style2"" me=""Style9"" /><EvenRowStyle parent=""EvenRow"" me=""Style7"" />" & _
+        "<FooterStyle parent=""Footer"" me=""Style3"" /><GroupStyle parent=""Group"" me=""Style1" & _
+        "1"" /><HeadingStyle parent=""Heading"" me=""Style2"" /><HighLightRowStyle parent=""Hig" & _
+        "hlightRow"" me=""Style6"" /><InactiveStyle parent=""Inactive"" me=""Style4"" /><OddRowS" & _
+        "tyle parent=""OddRow"" me=""Style8"" /><RecordSelectorStyle parent=""RecordSelector"" " & _
+        "me=""Style10"" /><SelectedStyle parent=""Selected"" me=""Style5"" /><Style parent="""" m" & _
+        "e=""Normal"" /></C1.Win.C1List.ListBoxView></Splits><NamedStyles><Style parent="""" " & _
+        "me=""Normal"" /><Style parent=""Normal"" me=""Heading"" /><Style parent=""Heading"" me=""" & _
+        "Footer"" /><Style parent=""Heading"" me=""Caption"" /><Style parent=""Heading"" me=""Ina" & _
+        "ctive"" /><Style parent=""Normal"" me=""Selected"" /><Style parent=""Normal"" me=""Highl" & _
+        "ightRow"" /><Style parent=""Normal"" me=""EvenRow"" /><Style parent=""Normal"" me=""OddR" & _
+        "ow"" /><Style parent=""Heading"" me=""RecordSelector"" /><Style parent=""Caption"" me=""" & _
+        "Group"" /></NamedStyles><vertSplits>1</vertSplits><horzSplits>1</horzSplits><Layo" & _
+        "ut>Modified</Layout><DefaultRecSelWidth>17</DefaultRecSelWidth></Blob>"
+        '
+        'frmOperacionesForm
+        '
+        Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
+        Me.ClientSize = New System.Drawing.Size(512, 214)
+        Me.Controls.Add(Me.TabControl1)
+        Me.Cursor = System.Windows.Forms.Cursors.Default
+        Me.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!)
+        Me.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.Name = "frmOperacionesForm"
+        Me.Text = " Operacions"
+        Me.Controls.SetChildIndex(Me.cboSeleccionCentro, 0)
+        Me.Controls.SetChildIndex(Me.sbtipo, 0)
+        Me.Controls.SetChildIndex(Me.btnActualizar, 0)
+        Me.Controls.SetChildIndex(Me.btnNuevo, 0)
+        Me.Controls.SetChildIndex(Me.btnBorrar, 0)
+        Me.Controls.SetChildIndex(Me.btnTancar, 0)
+        Me.Controls.SetChildIndex(Me.btnUltimo, 0)
+        Me.Controls.SetChildIndex(Me.btnPrimero, 0)
+        Me.Controls.SetChildIndex(Me.btnAnterior, 0)
+        Me.Controls.SetChildIndex(Me.btnSiguiente, 0)
+        Me.Controls.SetChildIndex(Me.btnRecargar, 0)
+        Me.Controls.SetChildIndex(Me.btnVerLista, 0)
+        Me.Controls.SetChildIndex(Me.btnModificar, 0)
+        Me.Controls.SetChildIndex(Me.TabControl1, 0)
+        CType(Me.txtDescripcion, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.TabControl1.ResumeLayout(False)
+        Me.TabPage1.ResumeLayout(False)
+        CType(Me.cboID, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.ResumeLayout(False)
+
+    End Sub
+
+#End Region
+
+    Shared frmChildForm As frmOperacionesForm
+    Public Shared Function GetInstance() As frmOperacionesForm
+        If frmChildForm Is Nothing Then
+            frmChildForm = New frmOperacionesForm
+            
+        End If
+        Return frmChildForm
+    End Function
+
+#Region "VARIABLES"
+
+    Public operacionActual As clsOperaciones
+
+#End Region
+
+#Region "INICIALIZAR"
+
+    Private Sub IniciarForm(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
+        Cursor = Cursors.WaitCursor
+        Try
+            cargando = True
+            operacionActual = New clsOperaciones(ds.Tables(tablaTrabajos), "C", BindingContext)
+            HacerBindings()
+            'operacionActual.tabla.AcceptChanges()
+            PonerModificables(soloLectura)
+            PSBTIPO(operacionActual.centro)
+            cargando = False
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : ccn()
+        End Try
+        Cursor = Cursors.Default
+    End Sub
+    Private Sub HacerBindings()
+        Try
+            AñadirBinding(cboID, operacionActual.dvForm, CCTreballs)
+            AñadirBinding(txtDescripcion, operacionActual.dvForm, CNTreballs)
+            AñadirBindingCombo(cboID, operacionActual.dvIdentificadores, CCTreballs, CCTreballs)
+            OcultarMostrarColumnaCbo(cboID, "CENTRO", False)
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : ccn()
+        End Try
+    End Sub
+
+#End Region
+
+#Region "MODIFICAR DB"
+
+    Friend Overrides Sub btnModificar_Click(ByVal sender As Object, ByVal e As System.EventArgs)  'Handles btnModificar.Click
+        Try
+            If Not editando Then
+                cargando = True
+                editando = True
+                PonerModificables(modificable)
+                PSBTIPO(operacionActual.centro)
+                cargando = False
+            End If
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : ccn()
+        End Try
+    End Sub
+    Friend Overrides Sub btnBorrar_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) 'Handles btnBorrar.Click
+        Try
+            If MessageBox.Show(rm.GetString("BorrarOperacion"), rm.GetString("ConfirmacionEliminacion"), MessageBoxButtons.YesNo) = DialogResult.Yes Then
+                editando = True
+                operacionActual.borrar() : ActualizarOrigen()
+                editando = False
+            End If
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : ccn()
+        End Try
+    End Sub
+    Private Sub ActualizarOrigen()
+        Try
+            If editando Then
+                editando = False
+                'operacionActual.tabla.AcceptChanges()
+                PonerModificables(soloLectura)
+            End If
+            If EsRegistroNuevo Then
+                editando = True : PSBTIPO(operacionActual.centro)
+                PonerControlesNuevo(esRegistroExistente)
+                EsRegistroNuevo = False
+            End If
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Friend Overrides Sub btnActualizar_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) 'Handles btnActualizar.Click
+        Try
+            cargando = True
+            If operacionActual.TieneCambios Then
+                Select Case MessageBox.Show(rm.GetString("QUIERECONFIRMARLOSCAMBIOS"), rm.GetString("INFORMACION"), MessageBoxButtons.YesNoCancel)
+                    Case DialogResult.Cancel
+                        cargando = False
+                        Exit Sub
+                    Case DialogResult.No
+                        operacionActual.tabla.RejectChanges()
+                        cargando = False
+                        Exit Sub
+                End Select
+            End If
+            operacionActual.ActualizarOrigen() : ActualizarOrigen()
+            PSBTIPO(operacionActual.centro) : cargando = False
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Friend Overrides Sub btnNuevo_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)  'Handles btnNuevaOperacion.Click
+        Try
+            cargando = True
+            EsRegistroNuevo = True
+            PonerModificables(modificable)
+            PonerControlesNuevo(False)
+            operacionActual.NuevoRegistro()
+            PSBTIPO(operacionActual.centro) : cargando = False
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+
+#End Region
+
+#Region "ESPECÍFICO"
+
+#End Region
+
+#Region "IMPRESIÓN"
+
+#End Region
+
+#Region "COMUNES"
+
+    Private Sub PonerModificables(Optional ByVal b As Boolean = False)
+        Try
+            PonerMod(b)
+            If Not b Then : cboID.DataSource = Nothing
+            Else : AñadirBindingCombo(cboID, operacionActual.dvIdentificadores, CCTreballs, CCTreballs) : operacionActual.tabla.AcceptChanges() : End If
+
+            cboID.LimitToList = b
+            cboID.SuperBack = b
+            cboID.ReadOnly = editando ''or esregistronuevo
+            ModiNuev(b)
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub PonerControlesNuevo(ByVal b As Boolean)
+        Try
+            Try
+
+                If Not b Then
+                    btnActualizar.Text = rm.GetString("CONFIRMAR")
+                Else
+                    btnActualizar.Text = rm.GetString("ACTUALIZAR")
+                End If
+                ModiNuev(b)
+                cboID.AutoCompletion = Not editando
+
+            Catch ex As Exception
+                LOG(ex.ToString) : cargando = False : ccn()
+            End Try
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : ccn()
+        End Try
+    End Sub
+    Private Sub btnVerLista_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnVerLista.Click
+        Try
+            Cursor = Cursors.WaitCursor
+            Dim f As frmOperacionesLista = frmOperacionesLista.GetInstance(esListado)
+            f.MdiParent = Me.MdiParent
+            AddHandler f.Closed, AddressOf CType(Me.MdiParent, frmPrincipal).childCerrado
+            AddHandler f.Load, AddressOf CType(Me.MdiParent, frmPrincipal).childAbierto : AddHandler f.Activated, AddressOf CType(Me.MdiParent, frmPrincipal).childOcultandoMostrando
+            f.Show()
+            f.BringToFront()
+            Cursor = Cursors.Default
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : ccn()
+        End Try
+    End Sub
+
+#End Region
+
+#Region "DESPLAZARSE"
+
+    Protected Friend Overrides Sub btnPrimero_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)  'Handles btnPrimero.Click
+        Try
+            cargando = True
+            operacionActual.PrimeroReg() : ActualizarOrigen()
+            PSBTIPO(operacionActual.centro) : cargando = False
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : ccn()
+        End Try
+    End Sub
+    Friend Overrides Sub btnUltimo_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) 'Handles btnUltimo.Click
+        Try
+            cargando = True
+            operacionActual.UltimoReg() : ActualizarOrigen()
+            PSBTIPO(operacionActual.centro) : cargando = False
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : ccn()
+        End Try
+    End Sub
+    Friend Overrides Sub btnAnterior_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)  'Handles btnAnterior.Click
+        Try
+            cargando = True
+            operacionActual.AnteriorReg() : ActualizarOrigen()
+            PSBTIPO(operacionActual.centro) : cargando = False
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Friend Overrides Sub btnSiguiente_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)  'Handles btnSiguiente.Click
+        Try
+            cargando = True
+            operacionActual.SiguienteReg() : ActualizarOrigen()
+            PSBTIPO(operacionActual.centro) : cargando = False
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+
+#End Region
+
+#Region "SELECCIÓN REGISTRO"
+
+    Private Sub cboID_ItemChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles cboid.RowChange
+        Try
+            If consulta() Then
+                cargando = True
+                operacionActual.CambiarAReg(nz(cboID.WillChangeToValue, ""), iraregistro)
+                PSBTIPO(operacionActual.centro) : cargando = False
+            End If
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+
+    End Sub
+    Private Sub cboID_KeyPress(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyPressEventArgs) Handles cboID.KeyPress
+        Try
+            If editando Or EsRegistroNuevo Then
+                cboID.AutoCompletion = False
+            Else
+                cboID.AutoCompletion = True
+            End If
+        Catch ex As Exception
+            MessageBox.Show(ex.ToString)
+        End Try
+    End Sub
+
+#End Region
+
+#Region "ELECCIONES"
+
+#End Region
+
+End Class

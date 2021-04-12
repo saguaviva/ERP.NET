@@ -1,0 +1,2709 @@
+Imports CoreLab.MySql
+Imports System.IO
+Imports System.Globalization
+
+Public Class frmPrincipal
+    Inherits Windows.Forms.Form
+
+#Region " Código generado por el Diseñador de Windows Forms "
+    <System.STAThread()> Public Shared Sub Main()
+        Try
+            System.Windows.Forms.Application.EnableVisualStyles()
+            directorio = CurDir() & "/"
+            Application.DoEvents()
+            System.Windows.Forms.Application.Run(New frmPrincipal)
+
+        Catch ex As Exception
+            MessageBox.Show(ex.ToString)
+        End Try
+    End Sub
+
+    Public Sub New()
+
+        MyBase.New()
+
+        PonerIdiomaEmpresa()
+        'El Diseñador de Windows Forms requiere esta llamada.
+        InitializeComponent() : Dim tom As SMcMaster.TabOrderManager = New SMcMaster.TabOrderManager(Me) : tom.SetTabOrder(SMcMaster.TabOrderManager.TabScheme.AcrossFirst)
+        'Agregar cualquier inicialización después de la llamada a InitializeComponent()
+
+    End Sub
+
+    'Form reemplaza a Dispose para limpiar la lista de componentes.
+    Protected Overloads Overrides Sub Dispose(ByVal disposing As Boolean)
+        '! Seal for less overhead - Can declare NotInheritable Class
+        If disposing Then
+            If Not (components Is Nothing) Then
+                components.Dispose()
+            End If
+        End If
+        MyBase.Dispose(disposing)
+    End Sub
+
+    'Requerido por el Diseñador de Windows Forms
+    Private components As System.ComponentModel.IContainer
+
+    'NOTA: el Diseñador de Windows Forms requiere el siguiente procedimiento
+    'Puede modificarse utilizando el Diseñador de Windows Forms. 
+    'No lo modifique con el editor de código.
+
+    Friend WithEvents ImageList1 As System.Windows.Forms.ImageList
+    Friend WithEvents SandBarManager1 As TD.SandBar.SandBarManager
+    Friend WithEvents leftSandBarDock As TD.SandBar.ToolBarContainer
+    Friend WithEvents rightSandBarDock As TD.SandBar.ToolBarContainer
+    Friend WithEvents bottomSandBarDock As TD.SandBar.ToolBarContainer
+    Friend WithEvents topSandBarDock As TD.SandBar.ToolBarContainer
+    Friend WithEvents MenuBar1 As TD.SandBar.MenuBar
+    Friend WithEvents mnuCastellano As TD.SandBar.MenuButtonItem
+    Friend WithEvents mnuCatalan As TD.SandBar.MenuButtonItem
+    Friend WithEvents mnuSalir As TD.SandBar.MenuButtonItem
+    Friend WithEvents mnuBaseDeDatos As TD.SandBar.MenuBarItem
+    Friend WithEvents MnuClientes As TD.SandBar.MenuButtonItem
+    Friend WithEvents MnuTalleres As TD.SandBar.MenuButtonItem
+    Friend WithEvents MenuItem31 As TD.SandBar.MenuButtonItem
+    Friend WithEvents MenuItem32 As TD.SandBar.MenuButtonItem
+    Friend WithEvents MnuProveedores As TD.SandBar.MenuButtonItem
+    Friend WithEvents MnuTransportistas As TD.SandBar.MenuButtonItem
+    Friend WithEvents MnuRepresentantes As TD.SandBar.MenuButtonItem
+    Friend WithEvents MnuOperaciones As TD.SandBar.MenuButtonItem
+    Friend WithEvents MnuMaquinas As TD.SandBar.MenuButtonItem
+    Friend WithEvents MnuHilos As TD.SandBar.MenuButtonItem
+    Friend WithEvents MnuTejidos As TD.SandBar.MenuButtonItem
+    Friend WithEvents MnuTejidos2 As TD.SandBar.MenuButtonItem
+    Friend WithEvents MnuDisposiciones As TD.SandBar.MenuButtonItem
+    Friend WithEvents MnuFornituras As TD.SandBar.MenuButtonItem
+    Friend WithEvents MnuMuestras As TD.SandBar.MenuButtonItem
+    Friend WithEvents mnuModelos As TD.SandBar.MenuButtonItem
+    Friend WithEvents MnuBancos As TD.SandBar.MenuButtonItem
+    Friend WithEvents MnuTipodeIVA As TD.SandBar.MenuButtonItem
+    Friend WithEvents mnuTemporadas As TD.SandBar.MenuButtonItem
+    Friend WithEvents mnuTejidoCompraPedidos As TD.SandBar.MenuButtonItem
+    Friend WithEvents mnuTejidoVentaPedido As TD.SandBar.MenuButtonItem
+    Friend WithEvents mnuTejidoVentaAlbaran As TD.SandBar.MenuButtonItem
+    Friend WithEvents mnuTejidoVentaFactura As TD.SandBar.MenuButtonItem
+    Friend WithEvents mnuCompraMuestrasPedidos As TD.SandBar.MenuButtonItem
+    Friend WithEvents mnuCompraFornituras As TD.SandBar.MenuButtonItem
+    Friend WithEvents mnuOrdenesFabricacion As TD.SandBar.MenuButtonItem
+    Friend WithEvents mnuVentaModelosAlbaranes As TD.SandBar.MenuButtonItem
+    Friend WithEvents mnuVentaModelosFacturas As TD.SandBar.MenuButtonItem
+    Friend WithEvents mnuVentana As TD.SandBar.MenuBarItem
+    Friend WithEvents mnuCerrarTodas As TD.SandBar.MenuButtonItem
+    Friend WithEvents mnuMinimizarTodas As TD.SandBar.MenuButtonItem
+    Friend WithEvents mnuCascada As TD.SandBar.MenuButtonItem
+    Friend WithEvents mnuOrganizacion As TD.SandBar.MenuButtonItem
+    Friend WithEvents mnuEnviarErrores As TD.SandBar.MenuBarItem
+    Friend WithEvents mnuErrores As TD.SandBar.MenuButtonItem
+    Friend WithEvents mnuArchivo As TD.SandBar.MenuBarItem
+    Friend WithEvents mnuIdioma As TD.SandBar.MenuButtonItem
+    Friend WithEvents mnuMuestrasCompraAlbaranes As TD.SandBar.MenuButtonItem
+    Friend WithEvents mnuFormadepago As TD.SandBar.MenuButtonItem
+    Friend WithEvents mnuRemesas As TD.SandBar.MenuButtonItem
+    Friend WithEvents mnuCartas As TD.SandBar.MenuButtonItem
+    Friend WithEvents mnuBtnFacturaProforma As TD.SandBar.MenuButtonItem
+    Friend WithEvents mnuControlStock As TD.SandBar.MenuBarItem
+    Friend WithEvents mnuControlStockHilos As TD.SandBar.MenuButtonItem
+    Friend WithEvents mnuControlStockTejidos As TD.SandBar.MenuButtonItem
+    Friend WithEvents mnuConfig As TD.SandBar.MenuButtonItem
+    Friend WithEvents mnuUtilidades As TD.SandBar.MenuButtonItem
+    Friend WithEvents mnuAyuda As TD.SandBar.MenuBarItem
+    Friend WithEvents mnuSobre As TD.SandBar.MenuButtonItem
+    Friend WithEvents mnuBackup As TD.SandBar.MenuButtonItem
+    Friend WithEvents mnuEstadisticas As TD.SandBar.MenuBarItem
+    Friend WithEvents mnuActualizarPrograma As TD.SandBar.MenuButtonItem
+    Friend WithEvents mnuListados As TD.SandBar.MenuBarItem
+    Friend WithEvents mnuListadoClientes As TD.SandBar.MenuButtonItem
+    Friend WithEvents mnuCompras As TD.SandBar.MenuBarItem
+    Friend WithEvents mnuVentas As TD.SandBar.MenuBarItem
+    Friend WithEvents mnuOrdenesFabricacionMuestras As TD.SandBar.MenuButtonItem
+    Friend WithEvents mnuListadoProveedores As TD.SandBar.MenuButtonItem
+    Friend WithEvents mnuListadoTalleres As TD.SandBar.MenuButtonItem
+    Friend WithEvents mnuListadoTransportistas As TD.SandBar.MenuButtonItem
+    Friend WithEvents mnuListadoRepresentantes As TD.SandBar.MenuButtonItem
+    Friend WithEvents mnuListadoOperaciones As TD.SandBar.MenuButtonItem
+    Friend WithEvents mnuListadoMaquinas As TD.SandBar.MenuButtonItem
+    Friend WithEvents mnListadoTejidos As TD.SandBar.MenuButtonItem
+    Friend WithEvents mnuListadoDisposiciones As TD.SandBar.MenuButtonItem
+    Friend WithEvents mnuListadoHilos As TD.SandBar.MenuButtonItem
+    Friend WithEvents mnuListadoMuestras As TD.SandBar.MenuButtonItem
+    Friend WithEvents mnuListadoModelos As TD.SandBar.MenuButtonItem
+    Friend WithEvents mnuListadoBancos As TD.SandBar.MenuButtonItem
+    Friend WithEvents mnuListadosCompra As TD.SandBar.MenuButtonItem
+    Friend WithEvents ExplorerBarControl1 As Compona.Windows.Forms.ExplorerBarControl
+    Friend WithEvents ExplorerBarBox1 As Compona.Windows.Forms.ExplorerBar.ExplorerBarBox
+    Friend WithEvents ExplorerBarBoxItem1 As Compona.Windows.Forms.ExplorerBar.ExplorerBarBoxItem
+    Friend WithEvents ExplorerBarBoxItem2 As Compona.Windows.Forms.ExplorerBar.ExplorerBarBoxItem
+    Friend WithEvents CollapsibleSplitter1 As NJFLib.Controls.CollapsibleSplitter
+    Friend WithEvents ExplorerBarBoxItem3 As Compona.Windows.Forms.ExplorerBar.ExplorerBarBoxItem
+    Friend WithEvents ExplorerBarBoxItem4 As Compona.Windows.Forms.ExplorerBar.ExplorerBarBoxItem
+    Friend WithEvents ExplorerBarBoxItem5 As Compona.Windows.Forms.ExplorerBar.ExplorerBarBoxItem
+    Friend WithEvents ExplorerBarBox2 As Compona.Windows.Forms.ExplorerBar.ExplorerBarBox
+    Friend WithEvents ExplorerBarBoxItem7 As Compona.Windows.Forms.ExplorerBar.ExplorerBarBoxItem
+    Friend WithEvents ExplorerBarBoxItem8 As Compona.Windows.Forms.ExplorerBar.ExplorerBarBoxItem
+    Friend WithEvents ExplorerBarBoxItem9 As Compona.Windows.Forms.ExplorerBar.ExplorerBarBoxItem
+    Friend WithEvents ExplorerBarBoxItem10 As Compona.Windows.Forms.ExplorerBar.ExplorerBarBoxItem
+    Friend WithEvents ExplorerBarBoxItem11 As Compona.Windows.Forms.ExplorerBar.ExplorerBarBoxItem
+    Friend WithEvents ExplorerBarBoxItem12 As Compona.Windows.Forms.ExplorerBar.ExplorerBarBoxItem
+    Friend WithEvents ExplorerBarBox3 As Compona.Windows.Forms.ExplorerBar.ExplorerBarBox
+    Friend WithEvents ExplorerBarBoxItem13 As Compona.Windows.Forms.ExplorerBar.ExplorerBarBoxItem
+    Friend WithEvents ExplorerBarBoxItem14 As Compona.Windows.Forms.ExplorerBar.ExplorerBarBoxItem
+    Friend WithEvents ExplorerBarBoxItem15 As Compona.Windows.Forms.ExplorerBar.ExplorerBarBoxItem
+    Friend WithEvents ExplorerBarBoxItem16 As Compona.Windows.Forms.ExplorerBar.ExplorerBarBoxItem
+    Friend WithEvents ExplorerBarBoxItem18 As Compona.Windows.Forms.ExplorerBar.ExplorerBarBoxItem
+    Friend WithEvents ExplorerBarBox4 As Compona.Windows.Forms.ExplorerBar.ExplorerBarBox
+    Friend WithEvents ExplorerBarBoxItem19 As Compona.Windows.Forms.ExplorerBar.ExplorerBarBoxItem
+    Friend WithEvents ExplorerBarBoxItem20 As Compona.Windows.Forms.ExplorerBar.ExplorerBarBoxItem
+    Friend WithEvents ExplorerBarBoxItem21 As Compona.Windows.Forms.ExplorerBar.ExplorerBarBoxItem
+    Friend WithEvents ExplorerBarBoxItem22 As Compona.Windows.Forms.ExplorerBar.ExplorerBarBoxItem
+    Friend WithEvents ExplorerBarBoxItem23 As Compona.Windows.Forms.ExplorerBar.ExplorerBarBoxItem
+    Friend WithEvents ExplorerBarBoxItem24 As Compona.Windows.Forms.ExplorerBar.ExplorerBarBoxItem
+    Friend WithEvents ExplorerBarBox5 As Compona.Windows.Forms.ExplorerBar.ExplorerBarBox
+    Friend WithEvents ExplorerBarBoxItem6 As Compona.Windows.Forms.ExplorerBar.ExplorerBarBoxItem
+    Friend WithEvents ExplorerBarBoxItem26 As Compona.Windows.Forms.ExplorerBar.ExplorerBarBoxItem
+    Friend WithEvents ExplorerBarBoxItem27 As Compona.Windows.Forms.ExplorerBar.ExplorerBarBoxItem
+    Friend WithEvents ExplorerBarBoxItem28 As Compona.Windows.Forms.ExplorerBar.ExplorerBarBoxItem
+    Friend WithEvents ExplorerBarBoxItem29 As Compona.Windows.Forms.ExplorerBar.ExplorerBarBoxItem
+    Friend WithEvents ExplorerBarBoxItem30 As Compona.Windows.Forms.ExplorerBar.ExplorerBarBoxItem
+    Friend WithEvents ToolBar1 As TD.SandBar.ToolBar
+    Friend WithEvents ExplorerBarBoxItem31 As Compona.Windows.Forms.ExplorerBar.ExplorerBarBoxItem
+    Friend WithEvents ExplorerBarBoxItem17 As Compona.Windows.Forms.ExplorerBar.ExplorerBarBoxItem
+    Friend WithEvents ExplorerBarBoxItem32 As Compona.Windows.Forms.ExplorerBar.ExplorerBarBoxItem
+    Friend WithEvents ExplorerBarBoxItem33 As Compona.Windows.Forms.ExplorerBar.ExplorerBarBoxItem
+    Friend WithEvents ExplorerBarBoxItem34 As Compona.Windows.Forms.ExplorerBar.ExplorerBarBoxItem
+    Friend WithEvents ExplorerBarBoxItem25 As Compona.Windows.Forms.ExplorerBar.ExplorerBarBoxItem
+    Friend WithEvents mnuEmpresas As TD.SandBar.MenuButtonItem
+    Friend WithEvents mnuNumeraciones As TD.SandBar.MenuButtonItem
+    Friend WithEvents MenuButtonItem1 As TD.SandBar.MenuButtonItem
+    Friend WithEvents mnuEditar As TD.SandBar.MenuBarItem
+    Friend WithEvents MenuButtonItem4 As TD.SandBar.MenuButtonItem
+    Friend WithEvents MenuButtonItem5 As TD.SandBar.MenuButtonItem
+    Friend WithEvents mnuCortar As TD.SandBar.MenuButtonItem
+    Friend WithEvents MenuButtonItem7 As TD.SandBar.MenuButtonItem
+    Friend WithEvents MenuButtonItem8 As TD.SandBar.MenuButtonItem
+    Friend WithEvents MenuButtonItem6 As TD.SandBar.MenuButtonItem
+    Friend WithEvents mnuSeleccionarTodo As TD.SandBar.MenuButtonItem
+    Friend WithEvents mnuStockModelos As TD.SandBar.MenuButtonItem
+    Friend WithEvents timActualizador As System.Windows.Forms.Timer
+    Friend WithEvents mnuCatalanImpresion As TD.SandBar.MenuButtonItem
+    Friend WithEvents mnuCastellanoImpresion As TD.SandBar.MenuButtonItem
+    Friend WithEvents mnuInglesImpresion As TD.SandBar.MenuButtonItem
+    Friend WithEvents mnuIncoterms As TD.SandBar.MenuButtonItem
+
+    <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent() 
+        Me.components = New System.ComponentModel.Container
+        Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(frmPrincipal))
+        Me.ImageList1 = New System.Windows.Forms.ImageList(Me.components)
+        Me.SandBarManager1 = New TD.SandBar.SandBarManager
+        Me.bottomSandBarDock = New TD.SandBar.ToolBarContainer
+        Me.leftSandBarDock = New TD.SandBar.ToolBarContainer
+        Me.rightSandBarDock = New TD.SandBar.ToolBarContainer
+        Me.topSandBarDock = New TD.SandBar.ToolBarContainer
+        Me.MenuBar1 = New TD.SandBar.MenuBar
+        Me.mnuBaseDeDatos = New TD.SandBar.MenuBarItem
+        Me.MnuClientes = New TD.SandBar.MenuButtonItem
+        Me.MnuTalleres = New TD.SandBar.MenuButtonItem
+        Me.MnuProveedores = New TD.SandBar.MenuButtonItem
+        Me.MnuTransportistas = New TD.SandBar.MenuButtonItem
+        Me.MnuRepresentantes = New TD.SandBar.MenuButtonItem
+        Me.MnuOperaciones = New TD.SandBar.MenuButtonItem
+        Me.MnuMaquinas = New TD.SandBar.MenuButtonItem
+        Me.MnuHilos = New TD.SandBar.MenuButtonItem
+        Me.MnuTejidos = New TD.SandBar.MenuButtonItem
+        Me.MnuTejidos2 = New TD.SandBar.MenuButtonItem
+        Me.MnuDisposiciones = New TD.SandBar.MenuButtonItem
+        Me.MnuFornituras = New TD.SandBar.MenuButtonItem
+        Me.MnuMuestras = New TD.SandBar.MenuButtonItem
+        Me.mnuModelos = New TD.SandBar.MenuButtonItem
+        Me.MnuBancos = New TD.SandBar.MenuButtonItem
+        Me.mnuEmpresas = New TD.SandBar.MenuButtonItem
+        Me.mnuFormadepago = New TD.SandBar.MenuButtonItem
+        Me.MnuTipodeIVA = New TD.SandBar.MenuButtonItem
+        Me.mnuTemporadas = New TD.SandBar.MenuButtonItem
+        Me.mnuCartas = New TD.SandBar.MenuButtonItem
+        Me.mnuEditar = New TD.SandBar.MenuBarItem
+        Me.MenuButtonItem4 = New TD.SandBar.MenuButtonItem
+        Me.MenuButtonItem5 = New TD.SandBar.MenuButtonItem
+        Me.mnuCortar = New TD.SandBar.MenuButtonItem
+        Me.MenuButtonItem7 = New TD.SandBar.MenuButtonItem
+        Me.MenuButtonItem8 = New TD.SandBar.MenuButtonItem
+        Me.MenuButtonItem6 = New TD.SandBar.MenuButtonItem
+        Me.mnuSeleccionarTodo = New TD.SandBar.MenuButtonItem
+        Me.mnuCompras = New TD.SandBar.MenuBarItem
+        Me.mnuTejidoCompraPedidos = New TD.SandBar.MenuButtonItem
+        Me.mnuCompraMuestrasPedidos = New TD.SandBar.MenuButtonItem
+        Me.mnuMuestrasCompraAlbaranes = New TD.SandBar.MenuButtonItem
+        Me.mnuOrdenesFabricacionMuestras = New TD.SandBar.MenuButtonItem
+        Me.mnuCompraFornituras = New TD.SandBar.MenuButtonItem
+        Me.mnuOrdenesFabricacion = New TD.SandBar.MenuButtonItem
+        Me.mnuVentas = New TD.SandBar.MenuBarItem
+        Me.mnuTejidoVentaPedido = New TD.SandBar.MenuButtonItem
+        Me.mnuTejidoVentaAlbaran = New TD.SandBar.MenuButtonItem
+        Me.mnuBtnFacturaProforma = New TD.SandBar.MenuButtonItem
+        Me.mnuTejidoVentaFactura = New TD.SandBar.MenuButtonItem
+        Me.mnuVentaModelosAlbaranes = New TD.SandBar.MenuButtonItem
+        Me.mnuVentaModelosFacturas = New TD.SandBar.MenuButtonItem
+        Me.mnuRemesas = New TD.SandBar.MenuButtonItem
+        Me.mnuListados = New TD.SandBar.MenuBarItem
+        Me.mnuListadoClientes = New TD.SandBar.MenuButtonItem
+        Me.mnuListadoProveedores = New TD.SandBar.MenuButtonItem
+        Me.mnuListadoTalleres = New TD.SandBar.MenuButtonItem
+        Me.mnuListadoTransportistas = New TD.SandBar.MenuButtonItem
+        Me.mnuListadoRepresentantes = New TD.SandBar.MenuButtonItem
+        Me.mnuListadoBancos = New TD.SandBar.MenuButtonItem
+        Me.mnuListadoOperaciones = New TD.SandBar.MenuButtonItem
+        Me.mnuListadoMaquinas = New TD.SandBar.MenuButtonItem
+        Me.mnListadoTejidos = New TD.SandBar.MenuButtonItem
+        Me.mnuListadoDisposiciones = New TD.SandBar.MenuButtonItem
+        Me.mnuListadoHilos = New TD.SandBar.MenuButtonItem
+        Me.mnuListadoMuestras = New TD.SandBar.MenuButtonItem
+        Me.mnuListadoModelos = New TD.SandBar.MenuButtonItem
+        Me.mnuListadosCompra = New TD.SandBar.MenuButtonItem
+        Me.mnuControlStock = New TD.SandBar.MenuBarItem
+        Me.mnuControlStockHilos = New TD.SandBar.MenuButtonItem
+        Me.mnuControlStockTejidos = New TD.SandBar.MenuButtonItem
+        Me.mnuStockModelos = New TD.SandBar.MenuButtonItem
+        Me.mnuEstadisticas = New TD.SandBar.MenuBarItem
+        Me.mnuVentana = New TD.SandBar.MenuBarItem
+        Me.mnuCerrarTodas = New TD.SandBar.MenuButtonItem
+        Me.mnuMinimizarTodas = New TD.SandBar.MenuButtonItem
+        Me.mnuCascada = New TD.SandBar.MenuButtonItem
+        Me.mnuOrganizacion = New TD.SandBar.MenuButtonItem
+        Me.MenuItem31 = New TD.SandBar.MenuButtonItem
+        Me.MenuItem32 = New TD.SandBar.MenuButtonItem
+        Me.mnuEnviarErrores = New TD.SandBar.MenuBarItem
+        Me.mnuErrores = New TD.SandBar.MenuButtonItem
+        Me.mnuAyuda = New TD.SandBar.MenuBarItem
+        Me.mnuSobre = New TD.SandBar.MenuButtonItem
+        Me.mnuActualizarPrograma = New TD.SandBar.MenuButtonItem
+        Me.mnuArchivo = New TD.SandBar.MenuBarItem
+        Me.mnuIdioma = New TD.SandBar.MenuButtonItem
+        Me.mnuCatalan = New TD.SandBar.MenuButtonItem
+        Me.mnuCastellano = New TD.SandBar.MenuButtonItem
+        Me.MenuButtonItem1 = New TD.SandBar.MenuButtonItem
+        Me.mnuCatalanImpresion = New TD.SandBar.MenuButtonItem
+        Me.mnuCastellanoImpresion = New TD.SandBar.MenuButtonItem
+        Me.mnuInglesImpresion = New TD.SandBar.MenuButtonItem
+        Me.mnuConfig = New TD.SandBar.MenuButtonItem
+        Me.mnuUtilidades = New TD.SandBar.MenuButtonItem
+        Me.mnuNumeraciones = New TD.SandBar.MenuButtonItem
+        Me.mnuBackup = New TD.SandBar.MenuButtonItem
+        Me.mnuSalir = New TD.SandBar.MenuButtonItem
+        Me.ExplorerBarBoxItem1 = New Compona.Windows.Forms.ExplorerBar.ExplorerBarBoxItem
+        Me.ExplorerBarBoxItem7 = New Compona.Windows.Forms.ExplorerBar.ExplorerBarBoxItem
+        Me.ExplorerBarBoxItem13 = New Compona.Windows.Forms.ExplorerBar.ExplorerBarBoxItem
+        Me.ExplorerBarBoxItem19 = New Compona.Windows.Forms.ExplorerBar.ExplorerBarBoxItem
+        Me.ExplorerBarControl1 = New Compona.Windows.Forms.ExplorerBarControl
+        Me.ExplorerBarBox4 = New Compona.Windows.Forms.ExplorerBar.ExplorerBarBox
+        Me.ExplorerBarBoxItem20 = New Compona.Windows.Forms.ExplorerBar.ExplorerBarBoxItem
+        Me.ExplorerBarBoxItem22 = New Compona.Windows.Forms.ExplorerBar.ExplorerBarBoxItem
+        Me.ExplorerBarBoxItem21 = New Compona.Windows.Forms.ExplorerBar.ExplorerBarBoxItem
+        Me.ExplorerBarBoxItem23 = New Compona.Windows.Forms.ExplorerBar.ExplorerBarBoxItem
+        Me.ExplorerBarBoxItem24 = New Compona.Windows.Forms.ExplorerBar.ExplorerBarBoxItem
+        Me.ExplorerBarBoxItem17 = New Compona.Windows.Forms.ExplorerBar.ExplorerBarBoxItem
+        Me.ExplorerBarBoxItem32 = New Compona.Windows.Forms.ExplorerBar.ExplorerBarBoxItem
+        Me.ExplorerBarBoxItem34 = New Compona.Windows.Forms.ExplorerBar.ExplorerBarBoxItem
+        Me.ExplorerBarBoxItem33 = New Compona.Windows.Forms.ExplorerBar.ExplorerBarBoxItem
+        Me.ExplorerBarBox3 = New Compona.Windows.Forms.ExplorerBar.ExplorerBarBox
+        Me.ExplorerBarBoxItem14 = New Compona.Windows.Forms.ExplorerBar.ExplorerBarBoxItem
+        Me.ExplorerBarBoxItem18 = New Compona.Windows.Forms.ExplorerBar.ExplorerBarBoxItem
+        Me.ExplorerBarBoxItem16 = New Compona.Windows.Forms.ExplorerBar.ExplorerBarBoxItem
+        Me.ExplorerBarBoxItem15 = New Compona.Windows.Forms.ExplorerBar.ExplorerBarBoxItem
+        Me.ExplorerBarBoxItem31 = New Compona.Windows.Forms.ExplorerBar.ExplorerBarBoxItem
+        Me.ExplorerBarBoxItem25 = New Compona.Windows.Forms.ExplorerBar.ExplorerBarBoxItem
+        Me.ExplorerBarBox2 = New Compona.Windows.Forms.ExplorerBar.ExplorerBarBox
+        Me.ExplorerBarBoxItem8 = New Compona.Windows.Forms.ExplorerBar.ExplorerBarBoxItem
+        Me.ExplorerBarBoxItem12 = New Compona.Windows.Forms.ExplorerBar.ExplorerBarBoxItem
+        Me.ExplorerBarBoxItem9 = New Compona.Windows.Forms.ExplorerBar.ExplorerBarBoxItem
+        Me.ExplorerBarBoxItem10 = New Compona.Windows.Forms.ExplorerBar.ExplorerBarBoxItem
+        Me.ExplorerBarBoxItem11 = New Compona.Windows.Forms.ExplorerBar.ExplorerBarBoxItem
+        Me.ExplorerBarBox5 = New Compona.Windows.Forms.ExplorerBar.ExplorerBarBox
+        Me.ExplorerBarBoxItem6 = New Compona.Windows.Forms.ExplorerBar.ExplorerBarBoxItem
+        Me.ExplorerBarBoxItem26 = New Compona.Windows.Forms.ExplorerBar.ExplorerBarBoxItem
+        Me.ExplorerBarBoxItem27 = New Compona.Windows.Forms.ExplorerBar.ExplorerBarBoxItem
+        Me.ExplorerBarBoxItem30 = New Compona.Windows.Forms.ExplorerBar.ExplorerBarBoxItem
+        Me.ExplorerBarBoxItem28 = New Compona.Windows.Forms.ExplorerBar.ExplorerBarBoxItem
+        Me.ExplorerBarBoxItem29 = New Compona.Windows.Forms.ExplorerBar.ExplorerBarBoxItem
+        Me.ExplorerBarBox1 = New Compona.Windows.Forms.ExplorerBar.ExplorerBarBox
+        Me.ExplorerBarBoxItem2 = New Compona.Windows.Forms.ExplorerBar.ExplorerBarBoxItem
+        Me.ExplorerBarBoxItem3 = New Compona.Windows.Forms.ExplorerBar.ExplorerBarBoxItem
+        Me.ExplorerBarBoxItem4 = New Compona.Windows.Forms.ExplorerBar.ExplorerBarBoxItem
+        Me.ExplorerBarBoxItem5 = New Compona.Windows.Forms.ExplorerBar.ExplorerBarBoxItem
+        Me.CollapsibleSplitter1 = New NJFLib.Controls.CollapsibleSplitter
+        Me.ToolBar1 = New TD.SandBar.ToolBar
+        Me.timActualizador = New System.Windows.Forms.Timer(Me.components)
+        Me.mnuIncoterms = New TD.SandBar.MenuButtonItem
+        Me.topSandBarDock.SuspendLayout()
+        Me.ExplorerBarControl1.SuspendLayout()
+        Me.ExplorerBarBox4.SuspendLayout()
+        Me.ExplorerBarBox3.SuspendLayout()
+        Me.ExplorerBarBox2.SuspendLayout()
+        Me.ExplorerBarBox5.SuspendLayout()
+        Me.ExplorerBarBox1.SuspendLayout()
+        Me.SuspendLayout()
+        '
+        'ImageList1
+        '
+        Me.ImageList1.ColorDepth = System.Windows.Forms.ColorDepth.Depth24Bit
+        Me.ImageList1.ImageSize = New System.Drawing.Size(16, 16)
+        Me.ImageList1.ImageStream = CType(resources.GetObject("ImageList1.ImageStream"), System.Windows.Forms.ImageListStreamer)
+        Me.ImageList1.TransparentColor = System.Drawing.Color.Transparent
+        '
+        'SandBarManager1
+        '
+        Me.SandBarManager1.OwnerForm = Me
+        '
+        'bottomSandBarDock
+        '
+        Me.bottomSandBarDock.Dock = System.Windows.Forms.DockStyle.Bottom
+        Me.bottomSandBarDock.Guid = New System.Guid("a1e552c9-759d-413d-ae48-71a376f18ce8")
+        Me.bottomSandBarDock.Location = New System.Drawing.Point(0, 734)
+        Me.bottomSandBarDock.Manager = Me.SandBarManager1
+        Me.bottomSandBarDock.Name = "bottomSandBarDock"
+        Me.bottomSandBarDock.Size = New System.Drawing.Size(1016, 0)
+        Me.bottomSandBarDock.TabIndex = 8
+        '
+        'leftSandBarDock
+        '
+        Me.leftSandBarDock.Dock = System.Windows.Forms.DockStyle.Left
+        Me.leftSandBarDock.Guid = New System.Guid("9a481142-7a03-4128-9d1c-0246b6b9dcc8")
+        Me.leftSandBarDock.Location = New System.Drawing.Point(0, 23)
+        Me.leftSandBarDock.Manager = Me.SandBarManager1
+        Me.leftSandBarDock.Name = "leftSandBarDock"
+        Me.leftSandBarDock.Size = New System.Drawing.Size(0, 711)
+        Me.leftSandBarDock.TabIndex = 6
+        '
+        'rightSandBarDock
+        '
+        Me.rightSandBarDock.Dock = System.Windows.Forms.DockStyle.Right
+        Me.rightSandBarDock.Guid = New System.Guid("b69aef10-f4dd-49cf-b07c-73c1b3e3e1ba")
+        Me.rightSandBarDock.Location = New System.Drawing.Point(1016, 23)
+        Me.rightSandBarDock.Manager = Me.SandBarManager1
+        Me.rightSandBarDock.Name = "rightSandBarDock"
+        Me.rightSandBarDock.Size = New System.Drawing.Size(0, 711)
+        Me.rightSandBarDock.TabIndex = 7
+        '
+        'topSandBarDock
+        '
+        Me.topSandBarDock.Controls.Add(Me.MenuBar1)
+        Me.topSandBarDock.Dock = System.Windows.Forms.DockStyle.Top
+        Me.topSandBarDock.Guid = New System.Guid("da5f1e82-c5d9-418e-a588-9b902ca8230b")
+        Me.topSandBarDock.Location = New System.Drawing.Point(0, 0)
+        Me.topSandBarDock.Manager = Me.SandBarManager1
+        Me.topSandBarDock.Name = "topSandBarDock"
+        Me.topSandBarDock.Size = New System.Drawing.Size(1016, 23)
+        Me.topSandBarDock.TabIndex = 9
+        '
+        'MenuBar1
+        '
+        Me.MenuBar1.Guid = New System.Guid("f22f9cc3-d636-4038-b999-27149cf7dab1")
+        Me.MenuBar1.ImageList = Me.ImageList1
+        Me.MenuBar1.Items.AddRange(New TD.SandBar.ToolbarItemBase() {Me.mnuBaseDeDatos, Me.mnuEditar, Me.mnuCompras, Me.mnuVentas, Me.mnuListados, Me.mnuControlStock, Me.mnuEstadisticas, Me.mnuVentana, Me.mnuEnviarErrores, Me.mnuAyuda, Me.mnuArchivo})
+        Me.MenuBar1.Location = New System.Drawing.Point(2, 0)
+        Me.MenuBar1.Movable = False
+        Me.MenuBar1.Name = "MenuBar1"
+        Me.MenuBar1.OwnerForm = Me
+        Me.MenuBar1.Size = New System.Drawing.Size(1014, 23)
+        Me.MenuBar1.TabIndex = 1
+        '
+        'mnuBaseDeDatos
+        '
+        Me.mnuBaseDeDatos.Items.AddRange(New TD.SandBar.ToolbarItemBase() {Me.MnuClientes, Me.MnuTalleres, Me.MnuProveedores, Me.MnuTransportistas, Me.MnuRepresentantes, Me.MnuOperaciones, Me.MnuMaquinas, Me.MnuHilos, Me.MnuTejidos, Me.MnuFornituras, Me.MnuMuestras, Me.mnuModelos, Me.MnuBancos, Me.mnuEmpresas, Me.mnuFormadepago, Me.MnuTipodeIVA, Me.mnuTemporadas, Me.mnuIncoterms, Me.mnuCartas})
+        Me.mnuBaseDeDatos.Text = "&Base de Dades"
+        '
+        'MnuClientes
+        '
+        Me.MnuClientes.Image = CType(resources.GetObject("MnuClientes.Image"), System.Drawing.Image)
+        Me.MnuClientes.Shortcut = System.Windows.Forms.Shortcut.CtrlL
+        Me.MnuClientes.Text = "&Clients"
+        '
+        'MnuTalleres
+        '
+        Me.MnuTalleres.Image = CType(resources.GetObject("MnuTalleres.Image"), System.Drawing.Image)
+        Me.MnuTalleres.Shortcut = System.Windows.Forms.Shortcut.CtrlA
+        Me.MnuTalleres.Text = "T&allers"
+        '
+        'MnuProveedores
+        '
+        Me.MnuProveedores.Shortcut = System.Windows.Forms.Shortcut.CtrlP
+        Me.MnuProveedores.Text = "&Proveidors"
+        '
+        'MnuTransportistas
+        '
+        Me.MnuTransportistas.Image = CType(resources.GetObject("MnuTransportistas.Image"), System.Drawing.Image)
+        Me.MnuTransportistas.Shortcut = System.Windows.Forms.Shortcut.CtrlN
+        Me.MnuTransportistas.Text = "Tra&nsportistes"
+        '
+        'MnuRepresentantes
+        '
+        Me.MnuRepresentantes.Image = CType(resources.GetObject("MnuRepresentantes.Image"), System.Drawing.Image)
+        Me.MnuRepresentantes.Shortcut = System.Windows.Forms.Shortcut.CtrlR
+        Me.MnuRepresentantes.Text = "&Representants"
+        '
+        'MnuOperaciones
+        '
+        Me.MnuOperaciones.BeginGroup = True
+        Me.MnuOperaciones.Text = "Operacions"
+        '
+        'MnuMaquinas
+        '
+        Me.MnuMaquinas.Text = "Màquines"
+        '
+        'MnuHilos
+        '
+        Me.MnuHilos.BeginGroup = True
+        Me.MnuHilos.Shortcut = System.Windows.Forms.Shortcut.CtrlF
+        Me.MnuHilos.Text = "&Fils"
+        '
+        'MnuTejidos
+        '
+        Me.MnuTejidos.Items.AddRange(New TD.SandBar.ToolbarItemBase() {Me.MnuTejidos2, Me.MnuDisposiciones})
+        Me.MnuTejidos.Text = "Teixits"
+        '
+        'MnuTejidos2
+        '
+        Me.MnuTejidos2.Shortcut = System.Windows.Forms.Shortcut.CtrlT
+        Me.MnuTejidos2.Text = "&Teixits"
+        '
+        'MnuDisposiciones
+        '
+        Me.MnuDisposiciones.Shortcut = System.Windows.Forms.Shortcut.CtrlD
+        Me.MnuDisposiciones.Text = "&Disposicions"
+        '
+        'MnuFornituras
+        '
+        Me.MnuFornituras.Shortcut = System.Windows.Forms.Shortcut.CtrlI
+        Me.MnuFornituras.Text = "&Fornitures"
+        '
+        'MnuMuestras
+        '
+        Me.MnuMuestras.Shortcut = System.Windows.Forms.Shortcut.CtrlM
+        Me.MnuMuestras.Text = "Co&mplements"
+        '
+        'mnuModelos
+        '
+        Me.mnuModelos.Shortcut = System.Windows.Forms.Shortcut.CtrlO
+        Me.mnuModelos.Text = "M&odels"
+        '
+        'MnuBancos
+        '
+        Me.MnuBancos.BeginGroup = True
+        Me.MnuBancos.Text = "Bancs / Caixes"
+        '
+        'mnuEmpresas
+        '
+        Me.mnuEmpresas.Text = "Empreses"
+        '
+        'mnuFormadepago
+        '
+        Me.mnuFormadepago.Text = "Formes de Pagament"
+        '
+        'MnuTipodeIVA
+        '
+        Me.MnuTipodeIVA.Text = "Tipus d'I.V.A"
+        '
+        'mnuTemporadas
+        '
+        Me.mnuTemporadas.Text = "Temporades"
+        '
+        'mnuCartas
+        '
+        Me.mnuCartas.BeginGroup = True
+        Me.mnuCartas.Text = "Mailing"
+        '
+        'mnuEditar
+        '
+        Me.mnuEditar.Items.AddRange(New TD.SandBar.ToolbarItemBase() {Me.MenuButtonItem4, Me.MenuButtonItem5, Me.mnuCortar, Me.MenuButtonItem7, Me.MenuButtonItem8, Me.MenuButtonItem6, Me.mnuSeleccionarTodo})
+        Me.mnuEditar.Text = "Edició"
+        '
+        'MenuButtonItem4
+        '
+        Me.MenuButtonItem4.Text = "Desfer"
+        '
+        'MenuButtonItem5
+        '
+        Me.MenuButtonItem5.Text = "Refer"
+        '
+        'mnuCortar
+        '
+        Me.mnuCortar.BeginGroup = True
+        Me.mnuCortar.Text = "Tallar"
+        '
+        'MenuButtonItem7
+        '
+        Me.MenuButtonItem7.Text = "Copiar"
+        '
+        'MenuButtonItem8
+        '
+        Me.MenuButtonItem8.Text = "Enganxar"
+        '
+        'MenuButtonItem6
+        '
+        Me.MenuButtonItem6.Text = "Eliminar"
+        '
+        'mnuSeleccionarTodo
+        '
+        Me.mnuSeleccionarTodo.BeginGroup = True
+        Me.mnuSeleccionarTodo.Text = "Seleccionar Tot"
+        '
+        'mnuCompras
+        '
+        Me.mnuCompras.Items.AddRange(New TD.SandBar.ToolbarItemBase() {Me.mnuTejidoCompraPedidos, Me.mnuCompraMuestrasPedidos, Me.mnuMuestrasCompraAlbaranes, Me.mnuOrdenesFabricacionMuestras, Me.mnuCompraFornituras, Me.mnuOrdenesFabricacion})
+        Me.mnuCompras.Text = "&Compres"
+        '
+        'mnuTejidoCompraPedidos
+        '
+        Me.mnuTejidoCompraPedidos.Text = "Comandes Teixits"
+        '
+        'mnuCompraMuestrasPedidos
+        '
+        Me.mnuCompraMuestrasPedidos.BeginGroup = True
+        Me.mnuCompraMuestrasPedidos.Text = "Comandes de Fils"
+        '
+        'mnuMuestrasCompraAlbaranes
+        '
+        Me.mnuMuestrasCompraAlbaranes.Text = "Albarans d'Entrega Fils"
+        '
+        'mnuOrdenesFabricacionMuestras
+        '
+        Me.mnuOrdenesFabricacionMuestras.Text = "Ordres de fabricació Mostres"
+        '
+        'mnuCompraFornituras
+        '
+        Me.mnuCompraFornituras.BeginGroup = True
+        Me.mnuCompraFornituras.Text = "Comandes Fornitures"
+        '
+        'mnuOrdenesFabricacion
+        '
+        Me.mnuOrdenesFabricacion.BeginGroup = True
+        Me.mnuOrdenesFabricacion.Text = "Ordres de Fabricació Models"
+        '
+        'mnuVentas
+        '
+        Me.mnuVentas.Items.AddRange(New TD.SandBar.ToolbarItemBase() {Me.mnuTejidoVentaPedido, Me.mnuTejidoVentaAlbaran, Me.mnuBtnFacturaProforma, Me.mnuTejidoVentaFactura, Me.mnuVentaModelosAlbaranes, Me.mnuVentaModelosFacturas, Me.mnuRemesas})
+        Me.mnuVentas.Text = "&Vendes"
+        '
+        'mnuTejidoVentaPedido
+        '
+        Me.mnuTejidoVentaPedido.Text = "Comandes Teixits/Mostres"
+        '
+        'mnuTejidoVentaAlbaran
+        '
+        Me.mnuTejidoVentaAlbaran.Text = "Albarans Teixits/Mostres"
+        '
+        'mnuBtnFacturaProforma
+        '
+        Me.mnuBtnFacturaProforma.Text = "Factura Proforma Teixits/Mostres"
+        '
+        'mnuTejidoVentaFactura
+        '
+        Me.mnuTejidoVentaFactura.Text = "Factures Teixits/Mostres"
+        '
+        'mnuVentaModelosAlbaranes
+        '
+        Me.mnuVentaModelosAlbaranes.BeginGroup = True
+        Me.mnuVentaModelosAlbaranes.Text = "Albarans Models"
+        '
+        'mnuVentaModelosFacturas
+        '
+        Me.mnuVentaModelosFacturas.Text = "Factures Models"
+        '
+        'mnuRemesas
+        '
+        Me.mnuRemesas.BeginGroup = True
+        Me.mnuRemesas.Text = "Remeses"
+        '
+        'mnuListados
+        '
+        Me.mnuListados.Items.AddRange(New TD.SandBar.ToolbarItemBase() {Me.mnuListadoClientes, Me.mnuListadoProveedores, Me.mnuListadoTalleres, Me.mnuListadoTransportistas, Me.mnuListadoRepresentantes, Me.mnuListadoBancos, Me.mnuListadoOperaciones, Me.mnuListadoMaquinas, Me.mnListadoTejidos, Me.mnuListadoDisposiciones, Me.mnuListadoHilos, Me.mnuListadoMuestras, Me.mnuListadoModelos, Me.mnuListadosCompra})
+        Me.mnuListados.Text = "Llistats"
+        '
+        'mnuListadoClientes
+        '
+        Me.mnuListadoClientes.Text = "Llistat Clients"
+        '
+        'mnuListadoProveedores
+        '
+        Me.mnuListadoProveedores.Text = "Llistat Proveïdors"
+        '
+        'mnuListadoTalleres
+        '
+        Me.mnuListadoTalleres.Text = "Llistat Tallers"
+        '
+        'mnuListadoTransportistas
+        '
+        Me.mnuListadoTransportistas.Text = "Llistat Transportistes"
+        '
+        'mnuListadoRepresentantes
+        '
+        Me.mnuListadoRepresentantes.Text = "Llistat Representants"
+        '
+        'mnuListadoBancos
+        '
+        Me.mnuListadoBancos.Text = "Llistat Bancs"
+        '
+        'mnuListadoOperaciones
+        '
+        Me.mnuListadoOperaciones.BeginGroup = True
+        Me.mnuListadoOperaciones.Text = "Llistat Operacions"
+        '
+        'mnuListadoMaquinas
+        '
+        Me.mnuListadoMaquinas.Text = "Llistat Màquines"
+        '
+        'mnListadoTejidos
+        '
+        Me.mnListadoTejidos.BeginGroup = True
+        Me.mnListadoTejidos.Text = "Llistat Teixits"
+        '
+        'mnuListadoDisposiciones
+        '
+        Me.mnuListadoDisposiciones.Text = "Llistat Disposicions"
+        '
+        'mnuListadoHilos
+        '
+        Me.mnuListadoHilos.Text = "Llistat Fils"
+        '
+        'mnuListadoMuestras
+        '
+        Me.mnuListadoMuestras.Text = "Llistat Mostres"
+        '
+        'mnuListadoModelos
+        '
+        Me.mnuListadoModelos.Text = "Llistat Models"
+        '
+        'mnuListadosCompra
+        '
+        Me.mnuListadosCompra.BeginGroup = True
+        Me.mnuListadosCompra.Text = "Llistat Compres/Vendes/Ordres"
+        '
+        'mnuControlStock
+        '
+        Me.mnuControlStock.Items.AddRange(New TD.SandBar.ToolbarItemBase() {Me.mnuControlStockHilos, Me.mnuControlStockTejidos, Me.mnuStockModelos})
+        Me.mnuControlStock.Text = "Stock"
+        '
+        'mnuControlStockHilos
+        '
+        Me.mnuControlStockHilos.Text = "Fils"
+        '
+        'mnuControlStockTejidos
+        '
+        Me.mnuControlStockTejidos.Text = "Teixits"
+        '
+        'mnuStockModelos
+        '
+        Me.mnuStockModelos.Text = "Models"
+        '
+        'mnuEstadisticas
+        '
+        Me.mnuEstadisticas.Text = "Estadístiques"
+        '
+        'mnuVentana
+        '
+        Me.mnuVentana.Items.AddRange(New TD.SandBar.ToolbarItemBase() {Me.mnuCerrarTodas, Me.mnuMinimizarTodas, Me.mnuCascada, Me.mnuOrganizacion, Me.MenuItem31, Me.MenuItem32})
+        Me.mnuVentana.MdiWindowList = True
+        Me.mnuVentana.Text = "Finestres"
+        '
+        'mnuCerrarTodas
+        '
+        Me.mnuCerrarTodas.Text = "Tancar Totes"
+        '
+        'mnuMinimizarTodas
+        '
+        Me.mnuMinimizarTodas.Text = "Minimitzar Totes"
+        '
+        'mnuCascada
+        '
+        Me.mnuCascada.BeginGroup = True
+        Me.mnuCascada.Text = "Cascada"
+        '
+        'mnuOrganizacion
+        '
+        Me.mnuOrganizacion.Text = "Organització Automàtica"
+        '
+        'MenuItem31
+        '
+        Me.MenuItem31.Text = "Horitzontal"
+        '
+        'MenuItem32
+        '
+        Me.MenuItem32.Text = "Vertical"
+        '
+        'mnuEnviarErrores
+        '
+        Me.mnuEnviarErrores.Items.AddRange(New TD.SandBar.ToolbarItemBase() {Me.mnuErrores})
+        Me.mnuEnviarErrores.Text = "Errors"
+        Me.mnuEnviarErrores.Visible = False
+        '
+        'mnuErrores
+        '
+        Me.mnuErrores.Text = "Enviar Errors"
+        '
+        'mnuAyuda
+        '
+        Me.mnuAyuda.Items.AddRange(New TD.SandBar.ToolbarItemBase() {Me.mnuSobre, Me.mnuActualizarPrograma})
+        Me.mnuAyuda.Text = "Ajuda"
+        '
+        'mnuSobre
+        '
+        Me.mnuSobre.Text = "TEX.NET"
+        '
+        'mnuActualizarPrograma
+        '
+        Me.mnuActualizarPrograma.Text = "Actualitzar Programa"
+        Me.mnuActualizarPrograma.Visible = False
+        '
+        'mnuArchivo
+        '
+        Me.mnuArchivo.Items.AddRange(New TD.SandBar.ToolbarItemBase() {Me.mnuIdioma, Me.MenuButtonItem1, Me.mnuConfig, Me.mnuUtilidades, Me.mnuNumeraciones, Me.mnuBackup, Me.mnuSalir})
+        Me.mnuArchivo.Text = "&Opcions"
+        '
+        'mnuIdioma
+        '
+        Me.mnuIdioma.Items.AddRange(New TD.SandBar.ToolbarItemBase() {Me.mnuCatalan, Me.mnuCastellano})
+        Me.mnuIdioma.Text = "Idioma"
+        '
+        'mnuCatalan
+        '
+        Me.mnuCatalan.Text = "Català"
+        '
+        'mnuCastellano
+        '
+        Me.mnuCastellano.Text = "Castellà"
+        '
+        'MenuButtonItem1
+        '
+        Me.MenuButtonItem1.Items.AddRange(New TD.SandBar.ToolbarItemBase() {Me.mnuCatalanImpresion, Me.mnuCastellanoImpresion, Me.mnuInglesImpresion})
+        Me.MenuButtonItem1.Text = "Idioma Impresions"
+        '
+        'mnuCatalanImpresion
+        '
+        Me.mnuCatalanImpresion.Text = "Català"
+        '
+        'mnuCastellanoImpresion
+        '
+        Me.mnuCastellanoImpresion.Text = "Castellà"
+        '
+        'mnuInglesImpresion
+        '
+        Me.mnuInglesImpresion.Text = "Anglès"
+        '
+        'mnuConfig
+        '
+        Me.mnuConfig.Text = "Configuració"
+        '
+        'mnuUtilidades
+        '
+        Me.mnuUtilidades.Text = "Utilidades MySQL"
+        '
+        'mnuNumeraciones
+        '
+        Me.mnuNumeraciones.Text = "Numeracions"
+        '
+        'mnuBackup
+        '
+        Me.mnuBackup.Text = "Backup"
+        Me.mnuBackup.Visible = False
+        '
+        'mnuSalir
+        '
+        Me.mnuSalir.ImageIndex = 3
+        Me.mnuSalir.Text = "Sortir"
+        '
+        'ExplorerBarBoxItem1
+        '
+        Me.ExplorerBarBoxItem1.ActiveLinkColor = System.Drawing.Color.Red
+        Me.ExplorerBarBoxItem1.Dock = System.Windows.Forms.DockStyle.Bottom
+        Me.ExplorerBarBoxItem1.Image = CType(resources.GetObject("ExplorerBarBoxItem1.Image"), System.Drawing.Image)
+        Me.ExplorerBarBoxItem1.LinkColor = System.Drawing.Color.FromArgb(CType(51, Byte), CType(106, Byte), CType(174, Byte))
+        Me.ExplorerBarBoxItem1.Location = New System.Drawing.Point(8, 46)
+        Me.ExplorerBarBoxItem1.Name = "ExplorerBarBoxItem1"
+        Me.MenuBar1.SetSandBarMenu(Me.ExplorerBarBoxItem1, Me.mnuBaseDeDatos)
+        Me.ExplorerBarBoxItem1.Size = New System.Drawing.Size(119, 21)
+        Me.ExplorerBarBoxItem1.TabIndex = 3
+        Me.ExplorerBarBoxItem1.Text = "Clients"
+        '
+        'ExplorerBarBoxItem7
+        '
+        Me.ExplorerBarBoxItem7.ActiveLinkColor = System.Drawing.Color.Red
+        Me.ExplorerBarBoxItem7.Dock = System.Windows.Forms.DockStyle.Bottom
+        Me.ExplorerBarBoxItem7.Image = CType(resources.GetObject("ExplorerBarBoxItem7.Image"), System.Drawing.Image)
+        Me.ExplorerBarBoxItem7.LinkColor = System.Drawing.Color.FromArgb(CType(51, Byte), CType(106, Byte), CType(174, Byte))
+        Me.ExplorerBarBoxItem7.Location = New System.Drawing.Point(8, 46)
+        Me.ExplorerBarBoxItem7.Name = "ExplorerBarBoxItem7"
+        Me.MenuBar1.SetSandBarMenu(Me.ExplorerBarBoxItem7, Me.mnuBaseDeDatos)
+        Me.ExplorerBarBoxItem7.Size = New System.Drawing.Size(119, 21)
+        Me.ExplorerBarBoxItem7.TabIndex = 3
+        Me.ExplorerBarBoxItem7.Text = "Comandes Teixits"
+        '
+        'ExplorerBarBoxItem13
+        '
+        Me.ExplorerBarBoxItem13.ActiveLinkColor = System.Drawing.Color.Red
+        Me.ExplorerBarBoxItem13.Dock = System.Windows.Forms.DockStyle.Bottom
+        Me.ExplorerBarBoxItem13.Image = CType(resources.GetObject("ExplorerBarBoxItem13.Image"), System.Drawing.Image)
+        Me.ExplorerBarBoxItem13.LinkColor = System.Drawing.Color.FromArgb(CType(51, Byte), CType(106, Byte), CType(174, Byte))
+        Me.ExplorerBarBoxItem13.Location = New System.Drawing.Point(8, 46)
+        Me.ExplorerBarBoxItem13.Name = "ExplorerBarBoxItem13"
+        Me.MenuBar1.SetSandBarMenu(Me.ExplorerBarBoxItem13, Me.mnuBaseDeDatos)
+        Me.ExplorerBarBoxItem13.Size = New System.Drawing.Size(119, 34)
+        Me.ExplorerBarBoxItem13.TabIndex = 3
+        Me.ExplorerBarBoxItem13.Text = "Comandes Teixits/Mostres"
+        '
+        'ExplorerBarBoxItem19
+        '
+        Me.ExplorerBarBoxItem19.ActiveLinkColor = System.Drawing.Color.Red
+        Me.ExplorerBarBoxItem19.Dock = System.Windows.Forms.DockStyle.Bottom
+        Me.ExplorerBarBoxItem19.Image = CType(resources.GetObject("ExplorerBarBoxItem19.Image"), System.Drawing.Image)
+        Me.ExplorerBarBoxItem19.LinkColor = System.Drawing.Color.FromArgb(CType(51, Byte), CType(106, Byte), CType(174, Byte))
+        Me.ExplorerBarBoxItem19.Location = New System.Drawing.Point(8, 46)
+        Me.ExplorerBarBoxItem19.Name = "ExplorerBarBoxItem19"
+        Me.MenuBar1.SetSandBarMenu(Me.ExplorerBarBoxItem19, Me.mnuBaseDeDatos)
+        Me.ExplorerBarBoxItem19.Size = New System.Drawing.Size(119, 21)
+        Me.ExplorerBarBoxItem19.TabIndex = 3
+        Me.ExplorerBarBoxItem19.Text = "Clients"
+        '
+        'ExplorerBarControl1
+        '
+        Me.ExplorerBarControl1.AutoScroll = True
+        Me.ExplorerBarControl1.AutoScrollMargin = New System.Drawing.Size(0, 15)
+        Me.ExplorerBarControl1.BackColor = System.Drawing.SystemColors.InactiveCaption
+        Me.ExplorerBarControl1.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D
+        Me.ExplorerBarControl1.Controls.Add(Me.ExplorerBarBox4)
+        Me.ExplorerBarControl1.Controls.Add(Me.ExplorerBarBox3)
+        Me.ExplorerBarControl1.Controls.Add(Me.ExplorerBarBox2)
+        Me.ExplorerBarControl1.Controls.Add(Me.ExplorerBarBox5)
+        Me.ExplorerBarControl1.Controls.Add(Me.ExplorerBarBox1)
+        Me.ExplorerBarControl1.Dock = System.Windows.Forms.DockStyle.Left
+        Me.ExplorerBarControl1.DockPadding.Left = 10
+        Me.ExplorerBarControl1.DockPadding.Right = 10
+        Me.ExplorerBarControl1.ForeColor = System.Drawing.Color.Black
+        Me.ExplorerBarControl1.Location = New System.Drawing.Point(0, 23)
+        Me.ExplorerBarControl1.Name = "ExplorerBarControl1"
+        Me.ExplorerBarControl1.Size = New System.Drawing.Size(176, 711)
+        Me.ExplorerBarControl1.TabIndex = 13
+        '
+        'ExplorerBarBox4
+        '
+        Me.ExplorerBarBox4.BackColor = System.Drawing.Color.FromArgb(CType(214, Byte), CType(223, Byte), CType(247, Byte))
+        Me.ExplorerBarBox4.BorderColor = System.Drawing.Color.White
+        Me.ExplorerBarBox4.CaptionEndColor = System.Drawing.Color.FromArgb(CType(199, Byte), CType(211, Byte), CType(247, Byte))
+        Me.ExplorerBarBox4.CaptionStartColor = System.Drawing.Color.FromArgb(CType(255, Byte), CType(255, Byte), CType(255, Byte))
+        Me.ExplorerBarBox4.Controls.Add(Me.ExplorerBarBoxItem19)
+        Me.ExplorerBarBox4.Controls.Add(Me.ExplorerBarBoxItem20)
+        Me.ExplorerBarBox4.Controls.Add(Me.ExplorerBarBoxItem22)
+        Me.ExplorerBarBox4.Controls.Add(Me.ExplorerBarBoxItem21)
+        Me.ExplorerBarBox4.Controls.Add(Me.ExplorerBarBoxItem23)
+        Me.ExplorerBarBox4.Controls.Add(Me.ExplorerBarBoxItem24)
+        Me.ExplorerBarBox4.Controls.Add(Me.ExplorerBarBoxItem17)
+        Me.ExplorerBarBox4.Controls.Add(Me.ExplorerBarBoxItem32)
+        Me.ExplorerBarBox4.Controls.Add(Me.ExplorerBarBoxItem34)
+        Me.ExplorerBarBox4.Controls.Add(Me.ExplorerBarBoxItem33)
+        Me.ExplorerBarBox4.Dock = System.Windows.Forms.DockStyle.Top
+        Me.ExplorerBarBox4.DockPadding.Bottom = 8
+        Me.ExplorerBarBox4.DockPadding.Left = 8
+        Me.ExplorerBarBox4.DockPadding.Right = 8
+        Me.ExplorerBarBox4.DockPadding.Top = 39
+        Me.ExplorerBarBox4.Expanded = True
+        Me.ExplorerBarBox4.ExpanderCollapseImage = CType(resources.GetObject("ExplorerBarBox4.ExpanderCollapseImage"), System.Drawing.Image)
+        Me.ExplorerBarBox4.ExpanderExpandImage = CType(resources.GetObject("ExplorerBarBox4.ExpanderExpandImage"), System.Drawing.Image)
+        Me.ExplorerBarBox4.ExpanderHoverCollapseImage = CType(resources.GetObject("ExplorerBarBox4.ExpanderHoverCollapseImage"), System.Drawing.Image)
+        Me.ExplorerBarBox4.ExpanderHoverExpandImage = CType(resources.GetObject("ExplorerBarBox4.ExpanderHoverExpandImage"), System.Drawing.Image)
+        Me.ExplorerBarBox4.FoldingSpeed = 20
+        Me.ExplorerBarBox4.ForeColor = System.Drawing.Color.FromArgb(CType(33, Byte), CType(93, Byte), CType(198, Byte))
+        Me.ExplorerBarBox4.HoverForeColor = System.Drawing.Color.FromArgb(CType(123, Byte), CType(153, Byte), CType(244, Byte))
+        Me.ExplorerBarBox4.Location = New System.Drawing.Point(10, 861)
+        Me.ExplorerBarBox4.Name = "ExplorerBarBox4"
+        Me.ExplorerBarBox4.Size = New System.Drawing.Size(135, 264)
+        Me.ExplorerBarBox4.TabIndex = 3
+        Me.ExplorerBarBox4.Text = "Llistats"
+        Me.ExplorerBarBox4.TopLeftMask = CType(resources.GetObject("ExplorerBarBox4.TopLeftMask"), System.Drawing.Bitmap)
+        Me.ExplorerBarBox4.TopRightMask = CType(resources.GetObject("ExplorerBarBox4.TopRightMask"), System.Drawing.Bitmap)
+        '
+        'ExplorerBarBoxItem20
+        '
+        Me.ExplorerBarBoxItem20.ActiveLinkColor = System.Drawing.Color.Red
+        Me.ExplorerBarBoxItem20.Dock = System.Windows.Forms.DockStyle.Bottom
+        Me.ExplorerBarBoxItem20.Image = CType(resources.GetObject("ExplorerBarBoxItem20.Image"), System.Drawing.Image)
+        Me.ExplorerBarBoxItem20.LinkColor = System.Drawing.Color.FromArgb(CType(51, Byte), CType(106, Byte), CType(174, Byte))
+        Me.ExplorerBarBoxItem20.Location = New System.Drawing.Point(8, 67)
+        Me.ExplorerBarBoxItem20.Name = "ExplorerBarBoxItem20"
+        Me.ExplorerBarBoxItem20.Size = New System.Drawing.Size(119, 21)
+        Me.ExplorerBarBoxItem20.TabIndex = 4
+        Me.ExplorerBarBoxItem20.Text = "Tallers"
+        '
+        'ExplorerBarBoxItem22
+        '
+        Me.ExplorerBarBoxItem22.ActiveLinkColor = System.Drawing.Color.Red
+        Me.ExplorerBarBoxItem22.Dock = System.Windows.Forms.DockStyle.Bottom
+        Me.ExplorerBarBoxItem22.Image = CType(resources.GetObject("ExplorerBarBoxItem22.Image"), System.Drawing.Image)
+        Me.ExplorerBarBoxItem22.LinkColor = System.Drawing.Color.FromArgb(CType(51, Byte), CType(106, Byte), CType(174, Byte))
+        Me.ExplorerBarBoxItem22.Location = New System.Drawing.Point(8, 88)
+        Me.ExplorerBarBoxItem22.Name = "ExplorerBarBoxItem22"
+        Me.ExplorerBarBoxItem22.Size = New System.Drawing.Size(119, 21)
+        Me.ExplorerBarBoxItem22.TabIndex = 6
+        Me.ExplorerBarBoxItem22.Text = "Proveïdors"
+        '
+        'ExplorerBarBoxItem21
+        '
+        Me.ExplorerBarBoxItem21.ActiveLinkColor = System.Drawing.Color.Red
+        Me.ExplorerBarBoxItem21.Dock = System.Windows.Forms.DockStyle.Bottom
+        Me.ExplorerBarBoxItem21.Image = CType(resources.GetObject("ExplorerBarBoxItem21.Image"), System.Drawing.Image)
+        Me.ExplorerBarBoxItem21.LinkColor = System.Drawing.Color.FromArgb(CType(51, Byte), CType(106, Byte), CType(174, Byte))
+        Me.ExplorerBarBoxItem21.Location = New System.Drawing.Point(8, 109)
+        Me.ExplorerBarBoxItem21.Name = "ExplorerBarBoxItem21"
+        Me.ExplorerBarBoxItem21.Size = New System.Drawing.Size(119, 21)
+        Me.ExplorerBarBoxItem21.TabIndex = 5
+        Me.ExplorerBarBoxItem21.Text = "Representants"
+        '
+        'ExplorerBarBoxItem23
+        '
+        Me.ExplorerBarBoxItem23.ActiveLinkColor = System.Drawing.Color.Red
+        Me.ExplorerBarBoxItem23.Dock = System.Windows.Forms.DockStyle.Bottom
+        Me.ExplorerBarBoxItem23.Image = CType(resources.GetObject("ExplorerBarBoxItem23.Image"), System.Drawing.Image)
+        Me.ExplorerBarBoxItem23.LinkColor = System.Drawing.Color.FromArgb(CType(51, Byte), CType(106, Byte), CType(174, Byte))
+        Me.ExplorerBarBoxItem23.Location = New System.Drawing.Point(8, 130)
+        Me.ExplorerBarBoxItem23.Name = "ExplorerBarBoxItem23"
+        Me.ExplorerBarBoxItem23.Size = New System.Drawing.Size(119, 21)
+        Me.ExplorerBarBoxItem23.TabIndex = 7
+        Me.ExplorerBarBoxItem23.Text = "Transportistes"
+        '
+        'ExplorerBarBoxItem24
+        '
+        Me.ExplorerBarBoxItem24.ActiveLinkColor = System.Drawing.Color.Red
+        Me.ExplorerBarBoxItem24.Dock = System.Windows.Forms.DockStyle.Bottom
+        Me.ExplorerBarBoxItem24.Image = CType(resources.GetObject("ExplorerBarBoxItem24.Image"), System.Drawing.Image)
+        Me.ExplorerBarBoxItem24.LinkColor = System.Drawing.Color.FromArgb(CType(51, Byte), CType(106, Byte), CType(174, Byte))
+        Me.ExplorerBarBoxItem24.Location = New System.Drawing.Point(8, 151)
+        Me.ExplorerBarBoxItem24.Name = "ExplorerBarBoxItem24"
+        Me.ExplorerBarBoxItem24.Size = New System.Drawing.Size(119, 21)
+        Me.ExplorerBarBoxItem24.TabIndex = 8
+        Me.ExplorerBarBoxItem24.Text = "Fils"
+        '
+        'ExplorerBarBoxItem17
+        '
+        Me.ExplorerBarBoxItem17.ActiveLinkColor = System.Drawing.Color.Red
+        Me.ExplorerBarBoxItem17.Dock = System.Windows.Forms.DockStyle.Bottom
+        Me.ExplorerBarBoxItem17.Image = CType(resources.GetObject("ExplorerBarBoxItem17.Image"), System.Drawing.Image)
+        Me.ExplorerBarBoxItem17.LinkColor = System.Drawing.Color.FromArgb(CType(51, Byte), CType(106, Byte), CType(174, Byte))
+        Me.ExplorerBarBoxItem17.Location = New System.Drawing.Point(8, 172)
+        Me.ExplorerBarBoxItem17.Name = "ExplorerBarBoxItem17"
+        Me.ExplorerBarBoxItem17.Size = New System.Drawing.Size(119, 21)
+        Me.ExplorerBarBoxItem17.TabIndex = 9
+        Me.ExplorerBarBoxItem17.Text = "Teixits"
+        '
+        'ExplorerBarBoxItem32
+        '
+        Me.ExplorerBarBoxItem32.ActiveLinkColor = System.Drawing.Color.Red
+        Me.ExplorerBarBoxItem32.Dock = System.Windows.Forms.DockStyle.Bottom
+        Me.ExplorerBarBoxItem32.Image = CType(resources.GetObject("ExplorerBarBoxItem32.Image"), System.Drawing.Image)
+        Me.ExplorerBarBoxItem32.LinkColor = System.Drawing.Color.FromArgb(CType(51, Byte), CType(106, Byte), CType(174, Byte))
+        Me.ExplorerBarBoxItem32.Location = New System.Drawing.Point(8, 193)
+        Me.ExplorerBarBoxItem32.Name = "ExplorerBarBoxItem32"
+        Me.ExplorerBarBoxItem32.Size = New System.Drawing.Size(119, 21)
+        Me.ExplorerBarBoxItem32.TabIndex = 10
+        Me.ExplorerBarBoxItem32.Text = "Mostres"
+        '
+        'ExplorerBarBoxItem34
+        '
+        Me.ExplorerBarBoxItem34.ActiveLinkColor = System.Drawing.Color.Red
+        Me.ExplorerBarBoxItem34.Dock = System.Windows.Forms.DockStyle.Bottom
+        Me.ExplorerBarBoxItem34.Image = CType(resources.GetObject("ExplorerBarBoxItem34.Image"), System.Drawing.Image)
+        Me.ExplorerBarBoxItem34.LinkColor = System.Drawing.Color.FromArgb(CType(51, Byte), CType(106, Byte), CType(174, Byte))
+        Me.ExplorerBarBoxItem34.Location = New System.Drawing.Point(8, 214)
+        Me.ExplorerBarBoxItem34.Name = "ExplorerBarBoxItem34"
+        Me.ExplorerBarBoxItem34.Size = New System.Drawing.Size(119, 21)
+        Me.ExplorerBarBoxItem34.TabIndex = 12
+        Me.ExplorerBarBoxItem34.Text = "Fornitures"
+        '
+        'ExplorerBarBoxItem33
+        '
+        Me.ExplorerBarBoxItem33.ActiveLinkColor = System.Drawing.Color.Red
+        Me.ExplorerBarBoxItem33.Dock = System.Windows.Forms.DockStyle.Bottom
+        Me.ExplorerBarBoxItem33.Image = CType(resources.GetObject("ExplorerBarBoxItem33.Image"), System.Drawing.Image)
+        Me.ExplorerBarBoxItem33.LinkColor = System.Drawing.Color.FromArgb(CType(51, Byte), CType(106, Byte), CType(174, Byte))
+        Me.ExplorerBarBoxItem33.Location = New System.Drawing.Point(8, 235)
+        Me.ExplorerBarBoxItem33.Name = "ExplorerBarBoxItem33"
+        Me.ExplorerBarBoxItem33.Size = New System.Drawing.Size(119, 21)
+        Me.ExplorerBarBoxItem33.TabIndex = 11
+        Me.ExplorerBarBoxItem33.Text = "Models"
+        '
+        'ExplorerBarBox3
+        '
+        Me.ExplorerBarBox3.BackColor = System.Drawing.Color.FromArgb(CType(214, Byte), CType(223, Byte), CType(247, Byte))
+        Me.ExplorerBarBox3.BorderColor = System.Drawing.Color.White
+        Me.ExplorerBarBox3.CaptionEndColor = System.Drawing.Color.FromArgb(CType(199, Byte), CType(211, Byte), CType(247, Byte))
+        Me.ExplorerBarBox3.CaptionStartColor = System.Drawing.Color.FromArgb(CType(255, Byte), CType(255, Byte), CType(255, Byte))
+        Me.ExplorerBarBox3.Controls.Add(Me.ExplorerBarBoxItem13)
+        Me.ExplorerBarBox3.Controls.Add(Me.ExplorerBarBoxItem14)
+        Me.ExplorerBarBox3.Controls.Add(Me.ExplorerBarBoxItem18)
+        Me.ExplorerBarBox3.Controls.Add(Me.ExplorerBarBoxItem16)
+        Me.ExplorerBarBox3.Controls.Add(Me.ExplorerBarBoxItem15)
+        Me.ExplorerBarBox3.Controls.Add(Me.ExplorerBarBoxItem31)
+        Me.ExplorerBarBox3.Controls.Add(Me.ExplorerBarBoxItem25)
+        Me.ExplorerBarBox3.Dock = System.Windows.Forms.DockStyle.Top
+        Me.ExplorerBarBox3.DockPadding.Bottom = 8
+        Me.ExplorerBarBox3.DockPadding.Left = 8
+        Me.ExplorerBarBox3.DockPadding.Right = 8
+        Me.ExplorerBarBox3.DockPadding.Top = 39
+        Me.ExplorerBarBox3.Expanded = True
+        Me.ExplorerBarBox3.ExpanderCollapseImage = CType(resources.GetObject("ExplorerBarBox3.ExpanderCollapseImage"), System.Drawing.Image)
+        Me.ExplorerBarBox3.ExpanderExpandImage = CType(resources.GetObject("ExplorerBarBox3.ExpanderExpandImage"), System.Drawing.Image)
+        Me.ExplorerBarBox3.ExpanderHoverCollapseImage = CType(resources.GetObject("ExplorerBarBox3.ExpanderHoverCollapseImage"), System.Drawing.Image)
+        Me.ExplorerBarBox3.ExpanderHoverExpandImage = CType(resources.GetObject("ExplorerBarBox3.ExpanderHoverExpandImage"), System.Drawing.Image)
+        Me.ExplorerBarBox3.FoldingSpeed = 20
+        Me.ExplorerBarBox3.ForeColor = System.Drawing.Color.FromArgb(CType(33, Byte), CType(93, Byte), CType(198, Byte))
+        Me.ExplorerBarBox3.HoverForeColor = System.Drawing.Color.FromArgb(CType(123, Byte), CType(153, Byte), CType(244, Byte))
+        Me.ExplorerBarBox3.Location = New System.Drawing.Point(10, 596)
+        Me.ExplorerBarBox3.Name = "ExplorerBarBox3"
+        Me.ExplorerBarBox3.Size = New System.Drawing.Size(135, 265)
+        Me.ExplorerBarBox3.TabIndex = 2
+        Me.ExplorerBarBox3.Text = "Vendes"
+        Me.ExplorerBarBox3.TopLeftMask = CType(resources.GetObject("ExplorerBarBox3.TopLeftMask"), System.Drawing.Bitmap)
+        Me.ExplorerBarBox3.TopRightMask = CType(resources.GetObject("ExplorerBarBox3.TopRightMask"), System.Drawing.Bitmap)
+        '
+        'ExplorerBarBoxItem14
+        '
+        Me.ExplorerBarBoxItem14.ActiveLinkColor = System.Drawing.Color.Red
+        Me.ExplorerBarBoxItem14.Dock = System.Windows.Forms.DockStyle.Bottom
+        Me.ExplorerBarBoxItem14.Image = CType(resources.GetObject("ExplorerBarBoxItem14.Image"), System.Drawing.Image)
+        Me.ExplorerBarBoxItem14.LinkColor = System.Drawing.Color.FromArgb(CType(51, Byte), CType(106, Byte), CType(174, Byte))
+        Me.ExplorerBarBoxItem14.Location = New System.Drawing.Point(8, 80)
+        Me.ExplorerBarBoxItem14.Name = "ExplorerBarBoxItem14"
+        Me.ExplorerBarBoxItem14.Size = New System.Drawing.Size(119, 34)
+        Me.ExplorerBarBoxItem14.TabIndex = 4
+        Me.ExplorerBarBoxItem14.Text = "Albarans Teixits/Mostres"
+        '
+        'ExplorerBarBoxItem18
+        '
+        Me.ExplorerBarBoxItem18.ActiveLinkColor = System.Drawing.Color.Red
+        Me.ExplorerBarBoxItem18.Dock = System.Windows.Forms.DockStyle.Bottom
+        Me.ExplorerBarBoxItem18.Image = CType(resources.GetObject("ExplorerBarBoxItem18.Image"), System.Drawing.Image)
+        Me.ExplorerBarBoxItem18.LinkColor = System.Drawing.Color.FromArgb(CType(51, Byte), CType(106, Byte), CType(174, Byte))
+        Me.ExplorerBarBoxItem18.Location = New System.Drawing.Point(8, 114)
+        Me.ExplorerBarBoxItem18.Name = "ExplorerBarBoxItem18"
+        Me.ExplorerBarBoxItem18.Size = New System.Drawing.Size(119, 21)
+        Me.ExplorerBarBoxItem18.TabIndex = 8
+        Me.ExplorerBarBoxItem18.Text = "Albarans Models"
+        '
+        'ExplorerBarBoxItem16
+        '
+        Me.ExplorerBarBoxItem16.ActiveLinkColor = System.Drawing.Color.Red
+        Me.ExplorerBarBoxItem16.Dock = System.Windows.Forms.DockStyle.Bottom
+        Me.ExplorerBarBoxItem16.Image = CType(resources.GetObject("ExplorerBarBoxItem16.Image"), System.Drawing.Image)
+        Me.ExplorerBarBoxItem16.LinkColor = System.Drawing.Color.FromArgb(CType(51, Byte), CType(106, Byte), CType(174, Byte))
+        Me.ExplorerBarBoxItem16.Location = New System.Drawing.Point(8, 135)
+        Me.ExplorerBarBoxItem16.Name = "ExplorerBarBoxItem16"
+        Me.ExplorerBarBoxItem16.Size = New System.Drawing.Size(119, 46)
+        Me.ExplorerBarBoxItem16.TabIndex = 6
+        Me.ExplorerBarBoxItem16.Text = "Factures Proforma Teixtis/Mostres"
+        '
+        'ExplorerBarBoxItem15
+        '
+        Me.ExplorerBarBoxItem15.ActiveLinkColor = System.Drawing.Color.Red
+        Me.ExplorerBarBoxItem15.Dock = System.Windows.Forms.DockStyle.Bottom
+        Me.ExplorerBarBoxItem15.Image = CType(resources.GetObject("ExplorerBarBoxItem15.Image"), System.Drawing.Image)
+        Me.ExplorerBarBoxItem15.LinkColor = System.Drawing.Color.FromArgb(CType(51, Byte), CType(106, Byte), CType(174, Byte))
+        Me.ExplorerBarBoxItem15.Location = New System.Drawing.Point(8, 181)
+        Me.ExplorerBarBoxItem15.Name = "ExplorerBarBoxItem15"
+        Me.ExplorerBarBoxItem15.Size = New System.Drawing.Size(119, 34)
+        Me.ExplorerBarBoxItem15.TabIndex = 5
+        Me.ExplorerBarBoxItem15.Text = "Factures Teixits/Mostres"
+        '
+        'ExplorerBarBoxItem31
+        '
+        Me.ExplorerBarBoxItem31.ActiveLinkColor = System.Drawing.Color.Red
+        Me.ExplorerBarBoxItem31.Dock = System.Windows.Forms.DockStyle.Bottom
+        Me.ExplorerBarBoxItem31.Image = CType(resources.GetObject("ExplorerBarBoxItem31.Image"), System.Drawing.Image)
+        Me.ExplorerBarBoxItem31.LinkColor = System.Drawing.Color.FromArgb(CType(51, Byte), CType(106, Byte), CType(174, Byte))
+        Me.ExplorerBarBoxItem31.Location = New System.Drawing.Point(8, 215)
+        Me.ExplorerBarBoxItem31.Name = "ExplorerBarBoxItem31"
+        Me.ExplorerBarBoxItem31.Size = New System.Drawing.Size(119, 21)
+        Me.ExplorerBarBoxItem31.TabIndex = 9
+        Me.ExplorerBarBoxItem31.Text = "Facturas Modelos"
+        '
+        'ExplorerBarBoxItem25
+        '
+        Me.ExplorerBarBoxItem25.ActiveLinkColor = System.Drawing.Color.Red
+        Me.ExplorerBarBoxItem25.Dock = System.Windows.Forms.DockStyle.Bottom
+        Me.ExplorerBarBoxItem25.Image = CType(resources.GetObject("ExplorerBarBoxItem25.Image"), System.Drawing.Image)
+        Me.ExplorerBarBoxItem25.LinkColor = System.Drawing.Color.FromArgb(CType(51, Byte), CType(106, Byte), CType(174, Byte))
+        Me.ExplorerBarBoxItem25.Location = New System.Drawing.Point(8, 236)
+        Me.ExplorerBarBoxItem25.Name = "ExplorerBarBoxItem25"
+        Me.ExplorerBarBoxItem25.Size = New System.Drawing.Size(119, 21)
+        Me.ExplorerBarBoxItem25.TabIndex = 10
+        Me.ExplorerBarBoxItem25.Text = "Remeses"
+        '
+        'ExplorerBarBox2
+        '
+        Me.ExplorerBarBox2.BackColor = System.Drawing.Color.FromArgb(CType(214, Byte), CType(223, Byte), CType(247, Byte))
+        Me.ExplorerBarBox2.BorderColor = System.Drawing.Color.White
+        Me.ExplorerBarBox2.CaptionEndColor = System.Drawing.Color.FromArgb(CType(199, Byte), CType(211, Byte), CType(247, Byte))
+        Me.ExplorerBarBox2.CaptionStartColor = System.Drawing.Color.FromArgb(CType(255, Byte), CType(255, Byte), CType(255, Byte))
+        Me.ExplorerBarBox2.Controls.Add(Me.ExplorerBarBoxItem7)
+        Me.ExplorerBarBox2.Controls.Add(Me.ExplorerBarBoxItem8)
+        Me.ExplorerBarBox2.Controls.Add(Me.ExplorerBarBoxItem12)
+        Me.ExplorerBarBox2.Controls.Add(Me.ExplorerBarBoxItem9)
+        Me.ExplorerBarBox2.Controls.Add(Me.ExplorerBarBoxItem10)
+        Me.ExplorerBarBox2.Controls.Add(Me.ExplorerBarBoxItem11)
+        Me.ExplorerBarBox2.Dock = System.Windows.Forms.DockStyle.Top
+        Me.ExplorerBarBox2.DockPadding.Bottom = 8
+        Me.ExplorerBarBox2.DockPadding.Left = 8
+        Me.ExplorerBarBox2.DockPadding.Right = 8
+        Me.ExplorerBarBox2.DockPadding.Top = 39
+        Me.ExplorerBarBox2.Expanded = True
+        Me.ExplorerBarBox2.ExpanderCollapseImage = CType(resources.GetObject("ExplorerBarBox2.ExpanderCollapseImage"), System.Drawing.Image)
+        Me.ExplorerBarBox2.ExpanderExpandImage = CType(resources.GetObject("ExplorerBarBox2.ExpanderExpandImage"), System.Drawing.Image)
+        Me.ExplorerBarBox2.ExpanderHoverCollapseImage = CType(resources.GetObject("ExplorerBarBox2.ExpanderHoverCollapseImage"), System.Drawing.Image)
+        Me.ExplorerBarBox2.ExpanderHoverExpandImage = CType(resources.GetObject("ExplorerBarBox2.ExpanderHoverExpandImage"), System.Drawing.Image)
+        Me.ExplorerBarBox2.FoldingSpeed = 20
+        Me.ExplorerBarBox2.ForeColor = System.Drawing.Color.FromArgb(CType(33, Byte), CType(93, Byte), CType(198, Byte))
+        Me.ExplorerBarBox2.HoverForeColor = System.Drawing.Color.FromArgb(CType(123, Byte), CType(153, Byte), CType(244, Byte))
+        Me.ExplorerBarBox2.Location = New System.Drawing.Point(10, 352)
+        Me.ExplorerBarBox2.Name = "ExplorerBarBox2"
+        Me.ExplorerBarBox2.Size = New System.Drawing.Size(135, 244)
+        Me.ExplorerBarBox2.TabIndex = 1
+        Me.ExplorerBarBox2.Text = "Compres"
+        Me.ExplorerBarBox2.TopLeftMask = CType(resources.GetObject("ExplorerBarBox2.TopLeftMask"), System.Drawing.Bitmap)
+        Me.ExplorerBarBox2.TopRightMask = CType(resources.GetObject("ExplorerBarBox2.TopRightMask"), System.Drawing.Bitmap)
+        '
+        'ExplorerBarBoxItem8
+        '
+        Me.ExplorerBarBoxItem8.ActiveLinkColor = System.Drawing.Color.Red
+        Me.ExplorerBarBoxItem8.Dock = System.Windows.Forms.DockStyle.Bottom
+        Me.ExplorerBarBoxItem8.Image = CType(resources.GetObject("ExplorerBarBoxItem8.Image"), System.Drawing.Image)
+        Me.ExplorerBarBoxItem8.LinkColor = System.Drawing.Color.FromArgb(CType(51, Byte), CType(106, Byte), CType(174, Byte))
+        Me.ExplorerBarBoxItem8.Location = New System.Drawing.Point(8, 67)
+        Me.ExplorerBarBoxItem8.Name = "ExplorerBarBoxItem8"
+        Me.ExplorerBarBoxItem8.Size = New System.Drawing.Size(119, 21)
+        Me.ExplorerBarBoxItem8.TabIndex = 4
+        Me.ExplorerBarBoxItem8.Text = "Comandes Fils"
+        '
+        'ExplorerBarBoxItem12
+        '
+        Me.ExplorerBarBoxItem12.ActiveLinkColor = System.Drawing.Color.Red
+        Me.ExplorerBarBoxItem12.Dock = System.Windows.Forms.DockStyle.Bottom
+        Me.ExplorerBarBoxItem12.Image = CType(resources.GetObject("ExplorerBarBoxItem12.Image"), System.Drawing.Image)
+        Me.ExplorerBarBoxItem12.LinkColor = System.Drawing.Color.FromArgb(CType(51, Byte), CType(106, Byte), CType(174, Byte))
+        Me.ExplorerBarBoxItem12.Location = New System.Drawing.Point(8, 88)
+        Me.ExplorerBarBoxItem12.Name = "ExplorerBarBoxItem12"
+        Me.ExplorerBarBoxItem12.Size = New System.Drawing.Size(119, 34)
+        Me.ExplorerBarBoxItem12.TabIndex = 8
+        Me.ExplorerBarBoxItem12.Text = "Comandes Fornituras"
+        '
+        'ExplorerBarBoxItem9
+        '
+        Me.ExplorerBarBoxItem9.ActiveLinkColor = System.Drawing.Color.Red
+        Me.ExplorerBarBoxItem9.Dock = System.Windows.Forms.DockStyle.Bottom
+        Me.ExplorerBarBoxItem9.Image = CType(resources.GetObject("ExplorerBarBoxItem9.Image"), System.Drawing.Image)
+        Me.ExplorerBarBoxItem9.LinkColor = System.Drawing.Color.FromArgb(CType(51, Byte), CType(106, Byte), CType(174, Byte))
+        Me.ExplorerBarBoxItem9.Location = New System.Drawing.Point(8, 122)
+        Me.ExplorerBarBoxItem9.Name = "ExplorerBarBoxItem9"
+        Me.ExplorerBarBoxItem9.Size = New System.Drawing.Size(119, 34)
+        Me.ExplorerBarBoxItem9.TabIndex = 5
+        Me.ExplorerBarBoxItem9.Text = "Albarans entrega fils"
+        '
+        'ExplorerBarBoxItem10
+        '
+        Me.ExplorerBarBoxItem10.ActiveLinkColor = System.Drawing.Color.Red
+        Me.ExplorerBarBoxItem10.Dock = System.Windows.Forms.DockStyle.Bottom
+        Me.ExplorerBarBoxItem10.Image = CType(resources.GetObject("ExplorerBarBoxItem10.Image"), System.Drawing.Image)
+        Me.ExplorerBarBoxItem10.LinkColor = System.Drawing.Color.FromArgb(CType(51, Byte), CType(106, Byte), CType(174, Byte))
+        Me.ExplorerBarBoxItem10.Location = New System.Drawing.Point(8, 156)
+        Me.ExplorerBarBoxItem10.Name = "ExplorerBarBoxItem10"
+        Me.ExplorerBarBoxItem10.Size = New System.Drawing.Size(119, 46)
+        Me.ExplorerBarBoxItem10.TabIndex = 6
+        Me.ExplorerBarBoxItem10.Text = "Ordres de fabricació Mostres"
+        '
+        'ExplorerBarBoxItem11
+        '
+        Me.ExplorerBarBoxItem11.ActiveLinkColor = System.Drawing.Color.Red
+        Me.ExplorerBarBoxItem11.Dock = System.Windows.Forms.DockStyle.Bottom
+        Me.ExplorerBarBoxItem11.Image = CType(resources.GetObject("ExplorerBarBoxItem11.Image"), System.Drawing.Image)
+        Me.ExplorerBarBoxItem11.LinkColor = System.Drawing.Color.FromArgb(CType(51, Byte), CType(106, Byte), CType(174, Byte))
+        Me.ExplorerBarBoxItem11.Location = New System.Drawing.Point(8, 202)
+        Me.ExplorerBarBoxItem11.Name = "ExplorerBarBoxItem11"
+        Me.ExplorerBarBoxItem11.Size = New System.Drawing.Size(119, 34)
+        Me.ExplorerBarBoxItem11.TabIndex = 7
+        Me.ExplorerBarBoxItem11.Text = "Ordres Fabricació Models"
+        '
+        'ExplorerBarBox5
+        '
+        Me.ExplorerBarBox5.BackColor = System.Drawing.Color.FromArgb(CType(214, Byte), CType(223, Byte), CType(247, Byte))
+        Me.ExplorerBarBox5.BorderColor = System.Drawing.Color.White
+        Me.ExplorerBarBox5.CaptionEndColor = System.Drawing.Color.FromArgb(CType(199, Byte), CType(211, Byte), CType(247, Byte))
+        Me.ExplorerBarBox5.CaptionStartColor = System.Drawing.Color.FromArgb(CType(255, Byte), CType(255, Byte), CType(255, Byte))
+        Me.ExplorerBarBox5.Controls.Add(Me.ExplorerBarBoxItem6)
+        Me.ExplorerBarBox5.Controls.Add(Me.ExplorerBarBoxItem26)
+        Me.ExplorerBarBox5.Controls.Add(Me.ExplorerBarBoxItem27)
+        Me.ExplorerBarBox5.Controls.Add(Me.ExplorerBarBoxItem30)
+        Me.ExplorerBarBox5.Controls.Add(Me.ExplorerBarBoxItem28)
+        Me.ExplorerBarBox5.Controls.Add(Me.ExplorerBarBoxItem29)
+        Me.ExplorerBarBox5.Dock = System.Windows.Forms.DockStyle.Top
+        Me.ExplorerBarBox5.DockPadding.Bottom = 8
+        Me.ExplorerBarBox5.DockPadding.Left = 8
+        Me.ExplorerBarBox5.DockPadding.Right = 8
+        Me.ExplorerBarBox5.DockPadding.Top = 39
+        Me.ExplorerBarBox5.Expanded = True
+        Me.ExplorerBarBox5.ExpanderCollapseImage = CType(resources.GetObject("ExplorerBarBox5.ExpanderCollapseImage"), System.Drawing.Image)
+        Me.ExplorerBarBox5.ExpanderExpandImage = CType(resources.GetObject("ExplorerBarBox5.ExpanderExpandImage"), System.Drawing.Image)
+        Me.ExplorerBarBox5.ExpanderHoverCollapseImage = CType(resources.GetObject("ExplorerBarBox5.ExpanderHoverCollapseImage"), System.Drawing.Image)
+        Me.ExplorerBarBox5.ExpanderHoverExpandImage = CType(resources.GetObject("ExplorerBarBox5.ExpanderHoverExpandImage"), System.Drawing.Image)
+        Me.ExplorerBarBox5.FoldingSpeed = 20
+        Me.ExplorerBarBox5.ForeColor = System.Drawing.Color.FromArgb(CType(33, Byte), CType(93, Byte), CType(198, Byte))
+        Me.ExplorerBarBox5.HoverForeColor = System.Drawing.Color.FromArgb(CType(123, Byte), CType(153, Byte), CType(244, Byte))
+        Me.ExplorerBarBox5.Location = New System.Drawing.Point(10, 159)
+        Me.ExplorerBarBox5.Name = "ExplorerBarBox5"
+        Me.ExplorerBarBox5.Size = New System.Drawing.Size(135, 193)
+        Me.ExplorerBarBox5.TabIndex = 5
+        Me.ExplorerBarBox5.Text = "Articles"
+        Me.ExplorerBarBox5.TopLeftMask = CType(resources.GetObject("ExplorerBarBox5.TopLeftMask"), System.Drawing.Bitmap)
+        Me.ExplorerBarBox5.TopRightMask = CType(resources.GetObject("ExplorerBarBox5.TopRightMask"), System.Drawing.Bitmap)
+        '
+        'ExplorerBarBoxItem6
+        '
+        Me.ExplorerBarBoxItem6.ActiveLinkColor = System.Drawing.Color.Red
+        Me.ExplorerBarBoxItem6.Dock = System.Windows.Forms.DockStyle.Bottom
+        Me.ExplorerBarBoxItem6.Image = CType(resources.GetObject("ExplorerBarBoxItem6.Image"), System.Drawing.Image)
+        Me.ExplorerBarBoxItem6.LinkColor = System.Drawing.Color.FromArgb(CType(51, Byte), CType(106, Byte), CType(174, Byte))
+        Me.ExplorerBarBoxItem6.Location = New System.Drawing.Point(8, 46)
+        Me.ExplorerBarBoxItem6.Name = "ExplorerBarBoxItem6"
+        Me.ExplorerBarBoxItem6.Size = New System.Drawing.Size(119, 21)
+        Me.ExplorerBarBoxItem6.TabIndex = 3
+        Me.ExplorerBarBoxItem6.Text = "Fils"
+        '
+        'ExplorerBarBoxItem26
+        '
+        Me.ExplorerBarBoxItem26.ActiveLinkColor = System.Drawing.Color.Red
+        Me.ExplorerBarBoxItem26.Dock = System.Windows.Forms.DockStyle.Bottom
+        Me.ExplorerBarBoxItem26.Image = CType(resources.GetObject("ExplorerBarBoxItem26.Image"), System.Drawing.Image)
+        Me.ExplorerBarBoxItem26.LinkColor = System.Drawing.Color.FromArgb(CType(51, Byte), CType(106, Byte), CType(174, Byte))
+        Me.ExplorerBarBoxItem26.Location = New System.Drawing.Point(8, 67)
+        Me.ExplorerBarBoxItem26.Name = "ExplorerBarBoxItem26"
+        Me.ExplorerBarBoxItem26.Size = New System.Drawing.Size(119, 21)
+        Me.ExplorerBarBoxItem26.TabIndex = 4
+        Me.ExplorerBarBoxItem26.Text = "Teixits"
+        '
+        'ExplorerBarBoxItem27
+        '
+        Me.ExplorerBarBoxItem27.ActiveLinkColor = System.Drawing.Color.Red
+        Me.ExplorerBarBoxItem27.Dock = System.Windows.Forms.DockStyle.Bottom
+        Me.ExplorerBarBoxItem27.Image = CType(resources.GetObject("ExplorerBarBoxItem27.Image"), System.Drawing.Image)
+        Me.ExplorerBarBoxItem27.LinkColor = System.Drawing.Color.FromArgb(CType(51, Byte), CType(106, Byte), CType(174, Byte))
+        Me.ExplorerBarBoxItem27.Location = New System.Drawing.Point(8, 88)
+        Me.ExplorerBarBoxItem27.Name = "ExplorerBarBoxItem27"
+        Me.ExplorerBarBoxItem27.Size = New System.Drawing.Size(119, 34)
+        Me.ExplorerBarBoxItem27.TabIndex = 5
+        Me.ExplorerBarBoxItem27.Text = "Disposicions Teixits"
+        '
+        'ExplorerBarBoxItem30
+        '
+        Me.ExplorerBarBoxItem30.ActiveLinkColor = System.Drawing.Color.Red
+        Me.ExplorerBarBoxItem30.Dock = System.Windows.Forms.DockStyle.Bottom
+        Me.ExplorerBarBoxItem30.Image = CType(resources.GetObject("ExplorerBarBoxItem30.Image"), System.Drawing.Image)
+        Me.ExplorerBarBoxItem30.LinkColor = System.Drawing.Color.FromArgb(CType(51, Byte), CType(106, Byte), CType(174, Byte))
+        Me.ExplorerBarBoxItem30.Location = New System.Drawing.Point(8, 122)
+        Me.ExplorerBarBoxItem30.Name = "ExplorerBarBoxItem30"
+        Me.ExplorerBarBoxItem30.Size = New System.Drawing.Size(119, 21)
+        Me.ExplorerBarBoxItem30.TabIndex = 8
+        Me.ExplorerBarBoxItem30.Text = "Complements"
+        '
+        'ExplorerBarBoxItem28
+        '
+        Me.ExplorerBarBoxItem28.ActiveLinkColor = System.Drawing.Color.Red
+        Me.ExplorerBarBoxItem28.Dock = System.Windows.Forms.DockStyle.Bottom
+        Me.ExplorerBarBoxItem28.Image = CType(resources.GetObject("ExplorerBarBoxItem28.Image"), System.Drawing.Image)
+        Me.ExplorerBarBoxItem28.LinkColor = System.Drawing.Color.FromArgb(CType(51, Byte), CType(106, Byte), CType(174, Byte))
+        Me.ExplorerBarBoxItem28.Location = New System.Drawing.Point(8, 143)
+        Me.ExplorerBarBoxItem28.Name = "ExplorerBarBoxItem28"
+        Me.ExplorerBarBoxItem28.Size = New System.Drawing.Size(119, 21)
+        Me.ExplorerBarBoxItem28.TabIndex = 6
+        Me.ExplorerBarBoxItem28.Text = "Fornitures"
+        '
+        'ExplorerBarBoxItem29
+        '
+        Me.ExplorerBarBoxItem29.ActiveLinkColor = System.Drawing.Color.Red
+        Me.ExplorerBarBoxItem29.Dock = System.Windows.Forms.DockStyle.Bottom
+        Me.ExplorerBarBoxItem29.Image = CType(resources.GetObject("ExplorerBarBoxItem29.Image"), System.Drawing.Image)
+        Me.ExplorerBarBoxItem29.LinkColor = System.Drawing.Color.FromArgb(CType(51, Byte), CType(106, Byte), CType(174, Byte))
+        Me.ExplorerBarBoxItem29.Location = New System.Drawing.Point(8, 164)
+        Me.ExplorerBarBoxItem29.Name = "ExplorerBarBoxItem29"
+        Me.ExplorerBarBoxItem29.Size = New System.Drawing.Size(119, 21)
+        Me.ExplorerBarBoxItem29.TabIndex = 7
+        Me.ExplorerBarBoxItem29.Text = "Models"
+        '
+        'ExplorerBarBox1
+        '
+        Me.ExplorerBarBox1.BackColor = System.Drawing.Color.FromArgb(CType(214, Byte), CType(223, Byte), CType(247, Byte))
+        Me.ExplorerBarBox1.BorderColor = System.Drawing.Color.White
+        Me.ExplorerBarBox1.CaptionEndColor = System.Drawing.Color.FromArgb(CType(199, Byte), CType(211, Byte), CType(247, Byte))
+        Me.ExplorerBarBox1.CaptionStartColor = System.Drawing.Color.FromArgb(CType(255, Byte), CType(255, Byte), CType(255, Byte))
+        Me.ExplorerBarBox1.Controls.Add(Me.ExplorerBarBoxItem1)
+        Me.ExplorerBarBox1.Controls.Add(Me.ExplorerBarBoxItem2)
+        Me.ExplorerBarBox1.Controls.Add(Me.ExplorerBarBoxItem3)
+        Me.ExplorerBarBox1.Controls.Add(Me.ExplorerBarBoxItem4)
+        Me.ExplorerBarBox1.Controls.Add(Me.ExplorerBarBoxItem5)
+        Me.ExplorerBarBox1.Dock = System.Windows.Forms.DockStyle.Top
+        Me.ExplorerBarBox1.DockPadding.Bottom = 8
+        Me.ExplorerBarBox1.DockPadding.Left = 8
+        Me.ExplorerBarBox1.DockPadding.Right = 8
+        Me.ExplorerBarBox1.DockPadding.Top = 39
+        Me.ExplorerBarBox1.Expanded = True
+        Me.ExplorerBarBox1.ExpanderCollapseImage = CType(resources.GetObject("ExplorerBarBox1.ExpanderCollapseImage"), System.Drawing.Image)
+        Me.ExplorerBarBox1.ExpanderExpandImage = CType(resources.GetObject("ExplorerBarBox1.ExpanderExpandImage"), System.Drawing.Image)
+        Me.ExplorerBarBox1.ExpanderHoverCollapseImage = CType(resources.GetObject("ExplorerBarBox1.ExpanderHoverCollapseImage"), System.Drawing.Image)
+        Me.ExplorerBarBox1.ExpanderHoverExpandImage = CType(resources.GetObject("ExplorerBarBox1.ExpanderHoverExpandImage"), System.Drawing.Image)
+        Me.ExplorerBarBox1.FoldingSpeed = 20
+        Me.ExplorerBarBox1.ForeColor = System.Drawing.Color.FromArgb(CType(33, Byte), CType(93, Byte), CType(198, Byte))
+        Me.ExplorerBarBox1.HoverForeColor = System.Drawing.Color.FromArgb(CType(123, Byte), CType(153, Byte), CType(244, Byte))
+        Me.ExplorerBarBox1.Location = New System.Drawing.Point(10, 0)
+        Me.ExplorerBarBox1.Name = "ExplorerBarBox1"
+        Me.ExplorerBarBox1.Size = New System.Drawing.Size(135, 159)
+        Me.ExplorerBarBox1.TabIndex = 0
+        Me.ExplorerBarBox1.Text = "Bases de Dades"
+        Me.ExplorerBarBox1.TopLeftMask = CType(resources.GetObject("ExplorerBarBox1.TopLeftMask"), System.Drawing.Bitmap)
+        Me.ExplorerBarBox1.TopRightMask = CType(resources.GetObject("ExplorerBarBox1.TopRightMask"), System.Drawing.Bitmap)
+        '
+        'ExplorerBarBoxItem2
+        '
+        Me.ExplorerBarBoxItem2.ActiveLinkColor = System.Drawing.Color.Red
+        Me.ExplorerBarBoxItem2.Dock = System.Windows.Forms.DockStyle.Bottom
+        Me.ExplorerBarBoxItem2.Image = CType(resources.GetObject("ExplorerBarBoxItem2.Image"), System.Drawing.Image)
+        Me.ExplorerBarBoxItem2.LinkColor = System.Drawing.Color.FromArgb(CType(51, Byte), CType(106, Byte), CType(174, Byte))
+        Me.ExplorerBarBoxItem2.Location = New System.Drawing.Point(8, 67)
+        Me.ExplorerBarBoxItem2.Name = "ExplorerBarBoxItem2"
+        Me.ExplorerBarBoxItem2.Size = New System.Drawing.Size(119, 21)
+        Me.ExplorerBarBoxItem2.TabIndex = 4
+        Me.ExplorerBarBoxItem2.Text = "Tallers"
+        '
+        'ExplorerBarBoxItem3
+        '
+        Me.ExplorerBarBoxItem3.ActiveLinkColor = System.Drawing.Color.Red
+        Me.ExplorerBarBoxItem3.Dock = System.Windows.Forms.DockStyle.Bottom
+        Me.ExplorerBarBoxItem3.Image = CType(resources.GetObject("ExplorerBarBoxItem3.Image"), System.Drawing.Image)
+        Me.ExplorerBarBoxItem3.LinkColor = System.Drawing.Color.FromArgb(CType(51, Byte), CType(106, Byte), CType(174, Byte))
+        Me.ExplorerBarBoxItem3.Location = New System.Drawing.Point(8, 88)
+        Me.ExplorerBarBoxItem3.Name = "ExplorerBarBoxItem3"
+        Me.ExplorerBarBoxItem3.Size = New System.Drawing.Size(119, 21)
+        Me.ExplorerBarBoxItem3.TabIndex = 5
+        Me.ExplorerBarBoxItem3.Text = "Proveïdors"
+        '
+        'ExplorerBarBoxItem4
+        '
+        Me.ExplorerBarBoxItem4.ActiveLinkColor = System.Drawing.Color.Red
+        Me.ExplorerBarBoxItem4.Dock = System.Windows.Forms.DockStyle.Bottom
+        Me.ExplorerBarBoxItem4.Image = CType(resources.GetObject("ExplorerBarBoxItem4.Image"), System.Drawing.Image)
+        Me.ExplorerBarBoxItem4.LinkColor = System.Drawing.Color.FromArgb(CType(51, Byte), CType(106, Byte), CType(174, Byte))
+        Me.ExplorerBarBoxItem4.Location = New System.Drawing.Point(8, 109)
+        Me.ExplorerBarBoxItem4.Name = "ExplorerBarBoxItem4"
+        Me.ExplorerBarBoxItem4.Size = New System.Drawing.Size(119, 21)
+        Me.ExplorerBarBoxItem4.TabIndex = 6
+        Me.ExplorerBarBoxItem4.Text = "Transportistes"
+        '
+        'ExplorerBarBoxItem5
+        '
+        Me.ExplorerBarBoxItem5.ActiveLinkColor = System.Drawing.Color.Red
+        Me.ExplorerBarBoxItem5.Dock = System.Windows.Forms.DockStyle.Bottom
+        Me.ExplorerBarBoxItem5.Image = CType(resources.GetObject("ExplorerBarBoxItem5.Image"), System.Drawing.Image)
+        Me.ExplorerBarBoxItem5.LinkColor = System.Drawing.Color.FromArgb(CType(51, Byte), CType(106, Byte), CType(174, Byte))
+        Me.ExplorerBarBoxItem5.Location = New System.Drawing.Point(8, 130)
+        Me.ExplorerBarBoxItem5.Name = "ExplorerBarBoxItem5"
+        Me.ExplorerBarBoxItem5.Size = New System.Drawing.Size(119, 21)
+        Me.ExplorerBarBoxItem5.TabIndex = 7
+        Me.ExplorerBarBoxItem5.Text = "Representants"
+        '
+        'CollapsibleSplitter1
+        '
+        Me.CollapsibleSplitter1.AnimationDelay = 20
+        Me.CollapsibleSplitter1.AnimationStep = 20
+        Me.CollapsibleSplitter1.BackColor = System.Drawing.Color.Gainsboro
+        Me.CollapsibleSplitter1.BorderStyle3D = System.Windows.Forms.Border3DStyle.RaisedInner
+        Me.CollapsibleSplitter1.ControlToHide = Me.ExplorerBarControl1
+        Me.CollapsibleSplitter1.ExpandParentForm = False
+        Me.CollapsibleSplitter1.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.CollapsibleSplitter1.Location = New System.Drawing.Point(176, 23)
+        Me.CollapsibleSplitter1.MinExtra = 0
+        Me.CollapsibleSplitter1.MinSize = 0
+        Me.CollapsibleSplitter1.Name = "CollapsibleSplitter1"
+        Me.CollapsibleSplitter1.TabIndex = 17
+        Me.CollapsibleSplitter1.TabStop = False
+        Me.CollapsibleSplitter1.UseAnimations = False
+        Me.CollapsibleSplitter1.VisualStyle = NJFLib.Controls.VisualStyles.XP
+        '
+        'ToolBar1
+        '
+        Me.ToolBar1.Dock = System.Windows.Forms.DockStyle.Bottom
+        Me.ToolBar1.Guid = New System.Guid("1ddeed21-d2fa-4a58-a24b-56e184b68dcb")
+        Me.ToolBar1.Location = New System.Drawing.Point(184, 716)
+        Me.ToolBar1.Name = "ToolBar1"
+        Me.ToolBar1.Overflow = TD.SandBar.ToolBarOverflow.Wrap
+        Me.ToolBar1.Size = New System.Drawing.Size(832, 18)
+        Me.ToolBar1.TabIndex = 19
+        Me.ToolBar1.Text = "ToolBar1"
+        '
+        'timActualizador
+        '
+        Me.timActualizador.Interval = 120000
+        '
+        'mnuIncoterms
+        '
+        Me.mnuIncoterms.Text = "Incoterms"
+        '
+        'frmPrincipal
+        '
+        Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
+        Me.ClientSize = New System.Drawing.Size(1016, 734)
+        Me.Controls.Add(Me.ToolBar1)
+        Me.Controls.Add(Me.CollapsibleSplitter1)
+        Me.Controls.Add(Me.ExplorerBarControl1)
+        Me.Controls.Add(Me.leftSandBarDock)
+        Me.Controls.Add(Me.rightSandBarDock)
+        Me.Controls.Add(Me.bottomSandBarDock)
+        Me.Controls.Add(Me.topSandBarDock)
+        Me.Cursor = System.Windows.Forms.Cursors.Default
+        Me.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!)
+        Me.ForeColor = System.Drawing.SystemColors.WindowText
+        Me.IsMdiContainer = True
+        Me.KeyPreview = True
+        Me.Name = "frmPrincipal"
+        Me.Text = "TEX.NET"
+        Me.WindowState = System.Windows.Forms.FormWindowState.Maximized
+        Me.topSandBarDock.ResumeLayout(False)
+        Me.ExplorerBarControl1.ResumeLayout(False)
+        Me.ExplorerBarBox4.ResumeLayout(False)
+        Me.ExplorerBarBox3.ResumeLayout(False)
+        Me.ExplorerBarBox2.ResumeLayout(False)
+        Me.ExplorerBarBox5.ResumeLayout(False)
+        Me.ExplorerBarBox1.ResumeLayout(False)
+        Me.ResumeLayout(False)
+
+    End Sub
+
+#End Region
+
+    Shared frmChildForm As frmPrincipal
+    Public Shared Function GetInstance() As frmPrincipal
+        If frmChildForm Is Nothing Then
+            frmChildForm = New frmPrincipal
+        End If
+        Return frmChildForm
+    End Function
+
+#Region "VARIABLES"
+
+    Private WithEvents xMDIClient As Windows.Forms.MdiClient
+    Private OriginalImage As Bitmap = Bitmap.FromFile(directorio & "\imagenes\logo.bmp")
+    Private salirSinConfirmar As Boolean = False
+    Private cargando As Boolean = False
+    Private fcargando As frCargando
+
+#End Region
+
+#Region "LEERCONFIGINICIALXML"
+
+    Private Sub PonerIdiomaEmpresa()
+        Dim xmlDoc As New Xml.XmlDocument
+        Dim tempnode As Xml.XmlNode
+        Dim lang As String
+        Try
+            xmlDoc.Load(directorio & "conf\configuracion.xml")
+            For Each tempnode In xmlDoc.DocumentElement.ChildNodes
+                Select Case tempnode.Name
+                    Case "IDIOMA"
+                        lang = tempnode.InnerText
+                    Case "EMPRESADEFECTO"
+                        empresaPorDefecto = nz(tempnode.InnerText, "C")
+                    Case "IDIOMAIMPRESION"
+                        idiomaImpresion = tempnode.InnerText
+                End Select
+            Next
+            System.Threading.Thread.CurrentThread.CurrentUICulture = New System.Globalization.CultureInfo(lang)
+
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Sub
+
+#End Region
+
+#Region "ARCHIVO"
+
+    Private Sub btnMnuSalir_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuSalir.Activate
+        Try
+            Close()
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+
+#End Region
+
+#Region "BASE DE DATOS"
+
+    Private Sub mnuEmpresas_Activate(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuEmpresas.Activate
+        Try
+            CargaFormulario(frmEmpresas.GetInstance)
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub MnuClientes_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MnuClientes.Activate
+        Try
+            CargaFormulario(frmClientesForm.GetInstance)
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub btnMnuTalleres_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MnuTalleres.Activate
+        Try
+            CargaFormulario(frmTalleresForm.GetInstance)
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub btnMnuProveedores_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MnuProveedores.Activate
+        Try
+            CargaFormulario(frmProveedoresForm.GetInstance)
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub btnMnuTransportistas_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MnuTransportistas.Activate
+        Try
+            CargaFormulario(frmTransportistasForm.GetInstance)
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub btnMnuRepresentantes_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MnuRepresentantes.Activate
+        Try
+            CargaFormulario(frmRepresentantesForm.GetInstance)
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub btnMnuOperaciones_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MnuOperaciones.Activate
+        Try
+            CargaFormulario(frmOperacionesForm.GetInstance)
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub btnMnuMaquinas_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MnuMaquinas.Activate
+        Try
+            CargaFormulario(frmMaquinasForm.GetInstance)
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub btnMnuHilos_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MnuHilos.Activate
+        Try
+            CargaFormulario(frmHilos.GetInstance)
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub btnMnuFornituras_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MnuFornituras.Activate
+        Try
+            CargaFormulario(frmFornituras.GetInstance)
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub btnMnuTipoIVA_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MnuTipodeIVA.Activate
+        Try
+            CargaFormulario(frmIVAForm.GetInstance)
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub btnMnuBancos_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MnuBancos.Activate
+        Try
+            CargaFormulario(frmBancosForm.GetInstance)
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub btnMnuFormasPago_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuFormadepago.Activate
+        Try
+            CargaFormulario(frmPagoForm2.GetInstance)
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub btnMnuMuestras_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MnuMuestras.Activate
+        Try
+            CargaFormulario(frmMuestras.GetInstance)
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub btnMnuTejidos2_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MnuTejidos2.Activate
+        Try
+            CargaFormulario(frmTejidos.GetInstance)
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub btnMnuDisposiciones_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MnuDisposiciones.Activate
+        Try
+            CargaFormulario(frmDisposicion.GetInstance)
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub MenuItem29_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuModelos.Activate
+        Try
+            CargaFormulario(frmModelos.GetInstance)
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+
+#End Region
+
+#Region "TEJIDOS"
+
+    Private Sub btnMnuTejidoVentaPedido_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuTejidoVentaPedido.Activate
+        Try
+            CargaFormulario(frmTejidoVentaPedido.GetInstance)
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub btnMnuTejidoVentaAlbaran_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuTejidoVentaAlbaran.Activate
+        Try
+            CargaFormulario(frmTejidoVentaAlbaran.GetInstance)
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub btnMnuTejidoVentaFactura_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuTejidoVentaFactura.Activate
+        Try
+            CargaFormulario(frmVentaFactura.GetInstance)
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+
+
+#End Region
+
+#Region "VENTANAS"
+
+    Private Sub CerrarTodas_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuCerrarTodas.Activate
+        Dim en As IEnumerator = Me.MdiChildren.GetEnumerator
+        While (en.MoveNext)
+            en.Current.close()
+        End While
+    End Sub
+    Private Sub Minimitzartots_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuMinimizarTodas.Activate
+        Dim en As IEnumerator = Me.MdiChildren.GetEnumerator
+        While (en.MoveNext)
+            en.Current.minimizeBox()
+        End While
+    End Sub
+    Private Sub Cascada_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuCascada.Activate
+        Me.LayoutMdi(MdiLayout.Cascade)
+    End Sub
+    Private Sub OrganizacionAutomatica_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuOrganizacion.Activate
+        Me.LayoutMdi(MdiLayout.ArrangeIcons)
+    End Sub
+    Private Sub Otraorg1_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MenuItem31.Activate
+        Me.LayoutMdi(MdiLayout.TileHorizontal)
+    End Sub
+    Private Sub Otraorg2_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MenuItem32.Activate
+        Me.LayoutMdi(MdiLayout.TileVertical)
+    End Sub
+
+#End Region
+
+#Region "FORNITURAS"
+
+    Private Sub btnMnuForniturasCompraPedido_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuCompraFornituras.Activate
+        Try
+            CargaFormulario(frmForniturasCompraPedido.GetInstance)
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+
+#End Region
+
+#Region "MODELOS"
+
+    Private Sub AlbaranesModelos_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuVentaModelosAlbaranes.Activate
+        Try
+            CargaFormulario(frmAlbaranesModelos.GetInstance)
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+
+    End Sub
+    Private Sub Modelos_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuVentaModelosFacturas.Activate
+        Try
+            CargaFormulario(frmFacturasModelos.GetInstance)
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub OrdenesFabricacion_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuOrdenesFabricacion.Activate
+        Try
+            CargaFormulario(frmOrdenesFabricacion.GetInstance)
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub Temporadas_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuTemporadas.Activate
+        Try
+            CargaFormulario(frmTemporadas.GetInstance)
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+
+    End Sub
+
+#End Region
+
+#Region "IDIOMAS"
+
+
+    Private Sub GuardarIdioma(ByVal idioma As String, Optional ByVal impresion As Boolean = False)
+        Try
+            Dim xmlWri As Xml.XmlWriter
+            Dim lang As String
+
+
+            ' Create an Xml document instance and load XML data.
+            Dim xmlDoc As Xml.XmlDocument = New Xml.XmlDocument
+            xmlDoc.Load(directorio & "conf\configuracion.xml")
+
+            ' I. Modification
+            ' 1. Increment all the Book Id attribute values by 100.
+            Dim tempnodeList As Xml.XmlNodeList
+            If impresion Then
+                tempnodeList = xmlDoc.SelectNodes("//IDIOMAIMPRESION")
+                idiomaImpresion = idioma
+            Else
+                tempnodeList = xmlDoc.SelectNodes("//IDIOMA")
+            End If
+
+            Dim tempnode As Xml.XmlNode
+            For Each tempnode In tempnodeList
+                tempnode.InnerText = idioma
+            Next
+            ' 2. Save the modified XML to a file in Unicode format.
+            xmlDoc.PreserveWhitespace = True
+            Dim wrtr As Xml.XmlTextWriter = New Xml.XmlTextWriter(directorio & "conf\configuracion.xml", System.Text.Encoding.Unicode)
+            xmlDoc.WriteTo(wrtr)
+            wrtr.Close()
+            w.Close()
+            If Not impresion Then
+                Application.Exit()
+                System.Diagnostics.Process.Start(Application.ExecutablePath)
+            End If
+
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Sub
+    Private Sub mnuCatalanImpresion_Activate(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuCatalanImpresion.Activate
+        Try
+            System.Threading.Thread.CurrentThread.CurrentUICulture = New CultureInfo("ca")
+            mnuCatalanImpresion.Checked = True
+            mnuInglesImpresion.Checked = False
+            mnuCastellanoImpresion.Checked = False
+            GuardarIdioma("ca", True)
+            'PonerNombresIdioma()
+
+        Catch ex As ArgumentException
+            LOG(ex.Message.ToString)
+        End Try
+    End Sub
+
+    Private Sub mnuCastellanoImpresion_Activate(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuCastellanoImpresion.Activate
+        Try
+            System.Threading.Thread.CurrentThread.CurrentUICulture = New CultureInfo("es-ES")
+            GuardarIdioma("es-ES", True)
+            mnuCatalanImpresion.Checked = False
+            mnuInglesImpresion.Checked = False
+            mnuCastellanoImpresion.Checked = True
+
+        Catch ex As ArgumentException
+            LOG(ex.Message.ToString)
+        End Try
+    End Sub
+    Private Sub mnuInglesImpresion_Activate(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuInglesImpresion.Activate
+        Try
+            System.Threading.Thread.CurrentThread.CurrentUICulture = New CultureInfo("en")
+            GuardarIdioma("en", True)
+            mnuCatalanImpresion.Checked = False
+            mnuInglesImpresion.Checked = True
+            mnuCastellanoImpresion.Checked = False
+
+        Catch ex As ArgumentException
+            LOG(ex.Message.ToString)
+        End Try
+    End Sub
+    Private Sub mnuCastellano_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuCastellano.Activate
+        Try
+            System.Threading.Thread.CurrentThread.CurrentUICulture = New CultureInfo("es-ES")
+            GuardarIdioma("es-ES")
+            mnuCatalan.Checked = False
+            mnuCastellano.Checked = True
+
+        Catch ex As ArgumentException
+            LOG(ex.Message.ToString)
+        End Try
+
+    End Sub
+    Private Sub mnuCatalan_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuCatalan.Activate
+        Try
+            System.Threading.Thread.CurrentThread.CurrentUICulture = New CultureInfo("ca")
+            mnuCatalan.Checked = True
+            mnuCastellano.Checked = False
+            GuardarIdioma("ca")
+            'PonerNombresIdioma()
+
+        Catch ex As ArgumentException
+            LOG(ex.Message.ToString)
+        End Try
+    End Sub
+
+#End Region
+
+#Region "COMPRAS"
+
+    Private Sub btnMnuTejidoCompraPedido_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuTejidoCompraPedidos.Activate
+        Try
+            CargaFormulario(frmTejidoCompraPedido.GetInstance)
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub mnuCompraMuestrasPedidos_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuCompraMuestrasPedidos.Activate
+        Try
+            CargaFormulario(frmHilosComprasPedido.GetInstance)
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub mnuMuestrasCompraAlbaranes_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuMuestrasCompraAlbaranes.Activate
+        Try
+            CargaFormulario(frmHilosComprasAlbaran.GetInstance)
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub mnuOrdenesFabricacionMuestras_Activate(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuOrdenesFabricacionMuestras.Activate
+        Try
+            CargaFormulario(frmMuestrasOrdenes.GetInstance)
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub mnuBtnFacturaProforma_Activate(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuBtnFacturaProforma.Activate
+        Try
+            CargaFormulario(frmVentaFacturaProforma.GetInstance)
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+
+#End Region
+
+#Region "LISTADOS"
+
+    Private Sub frmClientesLista_Activate(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuListadoClientes.Activate
+        Try
+            CargaFormulario(frmClientesLista.GetInstance(esListado))
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub frmProveedoresLista_Activate(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuListadoProveedores.Activate
+        Try
+            CargaFormulario(frmProveedoresLista.GetInstance(esListado))
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub frmTalleresLista_Activate(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuListadoTalleres.Activate
+        Try
+            CargaFormulario(frmTalleresLista.GetInstance(esListado))
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub MenuButtonItem22_Activate(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuListadoTransportistas.Activate
+        Try
+            CargaFormulario(frmTransportistasLista.GetInstance(esListado))
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub frmRepresentantesLista_Activate(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuListadoRepresentantes.Activate
+        Try
+            CargaFormulario(frmRepresentantesLista.GetInstance(esListado))
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub frmOperacionesLista_Activate(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuListadoOperaciones.Activate
+        Try
+            CargaFormulario(frmOperacionesLista.GetInstance(esListado))
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub frmMaquinasLista_Activate(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuListadoMaquinas.Activate
+        Try
+            CargaFormulario(frmMaquinasLista.GetInstance(esListado))
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub frmTejidosLista_Activate_2(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnListadoTejidos.Activate
+        Try
+            CargaFormulario(frmTejidosLista.GetInstance(esListado, empresaPorDefecto))
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub MenuButtonItem29_Activate(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuListadoMuestras.Activate
+        Try
+            CargaFormulario(frmMuestrasLista.GetInstance(esListado, empresaPorDefecto))
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False
+        End Try
+    End Sub
+    Private Sub frmDisposicionLista_Activate(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuListadoDisposiciones.Activate
+        Try
+            CargaFormulario(frmDisposicionLista.GetInstance(esListado))
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub frmModelosLista_Activate(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuListadoModelos.Activate
+        Try
+            CargaFormulario(frmModelosLista.GetInstance(esListado))
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub frmHilosLista_Activate(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuListadoHilos.Activate
+        Try
+            CargaFormulario(frmHilosLista.GetInstance(esListado, empresaPorDefecto))
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub mnuListadoBancos_Activate(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuListadoBancos.Activate
+        Try
+            CargaFormulario(frmBancosLista.GetInstance(esListado))
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub mnuListadosCompra_Activate(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuListadosCompra.Activate
+        Try
+            'CargaFormulario(frmPAFLista.GetInstance())
+            CargaFormulario(frmElegirPAFP.GetInstance)
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+
+#End Region
+
+#Region "FONDO"
+
+    Private Sub PonerImagenFondo()
+        Try
+            Dim xControl As Object
+            Dim imgDest As New Bitmap(Me.ClientSize.Width, Me.ClientSize.Height)
+            Dim xGraphics As Graphics = Graphics.FromImage(imgDest)
+
+            xGraphics.DrawImage(OriginalImage, 0, 0, imgDest.Width + 1, imgDest.Height + 1)
+
+            For Each xControl In Me.Controls
+                If xControl.GetType.ToString = "System.Windows.Forms.MdiClient" Then
+                    xMDIClient = xControl
+                    xControl.BackgroundImage = imgDest
+                    'directcast(xControl, System.Windows.Forms.MdiClient).BackgroundImage.PhysicalDimension
+                    Exit For
+                End If
+            Next
+
+            xGraphics.Dispose()
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub xMDIClient_Resize(ByVal sender As Object, ByVal e As System.EventArgs) Handles xMDIClient.Resize
+        DrawBG()
+    End Sub
+    Private Sub DrawBG()
+        Try
+            If Me.WindowState <> FormWindowState.Minimized Then
+                Dim imgDest As New Bitmap(Me.ClientSize.Width, Me.ClientSize.Height)
+                Dim xGraphics As Graphics = Graphics.FromImage(imgDest)
+                xGraphics.DrawImage(OriginalImage, 0, 0, imgDest.Width + 1, imgDest.Height + 1)
+                xMDIClient.BackgroundImage = imgDest
+                xGraphics.Dispose()
+            End If
+
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Sub
+
+#End Region
+
+#Region "ESTADÍSTICAS"
+
+    Private Sub mnuEstadisticas_BeforePopup(ByVal sender As System.Object, ByVal e As TD.SandBar.MenuPopupEventArgs) Handles mnuEstadisticas.BeforePopup
+        CargaFormulario(frmEstFacturacionArticulos.GetInstance)
+    End Sub
+
+#End Region
+
+#Region "ORGANIZAR"
+
+    Private Sub IniciarForm(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
+        Cursor = Cursors.AppStarting
+        Dim xmlDoc As New Xml.XmlDocument
+        Dim tempnode As Xml.XmlNode
+        Dim host As String
+        Dim puerto As Integer
+        Try
+
+            xmlDoc.Load(directorio & "conf\configuracion.xml")
+            For Each tempnode In xmlDoc.DocumentElement.ChildNodes
+                Select Case tempnode.Name
+                    Case "IPSERVIDOR"
+                        host = tempnode.InnerText
+                    Case "PUERTO"
+                        puerto = tempnode.InnerText
+                    Case "MODODEBUG"
+                        Try
+                            modoDebug = tempnode.InnerText
+                        Catch ex As Exception : End Try
+                End Select
+            Next
+
+            PonerChecksIdioma()
+
+            If modoDebug Then
+                monitor = New MySqlMonitor
+                monitor.IsActive = True
+            End If
+            mHost = host
+            cnn = New MySqlConnection("User=root;Password=J7V21R54;Host=" & host & " ;Database=coespunt;Port=" & puerto)
+
+            PonerImagenFondo()
+
+            mnuBackup.Visible = modoDebug
+            mnuErrores.Visible = modoDebug
+            mnuUtilidades.Visible = modoDebug
+            mnuBackup.Visible = modoDebug
+            mnuStockModelos.Visible = modoDebug
+            mnuEnviarErrores.Visible = modoDebug
+
+            Try
+                cnn.Open()
+                Dim cmdSelect As New MySqlCommand
+                Dim daSelect As New MySqlDataAdapter
+                cmdSelect.Connection = cnn
+                cmdSelect.CommandText = "SELECT CODI, DESCRI, DESCRI AS NOMFILIAL FROM FILIALES"
+                daSelect.SelectCommand = cmdSelect
+                ACN()
+                dtFiliales.Rows.Clear()
+                daSelect.Fill(dtFiliales)
+                PonerCaptions(dtFiliales)
+                dtFiliales.AcceptChanges()
+                cnn.Close()
+
+            Catch ex As Exception
+                MessageBox.Show(rm.GetString("ERRORCN"))
+                CargaFormulario(frmConfiguracion.GetInstance)
+                'salirSinConfirmar = True
+                'Me.Close()
+            End Try
+            ComprobarLOG()
+            'CargaFormulario(frmEstFacturacionArticulos.GetInstance)
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+        Cursor = Cursors.Default
+    End Sub
+    Private Sub PonerChecksIdioma()
+        Try
+            'Idioma del programa
+            Select Case System.Threading.Thread.CurrentThread.CurrentUICulture.Name
+                Case "ca"
+                    mnuCatalan.Checked = True
+                    mnuCastellano.Checked = False
+                Case "es-ES"
+                    mnuCatalan.Checked = False
+                    mnuCastellano.Checked = True
+            End Select
+
+            'Idioma de impresion
+            Select Case idiomaImpresion
+                Case "ca"
+                    mnuCatalanImpresion.Checked = True
+                    mnuCastellanoImpresion.Checked = False
+                    mnuInglesImpresion.Checked = False
+                Case "es-ES"
+                    mnuCatalanImpresion.Checked = False
+                    mnuCastellanoImpresion.Checked = True
+                    mnuInglesImpresion.Checked = False
+                Case "en"
+                    mnuCatalanImpresion.Checked = False
+                    mnuCastellanoImpresion.Checked = False
+                    mnuInglesImpresion.Checked = True
+            End Select
+
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Sub
+    Private Sub mnuRemesas_Activate(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuRemesas.Activate
+        Try
+            CargaFormulario(frmRemesas.GetInstance)
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub mnuCartas_Activate(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuCartas.Activate
+        Try
+            CargaFormulario(frmCartas.GetInstance)
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub ToolBar1_ButtonClick(ByVal sender As System.Object, ByVal e As TD.SandBar.ToolBarItemEventArgs)
+        MnuClientes_Click(Nothing, Nothing)
+    End Sub
+    Private Sub mnuControlStockHilos_Activate(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuControlStockHilos.Activate
+        Try
+            CargaFormulario(frmControlStockHilos.GetInstance)
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub mnuControlStockTejidos_Activate(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuControlStockTejidos.Activate
+        Try
+            CargaFormulario(frmControlStockTejidos.GetInstance)
+            'Cursor = Cursors.WaitCursor
+            'Dim f As frmControlStockTejidos = frmControlStockTejidos.GetInstance()
+            'f.MdiParent = Me
+            'AddHandler f.Closed, AddressOf CType(Me.MdiParent, frmPrincipal).childCerrado
+            'AddHandler f.Load, AddressOf CType(Me.MdiParent, frmPrincipal).childAbierto
+            'f.Show()
+            'f.BringToFront()
+            'Cursor = Cursors.Default
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub mnuConfig_Activate(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuConfig.Activate
+        Try
+            CargaFormulario(frmConfiguracion.GetInstance)
+
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Sub
+    Private Sub mnuUtilidades_Activate(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuUtilidades.Activate
+        Try
+            Dim f As New _00importador
+            '
+            f.MdiParent = Me
+            f.Show()
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub frmPrincipal_Closing(ByVal sender As Object, ByVal e As System.ComponentModel.CancelEventArgs) Handles MyBase.Closing
+        If salirSinConfirmar Then
+            e.Cancel = False
+        Else
+            Dim f As New frmSalir
+            f.ShowDialog()
+            If f.DialogResult = DialogResult.Yes Then
+                e.Cancel = False
+            Else
+                e.Cancel = True
+            End If
+        End If
+
+    End Sub
+    Private Sub mnuSobre_Activate(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuSobre.Activate
+        Try
+            Cursor = Cursors.WaitCursor : Dim f As New frmAbout
+            f.MdiParent = Me
+            f.Show()
+            Cursor = Cursors.Default
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub mnuNumeraciones_Activate(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuNumeraciones.Activate
+        Try
+            CargaFormulario(frmNumeracion.GetInstance)
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub mnuBackup_Activate(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuBackup.Activate
+        Cursor = Cursors.WaitCursor : Dim f As New frmBackup
+        '
+        f.ShowDialog()
+        Cursor = Cursors.Default
+    End Sub
+    Private Sub mnuActualizarPrograma_Activate(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuActualizarPrograma.Activate
+        Try
+            Cursor = Cursors.WaitCursor : Dim f As New frmActualizar
+            f.Show()
+            salirSinConfirmar = True
+            Me.Close()
+            Cursor = Cursors.Default
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+
+#End Region
+
+    Friend Sub CargandoFormulario()
+        Try
+
+            fcargando = New frCargando
+            fcargando.Show()
+            fcargando.Refresh()
+            fcargando.BringToFront()
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN() : cnn.Close()
+        End Try
+    End Sub
+
+#Region "EXPLORER BAR"
+
+    Private Sub CollapsibleSplitter1_SplitterMoved(ByVal sender As System.Object, ByVal e As System.Windows.Forms.SplitterEventArgs) Handles CollapsibleSplitter1.SplitterMoved
+        Dim f As Form
+        Dim iTop As Integer
+        Dim iLeft As Integer
+
+        For Each f In Me.MdiChildren
+            'If Me.WindowState <> 0 Then Exit Sub
+            'iTop = ((Me.Height - f.Height) \ 2)
+            'iLeft = ((Me.Width - f.Width) \ 2)
+            f.Top = MenuBar1.Location.Y + 10 'iTop
+            f.Left = CollapsibleSplitter1.Location.Y - 20 'iLeft
+            DrawBG()
+        Next
+    End Sub
+    Private Sub CollapsibleSplitter1_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles CollapsibleSplitter1.Click
+        Dim f As Form
+        Dim iTop As Integer
+        Dim iLeft As Integer
+
+        For Each f In Me.MdiChildren
+            'If Me.WindowState <> 0 Then Exit Sub
+            'iTop = ((Me.Height - f.Height) \ 2)
+            'iLeft = ((Me.Width - f.Width) \ 2)
+            f.Top = MenuBar1.Location.Y + 10 'iTop
+            f.Left = CollapsibleSplitter1.Location.Y - 20 'iLeft
+            DrawBG()
+        Next
+    End Sub
+    Private Sub ExplorerBarBoxItem1_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ExplorerBarBoxItem1.Click
+        Try
+            CargaFormulario(frmClientesForm.GetInstance)
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub ExplorerBarBoxItem25_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
+        Try
+            CargaFormulario(frmDatosGenericos.GetInstance)
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub ExplorerBarBoxItem2_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ExplorerBarBoxItem2.Click
+        CargaFormulario(frmTalleresForm.GetInstance)
+
+    End Sub
+    Private Sub ExplorerBarBoxItem3_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ExplorerBarBoxItem3.Click
+        CargaFormulario(frmProveedoresForm.GetInstance)
+
+    End Sub
+    Private Sub ExplorerBarBoxItem4_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ExplorerBarBoxItem4.Click
+        CargaFormulario(frmTransportistasForm.GetInstance)
+
+    End Sub
+    Private Sub ExplorerBarBoxItem5_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ExplorerBarBoxItem5.Click
+        CargaFormulario(frmRepresentantesForm.GetInstance)
+
+    End Sub
+    Private Sub ExplorerBarBoxItem6_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ExplorerBarBoxItem6.Click
+        CargaFormulario(frmHilos.GetInstance)
+    End Sub
+    Private Sub ExplorerBarBoxItem30_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ExplorerBarBoxItem30.Click
+        CargaFormulario(frmMuestras.GetInstance)
+    End Sub
+    Private Sub ExplorerBarBoxItem28_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ExplorerBarBoxItem28.Click
+        CargaFormulario(frmFornituras.GetInstance())
+    End Sub
+    Private Sub ExplorerBarBoxItem29_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ExplorerBarBoxItem29.Click
+        CargaFormulario(frmModelos.GetInstance)
+    End Sub
+    Private Sub ExplorerBarBoxItem26_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ExplorerBarBoxItem26.Click
+        CargaFormulario(frmTejidos.GetInstance)
+    End Sub
+    Private Sub ExplorerBarBoxItem27_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ExplorerBarBoxItem27.Click
+        CargaFormulario(frmDisposicion.GetInstance)
+    End Sub
+    Private Sub ExplorerBarBoxItem7_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ExplorerBarBoxItem7.Click
+        CargaFormulario(frmTejidoCompraPedido.GetInstance)
+    End Sub
+    Private Sub ExplorerBarBoxItem8_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ExplorerBarBoxItem8.Click
+        CargaFormulario(frmHilosComprasPedido.GetInstance)
+    End Sub
+    Private Sub ExplorerBarBoxItem10_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ExplorerBarBoxItem10.Click
+        CargaFormulario(frmMuestrasOrdenes.GetInstance)
+    End Sub
+    Private Sub ExplorerBarBoxItem9_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ExplorerBarBoxItem9.Click
+        CargaFormulario(frmHilosComprasAlbaran.GetInstance)
+    End Sub
+    Private Sub ExplorerBarBoxItem12_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ExplorerBarBoxItem12.Click
+        CargaFormulario(frmForniturasCompraPedido.GetInstance)
+    End Sub
+    Private Sub ExplorerBarBoxItem11_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ExplorerBarBoxItem11.Click
+        CargaFormulario(frmOrdenesFabricacion.GetInstance)
+    End Sub
+    Private Sub ExplorerBarBoxItem13_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ExplorerBarBoxItem13.Click
+        CargaFormulario(frmTejidoVentaPedido.GetInstance)
+    End Sub
+    Private Sub ExplorerBarBoxItem14_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ExplorerBarBoxItem14.Click
+        CargaFormulario(frmTejidoVentaAlbaran.GetInstance)
+    End Sub
+    Private Sub ExplorerBarBoxItem16_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ExplorerBarBoxItem16.Click
+        CargaFormulario(frmVentaFacturaProforma.GetInstance)
+    End Sub
+    Private Sub ExplorerBarBoxItem15_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ExplorerBarBoxItem15.Click
+        CargaFormulario(frmVentaFactura.GetInstance)
+    End Sub
+    Private Sub ExplorerBarBoxItem18_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ExplorerBarBoxItem18.Click
+        CargaFormulario(frmAlbaranesModelos.GetInstance)
+    End Sub
+    Private Sub ExplorerBarBoxItem31_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ExplorerBarBoxItem31.Click
+        CargaFormulario(frmFacturasModelos.GetInstance)
+    End Sub
+    Private Sub ExplorerBarBoxItem25_Click_1(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ExplorerBarBoxItem25.Click
+        CargaFormulario(frmRemesas.GetInstance)
+    End Sub
+    Private Sub ExplorerBarBoxItem35_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
+        CargaFormulario(frmBancosForm.GetInstance)
+    End Sub
+
+#End Region
+
+#Region "MIDLIST BAR"
+
+
+    Private Sub CargaFormulario(ByVal f As Form)
+        Try
+            Cursor = Cursors.WaitCursor
+            CargandoFormulario()
+            f.MdiParent = Me
+            AddHandler f.Closed, AddressOf childCerrado
+            AddHandler f.Load, AddressOf childAbierto
+            AddHandler f.Activated, AddressOf childOcultandoMostrando
+            f.Show()
+            f.BringToFront()
+            Cursor = Cursors.Default
+            fcargando.Close()
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN() : fcargando.Close()
+        End Try
+    End Sub
+    Public Sub childOcultandoMostrando(ByVal sender As Object, ByVal e As System.EventArgs)
+        Dim f As Form
+        Dim i As Integer
+        Dim b As TD.SandBar.ButtonItem
+        Try
+            If sender.Visible = False Then
+                For i = 0 To ToolBar1.Items.Count - 1
+                    If ToolBar1.Items(i).ToolTipText = sender.TEXT Then
+                        DirectCast(ToolBar1.Items(i), TD.SandBar.ButtonItem).Checked = False
+                    End If
+                Next
+            Else
+                For i = 0 To ToolBar1.Items.Count - 1
+                    If ToolBar1.Items(i).ToolTipText = sender.TEXT Then
+                        DirectCast(ToolBar1.Items(i), TD.SandBar.ButtonItem).Checked = True
+                    Else
+                        DirectCast(ToolBar1.Items(i), TD.SandBar.ButtonItem).Checked = False
+                    End If
+                Next
+            End If
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Public Sub childCerrado(ByVal sender As Object, ByVal e As System.EventArgs)
+        Dim ya As Boolean = True
+        Dim f As Form
+        Dim b As TD.SandBar.ButtonItem
+        Try
+            ToolBar1.Items.Clear()
+            For Each f In Me.MdiChildren
+                b = New TD.SandBar.ButtonItem
+                b.Text = f.Text
+                b.ToolTipText = f.Text
+                If Not sender.Text = f.Text Then
+                    If ya Then
+                        b.Checked = True
+                        f.BringToFront()
+                    End If
+                    b.BeginGroup = True
+                    b.ImageIndex = 22
+                    ToolBar1.Items.Add(b)
+                    ya = False
+                End If
+            Next
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Public Sub childAbierto(ByVal sender As Object, ByVal e As System.EventArgs)
+        Dim f As Form
+        Dim b As TD.SandBar.ButtonItem
+        Try
+            ToolBar1.Items.Clear()
+            For Each f In Me.MdiChildren
+                b = New TD.SandBar.ButtonItem
+                b.Text = f.Text
+                b.ToolTipText = f.Text
+                'If sender.Name = f.Name Then
+                '    b.Checked = True
+                'End If
+                b.BeginGroup = True
+                b.ImageIndex = 22
+                ToolBar1.Items.Add(b)
+            Next
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub ToolBar1_ButtonClick1(ByVal sender As System.Object, ByVal e As TD.SandBar.ToolBarItemEventArgs) Handles ToolBar1.ButtonClick
+        Try
+            Dim f As Form
+            Dim b As TD.SandBar.ButtonItem
+            For Each b In ToolBar1.Items
+                b.Checked = False
+            Next
+            For Each f In Me.MdiChildren
+                If f.Text = e.Item.ToolTipText Then
+                    f.BringToFront()
+                    f.Show()
+                    CType(e.Item, TD.SandBar.ButtonItem).Checked = True
+                    Return
+                End If
+            Next
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+
+#End Region
+
+    Private Sub ExplorerBarBoxItem19_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ExplorerBarBoxItem19.Click
+        Try
+            CargaFormulario(frmClientesLista.GetInstance(esListado))
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub ExplorerBarBoxItem20_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ExplorerBarBoxItem20.Click
+        Try
+            CargaFormulario(frmTalleresLista.GetInstance(esListado))
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub ExplorerBarBoxItem22_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ExplorerBarBoxItem22.Click
+        Try
+            CargaFormulario(frmProveedoresLista.GetInstance(esListado))
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub ExplorerBarBoxItem21_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ExplorerBarBoxItem21.Click
+        Try
+            CargaFormulario(frmRepresentantesLista.GetInstance(esListado))
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub ExplorerBarBoxItem23_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ExplorerBarBoxItem23.Click
+        Try
+            CargaFormulario(frmTransportistasLista.GetInstance(esListado))
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub ExplorerBarBoxItem24_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ExplorerBarBoxItem24.Click
+        Try
+            CargaFormulario(frmHilosLista.GetInstance(esListado, empresaPorDefecto))
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub ExplorerBarBoxItem17_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ExplorerBarBoxItem17.Click
+        Try
+            CargaFormulario(frmTejidosLista.GetInstance(esListado, empresaPorDefecto))
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub ExplorerBarBoxItem32_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ExplorerBarBoxItem32.Click
+        Try
+            CargaFormulario(frmMuestrasLista.GetInstance(esListado, empresaPorDefecto))
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub ExplorerBarBoxItem34_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ExplorerBarBoxItem34.Click
+        Try
+            CargaFormulario(frmForniturasLista.GetInstance(esListado, empresaPorDefecto))
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub ExplorerBarBoxItem33_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ExplorerBarBoxItem33.Click
+        Try
+            CargaFormulario(frmModelosLista.GetInstance(esListado))
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub MenuButtonItem4_Activate(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MenuButtonItem4.Activate
+        SendKeys.Send("^(Z)")
+    End Sub
+    Private Sub MenuButtonItem5_Activate(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MenuButtonItem5.Activate
+        SendKeys.Send("^(Y)")
+    End Sub
+    Private Sub mnuCortar_Activate(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuCortar.Activate
+        SendKeys.Send("^(X)")
+    End Sub
+    Private Sub MenuButtonItem7_Activate(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MenuButtonItem7.Activate
+        SendKeys.Send("^(C)")
+    End Sub
+    Private Sub MenuButtonItem8_Activate(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MenuButtonItem8.Activate
+        SendKeys.Send("^(V)")
+    End Sub
+    Private Sub MenuButtonItem6_Activate(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MenuButtonItem6.Activate
+        SendKeys.Send("{DEL}")
+    End Sub
+    Private Sub mnuSeleccionarTodo_Activate(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuSeleccionarTodo.Activate
+        SendKeys.Send("^(A)")
+    End Sub
+    Private Sub timActualizador_Tick(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles timActualizador.Tick
+        Dim sFileInfo As IO.FileInfo
+        Dim dFileInfo As IO.FileInfo
+        Dim sFile, sourceDir, destDir As String
+        Try
+            sFile = "tex.net.exe"
+
+            If sFileInfo.LastWriteTime > dFileInfo.LastWriteTime Then
+                sFileInfo = New System.IO.FileInfo(sFile)
+                dFileInfo = New System.IO.FileInfo(Replace(sFile, sourceDir, destDir))
+            End If
+
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Sub
+    Private Sub mnuIncoterms_Activate(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuIncoterms.Activate
+        Try
+            CargaFormulario(frmIncoterms.GetInstance)
+
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Sub
+
+End Class
+

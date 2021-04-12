@@ -1,0 +1,3090 @@
+Imports CoreLab.MySql
+Imports C1.Win.C1TrueDBGrid
+
+
+Namespace aura2k3
+
+    Public Class frmCompraPAFPlantilla
+        Inherits aura2k3.frmBase
+
+#Region " Código generado por el Diseñador de Windows Forms "
+
+        Public Sub New()
+            MyBase.New()
+
+            'El Diseñador de Windows Forms requiere esta llamada.
+            InitializeComponent() : Dim tom As SMcMaster.TabOrderManager = New SMcMaster.TabOrderManager(Me) : tom.SetTabOrder(SMcMaster.TabOrderManager.TabScheme.AcrossFirst)
+
+            'Agregar cualquier inicialización después de la llamada a InitializeComponent()
+
+        End Sub
+
+        'Form reemplaza a Dispose para limpiar la lista de componentes.
+        Protected Overloads Overrides Sub Dispose(ByVal disposing As Boolean)
+            If disposing Then
+                If Not (components Is Nothing) Then
+                    components.Dispose()
+                End If
+            End If
+           MyBase.Dispose(disposing)
+        End Sub
+
+        'Requerido por el Diseñador de Windows Forms
+        Private components As System.ComponentModel.IContainer
+
+        'NOTA: el Diseñador de Windows Forms requiere el siguiente procedimiento
+        'Puede modificarse utilizando el Diseñador de Windows Forms. 
+        'No lo modifique con el editor de código.
+        Protected WithEvents lblPedido As Label
+        Protected WithEvents lblObservaciones As Label
+        Protected WithEvents lblTraspasado As Label
+        Protected WithEvents GroupBox1 As System.Windows.Forms.GroupBox
+        Protected WithEvents lblDescuento As Label
+        Protected WithEvents lblBase As Label
+        Protected WithEvents lblTotalBruto As Label
+        Protected WithEvents txtTOTAL As C1.Win.C1Input.C1TextBox
+        Protected WithEvents btnImprimir As NETXP.Controls.XPButton          
+        Protected WithEvents gbEleccionClientesPAF As System.Windows.Forms.GroupBox
+        Protected WithEvents lblTotal As Label
+        Protected WithEvents btnElegirProveedor As NETXP.Controls.XPButton
+        Protected WithEvents lblFecha As Label
+        Protected WithEvents lblNumeroPedido As Label
+        Protected WithEvents lblProveedor As Label
+        Protected WithEvents tabPagePAF As System.Windows.Forms.TabPage
+        Protected WithEvents rdoVerTodasPAF As System.Windows.Forms.RadioButton
+        Protected WithEvents rdoVerPAFDeCliente As System.Windows.Forms.RadioButton
+        Protected WithEvents lblRE As Label
+        Protected WithEvents lblIVA As Label
+        Protected WithEvents lblFechaEntrega As Label
+        Protected WithEvents cboSeleccionProveParaPAF As C1.Win.C1List.C1Combo
+        Protected WithEvents dgDetalle As C1.Win.C1TrueDBGrid.C1TrueDBGrid
+        Protected WithEvents cboKM As C1.Win.C1TrueDBGrid.C1TrueDBDropdown
+        Protected WithEvents cboColor As C1.Win.C1TrueDBGrid.C1TrueDBDropdown
+        Protected WithEvents cboArticle As C1.Win.C1TrueDBGrid.C1TrueDBDropdown
+        Protected WithEvents lblNumeroPAF As System.Windows.Forms.Label
+        Protected WithEvents cboNOMPROVE As C1.Win.C1List.C1Combo
+        Protected WithEvents txtPROVE As C1.Win.C1Input.C1TextBox
+        Protected WithEvents txtOBSERV As C1.Win.C1Input.C1TextBox
+        Friend WithEvents dtpDATA As C1.Win.C1Input.C1DateEdit
+        Protected WithEvents txtNRO As C1.Win.C1Input.C1TextBox
+        Protected WithEvents txtP_DTE As C1.Win.C1Input.C1TextBox
+        Protected WithEvents txtBASE1 As C1.Win.C1Input.C1TextBox
+        Protected WithEvents txtBRUT1 As C1.Win.C1Input.C1TextBox
+        Protected WithEvents txtIVA1 As C1.Win.C1Input.C1TextBox
+        Protected WithEvents txtDTE1 As C1.Win.C1Input.C1TextBox
+        Protected WithEvents txtRE1 As C1.Win.C1Input.C1TextBox
+        Friend WithEvents dtpDATAENTREGA As C1.Win.C1Input.C1DateEdit
+        Friend WithEvents TabPage1 As System.Windows.Forms.TabPage
+        Protected WithEvents TabControlPAF As System.Windows.Forms.TabControl
+        Protected WithEvents Label1 As System.Windows.Forms.Label
+        Friend WithEvents cboFRA As C1.Win.C1List.C1Combo
+        Protected WithEvents chkESTOC As System.Windows.Forms.CheckBox
+        Protected WithEvents btnCancelar As NETXP.Controls.XPButton
+        Protected WithEvents lblPedidoMuestra As System.Windows.Forms.Label
+        Protected WithEvents txtCOMANDAMOSTRA As C1.Win.C1Input.C1TextBox
+        Friend WithEvents cboNOMTALLER As C1.Win.C1List.C1Combo
+        Friend WithEvents btnElegirTaller As NETXP.Controls.XPButton
+        Friend WithEvents txtTALLER As C1.Win.C1Input.C1TextBox
+        Friend WithEvents lblTaller As System.Windows.Forms.Label
+        Protected WithEvents lblOrdenFabComplemento As System.Windows.Forms.Label
+        Friend WithEvents cboORDENFABCOMP As C1.Win.C1List.C1Combo
+        Protected WithEvents Label2 As System.Windows.Forms.Label
+        Friend WithEvents ToolBarButton1 As System.Windows.Forms.ToolBarButton
+        Friend WithEvents ToolBarButton2 As System.Windows.Forms.ToolBarButton
+        Friend WithEvents ToolBarButton3 As System.Windows.Forms.ToolBarButton
+        Friend WithEvents ToolBarButton4 As System.Windows.Forms.ToolBarButton
+        Friend WithEvents ToolBarButton5 As System.Windows.Forms.ToolBarButton
+        Friend WithEvents ToolBarButton6 As System.Windows.Forms.ToolBarButton
+        Protected WithEvents cboMedida As C1.Win.C1TrueDBGrid.C1TrueDBDropdown
+        Friend WithEvents PrintControl1 As DevExpress.XtraPrinting.Control.PrintControl
+        Friend WithEvents PrintPreviewBar1 As DevExpress.XtraPrinting.Preview.PrintPreviewBar
+        Friend WithEvents PrintPreviewBarButton1 As DevExpress.XtraPrinting.Preview.PrintPreviewBarButton
+        Friend WithEvents PrintPreviewBarButton2 As DevExpress.XtraPrinting.Preview.PrintPreviewBarButton
+        Friend WithEvents PrintPreviewBarButton3 As DevExpress.XtraPrinting.Preview.PrintPreviewBarButton
+        Friend WithEvents ToolBarButton7 As System.Windows.Forms.ToolBarButton
+        Friend WithEvents PrintPreviewBarButton4 As DevExpress.XtraPrinting.Preview.PrintPreviewBarButton
+        Friend WithEvents PrintPreviewBarButton5 As DevExpress.XtraPrinting.Preview.PrintPreviewBarButton
+        Friend WithEvents PrintPreviewBarButton6 As DevExpress.XtraPrinting.Preview.PrintPreviewBarButton
+        Friend WithEvents PrintPreviewBarButton7 As DevExpress.XtraPrinting.Preview.PrintPreviewBarButton
+        Friend WithEvents PrintPreviewBarButton8 As DevExpress.XtraPrinting.Preview.PrintPreviewBarButton
+        Friend WithEvents ToolBarButton8 As System.Windows.Forms.ToolBarButton
+        Friend WithEvents PrintPreviewBarButton9 As DevExpress.XtraPrinting.Preview.PrintPreviewBarButton
+        Friend WithEvents PrintPreviewBarButton10 As DevExpress.XtraPrinting.Preview.PrintPreviewBarButton
+        Friend WithEvents PrintPreviewBarButton11 As DevExpress.XtraPrinting.Preview.PrintPreviewBarButton
+        Friend WithEvents PrintPreviewBarButton12 As DevExpress.XtraPrinting.Preview.PrintPreviewBarButton
+        Friend WithEvents ToolBarButton9 As System.Windows.Forms.ToolBarButton
+        Friend WithEvents PrintPreviewBarButton13 As DevExpress.XtraPrinting.Preview.PrintPreviewBarButton
+        Friend WithEvents PrintPreviewBarButton14 As DevExpress.XtraPrinting.Preview.PrintPreviewBarButton
+        Friend WithEvents PrintPreviewBarButton15 As DevExpress.XtraPrinting.Preview.PrintPreviewBarButton
+        Friend WithEvents PrintPreviewBarButton16 As DevExpress.XtraPrinting.Preview.PrintPreviewBarButton
+        Friend WithEvents ToolBarButton10 As System.Windows.Forms.ToolBarButton
+        Friend WithEvents PrintPreviewBarButton17 As DevExpress.XtraPrinting.Preview.PrintPreviewBarButton
+        Friend WithEvents PrintPreviewBarButton18 As DevExpress.XtraPrinting.Preview.PrintPreviewBarButton
+        Friend WithEvents PrintPreviewBarButton19 As DevExpress.XtraPrinting.Preview.PrintPreviewBarButton
+        Friend WithEvents ToolBarButton11 As System.Windows.Forms.ToolBarButton
+        Friend WithEvents PrintPreviewBarButton20 As DevExpress.XtraPrinting.Preview.PrintPreviewBarButton
+        Friend WithEvents PrintPreviewBarButton21 As DevExpress.XtraPrinting.Preview.PrintPreviewBarButton
+        Friend WithEvents ToolBarButton12 As System.Windows.Forms.ToolBarButton
+        Friend WithEvents PrintPreviewBarButton22 As DevExpress.XtraPrinting.Preview.PrintPreviewBarButton
+        <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
+            Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(frmCompraPAFPlantilla))
+            Me.tabPagePAF = New System.Windows.Forms.TabPage
+            Me.cboMedida = New C1.Win.C1TrueDBGrid.C1TrueDBDropdown
+            Me.Label2 = New System.Windows.Forms.Label
+            Me.cboArticle = New C1.Win.C1TrueDBGrid.C1TrueDBDropdown
+            Me.cboColor = New C1.Win.C1TrueDBGrid.C1TrueDBDropdown
+            Me.cboKM = New C1.Win.C1TrueDBGrid.C1TrueDBDropdown
+            Me.dgDetalle = New C1.Win.C1TrueDBGrid.C1TrueDBGrid
+            Me.lblRE = New System.Windows.Forms.Label
+            Me.txtRE1 = New C1.Win.C1Input.C1TextBox
+            Me.lblIVA = New System.Windows.Forms.Label
+            Me.lblDescuento = New System.Windows.Forms.Label
+            Me.lblBase = New System.Windows.Forms.Label
+            Me.lblTotalBruto = New System.Windows.Forms.Label
+            Me.txtIVA1 = New C1.Win.C1Input.C1TextBox
+            Me.txtTOTAL = New C1.Win.C1Input.C1TextBox
+            Me.txtBASE1 = New C1.Win.C1Input.C1TextBox
+            Me.txtDTE1 = New C1.Win.C1Input.C1TextBox
+            Me.txtBRUT1 = New C1.Win.C1Input.C1TextBox
+            Me.GroupBox1 = New System.Windows.Forms.GroupBox
+            Me.cboORDENFABCOMP = New C1.Win.C1List.C1Combo
+            Me.lblOrdenFabComplemento = New System.Windows.Forms.Label
+            Me.cboNOMTALLER = New C1.Win.C1List.C1Combo
+            Me.txtTALLER = New C1.Win.C1Input.C1TextBox
+            Me.btnElegirTaller = New NETXP.Controls.XPButton
+            Me.lblTaller = New System.Windows.Forms.Label
+            Me.txtCOMANDAMOSTRA = New C1.Win.C1Input.C1TextBox
+            Me.lblPedidoMuestra = New System.Windows.Forms.Label
+            Me.cboFRA = New C1.Win.C1List.C1Combo
+            Me.Label1 = New System.Windows.Forms.Label
+            Me.txtP_DTE = New C1.Win.C1Input.C1TextBox
+            Me.dtpDATA = New C1.Win.C1Input.C1DateEdit
+            Me.dtpDATAENTREGA = New C1.Win.C1Input.C1DateEdit
+            Me.txtNRO = New C1.Win.C1Input.C1TextBox
+            Me.cboNOMPROVE = New C1.Win.C1List.C1Combo
+            Me.lblFechaEntrega = New System.Windows.Forms.Label
+            Me.lblPedido = New System.Windows.Forms.Label
+            Me.lblProveedor = New System.Windows.Forms.Label
+            Me.btnElegirProveedor = New NETXP.Controls.XPButton
+            Me.txtPROVE = New C1.Win.C1Input.C1TextBox
+            Me.lblNumeroPedido = New System.Windows.Forms.Label
+            Me.lblFecha = New System.Windows.Forms.Label
+            Me.chkESTOC = New System.Windows.Forms.CheckBox
+            Me.txtOBSERV = New C1.Win.C1Input.C1TextBox
+            Me.lblObservaciones = New System.Windows.Forms.Label
+            Me.lblTraspasado = New System.Windows.Forms.Label
+            Me.lblTotal = New System.Windows.Forms.Label
+            Me.gbEleccionClientesPAF = New System.Windows.Forms.GroupBox
+            Me.lblNumeroPAF = New System.Windows.Forms.Label
+            Me.cboSeleccionProveParaPAF = New C1.Win.C1List.C1Combo
+            Me.rdoVerTodasPAF = New System.Windows.Forms.RadioButton
+            Me.rdoVerPAFDeCliente = New System.Windows.Forms.RadioButton
+            Me.btnImprimir = New NETXP.Controls.XPButton
+            Me.TabControlPAF = New System.Windows.Forms.TabControl
+            Me.TabPage1 = New System.Windows.Forms.TabPage
+            Me.btnCancelar = New NETXP.Controls.XPButton
+            Me.ToolBarButton1 = New System.Windows.Forms.ToolBarButton
+            Me.ToolBarButton2 = New System.Windows.Forms.ToolBarButton
+            Me.ToolBarButton3 = New System.Windows.Forms.ToolBarButton
+            Me.ToolBarButton4 = New System.Windows.Forms.ToolBarButton
+            Me.ToolBarButton5 = New System.Windows.Forms.ToolBarButton
+            Me.ToolBarButton6 = New System.Windows.Forms.ToolBarButton
+            Me.PrintControl1 = New DevExpress.XtraPrinting.Control.PrintControl
+            Me.PrintPreviewBar1 = New DevExpress.XtraPrinting.Preview.PrintPreviewBar
+            Me.PrintPreviewBarButton1 = New DevExpress.XtraPrinting.Preview.PrintPreviewBarButton
+            Me.PrintPreviewBarButton2 = New DevExpress.XtraPrinting.Preview.PrintPreviewBarButton
+            Me.PrintPreviewBarButton3 = New DevExpress.XtraPrinting.Preview.PrintPreviewBarButton
+            Me.ToolBarButton7 = New System.Windows.Forms.ToolBarButton
+            Me.PrintPreviewBarButton4 = New DevExpress.XtraPrinting.Preview.PrintPreviewBarButton
+            Me.PrintPreviewBarButton5 = New DevExpress.XtraPrinting.Preview.PrintPreviewBarButton
+            Me.PrintPreviewBarButton6 = New DevExpress.XtraPrinting.Preview.PrintPreviewBarButton
+            Me.PrintPreviewBarButton7 = New DevExpress.XtraPrinting.Preview.PrintPreviewBarButton
+            Me.PrintPreviewBarButton8 = New DevExpress.XtraPrinting.Preview.PrintPreviewBarButton
+            Me.ToolBarButton8 = New System.Windows.Forms.ToolBarButton
+            Me.PrintPreviewBarButton9 = New DevExpress.XtraPrinting.Preview.PrintPreviewBarButton
+            Me.PrintPreviewBarButton10 = New DevExpress.XtraPrinting.Preview.PrintPreviewBarButton
+            Me.PrintPreviewBarButton11 = New DevExpress.XtraPrinting.Preview.PrintPreviewBarButton
+            Me.PrintPreviewBarButton12 = New DevExpress.XtraPrinting.Preview.PrintPreviewBarButton
+            Me.ToolBarButton9 = New System.Windows.Forms.ToolBarButton
+            Me.PrintPreviewBarButton13 = New DevExpress.XtraPrinting.Preview.PrintPreviewBarButton
+            Me.PrintPreviewBarButton14 = New DevExpress.XtraPrinting.Preview.PrintPreviewBarButton
+            Me.PrintPreviewBarButton15 = New DevExpress.XtraPrinting.Preview.PrintPreviewBarButton
+            Me.PrintPreviewBarButton16 = New DevExpress.XtraPrinting.Preview.PrintPreviewBarButton
+            Me.ToolBarButton10 = New System.Windows.Forms.ToolBarButton
+            Me.PrintPreviewBarButton17 = New DevExpress.XtraPrinting.Preview.PrintPreviewBarButton
+            Me.PrintPreviewBarButton18 = New DevExpress.XtraPrinting.Preview.PrintPreviewBarButton
+            Me.PrintPreviewBarButton19 = New DevExpress.XtraPrinting.Preview.PrintPreviewBarButton
+            Me.ToolBarButton11 = New System.Windows.Forms.ToolBarButton
+            Me.PrintPreviewBarButton20 = New DevExpress.XtraPrinting.Preview.PrintPreviewBarButton
+            Me.PrintPreviewBarButton21 = New DevExpress.XtraPrinting.Preview.PrintPreviewBarButton
+            Me.ToolBarButton12 = New System.Windows.Forms.ToolBarButton
+            Me.PrintPreviewBarButton22 = New DevExpress.XtraPrinting.Preview.PrintPreviewBarButton
+            Me.tabPagePAF.SuspendLayout()
+            CType(Me.cboMedida, System.ComponentModel.ISupportInitialize).BeginInit()
+            CType(Me.cboArticle, System.ComponentModel.ISupportInitialize).BeginInit()
+            CType(Me.cboColor, System.ComponentModel.ISupportInitialize).BeginInit()
+            CType(Me.cboKM, System.ComponentModel.ISupportInitialize).BeginInit()
+            CType(Me.dgDetalle, System.ComponentModel.ISupportInitialize).BeginInit()
+            CType(Me.txtRE1, System.ComponentModel.ISupportInitialize).BeginInit()
+            CType(Me.txtIVA1, System.ComponentModel.ISupportInitialize).BeginInit()
+            CType(Me.txtTOTAL, System.ComponentModel.ISupportInitialize).BeginInit()
+            CType(Me.txtBASE1, System.ComponentModel.ISupportInitialize).BeginInit()
+            CType(Me.txtDTE1, System.ComponentModel.ISupportInitialize).BeginInit()
+            CType(Me.txtBRUT1, System.ComponentModel.ISupportInitialize).BeginInit()
+            Me.GroupBox1.SuspendLayout()
+            CType(Me.cboORDENFABCOMP, System.ComponentModel.ISupportInitialize).BeginInit()
+            CType(Me.cboNOMTALLER, System.ComponentModel.ISupportInitialize).BeginInit()
+            CType(Me.txtTALLER, System.ComponentModel.ISupportInitialize).BeginInit()
+            CType(Me.txtCOMANDAMOSTRA, System.ComponentModel.ISupportInitialize).BeginInit()
+            CType(Me.cboFRA, System.ComponentModel.ISupportInitialize).BeginInit()
+            CType(Me.txtP_DTE, System.ComponentModel.ISupportInitialize).BeginInit()
+            CType(Me.dtpDATA, System.ComponentModel.ISupportInitialize).BeginInit()
+            CType(Me.dtpDATAENTREGA, System.ComponentModel.ISupportInitialize).BeginInit()
+            CType(Me.txtNRO, System.ComponentModel.ISupportInitialize).BeginInit()
+            CType(Me.cboNOMPROVE, System.ComponentModel.ISupportInitialize).BeginInit()
+            CType(Me.txtPROVE, System.ComponentModel.ISupportInitialize).BeginInit()
+            CType(Me.txtOBSERV, System.ComponentModel.ISupportInitialize).BeginInit()
+            Me.gbEleccionClientesPAF.SuspendLayout()
+            CType(Me.cboSeleccionProveParaPAF, System.ComponentModel.ISupportInitialize).BeginInit()
+            Me.TabControlPAF.SuspendLayout()
+            Me.TabPage1.SuspendLayout()
+            Me.SuspendLayout()
+            '
+            'arrayCheckBox
+            '
+            Me.arrayCheckBox.Controls.AddRange(New System.Windows.Forms.Control() {Me.chkESTOC})
+            '
+            'arrayDateTime
+            '
+            Me.arrayDateTime.Controls.AddRange(New System.Windows.Forms.Control() {Me.dtpDATA, Me.dtpDATAENTREGA})
+            '
+            'arrayTabPages
+            '
+            Me.arrayTabPages.Controls.AddRange(New System.Windows.Forms.Control() {Me.tabPagePAF})
+            '
+            'btnSiguiente
+            '
+            Me.btnSiguiente.Name = "btnSiguiente"
+            '
+            'arrayBotones
+            '
+            Me.arrayBotones.Controls.AddRange(New System.Windows.Forms.Control() {Me.btnElegirProveedor, Me.btnElegirTaller})
+            '
+            'cboSeleccionCentro
+            '
+            Me.cboSeleccionCentro.Name = "cboSeleccionCentro"
+            '
+            'btnVerLista
+            '
+            Me.btnVerLista.Name = "btnVerLista"
+            '
+            'btnActualizar
+            '
+            Me.btnActualizar.Name = "btnActualizar"
+            '
+            'btnRecargar
+            '
+            Me.btnRecargar.Name = "btnRecargar"
+            '
+            'arrayTextBox
+            '
+            Me.arrayTextBox.Controls.AddRange(New System.Windows.Forms.Control() {Me.txtBASE1, Me.txtBRUT1, Me.txtCOMANDAMOSTRA, Me.txtDTE1, Me.txtIVA1, Me.txtNRO, Me.txtOBSERV, Me.txtPROVE, Me.txtP_DTE, Me.txtRE1, Me.txtTALLER, Me.txtTOTAL})
+            '
+            'arrayGrids
+            '
+            Me.arrayGrids.Controls.AddRange(New System.Windows.Forms.Control() {Me.dgDetalle})
+            '
+            'btnPrimero
+            '
+            Me.btnPrimero.Name = "btnPrimero"
+            '
+            'btnUltimo
+            '
+            Me.btnUltimo.Name = "btnUltimo"
+            '
+            'btnNuevo
+            '
+            Me.btnNuevo.Name = "btnNuevo"
+            '
+            'btnModificar
+            '
+            Me.btnModificar.Name = "btnModificar"
+            '
+            'btnTancar
+            '
+            Me.btnTancar.Name = "btnTancar"
+            '
+            'sbtipo
+            '
+            Me.sbtipo.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+            Me.sbtipo.Location = New System.Drawing.Point(5, 144)
+            Me.sbtipo.Name = "sbtipo"
+            Me.sbtipo.Text = ""
+            '
+            'btnAnterior
+            '
+            Me.btnAnterior.Name = "btnAnterior"
+            '
+            'btnBorrar
+            '
+            Me.btnBorrar.Name = "btnBorrar"
+            '
+            'arrayCombos
+            '
+            Me.arrayCombos.Controls.AddRange(New System.Windows.Forms.Control() {Me.cboNOMPROVE, Me.cboNOMTALLER, Me.cboORDENFABCOMP})
+            '
+            'tabPagePAF
+            '
+            Me.tabPagePAF.Controls.Add(Me.cboMedida)
+            Me.tabPagePAF.Controls.Add(Me.Label2)
+            Me.tabPagePAF.Controls.Add(Me.cboArticle)
+            Me.tabPagePAF.Controls.Add(Me.cboColor)
+            Me.tabPagePAF.Controls.Add(Me.cboKM)
+            Me.tabPagePAF.Controls.Add(Me.dgDetalle)
+            Me.tabPagePAF.Controls.Add(Me.lblRE)
+            Me.tabPagePAF.Controls.Add(Me.txtRE1)
+            Me.tabPagePAF.Controls.Add(Me.lblIVA)
+            Me.tabPagePAF.Controls.Add(Me.lblDescuento)
+            Me.tabPagePAF.Controls.Add(Me.lblBase)
+            Me.tabPagePAF.Controls.Add(Me.lblTotalBruto)
+            Me.tabPagePAF.Controls.Add(Me.txtIVA1)
+            Me.tabPagePAF.Controls.Add(Me.txtTOTAL)
+            Me.tabPagePAF.Controls.Add(Me.txtBASE1)
+            Me.tabPagePAF.Controls.Add(Me.txtDTE1)
+            Me.tabPagePAF.Controls.Add(Me.txtBRUT1)
+            Me.tabPagePAF.Controls.Add(Me.GroupBox1)
+            Me.tabPagePAF.Controls.Add(Me.txtOBSERV)
+            Me.tabPagePAF.Controls.Add(Me.lblObservaciones)
+            Me.tabPagePAF.Controls.Add(Me.lblTraspasado)
+            Me.tabPagePAF.Location = New System.Drawing.Point(4, 22)
+            Me.tabPagePAF.Name = "tabPagePAF"
+            Me.tabPagePAF.Size = New System.Drawing.Size(968, 478)
+            Me.tabPagePAF.TabIndex = 0
+            '
+            'cboMedida
+            '
+            Me.cboMedida.AllowColMove = True
+            Me.cboMedida.AllowColSelect = True
+            Me.cboMedida.AllowRowSizing = C1.Win.C1TrueDBGrid.RowSizingEnum.AllRows
+            Me.cboMedida.AlternatingRows = True
+            Me.cboMedida.CaptionHeight = 17
+            Me.cboMedida.ColumnCaptionHeight = 17
+            Me.cboMedida.ColumnFooterHeight = 17
+            Me.cboMedida.FetchRowStyles = False
+            Me.cboMedida.Images.Add(CType(resources.GetObject("resource"), System.Drawing.Image))
+            Me.cboMedida.Location = New System.Drawing.Point(704, 212)
+            Me.cboMedida.Name = "cboMedida"
+            Me.cboMedida.RowDivider.Color = System.Drawing.Color.DarkGray
+            Me.cboMedida.RowDivider.Style = C1.Win.C1TrueDBGrid.LineStyleEnum.Single
+            Me.cboMedida.RowHeight = 15
+            Me.cboMedida.RowSubDividerColor = System.Drawing.Color.DarkGray
+            Me.cboMedida.ScrollTips = False
+            Me.cboMedida.Size = New System.Drawing.Size(212, 132)
+            Me.cboMedida.TabIndex = 237
+            Me.cboMedida.TabStop = False
+            Me.cboMedida.Text = "C1TrueDBDropdown1"
+            Me.cboMedida.Visible = False
+            Me.cboMedida.PropBag = "<?xml version=""1.0""?><Blob><Styles type=""C1.Win.C1TrueDBGrid.Design.ContextWrappe" & _
+            "r""><Data>Group{AlignVert:Center;Border:None,,0, 0, 0, 0;BackColor:ControlDark;}E" & _
+            "ditor{}Style2{}Style5{}Style4{}Style7{}Style6{}EvenRow{BackColor:Aqua;}Selected{" & _
+            "ForeColor:HighlightText;BackColor:Highlight;}Style3{}Inactive{ForeColor:Inactive" & _
+            "CaptionText;BackColor:InactiveCaption;}FilterBar{}Footer{}Caption{AlignHorz:Cent" & _
+            "er;}Normal{Font:Microsoft Sans Serif, 8.25pt;}HighlightRow{ForeColor:HighlightTe" & _
+            "xt;BackColor:Highlight;}Style1{}OddRow{}RecordSelector{AlignImage:Center;}Headin" & _
+            "g{Wrap:True;BackColor:Control;Border:Raised,,1, 1, 1, 1;ForeColor:ControlText;Al" & _
+            "ignVert:Center;}Style8{}Style10{AlignHorz:Near;}Style11{}Style12{}Style13{}Style" & _
+            "9{}</Data></Styles><Splits><C1.Win.C1TrueDBGrid.DropdownView Name="""" Alternating" & _
+            "RowStyle=""True"" CaptionHeight=""17"" ColumnCaptionHeight=""17"" ColumnFooterHeight=""" & _
+            "17"" MarqueeStyle=""DottedCellBorder"" RecordSelectorWidth=""17"" DefRecSelWidth=""17""" & _
+            " RecordSelectors=""False"" VerticalScrollGroup=""1"" HorizontalScrollGroup=""1""><Capt" & _
+            "ionStyle parent=""Style2"" me=""Style10"" /><EditorStyle parent=""Editor"" me=""Style5""" & _
+            " /><EvenRowStyle parent=""EvenRow"" me=""Style8"" /><FilterBarStyle parent=""FilterBa" & _
+            "r"" me=""Style13"" /><FooterStyle parent=""Footer"" me=""Style3"" /><GroupStyle parent=" & _
+            """Group"" me=""Style12"" /><HeadingStyle parent=""Heading"" me=""Style2"" /><HighLightRo" & _
+            "wStyle parent=""HighlightRow"" me=""Style7"" /><InactiveStyle parent=""Inactive"" me=""" & _
+            "Style4"" /><OddRowStyle parent=""OddRow"" me=""Style9"" /><RecordSelectorStyle parent" & _
+            "=""RecordSelector"" me=""Style11"" /><SelectedStyle parent=""Selected"" me=""Style6"" />" & _
+            "<Style parent=""Normal"" me=""Style1"" /><ClientRect>0, 0, 208, 128</ClientRect><Bor" & _
+            "derSide>0</BorderSide></C1.Win.C1TrueDBGrid.DropdownView></Splits><NamedStyles><" & _
+            "Style parent="""" me=""Normal"" /><Style parent=""Normal"" me=""Heading"" /><Style paren" & _
+            "t=""Heading"" me=""Footer"" /><Style parent=""Heading"" me=""Caption"" /><Style parent=""" & _
+            "Heading"" me=""Inactive"" /><Style parent=""Normal"" me=""Selected"" /><Style parent=""N" & _
+            "ormal"" me=""Editor"" /><Style parent=""Normal"" me=""HighlightRow"" /><Style parent=""N" & _
+            "ormal"" me=""EvenRow"" /><Style parent=""Normal"" me=""OddRow"" /><Style parent=""Headin" & _
+            "g"" me=""RecordSelector"" /><Style parent=""Normal"" me=""FilterBar"" /><Style parent=""" & _
+            "Caption"" me=""Group"" /></NamedStyles><vertSplits>1</vertSplits><horzSplits>1</hor" & _
+            "zSplits><Layout>None</Layout><DefaultRecSelWidth>17</DefaultRecSelWidth><ClientA" & _
+            "rea>0, 0, 208, 128</ClientArea></Blob>"
+            '
+            'Label2
+            '
+            Me.Label2.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Me.Label2.ImeMode = System.Windows.Forms.ImeMode.NoControl
+            Me.Label2.Location = New System.Drawing.Point(808, 452)
+            Me.Label2.Name = "Label2"
+            Me.Label2.Size = New System.Drawing.Size(64, 20)
+            Me.Label2.TabIndex = 236
+            Me.Label2.Text = "Total"
+            Me.Label2.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+            '
+            'cboArticle
+            '
+            Me.cboArticle.AllowColMove = True
+            Me.cboArticle.AllowColSelect = True
+            Me.cboArticle.AllowRowSizing = C1.Win.C1TrueDBGrid.RowSizingEnum.AllRows
+            Me.cboArticle.AlternatingRows = True
+            Me.cboArticle.CaptionHeight = 17
+            Me.cboArticle.ColumnCaptionHeight = 17
+            Me.cboArticle.ColumnFooterHeight = 17
+            Me.cboArticle.FetchRowStyles = False
+            Me.cboArticle.Images.Add(CType(resources.GetObject("resource1"), System.Drawing.Image))
+            Me.cboArticle.Location = New System.Drawing.Point(484, 212)
+            Me.cboArticle.Name = "cboArticle"
+            Me.cboArticle.RowDivider.Color = System.Drawing.Color.DarkGray
+            Me.cboArticle.RowDivider.Style = C1.Win.C1TrueDBGrid.LineStyleEnum.Single
+            Me.cboArticle.RowHeight = 15
+            Me.cboArticle.RowSubDividerColor = System.Drawing.Color.DarkGray
+            Me.cboArticle.ScrollTips = False
+            Me.cboArticle.Size = New System.Drawing.Size(208, 132)
+            Me.cboArticle.TabIndex = 235
+            Me.cboArticle.TabStop = False
+            Me.cboArticle.Text = "C1TrueDBDropdown1"
+            Me.cboArticle.Visible = False
+            Me.cboArticle.PropBag = "<?xml version=""1.0""?><Blob><Styles type=""C1.Win.C1TrueDBGrid.Design.ContextWrappe" & _
+            "r""><Data>Group{BackColor:ControlDark;Border:None,,0, 0, 0, 0;AlignVert:Center;}E" & _
+            "ditor{}Style2{}Style5{}Style4{}Style7{}Style6{}EvenRow{BackColor:Aqua;}Selected{" & _
+            "ForeColor:HighlightText;BackColor:Highlight;}Style3{}Inactive{ForeColor:Inactive" & _
+            "CaptionText;BackColor:InactiveCaption;}FilterBar{}Footer{}Caption{AlignHorz:Cent" & _
+            "er;}Normal{Font:Microsoft Sans Serif, 8.25pt;}HighlightRow{ForeColor:HighlightTe" & _
+            "xt;BackColor:Highlight;}Style9{}OddRow{}RecordSelector{AlignImage:Center;}Headin" & _
+            "g{Wrap:True;AlignVert:Center;Border:Raised,,1, 1, 1, 1;ForeColor:ControlText;Bac" & _
+            "kColor:Control;}Style8{}Style10{AlignHorz:Near;}Style11{}Style12{}Style13{}Style" & _
+            "1{}</Data></Styles><Splits><C1.Win.C1TrueDBGrid.DropdownView Name="""" Alternating" & _
+            "RowStyle=""True"" CaptionHeight=""17"" ColumnCaptionHeight=""17"" ColumnFooterHeight=""" & _
+            "17"" MarqueeStyle=""DottedCellBorder"" RecordSelectorWidth=""17"" DefRecSelWidth=""17""" & _
+            " RecordSelectors=""False"" VerticalScrollGroup=""1"" HorizontalScrollGroup=""1""><Capt" & _
+            "ionStyle parent=""Style2"" me=""Style10"" /><EditorStyle parent=""Editor"" me=""Style5""" & _
+            " /><EvenRowStyle parent=""EvenRow"" me=""Style8"" /><FilterBarStyle parent=""FilterBa" & _
+            "r"" me=""Style13"" /><FooterStyle parent=""Footer"" me=""Style3"" /><GroupStyle parent=" & _
+            """Group"" me=""Style12"" /><HeadingStyle parent=""Heading"" me=""Style2"" /><HighLightRo" & _
+            "wStyle parent=""HighlightRow"" me=""Style7"" /><InactiveStyle parent=""Inactive"" me=""" & _
+            "Style4"" /><OddRowStyle parent=""OddRow"" me=""Style9"" /><RecordSelectorStyle parent" & _
+            "=""RecordSelector"" me=""Style11"" /><SelectedStyle parent=""Selected"" me=""Style6"" />" & _
+            "<Style parent=""Normal"" me=""Style1"" /><ClientRect>0, 0, 204, 128</ClientRect><Bor" & _
+            "derSide>0</BorderSide></C1.Win.C1TrueDBGrid.DropdownView></Splits><NamedStyles><" & _
+            "Style parent="""" me=""Normal"" /><Style parent=""Normal"" me=""Heading"" /><Style paren" & _
+            "t=""Heading"" me=""Footer"" /><Style parent=""Heading"" me=""Caption"" /><Style parent=""" & _
+            "Heading"" me=""Inactive"" /><Style parent=""Normal"" me=""Selected"" /><Style parent=""N" & _
+            "ormal"" me=""Editor"" /><Style parent=""Normal"" me=""HighlightRow"" /><Style parent=""N" & _
+            "ormal"" me=""EvenRow"" /><Style parent=""Normal"" me=""OddRow"" /><Style parent=""Headin" & _
+            "g"" me=""RecordSelector"" /><Style parent=""Normal"" me=""FilterBar"" /><Style parent=""" & _
+            "Caption"" me=""Group"" /></NamedStyles><vertSplits>1</vertSplits><horzSplits>1</hor" & _
+            "zSplits><Layout>None</Layout><DefaultRecSelWidth>17</DefaultRecSelWidth><ClientA" & _
+            "rea>0, 0, 204, 128</ClientArea></Blob>"
+            '
+            'cboColor
+            '
+            Me.cboColor.AllowColMove = True
+            Me.cboColor.AllowColSelect = True
+            Me.cboColor.AllowRowSizing = C1.Win.C1TrueDBGrid.RowSizingEnum.AllRows
+            Me.cboColor.AlternatingRows = True
+            Me.cboColor.CaptionHeight = 17
+            Me.cboColor.ColumnCaptionHeight = 17
+            Me.cboColor.ColumnFooterHeight = 17
+            Me.cboColor.FetchRowStyles = False
+            Me.cboColor.Images.Add(CType(resources.GetObject("resource2"), System.Drawing.Image))
+            Me.cboColor.Location = New System.Drawing.Point(28, 212)
+            Me.cboColor.Name = "cboColor"
+            Me.cboColor.RowDivider.Color = System.Drawing.Color.DarkGray
+            Me.cboColor.RowDivider.Style = C1.Win.C1TrueDBGrid.LineStyleEnum.Single
+            Me.cboColor.RowHeight = 15
+            Me.cboColor.RowSubDividerColor = System.Drawing.Color.DarkGray
+            Me.cboColor.ScrollTips = False
+            Me.cboColor.Size = New System.Drawing.Size(212, 132)
+            Me.cboColor.TabIndex = 234
+            Me.cboColor.TabStop = False
+            Me.cboColor.Text = "C1TrueDBDropdown1"
+            Me.cboColor.Visible = False
+            Me.cboColor.PropBag = "<?xml version=""1.0""?><Blob><Styles type=""C1.Win.C1TrueDBGrid.Design.ContextWrappe" & _
+            "r""><Data>Group{BackColor:ControlDark;Border:None,,0, 0, 0, 0;AlignVert:Center;}E" & _
+            "ditor{}Style2{}Style5{}Style4{}Style7{}Style6{}EvenRow{BackColor:Aqua;}Selected{" & _
+            "ForeColor:HighlightText;BackColor:Highlight;}Style3{}Inactive{ForeColor:Inactive" & _
+            "CaptionText;BackColor:InactiveCaption;}FilterBar{}Footer{}Caption{AlignHorz:Cent" & _
+            "er;}Normal{Font:Microsoft Sans Serif, 8.25pt;}HighlightRow{ForeColor:HighlightTe" & _
+            "xt;BackColor:Highlight;}Style9{}OddRow{}RecordSelector{AlignImage:Center;}Headin" & _
+            "g{Wrap:True;AlignVert:Center;Border:Raised,,1, 1, 1, 1;ForeColor:ControlText;Bac" & _
+            "kColor:Control;}Style8{}Style10{AlignHorz:Near;}Style11{}Style12{}Style13{}Style" & _
+            "1{}</Data></Styles><Splits><C1.Win.C1TrueDBGrid.DropdownView Name="""" Alternating" & _
+            "RowStyle=""True"" CaptionHeight=""17"" ColumnCaptionHeight=""17"" ColumnFooterHeight=""" & _
+            "17"" MarqueeStyle=""DottedCellBorder"" RecordSelectorWidth=""17"" DefRecSelWidth=""17""" & _
+            " RecordSelectors=""False"" VerticalScrollGroup=""1"" HorizontalScrollGroup=""1""><Capt" & _
+            "ionStyle parent=""Style2"" me=""Style10"" /><EditorStyle parent=""Editor"" me=""Style5""" & _
+            " /><EvenRowStyle parent=""EvenRow"" me=""Style8"" /><FilterBarStyle parent=""FilterBa" & _
+            "r"" me=""Style13"" /><FooterStyle parent=""Footer"" me=""Style3"" /><GroupStyle parent=" & _
+            """Group"" me=""Style12"" /><HeadingStyle parent=""Heading"" me=""Style2"" /><HighLightRo" & _
+            "wStyle parent=""HighlightRow"" me=""Style7"" /><InactiveStyle parent=""Inactive"" me=""" & _
+            "Style4"" /><OddRowStyle parent=""OddRow"" me=""Style9"" /><RecordSelectorStyle parent" & _
+            "=""RecordSelector"" me=""Style11"" /><SelectedStyle parent=""Selected"" me=""Style6"" />" & _
+            "<Style parent=""Normal"" me=""Style1"" /><ClientRect>0, 0, 208, 128</ClientRect><Bor" & _
+            "derSide>0</BorderSide></C1.Win.C1TrueDBGrid.DropdownView></Splits><NamedStyles><" & _
+            "Style parent="""" me=""Normal"" /><Style parent=""Normal"" me=""Heading"" /><Style paren" & _
+            "t=""Heading"" me=""Footer"" /><Style parent=""Heading"" me=""Caption"" /><Style parent=""" & _
+            "Heading"" me=""Inactive"" /><Style parent=""Normal"" me=""Selected"" /><Style parent=""N" & _
+            "ormal"" me=""Editor"" /><Style parent=""Normal"" me=""HighlightRow"" /><Style parent=""N" & _
+            "ormal"" me=""EvenRow"" /><Style parent=""Normal"" me=""OddRow"" /><Style parent=""Headin" & _
+            "g"" me=""RecordSelector"" /><Style parent=""Normal"" me=""FilterBar"" /><Style parent=""" & _
+            "Caption"" me=""Group"" /></NamedStyles><vertSplits>1</vertSplits><horzSplits>1</hor" & _
+            "zSplits><Layout>None</Layout><DefaultRecSelWidth>17</DefaultRecSelWidth><ClientA" & _
+            "rea>0, 0, 208, 128</ClientArea></Blob>"
+            '
+            'cboKM
+            '
+            Me.cboKM.AllowColMove = True
+            Me.cboKM.AllowColSelect = True
+            Me.cboKM.AllowRowSizing = C1.Win.C1TrueDBGrid.RowSizingEnum.AllRows
+            Me.cboKM.AlternatingRows = True
+            Me.cboKM.CaptionHeight = 17
+            Me.cboKM.ColumnCaptionHeight = 17
+            Me.cboKM.ColumnFooterHeight = 17
+            Me.cboKM.FetchRowStyles = False
+            Me.cboKM.Images.Add(CType(resources.GetObject("resource3"), System.Drawing.Image))
+            Me.cboKM.Location = New System.Drawing.Point(244, 212)
+            Me.cboKM.Name = "cboKM"
+            Me.cboKM.RowDivider.Color = System.Drawing.Color.DarkGray
+            Me.cboKM.RowDivider.Style = C1.Win.C1TrueDBGrid.LineStyleEnum.Single
+            Me.cboKM.RowHeight = 15
+            Me.cboKM.RowSubDividerColor = System.Drawing.Color.DarkGray
+            Me.cboKM.ScrollTips = False
+            Me.cboKM.Size = New System.Drawing.Size(236, 132)
+            Me.cboKM.TabIndex = 233
+            Me.cboKM.TabStop = False
+            Me.cboKM.Text = "C1TrueDBDropdown1"
+            Me.cboKM.ValueTranslate = True
+            Me.cboKM.Visible = False
+            Me.cboKM.PropBag = "<?xml version=""1.0""?><Blob><Styles type=""C1.Win.C1TrueDBGrid.Design.ContextWrappe" & _
+            "r""><Data>Group{BackColor:ControlDark;Border:None,,0, 0, 0, 0;AlignVert:Center;}E" & _
+            "ditor{}Style2{}Style5{}Style4{}Style7{}Style6{}EvenRow{BackColor:Aqua;}Selected{" & _
+            "ForeColor:HighlightText;BackColor:Highlight;}Style3{}Inactive{ForeColor:Inactive" & _
+            "CaptionText;BackColor:InactiveCaption;}FilterBar{}Footer{}Caption{AlignHorz:Cent" & _
+            "er;}Normal{Font:Microsoft Sans Serif, 8.25pt;}HighlightRow{ForeColor:HighlightTe" & _
+            "xt;BackColor:Highlight;}Style9{}OddRow{}RecordSelector{AlignImage:Center;}Headin" & _
+            "g{Wrap:True;AlignVert:Center;Border:Raised,,1, 1, 1, 1;ForeColor:ControlText;Bac" & _
+            "kColor:Control;}Style8{}Style10{AlignHorz:Near;}Style11{}Style12{}Style13{}Style" & _
+            "1{}</Data></Styles><Splits><C1.Win.C1TrueDBGrid.DropdownView Name="""" Alternating" & _
+            "RowStyle=""True"" CaptionHeight=""17"" ColumnCaptionHeight=""17"" ColumnFooterHeight=""" & _
+            "17"" MarqueeStyle=""DottedCellBorder"" RecordSelectorWidth=""17"" DefRecSelWidth=""17""" & _
+            " RecordSelectors=""False"" VerticalScrollGroup=""1"" HorizontalScrollGroup=""1""><Capt" & _
+            "ionStyle parent=""Style2"" me=""Style10"" /><EditorStyle parent=""Editor"" me=""Style5""" & _
+            " /><EvenRowStyle parent=""EvenRow"" me=""Style8"" /><FilterBarStyle parent=""FilterBa" & _
+            "r"" me=""Style13"" /><FooterStyle parent=""Footer"" me=""Style3"" /><GroupStyle parent=" & _
+            """Group"" me=""Style12"" /><HeadingStyle parent=""Heading"" me=""Style2"" /><HighLightRo" & _
+            "wStyle parent=""HighlightRow"" me=""Style7"" /><InactiveStyle parent=""Inactive"" me=""" & _
+            "Style4"" /><OddRowStyle parent=""OddRow"" me=""Style9"" /><RecordSelectorStyle parent" & _
+            "=""RecordSelector"" me=""Style11"" /><SelectedStyle parent=""Selected"" me=""Style6"" />" & _
+            "<Style parent=""Normal"" me=""Style1"" /><ClientRect>0, 0, 232, 128</ClientRect><Bor" & _
+            "derSide>0</BorderSide></C1.Win.C1TrueDBGrid.DropdownView></Splits><NamedStyles><" & _
+            "Style parent="""" me=""Normal"" /><Style parent=""Normal"" me=""Heading"" /><Style paren" & _
+            "t=""Heading"" me=""Footer"" /><Style parent=""Heading"" me=""Caption"" /><Style parent=""" & _
+            "Heading"" me=""Inactive"" /><Style parent=""Normal"" me=""Selected"" /><Style parent=""N" & _
+            "ormal"" me=""Editor"" /><Style parent=""Normal"" me=""HighlightRow"" /><Style parent=""N" & _
+            "ormal"" me=""EvenRow"" /><Style parent=""Normal"" me=""OddRow"" /><Style parent=""Headin" & _
+            "g"" me=""RecordSelector"" /><Style parent=""Normal"" me=""FilterBar"" /><Style parent=""" & _
+            "Caption"" me=""Group"" /></NamedStyles><vertSplits>1</vertSplits><horzSplits>1</hor" & _
+            "zSplits><Layout>None</Layout><DefaultRecSelWidth>17</DefaultRecSelWidth><ClientA" & _
+            "rea>0, 0, 232, 128</ClientArea></Blob>"
+            '
+            'dgDetalle
+            '
+            Me.dgDetalle.AllowAddNew = True
+            Me.dgDetalle.AllowDelete = True
+            Me.dgDetalle.AllowSort = False
+            Me.dgDetalle.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                        Or System.Windows.Forms.AnchorStyles.Left) _
+                        Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Me.dgDetalle.Caption = "LINIES COMPRA"
+            Me.dgDetalle.CaptionHeight = 17
+            Me.dgDetalle.CellTipsDelay = 250
+            Me.dgDetalle.FlatStyle = C1.Win.C1TrueDBGrid.FlatModeEnum.System
+            Me.dgDetalle.GroupByCaption = "Drag a column header here to group by that column"
+            Me.dgDetalle.Images.Add(CType(resources.GetObject("resource4"), System.Drawing.Image))
+            Me.dgDetalle.Location = New System.Drawing.Point(8, 184)
+            Me.dgDetalle.MarqueeStyle = C1.Win.C1TrueDBGrid.MarqueeEnum.DottedCellBorder
+            Me.dgDetalle.Name = "dgDetalle"
+            Me.dgDetalle.PreviewInfo.Location = New System.Drawing.Point(0, 0)
+            Me.dgDetalle.PreviewInfo.Size = New System.Drawing.Size(0, 0)
+            Me.dgDetalle.PreviewInfo.ZoomFactor = 75
+            Me.dgDetalle.RecordSelectorWidth = 17
+            Me.dgDetalle.RowDivider.Color = System.Drawing.Color.DarkGray
+            Me.dgDetalle.RowDivider.Style = C1.Win.C1TrueDBGrid.LineStyleEnum.Single
+            Me.dgDetalle.RowHeight = 15
+            Me.dgDetalle.RowSubDividerColor = System.Drawing.Color.DarkGray
+            Me.dgDetalle.Size = New System.Drawing.Size(952, 256)
+            Me.dgDetalle.SpringMode = True
+            Me.dgDetalle.TabAction = C1.Win.C1TrueDBGrid.TabActionEnum.GridNavigation
+            Me.dgDetalle.TabIndex = 213
+            Me.dgDetalle.Text = "C1TrueDBGrid1"
+            Me.dgDetalle.WrapCellPointer = True
+            Me.dgDetalle.PropBag = "<?xml version=""1.0""?><Blob><Styles type=""C1.Win.C1TrueDBGrid.Design.ContextWrappe" & _
+            "r""><Data>Group{BackColor:ControlDark;Border:None,,0, 0, 0, 0;AlignVert:Center;}E" & _
+            "ditor{}Style2{}Style5{}Style4{}Style7{}Style6{}EvenRow{BackColor:Aqua;}Selected{" & _
+            "ForeColor:HighlightText;BackColor:Highlight;}Style3{}Inactive{ForeColor:Inactive" & _
+            "CaptionText;BackColor:InactiveCaption;}FilterBar{}Footer{}Caption{Font:Microsoft" & _
+            " Sans Serif, 8.25pt, style=Bold;AlignHorz:Center;BackColor:InactiveCaption;}Styl" & _
+            "e9{}Normal{Font:Microsoft Sans Serif, 8.25pt;}HighlightRow{ForeColor:HighlightTe" & _
+            "xt;BackColor:Highlight;}Style14{}OddRow{}RecordSelector{AlignImage:Center;}Style" & _
+            "15{}Heading{Wrap:True;AlignVert:Center;Border:Raised,,1, 1, 1, 1;ForeColor:Contr" & _
+            "olText;BackColor:Control;}Style8{}Style10{AlignHorz:Near;}Style11{}Style12{}Styl" & _
+            "e13{}Style1{}</Data></Styles><Splits><C1.Win.C1TrueDBGrid.MergeView Name="""" Capt" & _
+            "ionHeight=""17"" ColumnCaptionHeight=""17"" ColumnFooterHeight=""17"" MarqueeStyle=""Do" & _
+            "ttedCellBorder"" RecordSelectorWidth=""17"" DefRecSelWidth=""17"" VerticalScrollGroup" & _
+            "=""1"" HorizontalScrollGroup=""1"" SpringMode=""True""><CaptionStyle parent=""Style2"" m" & _
+            "e=""Style10"" /><EditorStyle parent=""Editor"" me=""Style5"" /><EvenRowStyle parent=""E" & _
+            "venRow"" me=""Style8"" /><FilterBarStyle parent=""FilterBar"" me=""Style13"" /><FooterS" & _
+            "tyle parent=""Footer"" me=""Style3"" /><GroupStyle parent=""Group"" me=""Style12"" /><He" & _
+            "adingStyle parent=""Heading"" me=""Style2"" /><HighLightRowStyle parent=""HighlightRo" & _
+            "w"" me=""Style7"" /><InactiveStyle parent=""Inactive"" me=""Style4"" /><OddRowStyle par" & _
+            "ent=""OddRow"" me=""Style9"" /><RecordSelectorStyle parent=""RecordSelector"" me=""Styl" & _
+            "e11"" /><SelectedStyle parent=""Selected"" me=""Style6"" /><Style parent=""Normal"" me=" & _
+            """Style1"" /><ClientRect>0, 17, 948, 235</ClientRect><BorderSide>0</BorderSide></C" & _
+            "1.Win.C1TrueDBGrid.MergeView></Splits><NamedStyles><Style parent="""" me=""Normal"" " & _
+            "/><Style parent=""Normal"" me=""Heading"" /><Style parent=""Heading"" me=""Footer"" /><S" & _
+            "tyle parent=""Heading"" me=""Caption"" /><Style parent=""Heading"" me=""Inactive"" /><St" & _
+            "yle parent=""Normal"" me=""Selected"" /><Style parent=""Normal"" me=""Editor"" /><Style " & _
+            "parent=""Normal"" me=""HighlightRow"" /><Style parent=""Normal"" me=""EvenRow"" /><Style" & _
+            " parent=""Normal"" me=""OddRow"" /><Style parent=""Heading"" me=""RecordSelector"" /><St" & _
+            "yle parent=""Normal"" me=""FilterBar"" /><Style parent=""Caption"" me=""Group"" /></Name" & _
+            "dStyles><vertSplits>1</vertSplits><horzSplits>1</horzSplits><Layout>None</Layout" & _
+            "><DefaultRecSelWidth>17</DefaultRecSelWidth><ClientArea>0, 0, 948, 252</ClientAr" & _
+            "ea><PrintPageHeaderStyle parent="""" me=""Style14"" /><PrintPageFooterStyle parent=""" & _
+            """ me=""Style15"" /></Blob>"
+            '
+            'lblRE
+            '
+            Me.lblRE.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Me.lblRE.ImeMode = System.Windows.Forms.ImeMode.NoControl
+            Me.lblRE.Location = New System.Drawing.Point(408, 452)
+            Me.lblRE.Name = "lblRE"
+            Me.lblRE.Size = New System.Drawing.Size(40, 20)
+            Me.lblRE.TabIndex = 212
+            Me.lblRE.Text = "RE"
+            Me.lblRE.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+            '
+            'txtRE1
+            '
+            Me.txtRE1.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Me.txtRE1.BackColor = System.Drawing.Color.FromArgb(CType(224, Byte), CType(211, Byte), CType(120, Byte))
+            Me.txtRE1.CustomFormat = "#,##0.00"
+            Me.txtRE1.DataType = GetType(System.Double)
+            Me.txtRE1.Font = New System.Drawing.Font("Arial", 8.25!, System.Drawing.FontStyle.Bold)
+            Me.txtRE1.FormatType = C1.Win.C1Input.FormatTypeEnum.CustomFormat
+            Me.txtRE1.Location = New System.Drawing.Point(452, 452)
+            Me.txtRE1.Name = "txtRE1"
+            Me.txtRE1.Size = New System.Drawing.Size(72, 20)
+            Me.txtRE1.TabIndex = 211
+            Me.txtRE1.Tag = Nothing
+            Me.txtRE1.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+            '
+            'lblIVA
+            '
+            Me.lblIVA.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Me.lblIVA.ImeMode = System.Windows.Forms.ImeMode.NoControl
+            Me.lblIVA.Location = New System.Drawing.Point(536, 452)
+            Me.lblIVA.Name = "lblIVA"
+            Me.lblIVA.Size = New System.Drawing.Size(40, 20)
+            Me.lblIVA.TabIndex = 194
+            Me.lblIVA.Text = "IVA"
+            Me.lblIVA.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+            '
+            'lblDescuento
+            '
+            Me.lblDescuento.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Me.lblDescuento.ImeMode = System.Windows.Forms.ImeMode.NoControl
+            Me.lblDescuento.Location = New System.Drawing.Point(104, 452)
+            Me.lblDescuento.Name = "lblDescuento"
+            Me.lblDescuento.Size = New System.Drawing.Size(40, 20)
+            Me.lblDescuento.TabIndex = 193
+            Me.lblDescuento.Text = "Dte.:"
+            Me.lblDescuento.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+            '
+            'lblBase
+            '
+            Me.lblBase.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Me.lblBase.ImeMode = System.Windows.Forms.ImeMode.NoControl
+            Me.lblBase.Location = New System.Drawing.Point(228, 452)
+            Me.lblBase.Name = "lblBase"
+            Me.lblBase.Size = New System.Drawing.Size(100, 20)
+            Me.lblBase.TabIndex = 192
+            Me.lblBase.Text = "Base Imposable"
+            Me.lblBase.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+            '
+            'lblTotalBruto
+            '
+            Me.lblTotalBruto.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Me.lblTotalBruto.ImeMode = System.Windows.Forms.ImeMode.NoControl
+            Me.lblTotalBruto.Location = New System.Drawing.Point(660, 452)
+            Me.lblTotalBruto.Name = "lblTotalBruto"
+            Me.lblTotalBruto.Size = New System.Drawing.Size(64, 20)
+            Me.lblTotalBruto.TabIndex = 191
+            Me.lblTotalBruto.Text = "Total Brut"
+            Me.lblTotalBruto.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+            '
+            'txtIVA1
+            '
+            Me.txtIVA1.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Me.txtIVA1.BackColor = System.Drawing.Color.FromArgb(CType(224, Byte), CType(211, Byte), CType(120, Byte))
+            Me.txtIVA1.CustomFormat = "#,##0.00"
+            Me.txtIVA1.DataType = GetType(System.Double)
+            Me.txtIVA1.Font = New System.Drawing.Font("Arial", 8.25!, System.Drawing.FontStyle.Bold)
+            Me.txtIVA1.FormatType = C1.Win.C1Input.FormatTypeEnum.CustomFormat
+            Me.txtIVA1.Location = New System.Drawing.Point(580, 452)
+            Me.txtIVA1.Name = "txtIVA1"
+            Me.txtIVA1.Size = New System.Drawing.Size(72, 20)
+            Me.txtIVA1.TabIndex = 190
+            Me.txtIVA1.Tag = Nothing
+            Me.txtIVA1.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+            '
+            'txtTOTAL
+            '
+            Me.txtTOTAL.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Me.txtTOTAL.BackColor = System.Drawing.Color.FromArgb(CType(224, Byte), CType(211, Byte), CType(120, Byte))
+            Me.txtTOTAL.CustomFormat = "#,##0.00"
+            Me.txtTOTAL.DataType = GetType(System.Double)
+            Me.txtTOTAL.Font = New System.Drawing.Font("Arial", 8.25!, System.Drawing.FontStyle.Bold)
+            Me.txtTOTAL.FormatType = C1.Win.C1Input.FormatTypeEnum.CustomFormat
+            Me.txtTOTAL.Location = New System.Drawing.Point(876, 452)
+            Me.txtTOTAL.Name = "txtTOTAL"
+            Me.txtTOTAL.Size = New System.Drawing.Size(72, 20)
+            Me.txtTOTAL.TabIndex = 189
+            Me.txtTOTAL.Tag = Nothing
+            Me.txtTOTAL.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+            '
+            'txtBASE1
+            '
+            Me.txtBASE1.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Me.txtBASE1.BackColor = System.Drawing.Color.FromArgb(CType(224, Byte), CType(211, Byte), CType(120, Byte))
+            Me.txtBASE1.CustomFormat = "#,##0.00"
+            Me.txtBASE1.DataType = GetType(System.Double)
+            Me.txtBASE1.Font = New System.Drawing.Font("Arial", 8.25!, System.Drawing.FontStyle.Bold)
+            Me.txtBASE1.FormatType = C1.Win.C1Input.FormatTypeEnum.CustomFormat
+            Me.txtBASE1.Location = New System.Drawing.Point(328, 452)
+            Me.txtBASE1.Name = "txtBASE1"
+            Me.txtBASE1.Size = New System.Drawing.Size(72, 20)
+            Me.txtBASE1.TabIndex = 188
+            Me.txtBASE1.Tag = Nothing
+            Me.txtBASE1.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+            '
+            'txtDTE1
+            '
+            Me.txtDTE1.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Me.txtDTE1.BackColor = System.Drawing.Color.FromArgb(CType(224, Byte), CType(211, Byte), CType(120, Byte))
+            Me.txtDTE1.CustomFormat = "#,##0.00"
+            Me.txtDTE1.DataType = GetType(System.Double)
+            Me.txtDTE1.Font = New System.Drawing.Font("Arial", 8.25!, System.Drawing.FontStyle.Bold)
+            Me.txtDTE1.FormatType = C1.Win.C1Input.FormatTypeEnum.CustomFormat
+            Me.txtDTE1.Location = New System.Drawing.Point(148, 452)
+            Me.txtDTE1.Name = "txtDTE1"
+            Me.txtDTE1.Size = New System.Drawing.Size(72, 20)
+            Me.txtDTE1.TabIndex = 187
+            Me.txtDTE1.Tag = Nothing
+            Me.txtDTE1.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+            '
+            'txtBRUT1
+            '
+            Me.txtBRUT1.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Me.txtBRUT1.BackColor = System.Drawing.Color.FromArgb(CType(224, Byte), CType(211, Byte), CType(120, Byte))
+            Me.txtBRUT1.CustomFormat = "#,##0.00"
+            Me.txtBRUT1.DataType = GetType(System.Double)
+            Me.txtBRUT1.Font = New System.Drawing.Font("Arial", 8.25!, System.Drawing.FontStyle.Bold)
+            Me.txtBRUT1.FormatType = C1.Win.C1Input.FormatTypeEnum.CustomFormat
+            Me.txtBRUT1.Location = New System.Drawing.Point(728, 452)
+            Me.txtBRUT1.Name = "txtBRUT1"
+            Me.txtBRUT1.Size = New System.Drawing.Size(72, 20)
+            Me.txtBRUT1.TabIndex = 186
+            Me.txtBRUT1.Tag = Nothing
+            Me.txtBRUT1.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+            '
+            'GroupBox1
+            '
+            Me.GroupBox1.Controls.Add(Me.cboORDENFABCOMP)
+            Me.GroupBox1.Controls.Add(Me.lblOrdenFabComplemento)
+            Me.GroupBox1.Controls.Add(Me.cboNOMTALLER)
+            Me.GroupBox1.Controls.Add(Me.txtTALLER)
+            Me.GroupBox1.Controls.Add(Me.btnElegirTaller)
+            Me.GroupBox1.Controls.Add(Me.lblTaller)
+            Me.GroupBox1.Controls.Add(Me.txtCOMANDAMOSTRA)
+            Me.GroupBox1.Controls.Add(Me.lblPedidoMuestra)
+            Me.GroupBox1.Controls.Add(Me.cboFRA)
+            Me.GroupBox1.Controls.Add(Me.Label1)
+            Me.GroupBox1.Controls.Add(Me.txtP_DTE)
+            Me.GroupBox1.Controls.Add(Me.dtpDATA)
+            Me.GroupBox1.Controls.Add(Me.dtpDATAENTREGA)
+            Me.GroupBox1.Controls.Add(Me.txtNRO)
+            Me.GroupBox1.Controls.Add(Me.cboNOMPROVE)
+            Me.GroupBox1.Controls.Add(Me.lblFechaEntrega)
+            Me.GroupBox1.Controls.Add(Me.lblPedido)
+            Me.GroupBox1.Controls.Add(Me.lblProveedor)
+            Me.GroupBox1.Controls.Add(Me.btnElegirProveedor)
+            Me.GroupBox1.Controls.Add(Me.txtPROVE)
+            Me.GroupBox1.Controls.Add(Me.lblNumeroPedido)
+            Me.GroupBox1.Controls.Add(Me.lblFecha)
+            Me.GroupBox1.Controls.Add(Me.chkESTOC)
+            Me.GroupBox1.Location = New System.Drawing.Point(8, 12)
+            Me.GroupBox1.Name = "GroupBox1"
+            Me.GroupBox1.Size = New System.Drawing.Size(548, 168)
+            Me.GroupBox1.TabIndex = 4
+            Me.GroupBox1.TabStop = False
+            '
+            'cboORDENFABCOMP
+            '
+            Me.cboORDENFABCOMP.AddItemSeparator = Microsoft.VisualBasic.ChrW(59)
+            Me.cboORDENFABCOMP.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+            Me.cboORDENFABCOMP.Caption = ""
+            Me.cboORDENFABCOMP.CaptionHeight = 17
+            Me.cboORDENFABCOMP.CharacterCasing = System.Windows.Forms.CharacterCasing.Normal
+            Me.cboORDENFABCOMP.ColumnCaptionHeight = 17
+            Me.cboORDENFABCOMP.ColumnFooterHeight = 17
+            Me.cboORDENFABCOMP.ContentHeight = 15
+            Me.cboORDENFABCOMP.DeadAreaBackColor = System.Drawing.Color.Empty
+            Me.cboORDENFABCOMP.EditorBackColor = System.Drawing.SystemColors.Window
+            Me.cboORDENFABCOMP.EditorFont = New System.Drawing.Font("Microsoft Sans Serif", 8.25!)
+            Me.cboORDENFABCOMP.EditorForeColor = System.Drawing.SystemColors.WindowText
+            Me.cboORDENFABCOMP.EditorHeight = 15
+            Me.cboORDENFABCOMP.GapHeight = 2
+            Me.cboORDENFABCOMP.Images.Add(CType(resources.GetObject("resource5"), System.Drawing.Image))
+            Me.cboORDENFABCOMP.ItemHeight = 15
+            Me.cboORDENFABCOMP.Location = New System.Drawing.Point(324, 89)
+            Me.cboORDENFABCOMP.MatchEntryTimeout = CType(2000, Long)
+            Me.cboORDENFABCOMP.MaxDropDownItems = CType(5, Short)
+            Me.cboORDENFABCOMP.MaxLength = 32767
+            Me.cboORDENFABCOMP.MouseCursor = System.Windows.Forms.Cursors.Default
+            Me.cboORDENFABCOMP.Name = "cboORDENFABCOMP"
+            'Me.cbo.PartialRightColumn = False
+            Me.cboORDENFABCOMP.RowDivider.Color = System.Drawing.Color.DarkGray
+            Me.cboORDENFABCOMP.RowDivider.Style = C1.Win.C1List.LineStyleEnum.None
+            Me.cboORDENFABCOMP.RowSubDividerColor = System.Drawing.Color.DarkGray
+            Me.cboORDENFABCOMP.Size = New System.Drawing.Size(120, 19)
+            Me.cboORDENFABCOMP.TabIndex = 285
+            Me.cboORDENFABCOMP.Text = "C1Combo1"
+            Me.cboORDENFABCOMP.Visible = False
+            Me.cboORDENFABCOMP.PropBag = "<?xml version=""1.0""?><Blob><Styles type=""C1.Win.C1List.Design.ContextWrapper""><Da" & _
+            "ta>Group{AlignVert:Center;Border:None,,0, 0, 0, 0;BackColor:ControlDark;}Style2{" & _
+            "}Style5{}Style4{}Style7{}Style6{}EvenRow{BackColor:Aqua;}Selected{ForeColor:High" & _
+            "lightText;BackColor:Highlight;}Style3{}Inactive{ForeColor:InactiveCaptionText;Ba" & _
+            "ckColor:InactiveCaption;}Footer{}Caption{AlignHorz:Center;}Normal{}HighlightRow{" & _
+            "ForeColor:HighlightText;BackColor:Highlight;}Style1{}OddRow{}RecordSelector{Alig" & _
+            "nImage:Center;}Heading{Wrap:True;BackColor:Control;Border:Raised,,1, 1, 1, 1;For" & _
+            "eColor:ControlText;AlignVert:Center;}Style8{}Style10{}Style11{}Style9{AlignHorz:" & _
+            "Near;}</Data></Styles><Splits><C1.Win.C1List.ListBoxView AllowColSelect=""False"" " & _
+            "Name="""" CaptionHeight=""17"" ColumnCaptionHeight=""17"" ColumnFooterHeight=""17"" Vert" & _
+            "icalScrollGroup=""1"" HorizontalScrollGroup=""1""><ClientRect>0, 0, 116, 156</Client" & _
+            "Rect><VScrollBar><Width>17</Width></VScrollBar><HScrollBar><Height>17</Height></" & _
+            "HScrollBar><CaptionStyle parent=""Style2"" me=""Style9"" /><EvenRowStyle parent=""Eve" & _
+            "nRow"" me=""Style7"" /><FooterStyle parent=""Footer"" me=""Style3"" /><GroupStyle paren" & _
+            "t=""Group"" me=""Style11"" /><HeadingStyle parent=""Heading"" me=""Style2"" /><HighLight" & _
+            "RowStyle parent=""HighlightRow"" me=""Style6"" /><InactiveStyle parent=""Inactive"" me" & _
+            "=""Style4"" /><OddRowStyle parent=""OddRow"" me=""Style8"" /><RecordSelectorStyle pare" & _
+            "nt=""RecordSelector"" me=""Style10"" /><SelectedStyle parent=""Selected"" me=""Style5"" " & _
+            "/><Style parent=""Normal"" me=""Style1"" /></C1.Win.C1List.ListBoxView></Splits><Nam" & _
+            "edStyles><Style parent="""" me=""Normal"" /><Style parent=""Normal"" me=""Heading"" /><S" & _
+            "tyle parent=""Heading"" me=""Footer"" /><Style parent=""Heading"" me=""Caption"" /><Styl" & _
+            "e parent=""Heading"" me=""Inactive"" /><Style parent=""Normal"" me=""Selected"" /><Style" & _
+            " parent=""Normal"" me=""HighlightRow"" /><Style parent=""Normal"" me=""EvenRow"" /><Styl" & _
+            "e parent=""Normal"" me=""OddRow"" /><Style parent=""Heading"" me=""RecordSelector"" /><S" & _
+            "tyle parent=""Caption"" me=""Group"" /></NamedStyles><vertSplits>1</vertSplits><horz" & _
+            "Splits>1</horzSplits><Layout>Modified</Layout><DefaultRecSelWidth>17</DefaultRec" & _
+            "SelWidth></Blob>"
+            '
+            'lblOrdenFabComplemento
+            '
+            Me.lblOrdenFabComplemento.ImeMode = System.Windows.Forms.ImeMode.NoControl
+            Me.lblOrdenFabComplemento.Location = New System.Drawing.Point(208, 88)
+            Me.lblOrdenFabComplemento.Name = "lblOrdenFabComplemento"
+            Me.lblOrdenFabComplemento.Size = New System.Drawing.Size(112, 20)
+            Me.lblOrdenFabComplemento.TabIndex = 284
+            Me.lblOrdenFabComplemento.Text = "Ordre Complement"
+            Me.lblOrdenFabComplemento.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+            Me.lblOrdenFabComplemento.Visible = False
+            '
+            'cboNOMTALLER
+            '
+            Me.cboNOMTALLER.AddItemSeparator = Microsoft.VisualBasic.ChrW(59)
+            Me.cboNOMTALLER.AutoCompletion = True
+            Me.cboNOMTALLER.AutoSelect = True
+            Me.cboNOMTALLER.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+            Me.cboNOMTALLER.Caption = ""
+            Me.cboNOMTALLER.CaptionHeight = 17
+            Me.cboNOMTALLER.CharacterCasing = System.Windows.Forms.CharacterCasing.Normal
+            Me.cboNOMTALLER.ColumnCaptionHeight = 17
+            Me.cboNOMTALLER.ColumnFooterHeight = 17
+            Me.cboNOMTALLER.ContentHeight = 15
+            Me.cboNOMTALLER.Cursor = System.Windows.Forms.Cursors.Default
+            Me.cboNOMTALLER.DeadAreaBackColor = System.Drawing.Color.Empty
+            Me.cboNOMTALLER.EditorBackColor = System.Drawing.SystemColors.Window
+            Me.cboNOMTALLER.EditorFont = New System.Drawing.Font("Microsoft Sans Serif", 8.25!)
+            Me.cboNOMTALLER.EditorForeColor = System.Drawing.SystemColors.WindowText
+            Me.cboNOMTALLER.EditorHeight = 15
+            Me.cboNOMTALLER.GapHeight = 2
+            Me.cboNOMTALLER.Images.Add(CType(resources.GetObject("resource6"), System.Drawing.Image))
+            Me.cboNOMTALLER.IntegralHeight = True
+            Me.cboNOMTALLER.ItemHeight = 13
+            Me.cboNOMTALLER.Location = New System.Drawing.Point(164, 64)
+            Me.cboNOMTALLER.MatchEntryTimeout = CType(100, Long)
+            Me.cboNOMTALLER.MaxDropDownItems = CType(8, Short)
+            Me.cboNOMTALLER.MaxLength = 0
+            Me.cboNOMTALLER.MouseCursor = System.Windows.Forms.Cursors.Default
+            Me.cboNOMTALLER.Name = "cboNOMTALLER"
+            'Me.cbo.PartialRightColumn = False
+            Me.cboNOMTALLER.RowDivider.Color = System.Drawing.Color.DarkGray
+            Me.cboNOMTALLER.RowDivider.Style = C1.Win.C1List.LineStyleEnum.None
+            Me.cboNOMTALLER.RowSubDividerColor = System.Drawing.Color.DarkGray
+            Me.cboNOMTALLER.Size = New System.Drawing.Size(372, 19)
+            Me.cboNOMTALLER.TabIndex = 281
+            Me.cboNOMTALLER.Visible = False
+            Me.cboNOMTALLER.PropBag = "<?xml version=""1.0""?><Blob><Styles type=""C1.Win.C1List.Design.ContextWrapper""><Da" & _
+            "ta>Group{AlignVert:Center;Border:None,,0, 0, 0, 0;BackColor:ControlDark;}Style2{" & _
+            "}Style5{}Style4{}Style7{}Style6{}EvenRow{BackColor:Aqua;}Selected{ForeColor:High" & _
+            "lightText;BackColor:Highlight;}Style3{}Inactive{ForeColor:InactiveCaptionText;Ba" & _
+            "ckColor:InactiveCaption;}Footer{}Caption{AlignHorz:Center;}Normal{Font:Microsoft" & _
+            " Sans Serif, 8.25pt;BackColor:Window;}HighlightRow{ForeColor:HighlightText;BackC" & _
+            "olor:Highlight;}Style1{}OddRow{}RecordSelector{AlignImage:Center;}Heading{Wrap:T" & _
+            "rue;BackColor:Control;Border:Raised,,1, 1, 1, 1;ForeColor:ControlText;AlignVert:" & _
+            "Center;}Style8{}Style10{}Style11{}Style9{AlignHorz:Near;}</Data></Styles><Splits" & _
+            "><C1.Win.C1List.ListBoxView AllowColSelect=""False"" Name="""" CaptionHeight=""17"" Co" & _
+            "lumnCaptionHeight=""17"" ColumnFooterHeight=""17"" VerticalScrollGroup=""1"" Horizonta" & _
+            "lScrollGroup=""1""><ClientRect>0, 0, 116, 156</ClientRect><VScrollBar><Width>17</W" & _
+            "idth></VScrollBar><HScrollBar><Height>17</Height></HScrollBar><CaptionStyle pare" & _
+            "nt=""Style2"" me=""Style9"" /><EvenRowStyle parent=""EvenRow"" me=""Style7"" /><FooterSt" & _
+            "yle parent=""Footer"" me=""Style3"" /><GroupStyle parent=""Group"" me=""Style11"" /><Hea" & _
+            "dingStyle parent=""Heading"" me=""Style2"" /><HighLightRowStyle parent=""HighlightRow" & _
+            """ me=""Style6"" /><InactiveStyle parent=""Inactive"" me=""Style4"" /><OddRowStyle pare" & _
+            "nt=""OddRow"" me=""Style8"" /><RecordSelectorStyle parent=""RecordSelector"" me=""Style" & _
+            "10"" /><SelectedStyle parent=""Selected"" me=""Style5"" /><Style parent="""" me=""Normal" & _
+            """ /></C1.Win.C1List.ListBoxView></Splits><NamedStyles><Style parent="""" me=""Norma" & _
+            "l"" /><Style parent=""Normal"" me=""Heading"" /><Style parent=""Heading"" me=""Footer"" /" & _
+            "><Style parent=""Heading"" me=""Caption"" /><Style parent=""Heading"" me=""Inactive"" />" & _
+            "<Style parent=""Normal"" me=""Selected"" /><Style parent=""Normal"" me=""HighlightRow"" " & _
+            "/><Style parent=""Normal"" me=""EvenRow"" /><Style parent=""Normal"" me=""OddRow"" /><St" & _
+            "yle parent=""Heading"" me=""RecordSelector"" /><Style parent=""Caption"" me=""Group"" />" & _
+            "</NamedStyles><vertSplits>1</vertSplits><horzSplits>1</horzSplits><Layout>Modifi" & _
+            "ed</Layout><DefaultRecSelWidth>17</DefaultRecSelWidth></Blob>"
+            '
+            'txtTALLER
+            '
+            Me.txtTALLER.Location = New System.Drawing.Point(88, 64)
+            Me.txtTALLER.Name = "txtTALLER"
+            Me.txtTALLER.Size = New System.Drawing.Size(48, 20)
+            Me.txtTALLER.TabIndex = 280
+            Me.txtTALLER.Tag = Nothing
+            Me.txtTALLER.Visible = False
+            '
+            'btnElegirTaller
+            '
+            Me.btnElegirTaller.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+            Me.btnElegirTaller.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft
+            Me.btnElegirTaller.ImeMode = System.Windows.Forms.ImeMode.NoControl
+            Me.btnElegirTaller.Location = New System.Drawing.Point(136, 64)
+            Me.btnElegirTaller.Name = "btnElegirTaller"
+            Me.btnElegirTaller.Size = New System.Drawing.Size(24, 20)
+            Me.btnElegirTaller.TabIndex = 283
+            Me.btnElegirTaller.Text = "..."
+            Me.btnElegirTaller.Visible = False
+            '
+            'lblTaller
+            '
+            Me.lblTaller.ImeMode = System.Windows.Forms.ImeMode.NoControl
+            Me.lblTaller.Location = New System.Drawing.Point(8, 64)
+            Me.lblTaller.Name = "lblTaller"
+            Me.lblTaller.Size = New System.Drawing.Size(76, 20)
+            Me.lblTaller.TabIndex = 282
+            Me.lblTaller.Text = "Taller"
+            Me.lblTaller.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+            Me.lblTaller.Visible = False
+            '
+            'txtCOMANDAMOSTRA
+            '
+            Me.txtCOMANDAMOSTRA.Location = New System.Drawing.Point(316, 16)
+            Me.txtCOMANDAMOSTRA.Name = "txtCOMANDAMOSTRA"
+            Me.txtCOMANDAMOSTRA.Size = New System.Drawing.Size(112, 20)
+            Me.txtCOMANDAMOSTRA.TabIndex = 274
+            Me.txtCOMANDAMOSTRA.Tag = Nothing
+            Me.txtCOMANDAMOSTRA.Visible = False
+            '
+            'lblPedidoMuestra
+            '
+            Me.lblPedidoMuestra.ImeMode = System.Windows.Forms.ImeMode.NoControl
+            Me.lblPedidoMuestra.Location = New System.Drawing.Point(220, 12)
+            Me.lblPedidoMuestra.Name = "lblPedidoMuestra"
+            Me.lblPedidoMuestra.Size = New System.Drawing.Size(92, 24)
+            Me.lblPedidoMuestra.TabIndex = 275
+            Me.lblPedidoMuestra.Text = "Numero Comanda Venda"
+            Me.lblPedidoMuestra.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+            Me.lblPedidoMuestra.Visible = False
+            '
+            'cboFRA
+            '
+            Me.cboFRA.AddItemSeparator = Microsoft.VisualBasic.ChrW(59)
+            Me.cboFRA.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+            Me.cboFRA.Caption = ""
+            Me.cboFRA.CaptionHeight = 17
+            Me.cboFRA.CharacterCasing = System.Windows.Forms.CharacterCasing.Normal
+            Me.cboFRA.ColumnCaptionHeight = 17
+            Me.cboFRA.ColumnFooterHeight = 17
+            Me.cboFRA.ContentHeight = 15
+            Me.cboFRA.DeadAreaBackColor = System.Drawing.Color.Empty
+            Me.cboFRA.DropDownWidth = 8
+            Me.cboFRA.EditorBackColor = System.Drawing.SystemColors.Window
+            Me.cboFRA.EditorFont = New System.Drawing.Font("Microsoft Sans Serif", 8.25!)
+            Me.cboFRA.EditorForeColor = System.Drawing.SystemColors.WindowText
+            Me.cboFRA.EditorHeight = 15
+            Me.cboFRA.GapHeight = 2
+            Me.cboFRA.Images.Add(CType(resources.GetObject("resource7"), System.Drawing.Image))
+            Me.cboFRA.ItemHeight = 15
+            Me.cboFRA.Location = New System.Drawing.Point(88, 16)
+            Me.cboFRA.MatchEntryTimeout = CType(2000, Long)
+            Me.cboFRA.MaxDropDownItems = CType(5, Short)
+            Me.cboFRA.MaxLength = 32767
+            Me.cboFRA.MouseCursor = System.Windows.Forms.Cursors.Default
+            Me.cboFRA.Name = "cboFRA"
+            'Me.cbo.PartialRightColumn = False
+            Me.cboFRA.RowDivider.Color = System.Drawing.Color.DarkGray
+            Me.cboFRA.RowDivider.Style = C1.Win.C1List.LineStyleEnum.None
+            Me.cboFRA.RowSubDividerColor = System.Drawing.Color.DarkGray
+            Me.cboFRA.Size = New System.Drawing.Size(128, 19)
+            Me.cboFRA.TabIndex = 273
+            Me.cboFRA.Text = "C1Combo1"
+            Me.cboFRA.PropBag = "<?xml version=""1.0""?><Blob><Styles type=""C1.Win.C1List.Design.ContextWrapper""><Da" & _
+            "ta>Group{BackColor:ControlDark;Border:None,,0, 0, 0, 0;AlignVert:Center;}Style2{" & _
+            "}Style5{}Style4{}Style7{}Style6{}EvenRow{BackColor:Aqua;}Selected{ForeColor:High" & _
+            "lightText;BackColor:Highlight;}Style3{}Inactive{ForeColor:InactiveCaptionText;Ba" & _
+            "ckColor:InactiveCaption;}Footer{}Caption{AlignHorz:Center;}Normal{}HighlightRow{" & _
+            "ForeColor:HighlightText;BackColor:Highlight;}Style9{AlignHorz:Near;}OddRow{}Reco" & _
+            "rdSelector{AlignImage:Center;}Heading{Wrap:True;AlignVert:Center;Border:Raised,," & _
+            "1, 1, 1, 1;ForeColor:ControlText;BackColor:Control;}Style8{}Style10{}Style11{}St" & _
+            "yle1{}</Data></Styles><Splits><C1.Win.C1List.ListBoxView AllowColSelect=""False"" " & _
+            "Name="""" CaptionHeight=""17"" ColumnCaptionHeight=""17"" ColumnFooterHeight=""17"" Vert" & _
+            "icalScrollGroup=""1"" HorizontalScrollGroup=""1""><ClientRect>0, 0, 116, 156</Client" & _
+            "Rect><VScrollBar><Width>17</Width></VScrollBar><HScrollBar><Height>17</Height></" & _
+            "HScrollBar><CaptionStyle parent=""Style2"" me=""Style9"" /><EvenRowStyle parent=""Eve" & _
+            "nRow"" me=""Style7"" /><FooterStyle parent=""Footer"" me=""Style3"" /><GroupStyle paren" & _
+            "t=""Group"" me=""Style11"" /><HeadingStyle parent=""Heading"" me=""Style2"" /><HighLight" & _
+            "RowStyle parent=""HighlightRow"" me=""Style6"" /><InactiveStyle parent=""Inactive"" me" & _
+            "=""Style4"" /><OddRowStyle parent=""OddRow"" me=""Style8"" /><RecordSelectorStyle pare" & _
+            "nt=""RecordSelector"" me=""Style10"" /><SelectedStyle parent=""Selected"" me=""Style5"" " & _
+            "/><Style parent=""Normal"" me=""Style1"" /></C1.Win.C1List.ListBoxView></Splits><Nam" & _
+            "edStyles><Style parent="""" me=""Normal"" /><Style parent=""Normal"" me=""Heading"" /><S" & _
+            "tyle parent=""Heading"" me=""Footer"" /><Style parent=""Heading"" me=""Caption"" /><Styl" & _
+            "e parent=""Heading"" me=""Inactive"" /><Style parent=""Normal"" me=""Selected"" /><Style" & _
+            " parent=""Normal"" me=""HighlightRow"" /><Style parent=""Normal"" me=""EvenRow"" /><Styl" & _
+            "e parent=""Normal"" me=""OddRow"" /><Style parent=""Heading"" me=""RecordSelector"" /><S" & _
+            "tyle parent=""Caption"" me=""Group"" /></NamedStyles><vertSplits>1</vertSplits><horz" & _
+            "Splits>1</horzSplits><Layout>Modified</Layout><DefaultRecSelWidth>17</DefaultRec" & _
+            "SelWidth></Blob>"
+            '
+            'Label1
+            '
+            Me.Label1.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Me.Label1.ImeMode = System.Windows.Forms.ImeMode.NoControl
+            Me.Label1.Location = New System.Drawing.Point(8, 136)
+            Me.Label1.Name = "Label1"
+            Me.Label1.Size = New System.Drawing.Size(80, 20)
+            Me.Label1.TabIndex = 272
+            Me.Label1.Text = "Dte.:"
+            Me.Label1.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+            '
+            'txtP_DTE
+            '
+            Me.txtP_DTE.AcceptsReturn = True
+            Me.txtP_DTE.CustomFormat = "#,##0.00"
+            Me.txtP_DTE.DataType = GetType(System.Double)
+            Me.txtP_DTE.FormatType = C1.Win.C1Input.FormatTypeEnum.CustomFormat
+            Me.txtP_DTE.Location = New System.Drawing.Point(88, 136)
+            Me.txtP_DTE.Name = "txtP_DTE"
+            Me.txtP_DTE.Size = New System.Drawing.Size(112, 20)
+            Me.txtP_DTE.TabIndex = 271
+            Me.txtP_DTE.Tag = Nothing
+            '
+            'dtpDATA
+            '
+            '
+            'dtpDATA.Calendar
+            '
+            Me.dtpDATA.Calendar.ImeMode = System.Windows.Forms.ImeMode.NoControl
+            Me.dtpDATA.FormatType = C1.Win.C1Input.FormatTypeEnum.ShortDate
+            Me.dtpDATA.Location = New System.Drawing.Point(88, 112)
+            Me.dtpDATA.Name = "dtpDATA"
+            Me.dtpDATA.Size = New System.Drawing.Size(116, 20)
+            Me.dtpDATA.TabIndex = 270
+            Me.dtpDATA.Tag = Nothing
+            '
+            'dtpDATAENTREGA
+            '
+            '
+            'dtpDATAENTREGA.Calendar
+            '
+            Me.dtpDATAENTREGA.Calendar.ImeMode = System.Windows.Forms.ImeMode.NoControl
+            Me.dtpDATAENTREGA.Location = New System.Drawing.Point(324, 112)
+            Me.dtpDATAENTREGA.Name = "dtpDATAENTREGA"
+            Me.dtpDATAENTREGA.Size = New System.Drawing.Size(120, 20)
+            Me.dtpDATAENTREGA.TabIndex = 269
+            Me.dtpDATAENTREGA.Tag = Nothing
+            Me.dtpDATAENTREGA.Visible = False
+            '
+            'txtNRO
+            '
+            Me.txtNRO.Location = New System.Drawing.Point(88, 88)
+            Me.txtNRO.Name = "txtNRO"
+            Me.txtNRO.Size = New System.Drawing.Size(112, 20)
+            Me.txtNRO.TabIndex = 3
+            Me.txtNRO.Tag = Nothing
+            '
+            'cboNOMPROVE
+            '
+            Me.cboNOMPROVE.AddItemSeparator = Microsoft.VisualBasic.ChrW(59)
+            Me.cboNOMPROVE.AutoCompletion = True
+            Me.cboNOMPROVE.AutoSelect = True
+            Me.cboNOMPROVE.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+            Me.cboNOMPROVE.Caption = ""
+            Me.cboNOMPROVE.CaptionHeight = 17
+            Me.cboNOMPROVE.CharacterCasing = System.Windows.Forms.CharacterCasing.Normal
+            Me.cboNOMPROVE.ColumnCaptionHeight = 17
+            Me.cboNOMPROVE.ColumnFooterHeight = 17
+            Me.cboNOMPROVE.ContentHeight = 15
+            Me.cboNOMPROVE.Cursor = System.Windows.Forms.Cursors.Default
+            Me.cboNOMPROVE.DeadAreaBackColor = System.Drawing.Color.Empty
+            Me.cboNOMPROVE.EditorBackColor = System.Drawing.SystemColors.Window
+            Me.cboNOMPROVE.EditorFont = New System.Drawing.Font("Microsoft Sans Serif", 8.25!)
+            Me.cboNOMPROVE.EditorForeColor = System.Drawing.SystemColors.WindowText
+            Me.cboNOMPROVE.EditorHeight = 15
+            Me.cboNOMPROVE.GapHeight = 2
+            Me.cboNOMPROVE.Images.Add(CType(resources.GetObject("resource8"), System.Drawing.Image))
+            Me.cboNOMPROVE.ItemHeight = 15
+            Me.cboNOMPROVE.Location = New System.Drawing.Point(164, 40)
+            Me.cboNOMPROVE.MatchEntryTimeout = CType(100, Long)
+            Me.cboNOMPROVE.MaxDropDownItems = CType(5, Short)
+            Me.cboNOMPROVE.MaxLength = 255
+            Me.cboNOMPROVE.MouseCursor = System.Windows.Forms.Cursors.Default
+            Me.cboNOMPROVE.Name = "cboNOMPROVE"
+            'Me.cbo.PartialRightColumn = False
+            Me.cboNOMPROVE.RowDivider.Color = System.Drawing.Color.DarkGray
+            Me.cboNOMPROVE.RowDivider.Style = C1.Win.C1List.LineStyleEnum.None
+            Me.cboNOMPROVE.RowSubDividerColor = System.Drawing.Color.DarkGray
+            Me.cboNOMPROVE.Size = New System.Drawing.Size(372, 19)
+            Me.cboNOMPROVE.TabIndex = 2
+            Me.cboNOMPROVE.PropBag = "<?xml version=""1.0""?><Blob><Styles type=""C1.Win.C1List.Design.ContextWrapper""><Da" & _
+            "ta>Group{AlignVert:Center;Border:None,,0, 0, 0, 0;BackColor:ControlDark;}Style2{" & _
+            "}Style5{}Style4{}Style7{}Style6{}EvenRow{BackColor:Aqua;}Selected{ForeColor:High" & _
+            "lightText;BackColor:Highlight;}Style3{}Inactive{ForeColor:InactiveCaptionText;Ba" & _
+            "ckColor:InactiveCaption;}Footer{}Caption{AlignHorz:Center;}Normal{Font:Microsoft" & _
+            " Sans Serif, 8.25pt;BackColor:Window;}HighlightRow{ForeColor:HighlightText;BackC" & _
+            "olor:Highlight;}Style1{}OddRow{}RecordSelector{AlignImage:Center;}Heading{Wrap:T" & _
+            "rue;BackColor:Control;Border:Flat,ControlDark,1, 1, 1, 1;ForeColor:ControlText;A" & _
+            "lignVert:Center;}Style8{}Style10{}Style11{}Style9{AlignHorz:Near;}</Data></Style" & _
+            "s><Splits><C1.Win.C1List.ListBoxView AllowColSelect=""False"" Name="""" CaptionHeigh" & _
+            "t=""17"" ColumnCaptionHeight=""17"" ColumnFooterHeight=""17"" VerticalScrollGroup=""1"" " & _
+            "HorizontalScrollGroup=""1""><ClientRect>0, 0, 116, 156</ClientRect><VScrollBar><Wi" & _
+            "dth>17</Width></VScrollBar><HScrollBar><Height>17</Height></HScrollBar><CaptionS" & _
+            "tyle parent=""Style2"" me=""Style9"" /><EvenRowStyle parent=""EvenRow"" me=""Style7"" />" & _
+            "<FooterStyle parent=""Footer"" me=""Style3"" /><GroupStyle parent=""Group"" me=""Style1" & _
+            "1"" /><HeadingStyle parent=""Heading"" me=""Style2"" /><HighLightRowStyle parent=""Hig" & _
+            "hlightRow"" me=""Style6"" /><InactiveStyle parent=""Inactive"" me=""Style4"" /><OddRowS" & _
+            "tyle parent=""OddRow"" me=""Style8"" /><RecordSelectorStyle parent=""RecordSelector"" " & _
+            "me=""Style10"" /><SelectedStyle parent=""Selected"" me=""Style5"" /><Style parent="""" m" & _
+            "e=""Normal"" /></C1.Win.C1List.ListBoxView></Splits><NamedStyles><Style parent="""" " & _
+            "me=""Normal"" /><Style parent=""Normal"" me=""Heading"" /><Style parent=""Heading"" me=""" & _
+            "Footer"" /><Style parent=""Heading"" me=""Caption"" /><Style parent=""Heading"" me=""Ina" & _
+            "ctive"" /><Style parent=""Normal"" me=""Selected"" /><Style parent=""Normal"" me=""Highl" & _
+            "ightRow"" /><Style parent=""Normal"" me=""EvenRow"" /><Style parent=""Normal"" me=""OddR" & _
+            "ow"" /><Style parent=""Heading"" me=""RecordSelector"" /><Style parent=""Caption"" me=""" & _
+            "Group"" /></NamedStyles><vertSplits>1</vertSplits><horzSplits>1</horzSplits><Layo" & _
+            "ut>Modified</Layout><DefaultRecSelWidth>17</DefaultRecSelWidth></Blob>"
+            '
+            'lblFechaEntrega
+            '
+            Me.lblFechaEntrega.ImeMode = System.Windows.Forms.ImeMode.NoControl
+            Me.lblFechaEntrega.Location = New System.Drawing.Point(208, 112)
+            Me.lblFechaEntrega.Name = "lblFechaEntrega"
+            Me.lblFechaEntrega.Size = New System.Drawing.Size(112, 20)
+            Me.lblFechaEntrega.TabIndex = 12
+            Me.lblFechaEntrega.Text = "Data Entrega"
+            Me.lblFechaEntrega.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+            Me.lblFechaEntrega.Visible = False
+            '
+            'lblPedido
+            '
+            Me.lblPedido.ImeMode = System.Windows.Forms.ImeMode.NoControl
+            Me.lblPedido.Location = New System.Drawing.Point(8, 16)
+            Me.lblPedido.Name = "lblPedido"
+            Me.lblPedido.Size = New System.Drawing.Size(80, 20)
+            Me.lblPedido.TabIndex = 4
+            Me.lblPedido.Text = "Comanda"
+            Me.lblPedido.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+            '
+            'lblProveedor
+            '
+            Me.lblProveedor.ImeMode = System.Windows.Forms.ImeMode.NoControl
+            Me.lblProveedor.Location = New System.Drawing.Point(8, 40)
+            Me.lblProveedor.Name = "lblProveedor"
+            Me.lblProveedor.Size = New System.Drawing.Size(80, 20)
+            Me.lblProveedor.TabIndex = 3
+            Me.lblProveedor.Text = "Proveedor"
+            Me.lblProveedor.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+            '
+            'btnElegirProveedor
+            '
+            Me.btnElegirProveedor.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+            Me.btnElegirProveedor.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft
+            Me.btnElegirProveedor.ImeMode = System.Windows.Forms.ImeMode.NoControl
+            Me.btnElegirProveedor.Location = New System.Drawing.Point(136, 40)
+            Me.btnElegirProveedor.Name = "btnElegirProveedor"
+            Me.btnElegirProveedor.Size = New System.Drawing.Size(24, 20)
+            Me.btnElegirProveedor.TabIndex = 2
+            Me.btnElegirProveedor.Text = "..."
+            '
+            'txtPROVE
+            '
+            Me.txtPROVE.Location = New System.Drawing.Point(88, 40)
+            Me.txtPROVE.Name = "txtPROVE"
+            Me.txtPROVE.Size = New System.Drawing.Size(48, 20)
+            Me.txtPROVE.TabIndex = 1
+            Me.txtPROVE.Tag = Nothing
+            '
+            'lblNumeroPedido
+            '
+            Me.lblNumeroPedido.ImeMode = System.Windows.Forms.ImeMode.NoControl
+            Me.lblNumeroPedido.Location = New System.Drawing.Point(8, 88)
+            Me.lblNumeroPedido.Name = "lblNumeroPedido"
+            Me.lblNumeroPedido.Size = New System.Drawing.Size(80, 20)
+            Me.lblNumeroPedido.TabIndex = 6
+            Me.lblNumeroPedido.Text = "Numero"
+            Me.lblNumeroPedido.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+            '
+            'lblFecha
+            '
+            Me.lblFecha.ImeMode = System.Windows.Forms.ImeMode.NoControl
+            Me.lblFecha.Location = New System.Drawing.Point(8, 112)
+            Me.lblFecha.Name = "lblFecha"
+            Me.lblFecha.Size = New System.Drawing.Size(80, 20)
+            Me.lblFecha.TabIndex = 7
+            Me.lblFecha.Text = "Data"
+            Me.lblFecha.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+            '
+            'chkESTOC
+            '
+            Me.chkESTOC.BackColor = System.Drawing.Color.Transparent
+            Me.chkESTOC.ImeMode = System.Windows.Forms.ImeMode.NoControl
+            Me.chkESTOC.Location = New System.Drawing.Point(432, 16)
+            Me.chkESTOC.Name = "chkESTOC"
+            Me.chkESTOC.Size = New System.Drawing.Size(104, 22)
+            Me.chkESTOC.TabIndex = 0
+            Me.chkESTOC.Text = "Sumat a l'Stock"
+            Me.chkESTOC.Visible = False
+            '
+            'txtOBSERV
+            '
+            Me.txtOBSERV.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
+                        Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Me.txtOBSERV.Location = New System.Drawing.Point(560, 24)
+            Me.txtOBSERV.Multiline = True
+            Me.txtOBSERV.Name = "txtOBSERV"
+            Me.txtOBSERV.ScrollBars = System.Windows.Forms.ScrollBars.Vertical
+            Me.txtOBSERV.Size = New System.Drawing.Size(400, 156)
+            Me.txtOBSERV.TabIndex = 0
+            Me.txtOBSERV.Tag = Nothing
+            '
+            'lblObservaciones
+            '
+            Me.lblObservaciones.ImeMode = System.Windows.Forms.ImeMode.NoControl
+            Me.lblObservaciones.Location = New System.Drawing.Point(560, 8)
+            Me.lblObservaciones.Name = "lblObservaciones"
+            Me.lblObservaciones.Size = New System.Drawing.Size(148, 15)
+            Me.lblObservaciones.TabIndex = 176
+            Me.lblObservaciones.Text = "Observacions"
+            Me.lblObservaciones.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
+            '
+            'lblTraspasado
+            '
+            Me.lblTraspasado.ImeMode = System.Windows.Forms.ImeMode.NoControl
+            Me.lblTraspasado.Location = New System.Drawing.Point(784, 8)
+            Me.lblTraspasado.Name = "lblTraspasado"
+            Me.lblTraspasado.Size = New System.Drawing.Size(132, 15)
+            Me.lblTraspasado.TabIndex = 179
+            Me.lblTraspasado.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
+            '
+            'lblTotal
+            '
+            Me.lblTotal.ImeMode = System.Windows.Forms.ImeMode.NoControl
+            Me.lblTotal.Location = New System.Drawing.Point(0, 0)
+            Me.lblTotal.Name = "lblTotal"
+            Me.lblTotal.TabIndex = 0
+            '
+            'gbEleccionClientesPAF
+            '
+            Me.gbEleccionClientesPAF.Controls.Add(Me.lblNumeroPAF)
+            Me.gbEleccionClientesPAF.Controls.Add(Me.cboSeleccionProveParaPAF)
+            Me.gbEleccionClientesPAF.Controls.Add(Me.rdoVerTodasPAF)
+            Me.gbEleccionClientesPAF.Controls.Add(Me.rdoVerPAFDeCliente)
+            Me.gbEleccionClientesPAF.Location = New System.Drawing.Point(8, 8)
+            Me.gbEleccionClientesPAF.Name = "gbEleccionClientesPAF"
+            Me.gbEleccionClientesPAF.Size = New System.Drawing.Size(796, 48)
+            Me.gbEleccionClientesPAF.TabIndex = 210
+            Me.gbEleccionClientesPAF.TabStop = False
+            Me.gbEleccionClientesPAF.Text = "Escollir Proveïdors PAF"
+            '
+            'lblNumeroPAF
+            '
+            Me.lblNumeroPAF.ImeMode = System.Windows.Forms.ImeMode.NoControl
+            Me.lblNumeroPAF.Location = New System.Drawing.Point(632, 20)
+            Me.lblNumeroPAF.Name = "lblNumeroPAF"
+            Me.lblNumeroPAF.Size = New System.Drawing.Size(152, 23)
+            Me.lblNumeroPAF.TabIndex = 2
+            '
+            'cboSeleccionProveParaPAF
+            '
+            Me.cboSeleccionProveParaPAF.AddItemSeparator = Microsoft.VisualBasic.ChrW(59)
+            Me.cboSeleccionProveParaPAF.AutoCompletion = True
+            Me.cboSeleccionProveParaPAF.AutoSelect = True
+            Me.cboSeleccionProveParaPAF.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+            Me.cboSeleccionProveParaPAF.Caption = ""
+            Me.cboSeleccionProveParaPAF.CaptionHeight = 17
+            Me.cboSeleccionProveParaPAF.CharacterCasing = System.Windows.Forms.CharacterCasing.Normal
+            Me.cboSeleccionProveParaPAF.ColumnCaptionHeight = 17
+            Me.cboSeleccionProveParaPAF.ColumnFooterHeight = 17
+            Me.cboSeleccionProveParaPAF.ContentHeight = 15
+            Me.cboSeleccionProveParaPAF.Cursor = System.Windows.Forms.Cursors.Default
+            Me.cboSeleccionProveParaPAF.DeadAreaBackColor = System.Drawing.Color.Empty
+            Me.cboSeleccionProveParaPAF.EditorBackColor = System.Drawing.SystemColors.Window
+            Me.cboSeleccionProveParaPAF.EditorFont = New System.Drawing.Font("Microsoft Sans Serif", 8.25!)
+            Me.cboSeleccionProveParaPAF.EditorForeColor = System.Drawing.SystemColors.WindowText
+            Me.cboSeleccionProveParaPAF.EditorHeight = 15
+            Me.cboSeleccionProveParaPAF.GapHeight = 2
+            Me.cboSeleccionProveParaPAF.Images.Add(CType(resources.GetObject("resource9"), System.Drawing.Image))
+            Me.cboSeleccionProveParaPAF.ItemHeight = 15
+            Me.cboSeleccionProveParaPAF.LimitToList = True
+            Me.cboSeleccionProveParaPAF.Location = New System.Drawing.Point(296, 20)
+            Me.cboSeleccionProveParaPAF.MatchEntryTimeout = CType(100, Long)
+            Me.cboSeleccionProveParaPAF.MaxDropDownItems = CType(5, Short)
+            Me.cboSeleccionProveParaPAF.MaxLength = 32767
+            Me.cboSeleccionProveParaPAF.MouseCursor = System.Windows.Forms.Cursors.Default
+            Me.cboSeleccionProveParaPAF.Name = "cboSeleccionProveParaPAF"
+            'Me.cbo.PartialRightColumn = False
+            Me.cboSeleccionProveParaPAF.RowDivider.Color = System.Drawing.Color.DarkGray
+            Me.cboSeleccionProveParaPAF.RowDivider.Style = C1.Win.C1List.LineStyleEnum.None
+            Me.cboSeleccionProveParaPAF.RowSubDividerColor = System.Drawing.Color.DarkGray
+            Me.cboSeleccionProveParaPAF.Size = New System.Drawing.Size(324, 19)
+            Me.cboSeleccionProveParaPAF.TabIndex = 0
+            Me.cboSeleccionProveParaPAF.PropBag = "<?xml version=""1.0""?><Blob><Styles type=""C1.Win.C1List.Design.ContextWrapper""><Da" & _
+            "ta>Group{BackColor:ControlDark;Border:None,,0, 0, 0, 0;AlignVert:Center;}Style2{" & _
+            "}Style5{}Style4{}Style7{}Style6{}EvenRow{BackColor:Aqua;}Selected{ForeColor:High" & _
+            "lightText;BackColor:Highlight;}Style3{}Inactive{ForeColor:InactiveCaptionText;Ba" & _
+            "ckColor:InactiveCaption;}Footer{}Caption{AlignHorz:Center;}Normal{Font:Microsoft" & _
+            " Sans Serif, 8.25pt;BackColor:Window;}HighlightRow{ForeColor:HighlightText;BackC" & _
+            "olor:Highlight;}Style9{AlignHorz:Near;}OddRow{}RecordSelector{AlignImage:Center;" & _
+            "}Heading{Wrap:True;AlignVert:Center;Border:Flat,ControlDark,1, 1, 1, 1;ForeColor" & _
+            ":ControlText;BackColor:Control;}Style8{}Style10{}Style11{}Style1{}</Data></Style" & _
+            "s><Splits><C1.Win.C1List.ListBoxView AllowColSelect=""False"" Name="""" CaptionHeigh" & _
+            "t=""17"" ColumnCaptionHeight=""17"" ColumnFooterHeight=""17"" VerticalScrollGroup=""1"" " & _
+            "HorizontalScrollGroup=""1""><ClientRect>0, 0, 116, 156</ClientRect><VScrollBar><Wi" & _
+            "dth>17</Width></VScrollBar><HScrollBar><Height>17</Height></HScrollBar><CaptionS" & _
+            "tyle parent=""Style2"" me=""Style9"" /><EvenRowStyle parent=""EvenRow"" me=""Style7"" />" & _
+            "<FooterStyle parent=""Footer"" me=""Style3"" /><GroupStyle parent=""Group"" me=""Style1" & _
+            "1"" /><HeadingStyle parent=""Heading"" me=""Style2"" /><HighLightRowStyle parent=""Hig" & _
+            "hlightRow"" me=""Style6"" /><InactiveStyle parent=""Inactive"" me=""Style4"" /><OddRowS" & _
+            "tyle parent=""OddRow"" me=""Style8"" /><RecordSelectorStyle parent=""RecordSelector"" " & _
+            "me=""Style10"" /><SelectedStyle parent=""Selected"" me=""Style5"" /><Style parent="""" m" & _
+            "e=""Normal"" /></C1.Win.C1List.ListBoxView></Splits><NamedStyles><Style parent="""" " & _
+            "me=""Normal"" /><Style parent=""Normal"" me=""Heading"" /><Style parent=""Heading"" me=""" & _
+            "Footer"" /><Style parent=""Heading"" me=""Caption"" /><Style parent=""Heading"" me=""Ina" & _
+            "ctive"" /><Style parent=""Normal"" me=""Selected"" /><Style parent=""Normal"" me=""Highl" & _
+            "ightRow"" /><Style parent=""Normal"" me=""EvenRow"" /><Style parent=""Normal"" me=""OddR" & _
+            "ow"" /><Style parent=""Heading"" me=""RecordSelector"" /><Style parent=""Caption"" me=""" & _
+            "Group"" /></NamedStyles><vertSplits>1</vertSplits><horzSplits>1</horzSplits><Layo" & _
+            "ut>Modified</Layout><DefaultRecSelWidth>17</DefaultRecSelWidth></Blob>"
+            '
+            'rdoVerTodasPAF
+            '
+            Me.rdoVerTodasPAF.Checked = True
+            Me.rdoVerTodasPAF.ImeMode = System.Windows.Forms.ImeMode.NoControl
+            Me.rdoVerTodasPAF.Location = New System.Drawing.Point(4, 20)
+            Me.rdoVerTodasPAF.Name = "rdoVerTodasPAF"
+            Me.rdoVerTodasPAF.Size = New System.Drawing.Size(168, 20)
+            Me.rdoVerTodasPAF.TabIndex = 0
+            Me.rdoVerTodasPAF.TabStop = True
+            Me.rdoVerTodasPAF.Text = "Tots els proveïdors"
+            '
+            'rdoVerPAFDeCliente
+            '
+            Me.rdoVerPAFDeCliente.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft
+            Me.rdoVerPAFDeCliente.ImeMode = System.Windows.Forms.ImeMode.NoControl
+            Me.rdoVerPAFDeCliente.Location = New System.Drawing.Point(180, 20)
+            Me.rdoVerPAFDeCliente.Name = "rdoVerPAFDeCliente"
+            Me.rdoVerPAFDeCliente.Size = New System.Drawing.Size(116, 20)
+            Me.rdoVerPAFDeCliente.TabIndex = 1
+            Me.rdoVerPAFDeCliente.Text = "Del proveïdor"
+            '
+            'btnImprimir
+            '
+            Me.btnImprimir.Anchor = System.Windows.Forms.AnchorStyles.Bottom
+            Me.btnImprimir.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+            Me.btnImprimir.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft
+            Me.btnImprimir.ImeMode = System.Windows.Forms.ImeMode.NoControl
+            Me.btnImprimir.Location = New System.Drawing.Point(804, 572)
+            Me.btnImprimir.Name = "btnImprimir"
+            Me.btnImprimir.Size = New System.Drawing.Size(72, 20)
+            Me.btnImprimir.TabIndex = 0
+            Me.btnImprimir.Text = "Imprimir"
+            '
+            'TabControlPAF
+            '
+            Me.TabControlPAF.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+                        Or System.Windows.Forms.AnchorStyles.Left) _
+                        Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Me.TabControlPAF.Controls.Add(Me.tabPagePAF)
+            Me.TabControlPAF.Controls.Add(Me.TabPage1)
+            Me.TabControlPAF.ItemSize = New System.Drawing.Size(42, 18)
+            Me.TabControlPAF.Location = New System.Drawing.Point(4, 56)
+            Me.TabControlPAF.Name = "TabControlPAF"
+            Me.TabControlPAF.SelectedIndex = 0
+            Me.TabControlPAF.Size = New System.Drawing.Size(976, 504)
+            Me.TabControlPAF.TabIndex = 178
+            '
+            'TabPage1
+            '
+            Me.TabPage1.Controls.Add(Me.PrintPreviewBar1)
+            Me.TabPage1.Controls.Add(Me.PrintControl1)
+            Me.TabPage1.Location = New System.Drawing.Point(4, 22)
+            Me.TabPage1.Name = "TabPage1"
+            Me.TabPage1.Size = New System.Drawing.Size(968, 478)
+            Me.TabPage1.TabIndex = 1
+            Me.TabPage1.Text = "Impresió"
+            '
+            'btnCancelar
+            '
+            Me.btnCancelar.Anchor = System.Windows.Forms.AnchorStyles.Bottom
+            Me.btnCancelar.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+            Me.btnCancelar.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft
+            Me.btnCancelar.ImeMode = System.Windows.Forms.ImeMode.NoControl
+            Me.btnCancelar.Location = New System.Drawing.Point(804, 592)
+            Me.btnCancelar.Name = "btnCancelar"
+            Me.btnCancelar.Size = New System.Drawing.Size(72, 20)
+            Me.btnCancelar.TabIndex = 211
+            Me.btnCancelar.Text = "Cancelar"
+            '
+            'ToolBarButton1
+            '
+            Me.ToolBarButton1.Style = System.Windows.Forms.ToolBarButtonStyle.Separator
+            '
+            'ToolBarButton2
+            '
+            Me.ToolBarButton2.Style = System.Windows.Forms.ToolBarButtonStyle.Separator
+            '
+            'ToolBarButton3
+            '
+            Me.ToolBarButton3.Style = System.Windows.Forms.ToolBarButtonStyle.Separator
+            '
+            'ToolBarButton4
+            '
+            Me.ToolBarButton4.Style = System.Windows.Forms.ToolBarButtonStyle.Separator
+            '
+            'ToolBarButton5
+            '
+            Me.ToolBarButton5.Style = System.Windows.Forms.ToolBarButtonStyle.Separator
+            '
+            'ToolBarButton6
+            '
+            Me.ToolBarButton6.Style = System.Windows.Forms.ToolBarButtonStyle.Separator
+            '
+            'PrintControl1
+            '
+            Me.PrintControl1.IsMetric = True
+            Me.PrintControl1.Location = New System.Drawing.Point(52, 56)
+            Me.PrintControl1.Name = "PrintControl1"
+            Me.PrintControl1.Size = New System.Drawing.Size(488, 344)
+            Me.PrintControl1.TabIndex = 0
+            Me.PrintControl1.TabStop = False
+            Me.PrintControl1.Text = "PrintControl1"
+            '
+            'PrintPreviewBar1
+            '
+            Me.PrintPreviewBar1.Appearance = System.Windows.Forms.ToolBarAppearance.Flat
+            Me.PrintPreviewBar1.Buttons.AddRange(New System.Windows.Forms.ToolBarButton() {Me.PrintPreviewBarButton1, Me.PrintPreviewBarButton2, Me.PrintPreviewBarButton3, Me.ToolBarButton7, Me.PrintPreviewBarButton4, Me.PrintPreviewBarButton5, Me.PrintPreviewBarButton6, Me.PrintPreviewBarButton7, Me.PrintPreviewBarButton8, Me.ToolBarButton8, Me.PrintPreviewBarButton9, Me.PrintPreviewBarButton10, Me.PrintPreviewBarButton11, Me.PrintPreviewBarButton12, Me.ToolBarButton9, Me.PrintPreviewBarButton13, Me.PrintPreviewBarButton14, Me.PrintPreviewBarButton15, Me.PrintPreviewBarButton16, Me.ToolBarButton10, Me.PrintPreviewBarButton17, Me.PrintPreviewBarButton18, Me.PrintPreviewBarButton19, Me.ToolBarButton11, Me.PrintPreviewBarButton20, Me.PrintPreviewBarButton21, Me.ToolBarButton12, Me.PrintPreviewBarButton22})
+            Me.PrintPreviewBar1.ButtonSize = New System.Drawing.Size(16, 16)
+            Me.PrintPreviewBar1.DropDownArrows = True
+            Me.PrintPreviewBar1.Location = New System.Drawing.Point(0, 0)
+            Me.PrintPreviewBar1.Name = "PrintPreviewBar1"
+            Me.PrintPreviewBar1.ShowToolTips = True
+            Me.PrintPreviewBar1.Size = New System.Drawing.Size(968, 28)
+            Me.PrintPreviewBar1.TabIndex = 1
+            '
+            'PrintPreviewBarButton1
+            '
+            Me.PrintPreviewBarButton1.Command = DevExpress.XtraPrinting.PrintingSystemCommand.DocumentMap
+            Me.PrintPreviewBarButton1.Enabled = False
+            Me.PrintPreviewBarButton1.ImageIndex = 19
+            Me.PrintPreviewBarButton1.Style = System.Windows.Forms.ToolBarButtonStyle.ToggleButton
+            Me.PrintPreviewBarButton1.ToolTipText = "Document Map"
+            '
+            'PrintPreviewBarButton2
+            '
+            Me.PrintPreviewBarButton2.Command = DevExpress.XtraPrinting.PrintingSystemCommand.Find
+            Me.PrintPreviewBarButton2.Enabled = False
+            Me.PrintPreviewBarButton2.ImageIndex = 20
+            Me.PrintPreviewBarButton2.ToolTipText = "Search"
+            Me.PrintPreviewBarButton2.Visible = False
+            '
+            'PrintPreviewBarButton3
+            '
+            Me.PrintPreviewBarButton3.Command = DevExpress.XtraPrinting.PrintingSystemCommand.HandTool
+            Me.PrintPreviewBarButton3.Enabled = False
+            Me.PrintPreviewBarButton3.ImageIndex = 16
+            Me.PrintPreviewBarButton3.Style = System.Windows.Forms.ToolBarButtonStyle.ToggleButton
+            Me.PrintPreviewBarButton3.ToolTipText = "Hand Tool"
+            '
+            'ToolBarButton7
+            '
+            Me.ToolBarButton7.Style = System.Windows.Forms.ToolBarButtonStyle.Separator
+            '
+            'PrintPreviewBarButton4
+            '
+            Me.PrintPreviewBarButton4.Command = DevExpress.XtraPrinting.PrintingSystemCommand.Customize
+            Me.PrintPreviewBarButton4.ImageIndex = 14
+            Me.PrintPreviewBarButton4.Style = System.Windows.Forms.ToolBarButtonStyle.ToggleButton
+            Me.PrintPreviewBarButton4.ToolTipText = "Customize"
+            Me.PrintPreviewBarButton4.Visible = False
+            '
+            'PrintPreviewBarButton5
+            '
+            Me.PrintPreviewBarButton5.Command = DevExpress.XtraPrinting.PrintingSystemCommand.Print
+            Me.PrintPreviewBarButton5.Enabled = False
+            Me.PrintPreviewBarButton5.ImageIndex = 0
+            Me.PrintPreviewBarButton5.Style = System.Windows.Forms.ToolBarButtonStyle.ToggleButton
+            Me.PrintPreviewBarButton5.ToolTipText = "Print"
+            '
+            'PrintPreviewBarButton6
+            '
+            Me.PrintPreviewBarButton6.Command = DevExpress.XtraPrinting.PrintingSystemCommand.PrintDirect
+            Me.PrintPreviewBarButton6.Enabled = False
+            Me.PrintPreviewBarButton6.ImageIndex = 1
+            Me.PrintPreviewBarButton6.ToolTipText = "Print Direct"
+            '
+            'PrintPreviewBarButton7
+            '
+            Me.PrintPreviewBarButton7.Command = DevExpress.XtraPrinting.PrintingSystemCommand.PageSetup
+            Me.PrintPreviewBarButton7.Enabled = False
+            Me.PrintPreviewBarButton7.ImageIndex = 2
+            Me.PrintPreviewBarButton7.Style = System.Windows.Forms.ToolBarButtonStyle.ToggleButton
+            Me.PrintPreviewBarButton7.ToolTipText = "Page Setup"
+            '
+            'PrintPreviewBarButton8
+            '
+            Me.PrintPreviewBarButton8.Command = DevExpress.XtraPrinting.PrintingSystemCommand.EditPageHF
+            Me.PrintPreviewBarButton8.ImageIndex = 15
+            Me.PrintPreviewBarButton8.ToolTipText = "Header And Footer"
+            Me.PrintPreviewBarButton8.Visible = False
+            '
+            'ToolBarButton8
+            '
+            Me.ToolBarButton8.Style = System.Windows.Forms.ToolBarButtonStyle.Separator
+            '
+            'PrintPreviewBarButton9
+            '
+            Me.PrintPreviewBarButton9.Command = DevExpress.XtraPrinting.PrintingSystemCommand.Magnifier
+            Me.PrintPreviewBarButton9.Enabled = False
+            Me.PrintPreviewBarButton9.ImageIndex = 3
+            Me.PrintPreviewBarButton9.Style = System.Windows.Forms.ToolBarButtonStyle.ToggleButton
+            Me.PrintPreviewBarButton9.ToolTipText = "Magnifier"
+            '
+            'PrintPreviewBarButton10
+            '
+            Me.PrintPreviewBarButton10.Command = DevExpress.XtraPrinting.PrintingSystemCommand.ZoomIn
+            Me.PrintPreviewBarButton10.Enabled = False
+            Me.PrintPreviewBarButton10.ImageIndex = 4
+            Me.PrintPreviewBarButton10.ToolTipText = "Zoom In"
+            '
+            'PrintPreviewBarButton11
+            '
+            Me.PrintPreviewBarButton11.Command = DevExpress.XtraPrinting.PrintingSystemCommand.ZoomOut
+            Me.PrintPreviewBarButton11.Enabled = False
+            Me.PrintPreviewBarButton11.ImageIndex = 5
+            Me.PrintPreviewBarButton11.ToolTipText = "Zoom Out"
+            '
+            'PrintPreviewBarButton12
+            '
+            Me.PrintPreviewBarButton12.Command = DevExpress.XtraPrinting.PrintingSystemCommand.Zoom
+            Me.PrintPreviewBarButton12.Enabled = False
+            Me.PrintPreviewBarButton12.ImageIndex = 6
+            Me.PrintPreviewBarButton12.Style = System.Windows.Forms.ToolBarButtonStyle.DropDownButton
+            Me.PrintPreviewBarButton12.ToolTipText = "Zoom"
+            '
+            'ToolBarButton9
+            '
+            Me.ToolBarButton9.Style = System.Windows.Forms.ToolBarButtonStyle.Separator
+            '
+            'PrintPreviewBarButton13
+            '
+            Me.PrintPreviewBarButton13.Command = DevExpress.XtraPrinting.PrintingSystemCommand.ShowFirstPage
+            Me.PrintPreviewBarButton13.Enabled = False
+            Me.PrintPreviewBarButton13.ImageIndex = 7
+            Me.PrintPreviewBarButton13.ToolTipText = "First Page"
+            '
+            'PrintPreviewBarButton14
+            '
+            Me.PrintPreviewBarButton14.Command = DevExpress.XtraPrinting.PrintingSystemCommand.ShowPrevPage
+            Me.PrintPreviewBarButton14.Enabled = False
+            Me.PrintPreviewBarButton14.ImageIndex = 8
+            Me.PrintPreviewBarButton14.ToolTipText = "Previous Page"
+            '
+            'PrintPreviewBarButton15
+            '
+            Me.PrintPreviewBarButton15.Command = DevExpress.XtraPrinting.PrintingSystemCommand.ShowNextPage
+            Me.PrintPreviewBarButton15.Enabled = False
+            Me.PrintPreviewBarButton15.ImageIndex = 9
+            Me.PrintPreviewBarButton15.ToolTipText = "Next Page"
+            '
+            'PrintPreviewBarButton16
+            '
+            Me.PrintPreviewBarButton16.Command = DevExpress.XtraPrinting.PrintingSystemCommand.ShowLastPage
+            Me.PrintPreviewBarButton16.Enabled = False
+            Me.PrintPreviewBarButton16.ImageIndex = 10
+            Me.PrintPreviewBarButton16.ToolTipText = "Last Page"
+            '
+            'ToolBarButton10
+            '
+            Me.ToolBarButton10.Style = System.Windows.Forms.ToolBarButtonStyle.Separator
+            '
+            'PrintPreviewBarButton17
+            '
+            Me.PrintPreviewBarButton17.Command = DevExpress.XtraPrinting.PrintingSystemCommand.MultiplePages
+            Me.PrintPreviewBarButton17.Enabled = False
+            Me.PrintPreviewBarButton17.ImageIndex = 11
+            Me.PrintPreviewBarButton17.Style = System.Windows.Forms.ToolBarButtonStyle.ToggleButton
+            Me.PrintPreviewBarButton17.ToolTipText = "Multiple Pages"
+            '
+            'PrintPreviewBarButton18
+            '
+            Me.PrintPreviewBarButton18.Command = DevExpress.XtraPrinting.PrintingSystemCommand.FillBackground
+            Me.PrintPreviewBarButton18.Enabled = False
+            Me.PrintPreviewBarButton18.ImageIndex = 12
+            Me.PrintPreviewBarButton18.Style = System.Windows.Forms.ToolBarButtonStyle.ToggleButton
+            Me.PrintPreviewBarButton18.ToolTipText = "Background"
+            '
+            'PrintPreviewBarButton19
+            '
+            Me.PrintPreviewBarButton19.Command = DevExpress.XtraPrinting.PrintingSystemCommand.Watermark
+            Me.PrintPreviewBarButton19.Enabled = False
+            Me.PrintPreviewBarButton19.ImageIndex = 21
+            Me.PrintPreviewBarButton19.ToolTipText = "Watermark"
+            '
+            'ToolBarButton11
+            '
+            Me.ToolBarButton11.Style = System.Windows.Forms.ToolBarButtonStyle.Separator
+            '
+            'PrintPreviewBarButton20
+            '
+            Me.PrintPreviewBarButton20.Command = DevExpress.XtraPrinting.PrintingSystemCommand.ExportFile
+            Me.PrintPreviewBarButton20.Enabled = False
+            Me.PrintPreviewBarButton20.ImageIndex = 18
+            Me.PrintPreviewBarButton20.Style = System.Windows.Forms.ToolBarButtonStyle.DropDownButton
+            Me.PrintPreviewBarButton20.ToolTipText = "Export Document..."
+            '
+            'PrintPreviewBarButton21
+            '
+            Me.PrintPreviewBarButton21.Command = DevExpress.XtraPrinting.PrintingSystemCommand.SendFile
+            Me.PrintPreviewBarButton21.Enabled = False
+            Me.PrintPreviewBarButton21.ImageIndex = 17
+            Me.PrintPreviewBarButton21.Style = System.Windows.Forms.ToolBarButtonStyle.DropDownButton
+            Me.PrintPreviewBarButton21.ToolTipText = "Send e-mail..."
+            '
+            'ToolBarButton12
+            '
+            Me.ToolBarButton12.Style = System.Windows.Forms.ToolBarButtonStyle.Separator
+            '
+            'PrintPreviewBarButton22
+            '
+            Me.PrintPreviewBarButton22.Command = DevExpress.XtraPrinting.PrintingSystemCommand.ClosePreview
+            Me.PrintPreviewBarButton22.Enabled = False
+            Me.PrintPreviewBarButton22.ImageIndex = 13
+            Me.PrintPreviewBarButton22.ToolTipText = "Close Preview"
+            '
+            'frmCompraPAFPlantilla
+            '
+            Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
+            Me.ClientSize = New System.Drawing.Size(988, 618)
+            Me.Controls.Add(Me.btnCancelar)
+            Me.Controls.Add(Me.TabControlPAF)
+            Me.Controls.Add(Me.btnImprimir)
+            Me.Controls.Add(Me.gbEleccionClientesPAF)
+            Me.Cursor = System.Windows.Forms.Cursors.Default
+            Me.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!)
+            Me.KeyPreview = True
+            Me.Name = "frmCompraPAFPlantilla"
+            Me.Controls.SetChildIndex(Me.cboSeleccionCentro, 0)
+            Me.Controls.SetChildIndex(Me.sbtipo, 0)
+            Me.Controls.SetChildIndex(Me.btnActualizar, 0)
+            Me.Controls.SetChildIndex(Me.btnNuevo, 0)
+            Me.Controls.SetChildIndex(Me.btnBorrar, 0)
+            Me.Controls.SetChildIndex(Me.btnTancar, 0)
+            Me.Controls.SetChildIndex(Me.btnUltimo, 0)
+            Me.Controls.SetChildIndex(Me.btnPrimero, 0)
+            Me.Controls.SetChildIndex(Me.btnAnterior, 0)
+            Me.Controls.SetChildIndex(Me.btnSiguiente, 0)
+            Me.Controls.SetChildIndex(Me.btnRecargar, 0)
+            Me.Controls.SetChildIndex(Me.btnVerLista, 0)
+            Me.Controls.SetChildIndex(Me.btnModificar, 0)
+            Me.Controls.SetChildIndex(Me.gbEleccionClientesPAF, 0)
+            Me.Controls.SetChildIndex(Me.btnImprimir, 0)
+            Me.Controls.SetChildIndex(Me.TabControlPAF, 0)
+            Me.Controls.SetChildIndex(Me.btnCancelar, 0)
+            Me.tabPagePAF.ResumeLayout(False)
+            CType(Me.cboMedida, System.ComponentModel.ISupportInitialize).EndInit()
+            CType(Me.cboArticle, System.ComponentModel.ISupportInitialize).EndInit()
+            CType(Me.cboColor, System.ComponentModel.ISupportInitialize).EndInit()
+            CType(Me.cboKM, System.ComponentModel.ISupportInitialize).EndInit()
+            CType(Me.dgDetalle, System.ComponentModel.ISupportInitialize).EndInit()
+            CType(Me.txtRE1, System.ComponentModel.ISupportInitialize).EndInit()
+            CType(Me.txtIVA1, System.ComponentModel.ISupportInitialize).EndInit()
+            CType(Me.txtTOTAL, System.ComponentModel.ISupportInitialize).EndInit()
+            CType(Me.txtBASE1, System.ComponentModel.ISupportInitialize).EndInit()
+            CType(Me.txtDTE1, System.ComponentModel.ISupportInitialize).EndInit()
+            CType(Me.txtBRUT1, System.ComponentModel.ISupportInitialize).EndInit()
+            Me.GroupBox1.ResumeLayout(False)
+            CType(Me.cboORDENFABCOMP, System.ComponentModel.ISupportInitialize).EndInit()
+            CType(Me.cboNOMTALLER, System.ComponentModel.ISupportInitialize).EndInit()
+            CType(Me.txtTALLER, System.ComponentModel.ISupportInitialize).EndInit()
+            CType(Me.txtCOMANDAMOSTRA, System.ComponentModel.ISupportInitialize).EndInit()
+            CType(Me.cboFRA, System.ComponentModel.ISupportInitialize).EndInit()
+            CType(Me.txtP_DTE, System.ComponentModel.ISupportInitialize).EndInit()
+            CType(Me.dtpDATA, System.ComponentModel.ISupportInitialize).EndInit()
+            CType(Me.dtpDATAENTREGA, System.ComponentModel.ISupportInitialize).EndInit()
+            CType(Me.txtNRO, System.ComponentModel.ISupportInitialize).EndInit()
+            CType(Me.cboNOMPROVE, System.ComponentModel.ISupportInitialize).EndInit()
+            CType(Me.txtPROVE, System.ComponentModel.ISupportInitialize).EndInit()
+            CType(Me.txtOBSERV, System.ComponentModel.ISupportInitialize).EndInit()
+            Me.gbEleccionClientesPAF.ResumeLayout(False)
+            CType(Me.cboSeleccionProveParaPAF, System.ComponentModel.ISupportInitialize).EndInit()
+            Me.TabControlPAF.ResumeLayout(False)
+            Me.TabPage1.ResumeLayout(False)
+            Me.ResumeLayout(False)
+
+        End Sub
+
+#End Region
+
+#Region "VARIABLES"
+
+        Public PAFActual As clsPAFCompra
+        Dim fcargando As frCargando
+
+#End Region
+
+#Region "INICIALIZACION"
+
+        Private Sub INCPedidoTejido()
+            Try
+                'btnNuevo.Text = "Nova Comanda"
+                'btnBorrar.Text = "Borrar Comanda"
+                tabPagePAF.Text = rm.GetString("PEDIDO")
+                gbEleccionClientesPAF.Text = "Escollir Comandes"
+                Me.Text = rm.GetString("PEDIDOCOMPRATEJIDO")
+                PonerColores(System.Drawing.Color.Silver.ToArgb)
+
+            Catch ex As Exception
+                LOG(ex.ToString) : cargando = False : CCN()
+            End Try
+        End Sub
+        Private Sub INCOrdenMuestras()
+            Try
+                Me.Text = rm.GetString("ORDENCOMPLEMENTO")
+                'btnNuevo.Text = "Nou ordre fabricació"
+                'btnBorrar.Text = "Borrar ordre"
+                tabPagePAF.Text = "Ordre"
+                ' rdoVerPAFDeCliente.Text = "Veure Comandes Fils de Proveïdor:"
+                lblProveedor.Text = "Taller"
+                Me.Text = "Ordres fabricació"
+                gbEleccionClientesPAF.Text = "El·lecció ordres"
+                lblProveedor.Text = rm.GetString("TALLER")
+                dgDetalle.Caption = rm.GetString("LINEASORDENFAB")
+                'Nos muesta de que pedido se ha generado esta orden de fabricacion si es que la hay
+                txtCOMANDAMOSTRA.Visible = True
+                lblPedidoMuestra.Visible = True
+                'txtBRUT1.Visible = False
+                'txtBASE1.Visible = False
+                'txtIVA1.Visible = False
+                'txtRE1.Visible = False
+                'txtDTE1.Visible = False
+                'txtNRO.Visible = False
+                'txtTOTAL.Visible = False
+
+                'lblBase.Visible = False
+                'lblTotalBruto.Visible = False
+                'lblDescuento.Visible = False
+                'lblNumeroPedido.Visible = False
+                'lblRE.Visible = False
+                'lblIVA.Visible = False
+                'lblTotal.Visible = False
+                'txtP_DTE.Visible = False
+
+                dtpDATAENTREGA.Visible = True
+                lblFechaEntrega.Visible = True
+
+            Catch ex As Exception
+                LOG(ex.ToString) : cargando = False : CCN()
+            End Try
+        End Sub
+        Private Sub INCPedidoMuestras()
+            Try
+                Me.Text = rm.GetString("PEDIDOCOMPRAHILO")
+                'btnNuevo.Text = "Nova Comanda"
+                'btnBorrar.Text = rm.GetString("BORRARPEDIDO")
+                tabPagePAF.Text = rm.GetString("PEDIDO")
+                'rdoVerPAFDeCliente.Text = "Veure Comandes Fils de Proveïdor:"
+                gbEleccionClientesPAF.Text = "El·lecció comandes"
+                PonerColores(CType(221, Byte), CType(202, Byte), CType(217, Byte))
+
+            Catch ex As Exception
+                LOG(ex.ToString) : cargando = False : CCN()
+            End Try
+        End Sub
+        Private Sub INCPedidoFornituras()
+            Try
+                Me.Text = rm.GetString("PEDIDOFORNITURA")
+                'btnNuevo.Text = "Nova Comanda"
+                'btnBorrar.Text = "Borrar"
+                tabPagePAF.Text = rm.GetString("PEDIDO")
+                gbEleccionClientesPAF.Text = "El·lecció Comandes"
+
+            Catch ex As Exception
+                LOG(ex.ToString) : cargando = False : CCN()
+            End Try
+        End Sub
+        Private Sub INCAlbaranEntregaHilos()
+            Try
+                Me.Text = rm.GetString("ALBARANESENTREGAHILOS")
+                'btnNuevo.Text = "Nou Albarà"
+                'btnBorrar.Text = "Borrar Albarà"
+                tabPagePAF.Text = "Albarà Entrega Fil"
+                Text = "Albarans d'Entrega fils"
+                gbEleccionClientesPAF.Text = "El·lecció Albarans"
+                cboNOMTALLER.Visible = True
+                lblTaller.Visible = True
+                txtTALLER.Visible = True
+                lblOrdenFabComplemento.Visible = True
+                cboORDENFABCOMP.Visible = True
+                PonerColores(CType(176, Byte), CType(206, Byte), CType(172, Byte))
+
+            Catch ex As Exception
+                LOG(ex.ToString) : cargando = False : CCN()
+            End Try
+        End Sub
+        Private Sub IniciarSegunTipoDocumento()
+            Try
+                Select Case PAFActual.DOCUMENT
+                    Case Pedido
+                        Select Case PAFActual.TIPUS
+                            Case Tejido : INCPedidoTejido()
+                            Case Muestra : INCPedidoMuestras()
+                            Case Fornitura : INCPedidoFornituras()
+                        End Select
+                    Case Albaran
+                        Select Case PAFActual.TIPUS
+                            Case "M" : INCAlbaranEntregaHilos()
+                                'Case "T" : IniciarNumeroColumnasTejidoAlbaran()
+                        End Select
+                    Case OrdenFabComplementos
+                        'Es un orden de fabricacion de momento solo muestras
+                        Select Case PAFActual.TIPUS
+                            Case Muestra : INCOrdenMuestras()
+                        End Select
+                End Select
+
+            Catch ex As Exception
+                LOG(ex.ToString)
+            End Try
+        End Sub
+
+        Friend Sub IniciarDocumento(ByVal tipo as string, ByVal documento as string)
+            Try
+                'En el caso de los ordenes de fabricacion va hacia un taller
+                TabControlPAF.TabPages.Remove(TabPage1)
+                cargando = True
+
+                ACN()
+                PAFActual = New clsPAFCompra(ds.Tables("cactur"), empresaPorDefecto, BindingContext, DOCUMENTO, TIPO)
+                'Dim d As New aura2k3.ds22
+                'd.Tables.Add(PAFActual.dvForm.Table.Copy)
+                'd.Tables.Add(PAFActual.lineasCompra.dvForm.Table.Copy)
+
+                IniciarSegunTipoDocumento()
+                HacerBindings()
+
+                'CargarNumerosPAF()
+                cboSeleccionProveParaPAF.Visible = False
+                'lblNumeroPAF.Visible = False
+
+                PonerModificables(soloLectura)
+                MoverActual()
+                CCN()
+
+                PSBTIPO(PAFActual.centro)
+                If PAFActual.TIPUS = Muestra Then
+                    PAFActual.lineasCompra.IniciarDesplegableArticulo()
+                End If
+
+                AñadirColumnas()
+
+                OcultarTodasColumnaCbo(cboNOMPROVE)
+                PonerVisibleColumnaCBO(cboNOMPROVE, "NOM", 1)
+                AutoSizeCC(cboNOMPROVE)
+                cargando = False
+
+            Catch ex As Exception
+                LOG(ex.ToString) : cargando = False : CCN()
+            End Try
+        End Sub
+
+#End Region
+
+#Region "ESPECIFICO"
+
+#Region "PAFCOMPRA"
+
+        Private Sub PonerControlesNuevo(ByVal b As Boolean)
+            Try
+                If b Then : btnActualizar.Text = rm.GetString("ACTUALIZAR")
+                Else : btnActualizar.Text = rm.GetString("CONFIRMAR") : End If
+
+                ModiNuev(b)
+
+                cboFRA.AutoCompletion = Not editando
+
+                txtBASE1.Visible = b
+                lblBase.Visible = b
+
+                txtBRUT1.Visible = b
+                lblTotalBruto.Visible = b
+
+                txtDTE1.Visible = b
+                lblDescuento.Visible = b
+
+                txtIVA1.Visible = b
+                lblIVA.Visible = b
+
+                txtRE1.Visible = b
+                lblRE.Visible = b
+
+                txtTOTAL.Visible = b
+                lblTotal.Visible = b
+
+            Catch ex As Exception
+                LOG(ex.ToString) : cargando = False : CCN()
+            End Try
+        End Sub
+        Friend Overrides Sub btnNuevo_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) 'Handles btnNuevo.Click
+            Try
+                cargando = True
+                EsRegistroNuevo = True
+
+                If PAFActual.mProveSel <> -1 Then CambioEleccionTodosPAF()
+                cboSeleccionProveParaPAF.Visible = False
+                rdoVerPAFDeCliente.Checked = False
+                rdoVerTodasPAF.Checked = True
+
+                dgDetalle.Visible = False
+                gbEleccionClientesPAF.Visible = False
+
+                PonerControlesNuevo(False)
+                PonerModificables(modificable)
+
+                PAFActual.NuevoRegistro()
+
+                chkESTOC.Checked = False
+
+                MoverActual(True)
+
+                PSBTIPO(PAFActual.centro) : cargando = False
+
+            Catch ex As Exception
+                LOG(ex.ToString) : cargando = False : CCN()
+            End Try
+
+        End Sub
+        Private Sub HacerBindings()
+            Try
+                HacerBindingsTodos(PAFActual.dvForm)
+
+                AñadirBinding(cboFRA, PAFActual.dvForm, "FRA")
+                AñadirBindingCombo(cboFRA, PAFActual.dvIdentificadores, "FRA", "FRA")
+                'OcultarMostrarColumnaCbo(cboFRA, "CENTRO", False)
+
+                PAFActual.dtProve.DefaultView.Sort = "NOM"
+                AñadirBindingCombo(cboNOMPROVE, PAFActual.dtProve, CCProve, CNProve)
+                If PAFActual.DOCUMENT = Albaran AndAlso PAFActual.TIPUS = Hilos Then
+                    'Estamos ante un albaran de venta
+                    AñadirBindingCombo(cboNOMTALLER, PAFActual.dtTallers, CCTallers, CNTallers)
+                    AñadirBindingCombo(cboORDENFABCOMP, PAFActual.dtOrdeneFabComplementos, "FRA", "FRA")
+                End If
+
+                dgDetalle.SetDataBinding(PAFActual.lineasCompra.dvForm, "")
+
+                'chkSumadoEstoc.DataBindings.Add(New Binding("Checked", ds, "dcactu.ESTOC"))
+
+            Catch ex As Exception
+                LOG(ex.ToString) : cargando = False : CCN()
+            End Try
+
+        End Sub
+
+#End Region
+
+#Region "DETALLE PAF"
+
+        Private Sub dgDetalle_AfterColUpdate(ByVal sender As Object, ByVal e As C1.Win.C1TrueDBGrid.ColEventArgs) Handles dgDetalle.AfterColUpdate
+            Dim columna As String = e.Column.DataColumn.DataField
+            Try
+                If PuedoModificar() Then
+                    cargando = True
+                    dgDetalle.UpdateData()
+                    PAFActual.lineasCompra.HacerCalculosLineasPAF(columna)
+                    cargando = False
+                End If
+
+            Catch ex As Exception
+                LOG(ex.ToString) : cargando = False
+            End Try
+        End Sub
+        Private Sub dgDetalle_RowColChange(ByVal sender As Object, ByVal e As C1.Win.C1TrueDBGrid.RowColChangeEventArgs) Handles dgDetalle.RowColChange
+            Try
+                If PuedoModificar() Then
+                    cargando = True
+                    If e.LastRow <> dgDetalle.Row Then
+                        PAFActual.lineasCompra.CambioFila()
+                        TratarCambioFila()
+                    End If
+
+                    AutosizeColumnasTrueDBDropdown(cboArticle)
+                    AutosizeColumnasTrueDBDropdown(cboColor)
+                    AutosizeColumnasTrueDBDropdown(cboKM)
+
+                    AutoSizeCC(dgDetalle)
+
+                    cargando = False
+                End If
+
+            Catch ex As Exception
+                LOG(ex.ToString) : cargando = False : CCN()
+            End Try
+        End Sub
+        Private Sub dgDetalle_FetchCellTips(ByVal sender As Object, ByVal e As C1.Win.C1TrueDBGrid.FetchCellTipsEventArgs) Handles dgDetalle.FetchCellTips
+            Try
+                Select Case e.Column.DataColumn.DataField
+
+                    Case "ELEGIRTEJIDO"
+                        Select Case PAFActual.TIPUS
+                            Case Tejido
+                                e.CellTip = rm.GetString("TTESCOJERTEJIDO")
+                            Case Muestra
+                                e.CellTip = rm.GetString("TTESCOJERHILO")
+                        End Select
+                    Case "RECEPCION"
+                        e.CellTip = rm.GetString("TTTRASPASORECEPCION")
+
+                End Select
+
+            Catch ex As Exception
+                LOG(ex.ToString, True) : cargando = False
+            End Try
+        End Sub
+        Private Sub dgDetalle_ButtonClick(ByVal sender As Object, ByVal e As C1.Win.C1TrueDBGrid.ColEventArgs) Handles dgDetalle.ButtonClick
+            Dim cambios As Boolean = False
+            Try
+                If PuedoModificar() Then
+                    cargando = True
+                    'If dgDetalle(dgDetalle.Row, "TIPUS") <> "" Then 'AndAlso PAFActual.lineasCompra.dvForm.Count <> 0 Then
+                    Select Case e.Column.DataColumn.DataField
+
+                        Case "ELEGIRTEJIDO"
+                            dgDetalle.EditActive = True
+                            Select Case PAFActual.TIPUS
+                                Case "T" : cambios = EscogerTejido()
+                                Case "M" : cambios = EscogerHilo()
+                                Case "F" : cambios = EscogerFornitura()
+                            End Select
+                            If cambios Then PAFActual.lineasCompra.HacerCalculosLineasPAF(e.Column.DataColumn.DataField)
+
+                        Case "RECEPCION"
+                            'dgDetalle.EditActive = True
+                            PAFActual.TraspasarLinea()
+                    End Select
+
+                    cargando = False
+                End If
+
+            Catch ex As Exception
+                LOG(ex.ToString) : cargando = False : CCN()
+            End Try
+        End Sub
+        Private Sub dgDetalle_GotFocus(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles dgDetalle.GotFocus
+            Try
+                If PuedoModificar() Then
+                    cargando = True
+                    If PAFActual.TRASPAS = True And dgDetalle.Enabled = True Then
+                        MessageBox.Show(rm.GetString("NOTRASPLINIASDOCTRAS"))
+                    End If
+                    cargando = False
+                End If
+            Catch ex As Exception
+                LOG(ex.ToString) : cargando = False : CCN()
+            End Try
+        End Sub
+        Private Sub AñadirColumnas()
+            Dim i As Integer
+            Try
+                OcultarColumnasDG(dgDetalle)
+                i = 0
+                Select Case PAFActual.TIPUS
+                    Case Tejido
+                        PPCol2("ARTICLE", dgDetalle, rm.GetString("TEJIDO"), "", True, 100, False, PresentationEnum.ComboBox, False, 100, i, False, cboArticle)
+                    Case Muestra
+                        If PAFActual.DOCUMENT = OrdenFabComplementos Then
+                            PPCol2("ARTICLE", dgDetalle, rm.GetString("COMPLEMENTO"), "", True, 100, False, PresentationEnum.ComboBox, False, 100, i, False, cboArticle)
+                        Else
+                            PPCol2("ARTICLE", dgDetalle, rm.GetString("HILO"), "", True, 100, False, PresentationEnum.ComboBox, False, 100, i, False, cboArticle)
+                        End If
+                    Case Fornitura
+                        PPCol2("ARTICLE", dgDetalle, rm.GetString("FORNITURA"), "", True, 100, False, PresentationEnum.ComboBox, False, 100, i, False, cboArticle)
+                End Select
+
+                AñadirBindingCombo(cboArticle, PAFActual.lineasCompra.dtArticulos, "CODI", "")
+
+                i = i + 1
+                PPCol2("ELEGIRTEJIDO", dgDetalle, "", "", True, 20, False, PresentationEnum.Normal, True, 20, i, False)
+                PAFActual.lineasCompra.tabla.Columns("ELEGIRTEJIDO").DefaultValue = ""
+
+                i = i + 1
+                PPCol2("DESCRI", dgDetalle, rm.GetString("DESCRIPCION"), "", True, 300, False, PresentationEnum.Normal, False, 300, i, False)
+
+                i = i + 1
+                PPCol2("COLOR", dgDetalle, rm.GetString("COLOR"), "", True, 100, False, PresentationEnum.ComboBox, False, 100, i, False, cboColor)
+                
+                AñadirBindingCombo(cboColor, PAFActual.lineasCompra.dtColores, "COLOR", "COLOR")
+
+                If PAFActual.TIPUS = Tejido Then
+                    i = i + 1
+                    PPCol2("KM", dgDetalle, "K/M", "", True, 50, False, PresentationEnum.ComboBox, False, 50, i, False, cboKM)
+                    AñadirBindingCombo(cboKM, PAFActual.lineasCompra.dtKM, "NOMKM", "KM")
+                End If
+
+                'Ordenes de fabricacion de muestras
+                If PAFActual.DOCUMENT = "O" AndAlso PAFActual.TIPUS = "M" Then
+                    i = i + 1
+                    PPCol2("TALLA", dgDetalle, rm.GetString("TALLA"), "", True, 45, False, PresentationEnum.Normal, False, 45, i, False)
+                End If
+
+                If PAFActual.TIPUS = Fornitura Then
+                    i = i + 1
+                    'En talla tenemos las medias cuando hablamos de fornituras 
+                    PPCol2("TALLA", dgDetalle, rm.GetString("MEDIDA"), "", True, 45, False, PresentationEnum.Normal, False, 45, i, False, cboMedida)
+                    AñadirBindingCombo(cboMedida, PAFActual.lineasCompra.dtMedidas, "MEDIDA", "MEDIDA")
+                End If
+
+                i = i + 1
+                PPCol2("UNITATS", dgDetalle, rm.GetString("UNIDADES"), "#,##0.00", True, 45, False, PresentationEnum.Normal, False, 45, i, False, Nothing, True, 0, AlignHorzEnum.Far)
+
+                If PAFActual.DOCUMENT = "C" AndAlso (PAFActual.TIPUS = "M" OrElse PAFActual.TIPUS = Tejido OrElse PAFActual.TIPUS = Fornitura) Then
+                    i = i + 1
+                    Dim S As New C1.Win.C1TrueDBGrid.Style
+
+                    S.BackColor = Color.PaleGreen : S.Font = New Font(dgDetalle.Font, FontStyle.Bold)
+                    PPCol2("PERREBRE", dgDetalle, rm.GetString("PORRECIBIR"), "#,##0.00", True, 50, False, PresentationEnum.Normal, False, 50, i, False, Nothing, True, 0, AlignHorzEnum.Far, S, "^[1-9\-]")
+                    i = i + 1
+
+                    S = New C1.Win.C1TrueDBGrid.Style
+                    S.BackColor = Color.PaleVioletRed : S.Font = New Font(dgDetalle.Font, FontStyle.Bold)
+                    '-[0\.[1-9]
+                    PPCol2("REBUT", dgDetalle, rm.GetString("RECIBIDO"), "#,##0.00", True, 50, False, PresentationEnum.Normal, False, 50, i, False, Nothing, True, 0, AlignHorzEnum.Far, S, "^[1-9\-]")
+
+                    i = i + 1
+                    PPCol2("RECEPCION", dgDetalle, rm.GetString("RECEPCION"), "", True, 35, False, PresentationEnum.Normal, True, 35, i, False)
+                End If
+
+                If PAFActual.DOCUMENT <> OrdenFabComplementos Then
+                    i = i + 1
+                    PPCol2("PREU", dgDetalle, rm.GetString("PRECIO"), "#,##0.00", True, 50, False, PresentationEnum.Normal, False, 50, i, False, Nothing, True, 0, AlignHorzEnum.Far)
+
+                    i = i + 1
+                    PPCol2("DTE", dgDetalle, rm.GetString("DTE"), "#,##0.00", True, 50, False, PresentationEnum.Normal, False, 50, i, False, Nothing, True, 0, AlignHorzEnum.Far)
+
+                End If
+                i = i + 1
+                PPCol2("IMPORT", dgDetalle, rm.GetString("IMPORTE"), "#,##0.00", True, 50, False, PresentationEnum.Normal, False, 50, i, False, Nothing, True, 0, AlignHorzEnum.Far)
+
+                i = i + 1
+
+                'PPCol2("NLINEA", dgDetalle, rm.GetString("LINEA"), "", True, 55, False, PresentationEnum.Normal, False, 55, i, False)
+                'PPCol2("CENTRO", dgDetalle, "CENT", "", True, 55, False, PresentationEnum.Normal, False, 55, i, False)
+
+            Catch ex As Exception
+                LOG(ex.ToString) : cargando = False : CCN()
+            End Try
+        End Sub
+        Private Sub TratarCambioFila()
+            Try
+                'Asociamos las tablas adecuadas y ajustamos el tamaño
+
+                AñadirBindingCombo(cboColor, PAFActual.lineasCompra.dtColores, "COLOR", "COLOR")
+                AñadirBindingCombo(cboKM, PAFActual.lineasCompra.dtKM, "NOMKM", "KM")
+
+                AutoSizeCC(dgDetalle)
+
+            Catch ex As Exception
+                LOG(ex.ToString) : cargando = False
+            End Try
+        End Sub
+
+#End Region
+
+#Region "ESTOCS"
+
+        '!!! ESTO SE DEBERÍA HACER EN LA CLASE
+        'En cantidad tenemos lo que tenemos que sumar de estoc. En paf.lineascompra.KG tenemos si son kilos o metros
+        'El rendimiento del tejido se saca con el dlookup
+        Private Function SumarQuitarDispuesto(ByVal MASMENOS As String, ByVal cantidad As Double, ByVal articulo As String, ByVal km As String)
+            Dim METROS As Double
+            Dim KILOS As Double
+            Dim REND As Double
+            Dim cmd As New MySqlCommand
+            Try
+                '.STCRUK = roundnum(.STCRUM / .RENDIMENT, 2)
+                '.STCRUM = roundnum(.STCRUK * .RENDIMENT, 2)
+                'Hay que sumar al color del tejido que tiene esta disposicion los kg de la linea
+                Dim rendimientoTejido As Double = DLookUp("RENDIMENT", "TEIXITS", " CODI = """ & articulo & """ ")
+                If rendimientoTejido = 0 Then : REND = 1
+                Else : REND = rendimientoTejido : End If
+                'Aquí disponemos del rendimiento del tejido
+
+                Select Case km.ToUpper
+                    Case "K"
+                        'Esta representado en kilos
+                        METROS = roundnum(cantidad * REND, 2)
+                        KILOS = cantidad
+                    Case "M"
+                        METROS = cantidad
+                        KILOS = roundnum(cantidad / REND, 2)
+                        'Esta representado en metros
+                End Select
+
+
+                cmd = New MySqlCommand("UPDATE TEIXITS " & _
+                            " SET STCRUK = STCRUK " & MASMENOS & """" & NS(KILOS, True) & """, " & _
+                            " STCRUM = STCRUM " & MASMENOS & """" & NS(METROS, True) & """ " & _
+                            " WHERE CODI = """ & articulo & """ ", cnn)
+
+
+                cmd.ExecuteNonQuery()
+
+            Catch ex As Exception
+                LOG(ex.ToString) : cargando = False : CCN()
+            End Try
+
+        End Function
+        Private Sub ActualizarStockTejidos()
+            Dim i As Integer
+            Dim cmdSel As New MySqlCommand
+            Dim cmdUpd As New MySqlCommand
+            Dim strSQL As String
+            Dim stock As Double
+            Try
+                cmdSel.Connection = cnn
+                cmdUpd.Connection = cnn
+                ACN()
+                For i = 0 To PAFActual.lineasCompra.dvForm.Count - 1
+                    '!!!!!!!!!!!!!!!!!!!!!!!!!!
+                    If PAFActual.TIPUS = Tejido Then
+                        If PAFActual.lineasCompra.dvForm.Item(i).Item("COLOR") = "**CRU**" Then
+                            If chkESTOC.Checked = False Then
+                                SumarQuitarDispuesto("-", PAFActual.lineasCompra.dvForm.Item(i).Item("UNITATS"), PAFActual.lineasCompra.dvForm.Item(i).Item("ARTICLE"), PAFActual.lineasCompra.dvForm.Item(i).Item("KM"))
+                            Else
+                                SumarQuitarDispuesto("+", PAFActual.lineasCompra.dvForm.Item(i).Item("UNITATS"), PAFActual.lineasCompra.dvForm.Item(i).Item("ARTICLE"), PAFActual.lineasCompra.dvForm.Item(i).Item("KM"))
+                            End If
+                            GoTo JUER
+                        Else
+                            strSQL = "SELECT ACTUAL FROM " & tablaHiloColores & " WHERE(FIL = """ & PAFActual.lineasCompra.dvForm(i).Item("ARTICLE") & """ AND TIPUS = 'T' AND COLOR = """ & PAFActual.lineasCompra.dvForm(i).Item("COLOR") & """)"
+                        End If
+                    Else
+                        strSQL = "SELECT ACTUAL FROM " & tablaHiloColores & " WHERE(FIL = """ & PAFActual.lineasCompra.dvForm(i).Item("ARTICLE") & """ AND TIPUS = 'F' AND COLOR = """ & PAFActual.lineasCompra.dvForm(i).Item("COLOR") & """)"
+                    End If
+                    cmdSel.CommandText = strSQL
+
+                    If chkESTOC.Checked = False Then : stock = cmdSel.ExecuteScalar() - PAFActual.lineasCompra.dvForm.Item(i).Item("UNITATS")
+                    Else : stock = cmdSel.ExecuteScalar() + PAFActual.lineasCompra.dvForm.Item(i).Item("UNITATS") : End If
+
+                    If PAFActual.TIPUS = Tejido Then
+                        strSQL = "UPDATE " & tablaHiloColores & " SET ACTUAL = """ & NS(stock, True) & """ WHERE(FIL = """ & NS(PAFActual.lineasCompra.dvForm(i).Item("ARTICLE")) & """ AND TIPUS = 'T' AND COLOR = """ & NS(PAFActual.lineasCompra.dvForm(i).Item("COLOR")) & """)"
+                    Else
+                        strSQL = "UPDATE " & tablaHiloColores & " SET ACTUAL = """ & NS(stock, True) & """ WHERE(FIL = """ & NS(PAFActual.lineasCompra.dvForm(i).Item("ARTICLE")) & """ AND TIPUS = 'F' AND COLOR = """ & NS(PAFActual.lineasCompra.dvForm(i).Item("COLOR")) & """)"
+                    End If
+                    cmdUpd.CommandText = strSQL
+                    cmdUpd.ExecuteNonQuery()
+JUER:           Next
+                CCN()
+
+            Catch ex As Exception
+                LOG(ex.ToString) : cargando = False : CCN()
+            End Try
+        End Sub
+        Private Sub chkSumadoEstoc_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles chkESTOC.CheckedChanged
+            Try
+                actualizarchecked()
+                'ActualizarOrigen(tablaLineasCompras, daLineasPedido)
+                ActualizarStockTejidos()
+
+            Catch ex As Exception
+                LOG(ex.ToString) : cargando = False : CCN()
+            End Try
+
+        End Sub
+        Private Sub ActualitzarEstocs()
+            Try
+
+            Catch ex As Exception
+                LOG(ex.ToString) : cargando = False : CCN()
+            End Try
+        End Sub
+
+#End Region
+
+#End Region
+
+#Region "DESPLAZAMIENTO"
+
+        Private Sub MoverActual(Optional ByVal nuevo As Boolean = False)
+            Try
+                cargando = True
+                ActualizarTraspasado(nzn(cboFRA.Text, 0), "TRASPAS")
+                PAFActual.lineasCompra.HacerCalculosLineasPAF("")
+                AñadirBindingCombo(cboArticle, PAFActual.lineasCompra.dtArticulos, "CODI", "CODI")
+                PSBTIPO(PAFActual.centro) : cargando = False
+
+            Catch ex As Exception
+                LOG(ex.ToString) : cargando = False : CCN()
+            End Try
+        End Sub
+        Friend Overrides Sub btnSiguiente_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) ''Handles btnSiguiente.Click
+            Try
+                cargando = True
+                desplazando = True
+                cargando = True
+                PAFActual.SiguienteReg() : ActualizarOrigen()
+                MoverActual()
+                desplazando = False
+                PSBTIPO(PAFActual.centro) : cargando = False
+
+            Catch ex As Exception
+                LOG(ex.ToString) : cargando = False : CCN()
+            End Try
+        End Sub
+        Friend Overrides Sub btnUltimo_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) 'Handles btnUltimo.Click
+            Try
+                cargando = True
+                desplazando = True
+                PAFActual.UltimoReg() : ActualizarOrigen()
+                MoverActual()
+                desplazando = False
+                PSBTIPO(PAFActual.centro) : cargando = False
+
+            Catch ex As Exception
+                LOG(ex.ToString) : cargando = False : CCN()
+            End Try
+
+        End Sub
+        Friend Overrides Sub btnAnterior_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) 'Handles btnAnterior.Click
+            Try
+                cargando = True
+                desplazando = True
+                PAFActual.AnteriorReg() : ActualizarOrigen()
+                MoverActual()
+                desplazando = False
+                PSBTIPO(PAFActual.centro) : cargando = False
+
+            Catch ex As Exception
+                LOG(ex.ToString) : cargando = False : CCN()
+            End Try
+        End Sub
+        Protected Friend Overrides Sub btnPrimero_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) 'Handles btnPrimero.Click
+            Try
+                cargando = True
+                desplazando = True
+                PAFActual.PrimeroReg() : ActualizarOrigen()
+                MoverActual()
+                desplazando = False
+                PSBTIPO(PAFActual.centro) : cargando = False
+            Catch ex As Exception
+                LOG(ex.ToString) : cargando = False : CCN()
+            End Try
+        End Sub
+
+#End Region
+
+#Region "MODIFICAR ORIGEN"
+
+        Private Sub PonerModificables(Optional ByVal b As Boolean = False)
+            Try
+                PonerMod(b)
+                gbEleccionClientesPAF.Visible = b
+                If Not b Then : cboFRA.DataSource = Nothing
+                Else : AñadirBindingCombo(cboFRA, PAFActual.dvIdentificadores, "FRA", "FRA") : PAFActual.tabla.AcceptChanges() : End If
+                cboFRA.LimitToList = b
+                cboFRA.SuperBack = b
+                cboFRA.ReadOnly = editando Or EsRegistroNuevo
+                ModiNuev(b)
+
+            Catch ex As Exception
+                LOG(ex.ToString) : cargando = False : CCN()
+            End Try
+        End Sub
+        Private Sub ActualizarOrigen()
+            Try
+                If editando Then
+                    editando = False
+                    PonerModificables(soloLectura)
+                End If
+                If EsRegistroNuevo Then
+                    PonerControlesNuevo(True)
+                    MoverActual()
+                    dgDetalle.Visible = True
+                    gbEleccionClientesPAF.Visible = True
+                    editando = True
+                    PSBTIPO(PAFActual.centro)
+                    PAFActual.actualizarNumeraciones()
+                    EsRegistroNuevo = False
+                End If
+
+            Catch ex As Exception
+                LOG(ex.ToString) : cargando = False : CCN()
+            End Try
+        End Sub
+        Friend Overrides Sub btnActualizar_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) 'Handles btnActualizar.Click
+            Try
+                cargando = True
+                If PAFActual.PROVE = 0 Then
+                    MessageBox.Show(rm.GetString("FALTAPROVE"), rm.GetString("INFORMACION"), MessageBoxButtons.OK)
+                    cargando = False
+                    Exit Sub
+                End If
+                If PAFActual.TieneCambios Then
+                    Select Case MessageBox.Show(rm.GetString("QUIERECONFIRMARLOSCAMBIOS"), rm.GetString("INFORMACION"), MessageBoxButtons.YesNoCancel)
+                        Case DialogResult.Cancel
+                            cargando = False
+                            Exit Sub
+                        Case DialogResult.No
+                            PAFActual.tabla.RejectChanges()
+                            PAFActual.lineasCompra.tabla.RejectChanges()
+                            cargando = False
+                            Exit Sub
+                    End Select
+                End If
+                PAFActual.ActualizarOrigen() : ActualizarOrigen()
+                PSBTIPO(PAFActual.centro)
+                cargando = False
+
+            Catch ex As Exception
+                LOG(ex.ToString) : cargando = False : CCN()
+            End Try
+
+        End Sub
+        Friend Overrides Sub btnBorrar_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) 'Handles btnBorrar.Click
+            Try
+                If MessageBox.Show(rm.GetString("BorrarActual"), rm.GetString("ConfirmacionEliminacion"), MessageBoxButtons.YesNo) = DialogResult.Yes Then
+                    editando = True
+                    cargando = True
+                    'Primero borramos el tejido de la tabla tejido
+                    PAFActual.borrar()
+                    MoverActual()
+
+                    AñadirBindingCombo(cboFRA, PAFActual.dvIdentificadores, "FRA", "FRA")
+                    PAFActual.tabla.AcceptChanges()
+
+                    editando = False
+                    cargando = False
+                    PSBTIPO(PAFActual.centro)
+                End If
+
+            Catch ex As Exception
+                LOG(ex.ToString) : cargando = False : CCN()
+            End Try
+        End Sub
+
+#End Region
+
+#Region "IMPRIMIR"
+
+        Private Sub btnImprimir_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnImprimir.Click
+            Try
+                PAFActual.ImprimirPAF()
+
+            Catch ex As Exception
+                LOG(ex.ToString) : cargando = False : CCN()
+            End Try
+        End Sub
+
+#End Region
+
+#Region "SELECCION REGISTRO"
+
+        Private Sub VerPAFDeProveedor_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles rdoVerPAFDeCliente.CheckedChanged
+            Try
+                'Hay que rellenar el combo donde podemos elegir al cliente
+                If consulta() Then
+                    cargando = True
+                    If rdoVerPAFDeCliente.Checked = True Then
+                        cboSeleccionProveParaPAF.Visible = True
+                        AñadirBindingCombo(cboSeleccionProveParaPAF, PAFActual.dtProveConPAF, CCProve, CNProve)
+                        cboSeleccionProveParaPAF.Focus()
+                        lblNumeroPAF.Visible = True
+                    Else
+                        Select Case PAFActual.DOCUMENT
+                            Case Pedido
+                                lblNumeroPAF.Text = rm.GetString("NUMPEDIDOS") & " " & PAFActual.dvIdentificadores.Count
+                            Case Albaran
+                                lblNumeroPAF.Text = rm.GetString("NUMALBARANES") & " " & PAFActual.dvIdentificadores.Count
+                            Case Factura
+                                lblNumeroPAF.Text = rm.GetString("NUMFACTURAS") & " " & PAFActual.dvIdentificadores.Count
+                            Case Proforma
+                                lblNumeroPAF.Text = rm.GetString("NUMPROFORMA") & " " & PAFActual.dvIdentificadores.Count
+                        End Select
+                        cboSeleccionProveParaPAF.Visible = False
+                        lblNumeroPAF.Visible = False
+                    End If
+                    cargando = False
+                End If
+
+            Catch ex As Exception
+                LOG(ex.ToString) : cargando = False : CCN()
+            End Try
+        End Sub
+        Private Sub cboSeleccionProveParaPAF_Validating(ByVal sender As System.Object, ByVal e As System.ComponentModel.CancelEventArgs) Handles cboSeleccionProveParaPAF.Validating
+            Try
+                If consulta() Then
+                    cargando = True
+                    PAFActual.ElegirProve(nzn(cboSeleccionProveParaPAF.WillChangeToValue, 0))
+                    AñadirBindingCombo(cboFRA, PAFActual.dvIdentificadores, "FRA", "FRA")
+                    PAFActual.tabla.AcceptChanges()
+
+                    Select Case PAFActual.DOCUMENT
+                        Case Pedido
+                            lblNumeroPAF.Text = rm.GetString("NUMPEDIDOS") & " " & PAFActual.dvIdentificadores.Count
+                        Case Albaran
+                            lblNumeroPAF.Text = rm.GetString("NUMALBARANES") & " " & PAFActual.dvIdentificadores.Count
+                        Case Factura
+                            lblNumeroPAF.Text = rm.GetString("NUMFACTURAS") & " " & PAFActual.dvIdentificadores.Count
+                        Case Proforma
+                            lblNumeroPAF.Text = rm.GetString("NUMPROFORMA") & " " & PAFActual.dvIdentificadores.Count
+                    End Select
+                    MoverActual()
+                    cargando = False
+
+                End If
+
+            Catch ex As Exception
+                LOG(ex.ToString) : cargando = False : CCN()
+            End Try
+        End Sub
+        Private Function obtenercodigoProveedor(ByVal nombrecliente As String) As Integer
+            Try
+                Dim cmdSel As New MySqlCommand("SELECT codi FROM prove WHERE (NOM = """ & ponercontrabarrasreal(nombrecliente) & """)", cnn)
+                ACN()
+                Dim i As Integer = cmdSel.ExecuteScalar
+                CCN()
+                Return i
+            Catch ex As Exception
+                LOG(ex.ToString) : cargando = False : CCN()
+            End Try
+        End Function
+        Private Sub CambioEleccionTodosPAF()
+            Try
+                PAFActual.ElegirProve(-1)
+                PAFActual.numeroRegistros = PAFActual.obtenerNumeroReg(PAFActual.tabla.TableName, "")
+                PAFActual.tabla.AcceptChanges()
+
+                AutoSizeCC(cboFRA)
+
+                Select Case PAFActual.DOCUMENT
+                    Case Pedido
+                        lblNumeroPAF.Text = rm.GetString("NUMPEDIDOS") & " " & PAFActual.dvIdentificadores.Count
+                    Case Albaran
+                        lblNumeroPAF.Text = rm.GetString("NUMALBARANES") & " " & PAFActual.dvIdentificadores.Count
+                    Case Factura
+                        lblNumeroPAF.Text = rm.GetString("NUMFACTURAS") & " " & PAFActual.dvIdentificadores.Count
+                    Case Proforma
+                        lblNumeroPAF.Text = rm.GetString("NUMPROFORMA") & " " & PAFActual.dvIdentificadores.Count
+                End Select
+
+            Catch ex As Exception
+                LOG(ex.ToString)
+            End Try
+        End Sub
+        Private Sub rdoVerTodasPAF_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles rdoVerTodasPAF.CheckedChanged
+            Try
+                If consulta() Then
+                    cargando = True
+                    If rdoVerTodasPAF.Checked = True Then
+                        CambioEleccionTodosPAF()
+                        Select Case PAFActual.DOCUMENT
+                            Case Pedido
+                                lblNumeroPAF.Text = rm.GetString("NUMPEDIDOS") & " " & PAFActual.dvIdentificadores.Count
+                            Case Albaran
+                                lblNumeroPAF.Text = rm.GetString("NUMALBARANES") & " " & PAFActual.dvIdentificadores.Count
+                            Case Factura
+                                lblNumeroPAF.Text = rm.GetString("NUMFACTURAS") & " " & PAFActual.dvIdentificadores.Count
+                            Case Proforma
+                                lblNumeroPAF.Text = rm.GetString("NUMPROFORMA") & " " & PAFActual.dvIdentificadores.Count
+                        End Select
+                    End If
+                    cargando = False
+                End If
+
+            Catch ex As Exception
+                LOG(ex.ToString) : cargando = False : CCN()
+            End Try
+        End Sub
+
+#End Region
+
+#Region "ELEGIR REGISTRO"
+
+        Private Sub cboID_KeyPress(ByVal sender As System.Object, ByVal e As System.Windows.Forms.KeyPressEventArgs) Handles cboFRA.KeyPress
+            Try
+                If editando Then : cboFRA.AutoCompletion = False
+                Else : cboFRA.AutoCompletion = True : End If
+
+            Catch ex As Exception
+                MessageBox.Show(ex.ToString)
+            End Try
+        End Sub
+        Private Sub cboCodigoPAF_ItemChanged(ByVal sender As System.Object, ByVal e As System.ComponentModel.CancelEventArgs) Handles cboFRA.Validating
+            Try
+                If consulta() Then
+                    cargando = True
+                    CargandoFormulario()
+                    PAFActual.CambiarAReg(nzn(cboFRA.WillChangeToValue, 0), iraregistro)
+
+                    MoverActual()
+                    PSBTIPO(PAFActual.centro) : cargando = False
+                    fcargando.Close()
+                End If
+
+            Catch ex As Exception
+                LOG(ex.ToString) : cargando = False : CCN()
+            End Try
+        End Sub
+
+#End Region
+
+#Region "ELECCIONES"
+
+        Private Sub txtTALLER_Validated(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles txtTALLER.Validated
+            Try
+                If PuedoModificar() Then
+                    cargando = True
+                    PAFActual.TALLER = nzn(txtTALLER.Text, 0)
+                    PSBTIPO(PAFActual.centro) : cargando = False
+                End If
+
+            Catch ex As Exception
+                LOG(ex.ToString) : cargando = False : CCN()
+            End Try
+        End Sub
+        Private Sub txtCodigoProveedor_Validated(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles txtPROVE.Validated
+            Try
+                If PuedoModificar() Then
+                    cargando = True
+                    PAFActual.PROVE = nzn(txtPROVE.Text, 0)
+                    cboNOMPROVE.SelectedValue = PAFActual.PROVE
+                    PAFActual.PonerDatosProve()
+                    If PAFActual.TIPUS = Muestra Then
+                        PAFActual.lineasCompra.IniciarDesplegableArticulo()
+                        AñadirBindingCombo(cboArticle, PAFActual.lineasCompra.dtArticulos, "CODI", "CODI")
+                    End If
+                    PSBTIPO(PAFActual.centro) : cargando = False
+                End If
+
+            Catch ex As Exception
+                LOG(ex.ToString) : cargando = False : CCN()
+            End Try
+        End Sub
+        Private Sub btnElegirProveedor_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnElegirProveedor.Click
+
+            Try
+                If PAFActual.DOCUMENT = OrdenFabComplementos Then
+                    Cursor = Cursors.WaitCursor
+                    Dim f As frmTalleresLista = frmTalleresLista.GetInstance(esEleccion)
+                    f.ShowDialog()
+                    If Not f.dr Is Nothing Then
+                        PAFActual.PROVE = f.dr("CODI")
+                        PAFActual.PonerDatosProve()
+                    End If
+                    Cursor = Cursors.Default
+                    f = Nothing
+                Else
+                    Cursor = Cursors.WaitCursor
+                    Dim f As frmProveedoresLista = frmProveedoresLista.GetInstance(esEleccion)
+                    f.ShowDialog()
+                    If Not f.dr Is Nothing Then
+                        PAFActual.PROVE = f.dr("CODI")
+                        PAFActual.PonerDatosProve()
+                    End If
+                    If PAFActual.TIPUS = Muestra Then
+                        PAFActual.lineasCompra.IniciarDesplegableArticulo()
+                        AñadirBindingCombo(cboArticle, PAFActual.lineasCompra.dtArticulos, "CODI", "CODI")
+                    End If
+                    f = Nothing
+                    Cursor = Cursors.Default
+                End If
+
+            Catch ex As Exception
+                LOG(ex.ToString) : cargando = False : CCN()
+            End Try
+        End Sub
+        Private Function EscogerTejido() As Boolean
+            Try
+                Cursor = Cursors.WaitCursor
+                Dim f As frmTejidosLista = frmTejidosLista.GetInstance(esEleccion, PAFActual.centro)
+                f.ShowDialog()
+                Cursor = Cursors.Default
+                If Not f.dr Is Nothing Then
+                    PAFActual.lineasCompra.ARTICLE = f.dr("CODI")
+                    PAFActual.lineasCompra.DESCRI = f.dr("DESCRI")
+                    f = Nothing
+                    Return True
+                Else
+                    f = Nothing
+                    Return False
+                End If
+
+            Catch ex As Exception
+                LOG(ex.ToString) : cargando = False : CCN()
+            End Try
+        End Function
+        Private Function EscogerHilo() As Boolean
+            Try
+                Cursor = Cursors.WaitCursor
+                Dim f As frmHilosLista = frmHilosLista.GetInstance(esEleccion, PAFActual.centro)
+                f.prove = PAFActual.PROVE
+                f.ShowDialog()
+                Cursor = Cursors.Default
+                If Not f.dr Is Nothing Then
+                    PAFActual.lineasCompra.ARTICLE = f.dr("CODI")
+                    PAFActual.lineasCompra.DESCRI = f.dr("DESCRI")
+                    f = Nothing
+                    Return True
+                Else
+                    f = Nothing
+                    Return False
+                End If
+
+            Catch ex As Exception
+                LOG(ex.ToString) : cargando = False : CCN()
+            End Try
+        End Function
+        Private Function EscogerFornitura() As Boolean
+            Try
+                Cursor = Cursors.WaitCursor
+                Dim f As frmForniturasLista = frmForniturasLista.GetInstance(esEleccion, PAFActual.centro)
+                f.ShowDialog()
+                Cursor = Cursors.Default
+                If Not f.dr Is Nothing Then
+                    PAFActual.lineasCompra.ARTICLE = f.dr("CODI")
+                    PAFActual.lineasCompra.DESCRI = f.dr("DESCRI")
+                    f = Nothing
+                    Return True
+                Else
+                    f = Nothing
+                    Return False
+                End If
+
+            Catch ex As Exception
+                LOG(ex.ToString) : cargando = False : CCN()
+            End Try
+        End Function
+        Private Sub cboNOMPROVE_Cambio(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cboNOMPROVE.SelectedValueChanged
+            Try
+                If PuedoModificar() Then
+                    cargando = True
+                    With cboNOMPROVE
+                        PAFActual.PROVE = nzn(cboNOMPROVE.WillChangeToValue, 0)
+                        PAFActual.PonerDatosProve()
+                        If PAFActual.TIPUS = "M" Then
+                            PAFActual.lineasCompra.IniciarDesplegableArticulo()
+                            AñadirBindingCombo(cboArticle, PAFActual.lineasCompra.dtArticulos, "CODI", "CODI")
+                        End If
+                        PSBTIPO(PAFActual.centro)
+                    End With
+                    cargando = False
+                End If
+
+            Catch ex As Exception
+                LOG(ex.ToString) : cargando = False : CCN()
+            End Try
+
+        End Sub
+        'El taller al que se van a llevar los hilos para hacer muestras o modelos.
+        Private Sub cboNOMTALLER_Cambio(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cboNOMTALLER.SelectedValueChanged
+            Try
+                If PuedoModificar() Then
+                    With cboNOMTALLER
+                        If (EsRegistroNuevo Or editando) And Not cargando Then
+                            cargando = True
+                            PAFActual.TALLER = nzn(cboNOMTALLER.WillChangeToValue, 0)
+                            PSBTIPO(PAFActual.centro)
+                            cargando = False
+                        End If
+                    End With
+                End If
+
+            Catch ex As Exception
+                LOG(ex.ToString) : cargando = False : CCN()
+            End Try
+        End Sub
+#End Region
+
+#Region "ORGANIZAR"
+
+        Private Sub ActualizarTraspasado(ByVal codigoabuscar As Integer, ByVal campo As String)
+
+            Try
+                If PAFActual.DOCUMENT = "F" Then
+
+                    Dim drNew As System.Data.DataRow
+                    Dim cm As CurrencyManager = Me.BindingContext(ds, tabla)
+                    Dim dsrc As DataView
+                    dsrc = CType(cm.List, DataView)
+                    dsrc.Sort = "FRA"
+                    Dim idx As Integer = dsrc.Find(codigoabuscar)
+                    If Not idx = -1 Then
+                        If Not IsDBNull(PAFActual.tabla.Rows(idx).Item(campo)) Then
+                            If (PAFActual.tabla.Rows(idx).Item(campo) = "S") Then : lblTraspasado.Text = "TRASPASAT"
+                            Else : lblTraspasado.Text = "NO TRASPASAT"
+                            End If
+                        End If
+                    End If
+                End If
+            Catch ex As Exception
+                LOG(ex.ToString) : cargando = False : CCN()
+            End Try
+
+        End Sub
+        Private Sub actualizarchecked()
+            Try
+                Dim i As Integer
+                If chkESTOC.Checked = False Then
+                    For i = 0 To PAFActual.lineasCompra.dvForm.Count - 1
+                        PAFActual.lineasCompra.dvForm(i).Item("ESTOC") = 0
+                        'MessageBox.Show(i)
+                    Next
+                Else
+                    For i = 0 To PAFActual.lineasCompra.dvForm.Count - 1
+                        PAFActual.lineasCompra.dvForm(i).Item("ESTOC") = 1
+                        'MessageBox.Show(i)
+                    Next
+                End If
+            Catch ex As Exception
+                LOG(ex.ToString) : cargando = False : CCN()
+            End Try
+
+        End Sub
+        Private Sub Validando_TantoPorCiento(ByVal sender As System.Object, ByVal e As System.ComponentModel.CancelEventArgs) Handles txtP_DTE.Validating
+            Try
+                If (txtP_DTE.Text > 100 Or txtP_DTE.Text < 0) Then
+                    MessageBox.Show(rm.GetString("TANTOPORCIENTOINVALIDO"))
+                    e.Cancel = True
+                Else
+                    'PAFActual.ActualizarTotalesPAF()
+                End If
+                'AceptarCambios(tabla)
+            Catch ex As Exception
+
+            End Try
+
+        End Sub
+        Private Sub btnRecargar_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnRecargar.Click
+            Try
+                cargando = True
+                Dim id As Object
+                id = cboFRA.Text
+                PAFActual.ActualizarOrigen()
+                PAFActual.CambiarAReg(id, iraregistro)
+                MoverActual()
+                cargando = False
+
+            Catch ex As Exception
+                LOG(ex.ToString) : CCN() : cargando = False
+            End Try
+        End Sub
+        Friend Overrides Sub btnModificar_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) 'Handles btnModificar.Click
+            Try
+                If Not editando Then
+                    cargando = True
+                    editando = True
+                    CambioEleccionTodosPAF()
+                    cboSeleccionProveParaPAF.Visible = False
+                    rdoVerPAFDeCliente.Checked = False
+                    rdoVerTodasPAF.Checked = True
+
+                    PonerModificables(modificable)
+                    cargando = False
+                    PSBTIPO(PAFActual.centro)
+                End If
+
+            Catch ex As Exception
+                LOG(ex.ToString) : cargando = False : CCN()
+            End Try
+        End Sub
+        Private Sub btnCancelar_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnCancelar.Click
+            Try
+                If PAFActual.tabla.GetChanges Is Nothing Then
+                    Close()
+                Else
+                    Close()
+                End If
+
+            Catch ex As Exception
+                LOG(ex.ToString) : cargando = False
+            End Try
+        End Sub
+        Private Sub dgdetalle_BeforeDelete(ByVal sender As Object, ByVal e As C1.Win.C1TrueDBGrid.CancelEventArgs) Handles dgDetalle.BeforeDelete
+            Try
+                If MessageBox.Show(rm.GetString("BORRARLINEA"), rm.GetString("ConfirmacionEliminacion"), MessageBoxButtons.YesNo) = DialogResult.Yes Then
+                    e.Cancel = False
+                Else
+                    e.Cancel = True
+                End If
+
+            Catch ex As Exception
+                LOG(ex.ToString)
+            End Try
+        End Sub
+        Private Sub frmCompraPAFPlantilla_Closed(ByVal sender As Object, ByVal e As System.EventArgs) Handles MyBase.Closed
+            Try
+                GrabaParametro(PAFActual.FRA, "" & PAFActual.DOCUMENT & PAFActual.TIPUS & "C" & PAFActual.centro & "")
+
+            Catch ex As Exception
+                LOG(ex.ToString)
+            End Try
+        End Sub
+        Friend Sub CargandoFormulario()
+            Try
+
+                fcargando = New frCargando
+                fcargando.Show()
+                fcargando.Refresh()
+                fcargando.BringToFront()
+
+            Catch ex As Exception
+                LOG(ex.ToString) : cargando = False : CCN() : cnn.Close()
+            End Try
+        End Sub
+        Private Sub PonerColores(ByVal rgb As Integer)
+            Me.TabPage1.BackColor = System.Drawing.Color.FromArgb(rgb)
+            Me.tabPagePAF.BackColor = System.Drawing.Color.FromArgb(rgb)
+            Me.GroupBox1.BackColor = System.Drawing.Color.FromArgb(rgb)
+            Me.gbEleccionClientesPAF.BackColor = System.Drawing.Color.FromArgb(rgb)
+            Me.gbEleccionClientesPAF.BackColor = System.Drawing.Color.FromArgb(rgb)
+            Me.BackColor = System.Drawing.Color.FromArgb(rgb)
+            Me.lblPedido.BackColor = System.Drawing.Color.FromArgb(rgb)
+
+        End Sub
+        Private Sub PonerColores(ByVal r As Byte, ByVal g As Byte, ByVal b As Byte)
+
+            Me.TabPage1.BackColor = System.Drawing.Color.FromArgb(CType(176, Byte), CType(206, Byte), CType(172, Byte))
+            Me.tabPagePAF.BackColor = System.Drawing.Color.FromArgb(CType(r, Byte), CType(g, Byte), CType(b, Byte))
+            Me.GroupBox1.BackColor = System.Drawing.Color.FromArgb(CType(r, Byte), CType(g, Byte), CType(b, Byte))
+            Me.gbEleccionClientesPAF.BackColor = System.Drawing.Color.FromArgb(CType(r, Byte), CType(b, Byte), CType(b, Byte))
+            Me.gbEleccionClientesPAF.BackColor = System.Drawing.Color.FromArgb(CType(r, Byte), CType(g, Byte), CType(b, Byte))
+            Me.BackColor = System.Drawing.Color.FromArgb(CType(r, Byte), CType(g, Byte), CType(b, Byte))
+            Me.lblPedido.BackColor = System.Drawing.Color.FromArgb(CType(r, Byte), CType(g, Byte), CType(b, Byte))
+
+        End Sub
+        Private Sub TabControlPAF_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles TabControlPAF.SelectedIndexChanged
+            Try
+                If Not Me.DesignMode Then
+                    If Not cargando And Not EsRegistroNuevo Then
+                        If PAFActual.TieneCambios Then
+                            Select Case MessageBox.Show(rm.GetString("QUIERECONFIRMARLOSCAMBIOS"), rm.GetString("INFORMACION"), MessageBoxButtons.YesNoCancel)
+                                Case DialogResult.Cancel
+                                    cargando = False
+                                Case DialogResult.No
+                                    PAFActual.tabla.RejectChanges()
+                                    PAFActual.lineasCompra.tabla.RejectChanges()
+                                    cargando = False
+                                Case DialogResult.Yes
+                                    PAFActual.ActualizarOrigen()
+                            End Select
+                        End If
+                    End If
+                End If
+                'If TabControlPAF.SelectedTab Is TabPage1 Then
+                '    Dim Report As New rptCompraPedidoFornituras(PAFActual.FRA, PAFActual.FRA, PAFActual.PROVE, PAFActual.PROVE, PAFActual.TIPUS, PAFActual.DOCUMENT, PAFActual.centro)
+                '    ' assigning a report to the print control
+                '    PrintControl1.PrintingSystem = Report.PrintingSystem
+                '    ' creating the report document
+                '    Report.CreateDocument()
+                'End If
+
+            Catch ex As Exception
+                LOG(ex.ToString)
+            End Try
+        End Sub
+
+#End Region
+
+#Region "LISTADO"
+
+        Private Sub btnVerLista_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnVerLista.Click
+            Try
+                Cursor = Cursors.WaitCursor
+                Dim f As frmPAFLista = frmPAFLista.GetInstance(PAFActual.TIPUS, PAFActual.DOCUMENT, PAFActual.centro, tablaCompras)
+
+                f.MdiParent = Me.MdiParent
+                f.Show()
+                f.BringToFront()
+                Cursor = Cursors.Default
+
+            Catch ex As Exception
+                LOG(ex.ToString) : cargando = False : CCN()
+            End Try
+        End Sub
+
+#End Region
+
+#Region "SELECCION EMPRESA"
+        Private Sub cboSeleccion_ItemChanged(ByVal sender As Object, ByVal e As System.EventArgs) _
+                                                          Handles cboSeleccionCentro.SelectionChangeCommitted
+            Try
+                If consulta() Then
+                    cargando = True
+                    PAFActual.cambioCentro(nz(cboSeleccionCentro.SelectedValue, empresaPorDefecto), ultimo)
+                    'AñadirBindingCombo(cboFRA, PAFActual.dvIdentificadores, "FRA", "FRA")
+                    'Aqui hay que hacer un moveractual
+                    'CargarNumerosPAF()
+                    cboSeleccionCentro.SelectedValue = PAFActual.centro
+                    cargando = False
+                Else
+                    If EsRegistroNuevo And Not cargando Then
+                        cargando = True
+                        PAFActual.centro = nz(cboSeleccionCentro.SelectedValue, empresaPorDefecto)
+                        PAFActual.tabla.Clear()
+                        PAFActual.NuevoRegistro()
+                        PSBTIPO(PAFActual.centro)
+                    End If
+                    cargando = False
+                End If
+
+            Catch ex As Exception
+                LOG(ex.ToString) : CCN() : cargando = False
+            End Try
+        End Sub
+
+#End Region
+
+    End Class
+
+End Namespace

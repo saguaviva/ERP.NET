@@ -1,0 +1,75 @@
+﻿Namespace ura2k3
+End Namespace
+
+Namespace ura2k3
+End Namespace
+
+Namespace ura2k3
+End Namespace
+
+Namespace ura2k3
+End Namespace
+
+Namespace ura2k3
+End Namespace
+
+Namespace ura2k3
+End Namespace
+
+Namespace ura2k3
+End Namespace
+
+Namespace ura2k3
+End Namespace
+
+Namespace ura2k3
+End Namespace
+
+Namespace ura2k3
+End Namespace
+
+Namespace ura2k3
+End Namespace
+
+Namespace ura2k3
+End Namespace
+
+Namespace ura2k3
+End Namespace
+
+Namespace ura2k3
+End Namespace
+
+Namespace ura2k3
+End Namespace
+
+Namespace ura2k3
+End Namespace
+
+Namespace ura2k3
+End Namespace
+
+Namespace ura2k3
+End Namespace
+
+Namespace ura2k3
+End Namespace
+
+Namespace ura2k3
+End Namespace
+
+Namespace ura2k3
+End Namespace
+
+Namespace ura2k3
+End Namespace
+
+Namespace ura2k3
+End Namespace
+
+Namespace ura2k3
+End Namespace
+
+'Namespace aura2k3 Partial Public Class ds11
+'    End Class
+'End Namespace

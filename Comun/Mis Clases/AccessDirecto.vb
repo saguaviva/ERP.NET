@@ -1,0 +1,571 @@
+Imports Access = Microsoft.Office.Interop.Access
+Imports MySql.Data.MySqlClient : Imports clsFuncionesLOG : Imports clsFuncionesC1 : Imports clsFuncionesUtiles : Imports clsConstantes : Imports clsOtrasFunciones
+Imports dao
+
+Public Class AccessDirecto
+
+#Region "VARIABLES"
+
+    Private ds As New aura2k3.ds11
+    Private tabla As String
+
+#End Region
+
+#Region "ACCESS"
+
+    Friend Function gettipodetostring(ByVal tipo As String) As Object
+        Select Case tipo
+            Case "System.String" : Return "string"
+            Case "System.Integer" : Return "integer"
+            Case "System.Date" : Return "date"
+            Case "System.Double" : Return "double"
+            Case "System.Int32" : Return "integer"
+            Case "System.Int16" : Return "integer"
+            Case "System.DateTime" : Return "date"
+            Case "System.Boolean" : Return "boolean"
+            Case "System.Char" : Return "string"
+            Case "System.Decimal" : Return "double"
+            Case "System.Single" : Return "double"
+        End Select
+    End Function
+
+    Friend Function GetNombreCampo(ByVal val As String, ByVal campodesc As Byte, ByVal arraycampos As Hashtable) As Object
+        'El campodesc nos indica que tenemos q devolver si el nombre
+        'del campo o la despcripcion
+        Try
+            Dim keys As ICollection = arraycampos.Keys
+            Dim e As IEnumerator = keys.GetEnumerator
+            While e.MoveNext
+                If arraycampos(e.Current)(1) = val Then
+                    Return arraycampos(e.Current)(campodesc)
+                End If
+            End While
+            'Return ArrayCampos.Item(lstCampos.Items(val))(0)
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Function
+    Friend Function abrirAccess(ByVal b As Boolean, ByVal str As String)
+        Dim oAccess As Access.Application = New Access.Application
+        Dim oForm As Access.Form
+        Dim sDBPath As String 'path to Northwind.mdb
+        Const TEXT_TYPE As Integer = 10
+        Dim prp As Object
+        Try
+            ' Start a new instance of Access for Automation:
+            ' Open a database in exclusive mode:
+            If Not oAccess.Visible Then oAccess.Visible = b
+            sDBPath = CurDir() & "\access\access\temp.mdb"
+            'MessageBox.Show(sDBPath)
+            oAccess.OpenCurrentDatabase(sDBPath, Exclusive:=False)
+            'oAccess.OpenCurrentDatabase(filepath:=sDBPath, exclusive:=False, bstrPassword:="")
+            'oAccess.OpenCurrentDatabase(sDBPath)
+            prp = oAccess.CurrentDb.CreateProperty("AppTitle", TEXT_TYPE, str)
+            Try
+                oAccess.CurrentDb.Properties.Append(prp)
+            Catch
+            End Try
+
+            oAccess.CurrentDb.Properties("AppTitle").Value = str
+            oAccess.RefreshTitleBar()
+            Return oAccess
+        Catch ex As Exception
+            LOG(ex.ToString)
+            Try
+                oAccess.OpenCurrentDatabase("access\temp.mdb", Exclusive:=False)
+            Catch ex2 As Exception
+                MessageBox.Show(ex2.ToString)
+            End Try
+        End Try
+    End Function
+    Friend Function ShellGetDB(ByVal sDBPath As String, Optional ByVal sCmdLine As String = vbNullString, Optional ByVal enuWindowStyle As Microsoft.VisualBasic.AppWinStyle = AppWinStyle.MinimizedFocus, Optional ByVal iSleepTime As Integer = 1000) As Access.Application
+        'Launches a new instance of Access with a database (sDBPath)
+        'using the Shell function then returns the Application object
+        'via calling: GetObject(sDBPath). Returns the Application
+        'object of the new instance of Access, assuming that sDBPath
+        'is not already opened in another instance of Access. To ensure
+        'the Application object of the new instance is returned, make
+        'sure sDBPath is not already opened in another instance of Access.
+        '
+        'Example:
+        'Dim oAccess As Access.Application
+        'oAccess = ShellGetDB("c:\mydb.mdb")
+        ' Enable an error handler for this procedure:
+        On Error GoTo ErrorHandler
+        Dim oAccess As Access.Application
+        Dim sAccPath As String 'path to msaccess.exe
+        ' Obtain the path to msaccess.exe:
+        sAccPath = GetOfficeAppPath("Access.Application", "msaccess.exe")
+        If sAccPath = "" Then
+            MsgBox("Can't determine path to msaccess.exe", MsgBoxStyle.MsgBoxSetForeground)
+            Return Nothing
+        End If
+        ' Make sure specified database (sDBPath) exists:
+        If Not System.IO.File.Exists(sDBPath) Then
+            MsgBox("Can't find the file """ & sDBPath & """", MsgBoxStyle.MsgBoxSetForeground)
+            Return Nothing
+        End If
+        ' Start a new instance of Access using sDBPath and sCmdLine:
+        If sCmdLine = vbNullString Then
+            sCmdLine = Chr(34) & sDBPath & Chr(34)
+        Else
+            sCmdLine = Chr(34) & sDBPath & Chr(34) & " " & sCmdLine
+        End If
+        Shell(PathName:=sAccPath & " " & sCmdLine, Style:=enuWindowStyle)
+        'Note: It is advised that the Style argument of the Shell
+        'function be used to give focus to Access.
+        ' Move focus back to this form. This ensures that Access
+        ' registers itself in the ROT, allowing GetObject to find it:
+        'AppActivate(Title:=Me.Text)
+        ' Pause to allow database to open:
+        'System.Threading.Thread.Sleep(iSleepTime)
+        ' Obtain Application object of the instance of Access
+        ' that has the database open:
+        oAccess = GetObject(sDBPath)
+
+        Return oAccess
+ErrorCleanup:
+        ' Try to quit Access due to an unexpected error:
+        On Error Resume Next
+        oAccess.Quit(Option:=Access.AcQuitOption.acQuitSaveNone)
+        System.Runtime.InteropServices.Marshal.ReleaseComObject(oAccess)
+        oAccess = Nothing
+        Return Nothing
+ErrorHandler:
+        MsgBox(Err.Number & ": " & Err.Description, MsgBoxStyle.MsgBoxSetForeground, "Error Handler")
+        Resume ErrorCleanup
+    End Function
+    Private Declare Sub Sleep Lib "Kernel32" (ByVal dwMS As Long)
+    Friend Function GetOfficeAppPath(ByVal sProgId As String, ByVal sEXE As String) As String
+        '! Dead procedure (called by dead only)
+        'Returns path of the Office application. e.g.
+        'GetOfficeAppPath("Access.Application", "msaccess.exe") returns
+        'full path to Microsoft Access. Approach based on Q240794.
+        'Returns empty string if path not found in registry.
+        ' Enable an error handler for this procedure:
+        On Error GoTo ErrorHandler
+        Dim oReg As Microsoft.Win32.RegistryKey = Microsoft.Win32.Registry.LocalMachine
+        Dim oKey As Microsoft.Win32.RegistryKey
+        Dim sCLSID As String
+        Dim sPath As String
+        Dim iPos As Integer
+        ' First, get the clsid from the progid from the registry key
+        ' HKEY_LOCAL_MACHINE\Software\Classes\<PROGID>\CLSID:
+        oKey = oReg.OpenSubKey("Software\Classes\" & sProgId & "\CLSID")
+        sCLSID = oKey.GetValue("")
+        oKey.Close()
+        ' Now that we have the CLSID, locate the server path at
+        ' HKEY_LOCAL_MACHINE\Software\Classes\CLSID\ 
+        ' {xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx}\LocalServer32:
+        oKey = oReg.OpenSubKey("Software\Classes\CLSID\" & sCLSID & "\LocalServer32")
+        sPath = oKey.GetValue("")
+        oKey.Close()
+        ' Remove any characters beyond the exe name:
+        '! Text comparison used
+        iPos = InStr(1, sPath, sEXE, CompareMethod.Text)
+        sPath = Microsoft.VisualBasic.Left(sPath, iPos + Len(sEXE) - 1)
+        Return Trim(sPath)
+ErrorHandler:
+        Return ""
+    End Function
+    Friend Function CrearConsultaSQL(ByVal arraycampos As Hashtable, ByVal tabla As String, ByVal lstCampos As ListBox) As Object
+        '! Dead procedure (called by dead only)
+        '! Changed CrearConsultaSQL to Object
+        Try
+            Dim strSQL As String = "CREATE TABLE " & tabla & " ("
+            Dim i As Integer
+            Dim nombreCampo As String
+            Dim tipoCampo As String
+            For i = 0 To lstCampos.SelectedItems.Count - 1
+                nombreCampo = GetNombreCampo(lstCampos.Items(lstCampos.SelectedIndices(i)), 0, arraycampos)
+                tipoCampo = gettipodetostring(ds.Tables(tabla).Columns(nombreCampo).DataType.ToString)
+                If i = 0 Then : strSQL = strSQL & nombreCampo & " " & tipoCampo
+                Else : strSQL = strSQL & " ," & nombreCampo & " " & tipoCampo
+                End If
+            Next
+            strSQL = strSQL & ");"
+            Return strSQL
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Function
+    Friend Function NumeroFilas2(ByVal dg As C1.Win.C1TrueDBGrid.C1TrueDBGrid) As Integer
+        Dim numRows As Integer
+        Try
+            numRows = dg.BindingContext(dg.DataSource, dg.DataMember).Count
+            Return numRows
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Function
+    Friend Sub RellenarTablaAccess2(ByVal arraycampos As Hashtable, ByVal lstCampos As ListBox, ByVal tabla As String, ByVal dg As C1.Win.C1TrueDBGrid.C1TrueDBGrid, Optional ByVal path As String = "access\temp.mdb")
+        Dim cnTemp As New OleDb.OleDbConnection("Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" & path & ";User Id=admin;Password=;")
+        Dim strSQL As String = "INSERT INTO " & tabla & "("
+        Dim i As Integer
+        Dim nombreCampo As String
+        Dim j As Integer
+        Dim valorCampo As String
+        Dim selTemp As OleDb.OleDbCommand
+        Dim strSQLtemp As String
+        Try
+            For i = 0 To lstCampos.SelectedItems.Count - 1
+                nombreCampo = GetNombreCampo(lstCampos.Items(lstCampos.SelectedIndices(i)), 0, arraycampos)
+                If i = 0 Then
+                    strSQL = strSQL & nombreCampo & " "
+                Else
+                    strSQL = strSQL & " ," & nombreCampo & " "
+                End If
+            Next
+            strSQL = strSQL & ") VALUES("
+            strSQLtemp = strSQL
+            'Ahora hay q meter los valores
+            cnTemp.Open()
+            For i = 0 To NumeroFilas2(dg) - 1
+                For j = 0 To lstCampos.SelectedItems.Count - 1
+                    nombreCampo = GetNombreCampo(lstCampos.Items(lstCampos.SelectedIndices(j)), 0, arraycampos)
+                    If IsDBNull(dg.Item(i, nombreCampo)) Then
+                        valorCampo = ""
+                    Else
+                        valorCampo = (dg.Item(i, nombreCampo))
+                    End If
+                    If j = 0 Then
+                        PonerContraBarras(valorCampo)
+                        strSQL = strSQL & " """ & valorCampo & """ "
+                    Else
+                        PonerContraBarras(valorCampo)
+                        strSQL = strSQL & " ,""" & valorCampo & """ "
+                    End If
+                Next
+                strSQL = strSQL & ");"
+                selTemp = New OleDb.OleDbCommand(strSQL, cnTemp)
+                selTemp.ExecuteNonQuery()
+                strSQL = strSQLtemp
+            Next
+            'strSQL = "DELETE * FROM tPars"
+            'selTemp.CommandText = strSQL
+            'selTemp.ExecuteNonQuery()
+            'strSQL = "INSERT INTO tPars (tabla) VALUES (""" & tabla & """);"
+            'selTemp.CommandText = strSQL
+            'selTemp.ExecuteNonQuery()
+            'selTemp = Nothing
+            cnTemp.Close()
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Sub
+    'Funcion para normalizar los strings
+
+    Friend Sub PonerContraBarras(ByRef valorcampo As String)
+        '! Dead procedure (called by dead only)
+        Try
+            valorcampo = valorcampo.Replace("""", """""")
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Sub
+    Friend Sub CargarInformeAccess(ByVal consulta As String, ByVal titulo As String)
+        '! Dead parameter: titulo
+        Dim oaccess As Access.Application
+        Try
+            oaccess = New Access.Application
+            'MessageBox.Show(sDBPath)
+            oaccess.OpenCurrentDatabase(CurDir() & "\access\temp.mdb", Exclusive:=True)
+            oaccess.DoCmd.OpenReport(consulta, Access.AcView.acViewPreview)
+            oaccess.DoCmd.Maximize()
+            PonerBarra(oaccess)
+            If Not oaccess.Visible Then oaccess.Visible = True
+            If Not oaccess.UserControl Then oaccess.UserControl = True
+            System.Runtime.InteropServices.Marshal.ReleaseComObject(oaccess)
+            oaccess = Nothing
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Sub
+    Friend Sub PonerBarra(ByVal oAccess As Access.Application)
+
+        Try
+            Dim en As IEnumerator = oAccess.CommandBars.GetEnumerator
+            'Primero quitamos todas las posibles barras
+            While en.MoveNext
+                en.Current.enabled = False
+            End While
+            oAccess.Run("CreateCustomCommandBar")
+        Catch ex As Exception
+            oAccess.Run("CreateCustomCommandBar")
+        End Try
+    End Sub
+    Friend Sub AutoSizeColumnasConsulta(ByVal consulta As String, ByVal oAccess As Access.Application, ByVal lstCampos As ListBox, ByVal dg As C1.Win.C1TrueDBGrid.C1TrueDBGrid, ByVal arraycampos As Hashtable, ByVal tabla As String)
+        '! Dead procedure (called by dead only)
+        '! Dead parameter: tabla
+        '! Dead parameter: consulta
+        Dim i As Integer
+        Dim j As Integer
+        Dim maxTamaño As Integer
+        Dim nombreCampo As String
+
+        Try
+            For i = 0 To lstCampos.SelectedItems.Count - 1
+                nombreCampo = GetNombreCampo(lstCampos.Items(lstCampos.SelectedIndices(i)), 0, arraycampos)
+                For j = 0 To NumeroFilas2(dg) - 1
+                    If maxTamaño < GetTamañoColumnaEnInches2(arraycampos, nombreCampo, dg) Then
+                        maxTamaño = GetTamañoColumnaEnInches2(arraycampos, nombreCampo, dg)
+                    End If
+                Next
+                oAccess.Run("Poner", nombreCampo, maxTamaño)
+                maxTamaño = 0
+            Next
+            '!!!!!!! EL 3 INDICA QUE ES dbInteger (un tipo de DAO) no valen los
+            'des dbType y como no se puede poner el dbInteger pos... para saber
+            'cual es el que vale se puede hacer un msgbox en acces directamente
+            'del tipo
+
+        Catch ex As Exception
+            LOG(ex.ToString) ': oAccess.Quit()
+        End Try
+    End Sub
+    Private Sub PonerTituloAccess(ByVal oAccess As Access.Application, ByVal titulo As String)
+        '! Dead procedure (called by dead only)
+        Dim prp As Object
+        Const TEXT_TYPE As Integer = 10
+        Try
+            prp = oAccess.CurrentDb.CreateProperty("AppTitle", TEXT_TYPE, titulo)
+            Try
+                oAccess.CurrentDb.Properties.Append(prp)
+            Catch ex As Exception
+            End Try
+            oAccess.CurrentDb.Properties("AppTitle").Value = titulo
+            oAccess.RefreshTitleBar()
+        Catch ex As Exception
+        End Try
+    End Sub
+    Friend Sub CargarConsulta(ByVal sConsulta As String, _
+                    ByVal lstCampos As System.Windows.Forms.ListBox, _
+                    ByVal dg As C1.Win.C1TrueDBGrid.C1TrueDBGrid, _
+                    ByVal tituloaccess As String, _
+                    ByVal ArrayCampos As Hashtable)
+        On Error GoTo ErrorHandler
+
+        Dim oAccess As Access.Application
+        oAccess = New Access.Application
+        Dim oForm As Access.Form
+        Dim sDBPath As String
+
+        sDBPath = oAccess.SysCmd(Action:=Access.AcSysCmdAction.acSysCmdAccessDir)
+        sDBPath = CurDir() & "\access\temp.mdb"
+        oAccess.OpenCurrentDatabase(filepath:=sDBPath, Exclusive:=False)
+
+        For Each oForm In oAccess.Forms
+            oAccess.DoCmd.Close(ObjectType:=Access.AcObjectType.acForm, ObjectName:=oForm.Name, Save:=Access.AcCloseSave.acSaveNo)
+        Next
+        If Not oForm Is Nothing Then
+            System.Runtime.InteropServices.Marshal.ReleaseComObject(oForm)
+        End If
+        oForm = Nothing
+        PonerTituloAccess(oAccess, tituloaccess)
+
+        oAccess.Run("PonerConsulta")
+        AutoSizeColumnasConsulta("listado", oAccess, lstCampos, dg, ArrayCampos, tabla)
+        PonerBarra(oAccess)
+        oAccess.CloseCurrentDatabase()
+        oAccess.OpenCurrentDatabase(filepath:=sDBPath, Exclusive:=False)
+        oAccess.DoCmd.SelectObject(ObjectType:=Access.AcObjectType.acQuery, ObjectName:=sConsulta, InDatabaseWindow:=True)
+        oAccess.RunCommand(Command:=Access.AcCommand.acCmdAppMaximize)
+        oAccess.DoCmd.OpenQuery(sConsulta, Access.AcView.acViewPreview)
+        oAccess.DoCmd.Maximize()
+        If Not oAccess.Visible Then oAccess.Visible = True
+        If Not oAccess.UserControl Then oAccess.UserControl = True
+        System.Runtime.InteropServices.Marshal.ReleaseComObject(oAccess)
+        oAccess = Nothing
+        Exit Sub
+ErrorCleanup:
+        ' Try to quit Access due to an unexpected error:
+        On Error Resume Next
+        System.Runtime.InteropServices.Marshal.ReleaseComObject(oForm)
+        oForm = Nothing
+        oAccess.Quit(Option:=Access.AcQuitOption.acQuitSaveNone)
+        System.Runtime.InteropServices.Marshal.ReleaseComObject(oAccess)
+        oAccess = Nothing
+        Exit Sub
+ErrorHandler:
+        MsgBox(Err.Number & ": " & Err.Description, MsgBoxStyle.MsgBoxSetForeground, "Error Handler")
+        Resume ErrorCleanup
+    End Sub
+
+    Private Function GetTamañoColumnaEnInches2(ByVal ArrayCampos As Hashtable, ByVal campo As String, ByVal dg As C1.Win.C1TrueDBGrid.C1TrueDBGrid) As Object
+        '! Dead procedure (called by dead only)
+        '! Changed GetTamañoColumnaEnInches2 to Object
+        '! Dead parameter: ArrayCampos
+        Dim width As Single = 0
+
+        Dim i As Integer
+
+        Dim f As New Font("Arial", 8, FontStyle.Regular)
+        Dim g As Graphics
+        Dim size As SizeF
+        Dim sf As New StringFormat(StringFormat.GenericTypographic)
+        Try
+            g = Graphics.FromHwnd(dg.Handle)
+            For i = 0 To NumeroFilas2(dg) - 1 'Numero de campos
+                If Not IsDBNull(dg(i, campo)) Then
+                    size = g.MeasureString(dg.Item(i, campo), f, 500, sf)
+                    If (size.Width > width) Then
+                        width = size.Width
+                    End If
+                End If
+            Next
+            Return roundnum(width / 72 * 1440, 0)
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Function
+    Friend Sub CrearTablaAccessLista(ByVal Arraycampos As Hashtable, ByVal tabla As String, ByVal lstcampos As ListBox, Optional ByVal path As String = "access\temp.mdb")
+        Dim strSQL = CrearConsultaSQL(Arraycampos, tabla, lstcampos)
+        Dim strSQLDrop As String = "DROP TABLE " & tabla & ";"
+        Dim cnTemp As New OleDb.OleDbConnection("Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" & path & ";User Id=admin;Password=;")
+        Dim cmdCreateTable As New OleDb.OleDbCommand(strSQL, cnTemp)
+        Dim cmdDropTable As New OleDb.OleDbCommand(strSQLDrop, cnTemp)
+        Try
+            cnTemp.Open()
+            Try
+                cmdDropTable.ExecuteNonQuery()
+            Catch ex As Exception
+            End Try
+            cmdCreateTable.ExecuteNonQuery()
+            cnTemp.Close()
+
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Sub
+    Friend Sub BorrarDatosTablaAccess(ByVal tablaAccess As String)
+        Dim cnTemp As New OleDb.OleDbConnection("Provider=Microsoft.Jet.OLEDB.4.0;Data Source=access\temp.mdb;User Id=admin;Password=;")
+        Dim strSQL As String = "DELETE * FROM " & tablaAccess & ""
+        Dim cmdDel As New OleDb.OleDbCommand(strSQL, cnTemp)
+        Try
+            cnTemp.Open()
+            cmdDel.ExecuteNonQuery()
+            cnTemp.Close()
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Sub
+
+#End Region
+
+#Region "GENERACION SQLs"
+
+    Protected Friend Function GenerarSQLInsert(ByVal dt As DataTable) As String
+        Dim i As Integer
+        Dim sqlIns As String
+        Dim sqlIns2 As String
+        Try
+            sqlIns = "INSERT INTO " & dt.TableName & " ("
+            For i = 0 To dt.Columns.Count - 1
+                If Not esCampoDeNombre(dt.Columns(i).ColumnName) Then
+                    sqlIns = sqlIns & dt.Columns(i).ColumnName & ","
+                    'Ahora los parametros
+                    sqlIns2 = sqlIns2 & "@p" & dt.Columns(i).ColumnName & ","
+                End If
+            Next
+            sqlIns = sqlIns.Substring(0, sqlIns.Length - 1) & ") VALUES (" & sqlIns2
+
+            sqlIns = sqlIns.Substring(0, sqlIns.Length - 1) & ")"
+
+            Return sqlIns
+
+        Catch ex As Exception
+            LOG(ex.ToString) : CCN()
+        End Try
+    End Function
+    Protected Friend Function GenerarSQLDelete(ByVal dt As DataTable) As String
+        Dim i As Integer
+        Dim sqldel As String
+        Try
+            sqldel = "DELETE FROM " & dt.TableName & " WHERE ("
+            For i = 0 To dt.Columns.Count - 1
+                If Not esCampoDeNombre(dt.Columns(i).ColumnName) Then
+                    Dim u As System.Data.UniqueConstraint
+                    u = dt.Constraints(0)
+                    If esPrimaryKey(u, dt.Columns(i).ColumnName) Then
+                        sqldel = sqldel & dt.Columns(i).ColumnName & " = @pi" & dt.Columns(i).ColumnName & " AND "
+                    End If
+                End If
+            Next
+            sqldel = sqldel.Substring(0, sqldel.Length - 4) & ")"
+            Return sqldel
+
+        Catch ex As Exception
+            LOG(ex.ToString) : CCN()
+        End Try
+    End Function
+    Protected Friend Function GenerarSQLUpdate(ByVal dt As DataTable) As String
+        Dim i As Integer
+        Dim sqlUpd As String
+        Try
+            sqlUpd = "UPDATE " & dt.TableName & " SET "
+            For i = 0 To dt.Columns.Count - 1
+                If Not esCampoDeNombre(dt.Columns(i).ColumnName) Then
+                    sqlUpd = sqlUpd & dt.Columns(i).ColumnName & " = @p" & dt.Columns(i).ColumnName & ","
+                End If
+            Next
+
+            sqlUpd = sqlUpd.Substring(0, sqlUpd.Length - 1) & " WHERE ("
+
+            For i = 0 To dt.Columns.Count - 1
+                If Not esCampoDeNombre(dt.Columns(i).ColumnName) Then
+                    Dim u As System.Data.UniqueConstraint
+                    u = dt.Constraints(0)
+                    If esPrimaryKey(u, dt.Columns(i).ColumnName) Then
+
+                        sqlUpd = sqlUpd & dt.Columns(i).ColumnName & " = @pi" & dt.Columns(i).ColumnName & " AND "
+                    End If
+                End If
+            Next
+            sqlUpd = sqlUpd.Substring(0, sqlUpd.Length - 4) & ")"
+            Return sqlUpd
+
+        Catch ex As Exception
+            LOG(ex.ToString) : CCN()
+        End Try
+    End Function
+
+#End Region
+
+    Sub AñadirParametros(ByVal cmd As IDbCommand, ByVal dt As DataTable)
+        Dim i As Integer
+        Try
+            For i = 0 To dt.Columns.Count - 1
+                If Not esCampoDeNombre(dt.Columns(i).ColumnName) Then
+                    añadirParametro(cmd, gettipodetostring(dt.Columns(i).DataType.FullName.ToString), dt.Columns(i).ColumnName, "ACCESS")
+                End If
+            Next
+
+        Catch ex As Exception
+            LOG(ex.ToString) : CCN()
+        End Try
+    End Sub
+    'Public Sub TraspasarTabla(ByVal dt As DataTable)
+    '    Dim cnAccess As New OleDb.OleDbConnection("Provider=Microsoft.Jet.OLEDB.4.0;Data Source=access\temp.mdb;User Id=admin;Password=;")
+    '    Dim daAccess As New OleDb.OleDbDataAdapter
+    '    Try
+    '        daAccess.InsertCommand = New OleDb.OleDbCommand(GenerarSQLInsert(dt), cnAccess)
+    '        AñadirParametros(daAccess.InsertCommand, dt)
+
+    '        cnAccess.Open()
+    '        For i = 0 To dt.Columns.Count - 1
+    '            If Not esCampoDeNombre(dt.Columns(i).ColumnName) Then
+    '                añadirParametro(cmd, gettipodetostring(dt.Columns(i).DataType.FullName.ToString), dt.Columns(i).ColumnName, "ACCESS")
+    '            End If
+    '        Next
+    '        daAccess.Update(dt)
+    '        cnAccess.Close()
+
+    '    Catch ex As Exception
+    '        LOG(ex.ToString)
+    '    End Try
+    'End Sub
+    Public Sub New(ByVal tabl As String)
+        tabla = tabl
+    End Sub
+   
+End Class

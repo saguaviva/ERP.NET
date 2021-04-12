@@ -1,0 +1,1545 @@
+﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <ProjectType>Local</ProjectType>
+    <ProductVersion>8.0.50727</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{863BE3BF-574C-443C-823B-7B7EE68707C4}</ProjectGuid>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ApplicationIcon>
+    </ApplicationIcon>
+    <AssemblyKeyContainerName>
+    </AssemblyKeyContainerName>
+    <AssemblyName>TEX.NET</AssemblyName>
+    <AssemblyOriginatorKeyFile>
+    </AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyMode>None</AssemblyOriginatorKeyMode>
+    <DefaultClientScript>JScript</DefaultClientScript>
+    <DefaultHTMLPageLayout>Grid</DefaultHTMLPageLayout>
+    <DefaultTargetSchema>IE50</DefaultTargetSchema>
+    <DelaySign>false</DelaySign>
+    <OutputType>WinExe</OutputType>
+    <OptionCompare>Binary</OptionCompare>
+    <OptionExplicit>On</OptionExplicit>
+    <OptionStrict>Off</OptionStrict>
+    <RootNamespace>
+    </RootNamespace>
+    <StartupObject>
+    </StartupObject>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <MyType>WindowsFormsWithCustomSubMain</MyType>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <OutputPath>bin\</OutputPath>
+    <DocumentationFile>TEX.NET.xml</DocumentationFile>
+    <BaseAddress>285212672</BaseAddress>
+    <ConfigurationOverrideFile>
+    </ConfigurationOverrideFile>
+    <DefineConstants>
+    </DefineConstants>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <DebugSymbols>true</DebugSymbols>
+    <Optimize>true</Optimize>
+    <RegisterForComInterop>false</RegisterForComInterop>
+    <RemoveIntegerChecks>false</RemoveIntegerChecks>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <WarningLevel>1</WarningLevel>
+    <NoWarn>42016,42017,42018,42019,42032</NoWarn>
+    <DebugType>full</DebugType>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <OutputPath>bin\</OutputPath>
+    <DocumentationFile>TEX.NET.xml</DocumentationFile>
+    <BaseAddress>285212672</BaseAddress>
+    <ConfigurationOverrideFile>
+    </ConfigurationOverrideFile>
+    <DefineConstants>
+    </DefineConstants>
+    <DefineDebug>false</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <DebugSymbols>false</DebugSymbols>
+    <Optimize>true</Optimize>
+    <RegisterForComInterop>false</RegisterForComInterop>
+    <RemoveIntegerChecks>false</RemoveIntegerChecks>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <WarningLevel>1</WarningLevel>
+    <NoWarn>42016,42017,42018,42019,42032</NoWarn>
+    <DebugType>none</DebugType>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="ADODB">
+      <Name>adodb</Name>
+      <HintPath>..\..\Archivos de programa\Microsoft.NET\Primary Interop Assemblies\adodb.dll</HintPath>
+      <AssemblyFolderKey>hklm\primary interop assemblies</AssemblyFolderKey>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="C1.C1PrintDocument">
+      <Name>C1.C1PrintDocument</Name>
+      <HintPath>bin\C1.C1PrintDocument.dll</HintPath>
+    </Reference>
+    <Reference Include="C1.Common">
+      <Name>C1.Common</Name>
+      <HintPath>bin\C1.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="C1.Win.C1Input">
+      <Name>C1.Win.C1Input</Name>
+      <HintPath>bin\C1.Win.C1Input.dll</HintPath>
+    </Reference>
+    <Reference Include="C1.Win.C1List">
+      <Name>C1.Win.C1List</Name>
+      <HintPath>bin\C1.Win.C1List.dll</HintPath>
+    </Reference>
+    <Reference Include="C1.Win.C1PrintPreview">
+      <Name>C1.Win.C1PrintPreview</Name>
+      <HintPath>bin\C1.Win.C1PrintPreview.dll</HintPath>
+    </Reference>
+    <Reference Include="C1.Win.C1Report">
+      <Name>C1.Win.C1Report</Name>
+      <HintPath>bin\C1.Win.C1Report.dll</HintPath>
+    </Reference>
+    <Reference Include="C1.Win.C1ReportDesigner">
+      <Name>C1.Win.C1ReportDesigner</Name>
+      <HintPath>bin\C1.Win.C1ReportDesigner.dll</HintPath>
+    </Reference>
+    <Reference Include="C1.Win.C1TrueDBGrid">
+      <Name>C1.Win.C1TrueDBGrid</Name>
+      <HintPath>bin\C1.Win.C1TrueDBGrid.dll</HintPath>
+    </Reference>
+    <Reference Include="CollapsibleSplitter">
+      <Name>CollapsibleSplitter</Name>
+      <HintPath>bin\CollapsibleSplitter.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Compona.CommonControls">
+      <Name>compona.commoncontrols</Name>
+      <HintPath>f:\archivos de programa\programacion\compona\bin\compona.commoncontrols.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Compona.CoreLib">
+      <Name>Compona.CoreLib</Name>
+      <HintPath>bin\Compona.CoreLib.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Compona.Editors">
+      <Name>compona.editors</Name>
+      <HintPath>f:\archivos de programa\programacion\compona\bin\compona.editors.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Compona.ExplorerBar">
+      <Name>compona.explorerbar</Name>
+      <HintPath>f:\archivos de programa\programacion\compona\bin\compona.explorerbar.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Compona.LayoutContainers">
+      <Name>compona.layoutcontainers</Name>
+      <HintPath>f:\archivos de programa\programacion\compona\bin\compona.layoutcontainers.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="CoreLab.MySql">
+      <Name>CoreLab.MySql</Name>
+      <HintPath>F:\Archivos de programa\CoreLab\MySQLDirect.NET\CoreLab.MySql.dll</HintPath>
+      <AssemblyFolderKey>hklm\dn\mysqldirect</AssemblyFolderKey>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="dao">
+      <Name>dao</Name>
+      <HintPath>bin\dao.dll</HintPath>
+    </Reference>
+    <Reference Include="DevExpress.Data3, Version=3.1.0.0, Culture=neutral, PublicKeyToken=79868b8147b5eae4" />
+    <Reference Include="DevExpress.Utils3, Version=3.1.0.0, Culture=neutral, PublicKeyToken=79868b8147b5eae4" />
+    <Reference Include="DevExpress.XtraPrinting3, Version=1.11.0.0, Culture=neutral, PublicKeyToken=79868b8147b5eae4" />
+    <Reference Include="DevExpress.XtraReports3, Version=1.11.0.0, Culture=neutral, PublicKeyToken=79868b8147b5eae4" />
+    <Reference Include="ErikPorter.WindowsForms.Controls.ControlArray">
+      <Name>ErikPorter.WindowsForms.Controls.ControlArray</Name>
+      <HintPath>..\..\ErikPorter.WindowsForms.Controls.ControlArray.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Eyefinder">
+      <Name>Eyefinder</Name>
+      <HintPath>bin\Eyefinder.dll</HintPath>
+    </Reference>
+    <Reference Include="FtpSupport">
+      <Name>FtpSupport</Name>
+      <HintPath>bin\FtpSupport.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Data.Odbc">
+      <Name>Microsoft.Data.Odbc</Name>
+      <HintPath>F:\Archivos de programa\Microsoft.NET\Odbc.Net\Microsoft.Data.Odbc.dll</HintPath>
+      <AssemblyFolderKey>hklm\dn\microsoft odbc .net data provider</AssemblyFolderKey>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.VisualBasic.Compatibility">
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="misControles">
+      <Name>misControles</Name>
+      <HintPath>bin\misControles.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="mscorcfg">
+      <Name>mscorcfg</Name>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="NETXP.Controls">
+      <Name>netxp.controls</Name>
+      <HintPath>bin\dlls\netxp.controls.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="NETXP.Library">
+      <Name>NETXP.Library</Name>
+      <HintPath>bin\NETXP.Library.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="NETXP.Win32">
+      <Name>NETXP.Win32</Name>
+      <HintPath>bin\NETXP.Win32.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="num2text">
+      <Name>num2text</Name>
+      <HintPath>bin\num2text.dll</HintPath>
+    </Reference>
+    <Reference Include="Office">
+      <Name>office</Name>
+      <HintPath>..\..\oxp\office.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="SandBar">
+      <Name>SandBar</Name>
+      <HintPath>bin\SandBar.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System">
+      <Name>System</Name>
+      <HintPath>bin\dlls\System.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Data">
+      <Name>System.Data</Name>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Design">
+      <Name>System.Design</Name>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Drawing">
+      <Name>System.Drawing</Name>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Web">
+      <Name>System.Web</Name>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Web.Services">
+      <Name>System.Web.Services</Name>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Windows.Forms">
+      <Name>System.Windows.Forms</Name>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Xml">
+      <Name>System.XML</Name>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="TabOrder">
+      <Name>TabOrder</Name>
+      <HintPath>bin\TabOrder.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <COMReference Include="Access">
+      <Guid>{4AFFC9A0-5F99-101B-AF4E-00AA003F0F07}</Guid>
+      <VersionMajor>9</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+    </COMReference>
+    <COMReference Include="ADODB1">
+      <Guid>{00000201-0000-0010-8000-00AA006D2EA4}</Guid>
+      <VersionMajor>2</VersionMajor>
+      <VersionMinor>1</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>primary</WrapperTool>
+      <Isolated>False</Isolated>
+      <Private>True</Private>
+    </COMReference>
+    <COMReference Include="ADOX">
+      <Guid>{00000600-0000-0010-8000-00AA006D2EA4}</Guid>
+      <VersionMajor>2</VersionMajor>
+      <VersionMinor>8</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Private>True</Private>
+    </COMReference>
+    <COMReference Include="DAO1">
+      <Guid>{00025E01-0000-0000-C000-000000000046}</Guid>
+      <VersionMajor>5</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+    </COMReference>
+    <COMReference Include="Excel">
+      <Guid>{00020813-0000-0000-C000-000000000046}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>5</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+    </COMReference>
+    <COMReference Include="Microsoft.Office.Core">
+      <Guid>{2DF8D04C-5BFA-101B-BDE5-00AA0044DE52}</Guid>
+      <VersionMajor>2</VersionMajor>
+      <VersionMinor>3</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>primary</WrapperTool>
+      <Isolated>False</Isolated>
+      <Private>True</Private>
+    </COMReference>
+    <COMReference Include="MSDATASRC">
+      <Guid>{7C0FFAB0-CD84-11D0-949A-00A0C91110ED}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>primary</WrapperTool>
+      <Private>True</Private>
+    </COMReference>
+    <COMReference Include="Office1">
+      <Guid>{2DF8D04C-5BFA-101B-BDE5-00AA0044DE52}</Guid>
+      <VersionMajor>2</VersionMajor>
+      <VersionMinor>1</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+    </COMReference>
+    <COMReference Include="Office2">
+      <Guid>{2DF8D04C-5BFA-101B-BDE5-00AA0044DE52}</Guid>
+      <VersionMajor>2</VersionMajor>
+      <VersionMinor>1</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <Private>True</Private>
+    </COMReference>
+    <COMReference Include="SHDocVw">
+      <Guid>{EAB22AC0-30C1-11CF-A7EB-0000C05BAE0B}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>1</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+    </COMReference>
+    <COMReference Include="stdole">
+      <Guid>{00020430-0000-0000-C000-000000000046}</Guid>
+      <VersionMajor>2</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>primary</WrapperTool>
+      <Private>True</Private>
+    </COMReference>
+    <COMReference Include="VBIDE">
+      <Guid>{0002E157-0000-0000-C000-000000000046}</Guid>
+      <VersionMajor>5</VersionMajor>
+      <VersionMinor>3</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>primary</WrapperTool>
+      <Isolated>False</Isolated>
+      <Private>True</Private>
+    </COMReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Import Include="Microsoft.Office" />
+    <Import Include="Microsoft.Office.Core" />
+    <Import Include="Microsoft.VisualBasic" />
+    <Import Include="System" />
+    <Import Include="System.Collections" />
+    <Import Include="System.Data" />
+    <Import Include="System.Diagnostics" />
+    <Import Include="System.Drawing" />
+    <Import Include="System.Windows.Forms" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AssemblyInfo.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="clases\AppIncrustada\clsWinApi.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="clases\AppIncrustada\frm1.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="clases\Articulos\Fornituras\clsDetalleForni.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="clases\Articulos\Fornituras\clsFornitura.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="clases\Articulos\Fornituras\frmFornituras.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="clases\Articulos\Hilos\clsCartaColoresHilo.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="clases\Articulos\Hilos\clsHilos.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="clases\Articulos\Hilos\frmHilos.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="clases\Articulos\Modelos\clsDetalleColorModelo.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="clases\Articulos\Modelos\clsDetalleEscandalloModelo.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="clases\Articulos\Modelos\clsDetalleForniturasModelo.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="clases\Articulos\Modelos\clsDetalleStockModelo.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="clases\Articulos\Modelos\clsManipulacion.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="clases\Articulos\Modelos\clsModelo.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="clases\Articulos\Modelos\frmModelos.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="clases\Articulos\Muestras\clsCartaColoresMuestra.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="clases\Articulos\Muestras\clsDesgloseMuestra.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="clases\Articulos\Muestras\clsMaquinasMuestra.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="clases\Articulos\Muestras\clsMuestra.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="clases\Articulos\Muestras\frmComplementos.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="clases\Articulos\Muestras\frmDesgloseMuestraColorMaquina.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="clases\Articulos\Tejidos\clsAcabadosTejidos.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="clases\Articulos\Tejidos\clsCartaColoresTejido.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="clases\Articulos\Tejidos\clsComposicionTejido.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="clases\Articulos\Tejidos\clsTejido.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="clases\Articulos\Tejidos\Disposiciones\clsDetalleDisposicion.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="clases\Articulos\Tejidos\Disposiciones\clsDisposicion.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="clases\Articulos\Tejidos\Disposiciones\frmAcabadorPorDefecto.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="clases\Articulos\Tejidos\Disposiciones\frmDisposicion.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="clases\Articulos\Tejidos\frmTejidos.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="clases\clsEstadisticas.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="clases\Gente\Bancos\clsBanco.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="clases\Gente\Bancos\clsCuentasBancos.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="clases\Gente\Bancos\frmBancosForm.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="clases\Gente\Clientes\clsCliente.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="clases\Gente\Clientes\clsDirecciones.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="clases\Gente\Clientes\frmClientesForm.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="clases\Gente\clsEmpresa.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="clases\Gente\clsProveedor.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="clases\Gente\clsRepresentantes.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="clases\Gente\clsTransportista.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="clases\Gente\frmEmpresas.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="clases\Gente\frmProveedoresForm.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="clases\Gente\frmRepresentantesForm.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="clases\Gente\frmTransportistasForm.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="clases\Gente\Talleres\clsAcabados.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="clases\Gente\Talleres\clsTaller.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="clases\Gente\Talleres\frmTalleresForm.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="clases\Mis Clases\AccessDirecto.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="clases\Mis Clases\clsArrays.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="clases\Mis Clases\ExcelDirecto.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="clases\Mis Clases\miXML.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="clases\Otros\clsError.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="clases\Otros\clsForma.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="clases\Otros\clsForma2.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="clases\Otros\clsIncoterm.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="clases\Otros\clsIVA.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="clases\Otros\clsMaquina.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="clases\Otros\clsOperaciones.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="clases\Otros\frmTraspasarModeloAAlbaran.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="clases\PAF\clsImpresionPAFPO.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="clases\PAF\Compra\clsLineasCompra.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="clases\PAF\Compra\clsPAFCompra.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="clases\PAF\Compra\clsTraspasosCompra.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="clases\PAF\Compra\frmForniturasCompraPedido.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="clases\PAF\Compra\frmHilosComprasAlbaran.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="clases\PAF\Compra\frmHilosComprasPedido.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="clases\PAF\Compra\frmListaRecibido.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="clases\PAF\Compra\frmMuestrasOrdenes.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="clases\PAF\Compra\frmTejidoCompraPedido.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="clases\PAF\Compra\_frmCompraPAFPlantilla.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="clases\PAF\Copia %282%29 de clsImpresionPAFPO.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="clases\PAF\Copia de clsImpresionPAFPO.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="clases\PAF\Modelos\frmAlbaranesModelos.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="clases\PAF\Modelos\frmFacturasModelos.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="clases\PAF\Modelos\frmTemporadas.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="clases\PAF\Modelos\Ordenes\clsAnulaciones.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="clases\PAF\Modelos\Ordenes\clsDetallePAFCompraModelo.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="clases\PAF\Modelos\Ordenes\clsOrdenModelo.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="clases\PAF\Modelos\Ordenes\clsProcesosOrden.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="clases\PAF\Modelos\Ordenes\clsTraspasosOrdenPrenda.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="clases\PAF\Modelos\Ordenes\frmOrdenesFabricacion.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="clases\PAF\Modelos\Ordenes\frmTraspasoLineaOrdenes.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="clases\PAF\Venta\clsImpresionVenta.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="clases\PAF\Venta\clsImpresionVenta2.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="clases\PAF\Venta\clsLineasVenta.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="clases\PAF\Venta\clsPAFVenta.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="clases\PAF\Venta\clsTraspasosVenta.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="clases\PAF\Venta\clsVencimientos.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="clases\PAF\Venta\frmTejidoVentaAlbaran.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="clases\PAF\Venta\frmTraspasoLineaPAF.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="clases\PAF\Venta\frmVentaFactura.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="clases\PAF\Venta\frmVentaFacturaProforma.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="clases\PAF\Venta\frmVentaPedido.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="clases\PAF\Venta\Remesas\clsCuentasRemesa.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="clases\PAF\Venta\Remesas\clsLineasRemesa.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="clases\PAF\Venta\Remesas\clsRemesa.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="clases\PAF\Venta\Remesas\frmRemesas.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="clases\PAF\Venta\_frmVentaPAFPlantilla.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="clases\_BD\clsADO.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ds1.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ds1.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="formularios articulos\frmCartas.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="formularios articulos\frmIncoterms.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="formularios articulos\frmIVAForm.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="formularios articulos\frmMaquinasForm.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="formularios articulos\frmOperacionesForm.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="formularios articulos\frmPagoForm2.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="formularios articulos\frmTareas.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="formularios elegir\frmElegirAcabados.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="formularios elegir\frmElegirTemporadaAMostrar.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="formularios estadisticas\frmEst.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="formularios informes\frmControlStockHilos.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="formularios informes\frmControlStockTejidos.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="formularios INFO\frmAbout.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="formularios INFO\frmPedirDato.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="formularios INFO\frmSalir.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="formularios INFO\frmSplash.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="formularios listas\frmAcabadosLista.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="formularios listas\frmBancosLista.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="formularios listas\frmClientesLista.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="formularios listas\frmDisposicionLista.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="formularios listas\frmForniturasLista.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="formularios listas\frmHilosLista.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="formularios listas\frmIVALista.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="formularios listas\frmListadoColoresDisp.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="formularios listas\frmListadoEmpresas.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="formularios listas\frmListaOrdenesModelos.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="formularios listas\frmMaquinasLista.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="formularios listas\frmModelosLista.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="formularios listas\frmMuestrasLista.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="formularios listas\frmOperacionesLista.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="formularios listas\frmPagoLista.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="formularios listas\frmProveedoresLista.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="formularios listas\frmRepresentantesLista.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="formularios listas\frmTalleresLista.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="formularios listas\frmTejidosLista.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="formularios listas\frmTransportistasLista.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="formularios listas\Listados PAFP\frmElegirPAFP.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="formularios listas\Listados PAFP\frmListadoPAF.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="formularios listas\_frmPlantillaLista.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="formularios\Form1.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="formularios\Form2.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="formularios\frmActualizar.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="formularios\frmBackup.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="formularios\frmCargando.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="formularios\frmConfiguracion.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="formularios\frmDatosGenericos.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="formularios\frmErrores.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="formularios\frmNumeraciones.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="formularios\frmPrincipal.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="formularios\frmUtilidadesDebug.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="formularios\_frmBase.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Modulos\modAbrirCosas.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Modulos\modConstantes.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Modulos\modFuncionesAOrganizar.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Modulos\modFuncionesC1.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Modulos\modFuncionesLOG.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Modulos\modFuncionesUtiles.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Content Include="ds1.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <CustomToolNamespace>aura2k3</CustomToolNamespace>
+      <LastGenOutput>ds1.Designer.vb</LastGenOutput>
+    </Content>
+    <None Include="ds1.xsc">
+      <DependentUpon>ds1.xsd</DependentUpon>
+    </None>
+    <None Include="ds1.xsx">
+      <DependentUpon>ds1.xsd</DependentUpon>
+    </None>
+    <EmbeddedResource Include="clases\AppIncrustada\frm1.resx">
+      <DependentUpon>frm1.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="clases\Articulos\Fornituras\frmFornituras.ca.resx">
+      <DependentUpon>frmFornituras.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="clases\Articulos\Fornituras\frmFornituras.es-ES.resx">
+      <DependentUpon>frmFornituras.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="clases\Articulos\Fornituras\frmFornituras.es.resx">
+      <DependentUpon>frmFornituras.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="clases\Articulos\Fornituras\frmFornituras.resx">
+      <DependentUpon>frmFornituras.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="clases\Articulos\Hilos\frmHilos.ca.resx">
+      <DependentUpon>frmHilos.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="clases\Articulos\Hilos\frmHilos.es-ES.resx">
+      <DependentUpon>frmHilos.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="clases\Articulos\Hilos\frmHilos.resx">
+      <DependentUpon>frmHilos.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="clases\Articulos\Modelos\frmModelos.ca.resx">
+      <DependentUpon>frmModelos.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="clases\Articulos\Modelos\frmModelos.es-ES.resx">
+      <DependentUpon>frmModelos.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="clases\Articulos\Modelos\frmModelos.resx">
+      <DependentUpon>frmModelos.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="clases\Articulos\Muestras\frmComplementos.ca.resx">
+      <DependentUpon>frmComplementos.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="clases\Articulos\Muestras\frmComplementos.es-ES.resx">
+      <DependentUpon>frmComplementos.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="clases\Articulos\Muestras\frmComplementos.resx">
+      <DependentUpon>frmComplementos.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="clases\Articulos\Muestras\frmDesgloseMuestraColorMaquina.ca.resx">
+      <DependentUpon>frmDesgloseMuestraColorMaquina.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="clases\Articulos\Muestras\frmDesgloseMuestraColorMaquina.es-ES.resx">
+      <DependentUpon>frmDesgloseMuestraColorMaquina.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="clases\Articulos\Muestras\frmDesgloseMuestraColorMaquina.resx">
+      <DependentUpon>frmDesgloseMuestraColorMaquina.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="clases\Articulos\Tejidos\Disposiciones\frmAcabadorPorDefecto.resx">
+      <DependentUpon>frmAcabadorPorDefecto.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="clases\Articulos\Tejidos\Disposiciones\frmDisposicion.ca.resx">
+      <DependentUpon>frmDisposicion.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="clases\Articulos\Tejidos\Disposiciones\frmDisposicion.es-ES.resx">
+      <DependentUpon>frmDisposicion.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="clases\Articulos\Tejidos\Disposiciones\frmDisposicion.resx">
+      <DependentUpon>frmDisposicion.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="clases\Articulos\Tejidos\frmTejidos.ca.resx">
+      <DependentUpon>frmTejidos.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="clases\Articulos\Tejidos\frmTejidos.es-ES.resx">
+      <DependentUpon>frmTejidos.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="clases\Articulos\Tejidos\frmTejidos.resx">
+      <DependentUpon>frmTejidos.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="clases\Gente\Bancos\frmBancosForm.ca.resx">
+      <DependentUpon>frmBancosForm.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="clases\Gente\Bancos\frmBancosForm.es-ES.resx">
+      <DependentUpon>frmBancosForm.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="clases\Gente\Bancos\frmBancosForm.resx">
+      <DependentUpon>frmBancosForm.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="clases\Gente\Clientes\frmClientesForm.ca.resx">
+      <DependentUpon>frmClientesForm.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="clases\Gente\Clientes\frmClientesForm.es-ES.resx">
+      <DependentUpon>frmClientesForm.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="clases\Gente\Clientes\frmClientesForm.resx">
+      <DependentUpon>frmClientesForm.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="clases\Gente\frmEmpresas.ca.resx">
+      <DependentUpon>frmEmpresas.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="clases\Gente\frmEmpresas.es-ES.resx">
+      <DependentUpon>frmEmpresas.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="clases\Gente\frmEmpresas.resx">
+      <DependentUpon>frmEmpresas.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="clases\Gente\frmProveedoresForm.ca.resx">
+      <DependentUpon>frmProveedoresForm.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="clases\Gente\frmProveedoresForm.es-ES.resx">
+      <DependentUpon>frmProveedoresForm.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="clases\Gente\frmProveedoresForm.resx">
+      <DependentUpon>frmProveedoresForm.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="clases\Gente\frmRepresentantesForm.ca.resx">
+      <DependentUpon>frmRepresentantesForm.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="clases\Gente\frmRepresentantesForm.es-ES.resx">
+      <DependentUpon>frmRepresentantesForm.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="clases\Gente\frmRepresentantesForm.resx">
+      <DependentUpon>frmRepresentantesForm.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="clases\Gente\frmTransportistasForm.ca.resx">
+      <DependentUpon>frmTransportistasForm.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="clases\Gente\frmTransportistasForm.es-ES.resx">
+      <DependentUpon>frmTransportistasForm.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="clases\Gente\frmTransportistasForm.resx">
+      <DependentUpon>frmTransportistasForm.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="clases\Gente\Talleres\frmTalleresForm.resx">
+      <DependentUpon>frmTalleresForm.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="clases\Otros\frmTraspasarModeloAAlbaran.ca.resx">
+      <DependentUpon>frmTraspasarModeloAAlbaran.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="clases\Otros\frmTraspasarModeloAAlbaran.es-ES.resx">
+      <DependentUpon>frmTraspasarModeloAAlbaran.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="clases\Otros\frmTraspasarModeloAAlbaran.resx">
+      <DependentUpon>frmTraspasarModeloAAlbaran.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="clases\PAF\Compra\frmForniturasCompraPedido.resx">
+      <DependentUpon>frmForniturasCompraPedido.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="clases\PAF\Compra\frmHilosComprasAlbaran.resx">
+      <DependentUpon>frmHilosComprasAlbaran.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="clases\PAF\Compra\frmHilosComprasPedido.resx">
+      <DependentUpon>frmHilosComprasPedido.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="clases\PAF\Compra\frmListaRecibido.ca.resx">
+      <DependentUpon>frmListaRecibido.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="clases\PAF\Compra\frmListaRecibido.es-ES.resx">
+      <DependentUpon>frmListaRecibido.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="clases\PAF\Compra\frmListaRecibido.resx">
+      <DependentUpon>frmListaRecibido.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="clases\PAF\Compra\frmMuestrasOrdenes.resx">
+      <DependentUpon>frmMuestrasOrdenes.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="clases\PAF\Compra\frmTejidoCompraPedido.resx">
+      <DependentUpon>frmTejidoCompraPedido.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="clases\PAF\Compra\_frmCompraPAFPlantilla.ca.resx">
+      <DependentUpon>_frmCompraPAFPlantilla.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="clases\PAF\Compra\_frmCompraPAFPlantilla.es-ES.resx">
+      <DependentUpon>_frmCompraPAFPlantilla.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="clases\PAF\Compra\_frmCompraPAFPlantilla.resx">
+      <DependentUpon>_frmCompraPAFPlantilla.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="clases\PAF\Modelos\frmAlbaranesModelos.ca.resx">
+      <DependentUpon>frmAlbaranesModelos.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="clases\PAF\Modelos\frmAlbaranesModelos.es-ES.resx">
+      <DependentUpon>frmAlbaranesModelos.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="clases\PAF\Modelos\frmAlbaranesModelos.resx">
+      <DependentUpon>frmAlbaranesModelos.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="clases\PAF\Modelos\frmFacturasModelos.ca.resx">
+      <DependentUpon>frmFacturasModelos.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="clases\PAF\Modelos\frmFacturasModelos.es-ES.resx">
+      <DependentUpon>frmFacturasModelos.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="clases\PAF\Modelos\frmFacturasModelos.resx">
+      <DependentUpon>frmFacturasModelos.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="clases\PAF\Modelos\frmTemporadas.ca.resx">
+      <DependentUpon>frmTemporadas.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="clases\PAF\Modelos\frmTemporadas.es-ES.resx">
+      <DependentUpon>frmTemporadas.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="clases\PAF\Modelos\frmTemporadas.resx">
+      <DependentUpon>frmTemporadas.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="clases\PAF\Modelos\Ordenes\frmOrdenesFabricacion.ca.resx">
+      <DependentUpon>frmOrdenesFabricacion.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="clases\PAF\Modelos\Ordenes\frmOrdenesFabricacion.es-ES.resx">
+      <DependentUpon>frmOrdenesFabricacion.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="clases\PAF\Modelos\Ordenes\frmOrdenesFabricacion.resx">
+      <DependentUpon>frmOrdenesFabricacion.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="clases\PAF\Modelos\Ordenes\frmTraspasoLineaOrdenes.ca.resx">
+      <DependentUpon>frmTraspasoLineaOrdenes.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="clases\PAF\Modelos\Ordenes\frmTraspasoLineaOrdenes.es-ES.resx">
+      <DependentUpon>frmTraspasoLineaOrdenes.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="clases\PAF\Modelos\Ordenes\frmTraspasoLineaOrdenes.resx">
+      <DependentUpon>frmTraspasoLineaOrdenes.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="clases\PAF\Venta\frmTejidoVentaAlbaran.resx">
+      <DependentUpon>frmTejidoVentaAlbaran.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="clases\PAF\Venta\frmTraspasoLineaPAF.ca.resx">
+      <DependentUpon>frmTraspasoLineaPAF.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="clases\PAF\Venta\frmTraspasoLineaPAF.es-ES.resx">
+      <DependentUpon>frmTraspasoLineaPAF.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="clases\PAF\Venta\frmTraspasoLineaPAF.resx">
+      <DependentUpon>frmTraspasoLineaPAF.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="clases\PAF\Venta\frmVentaFactura.resx">
+      <DependentUpon>frmVentaFactura.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="clases\PAF\Venta\frmVentaFacturaProforma.resx">
+      <DependentUpon>frmVentaFacturaProforma.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="clases\PAF\Venta\frmVentaPedido.resx">
+      <DependentUpon>frmVentaPedido.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="clases\PAF\Venta\Remesas\frmRemesas.ca.resx">
+      <DependentUpon>frmRemesas.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="clases\PAF\Venta\Remesas\frmRemesas.es-ES.resx">
+      <DependentUpon>frmRemesas.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="clases\PAF\Venta\Remesas\frmRemesas.resx">
+      <DependentUpon>frmRemesas.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="clases\PAF\Venta\_frmVentaPAFPlantilla.resx">
+      <DependentUpon>_frmVentaPAFPlantilla.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios articulos\frmCartas.ca.resx">
+      <DependentUpon>frmCartas.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios articulos\frmCartas.es-ES.resx">
+      <DependentUpon>frmCartas.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios articulos\frmCartas.resx">
+      <DependentUpon>frmCartas.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios articulos\frmIncoterms.ca.resx">
+      <DependentUpon>frmIncoterms.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios articulos\frmIncoterms.es-ES.resx">
+      <DependentUpon>frmIncoterms.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios articulos\frmIncoterms.resx">
+      <DependentUpon>frmIncoterms.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios articulos\frmIVAForm.ca.resx">
+      <DependentUpon>frmIVAForm.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios articulos\frmIVAForm.es-ES.resx">
+      <DependentUpon>frmIVAForm.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios articulos\frmIVAForm.resx">
+      <DependentUpon>frmIVAForm.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios articulos\frmMaquinasForm.ca.resx">
+      <DependentUpon>frmMaquinasForm.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios articulos\frmMaquinasForm.es-ES.resx">
+      <DependentUpon>frmMaquinasForm.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios articulos\frmMaquinasForm.resx">
+      <DependentUpon>frmMaquinasForm.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios articulos\frmOperacionesForm.ca.resx">
+      <DependentUpon>frmOperacionesForm.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios articulos\frmOperacionesForm.es-ES.resx">
+      <DependentUpon>frmOperacionesForm.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios articulos\frmOperacionesForm.resx">
+      <DependentUpon>frmOperacionesForm.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios articulos\frmPagoForm2.ca.resx">
+      <DependentUpon>frmPagoForm2.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios articulos\frmPagoForm2.es-ES.resx">
+      <DependentUpon>frmPagoForm2.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios articulos\frmPagoForm2.resx">
+      <DependentUpon>frmPagoForm2.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios articulos\frmTareas.ca.resx">
+      <DependentUpon>frmTareas.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios articulos\frmTareas.es-ES.resx">
+      <DependentUpon>frmTareas.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios articulos\frmTareas.resx">
+      <DependentUpon>frmTareas.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios elegir\frmElegirAcabados.ca.resx">
+      <DependentUpon>frmElegirAcabados.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios elegir\frmElegirAcabados.es-ES.resx">
+      <DependentUpon>frmElegirAcabados.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios elegir\frmElegirAcabados.resx">
+      <DependentUpon>frmElegirAcabados.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios elegir\frmElegirTemporadaAMostrar.ca.resx">
+      <DependentUpon>frmElegirTemporadaAMostrar.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios elegir\frmElegirTemporadaAMostrar.es-ES.resx">
+      <DependentUpon>frmElegirTemporadaAMostrar.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios elegir\frmElegirTemporadaAMostrar.resx">
+      <DependentUpon>frmElegirTemporadaAMostrar.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios estadisticas\frmEst.ca.resx">
+      <DependentUpon>frmEst.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios estadisticas\frmEst.es-ES.resx">
+      <DependentUpon>frmEst.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios estadisticas\frmEst.resx">
+      <DependentUpon>frmEst.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios informes\frmControlStockHilos.ca.resx">
+      <DependentUpon>frmControlStockHilos.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios informes\frmControlStockHilos.es-ES.resx">
+      <DependentUpon>frmControlStockHilos.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios informes\frmControlStockHilos.resx">
+      <DependentUpon>frmControlStockHilos.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios informes\frmControlStockTejidos.ca.resx">
+      <DependentUpon>frmControlStockTejidos.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios informes\frmControlStockTejidos.es-ES.resx">
+      <DependentUpon>frmControlStockTejidos.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios informes\frmControlStockTejidos.resx">
+      <DependentUpon>frmControlStockTejidos.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios INFO\frmAbout.ca.resx">
+      <DependentUpon>frmAbout.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios INFO\frmAbout.es-ES.resx">
+      <DependentUpon>frmAbout.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios INFO\frmAbout.resx">
+      <DependentUpon>frmAbout.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios INFO\frmPedirDato.resx">
+      <DependentUpon>frmPedirDato.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios INFO\frmSalir.ca.resx">
+      <DependentUpon>frmSalir.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios INFO\frmSalir.es-ES.resx">
+      <DependentUpon>frmSalir.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios INFO\frmSalir.resx">
+      <DependentUpon>frmSalir.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios INFO\frmSplash.ca.resx">
+      <DependentUpon>frmSplash.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios INFO\frmSplash.es-ES.resx">
+      <DependentUpon>frmSplash.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios INFO\frmSplash.resx">
+      <DependentUpon>frmSplash.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios listas\frmAcabadosLista.resx">
+      <DependentUpon>frmAcabadosLista.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios listas\frmBancosLista.ca.resx">
+      <DependentUpon>frmBancosLista.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios listas\frmBancosLista.es-ES.resx">
+      <DependentUpon>frmBancosLista.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios listas\frmBancosLista.resx">
+      <DependentUpon>frmBancosLista.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios listas\frmClientesLista.ca.resx">
+      <DependentUpon>frmClientesLista.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios listas\frmClientesLista.es-ES.resx">
+      <DependentUpon>frmClientesLista.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios listas\frmClientesLista.resx">
+      <DependentUpon>frmClientesLista.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios listas\frmDisposicionLista.ca.resx">
+      <DependentUpon>frmDisposicionLista.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios listas\frmDisposicionLista.es-ES.resx">
+      <DependentUpon>frmDisposicionLista.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios listas\frmDisposicionLista.resx">
+      <DependentUpon>frmDisposicionLista.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios listas\frmForniturasLista.ca.resx">
+      <DependentUpon>frmForniturasLista.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios listas\frmForniturasLista.es-ES.resx">
+      <DependentUpon>frmForniturasLista.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios listas\frmForniturasLista.resx">
+      <DependentUpon>frmForniturasLista.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios listas\frmHilosLista.ca.resx">
+      <DependentUpon>frmHilosLista.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios listas\frmHilosLista.es-ES.resx">
+      <DependentUpon>frmHilosLista.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios listas\frmHilosLista.resx">
+      <DependentUpon>frmHilosLista.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios listas\frmIVALista.ca.resx">
+      <DependentUpon>frmIVALista.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios listas\frmIVALista.es-ES.resx">
+      <DependentUpon>frmIVALista.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios listas\frmIVALista.resx">
+      <DependentUpon>frmIVALista.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios listas\frmListadoColoresDisp.resx">
+      <DependentUpon>frmListadoColoresDisp.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios listas\frmListadoEmpresas.ca.resx">
+      <DependentUpon>frmListadoEmpresas.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios listas\frmListadoEmpresas.es-ES.resx">
+      <DependentUpon>frmListadoEmpresas.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios listas\frmListadoEmpresas.resx">
+      <DependentUpon>frmListadoEmpresas.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios listas\frmListaOrdenesModelos.ca.resx">
+      <DependentUpon>frmListaOrdenesModelos.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios listas\frmListaOrdenesModelos.es-ES.resx">
+      <DependentUpon>frmListaOrdenesModelos.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios listas\frmListaOrdenesModelos.resx">
+      <DependentUpon>frmListaOrdenesModelos.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios listas\frmMaquinasLista.ca.resx">
+      <DependentUpon>frmMaquinasLista.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios listas\frmMaquinasLista.es-ES.resx">
+      <DependentUpon>frmMaquinasLista.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios listas\frmMaquinasLista.resx">
+      <DependentUpon>frmMaquinasLista.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios listas\frmModelosLista.ca.resx">
+      <DependentUpon>frmModelosLista.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios listas\frmModelosLista.es-ES.resx">
+      <DependentUpon>frmModelosLista.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios listas\frmModelosLista.resx">
+      <DependentUpon>frmModelosLista.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios listas\frmMuestrasLista.ca.resx">
+      <DependentUpon>frmMuestrasLista.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios listas\frmMuestrasLista.es-ES.resx">
+      <DependentUpon>frmMuestrasLista.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios listas\frmMuestrasLista.resx">
+      <DependentUpon>frmMuestrasLista.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios listas\frmOperacionesLista.ca.resx">
+      <DependentUpon>frmOperacionesLista.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios listas\frmOperacionesLista.es-ES.resx">
+      <DependentUpon>frmOperacionesLista.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios listas\frmOperacionesLista.resx">
+      <DependentUpon>frmOperacionesLista.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios listas\frmPagoLista.ca.resx">
+      <DependentUpon>frmPagoLista.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios listas\frmPagoLista.es-ES.resx">
+      <DependentUpon>frmPagoLista.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios listas\frmPagoLista.resx">
+      <DependentUpon>frmPagoLista.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios listas\frmProveedoresLista.ca.resx">
+      <DependentUpon>frmProveedoresLista.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios listas\frmProveedoresLista.es-ES.resx">
+      <DependentUpon>frmProveedoresLista.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios listas\frmProveedoresLista.resx">
+      <DependentUpon>frmProveedoresLista.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios listas\frmRepresentantesLista.ca.resx">
+      <DependentUpon>frmRepresentantesLista.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios listas\frmRepresentantesLista.es-ES.resx">
+      <DependentUpon>frmRepresentantesLista.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios listas\frmRepresentantesLista.resx">
+      <DependentUpon>frmRepresentantesLista.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios listas\frmTalleresLista.ca.resx">
+      <DependentUpon>frmTalleresLista.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios listas\frmTalleresLista.es-ES.resx">
+      <DependentUpon>frmTalleresLista.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios listas\frmTalleresLista.resx">
+      <DependentUpon>frmTalleresLista.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios listas\frmTejidosLista.ca.resx">
+      <DependentUpon>frmTejidosLista.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios listas\frmTejidosLista.es-ES.resx">
+      <DependentUpon>frmTejidosLista.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios listas\frmTejidosLista.resx">
+      <DependentUpon>frmTejidosLista.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios listas\frmTransportistasLista.ca.resx">
+      <DependentUpon>frmTransportistasLista.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios listas\frmTransportistasLista.es-ES.resx">
+      <DependentUpon>frmTransportistasLista.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios listas\frmTransportistasLista.resx">
+      <DependentUpon>frmTransportistasLista.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios listas\Listados PAFP\frmElegirPAFP.resx">
+      <DependentUpon>frmElegirPAFP.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios listas\Listados PAFP\frmListadoPAF.ca.resx">
+      <DependentUpon>frmListadoPAF.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios listas\Listados PAFP\frmListadoPAF.es-ES.resx">
+      <DependentUpon>frmListadoPAF.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios listas\Listados PAFP\frmListadoPAF.resx">
+      <DependentUpon>frmListadoPAF.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios listas\_frmPlantillaLista.ca.resx">
+      <DependentUpon>_frmPlantillaLista.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios listas\_frmPlantillaLista.es-ES.resx">
+      <DependentUpon>_frmPlantillaLista.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios listas\_frmPlantillaLista.resx">
+      <DependentUpon>_frmPlantillaLista.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios\Form1.resx">
+      <DependentUpon>Form1.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios\Form2.resx">
+      <DependentUpon>Form2.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios\frmActualizar.ca.resx">
+      <DependentUpon>frmActualizar.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios\frmActualizar.es-ES.resx">
+      <DependentUpon>frmActualizar.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios\frmActualizar.resx">
+      <DependentUpon>frmActualizar.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios\frmBackup.ca.resx">
+      <DependentUpon>frmBackup.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios\frmBackup.es-ES.resx">
+      <DependentUpon>frmBackup.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios\frmBackup.resx">
+      <DependentUpon>frmBackup.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios\frmCargando.ca.resx">
+      <DependentUpon>frmCargando.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios\frmCargando.es-ES.resx">
+      <DependentUpon>frmCargando.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios\frmCargando.resx">
+      <DependentUpon>frmCargando.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios\frmConfiguracion.resx">
+      <DependentUpon>frmConfiguracion.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios\frmDatosGenericos.ca.resx">
+      <DependentUpon>frmDatosGenericos.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios\frmDatosGenericos.es-ES.resx">
+      <DependentUpon>frmDatosGenericos.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios\frmDatosGenericos.resx">
+      <DependentUpon>frmDatosGenericos.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios\frmErrores.ca.resx">
+      <DependentUpon>frmErrores.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios\frmErrores.es-ES.resx">
+      <DependentUpon>frmErrores.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios\frmErrores.resx">
+      <DependentUpon>frmErrores.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios\frmNumeraciones.resx">
+      <DependentUpon>frmNumeraciones.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios\frmPrincipal.ca.resx">
+      <DependentUpon>frmPrincipal.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios\frmPrincipal.es-ES.resx">
+      <DependentUpon>frmPrincipal.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios\frmPrincipal.resx">
+      <DependentUpon>frmPrincipal.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios\frmUtilidadesDebug.ca.resx">
+      <DependentUpon>frmUtilidadesDebug.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios\frmUtilidadesDebug.es-ES.resx">
+      <DependentUpon>frmUtilidadesDebug.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios\frmUtilidadesDebug.resx">
+      <DependentUpon>frmUtilidadesDebug.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios\_frmBase.ca.resx">
+      <DependentUpon>_frmBase.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios\_frmBase.es-ES.resx">
+      <DependentUpon>_frmBase.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="formularios\_frmBase.resx">
+      <DependentUpon>_frmBase.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="licenses.licx" />
+    <EmbeddedResource Include="Recurso\Resource.ca.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Recurso\Resource.en.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Recurso\Resource.ES-es.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Recurso\Resource.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{CF845C55-C321-4742-B673-E6212D061ED9}" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="My Project\" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.VisualBasic.targets" />
+  <PropertyGroup>
+    <PreBuildEvent>
+    </PreBuildEvent>
+    <PostBuildEvent>
+    </PostBuildEvent>
+  </PropertyGroup>
+</Project>

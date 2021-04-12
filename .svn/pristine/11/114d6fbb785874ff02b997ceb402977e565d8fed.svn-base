@@ -1,0 +1,443 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>C1.Win.CollectionView</name>
+    </assembly>
+    <members>
+        <member name="M:C1.Win.Core.ObjectEx.GetPropertyValue(System.Object,System.String)">
+            <summary>
+            Gets the value of a property or property path of the specified object.
+            </summary>
+            <remarks>
+            This extension DON'T evaluate ICustomTypeDescriptor interface. 
+            Use generic extension with the same name if you are evaluating the path 
+            of a DataTable or any object that implements ICustomTypeDescriptor.
+            </remarks>
+            <param name="target">The target object.</param>
+            <param name="path">The name of the property or the property path.</param>
+            <returns>The value contained in the property</returns>
+        </member>
+        <member name="M:C1.Win.Core.ObjectEx.SetPropertyValue``1(System.Object,System.String,``0)">
+            <summary>
+            Sets the value of a property or property path of the specified object.
+            </summary>
+            <typeparam name="T">Type of the property to set.</typeparam>
+            <param name="target">Object that contains the property.</param>
+            <param name="path">Name or path of the property that contains the value.</param>
+            <param name="value">New value for the property.</param>
+        </member>
+        <member name="T:C1.Win.Core.TypeEx">
+            <summary>
+            The <see cref="T:C1.Win.Core.TypeEx"/> class provides useful extension methods for the <see cref="T:System.Type"/> class.
+            </summary>
+        </member>
+        <member name="M:C1.Win.Core.TypeEx.New``1(System.Type)">
+            <summary>
+            Creates a new instance of this type using the default constructor.
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="type">The type.</param>
+            <returns>A new instance of type T.</returns>
+        </member>
+        <member name="M:C1.Win.Core.TypeEx.New(System.Type)">
+            <summary>
+            Creates a new instance of this type using the default constructor.
+            </summary>
+            <param name="type">The type.</param>
+            <returns>A new instance of type T.</returns>
+        </member>
+        <member name="M:C1.Win.Core.TypeEx.GetDefaultPublicCtor(System.Type)">
+            <summary>
+            Returns default public instance parameter-less constructor for the specified type.
+            </summary>
+            <param name="type">The type.</param>
+            <returns>The default constructor for the specified type if it exists; Null otherwise.</returns>
+        </member>
+        <member name="M:C1.Win.Core.TypeEx.New``1(System.Type,System.Action{``0})">
+            <summary>
+            Creates a new instance of this type using the default constructor.
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="type">The type.</param>
+            <param name="initializers">The initializers.</param>
+            <returns>A new instance of type T</returns>
+        </member>
+        <member name="M:C1.Win.Core.TypeEx.GetNonNullableType(System.Type)">
+            <summary>
+            Returns the underlying type of a nullable type:
+            e.g. if Type = double?, then returns double.
+            </summary>
+            <param name="type">Type.</param>
+            <returns>The underlying type.</returns>
+        </member>
+        <member name="M:C1.Win.Core.TypeEx.IsNullableType(System.Type)">
+            <summary>
+            Returns true if the type is a nullable type.
+            </summary>
+            <param name="type">Type.</param>
+            <returns>True if the type is nullable.</returns>
+        </member>
+        <member name="M:C1.Win.Core.TypeEx.IsNumeric(System.Type)">
+            <summary>
+            Returns true if the type is any of the numeric data types:
+            double, float, int, uint, long, ulong, short, ushort, sbyte, byte and decimal.
+            </summary>
+            <param name="type">Type.</param>
+            <returns>True if the type is numeric.</returns>
+        </member>
+        <member name="M:C1.Win.Core.TypeEx.IsNumericIntegral(System.Type)">
+            <summary>
+            Returns true if the type is any of the integral numeric data types:
+            int, uint, long, ulong, short, ushort, sbyte and byte.
+            </summary>
+            <param name="type">Type.</param>
+            <returns>True if the type is an integral numeric.</returns>
+        </member>
+        <member name="M:C1.Win.Core.TypeEx.IsNumericIntegralSigned(System.Type)">
+            <summary>
+            Returns true if the type is any of the integral signed numeric data types:
+            int, long, short and sbyte.
+            </summary>
+            <param name="type">Type.</param>
+            <returns>True if the type is a signed integral numeric.</returns>
+        </member>
+        <member name="M:C1.Win.Core.TypeEx.IsNumericIntegralUnsigned(System.Type)">
+            <summary>
+            Returns true if the type is any of the integral unsigned numeric data types:
+            uint, ulong, ushort and byte.
+            </summary>
+            <param name="type">Type.</param>
+            <returns>True if the type is an unsigned integral numeric.</returns>
+        </member>
+        <member name="M:C1.Win.Core.TypeEx.IsNumericNonIntegral(System.Type)">
+            <summary>
+            Returns true if the type is any of the numeric non-integral data types:
+            double, float and decimal.
+            </summary>
+            <param name="type">Type.</param>
+            <returns>True if the type is a non-integral numeric.</returns>
+        </member>
+        <member name="M:C1.Win.Core.TypeEx.GetEnumValues``1(System.Type)">
+            <summary>
+            Returns the values of an Enum type (Type.IsEnum == true).
+            </summary>
+            <typeparam name="T">Enum type.</typeparam>
+            <param name="enumType">Enum type.</param>
+            <returns>The list of values for that enum type.</returns>
+        </member>
+        <member name="T:C1.Win.CollectionView.C1BindingListCollectionView">
+            <summary>
+            This collection view takes an <see cref="T:System.ComponentModel.IBindingListView"/> and wraps its features to be consumed as an <see cref="T:C1.CollectionView.ICollectionView`1"/>.
+            </summary>
+        </member>
+        <member name="M:C1.Win.CollectionView.C1BindingListCollectionView.#ctor(System.ComponentModel.IBindingListView)">
+            <summary>
+            Initializes a new instance of the <see cref="T:C1.Win.CollectionView.C1BindingListCollectionView"/> class.
+            </summary>
+            <param name="bindingList">The binding list.</param>
+        </member>
+        <member name="P:C1.Win.CollectionView.C1BindingListCollectionView.BindingList">
+            <summary>
+            Gets the underlying <see cref="T:System.ComponentModel.IBindingList"/>.
+            </summary>
+        </member>
+        <member name="E:C1.Win.CollectionView.C1BindingListCollectionView.FilterChanged">
+            <summary>
+            Raised after a filter operation was performed.
+            </summary>
+        </member>
+        <member name="P:C1.Win.CollectionView.C1BindingListCollectionView.FilterExpression">
+            <summary>
+            Gets the filter expression applied to the data.
+            </summary>
+        </member>
+        <member name="M:C1.Win.CollectionView.C1BindingListCollectionView.CanFilter(C1.CollectionView.FilterExpression)">
+            <summary>
+            Returns whether the collection view is able to filter the specified <paramref name="filterExpression" />.
+            </summary>
+            <param name="filterExpression">The filter expression that determine how the data would be filtered.</param>
+            <returns></returns>
+        </member>
+        <member name="M:C1.Win.CollectionView.C1BindingListCollectionView.FilterAsync(C1.CollectionView.FilterExpression)">
+            <summary>
+            Filters the data using specified <paramref name="filterExpression" />.
+            </summary>
+            <param name="filterExpression">The filter expression applied to the data.</param>
+            <returns></returns>
+        </member>
+        <member name="T:C1.Win.CollectionView.C1CollectionViewBindingList">
+            <summary>
+            This class exposes an <see cref="T:C1.CollectionView.ICollectionView`1"/> as a <see cref="T:System.ComponentModel.IBindingList"/> so it can be used in WinForm controls that has support for this interface.
+            </summary>
+        </member>
+        <member name="M:C1.Win.CollectionView.C1CollectionViewBindingList.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:C1.Win.CollectionView.C1CollectionViewBindingList"/> class.
+            </summary>
+        </member>
+        <member name="M:C1.Win.CollectionView.C1CollectionViewBindingList.#ctor(System.Collections.IEnumerable)">
+            <summary>
+            Initializes a new instance of the <see cref="T:C1.Win.CollectionView.C1CollectionViewBindingList"/> class.
+            </summary>
+            <param name="source">The source.</param>
+        </member>
+        <member name="M:C1.Win.CollectionView.C1CollectionViewBindingList.#ctor(C1.CollectionView.ICollectionView{System.Object})">
+            <summary>
+            Initializes a new instance of the <see cref="T:C1.Win.CollectionView.C1CollectionViewBindingList"/> class.
+            </summary>
+            <param name="collectionView">The collection view.</param>
+        </member>
+        <member name="P:C1.Win.CollectionView.C1CollectionViewBindingList.CollectionView">
+            <summary>
+            Gets or sets the underlying collection view.
+            </summary>
+        </member>
+        <member name="P:C1.Win.CollectionView.C1CollectionViewBindingList.Item(System.Int32)">
+            <summary>
+            Gets the <see cref="T:System.Object"/> at the specified index.
+            </summary>
+            <param name="index">The index.</param>
+        </member>
+        <member name="P:C1.Win.CollectionView.C1CollectionViewBindingList.AllowNew">
+            <summary>
+            Gets whether you can add items to the list using <see cref="M:System.ComponentModel.IBindingList.AddNew" />.
+            </summary>
+        </member>
+        <member name="P:C1.Win.CollectionView.C1CollectionViewBindingList.AllowEdit">
+            <summary>
+            Gets whether you can update items in the list.
+            </summary>
+        </member>
+        <member name="P:C1.Win.CollectionView.C1CollectionViewBindingList.AllowRemove">
+            <summary>
+            Gets whether you can remove items from the list, using <see cref="M:System.Collections.IList.Remove(System.Object)" /> or <see cref="M:System.Collections.IList.RemoveAt(System.Int32)" />.
+            </summary>
+        </member>
+        <member name="P:C1.Win.CollectionView.C1CollectionViewBindingList.SupportsChangeNotification">
+            <summary>
+            Gets whether a <see cref="E:System.ComponentModel.IBindingList.ListChanged" /> event is raised when the list changes or an item in the list changes.
+            </summary>
+        </member>
+        <member name="P:C1.Win.CollectionView.C1CollectionViewBindingList.SupportsSearching">
+            <summary>
+            Gets whether the list supports searching using the <see cref="M:System.ComponentModel.IBindingList.Find(System.ComponentModel.PropertyDescriptor,System.Object)" /> method.
+            </summary>
+        </member>
+        <member name="P:C1.Win.CollectionView.C1CollectionViewBindingList.SupportsSorting">
+            <summary>
+            Gets whether the list supports sorting.
+            </summary>
+        </member>
+        <member name="P:C1.Win.CollectionView.C1CollectionViewBindingList.IsSorted">
+            <summary>
+            Gets whether the items in the list are sorted.
+            </summary>
+        </member>
+        <member name="P:C1.Win.CollectionView.C1CollectionViewBindingList.SortProperty">
+            <summary>
+            Gets the <see cref="T:System.ComponentModel.PropertyDescriptor" /> that is being used for sorting.
+            </summary>
+        </member>
+        <member name="P:C1.Win.CollectionView.C1CollectionViewBindingList.SortDirection">
+            <summary>
+            Gets the direction of the sort.
+            </summary>
+        </member>
+        <member name="P:C1.Win.CollectionView.C1CollectionViewBindingList.IsReadOnly">
+            <summary>
+            Gets a value indicating whether the <see cref="T:System.Collections.IList" /> is read-only.
+            </summary>
+            <exception cref="T:System.NotImplementedException"></exception>
+        </member>
+        <member name="P:C1.Win.CollectionView.C1CollectionViewBindingList.IsFixedSize">
+            <summary>
+            Gets a value indicating whether the <see cref="T:System.Collections.IList" /> has a fixed size.
+            </summary>
+            <exception cref="T:System.NotImplementedException"></exception>
+        </member>
+        <member name="P:C1.Win.CollectionView.C1CollectionViewBindingList.Count">
+            <summary>
+            Gets the number of elements contained in the <see cref="T:System.Collections.ICollection" />.
+            </summary>
+        </member>
+        <member name="P:C1.Win.CollectionView.C1CollectionViewBindingList.SyncRoot">
+            <summary>
+            Gets an object that can be used to synchronize access to the <see cref="T:System.Collections.ICollection" />.
+            </summary>
+            <exception cref="T:System.NotImplementedException"></exception>
+        </member>
+        <member name="P:C1.Win.CollectionView.C1CollectionViewBindingList.IsSynchronized">
+            <summary>
+            Gets a value indicating whether access to the <see cref="T:System.Collections.ICollection" /> is synchronized (thread safe).
+            </summary>
+            <exception cref="T:System.NotImplementedException"></exception>
+        </member>
+        <member name="E:C1.Win.CollectionView.C1CollectionViewBindingList.ListChanged">
+            <summary>
+            Occurs when the list changes or an item in the list changes.
+            </summary>
+        </member>
+        <member name="M:C1.Win.CollectionView.C1CollectionViewBindingList.Add(System.Object)">
+            <summary>
+            Adds an item to the <see cref="T:System.Collections.IList" />.
+            </summary>
+            <param name="value">The object to add to the <see cref="T:System.Collections.IList" />.</param>
+            <returns>
+            The position into which the new element was inserted, or -1 to indicate that the item was not inserted into the collection.
+            </returns>
+            <exception cref="T:System.NotImplementedException"></exception>
+        </member>
+        <member name="M:C1.Win.CollectionView.C1CollectionViewBindingList.AddIndex(System.ComponentModel.PropertyDescriptor)">
+            <summary>
+            Adds the <see cref="T:System.ComponentModel.PropertyDescriptor" /> to the indexes used for searching.
+            </summary>
+            <param name="property">The <see cref="T:System.ComponentModel.PropertyDescriptor" /> to add to the indexes used for searching.</param>
+            <exception cref="T:System.NotImplementedException"></exception>
+        </member>
+        <member name="M:C1.Win.CollectionView.C1CollectionViewBindingList.AddNew">
+            <summary>
+            Adds a new item to the list.
+            </summary>
+        </member>
+        <member name="M:C1.Win.CollectionView.C1CollectionViewBindingList.ApplySort(System.ComponentModel.PropertyDescriptor,System.ComponentModel.ListSortDirection)">
+            <summary>
+            Sorts the list based on a <see cref="T:System.ComponentModel.PropertyDescriptor" /> and a <see cref="T:System.ComponentModel.ListSortDirection" />.
+            </summary>
+            <param name="property">The <see cref="T:System.ComponentModel.PropertyDescriptor" /> to sort by.</param>
+            <param name="direction">One of the <see cref="T:System.ComponentModel.ListSortDirection" /> values.</param>
+        </member>
+        <member name="M:C1.Win.CollectionView.C1CollectionViewBindingList.Clear">
+            <summary>
+            Removes all items from the <see cref="T:System.Collections.IList" />.
+            </summary>
+            <exception cref="T:System.NotImplementedException"></exception>
+        </member>
+        <member name="M:C1.Win.CollectionView.C1CollectionViewBindingList.Contains(System.Object)">
+            <summary>
+            Determines whether the <see cref="T:System.Collections.IList" /> contains a specific value.
+            </summary>
+            <param name="value">The object to locate in the <see cref="T:System.Collections.IList" />.</param>
+            <returns>
+            true if the <see cref="T:System.Object" /> is found in the <see cref="T:System.Collections.IList" />; otherwise, false.
+            </returns>
+            <exception cref="T:System.NotImplementedException"></exception>
+        </member>
+        <member name="M:C1.Win.CollectionView.C1CollectionViewBindingList.CopyTo(System.Array,System.Int32)">
+            <summary>
+            Copies the elements of the <see cref="T:System.Collections.ICollection" /> to an <see cref="T:System.Array" />, starting at a particular <see cref="T:System.Array" /> index.
+            </summary>
+            <param name="array">The one-dimensional <see cref="T:System.Array" /> that is the destination of the elements copied from <see cref="T:System.Collections.ICollection" />. The <see cref="T:System.Array" /> must have zero-based indexing.</param>
+            <param name="index">The zero-based index in <paramref name="array" /> at which copying begins.</param>
+            <exception cref="T:System.NotImplementedException"></exception>
+        </member>
+        <member name="M:C1.Win.CollectionView.C1CollectionViewBindingList.Find(System.ComponentModel.PropertyDescriptor,System.Object)">
+            <summary>
+            Returns the index of the row that has the given <see cref="T:System.ComponentModel.PropertyDescriptor" />.
+            </summary>
+            <param name="property">The <see cref="T:System.ComponentModel.PropertyDescriptor" /> to search on.</param>
+            <param name="key">The value of the <paramref name="property" /> parameter to search for.</param>
+            <returns>
+            The index of the row that has the given <see cref="T:System.ComponentModel.PropertyDescriptor" />.
+            </returns>
+            <exception cref="T:System.NotImplementedException"></exception>
+        </member>
+        <member name="M:C1.Win.CollectionView.C1CollectionViewBindingList.GetEnumerator">
+            <summary>
+            Returns an enumerator that iterates through a collection.
+            </summary>
+            <returns>
+            An <see cref="T:System.Collections.IEnumerator" /> object that can be used to iterate through the collection.
+            </returns>
+            <exception cref="T:System.NotImplementedException"></exception>
+        </member>
+        <member name="M:C1.Win.CollectionView.C1CollectionViewBindingList.IndexOf(System.Object)">
+            <summary>
+            Determines the index of a specific item in the <see cref="T:System.Collections.IList" />.
+            </summary>
+            <param name="value">The object to locate in the <see cref="T:System.Collections.IList" />.</param>
+            <returns>
+            The index of <paramref name="value" /> if found in the list; otherwise, -1.
+            </returns>
+            <exception cref="T:System.NotImplementedException"></exception>
+        </member>
+        <member name="M:C1.Win.CollectionView.C1CollectionViewBindingList.Insert(System.Int32,System.Object)">
+            <summary>
+            Inserts an item to the <see cref="T:System.Collections.IList" /> at the specified index.
+            </summary>
+            <param name="index">The zero-based index at which <paramref name="value" /> should be inserted.</param>
+            <param name="value">The object to insert into the <see cref="T:System.Collections.IList" />.</param>
+            <exception cref="T:System.NotImplementedException"></exception>
+        </member>
+        <member name="M:C1.Win.CollectionView.C1CollectionViewBindingList.Remove(System.Object)">
+            <summary>
+            Removes the first occurrence of a specific object from the <see cref="T:System.Collections.IList" />.
+            </summary>
+            <param name="value">The object to remove from the <see cref="T:System.Collections.IList" />.</param>
+            <exception cref="T:System.NotImplementedException"></exception>
+        </member>
+        <member name="M:C1.Win.CollectionView.C1CollectionViewBindingList.RemoveAt(System.Int32)">
+            <summary>
+            Removes the <see cref="T:System.Collections.IList" /> item at the specified index.
+            </summary>
+            <param name="index">The zero-based index of the item to remove.</param>
+        </member>
+        <member name="M:C1.Win.CollectionView.C1CollectionViewBindingList.RemoveIndex(System.ComponentModel.PropertyDescriptor)">
+            <summary>
+            Removes the <see cref="T:System.ComponentModel.PropertyDescriptor" /> from the indexes used for searching.
+            </summary>
+            <param name="property">The <see cref="T:System.ComponentModel.PropertyDescriptor" /> to remove from the indexes used for searching.</param>
+            <exception cref="T:System.NotImplementedException"></exception>
+        </member>
+        <member name="M:C1.Win.CollectionView.C1CollectionViewBindingList.RemoveSort">
+            <summary>
+            Removes any sort applied using <see cref="M:System.ComponentModel.IBindingList.ApplySort(System.ComponentModel.PropertyDescriptor,System.ComponentModel.ListSortDirection)" />.
+            </summary>
+            <exception cref="T:System.NotImplementedException"></exception>
+        </member>
+        <member name="M:C1.Win.CollectionView.C1CollectionViewBindingList.CancelNew(System.Int32)">
+            <summary>
+            Discards a pending new item from the collection.
+            </summary>
+            <param name="itemIndex">The index of the item that was previously added to the collection.</param>
+        </member>
+        <member name="M:C1.Win.CollectionView.C1CollectionViewBindingList.EndNew(System.Int32)">
+            <summary>
+            Commits a pending new item to the collection.
+            </summary>
+            <param name="itemIndex">The index of the item that was previously added to the collection.</param>
+        </member>
+        <member name="M:C1.Win.CollectionView.C1CollectionViewBindingList.GetListName(System.ComponentModel.PropertyDescriptor[])">
+            <summary>
+            Returns the name of the list.
+            </summary>
+            <param name="listAccessors">An array of <see cref="T:System.ComponentModel.PropertyDescriptor" /> objects, for which the list name is returned. This can be null.</param>
+            <returns>
+            The name of the list.
+            </returns>
+        </member>
+        <member name="M:C1.Win.CollectionView.C1CollectionViewBindingList.GetItemProperties(System.ComponentModel.PropertyDescriptor[])">
+            <summary>
+            Returns the <see cref="T:System.ComponentModel.PropertyDescriptorCollection" /> that represents the properties on each item used to bind data.
+            </summary>
+            <param name="listAccessors">An array of <see cref="T:System.ComponentModel.PropertyDescriptor" /> objects to find in the collection as bindable. This can be null.</param>
+            <returns>
+            The <see cref="T:System.ComponentModel.PropertyDescriptorCollection" /> that represents the properties on each item used to bind data.
+            </returns>
+        </member>
+        <member name="T:C1.Win.CollectionView.ListViewEx">
+            <summary>
+            Extension methods for the class <see cref="T:System.Windows.Forms.ListView"/>.
+            </summary>
+        </member>
+        <member name="M:C1.Win.CollectionView.ListViewEx.SetItemsSource(System.Windows.Forms.ListView,System.Collections.IEnumerable,System.String,System.String)">
+            <summary>
+            Populates items and groups of <see cref="T:System.Windows.Forms.ListView"/> according to the source, supporting grouping, sorting and filtering.
+            </summary>
+            <param name="list">The list that will be populated.</param>
+            <param name="source">The data source.</param>
+            <param name="textMemberPath">The name of the property where the text of the item comes from.</param>
+            <param name="largeIconMemberPath">The name of the property containing the urls of the images that will be downloaded to the <see cref="P:System.Windows.Forms.ListView.LargeImageList"/>.</param>
+            <returns></returns>
+        </member>
+    </members>
+</doc>

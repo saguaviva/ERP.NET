@@ -1,0 +1,392 @@
+Imports CoreLab.MySql
+Imports C1.Win.C1TrueDBGrid
+
+
+Public Class frmTraspasoLineasOrdenes
+    Inherits aura2k3.frmBase
+
+
+#Region " Código generado por el Diseñador de Windows Forms "
+
+    Public Sub New()
+        MyBase.New()
+
+        'El Diseñador de Windows Forms requiere esta llamada.
+        InitializeComponent() : Dim tom As SMcMaster.TabOrderManager = New SMcMaster.TabOrderManager(Me) : tom.SetTabOrder(SMcMaster.TabOrderManager.TabScheme.AcrossFirst)
+
+        'Agregar cualquier inicialización después de la llamada a InitializeComponent()
+
+    End Sub
+
+    'Form reemplaza a Dispose para limpiar la lista de componentes.
+    Protected Overloads Overrides Sub Dispose(ByVal disposing As Boolean)
+        '! Seal for less overhead - Can declare NotInheritable Class
+        If disposing Then
+            If Not (components Is Nothing) Then
+                components.Dispose()
+            End If
+        End If
+        MyBase.Dispose(disposing)
+    End Sub
+
+    'Requerido por el Diseñador de Windows Forms
+    Private components As System.ComponentModel.IContainer
+
+    'NOTA: el Diseñador de Windows Forms requiere el siguiente procedimiento
+    'Puede modificarse utilizando el Diseñador de Windows Forms. 
+    'No lo modifique con el editor de código.
+    '! WithEvents adds overhead: btnAceptar
+
+    '! WithEvents adds overhead: btnCancelar
+    Friend WithEvents btnCancelar As NETXP.Controls.XPButton
+    '! Events not handled: dgTraspaso
+    '! WithEvents adds overhead: dgTraspaso
+    Friend WithEvents btnAceptar As NETXP.Controls.XPButton
+    Friend WithEvents dgTraspaso As C1.Win.C1TrueDBGrid.C1TrueDBGrid
+    <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
+        Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(frmTraspasoLineasOrdenes))
+        Me.btnAceptar = New NETXP.Controls.XPButton
+        Me.dgTraspaso = New C1.Win.C1TrueDBGrid.C1TrueDBGrid
+        CType(Me.dgTraspaso, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.SuspendLayout()
+        '
+        'cboSeleccionCentro
+        '
+        Me.cboSeleccionCentro.Location = New System.Drawing.Point(280, 7)
+        Me.cboSeleccionCentro.Name = "cboSeleccionCentro"
+        '
+        'btnVerLista
+        '
+        Me.btnVerLista.Location = New System.Drawing.Point(672, 209)
+        Me.btnVerLista.Name = "btnVerLista"
+        Me.btnVerLista.Size = New System.Drawing.Size(72, 19)
+        '
+        'btnActualizar
+        '
+        Me.btnActualizar.Location = New System.Drawing.Point(72, 209)
+        Me.btnActualizar.Name = "btnActualizar"
+        Me.btnActualizar.Size = New System.Drawing.Size(90, 19)
+        '
+        'btnNuevo
+        '
+        Me.btnNuevo.Location = New System.Drawing.Point(264, 209)
+        Me.btnNuevo.Name = "btnNuevo"
+        Me.btnNuevo.Size = New System.Drawing.Size(82, 37)
+        '
+        'btnBorrar
+        '
+        Me.btnBorrar.Location = New System.Drawing.Point(160, 224)
+        Me.btnBorrar.Name = "btnBorrar"
+        Me.btnBorrar.Size = New System.Drawing.Size(98, 18)
+        '
+        'btnTancar
+        '
+        Me.btnTancar.Location = New System.Drawing.Point(672, 224)
+        Me.btnTancar.Name = "btnTancar"
+        Me.btnTancar.Size = New System.Drawing.Size(72, 18)
+        '
+        'btnModificar
+        '
+        Me.btnModificar.Location = New System.Drawing.Point(160, 209)
+        Me.btnModificar.Name = "btnModificar"
+        Me.btnModificar.Size = New System.Drawing.Size(98, 19)
+        '
+        'btnUltimo
+        '
+        Me.btnUltimo.Location = New System.Drawing.Point(344, 209)
+        Me.btnUltimo.Name = "btnUltimo"
+        Me.btnUltimo.Size = New System.Drawing.Size(32, 19)
+        '
+        'btnPrimero
+        '
+        Me.btnPrimero.Location = New System.Drawing.Point(40, 209)
+        Me.btnPrimero.Name = "btnPrimero"
+        Me.btnPrimero.Size = New System.Drawing.Size(32, 19)
+        '
+        'btnAnterior
+        '
+        Me.btnAnterior.Location = New System.Drawing.Point(40, 224)
+        Me.btnAnterior.Name = "btnAnterior"
+        Me.btnAnterior.Size = New System.Drawing.Size(32, 18)
+        '
+        'btnSiguiente
+        '
+        Me.btnSiguiente.Location = New System.Drawing.Point(344, 224)
+        Me.btnSiguiente.Name = "btnSiguiente"
+        Me.btnSiguiente.Size = New System.Drawing.Size(32, 18)
+        '
+        'btnRecargar
+        '
+        Me.btnRecargar.Location = New System.Drawing.Point(72, 224)
+        Me.btnRecargar.Name = "btnRecargar"
+        Me.btnRecargar.Size = New System.Drawing.Size(90, 18)
+        '
+        'sbtipo
+        '
+        Me.sbtipo.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.sbtipo.Location = New System.Drawing.Point(5, 254)
+        Me.sbtipo.Name = "sbtipo"
+        Me.sbtipo.Size = New System.Drawing.Size(88, 15)
+        Me.sbtipo.Text = ""
+        '
+        'btnAceptar
+        '
+        Me.btnAceptar.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.btnAceptar.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft
+        Me.btnAceptar.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.btnAceptar.Location = New System.Drawing.Point(752, 236)
+        Me.btnAceptar.Name = "btnAceptar"
+        Me.btnAceptar.Size = New System.Drawing.Size(75, 22)
+        Me.btnAceptar.TabIndex = 2
+        Me.btnAceptar.Text = "Acceptar"
+        '
+        'dgTraspaso
+        '
+        Me.dgTraspaso.AllowAddNew = True
+        Me.dgTraspaso.AllowDelete = True
+        Me.dgTraspaso.BorderStyle = System.Windows.Forms.BorderStyle.None
+        Me.dgTraspaso.CaptionHeight = 18
+        Me.dgTraspaso.FlatStyle = C1.Win.C1TrueDBGrid.FlatModeEnum.System
+        Me.dgTraspaso.GroupByCaption = "Drag a column header here to group by that column"
+        Me.dgTraspaso.Images.Add(CType(resources.GetObject("resource"), System.Drawing.Image))
+        Me.dgTraspaso.Location = New System.Drawing.Point(4, 4)
+        Me.dgTraspaso.MarqueeStyle = C1.Win.C1TrueDBGrid.MarqueeEnum.DottedCellBorder
+        Me.dgTraspaso.Name = "dgTraspaso"
+        Me.dgTraspaso.PreviewInfo.Location = New System.Drawing.Point(0, 0)
+        Me.dgTraspaso.PreviewInfo.Size = New System.Drawing.Size(0, 0)
+        Me.dgTraspaso.PreviewInfo.ZoomFactor = 75
+        Me.dgTraspaso.RecordSelectorWidth = 17
+        Me.dgTraspaso.RowDivider.Color = System.Drawing.Color.DarkGray
+        Me.dgTraspaso.RowDivider.Style = C1.Win.C1TrueDBGrid.LineStyleEnum.Single
+        Me.dgTraspaso.RowHeight = 15
+        Me.dgTraspaso.RowSubDividerColor = System.Drawing.Color.DarkGray
+        Me.dgTraspaso.Size = New System.Drawing.Size(836, 228)
+        Me.dgTraspaso.TabAction = C1.Win.C1TrueDBGrid.TabActionEnum.GridNavigation
+        Me.dgTraspaso.TabIndex = 12
+        Me.dgTraspaso.Text = "C1TrueDBGrid1"
+        Me.dgTraspaso.PropBag = "<?xml version=""1.0""?><Blob><Styles type=""C1.Win.C1TrueDBGrid.Design.ContextWrappe" & _
+        "r""><Data>Group{AlignVert:Center;Border:None,,0, 0, 0, 0;BackColor:ControlDark;}E" & _
+        "ditor{}Style2{}Style5{}Style4{}Style7{}Style6{}EvenRow{BackColor:Aqua;}Selected{" & _
+        "ForeColor:HighlightText;BackColor:Highlight;}Style3{}Inactive{ForeColor:Inactive" & _
+        "CaptionText;BackColor:InactiveCaption;}FilterBar{}Footer{}Caption{AlignHorz:Cent" & _
+        "er;}Style9{}Normal{Font:Microsoft Sans Serif, 8.25pt;}HighlightRow{ForeColor:Hig" & _
+        "hlightText;BackColor:Highlight;}Style14{}OddRow{}RecordSelector{AlignImage:Cente" & _
+        "r;}Style15{}Heading{Wrap:True;BackColor:Control;Border:Raised,,1, 1, 1, 1;ForeCo" & _
+        "lor:ControlText;AlignVert:Center;}Style8{}Style10{AlignHorz:Near;}Style11{}Style" & _
+        "12{}Style13{}Style1{}</Data></Styles><Splits><C1.Win.C1TrueDBGrid.MergeView HBar" & _
+        "Height=""16"" Name="""" CaptionHeight=""17"" ColumnCaptionHeight=""17"" ColumnFooterHeig" & _
+        "ht=""17"" MarqueeStyle=""DottedCellBorder"" RecordSelectorWidth=""17"" DefRecSelWidth=" & _
+        """17"" VerticalScrollGroup=""1"" HorizontalScrollGroup=""1""><CaptionStyle parent=""Sty" & _
+        "le2"" me=""Style10"" /><EditorStyle parent=""Editor"" me=""Style5"" /><EvenRowStyle par" & _
+        "ent=""EvenRow"" me=""Style8"" /><FilterBarStyle parent=""FilterBar"" me=""Style13"" /><F" & _
+        "ooterStyle parent=""Footer"" me=""Style3"" /><GroupStyle parent=""Group"" me=""Style12""" & _
+        " /><HeadingStyle parent=""Heading"" me=""Style2"" /><HighLightRowStyle parent=""Highl" & _
+        "ightRow"" me=""Style7"" /><InactiveStyle parent=""Inactive"" me=""Style4"" /><OddRowSty" & _
+        "le parent=""OddRow"" me=""Style9"" /><RecordSelectorStyle parent=""RecordSelector"" me" & _
+        "=""Style11"" /><SelectedStyle parent=""Selected"" me=""Style6"" /><Style parent=""Norma" & _
+        "l"" me=""Style1"" /><ClientRect>0, 0, 836, 228</ClientRect><BorderSide>0</BorderSid" & _
+        "e></C1.Win.C1TrueDBGrid.MergeView></Splits><NamedStyles><Style parent="""" me=""Nor" & _
+        "mal"" /><Style parent=""Normal"" me=""Heading"" /><Style parent=""Heading"" me=""Footer""" & _
+        " /><Style parent=""Heading"" me=""Caption"" /><Style parent=""Heading"" me=""Inactive"" " & _
+        "/><Style parent=""Normal"" me=""Selected"" /><Style parent=""Normal"" me=""Editor"" /><S" & _
+        "tyle parent=""Normal"" me=""HighlightRow"" /><Style parent=""Normal"" me=""EvenRow"" /><" & _
+        "Style parent=""Normal"" me=""OddRow"" /><Style parent=""Heading"" me=""RecordSelector"" " & _
+        "/><Style parent=""Normal"" me=""FilterBar"" /><Style parent=""Caption"" me=""Group"" /><" & _
+        "/NamedStyles><vertSplits>1</vertSplits><horzSplits>1</horzSplits><Layout>None</L" & _
+        "ayout><DefaultRecSelWidth>17</DefaultRecSelWidth><ClientArea>0, 0, 836, 228</Cli" & _
+        "entArea><PrintPageHeaderStyle parent="""" me=""Style14"" /><PrintPageFooterStyle par" & _
+        "ent="""" me=""Style15"" /></Blob>"
+        '
+        'frmTraspasoLineasOrdenes
+        '
+        Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
+        Me.ClientSize = New System.Drawing.Size(844, 266)
+        Me.Controls.Add(Me.dgTraspaso)
+        Me.Controls.Add(Me.btnAceptar)
+        Me.Cursor = System.Windows.Forms.Cursors.Default
+        Me.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!)
+        Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow
+        Me.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.Name = "frmTraspasoLineasOrdenes"
+        Me.StartPosition = System.Windows.Forms.FormStartPosition.Manual
+        Me.Text = "Traspàs linies"
+        Me.Controls.SetChildIndex(Me.cboSeleccionCentro, 0)
+        Me.Controls.SetChildIndex(Me.sbtipo, 0)
+        Me.Controls.SetChildIndex(Me.btnActualizar, 0)
+        Me.Controls.SetChildIndex(Me.btnNuevo, 0)
+        Me.Controls.SetChildIndex(Me.btnBorrar, 0)
+        Me.Controls.SetChildIndex(Me.btnTancar, 0)
+        Me.Controls.SetChildIndex(Me.btnUltimo, 0)
+        Me.Controls.SetChildIndex(Me.btnPrimero, 0)
+        Me.Controls.SetChildIndex(Me.btnAnterior, 0)
+        Me.Controls.SetChildIndex(Me.btnSiguiente, 0)
+        Me.Controls.SetChildIndex(Me.btnRecargar, 0)
+        Me.Controls.SetChildIndex(Me.btnVerLista, 0)
+        Me.Controls.SetChildIndex(Me.btnModificar, 0)
+        Me.Controls.SetChildIndex(Me.btnAceptar, 0)
+        Me.Controls.SetChildIndex(Me.dgTraspaso, 0)
+        CType(Me.dgTraspaso, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.ResumeLayout(False)
+
+    End Sub
+
+#End Region
+
+#Region "VARIABLES"
+
+    Public PAF As clsOrdenModelo
+    Public traspasoActual As clsTraspasosOrdenPrenda
+    Public localizacion As Point
+
+#End Region
+
+#Region "INICIALIZACION"
+
+    Private Sub IniciarForm(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
+        Cursor = Cursors.WaitCursor
+        Try
+            traspasoActual = New clsTraspasosOrdenPrenda(ds.Tables("dcfactutrasp"), PAF.centro, Me.BindingContext, PAF)
+            dgTraspaso.SetDataBinding(traspasoActual.dvForm, "")
+            InicializarDgTraspaso()
+            PonerHandlersErroresParaGrids()
+            localizacion.X = localizacion.X
+            Me.Location = localizacion
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+        Cursor = Cursors.Default
+    End Sub
+    Private Sub InicializarDgTraspaso()
+        Dim i As Integer
+        Try
+            OcultarColumnasDG(dgTraspaso)
+            i = 0
+            PPCol2("FRA", dgTraspaso, rm.GetString("ALBARAN"), "", _
+                        True, 35, False, C1.Win.C1TrueDBGrid.PresentationEnum.Normal, False, 100, i, False)
+            i = i + 1
+            PPCol2("TALLA01", dgTraspaso, PAF.TALLA01, "", True, 50, False, PresentationEnum.Normal, False, 50, i, False)
+            i = i + 1
+            PPCol2("TALLA02", dgTraspaso, PAF.TALLA02, "", True, 50, False, PresentationEnum.Normal, False, 50, i, False)
+            i = i + 1
+            PPCol2("TALLA03", dgTraspaso, PAF.TALLA03, "", True, 50, False, PresentationEnum.Normal, False, 50, i, False)
+                i = i + 1
+            PPCol2("TALLA04", dgTraspaso, PAF.TALLA04, "", True, 50, False, PresentationEnum.Normal, False, 50, i, False)
+                i = i + 1
+            PPCol2("TALLA05", dgTraspaso, PAF.TALLA05, "", True, 50, False, PresentationEnum.Normal, False, 50, i, False)
+                i = i + 1
+            PPCol2("TALLA06", dgTraspaso, PAF.TALLA06, "", True, 50, False, PresentationEnum.Normal, False, 50, i, False)
+                i = i + 1
+            PPCol2("TALLA07", dgTraspaso, PAF.TALLA07, "", True, 50, False, PresentationEnum.Normal, False, 50, i, False)
+                i = i + 1
+            PPCol2("TALLA08", dgTraspaso, PAF.TALLA08, "", True, 50, False, PresentationEnum.Normal, False, 50, i, False)
+                i = i + 1
+            PPCol2("TALLA09", dgTraspaso, PAF.TALLA09, "", True, 50, False, PresentationEnum.Normal, False, 50, i, False)
+                i = i + 1
+            PPCol2("TALLA10", dgTraspaso, PAF.TALLA10, "", True, 50, False, PresentationEnum.Normal, False, 50, i, False)
+            i = i + 1
+            PPCol2("DATA", dgTraspaso, rm.GetString("FECHA"), "Short Date", True, 35, False, _
+                    C1.Win.C1TrueDBGrid.PresentationEnum.Normal, False, 100, i, False)
+
+            'dgTraspaso.Splits(0).DisplayColumns("DATA").ButtonText = True
+
+            i = i + 1
+            PPCol2("TRASPASADA", dgTraspaso, rm.GetString("TRASPASADA"), "", True, 35, _
+                    False, C1.Win.C1TrueDBGrid.PresentationEnum.CheckBox, False, 100, i, False)
+
+            'En principio esto no sirve para nada pq no se trasapasa de albaranes a facturas de forma
+            'parcial
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+
+#End Region
+
+#Region "ORGANIZAR"
+
+    Private Sub btnAceptar_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnAceptar.Click
+        Try
+            traspasoActual.ActualizarOrigen(False, True)
+            Me.Close()
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    '*********************************************************************************
+    'Se encarga de comprobar que el documento de destiono exista sea del mismo tipo
+    'y que no este traspasado a otro doc ya, devuelve 1 en caso de que no exista el documento
+    'hay que crearlo, 2 si existe y no esta traspasado y 0 si existe y no esta traspasado
+    '**********************************************************************************
+    Private Sub btnCancelar_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnCancelar.Click
+        Try
+            Close()
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub dgTraspaso_AfterColUpdate(ByVal sender As System.Object, ByVal e As C1.Win.C1TrueDBGrid.ColEventArgs) Handles dgTraspaso.AfterColUpdate
+        Try
+            If Not cargando Then
+                cargando = True
+                Select Case e.Column.DataColumn.DataField
+                    Case "TRASPASADA"
+                        traspasoActual.HacerCalculos()
+                End Select
+                cargando = False
+            End If
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+
+#End Region
+
+#Region "OVERRIDES"
+
+    Protected Friend Overrides Sub btnPrimero_Click(ByVal sender As Object, ByVal e As System.EventArgs)
+
+    End Sub
+    Friend Overrides Sub btnSiguiente_Click(ByVal sender As Object, ByVal e As System.EventArgs)
+
+    End Sub
+    Friend Overrides Sub btnUltimo_Click(ByVal sender As Object, ByVal e As System.EventArgs)
+
+    End Sub
+    Friend Overrides Sub btnActualizar_Click(ByVal sender As Object, ByVal e As System.EventArgs)
+
+    End Sub
+    Friend Overrides Sub btnAnterior_Click(ByVal sender As Object, ByVal e As System.EventArgs)
+
+    End Sub
+    Friend Overrides Sub btnBorrar_Click(ByVal sender As Object, ByVal e As System.EventArgs)
+
+    End Sub
+    Friend Overrides Sub btnModificar_Click(ByVal sender As Object, ByVal e As System.EventArgs)
+
+    End Sub
+    Friend Overrides Sub btnNuevo_Click(ByVal sender As Object, ByVal e As System.EventArgs)
+
+    End Sub
+
+#End Region
+
+    Private Sub dgTraspaso_BeforeDelete(ByVal sender As Object, ByVal e As C1.Win.C1TrueDBGrid.CancelEventArgs) Handles dgTraspaso.BeforeDelete
+        Try
+            If MessageBox.Show(rm.GetString("BORRARLINEA"), rm.GetString("ConfirmacionEliminacion"), MessageBoxButtons.YesNo) = DialogResult.Yes Then
+                e.Cancel = False
+            Else
+                e.Cancel = True
+            End If
+
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Sub
+
+End Class
+

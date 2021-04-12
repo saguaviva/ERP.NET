@@ -1,0 +1,782 @@
+Imports MySql.Data.MySqlClient : Imports clsFuncionesLOG : Imports clsFuncionesC1 : Imports clsFuncionesUtiles : Imports clsConstantes : Imports clsOtrasFunciones
+
+Public Class frmCartas
+    Inherits aura2k3.frmBase
+
+
+#Region " Código generado por el Diseñador de Windows Forms "
+
+    Public Sub New()
+        MyBase.New()
+
+        'El Diseñador de Windows Forms requiere esta llamada.
+        InitializeComponent() : Dim tom As SMcMaster.TabOrderManager = New SMcMaster.TabOrderManager(Me) : tom.SetTabOrder(SMcMaster.TabOrderManager.TabScheme.AcrossFirst)
+
+        'Agregar cualquier inicialización después de la llamada a InitializeComponent()
+
+    End Sub
+
+    'Form reemplaza a Dispose para limpiar la lista de componentes.
+    Protected Overloads Overrides Sub Dispose(ByVal disposing As Boolean)
+        If disposing Then
+            If Not (components Is Nothing) Then
+                components.Dispose()
+            End If
+        End If
+        MyBase.Dispose(disposing)
+        frmChildForm = Nothing
+    End Sub
+
+    'Requerido por el Diseñador de Windows Forms
+    Private components As System.ComponentModel.IContainer
+
+    'NOTA: el Diseñador de Windows Forms requiere el siguiente procedimiento
+    'Puede modificarse utilizando el Diseñador de Windows Forms. 
+    'No lo modifique con el editor de código.
+    Friend WithEvents btnImprimir As C1.Win.C1Input.C1Button 'Leadedit.UI.Windows.FlatButton
+    Friend WithEvents rdoTodosClientes As System.Windows.Forms.RadioButton
+    Friend WithEvents rdoListado As System.Windows.Forms.RadioButton
+    Friend WithEvents gpSeleccionClientes As System.Windows.Forms.GroupBox
+    Friend WithEvents clbListaClientes As System.Windows.Forms.CheckedListBox
+    'Leadedit.UI.Windows.FlatButton
+    Friend WithEvents rtbTexto As System.Windows.Forms.RichTextBox
+    Friend WithEvents cboSeleccion As TD.SandBar.FlatComboBox
+    Friend WithEvents cboIntervalo1 As TD.SandBar.FlatComboBox
+    Friend WithEvents cboIntervalo2 As TD.SandBar.FlatComboBox
+    Friend WithEvents FlatButton1 As C1.Win.C1Input.C1Button 'Leadedit.UI.Windows.FlatButton
+    Friend WithEvents btnDesmarcarTodos As C1.Win.C1Input.C1Button 'Leadedit.UI.Windows.FlatButton
+    Friend WithEvents btnIvertir As C1.Win.C1Input.C1Button
+    <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
+        Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(frmCartas))
+        Me.btnImprimir = New C1.Win.C1Input.C1Button
+        Me.rdoTodosClientes = New System.Windows.Forms.RadioButton
+        Me.rdoListado = New System.Windows.Forms.RadioButton
+        Me.gpSeleccionClientes = New System.Windows.Forms.GroupBox
+        Me.btnDesmarcarTodos = New C1.Win.C1Input.C1Button
+        Me.FlatButton1 = New C1.Win.C1Input.C1Button
+        Me.cboIntervalo2 = New TD.SandBar.FlatComboBox
+        Me.cboIntervalo1 = New TD.SandBar.FlatComboBox
+        Me.cboSeleccion = New TD.SandBar.FlatComboBox
+        Me.clbListaClientes = New System.Windows.Forms.CheckedListBox
+        Me.rtbTexto = New System.Windows.Forms.RichTextBox
+        Me.btnIvertir = New C1.Win.C1Input.C1Button
+        Me.gpSeleccionClientes.SuspendLayout()
+        Me.SuspendLayout()
+        '
+        'cboSeleccionCentro
+        '
+        Me.cboSeleccionCentro.Name = "cboSeleccionCentro"
+        '
+        'btnVerLista
+        '
+        Me.btnVerLista.Name = "btnVerLista"
+        '
+        'btnActualizar
+        '
+        Me.btnActualizar.Name = "btnActualizar"
+        '
+        'btnNuevo
+        '
+        Me.btnNuevo.Name = "btnNuevo"
+        '
+        'btnBorrar
+        '
+        Me.btnBorrar.Name = "btnBorrar"
+        '
+        'btnTancar
+        '
+        Me.btnTancar.Name = "btnTancar"
+        Me.btnTancar.Visible = CType(resources.GetObject("btnTancar.Visible"), Boolean)
+        '
+        'btnModificar
+        '
+        Me.btnModificar.Name = "btnModificar"
+        '
+        'btnUltimo
+        '
+        Me.btnUltimo.Name = "btnUltimo"
+        '
+        'btnPrimero
+        '
+        Me.btnPrimero.Name = "btnPrimero"
+        '
+        'btnAnterior
+        '
+        Me.btnAnterior.Name = "btnAnterior"
+        '
+        'sbtipo
+        '
+        Me.sbtipo.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.sbtipo.Location = CType(resources.GetObject("sbtipo.Location"), System.Drawing.Point)
+        Me.sbtipo.Name = "sbtipo"
+        Me.sbtipo.Text = resources.GetString("sbtipo.Text")
+        '
+        'btnSiguiente
+        '
+        Me.btnSiguiente.Name = "btnSiguiente"
+        '
+        'btnRecargar
+        '
+        Me.btnRecargar.Name = "btnRecargar"
+        '
+        'btnImprimir
+        '
+        Me.btnImprimir.AccessibleDescription = resources.GetString("btnImprimir.AccessibleDescription")
+        Me.btnImprimir.AccessibleName = resources.GetString("btnImprimir.AccessibleName")
+        Me.btnImprimir.Anchor = CType(resources.GetObject("btnImprimir.Anchor"), System.Windows.Forms.AnchorStyles)
+        Me.btnImprimir.BackgroundImage = CType(resources.GetObject("btnImprimir.BackgroundImage"), System.Drawing.Image)
+        Me.btnImprimir.Dock = CType(resources.GetObject("btnImprimir.Dock"), System.Windows.Forms.DockStyle)
+        Me.btnImprimir.Enabled = CType(resources.GetObject("btnImprimir.Enabled"), Boolean)
+        Me.btnImprimir.FlatStyle = CType(resources.GetObject("btnImprimir.FlatStyle"), System.Windows.Forms.FlatStyle)
+        Me.btnImprimir.Font = CType(resources.GetObject("btnImprimir.Font"), System.Drawing.Font)
+        Me.btnImprimir.Image = CType(resources.GetObject("btnImprimir.Image"), System.Drawing.Image)
+        Me.btnImprimir.ImageAlign = CType(resources.GetObject("btnImprimir.ImageAlign"), System.Drawing.ContentAlignment)
+        Me.btnImprimir.ImageIndex = CType(resources.GetObject("btnImprimir.ImageIndex"), Integer)
+        Me.btnImprimir.ImeMode = CType(resources.GetObject("btnImprimir.ImeMode"), System.Windows.Forms.ImeMode)
+        Me.btnImprimir.Location = CType(resources.GetObject("btnImprimir.Location"), System.Drawing.Point)
+        Me.btnImprimir.Name = "btnImprimir"
+        Me.btnImprimir.RightToLeft = CType(resources.GetObject("btnImprimir.RightToLeft"), System.Windows.Forms.RightToLeft)
+        Me.btnImprimir.Size = CType(resources.GetObject("btnImprimir.Size"), System.Drawing.Size)
+        Me.btnImprimir.TabIndex = CType(resources.GetObject("btnImprimir.TabIndex"), Integer)
+        Me.btnImprimir.TabStop = False
+        Me.btnImprimir.Text = resources.GetString("btnImprimir.Text")
+        Me.btnImprimir.TextAlign = CType(resources.GetObject("btnImprimir.TextAlign"), System.Drawing.ContentAlignment)
+        Me.btnImprimir.Visible = CType(resources.GetObject("btnImprimir.Visible"), Boolean)
+        '
+        'rdoTodosClientes
+        '
+        Me.rdoTodosClientes.AccessibleDescription = resources.GetString("rdoTodosClientes.AccessibleDescription")
+        Me.rdoTodosClientes.AccessibleName = resources.GetString("rdoTodosClientes.AccessibleName")
+        Me.rdoTodosClientes.Anchor = CType(resources.GetObject("rdoTodosClientes.Anchor"), System.Windows.Forms.AnchorStyles)
+        Me.rdoTodosClientes.Appearance = CType(resources.GetObject("rdoTodosClientes.Appearance"), System.Windows.Forms.Appearance)
+        Me.rdoTodosClientes.BackgroundImage = CType(resources.GetObject("rdoTodosClientes.BackgroundImage"), System.Drawing.Image)
+        Me.rdoTodosClientes.CheckAlign = CType(resources.GetObject("rdoTodosClientes.CheckAlign"), System.Drawing.ContentAlignment)
+        Me.rdoTodosClientes.Checked = True
+        Me.rdoTodosClientes.Dock = CType(resources.GetObject("rdoTodosClientes.Dock"), System.Windows.Forms.DockStyle)
+        Me.rdoTodosClientes.Enabled = CType(resources.GetObject("rdoTodosClientes.Enabled"), Boolean)
+        Me.rdoTodosClientes.FlatStyle = CType(resources.GetObject("rdoTodosClientes.FlatStyle"), System.Windows.Forms.FlatStyle)
+        Me.rdoTodosClientes.Font = CType(resources.GetObject("rdoTodosClientes.Font"), System.Drawing.Font)
+        Me.rdoTodosClientes.Image = CType(resources.GetObject("rdoTodosClientes.Image"), System.Drawing.Image)
+        Me.rdoTodosClientes.ImageAlign = CType(resources.GetObject("rdoTodosClientes.ImageAlign"), System.Drawing.ContentAlignment)
+        Me.rdoTodosClientes.ImageIndex = CType(resources.GetObject("rdoTodosClientes.ImageIndex"), Integer)
+        Me.rdoTodosClientes.ImeMode = CType(resources.GetObject("rdoTodosClientes.ImeMode"), System.Windows.Forms.ImeMode)
+        Me.rdoTodosClientes.Location = CType(resources.GetObject("rdoTodosClientes.Location"), System.Drawing.Point)
+        Me.rdoTodosClientes.Name = "rdoTodosClientes"
+        Me.rdoTodosClientes.RightToLeft = CType(resources.GetObject("rdoTodosClientes.RightToLeft"), System.Windows.Forms.RightToLeft)
+        Me.rdoTodosClientes.Size = CType(resources.GetObject("rdoTodosClientes.Size"), System.Drawing.Size)
+        Me.rdoTodosClientes.TabIndex = CType(resources.GetObject("rdoTodosClientes.TabIndex"), Integer)
+        Me.rdoTodosClientes.TabStop = True
+        Me.rdoTodosClientes.Text = resources.GetString("rdoTodosClientes.Text")
+        Me.rdoTodosClientes.TextAlign = CType(resources.GetObject("rdoTodosClientes.TextAlign"), System.Drawing.ContentAlignment)
+        Me.rdoTodosClientes.Visible = CType(resources.GetObject("rdoTodosClientes.Visible"), Boolean)
+        '
+        'rdoListado
+        '
+        Me.rdoListado.AccessibleDescription = resources.GetString("rdoListado.AccessibleDescription")
+        Me.rdoListado.AccessibleName = resources.GetString("rdoListado.AccessibleName")
+        Me.rdoListado.Anchor = CType(resources.GetObject("rdoListado.Anchor"), System.Windows.Forms.AnchorStyles)
+        Me.rdoListado.Appearance = CType(resources.GetObject("rdoListado.Appearance"), System.Windows.Forms.Appearance)
+        Me.rdoListado.BackgroundImage = CType(resources.GetObject("rdoListado.BackgroundImage"), System.Drawing.Image)
+        Me.rdoListado.CheckAlign = CType(resources.GetObject("rdoListado.CheckAlign"), System.Drawing.ContentAlignment)
+        Me.rdoListado.Dock = CType(resources.GetObject("rdoListado.Dock"), System.Windows.Forms.DockStyle)
+        Me.rdoListado.Enabled = CType(resources.GetObject("rdoListado.Enabled"), Boolean)
+        Me.rdoListado.FlatStyle = CType(resources.GetObject("rdoListado.FlatStyle"), System.Windows.Forms.FlatStyle)
+        Me.rdoListado.Font = CType(resources.GetObject("rdoListado.Font"), System.Drawing.Font)
+        Me.rdoListado.Image = CType(resources.GetObject("rdoListado.Image"), System.Drawing.Image)
+        Me.rdoListado.ImageAlign = CType(resources.GetObject("rdoListado.ImageAlign"), System.Drawing.ContentAlignment)
+        Me.rdoListado.ImageIndex = CType(resources.GetObject("rdoListado.ImageIndex"), Integer)
+        Me.rdoListado.ImeMode = CType(resources.GetObject("rdoListado.ImeMode"), System.Windows.Forms.ImeMode)
+        Me.rdoListado.Location = CType(resources.GetObject("rdoListado.Location"), System.Drawing.Point)
+        Me.rdoListado.Name = "rdoListado"
+        Me.rdoListado.RightToLeft = CType(resources.GetObject("rdoListado.RightToLeft"), System.Windows.Forms.RightToLeft)
+        Me.rdoListado.Size = CType(resources.GetObject("rdoListado.Size"), System.Drawing.Size)
+        Me.rdoListado.TabIndex = CType(resources.GetObject("rdoListado.TabIndex"), Integer)
+        Me.rdoListado.Text = resources.GetString("rdoListado.Text")
+        Me.rdoListado.TextAlign = CType(resources.GetObject("rdoListado.TextAlign"), System.Drawing.ContentAlignment)
+        Me.rdoListado.Visible = CType(resources.GetObject("rdoListado.Visible"), Boolean)
+        '
+        'gpSeleccionClientes
+        '
+        Me.gpSeleccionClientes.AccessibleDescription = resources.GetString("gpSeleccionClientes.AccessibleDescription")
+        Me.gpSeleccionClientes.AccessibleName = resources.GetString("gpSeleccionClientes.AccessibleName")
+        Me.gpSeleccionClientes.Anchor = CType(resources.GetObject("gpSeleccionClientes.Anchor"), System.Windows.Forms.AnchorStyles)
+        Me.gpSeleccionClientes.BackgroundImage = CType(resources.GetObject("gpSeleccionClientes.BackgroundImage"), System.Drawing.Image)
+        Me.gpSeleccionClientes.Controls.Add(Me.btnIvertir)
+        Me.gpSeleccionClientes.Controls.Add(Me.btnDesmarcarTodos)
+        Me.gpSeleccionClientes.Controls.Add(Me.FlatButton1)
+        Me.gpSeleccionClientes.Controls.Add(Me.cboIntervalo2)
+        Me.gpSeleccionClientes.Controls.Add(Me.cboIntervalo1)
+        Me.gpSeleccionClientes.Controls.Add(Me.cboSeleccion)
+        Me.gpSeleccionClientes.Controls.Add(Me.clbListaClientes)
+        Me.gpSeleccionClientes.Controls.Add(Me.rdoListado)
+        Me.gpSeleccionClientes.Controls.Add(Me.rdoTodosClientes)
+        Me.gpSeleccionClientes.Dock = CType(resources.GetObject("gpSeleccionClientes.Dock"), System.Windows.Forms.DockStyle)
+        Me.gpSeleccionClientes.Enabled = CType(resources.GetObject("gpSeleccionClientes.Enabled"), Boolean)
+        Me.gpSeleccionClientes.Font = CType(resources.GetObject("gpSeleccionClientes.Font"), System.Drawing.Font)
+        Me.gpSeleccionClientes.ImeMode = CType(resources.GetObject("gpSeleccionClientes.ImeMode"), System.Windows.Forms.ImeMode)
+        Me.gpSeleccionClientes.Location = CType(resources.GetObject("gpSeleccionClientes.Location"), System.Drawing.Point)
+        Me.gpSeleccionClientes.Name = "gpSeleccionClientes"
+        Me.gpSeleccionClientes.RightToLeft = CType(resources.GetObject("gpSeleccionClientes.RightToLeft"), System.Windows.Forms.RightToLeft)
+        Me.gpSeleccionClientes.Size = CType(resources.GetObject("gpSeleccionClientes.Size"), System.Drawing.Size)
+        Me.gpSeleccionClientes.TabIndex = CType(resources.GetObject("gpSeleccionClientes.TabIndex"), Integer)
+        Me.gpSeleccionClientes.TabStop = False
+        Me.gpSeleccionClientes.Text = resources.GetString("gpSeleccionClientes.Text")
+        Me.gpSeleccionClientes.Visible = CType(resources.GetObject("gpSeleccionClientes.Visible"), Boolean)
+        '
+        'btnDesmarcarTodos
+        '
+        Me.btnDesmarcarTodos.AccessibleDescription = resources.GetString("btnDesmarcarTodos.AccessibleDescription")
+        Me.btnDesmarcarTodos.AccessibleName = resources.GetString("btnDesmarcarTodos.AccessibleName")
+        Me.btnDesmarcarTodos.Anchor = CType(resources.GetObject("btnDesmarcarTodos.Anchor"), System.Windows.Forms.AnchorStyles)
+        Me.btnDesmarcarTodos.BackgroundImage = CType(resources.GetObject("btnDesmarcarTodos.BackgroundImage"), System.Drawing.Image)
+        Me.btnDesmarcarTodos.Dock = CType(resources.GetObject("btnDesmarcarTodos.Dock"), System.Windows.Forms.DockStyle)
+        Me.btnDesmarcarTodos.Enabled = CType(resources.GetObject("btnDesmarcarTodos.Enabled"), Boolean)
+        Me.btnDesmarcarTodos.FlatStyle = CType(resources.GetObject("btnDesmarcarTodos.FlatStyle"), System.Windows.Forms.FlatStyle)
+        Me.btnDesmarcarTodos.Font = CType(resources.GetObject("btnDesmarcarTodos.Font"), System.Drawing.Font)
+        Me.btnDesmarcarTodos.Image = CType(resources.GetObject("btnDesmarcarTodos.Image"), System.Drawing.Image)
+        Me.btnDesmarcarTodos.ImageAlign = CType(resources.GetObject("btnDesmarcarTodos.ImageAlign"), System.Drawing.ContentAlignment)
+        Me.btnDesmarcarTodos.ImageIndex = CType(resources.GetObject("btnDesmarcarTodos.ImageIndex"), Integer)
+        Me.btnDesmarcarTodos.ImeMode = CType(resources.GetObject("btnDesmarcarTodos.ImeMode"), System.Windows.Forms.ImeMode)
+        Me.btnDesmarcarTodos.Location = CType(resources.GetObject("btnDesmarcarTodos.Location"), System.Drawing.Point)
+        Me.btnDesmarcarTodos.Name = "btnDesmarcarTodos"
+        Me.btnDesmarcarTodos.RightToLeft = CType(resources.GetObject("btnDesmarcarTodos.RightToLeft"), System.Windows.Forms.RightToLeft)
+        Me.btnDesmarcarTodos.Size = CType(resources.GetObject("btnDesmarcarTodos.Size"), System.Drawing.Size)
+        Me.btnDesmarcarTodos.TabIndex = CType(resources.GetObject("btnDesmarcarTodos.TabIndex"), Integer)
+        Me.btnDesmarcarTodos.TabStop = False
+        Me.btnDesmarcarTodos.Text = resources.GetString("btnDesmarcarTodos.Text")
+        Me.btnDesmarcarTodos.TextAlign = CType(resources.GetObject("btnDesmarcarTodos.TextAlign"), System.Drawing.ContentAlignment)
+        Me.btnDesmarcarTodos.Visible = CType(resources.GetObject("btnDesmarcarTodos.Visible"), Boolean)
+        '
+        'FlatButton1
+        '
+        Me.FlatButton1.AccessibleDescription = resources.GetString("FlatButton1.AccessibleDescription")
+        Me.FlatButton1.AccessibleName = resources.GetString("FlatButton1.AccessibleName")
+        Me.FlatButton1.Anchor = CType(resources.GetObject("FlatButton1.Anchor"), System.Windows.Forms.AnchorStyles)
+        Me.FlatButton1.BackgroundImage = CType(resources.GetObject("FlatButton1.BackgroundImage"), System.Drawing.Image)
+        Me.FlatButton1.Dock = CType(resources.GetObject("FlatButton1.Dock"), System.Windows.Forms.DockStyle)
+        Me.FlatButton1.Enabled = CType(resources.GetObject("FlatButton1.Enabled"), Boolean)
+        Me.FlatButton1.FlatStyle = CType(resources.GetObject("FlatButton1.FlatStyle"), System.Windows.Forms.FlatStyle)
+        Me.FlatButton1.Font = CType(resources.GetObject("FlatButton1.Font"), System.Drawing.Font)
+        Me.FlatButton1.Image = CType(resources.GetObject("FlatButton1.Image"), System.Drawing.Image)
+        Me.FlatButton1.ImageAlign = CType(resources.GetObject("FlatButton1.ImageAlign"), System.Drawing.ContentAlignment)
+        Me.FlatButton1.ImageIndex = CType(resources.GetObject("FlatButton1.ImageIndex"), Integer)
+        Me.FlatButton1.ImeMode = CType(resources.GetObject("FlatButton1.ImeMode"), System.Windows.Forms.ImeMode)
+        Me.FlatButton1.Location = CType(resources.GetObject("FlatButton1.Location"), System.Drawing.Point)
+        Me.FlatButton1.Name = "FlatButton1"
+        Me.FlatButton1.RightToLeft = CType(resources.GetObject("FlatButton1.RightToLeft"), System.Windows.Forms.RightToLeft)
+        Me.FlatButton1.Size = CType(resources.GetObject("FlatButton1.Size"), System.Drawing.Size)
+        Me.FlatButton1.TabIndex = CType(resources.GetObject("FlatButton1.TabIndex"), Integer)
+        Me.FlatButton1.TabStop = False
+        Me.FlatButton1.Text = resources.GetString("FlatButton1.Text")
+        Me.FlatButton1.TextAlign = CType(resources.GetObject("FlatButton1.TextAlign"), System.Drawing.ContentAlignment)
+        Me.FlatButton1.Visible = CType(resources.GetObject("FlatButton1.Visible"), Boolean)
+        '
+        'cboIntervalo2
+        '
+        Me.cboIntervalo2.AccessibleDescription = resources.GetString("cboIntervalo2.AccessibleDescription")
+        Me.cboIntervalo2.AccessibleName = resources.GetString("cboIntervalo2.AccessibleName")
+        Me.cboIntervalo2.Anchor = CType(resources.GetObject("cboIntervalo2.Anchor"), System.Windows.Forms.AnchorStyles)
+        Me.cboIntervalo2.BackgroundImage = CType(resources.GetObject("cboIntervalo2.BackgroundImage"), System.Drawing.Image)
+        Me.cboIntervalo2.DefaultText = resources.GetString("cboIntervalo2.DefaultText")
+        Me.cboIntervalo2.Dock = CType(resources.GetObject("cboIntervalo2.Dock"), System.Windows.Forms.DockStyle)
+        Me.cboIntervalo2.Enabled = CType(resources.GetObject("cboIntervalo2.Enabled"), Boolean)
+        Me.cboIntervalo2.Font = CType(resources.GetObject("cboIntervalo2.Font"), System.Drawing.Font)
+        Me.cboIntervalo2.ForeColor = System.Drawing.SystemColors.ControlText
+        Me.cboIntervalo2.ImeMode = CType(resources.GetObject("cboIntervalo2.ImeMode"), System.Windows.Forms.ImeMode)
+        Me.cboIntervalo2.IntegralHeight = CType(resources.GetObject("cboIntervalo2.IntegralHeight"), Boolean)
+        Me.cboIntervalo2.ItemHeight = CType(resources.GetObject("cboIntervalo2.ItemHeight"), Integer)
+        Me.cboIntervalo2.Location = CType(resources.GetObject("cboIntervalo2.Location"), System.Drawing.Point)
+        Me.cboIntervalo2.MaxDropDownItems = CType(resources.GetObject("cboIntervalo2.MaxDropDownItems"), Integer)
+        Me.cboIntervalo2.MaxLength = CType(resources.GetObject("cboIntervalo2.MaxLength"), Integer)
+        Me.cboIntervalo2.Name = "cboIntervalo2"
+        Me.cboIntervalo2.RightToLeft = CType(resources.GetObject("cboIntervalo2.RightToLeft"), System.Windows.Forms.RightToLeft)
+        Me.cboIntervalo2.Size = CType(resources.GetObject("cboIntervalo2.Size"), System.Drawing.Size)
+        Me.cboIntervalo2.TabIndex = CType(resources.GetObject("cboIntervalo2.TabIndex"), Integer)
+        Me.cboIntervalo2.Text = resources.GetString("cboIntervalo2.Text")
+        Me.cboIntervalo2.Visible = CType(resources.GetObject("cboIntervalo2.Visible"), Boolean)
+        '
+        'cboIntervalo1
+        '
+        Me.cboIntervalo1.AccessibleDescription = resources.GetString("cboIntervalo1.AccessibleDescription")
+        Me.cboIntervalo1.AccessibleName = resources.GetString("cboIntervalo1.AccessibleName")
+        Me.cboIntervalo1.Anchor = CType(resources.GetObject("cboIntervalo1.Anchor"), System.Windows.Forms.AnchorStyles)
+        Me.cboIntervalo1.BackgroundImage = CType(resources.GetObject("cboIntervalo1.BackgroundImage"), System.Drawing.Image)
+        Me.cboIntervalo1.DefaultText = resources.GetString("cboIntervalo1.DefaultText")
+        Me.cboIntervalo1.Dock = CType(resources.GetObject("cboIntervalo1.Dock"), System.Windows.Forms.DockStyle)
+        Me.cboIntervalo1.Enabled = CType(resources.GetObject("cboIntervalo1.Enabled"), Boolean)
+        Me.cboIntervalo1.Font = CType(resources.GetObject("cboIntervalo1.Font"), System.Drawing.Font)
+        Me.cboIntervalo1.ForeColor = System.Drawing.SystemColors.ControlText
+        Me.cboIntervalo1.ImeMode = CType(resources.GetObject("cboIntervalo1.ImeMode"), System.Windows.Forms.ImeMode)
+        Me.cboIntervalo1.IntegralHeight = CType(resources.GetObject("cboIntervalo1.IntegralHeight"), Boolean)
+        Me.cboIntervalo1.ItemHeight = CType(resources.GetObject("cboIntervalo1.ItemHeight"), Integer)
+        Me.cboIntervalo1.Location = CType(resources.GetObject("cboIntervalo1.Location"), System.Drawing.Point)
+        Me.cboIntervalo1.MaxDropDownItems = CType(resources.GetObject("cboIntervalo1.MaxDropDownItems"), Integer)
+        Me.cboIntervalo1.MaxLength = CType(resources.GetObject("cboIntervalo1.MaxLength"), Integer)
+        Me.cboIntervalo1.Name = "cboIntervalo1"
+        Me.cboIntervalo1.RightToLeft = CType(resources.GetObject("cboIntervalo1.RightToLeft"), System.Windows.Forms.RightToLeft)
+        Me.cboIntervalo1.Size = CType(resources.GetObject("cboIntervalo1.Size"), System.Drawing.Size)
+        Me.cboIntervalo1.TabIndex = CType(resources.GetObject("cboIntervalo1.TabIndex"), Integer)
+        Me.cboIntervalo1.Text = resources.GetString("cboIntervalo1.Text")
+        Me.cboIntervalo1.Visible = CType(resources.GetObject("cboIntervalo1.Visible"), Boolean)
+        '
+        'cboSeleccion
+        '
+        Me.cboSeleccion.AccessibleDescription = resources.GetString("cboSeleccion.AccessibleDescription")
+        Me.cboSeleccion.AccessibleName = resources.GetString("cboSeleccion.AccessibleName")
+        Me.cboSeleccion.Anchor = CType(resources.GetObject("cboSeleccion.Anchor"), System.Windows.Forms.AnchorStyles)
+        Me.cboSeleccion.BackgroundImage = CType(resources.GetObject("cboSeleccion.BackgroundImage"), System.Drawing.Image)
+        Me.cboSeleccion.DefaultText = resources.GetString("cboSeleccion.DefaultText")
+        Me.cboSeleccion.Dock = CType(resources.GetObject("cboSeleccion.Dock"), System.Windows.Forms.DockStyle)
+        Me.cboSeleccion.Enabled = CType(resources.GetObject("cboSeleccion.Enabled"), Boolean)
+        Me.cboSeleccion.Font = CType(resources.GetObject("cboSeleccion.Font"), System.Drawing.Font)
+        Me.cboSeleccion.ForeColor = System.Drawing.SystemColors.ControlText
+        Me.cboSeleccion.ImeMode = CType(resources.GetObject("cboSeleccion.ImeMode"), System.Windows.Forms.ImeMode)
+        Me.cboSeleccion.IntegralHeight = CType(resources.GetObject("cboSeleccion.IntegralHeight"), Boolean)
+        Me.cboSeleccion.ItemHeight = CType(resources.GetObject("cboSeleccion.ItemHeight"), Integer)
+        Me.cboSeleccion.Items.AddRange(New Object() {resources.GetString("cboSeleccion.Items"), resources.GetString("cboSeleccion.Items1"), resources.GetString("cboSeleccion.Items2"), resources.GetString("cboSeleccion.Items3")})
+        Me.cboSeleccion.Location = CType(resources.GetObject("cboSeleccion.Location"), System.Drawing.Point)
+        Me.cboSeleccion.MaxDropDownItems = CType(resources.GetObject("cboSeleccion.MaxDropDownItems"), Integer)
+        Me.cboSeleccion.MaxLength = CType(resources.GetObject("cboSeleccion.MaxLength"), Integer)
+        Me.cboSeleccion.Name = "cboSeleccion"
+        Me.cboSeleccion.RightToLeft = CType(resources.GetObject("cboSeleccion.RightToLeft"), System.Windows.Forms.RightToLeft)
+        Me.cboSeleccion.Size = CType(resources.GetObject("cboSeleccion.Size"), System.Drawing.Size)
+        Me.cboSeleccion.TabIndex = CType(resources.GetObject("cboSeleccion.TabIndex"), Integer)
+        Me.cboSeleccion.Text = resources.GetString("cboSeleccion.Text")
+        Me.cboSeleccion.Visible = CType(resources.GetObject("cboSeleccion.Visible"), Boolean)
+        '
+        'clbListaClientes
+        '
+        Me.clbListaClientes.AccessibleDescription = resources.GetString("clbListaClientes.AccessibleDescription")
+        Me.clbListaClientes.AccessibleName = resources.GetString("clbListaClientes.AccessibleName")
+        Me.clbListaClientes.Anchor = CType(resources.GetObject("clbListaClientes.Anchor"), System.Windows.Forms.AnchorStyles)
+        Me.clbListaClientes.BackgroundImage = CType(resources.GetObject("clbListaClientes.BackgroundImage"), System.Drawing.Image)
+        Me.clbListaClientes.CheckOnClick = True
+        Me.clbListaClientes.ColumnWidth = CType(resources.GetObject("clbListaClientes.ColumnWidth"), Integer)
+        Me.clbListaClientes.Dock = CType(resources.GetObject("clbListaClientes.Dock"), System.Windows.Forms.DockStyle)
+        Me.clbListaClientes.Enabled = CType(resources.GetObject("clbListaClientes.Enabled"), Boolean)
+        Me.clbListaClientes.Font = CType(resources.GetObject("clbListaClientes.Font"), System.Drawing.Font)
+        Me.clbListaClientes.HorizontalExtent = CType(resources.GetObject("clbListaClientes.HorizontalExtent"), Integer)
+        Me.clbListaClientes.HorizontalScrollbar = CType(resources.GetObject("clbListaClientes.HorizontalScrollbar"), Boolean)
+        Me.clbListaClientes.ImeMode = CType(resources.GetObject("clbListaClientes.ImeMode"), System.Windows.Forms.ImeMode)
+        Me.clbListaClientes.IntegralHeight = CType(resources.GetObject("clbListaClientes.IntegralHeight"), Boolean)
+        Me.clbListaClientes.Location = CType(resources.GetObject("clbListaClientes.Location"), System.Drawing.Point)
+        Me.clbListaClientes.Name = "clbListaClientes"
+        Me.clbListaClientes.RightToLeft = CType(resources.GetObject("clbListaClientes.RightToLeft"), System.Windows.Forms.RightToLeft)
+        Me.clbListaClientes.ScrollAlwaysVisible = CType(resources.GetObject("clbListaClientes.ScrollAlwaysVisible"), Boolean)
+        Me.clbListaClientes.Size = CType(resources.GetObject("clbListaClientes.Size"), System.Drawing.Size)
+        Me.clbListaClientes.TabIndex = CType(resources.GetObject("clbListaClientes.TabIndex"), Integer)
+        Me.clbListaClientes.ThreeDCheckBoxes = True
+        Me.clbListaClientes.Visible = CType(resources.GetObject("clbListaClientes.Visible"), Boolean)
+        '
+        'rtbTexto
+        '
+        Me.rtbTexto.AccessibleDescription = resources.GetString("rtbTexto.AccessibleDescription")
+        Me.rtbTexto.AccessibleName = resources.GetString("rtbTexto.AccessibleName")
+        Me.rtbTexto.Anchor = CType(resources.GetObject("rtbTexto.Anchor"), System.Windows.Forms.AnchorStyles)
+        Me.rtbTexto.AutoSize = CType(resources.GetObject("rtbTexto.AutoSize"), Boolean)
+        Me.rtbTexto.BackgroundImage = CType(resources.GetObject("rtbTexto.BackgroundImage"), System.Drawing.Image)
+        Me.rtbTexto.BulletIndent = CType(resources.GetObject("rtbTexto.BulletIndent"), Integer)
+        Me.rtbTexto.Dock = CType(resources.GetObject("rtbTexto.Dock"), System.Windows.Forms.DockStyle)
+        Me.rtbTexto.Enabled = CType(resources.GetObject("rtbTexto.Enabled"), Boolean)
+        Me.rtbTexto.Font = CType(resources.GetObject("rtbTexto.Font"), System.Drawing.Font)
+        Me.rtbTexto.ImeMode = CType(resources.GetObject("rtbTexto.ImeMode"), System.Windows.Forms.ImeMode)
+        Me.rtbTexto.Location = CType(resources.GetObject("rtbTexto.Location"), System.Drawing.Point)
+        Me.rtbTexto.MaxLength = CType(resources.GetObject("rtbTexto.MaxLength"), Integer)
+        Me.rtbTexto.Multiline = CType(resources.GetObject("rtbTexto.Multiline"), Boolean)
+        Me.rtbTexto.Name = "rtbTexto"
+        Me.rtbTexto.RightMargin = CType(resources.GetObject("rtbTexto.RightMargin"), Integer)
+        Me.rtbTexto.RightToLeft = CType(resources.GetObject("rtbTexto.RightToLeft"), System.Windows.Forms.RightToLeft)
+        Me.rtbTexto.ScrollBars = CType(resources.GetObject("rtbTexto.ScrollBars"), System.Windows.Forms.RichTextBoxScrollBars)
+        Me.rtbTexto.Size = CType(resources.GetObject("rtbTexto.Size"), System.Drawing.Size)
+        Me.rtbTexto.TabIndex = CType(resources.GetObject("rtbTexto.TabIndex"), Integer)
+        Me.rtbTexto.Text = resources.GetString("rtbTexto.Text")
+        Me.rtbTexto.Visible = CType(resources.GetObject("rtbTexto.Visible"), Boolean)
+        Me.rtbTexto.WordWrap = CType(resources.GetObject("rtbTexto.WordWrap"), Boolean)
+        Me.rtbTexto.ZoomFactor = CType(resources.GetObject("rtbTexto.ZoomFactor"), Single)
+        '
+        'btnIvertir
+        '
+        Me.btnIvertir.AccessibleDescription = resources.GetString("btnIvertir.AccessibleDescription")
+        Me.btnIvertir.AccessibleName = resources.GetString("btnIvertir.AccessibleName")
+        Me.btnIvertir.Anchor = CType(resources.GetObject("btnIvertir.Anchor"), System.Windows.Forms.AnchorStyles)
+        Me.btnIvertir.BackgroundImage = CType(resources.GetObject("btnIvertir.BackgroundImage"), System.Drawing.Image)
+        Me.btnIvertir.Dock = CType(resources.GetObject("btnIvertir.Dock"), System.Windows.Forms.DockStyle)
+        Me.btnIvertir.Enabled = CType(resources.GetObject("btnIvertir.Enabled"), Boolean)
+        Me.btnIvertir.FlatStyle = CType(resources.GetObject("btnIvertir.FlatStyle"), System.Windows.Forms.FlatStyle)
+        Me.btnIvertir.Font = CType(resources.GetObject("btnIvertir.Font"), System.Drawing.Font)
+        Me.btnIvertir.Image = CType(resources.GetObject("btnIvertir.Image"), System.Drawing.Image)
+        Me.btnIvertir.ImageAlign = CType(resources.GetObject("btnIvertir.ImageAlign"), System.Drawing.ContentAlignment)
+        Me.btnIvertir.ImageIndex = CType(resources.GetObject("btnIvertir.ImageIndex"), Integer)
+        Me.btnIvertir.ImeMode = CType(resources.GetObject("btnIvertir.ImeMode"), System.Windows.Forms.ImeMode)
+        Me.btnIvertir.Location = CType(resources.GetObject("btnIvertir.Location"), System.Drawing.Point)
+        Me.btnIvertir.Name = "btnIvertir"
+        Me.btnIvertir.RightToLeft = CType(resources.GetObject("btnIvertir.RightToLeft"), System.Windows.Forms.RightToLeft)
+        Me.btnIvertir.Size = CType(resources.GetObject("btnIvertir.Size"), System.Drawing.Size)
+        Me.btnIvertir.TabIndex = CType(resources.GetObject("btnIvertir.TabIndex"), Integer)
+        Me.btnIvertir.TabStop = False
+        Me.btnIvertir.Text = resources.GetString("btnIvertir.Text")
+        Me.btnIvertir.TextAlign = CType(resources.GetObject("btnIvertir.TextAlign"), System.Drawing.ContentAlignment)
+        Me.btnIvertir.Visible = CType(resources.GetObject("btnIvertir.Visible"), Boolean)
+        '
+        'frmCartas
+        '
+        Me.AccessibleDescription = resources.GetString("$this.AccessibleDescription")
+        Me.AccessibleName = resources.GetString("$this.AccessibleName")
+        Me.AutoScaleBaseSize = CType(resources.GetObject("$this.AutoScaleBaseSize"), System.Drawing.Size)
+        Me.AutoScroll = CType(resources.GetObject("$this.AutoScroll"), Boolean)
+        Me.AutoScrollMargin = CType(resources.GetObject("$this.AutoScrollMargin"), System.Drawing.Size)
+        Me.AutoScrollMinSize = CType(resources.GetObject("$this.AutoScrollMinSize"), System.Drawing.Size)
+        Me.BackgroundImage = CType(resources.GetObject("$this.BackgroundImage"), System.Drawing.Image)
+        Me.ClientSize = CType(resources.GetObject("$this.ClientSize"), System.Drawing.Size)
+        Me.Controls.Add(Me.gpSeleccionClientes)
+        Me.Controls.Add(Me.rtbTexto)
+        Me.Controls.Add(Me.btnImprimir)
+        Me.Cursor = System.Windows.Forms.Cursors.Default
+        Me.Enabled = CType(resources.GetObject("$this.Enabled"), Boolean)
+        Me.Font = CType(resources.GetObject("$this.Font"), System.Drawing.Font)
+        Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
+        Me.ImeMode = CType(resources.GetObject("$this.ImeMode"), System.Windows.Forms.ImeMode)
+        Me.Location = CType(resources.GetObject("$this.Location"), System.Drawing.Point)
+        Me.MaximumSize = CType(resources.GetObject("$this.MaximumSize"), System.Drawing.Size)
+        Me.MinimumSize = CType(resources.GetObject("$this.MinimumSize"), System.Drawing.Size)
+        Me.Name = "frmCartas"
+        Me.RightToLeft = CType(resources.GetObject("$this.RightToLeft"), System.Windows.Forms.RightToLeft)
+        Me.StartPosition = CType(resources.GetObject("$this.StartPosition"), System.Windows.Forms.FormStartPosition)
+        Me.Text = resources.GetString("$this.Text")
+        Me.Controls.SetChildIndex(Me.cboSeleccionCentro, 0)
+        Me.Controls.SetChildIndex(Me.sbtipo, 0)
+        Me.Controls.SetChildIndex(Me.btnActualizar, 0)
+        Me.Controls.SetChildIndex(Me.btnNuevo, 0)
+        Me.Controls.SetChildIndex(Me.btnBorrar, 0)
+        Me.Controls.SetChildIndex(Me.btnTancar, 0)
+        Me.Controls.SetChildIndex(Me.btnUltimo, 0)
+        Me.Controls.SetChildIndex(Me.btnPrimero, 0)
+        Me.Controls.SetChildIndex(Me.btnAnterior, 0)
+        Me.Controls.SetChildIndex(Me.btnSiguiente, 0)
+        Me.Controls.SetChildIndex(Me.btnRecargar, 0)
+        Me.Controls.SetChildIndex(Me.btnVerLista, 0)
+        Me.Controls.SetChildIndex(Me.btnModificar, 0)
+        Me.Controls.SetChildIndex(Me.btnImprimir, 0)
+        Me.Controls.SetChildIndex(Me.rtbTexto, 0)
+        Me.Controls.SetChildIndex(Me.gpSeleccionClientes, 0)
+        Me.gpSeleccionClientes.ResumeLayout(False)
+        Me.ResumeLayout(False)
+
+    End Sub
+
+#End Region
+
+    Shared frmChildForm As frmCartas
+    Public Shared Function GetInstance() As frmCartas
+        If frmChildForm Is Nothing Then
+            frmChildForm = New frmCartas
+
+        End If
+        Return frmChildForm
+    End Function
+
+#Region "----VARIABLES-----"
+
+    Private dvClientes As New DataView
+    Private da As New MySql.Data.MySqlClient.MySqlDataAdapter
+    Private cmdSelect As New MySql.Data.MySqlClient.MySqlCommand
+
+#End Region
+
+    Private Sub IniciarForm(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
+        Cursor = Cursors.WaitCursor
+        Try
+            cmdSelect.Connection = cnn
+
+            da.SelectCommand = cmdSelect
+
+            FlatButton1.Visible = False
+            cboIntervalo1.Visible = False
+            cboIntervalo2.Visible = False
+            btnDesmarcarTodos.Visible = False
+            cboSeleccion.SelectedItem = tablaClientes
+
+            Cargar(tablaClientes)
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+        Cursor = Cursors.Default
+    End Sub
+    Private Sub Cargar(ByVal tipo As String)
+        Try
+            cmdSelect.CommandText = "SELECT NOM, " & _
+                                    "CODI, " & _
+                                    "DOM, " & _
+                                    "CP, " & _
+                                    "POB, " & _
+                                    "PROV " & _
+                                    "FROM " & tipo & " ORDER BY codi"
+            ds.Tables(tipo).Rows.Clear()
+            da.Fill(ds.Tables(tipo))
+            dvClientes = ds.Tables(tipo).DefaultView
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub CargarListadoClientes()
+        Dim i As Integer
+        Try
+            clbListaClientes.Items.Clear()
+            For i = 0 To dvClientes.Count - 1
+                clbListaClientes.Items.Add(dvClientes(i).Item("CODI") & " - " & dvClientes(i).Item("NOM"))
+
+            Next
+            cboIntervalo1.Items.Clear()
+            cboIntervalo2.Items.Clear()
+            For i = 0 To dvClientes.Count - 1
+                cboIntervalo1.Items.Add(dvClientes(i).Item("CODI"))
+            Next
+
+            For i = 0 To dvClientes.Count - 1
+                cboIntervalo2.Items.Add(dvClientes(i).Item("CODI"))
+            Next
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub rdoListado_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles rdoListado.CheckedChanged
+        Dim i As Integer
+        Try
+            If rdoListado.Checked = True Then
+                rdoTodosClientes.Checked = False
+                CargarListadoClientes()
+                FlatButton1.Visible = True
+                cboIntervalo1.Visible = True
+                cboIntervalo2.Visible = True
+                btnDesmarcarTodos.Visible = True
+            Else
+                rdoTodosClientes.Checked = True
+                clbListaClientes.Items.Clear()
+                FlatButton1.Visible = False
+                cboIntervalo1.Visible = False
+                cboIntervalo2.Visible = False
+                btnDesmarcarTodos.Visible = False
+
+            End If
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub rdoTodosClientes_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles rdoTodosClientes.CheckedChanged
+        Try
+            dvClientes.RowFilter = ""
+            FlatButton1.Visible = False
+            cboIntervalo1.Visible = False
+            cboIntervalo2.Visible = False
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub IntroducirDatosAccess(ByVal todos As Boolean)
+        'Esta funcion introduce en access las tuplas necesarias para imprimir las
+        'cartas si estan elegidos todos los clientes se recorre todos
+        Dim i As Integer
+        Dim strSQL As String
+        Dim cnTemp As New OleDb.OleDbConnection("Provider=Microsoft.Jet.OLEDB.4.0;Data Source=access\temp.mdb;User Id=admin;Password=;")
+        Dim cmdIns As New OleDb.OleDbCommand
+
+        Try
+            cmdIns.Parameters.Add("pTEXTE", OleDb.OleDbType.VarChar)
+            cmdIns.Parameters.Add("pNOM", OleDb.OleDbType.WChar)
+            cmdIns.Parameters.Add("pDOM", OleDb.OleDbType.VarChar)
+            If todos = True Then
+                dvClientes.RowFilter = ""
+            Else
+                For i = 0 To clbListaClientes.CheckedItems.Count - 1
+                    With clbListaClientes.CheckedItems.Item(i).ToString
+                        strSQL = strSQL & " CODI = '" & .Substring(0, .IndexOf("-") - 1) & "' OR "
+                    End With
+                Next
+                dvClientes.RowFilter = strSQL.Substring(0, strSQL.Length - 3)
+            End If
+            cnTemp.Open()
+            i = 0
+            cmdIns.Connection = cnTemp
+
+
+            For i = 0 To dvClientes.Count - 1
+                cmdIns.Parameters("pNOM").Value = dvClientes(i).Item("NOM")
+                cmdIns.Parameters("pDOM").Value = dvClientes(i).Item("DOM")
+                cmdIns.Parameters("pTEXTE").Value = rtbTexto.Rtf
+                strSQL = _
+                   "INSERT INTO " & _
+                   "tCARTASCLIENTES" & _
+                   " (CODI, " & _
+                   "TEXTE, " & _
+                   "PROV, " & _
+                   "POB, " & _
+                   "CP, " & _
+                    "NOM, " & _
+                      "DOM, " & _
+                   "EMAIL) VALUES(" & _
+                   " """ & general.NS(dvClientes(i).Item("CODI")) & """ ," & _
+                   " @pTEXTE ," & _
+                   " """ & general.NS(dvClientes(i).Item("PROV")) & """," & _
+                   " """ & general.NS(dvClientes(i).Item("POB")) & """," & _
+                   " """ & general.NS(dvClientes(i).Item("CP")) & """," & _
+                   " @pNOM," & _
+                   " @pDOM ," & _
+                   " "" email "")"
+
+                cmdIns.CommandText = strSQL
+                cmdIns.ExecuteNonQuery()
+
+            Next
+            cnTemp.Close()
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub btnImprimir_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnImprimir.Click
+        Dim accessDir As New AccessDirecto(tabla)
+        Try
+            If Not clbListaClientes.CheckedItems.Count = 0 Or rdoTodosClientes.Checked = True Then
+                accessDir.BorrarDatosTablaAccess("tCARTASCLIENTES")
+                IntroducirDatosAccess(Not rdoListado.Checked)
+                accessDir.CargarInformeAccess("iCARTASCLIENTES", "Cartes")
+            Else
+                MessageBox.Show("Has de seleccionar algun element de la llista")
+            End If
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+
+        End Try
+    End Sub
+    Private Sub btnCerrar_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnTancar.Click
+        Try
+            Me.Close()
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub cboSeleccion_Validating(ByVal sender As Object, ByVal e As System.ComponentModel.CancelEventArgs) Handles cboSeleccion.Validating
+        Try
+            Select Case cboSeleccion.SelectedItem
+                Case tablaClientes
+                    Cargar(tablaClientes)
+                    If rdoTodosClientes.Checked = False Then
+                        CargarListadoClientes()
+                    End If
+                Case "PROVEÏDORS"
+                    Cargar(tablaProveedores)
+                    If rdoTodosClientes.Checked = False Then
+                        CargarListadoClientes()
+                    End If
+                Case "REPRESENTANTS"
+                    Cargar("repres")
+                    If rdoTodosClientes.Checked = False Then
+                        CargarListadoClientes()
+                    End If
+                Case "TRANSPORTISTES"
+                    Cargar("trans")
+                    If rdoTodosClientes.Checked = False Then
+                        CargarListadoClientes()
+                    End If
+            End Select
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub FlatButton1_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles FlatButton1.Click
+        Dim i As Integer
+        Try
+            If CType(cboIntervalo1.Text, Integer) > CType(cboIntervalo2.Text, Integer) Then
+                MessageBox.Show("INTEVAL NO VÀLID")
+            Else
+                clbListaClientes.Items.Clear()
+                For i = 0 To dvClientes.Count - 1 ' clbListaClientes.Items.Count - 1
+                    If dvClientes(i).Item("CODI") >= CType(cboIntervalo1.Text, Integer) And dvClientes(i).Item("CODI") <= CType(cboIntervalo2.Text, Integer) Then
+
+                        clbListaClientes.Items.Add(dvClientes(i).Item("CODI") & " - " & dvClientes(i).Item("NOM"), True)
+                    Else
+                        clbListaClientes.Items.Add(dvClientes(i).Item("CODI") & " - " & dvClientes(i).Item("NOM"), False)
+                    End If
+                Next
+            End If
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub btnDesmarcarTodos_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnDesmarcarTodos.Click
+        Try
+            Select Case cboSeleccion.SelectedItem
+                Case tablaClientes
+                    Cargar(tablaClientes)
+                    If rdoTodosClientes.Checked = False Then
+                        CargarListadoClientes()
+                    End If
+                Case "PROVEÏDORS"
+                    Cargar(tablaProveedores)
+                    If rdoTodosClientes.Checked = False Then
+                        CargarListadoClientes()
+                    End If
+                Case "REPRESENTANTS"
+                    Cargar("repres")
+                    If rdoTodosClientes.Checked = False Then
+                        CargarListadoClientes()
+                    End If
+                Case "TRANSPORTISTES"
+                    Cargar("trans")
+                    If rdoTodosClientes.Checked = False Then
+                        CargarListadoClientes()
+                    End If
+            End Select
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+
+
+    Friend Overrides Sub btnActualizar_Click(ByVal sender As Object, ByVal e As System.EventArgs)
+
+    End Sub
+
+    Friend Overrides Sub btnAnterior_Click(ByVal sender As Object, ByVal e As System.EventArgs)
+
+    End Sub
+
+    Friend Overrides Sub btnBorrar_Click(ByVal sender As Object, ByVal e As System.EventArgs)
+
+    End Sub
+
+    Friend Overrides Sub btnModificar_Click(ByVal sender As Object, ByVal e As System.EventArgs)
+
+    End Sub
+
+    Friend Overrides Sub btnNuevo_Click(ByVal sender As Object, ByVal e As System.EventArgs)
+
+    End Sub
+
+    Protected Friend Overrides Sub btnPrimero_Click(ByVal sender As Object, ByVal e As System.EventArgs)
+
+    End Sub
+
+    Friend Overrides Sub btnSiguiente_Click(ByVal sender As Object, ByVal e As System.EventArgs)
+
+    End Sub
+
+    Friend Overrides Sub btnUltimo_Click(ByVal sender As Object, ByVal e As System.EventArgs)
+
+    End Sub
+
+    Private Sub btnIvertir_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnIvertir.Click
+        Try
+            Dim i As Integer
+            For i = 0 To clbListaClientes.Items.Count - 1
+                clbListaClientes.SetItemChecked(i, Not clbListaClientes.GetItemChecked(i))
+            Next
+
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Sub
+End Class

@@ -1,0 +1,568 @@
+<?xml version="1.0"?>
+<doc>
+  <assembly>
+    <name>C1.Win.FlexPivot.Slicer.4</name>
+  </assembly>
+  <members>
+    <member name="T:C1.Win.FlexPivot.Styles.IButtonImages">
+      <summary>
+            Button images interface
+            </summary>
+    </member>
+    <member name="P:C1.Win.FlexPivot.Styles.IButtonImages.SortNone">
+      <summary>
+            Image used for Sort button in unsorted mode.
+            </summary>
+    </member>
+    <member name="P:C1.Win.FlexPivot.Styles.IButtonImages.SortAscending">
+      <summary>
+            Image used for ascending Sort button.
+            </summary>
+    </member>
+    <member name="P:C1.Win.FlexPivot.Styles.IButtonImages.SortDescending">
+      <summary>
+            Image used for descending Sort button.
+            </summary>
+    </member>
+    <member name="P:C1.Win.FlexPivot.Styles.IButtonImages.MultiSelect">
+      <summary>
+            Image used for MultiSelect button.
+            </summary>
+    </member>
+    <member name="P:C1.Win.FlexPivot.Styles.IButtonImages.Clear">
+      <summary>
+            Image used for Clear button.
+            </summary>
+    </member>
+    <member name="T:C1.Win.FlexPivot.Styles.ButtonImages">
+      <summary>
+            Button images
+            </summary>
+    </member>
+    <member name="P:C1.Win.FlexPivot.Styles.ButtonImages.SortNone">
+      <summary>
+            Gets or sets image used for Sort button in unsorted mode.
+            </summary>
+    </member>
+    <member name="P:C1.Win.FlexPivot.Styles.ButtonImages.SortAscending">
+      <summary>
+            Gets or sets image used for ascending Sort button.
+            </summary>
+    </member>
+    <member name="P:C1.Win.FlexPivot.Styles.ButtonImages.SortDescending">
+      <summary>
+            Gets or sets image used for descending Sort button.
+            </summary>
+    </member>
+    <member name="P:C1.Win.FlexPivot.Styles.ButtonImages.MultiSelect">
+      <summary>
+            Gets or sets image used for MultiSelect button.
+            </summary>
+    </member>
+    <member name="P:C1.Win.FlexPivot.Styles.ButtonImages.Clear">
+      <summary>
+            Gets or sets image used for Clear button.
+            </summary>
+    </member>
+    <member name="P:C1.Win.FlexPivot.Styles.ButtonImages.DefaultStyle">
+      <summary>
+            Gets a style that contains the default values for current style.
+            </summary>
+    </member>
+    <member name="M:C1.Win.FlexPivot.Styles.ButtonImages.Clone">
+      <summary>
+            Creates an instance of the <see cref="T:C1.Win.C1Themes.BaseStyle" /> class that is identical to the current <see cref="T:C1.Win.C1Themes.BaseStyle" /></summary>
+    </member>
+    <member name="T:C1.Win.FlexPivot.Styles.IButtonStateStyles">
+      <summary>
+            Interface to provide button styles in different states
+            </summary>
+    </member>
+    <member name="P:C1.Win.FlexPivot.Styles.IButtonStateStyles.Border">
+      <summary>
+            Border
+            </summary>
+    </member>
+    <member name="P:C1.Win.FlexPivot.Styles.IButtonStateStyles.BorderColor">
+      <summary>
+            BorderColor
+            </summary>
+    </member>
+    <member name="P:C1.Win.FlexPivot.Styles.IButtonStateStyles.BackColor">
+      <summary>
+            BackColor
+            </summary>
+    </member>
+    <member name="T:C1.Win.FlexPivot.Styles.ButtonStateStyle">
+      <summary>
+        <see cref="T:C1.Win.FlexPivot.Styles.ButtonStateStyle" /> contains display attributes that 
+            determine the general appearance of the button on the screen depending on its state.
+            </summary>
+    </member>
+    <member name="P:C1.Win.FlexPivot.Styles.ButtonStateStyle.BackColor">
+      <summary>
+            Gets or sets the <see cref="T:System.Drawing.Color" /> used to paint the background.
+            </summary>
+    </member>
+    <member name="P:C1.Win.FlexPivot.Styles.ButtonStateStyle.Border">
+      <summary>
+            Gets or sets the thickness of the border around the element.
+            </summary>
+    </member>
+    <member name="P:C1.Win.FlexPivot.Styles.ButtonStateStyle.BorderColor">
+      <summary>
+            Gets or sets the <see cref="T:System.Drawing.Color" /> used to draw the border around the element.
+            </summary>
+    </member>
+    <member name="P:C1.Win.FlexPivot.Styles.ButtonStateStyle.DefaultStyle">
+      <summary>
+            Gets a style that contains the default values for current style.
+            </summary>
+    </member>
+    <member name="M:C1.Win.FlexPivot.Styles.ButtonStateStyle.Clone">
+      <summary>
+            Creates an instance of the <see cref="T:C1.Win.C1Themes.BaseStyle" /> class that is identical to the current <see cref="T:C1.Win.C1Themes.BaseStyle" /></summary>
+    </member>
+    <member name="T:C1.Win.FlexPivot.Styles.IButtonStyles">
+      <summary>
+            Button styles interface
+            </summary>
+    </member>
+    <member name="P:C1.Win.FlexPivot.Styles.IButtonStyles.Padding">
+      <summary>
+            Padding
+            </summary>
+    </member>
+    <member name="P:C1.Win.FlexPivot.Styles.IButtonStyles.Margins">
+      <summary>
+            Margin
+            </summary>
+    </member>
+    <member name="P:C1.Win.FlexPivot.Styles.IButtonStyles.Corners">
+      <summary>
+            Corners
+            </summary>
+    </member>
+    <member name="P:C1.Win.FlexPivot.Styles.IButtonStyles.ForeColor">
+      <summary>
+            ForeColor
+            </summary>
+    </member>
+    <member name="P:C1.Win.FlexPivot.Styles.IButtonStyles.Default">
+      <summary>
+            Default style
+            </summary>
+    </member>
+    <member name="P:C1.Win.FlexPivot.Styles.IButtonStyles.Hot">
+      <summary>
+            Hot style
+            </summary>
+    </member>
+    <member name="P:C1.Win.FlexPivot.Styles.IButtonStyles.Pressed">
+      <summary>
+            Pressed style
+            </summary>
+    </member>
+    <member name="P:C1.Win.FlexPivot.Styles.IButtonStyles.HotPressed">
+      <summary>
+            HotPressed style
+            </summary>
+    </member>
+    <member name="T:C1.Win.FlexPivot.Styles.ButtonStyles">
+      <summary>
+        <see cref="T:C1.Win.FlexPivot.Styles.ButtonStyles" /> contains display attributes that 
+            determine the general appearance of the button on the screen.
+            </summary>
+    </member>
+    <member name="P:C1.Win.FlexPivot.Styles.ButtonStyles.ForeColor">
+      <summary>
+            Gets or sets the <see cref="T:System.Drawing.Color" /> used to draw the text.
+            </summary>
+    </member>
+    <member name="P:C1.Win.FlexPivot.Styles.ButtonStyles.Padding">
+      <summary>
+            Gets or sets the thickness of the padding between the element edges and its content.
+            </summary>
+    </member>
+    <member name="P:C1.Win.FlexPivot.Styles.ButtonStyles.Margins">
+      <summary>
+            Gets or sets the thickness of the margins around the element.
+            </summary>
+    </member>
+    <member name="P:C1.Win.FlexPivot.Styles.ButtonStyles.Corners">
+      <summary>
+            Gets or sets the radii of the element corners.
+            </summary>
+    </member>
+    <member name="P:C1.Win.FlexPivot.Styles.ButtonStyles.Default">
+      <summary>
+            Gets style containing display attributes that determine the general appearance of element on the screen in the default state.
+            </summary>
+    </member>
+    <member name="P:C1.Win.FlexPivot.Styles.ButtonStyles.Hot">
+      <summary>
+            Gets style containing display attributes that determine the general appearance of element on the screen when the cursor is over it.
+            </summary>
+    </member>
+    <member name="P:C1.Win.FlexPivot.Styles.ButtonStyles.Pressed">
+      <summary>
+            Gets style containing display attributes that determine the general appearance of pressed element on the screen.
+            </summary>
+    </member>
+    <member name="P:C1.Win.FlexPivot.Styles.ButtonStyles.HotPressed">
+      <summary>
+            Gets style containing display attributes that determine the general appearance of pressed element on the screen when the cursor is over it.
+            </summary>
+    </member>
+    <member name="P:C1.Win.FlexPivot.Styles.ButtonStyles.DefaultStyle">
+      <summary>
+            Gets a style that contains the default values for current style.
+            </summary>
+    </member>
+    <member name="M:C1.Win.FlexPivot.Styles.ButtonStyles.Clone">
+      <summary>
+            Creates an instance of the <see cref="T:C1.Win.C1Themes.BaseStyle" /> class that is identical to the current <see cref="T:C1.Win.C1Themes.BaseStyle" /></summary>
+    </member>
+    <member name="T:C1.Win.FlexPivot.Styles.ICommonStyle">
+      <summary>
+            Common style interface
+            </summary>
+    </member>
+    <member name="P:C1.Win.FlexPivot.Styles.ICommonStyle.Padding">
+      <summary>
+            Padding
+            </summary>
+    </member>
+    <member name="P:C1.Win.FlexPivot.Styles.ICommonStyle.CheckListPadding">
+      <summary>
+            Padding for CheckList element
+            </summary>
+    </member>
+    <member name="P:C1.Win.FlexPivot.Styles.ICommonStyle.BackColor">
+      <summary>
+            BackColor 
+            </summary>
+    </member>
+    <member name="T:C1.Win.FlexPivot.Styles.CommonStyle">
+      <summary>
+        <see cref="T:C1.Win.FlexPivot.Styles.CommonStyle" /> contains display attributes that 
+            determine the common appearance features of the control on the screen.
+            </summary>
+    </member>
+    <member name="P:C1.Win.FlexPivot.Styles.CommonStyle.BackColor">
+      <summary>
+            Gets or sets the <see cref="T:System.Drawing.Color" /> used to paint the background.
+            </summary>
+    </member>
+    <member name="P:C1.Win.FlexPivot.Styles.CommonStyle.Padding">
+      <summary>
+            Gets or sets the thickness of the padding between the element edges and its content.
+            </summary>
+    </member>
+    <member name="P:C1.Win.FlexPivot.Styles.CommonStyle.CheckListPadding">
+      <summary>
+            Gets or sets the thickness of the padding between the check list edges and its content.
+            </summary>
+    </member>
+    <member name="P:C1.Win.FlexPivot.Styles.CommonStyle.DefaultStyle">
+      <summary>
+            Gets a style that contains the default values for current style.
+            </summary>
+    </member>
+    <member name="M:C1.Win.FlexPivot.Styles.CommonStyle.Clone">
+      <summary>
+            Creates an instance of the <see cref="T:C1.Win.C1Themes.BaseStyle" /> class that is identical to the current <see cref="T:C1.Win.C1Themes.BaseStyle" /></summary>
+    </member>
+    <member name="T:C1.Win.FlexPivot.Styles.IHeaderStyle">
+      <summary>
+            Header style interface
+            </summary>
+    </member>
+    <member name="P:C1.Win.FlexPivot.Styles.IHeaderStyle.Font">
+      <summary>
+            Gets or sets font of the header text.
+            </summary>
+    </member>
+    <member name="P:C1.Win.FlexPivot.Styles.IHeaderStyle.Padding">
+      <summary>
+            Gets or sets padding of the header element.
+            </summary>
+    </member>
+    <member name="P:C1.Win.FlexPivot.Styles.IHeaderStyle.Margins">
+      <summary>
+            Margin
+            </summary>
+    </member>
+    <member name="P:C1.Win.FlexPivot.Styles.IHeaderStyle.Images">
+      <summary>
+            Button images
+            </summary>
+    </member>
+    <member name="P:C1.Win.FlexPivot.Styles.IHeaderStyle.Button">
+      <summary>
+            Button styles
+            </summary>
+    </member>
+    <member name="P:C1.Win.FlexPivot.Styles.IHeaderStyle.BackColor">
+      <summary>
+            Back color
+            </summary>
+    </member>
+    <member name="P:C1.Win.FlexPivot.Styles.IHeaderStyle.HorizontalAlignment">
+      <summary>
+            Text horizontal alignment
+            </summary>
+    </member>
+    <member name="P:C1.Win.FlexPivot.Styles.IHeaderStyle.VerticalAlignment">
+      <summary>
+            Text vertical alignment
+            </summary>
+    </member>
+    <member name="P:C1.Win.FlexPivot.Styles.IHeaderStyle.Corners">
+      <summary>
+            Corners
+            </summary>
+    </member>
+    <member name="P:C1.Win.FlexPivot.Styles.IHeaderStyle.Border">
+      <summary>
+            Borders
+            </summary>
+    </member>
+    <member name="P:C1.Win.FlexPivot.Styles.IHeaderStyle.BorderColor">
+      <summary>
+            Border color
+            </summary>
+    </member>
+    <member name="P:C1.Win.FlexPivot.Styles.IHeaderStyle.ForeColor">
+      <summary>
+            ForeColor
+            </summary>
+    </member>
+    <member name="T:C1.Win.FlexPivot.Styles.HeaderStyle">
+      <summary>
+        <see cref="T:C1.Win.FlexPivot.Styles.HeaderStyle" /> contains display attributes that 
+            determine the general appearance of the header on the screen.
+            </summary>
+    </member>
+    <member name="P:C1.Win.FlexPivot.Styles.HeaderStyle.Font">
+      <summary>
+            Gets or sets font of the header text.
+            </summary>
+    </member>
+    <member name="P:C1.Win.FlexPivot.Styles.HeaderStyle.VerticalAlignment">
+      <summary>
+            Gets or set a value specifying the vertical alignment of header text.
+            </summary>
+    </member>
+    <member name="P:C1.Win.FlexPivot.Styles.HeaderStyle.HorizontalAlignment">
+      <summary>
+            Gets or sets how header text is aligned in the horizontal direction.
+            </summary>
+    </member>
+    <member name="P:C1.Win.FlexPivot.Styles.HeaderStyle.Padding">
+      <summary>
+            Gets or sets the thickness of the padding between the element edges and its content.
+            </summary>
+    </member>
+    <member name="P:C1.Win.FlexPivot.Styles.HeaderStyle.Margins">
+      <summary>
+            Gets or sets the thickness of the margins around the element.
+            </summary>
+    </member>
+    <member name="P:C1.Win.FlexPivot.Styles.HeaderStyle.Button">
+      <summary>
+            Gets style containing display attributes that determine the general appearance of the header button element on the screen when the cursor is over it.
+            </summary>
+    </member>
+    <member name="P:C1.Win.FlexPivot.Styles.HeaderStyle.BackColor">
+      <summary>
+            Gets or sets the <see cref="T:System.Drawing.Color" /> used to paint the background.
+            </summary>
+    </member>
+    <member name="P:C1.Win.FlexPivot.Styles.HeaderStyle.Border">
+      <summary>
+            Gets or sets the thickness of the border around the element.
+            </summary>
+    </member>
+    <member name="P:C1.Win.FlexPivot.Styles.HeaderStyle.BorderColor">
+      <summary>
+            Gets or sets the <see cref="T:System.Drawing.Color" /> used to draw the border around the element.
+            </summary>
+    </member>
+    <member name="P:C1.Win.FlexPivot.Styles.HeaderStyle.Corners">
+      <summary>
+            Gets or sets the radii of the element corners.
+            </summary>
+    </member>
+    <member name="P:C1.Win.FlexPivot.Styles.HeaderStyle.ForeColor">
+      <summary>
+            Gets or sets the <see cref="T:System.Drawing.Color" /> used to draw the text.
+            </summary>
+    </member>
+    <member name="P:C1.Win.FlexPivot.Styles.HeaderStyle.Images">
+      <summary>
+            Gets or sets images used in buttons.
+            </summary>
+    </member>
+    <member name="P:C1.Win.FlexPivot.Styles.HeaderStyle.DefaultStyle">
+      <summary>
+            Gets a style that contains the default values for current style.
+            </summary>
+    </member>
+    <member name="M:C1.Win.FlexPivot.Styles.HeaderStyle.Clone">
+      <summary>
+            Creates an instance of the <see cref="T:C1.Win.C1Themes.BaseStyle" /> class that is identical to the current <see cref="T:C1.Win.C1Themes.BaseStyle" /></summary>
+    </member>
+    <member name="T:C1.Win.FlexPivot.Styles.SlicerStyles">
+      <summary>
+            The <see cref="T:C1.Win.FlexPivot.Styles.SlicerStyles" /> class represents the theme for the <see cref="T:C1.Win.FlexPivot.C1FlexPivotSlicer" /> control 
+            which contains display attributes that determine the appearance of control. 
+            </summary>
+    </member>
+    <member name="P:C1.Win.FlexPivot.Styles.SlicerStyles.Common">
+      <summary>
+            Gets <see cref="T:C1.Win.FlexPivot.Styles.CommonStyle" /> containing display attributes that 
+            determine the common appearance features of the control header on the screen.
+            </summary>
+    </member>
+    <member name="P:C1.Win.FlexPivot.Styles.SlicerStyles.Header">
+      <summary>
+            Gets <see cref="T:C1.Win.FlexPivot.Styles.HeaderStyle" /> containing display attributes that 
+            determine the general appearance of the control header on the screen.
+            </summary>
+    </member>
+    <member name="P:C1.Win.FlexPivot.Styles.SlicerStyles.CheckList">
+      <summary>
+            Gets <see cref="T:C1.Win.Input.CheckListStyles" /> containing display attributes that 
+            determine the general appearance of the check list on the screen.
+            </summary>
+    </member>
+    <member name="P:C1.Win.FlexPivot.Styles.SlicerStyles.DefaultStyle">
+      <summary>
+            Gets a theme that contains the default values for current theme.
+            </summary>
+    </member>
+    <member name="P:C1.Win.FlexPivot.Styles.SlicerStyles.IsDefault">
+      <summary>
+            Gets value indicating whether the theme is default.
+            </summary>
+    </member>
+    <member name="M:C1.Win.FlexPivot.Styles.SlicerStyles.SetFont(System.Drawing.Font)">
+      <summary>
+            Sets font property of the style.
+            </summary>
+      <param name="font">specified font.</param>
+    </member>
+    <member name="M:C1.Win.FlexPivot.Styles.SlicerStyles.Clone">
+      <summary>
+            Creates an instance of the <see cref="T:C1.Win.C1Themes.BaseTheme" /> class that is identical to the current <see cref="T:C1.Win.C1Themes.BaseTheme" /></summary>
+      <returns>The copy of the current <see cref="T:C1.Win.C1Themes.BaseTheme" />.</returns>
+    </member>
+    <member name="T:C1.Win.FlexPivot.C1FlexPivotSlicer">
+      <summary>
+            Provides simple interface to filter a <see cref="T:C1.FlexPivot.C1FlexPivotField" />.
+            </summary>
+    </member>
+    <member name="M:C1.Win.FlexPivot.C1FlexPivotSlicer.#ctor">
+      <summary>
+            Initializes a new instance of the <see cref="T:C1.Win.FlexPivot.C1FlexPivotSlicer" /> class.
+            </summary>
+    </member>
+    <member name="P:C1.Win.FlexPivot.C1FlexPivotSlicer.DataSource">
+      <summary>
+            Gets or sets the <see cref="T:C1.Win.FlexPivot.C1FlexPivotPanel" /> that provides data for this control.
+            </summary>
+    </member>
+    <member name="P:C1.Win.FlexPivot.C1FlexPivotSlicer.Field">
+      <summary>
+            Gets or sets the <see cref="T:C1.FlexPivot.C1FlexPivotField" /> being filtered by this <see cref="T:C1.Win.FlexPivot.C1FlexPivotSlicer" />.
+            </summary>
+    </member>
+    <member name="P:C1.Win.FlexPivot.C1FlexPivotSlicer.FieldName">
+      <summary>
+            Gets or sets the <see cref="P:C1.FlexPivot.C1FlexPivotField.Name" /> being filtered by this <see cref="T:C1.Win.FlexPivot.C1FlexPivotSlicer" />.
+            </summary>
+    </member>
+    <member name="P:C1.Win.FlexPivot.C1FlexPivotSlicer.MultiSelect">
+      <summary>
+            Gets or sets a value that determines whether users should be allowed to select multiple values from the list.
+            </summary>
+    </member>
+    <member name="P:C1.Win.FlexPivot.C1FlexPivotSlicer.ShowHeader">
+      <summary>
+            Gets or sets a value indicating whether the control displays the header area with the header string and multi-select/clear buttons.
+            </summary>
+    </member>
+    <member name="P:C1.Win.FlexPivot.C1FlexPivotSlicer.ShowMultiSelect">
+      <summary>
+            Gets or sets a value indicating whether the control displays the MultiSelect button on the header.
+            </summary>
+    </member>
+    <member name="P:C1.Win.FlexPivot.C1FlexPivotSlicer.ShowSort">
+      <summary>
+            Gets or sets a value indicating whether the control displays the Sort button on the header.
+            </summary>
+    </member>
+    <member name="P:C1.Win.FlexPivot.C1FlexPivotSlicer.ShowClear">
+      <summary>
+            Gets or sets a value indicating whether the control displays the Clear button on the header.
+            </summary>
+    </member>
+    <member name="P:C1.Win.FlexPivot.C1FlexPivotSlicer.ShowCheckBoxes">
+      <summary>
+            Gets or sets a value indicating whether the control displays checkboxes next to each item.
+            </summary>
+    </member>
+    <member name="P:C1.Win.FlexPivot.C1FlexPivotSlicer.ShowSelectAll">
+      <summary>
+            Gets or sets a value indicating whether the list of control displays select all node.
+            </summary>
+    </member>
+    <member name="P:C1.Win.FlexPivot.C1FlexPivotSlicer.SortOrder">
+      <summary>
+            Gets or sets sort order applied to the list.
+            </summary>
+    </member>
+    <member name="P:C1.Win.FlexPivot.C1FlexPivotSlicer.Styles">
+      <summary>
+        <see cref="T:C1.Win.FlexPivot.Styles.SlicerStyles" /> contains display attributes that 
+            determine the appearance of the control on the screen.
+            </summary>
+    </member>
+    <member name="T:C1.Win.FlexPivot.Design.IFlexPivotDataSource">
+      <summary>
+            Provides DataSource.
+            </summary>
+      <remarks>
+            This interface helps <see cref="T:C1.Win.FlexPivot.Design.C1FlexPivotFieldNameEditor" /> to find DataSource property of a context.
+            </remarks>
+    </member>
+    <member name="P:C1.Win.FlexPivot.Design.IFlexPivotDataSource.DataSource">
+      <summary>
+            DataSource.
+            </summary>
+    </member>
+    <member name="T:C1.Win.FlexPivot.Design.C1FlexPivotFieldNameEditor">
+      <summary>
+            Type editor for <see cref="P:C1.Win.FlexPivot.C1FlexPivotSlicer.FieldName" /> property.
+            </summary>
+    </member>
+    <member name="T:C1.Win.FlexPivot.Localization.SlicerStrings">
+      <summary>
+            The <see cref="T:C1.Win.FlexPivot.Localization.Strings" /> class contains static properties used for localization.
+            </summary>
+    </member>
+    <member name="P:C1.Win.FlexPivot.Localization.SlicerStrings.ResourceManager">
+      <summary>
+            The <see cref="P:C1.Win.FlexPivot.Localization.SlicerStrings.ResourceManager" /> object used for lookup resources.
+            </summary>
+      <remarks>Set this property to the valid value if 
+            you define resources in a Custom Control assembly.</remarks>
+    </member>
+    <member name="P:C1.Win.FlexPivot.Localization.SlicerStrings.UICulture">
+      <summary>
+            Returns default <see cref="T:System.Globalization.CultureInfo" /> object used as fallback culture.
+            </summary>
+    </member>
+  </members>
+</doc>

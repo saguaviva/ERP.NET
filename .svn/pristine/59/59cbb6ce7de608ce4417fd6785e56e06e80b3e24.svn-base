@@ -1,0 +1,566 @@
+Imports MySql.Data.MySqlClient : Imports clsFuncionesLOG : Imports clsFuncionesC1 : Imports clsFuncionesUtiles : Imports clsConstantes
+
+Public Class frmListaRecibido
+    Inherits aura2k3.frmBase
+
+
+#Region " Código generado por el Diseñador de Windows Forms "
+
+    Public Sub New()
+        MyBase.New()
+
+        'El Diseñador de Windows Forms requiere esta llamada.
+        InitializeComponent() : Dim tom As SMcMaster.TabOrderManager = New SMcMaster.TabOrderManager(Me) : tom.SetTabOrder(SMcMaster.TabOrderManager.TabScheme.AcrossFirst)
+
+        'Agregar cualquier inicialización después de la llamada a InitializeComponent()
+
+    End Sub
+
+    'Form reemplaza a Dispose para limpiar la lista de componentes.
+    Protected Overloads Overrides Sub Dispose(ByVal disposing As Boolean)
+        '! Seal for less overhead - Can declare NotInheritable Class
+        If disposing Then
+            If Not (components Is Nothing) Then
+                components.Dispose()
+            End If
+        End If
+        MyBase.Dispose(disposing)
+    End Sub
+
+    'Requerido por el Diseñador de Windows Forms
+    Private components As System.ComponentModel.IContainer
+
+    'NOTA: el Diseñador de Windows Forms requiere el siguiente procedimiento
+    'Puede modificarse utilizando el Diseñador de Windows Forms. 
+    'No lo modifique con el editor de código.
+
+    Friend WithEvents btnAceptar As C1.Win.C1Input.C1Button
+
+    Friend WithEvents dgRecibido As C1.Win.C1TrueDBGrid.C1TrueDBGrid
+    Friend WithEvents Label1 As System.Windows.Forms.Label
+    Friend WithEvents txtCantidadRecibida As C1.Win.C1Input.C1TextBox
+    Friend WithEvents Label2 As System.Windows.Forms.Label
+    Friend WithEvents txtFaltanPorRecibir As C1.Win.C1Input.C1TextBox
+    Friend WithEvents Label3 As System.Windows.Forms.Label
+    Friend WithEvents txtYaRecibido As C1.Win.C1Input.C1TextBox
+    <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
+        Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(frmListaRecibido))
+        Me.btnAceptar = New C1.Win.C1Input.C1Button
+        Me.dgRecibido = New C1.Win.C1TrueDBGrid.C1TrueDBGrid
+        Me.txtCantidadRecibida = New C1.Win.C1Input.C1TextBox
+        Me.Label1 = New System.Windows.Forms.Label
+        Me.Label2 = New System.Windows.Forms.Label
+        Me.txtFaltanPorRecibir = New C1.Win.C1Input.C1TextBox
+        Me.Label3 = New System.Windows.Forms.Label
+        Me.txtYaRecibido = New C1.Win.C1Input.C1TextBox
+        CType(Me.dgRecibido, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.txtCantidadRecibida, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.txtFaltanPorRecibir, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.txtYaRecibido, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.SuspendLayout()
+        '
+        'sbtipo
+        '
+        Me.sbtipo.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.sbtipo.Location = New System.Drawing.Point(5, 144)
+        Me.sbtipo.Name = "sbtipo"
+        Me.sbtipo.Text = ""
+        '
+        'btnRecargar
+        '
+        Me.btnRecargar.Name = "btnRecargar"
+        '
+        'btnSiguiente
+        '
+        Me.btnSiguiente.Name = "btnSiguiente"
+        '
+        'btnAnterior
+        '
+        Me.btnAnterior.Name = "btnAnterior"
+        '
+        'btnPrimero
+        '
+        Me.btnPrimero.Name = "btnPrimero"
+        '
+        'btnUltimo
+        '
+        Me.btnUltimo.Name = "btnUltimo"
+        '
+        'btnModificar
+        '
+        Me.btnModificar.Name = "btnModificar"
+        '
+        'btnTancar
+        '
+        Me.btnTancar.Name = "btnTancar"
+        '
+        'btnBorrar
+        '
+        Me.btnBorrar.Name = "btnBorrar"
+        '
+        'btnNuevo
+        '
+        Me.btnNuevo.Name = "btnNuevo"
+        '
+        'arrayGrids
+        '
+        '
+        'btnActualizar
+        '
+        Me.btnActualizar.Name = "btnActualizar"
+        '
+        'btnVerLista
+        '
+        Me.btnVerLista.Name = "btnVerLista"
+        '
+        'cboSeleccionCentro
+        '
+        Me.cboSeleccionCentro.Name = "cboSeleccionCentro"
+        '
+        'btnAceptar
+        '
+        Me.btnAceptar.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnAceptar.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.btnAceptar.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft
+        Me.btnAceptar.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.btnAceptar.Location = New System.Drawing.Point(548, 292)
+        Me.btnAceptar.Name = "btnAceptar"
+        Me.btnAceptar.TabIndex = 1
+        Me.btnAceptar.Text = "Acceptar"
+        '
+        'dgRecibido
+        '
+        Me.dgRecibido.AllowAddNew = True
+        Me.dgRecibido.AllowDelete = True
+        Me.dgRecibido.CaptionHeight = 17
+        Me.dgRecibido.FlatStyle = C1.Win.C1TrueDBGrid.FlatModeEnum.System
+        Me.dgRecibido.GroupByCaption = "Drag a column header here to group by that column"
+        Me.dgRecibido.Images.Add(CType(resources.GetObject("resource"), System.Drawing.Image))
+        Me.dgRecibido.Location = New System.Drawing.Point(12, 12)
+        Me.dgRecibido.MarqueeStyle = C1.Win.C1TrueDBGrid.MarqueeEnum.DottedCellBorder
+        Me.dgRecibido.Name = "dgRecibido"
+        Me.dgRecibido.PreviewInfo.Location = New System.Drawing.Point(0, 0)
+        Me.dgRecibido.PreviewInfo.Size = New System.Drawing.Size(0, 0)
+        Me.dgRecibido.PreviewInfo.ZoomFactor = 75
+        Me.dgRecibido.RecordSelectorWidth = 17
+        Me.dgRecibido.RowDivider.Color = System.Drawing.Color.DarkGray
+        Me.dgRecibido.RowDivider.Style = C1.Win.C1TrueDBGrid.LineStyleEnum.Single
+        Me.dgRecibido.RowHeight = 15
+        Me.dgRecibido.RowSubDividerColor = System.Drawing.Color.DarkGray
+        Me.dgRecibido.Size = New System.Drawing.Size(604, 240)
+        Me.dgRecibido.TabAction = C1.Win.C1TrueDBGrid.TabActionEnum.GridNavigation
+        Me.dgRecibido.TabIndex = 12
+        Me.dgRecibido.Text = "C1TrueDBGrid1"
+        Me.dgRecibido.PropBag = "<?xml version=""1.0""?><Blob><Styles type=""C1.Win.C1TrueDBGrid.Design.ContextWrappe" & _
+        "r""><Data>Group{BackColor:ControlDark;Border:None,,0, 0, 0, 0;AlignVert:Center;}E" & _
+        "ditor{}Style2{}Style5{}Style4{}Style7{}Style6{}EvenRow{BackColor:Aqua;}Selected{" & _
+        "ForeColor:HighlightText;BackColor:Highlight;}Style3{}Inactive{ForeColor:Inactive" & _
+        "CaptionText;BackColor:InactiveCaption;}FilterBar{}Footer{}Caption{AlignHorz:Cent" & _
+        "er;}Style9{}Normal{Font:Microsoft Sans Serif, 8.25pt;}HighlightRow{ForeColor:Hig" & _
+        "hlightText;BackColor:Highlight;}Style14{}OddRow{}RecordSelector{AlignImage:Cente" & _
+        "r;}Style15{}Heading{Wrap:True;AlignVert:Center;Border:Raised,,1, 1, 1, 1;ForeCol" & _
+        "or:ControlText;BackColor:Control;}Style8{}Style10{AlignHorz:Near;}Style11{}Style" & _
+        "12{}Style13{}Style1{}</Data></Styles><Splits><C1.Win.C1TrueDBGrid.MergeView Name" & _
+        "="""" CaptionHeight=""17"" ColumnCaptionHeight=""17"" ColumnFooterHeight=""17"" MarqueeS" & _
+        "tyle=""DottedCellBorder"" RecordSelectorWidth=""17"" DefRecSelWidth=""17"" VerticalScr" & _
+        "ollGroup=""1"" HorizontalScrollGroup=""1""><CaptionStyle parent=""Style2"" me=""Style10" & _
+        """ /><EditorStyle parent=""Editor"" me=""Style5"" /><EvenRowStyle parent=""EvenRow"" me" & _
+        "=""Style8"" /><FilterBarStyle parent=""FilterBar"" me=""Style13"" /><FooterStyle paren" & _
+        "t=""Footer"" me=""Style3"" /><GroupStyle parent=""Group"" me=""Style12"" /><HeadingStyle" & _
+        " parent=""Heading"" me=""Style2"" /><HighLightRowStyle parent=""HighlightRow"" me=""Sty" & _
+        "le7"" /><InactiveStyle parent=""Inactive"" me=""Style4"" /><OddRowStyle parent=""OddRo" & _
+        "w"" me=""Style9"" /><RecordSelectorStyle parent=""RecordSelector"" me=""Style11"" /><Se" & _
+        "lectedStyle parent=""Selected"" me=""Style6"" /><Style parent=""Normal"" me=""Style1"" /" & _
+        "><ClientRect>0, 0, 600, 236</ClientRect><BorderSide>0</BorderSide></C1.Win.C1Tru" & _
+        "eDBGrid.MergeView></Splits><NamedStyles><Style parent="""" me=""Normal"" /><Style pa" & _
+        "rent=""Normal"" me=""Heading"" /><Style parent=""Heading"" me=""Footer"" /><Style parent" & _
+        "=""Heading"" me=""Caption"" /><Style parent=""Heading"" me=""Inactive"" /><Style parent=" & _
+        """Normal"" me=""Selected"" /><Style parent=""Normal"" me=""Editor"" /><Style parent=""Nor" & _
+        "mal"" me=""HighlightRow"" /><Style parent=""Normal"" me=""EvenRow"" /><Style parent=""No" & _
+        "rmal"" me=""OddRow"" /><Style parent=""Heading"" me=""RecordSelector"" /><Style parent=" & _
+        """Normal"" me=""FilterBar"" /><Style parent=""Caption"" me=""Group"" /></NamedStyles><ve" & _
+        "rtSplits>1</vertSplits><horzSplits>1</horzSplits><Layout>None</Layout><DefaultRe" & _
+        "cSelWidth>17</DefaultRecSelWidth><ClientArea>0, 0, 600, 236</ClientArea><PrintPa" & _
+        "geHeaderStyle parent="""" me=""Style14"" /><PrintPageFooterStyle parent="""" me=""Style" & _
+        "15"" /></Blob>"
+        '
+        'txtCantidadRecibida
+        '
+        Me.txtCantidadRecibida.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.txtCantidadRecibida.CustomFormat = "###,###,###,###,##0.00"
+        Me.txtCantidadRecibida.DataType = GetType(System.Double)
+        Me.txtCantidadRecibida.FormatType = C1.Win.C1Input.FormatTypeEnum.CustomFormat
+        Me.txtCantidadRecibida.Location = New System.Drawing.Point(412, 292)
+        Me.txtCantidadRecibida.Name = "txtCantidadRecibida"
+        Me.txtCantidadRecibida.TabIndex = 13
+        Me.txtCantidadRecibida.Tag = Nothing
+        Me.txtCantidadRecibida.Visible = False
+        '
+        'Label1
+        '
+        Me.Label1.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.Label1.Location = New System.Drawing.Point(164, 292)
+        Me.Label1.Name = "Label1"
+        Me.Label1.Size = New System.Drawing.Size(244, 20)
+        Me.Label1.TabIndex = 14
+        Me.Label1.Text = "Indica quina quantitat s'ha rebut del teixit"
+        Me.Label1.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        Me.Label1.Visible = False
+        '
+        'Label2
+        '
+        Me.Label2.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.Label2.Location = New System.Drawing.Point(164, 268)
+        Me.Label2.Name = "Label2"
+        Me.Label2.Size = New System.Drawing.Size(244, 20)
+        Me.Label2.TabIndex = 16
+        Me.Label2.Text = "Queden per rebre:"
+        Me.Label2.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        Me.Label2.Visible = False
+        '
+        'txtFaltanPorRecibir
+        '
+        Me.txtFaltanPorRecibir.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.txtFaltanPorRecibir.CustomFormat = "###,###,###,###,##0.00"
+        Me.txtFaltanPorRecibir.DataType = GetType(System.Double)
+        Me.txtFaltanPorRecibir.FormatType = C1.Win.C1Input.FormatTypeEnum.CustomFormat
+        Me.txtFaltanPorRecibir.Location = New System.Drawing.Point(412, 268)
+        Me.txtFaltanPorRecibir.Name = "txtFaltanPorRecibir"
+        Me.txtFaltanPorRecibir.ReadOnly = True
+        Me.txtFaltanPorRecibir.TabIndex = 15
+        Me.txtFaltanPorRecibir.Tag = Nothing
+        Me.txtFaltanPorRecibir.Visible = False
+        '
+        'Label3
+        '
+        Me.Label3.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.Label3.Location = New System.Drawing.Point(164, 244)
+        Me.Label3.Name = "Label3"
+        Me.Label3.Size = New System.Drawing.Size(244, 20)
+        Me.Label3.TabIndex = 20
+        Me.Label3.Text = "Ja Rebut"
+        Me.Label3.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        Me.Label3.Visible = False
+        '
+        'txtYaRecibido
+        '
+        Me.txtYaRecibido.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.txtYaRecibido.CustomFormat = "###,###,###,###,##0.00"
+        Me.txtYaRecibido.DataType = GetType(System.Double)
+        Me.txtYaRecibido.FormatType = C1.Win.C1Input.FormatTypeEnum.CustomFormat
+        Me.txtYaRecibido.Location = New System.Drawing.Point(412, 244)
+        Me.txtYaRecibido.Name = "txtYaRecibido"
+        Me.txtYaRecibido.ReadOnly = True
+        Me.txtYaRecibido.TabIndex = 19
+        Me.txtYaRecibido.Tag = Nothing
+        Me.txtYaRecibido.Visible = False
+        '
+        'frmListaRecibido
+        '
+        Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
+        Me.ClientSize = New System.Drawing.Size(632, 321)
+        Me.Controls.Add(Me.Label3)
+        Me.Controls.Add(Me.txtYaRecibido)
+        Me.Controls.Add(Me.Label2)
+        Me.Controls.Add(Me.txtFaltanPorRecibir)
+        Me.Controls.Add(Me.Label1)
+        Me.Controls.Add(Me.txtCantidadRecibida)
+        Me.Controls.Add(Me.dgRecibido)
+        Me.Controls.Add(Me.btnAceptar)
+        Me.Cursor = System.Windows.Forms.Cursors.Default
+        Me.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!)
+        Me.Name = "frmListaRecibido"
+        Me.Text = "Llistat Rebut"
+        Me.Controls.SetChildIndex(Me.cboSeleccionCentro, 0)
+        Me.Controls.SetChildIndex(Me.sbtipo, 0)
+        Me.Controls.SetChildIndex(Me.btnActualizar, 0)
+        Me.Controls.SetChildIndex(Me.btnNuevo, 0)
+        Me.Controls.SetChildIndex(Me.btnBorrar, 0)
+        Me.Controls.SetChildIndex(Me.btnTancar, 0)
+        Me.Controls.SetChildIndex(Me.btnUltimo, 0)
+        Me.Controls.SetChildIndex(Me.btnPrimero, 0)
+        Me.Controls.SetChildIndex(Me.btnAnterior, 0)
+        Me.Controls.SetChildIndex(Me.btnSiguiente, 0)
+        Me.Controls.SetChildIndex(Me.btnRecargar, 0)
+        Me.Controls.SetChildIndex(Me.btnVerLista, 0)
+        Me.Controls.SetChildIndex(Me.btnModificar, 0)
+        Me.Controls.SetChildIndex(Me.btnAceptar, 0)
+        Me.Controls.SetChildIndex(Me.dgRecibido, 0)
+        Me.Controls.SetChildIndex(Me.txtCantidadRecibida, 0)
+        Me.Controls.SetChildIndex(Me.Label1, 0)
+        Me.Controls.SetChildIndex(Me.txtFaltanPorRecibir, 0)
+        Me.Controls.SetChildIndex(Me.Label2, 0)
+        Me.Controls.SetChildIndex(Me.txtYaRecibido, 0)
+        Me.Controls.SetChildIndex(Me.Label3, 0)
+        CType(Me.dgRecibido, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.txtCantidadRecibida, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.txtFaltanPorRecibir, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.txtYaRecibido, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.ResumeLayout(False)
+
+    End Sub
+
+#End Region
+
+#Region "VARIABLES"
+
+    Public PAF As clsPAFCompra
+    Public traspasoActual As clsTraspasosCompra
+
+#End Region
+
+#Region "INICIALIZACION"
+
+    Private Sub IniciarForm(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
+        Cursor = Cursors.WaitCursor
+        Try
+
+            Me.arrayGrids = New System.Windows.Forms.Control() {Me.dgRecibido}
+            traspasoActual = New clsTraspasosCompra(ds.Tables("dcfactutrasp"), PAF.centro, Me.BindingContext, PAF)
+            dgRecibido.DataSource = traspasoActual.dvForm
+
+            InicializarDgTraspaso()
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+        Cursor = Cursors.Default
+    End Sub
+    Private Sub InicializarDgTraspaso()
+        Dim i As Integer = 0
+        Try
+            OcultarColumnasDG(dgRecibido)
+            If PAF.TIPUS = Tejido OrElse PAF.TIPUS = Fornitura Then
+                Label1.Visible = True
+                txtCantidadRecibida.Visible = True
+                dgRecibido.Visible = False
+                txtFaltanPorRecibir.Visible = True
+                Label2.Visible = True
+                txtYaRecibido.Visible = True
+                Label3.Visible = True
+                txtFaltanPorRecibir.Value = PAF.lineasCompra.PERREBRE
+                txtYaRecibido.Value = PAF.lineasCompra.REBUT
+                Me.ClientSize = New System.Drawing.Size(500, 120)
+                Exit Sub
+            End If
+
+            i = 0
+            Select Case PAF.DOCUMENT
+                Case Pedido
+                    PPCol2("FRA", dgRecibido, rm.GetString("ALBARAN"), "", _
+                                True, 35, False, C1.Win.C1TrueDBGrid.PresentationEnum.Normal, False, 100, i, False)
+                Case Albaran
+                    PPCol2("FRA", dgRecibido, rm.GetString("AFACTURA"), "", True, 35, _
+                            False, C1.Win.C1TrueDBGrid.PresentationEnum.Normal, False, 100, i, False)
+            End Select
+
+            i = i + 1
+            PPCol2("QUANTITAT", dgRecibido, rm.GetString("CANTIDAD"), "", True, 35, _
+                    False, C1.Win.C1TrueDBGrid.PresentationEnum.Normal, False, 100, i, False)
+
+            i = i + 1
+            PPCol2("DATA", dgRecibido, rm.GetString("FECHA"), "Short Date", True, 35, False, _
+                    C1.Win.C1TrueDBGrid.PresentationEnum.Normal, False, 100, i, False)
+
+            'dgTraspaso.Splits(0).DisplayColumns("DATA").ButtonText = True
+
+            i = i + 1
+            PPCol2("TRASPASADA", dgRecibido, rm.GetString("TRASPASADA"), "", True, 35, _
+                    False, C1.Win.C1TrueDBGrid.PresentationEnum.CheckBox, False, 100, i, False)
+            i = i + 1
+            '!!!!!!!! Ocultar
+            'PPCol2("ALINEA", dgRecibido, "ALINEA", "", True, 35, _
+            '        False, C1.Win.C1TrueDBGrid.PresentationEnum.Normal, False, 100, i, False)
+            'i = i + 1
+            'PPCol2("COMAN", dgRecibido, "COMAN", "", True, 35, _
+            '                    False, C1.Win.C1TrueDBGrid.PresentationEnum.Normal, False, 100, i, False)
+            'i = i + 1
+            'PPCol2("ALBAR", dgRecibido, "ALBAR", "", True, 35, _
+            '                    False, C1.Win.C1TrueDBGrid.PresentationEnum.Normal, False, 100, i, False)
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+
+#End Region
+
+#Region "ORGANIZAR"
+
+    Friend Sub guardarDV(ByVal dv As DataView)
+        Dim bm As BindingManagerBase
+        Dim drv As DataRowView
+        Try
+            bm = BindingContext(dv)
+            If Not bm.Count = 0 Then
+                drv = CType(bm.Current, DataRowView)
+                drv.EndEdit()
+            End If
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Function ActualizarStockTejidos(ByVal cantidad As Double) As Boolean
+        Dim METROS As Double
+        Dim KILOS As Double
+        Dim REND As Double
+        Dim strSQL As String
+        Dim stock As Double
+        Dim cmdSel As New MySqlCommand
+        Dim cmdUpd As New MySqlCommand
+        Try
+            cmdSel.Connection = cnn
+            cmdUpd.Connection = cnn
+            Dim rendimientoTejido As Double = DLookUp("RENDIMENT", "TEIXITS", " CODI = """ & PAF.lineasCompra.ARTICLE & """ AND CENTRO = """ & PAF.centro & """ ")
+            If rendimientoTejido = 0 Then : REND = 1
+            Else : REND = rendimientoTejido : End If
+            Select Case PAF.lineasCompra.KM
+                Case "K"
+                    'Esta representado en kilos
+                    METROS = roundnum(cantidad * REND, 2)
+                    KILOS = cantidad
+                Case "M"
+                    METROS = cantidad
+                    KILOS = roundnum(cantidad / REND, 2)
+                    'Esta representado en metros
+            End Select
+
+            ACN()
+            strSQL = "UPDATE " & tablaHiloColores & " SET ACTUAL = ACTUAL + " & general.NS(METROS, True) & " WHERE(FIL = """ & general.NS(PAF.lineasCompra.ARTICLE) & """ AND TIPUS = ""T"" AND COLOR = """ & general.NS(PAF.lineasCompra.COLOR) & """ AND CENTRO = """ & PAF.centro & """ )"
+            cmdUpd.CommandText = strSQL
+            cmdUpd.ExecuteNonQuery()
+            CCN()
+            Return True
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Function
+    Private Function SumarQuitarDispuesto(ByVal MASMENOS As String, ByVal cantidad As Double)
+        Dim METROS As Double
+        Dim KILOS As Double
+        Dim REND As Double
+        Dim cmd As New MySqlCommand
+        Try
+            '.STCRUK = roundnum(.STCRUM / .RENDIMENT, 2)
+            '.STCRUM = roundnum(.STCRUK * .RENDIMENT, 2)
+            'Hay que sumar al color del tejido que tiene esta disposicion los kg de la linea
+            Dim rendimientoTejido As Double = DLookUp("RENDIMENT", "TEIXITS", " CODI = """ & PAF.lineasCompra.ARTICLE & """ AND CENTRO = """ & PAF.centro & """ ")
+            If rendimientoTejido = 0 Then : REND = 1
+            Else : REND = rendimientoTejido : End If
+            'Aquí disponemos del rendimiento del tejido
+
+            Select Case PAF.lineasCompra.KM
+                Case "K"
+                    'Esta representado en kilos
+                    METROS = roundnum(cantidad * REND, 2)
+                    KILOS = cantidad
+                Case "M"
+                    METROS = cantidad
+                    KILOS = roundnum(cantidad / REND, 2)
+                    'Esta representado en metros
+            End Select
+
+
+            cmd = New MySqlCommand("UPDATE TEIXITS " & _
+                        " SET STCRUK = STCRUK " & MASMENOS & """" & general.NS(KILOS, True) & """, " & _
+                        " STCRUM = STCRUM " & MASMENOS & """" & general.NS(METROS, True) & """ " & _
+                        " WHERE CODI = """ & PAF.lineasCompra.ARTICLE & """ AND CENTRO = """ & PAF.centro & """ ", cnn)
+
+            ACN()
+            cmd.ExecuteNonQuery()
+            CCN()
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+
+    End Function
+    Private Function ActualizarStockFonituras(ByVal cantidad As Double) As Boolean
+        Dim strSQL As String
+        Dim stock As Double
+        Dim cmdUpd As New MySqlCommand
+        Try
+
+            cmdUpd.Connection = cnn
+            ACN()
+            'La medida en el pedido es la talla y en el detalle de las fornituras es el color (para aprovechar el filcol)
+            strSQL = "UPDATE " & tablaHiloColores & " SET ACTUAL = ACTUAL + " & general.NS(cantidad, True) & " " & _
+                        " WHERE (" & _
+                        " FIL = """ & general.NS(PAF.lineasCompra.ARTICLE) & """ AND " & _
+                        " CENTRO = """ & PAF.centro & """ AND " & _
+                        " TIPUS = ""O"" AND " & _
+                        " COLOR = """ & general.NS(PAF.lineasCompra.TALLA) & """)"
+
+            cmdUpd.CommandText = strSQL
+            cmdUpd.ExecuteNonQuery()
+            CCN()
+            Return True
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Function
+    Private Sub btnAceptar_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnAceptar.Click
+        Try
+            Select Case PAF.TIPUS
+                Case Tejido
+                    If PAF.lineasCompra.COLOR = "**CRU**" Then
+                        SumarQuitarDispuesto("+", nzn(txtCantidadRecibida.Value, 0))
+                    Else
+                        ActualizarStockTejidos(nzn(txtCantidadRecibida.Value, 0))
+                    End If
+                    PAF.lineasCompra.REBUT = PAF.lineasCompra.REBUT + nzn(txtCantidadRecibida.Value, 0)
+                    PAF.lineasCompra.PERREBRE = PAF.lineasCompra.UNITATS - PAF.lineasCompra.REBUT
+
+                Case Fornitura
+
+                    ActualizarStockFonituras(nzn(txtCantidadRecibida.Value, 0))
+                    PAF.lineasCompra.REBUT = PAF.lineasCompra.REBUT + nzn(txtCantidadRecibida.Value, 0)
+                    PAF.lineasCompra.PERREBRE = PAF.lineasCompra.UNITATS - PAF.lineasCompra.REBUT
+
+                Case Else
+                    traspasoActual.ActualizarOrigen(False, True)
+
+            End Select
+
+            Me.Close()
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub dg_ButtonClick(ByVal sender As System.Object, ByVal e As C1.Win.C1TrueDBGrid.ColEventArgs) Handles dgRecibido.AfterColUpdate
+        Dim b As Boolean
+        Try
+            If Not cargando Then
+                cargando = True
+                Select Case e.Column.DataColumn.DataField
+                    Case "TRASPASADA"
+                        traspasoActual.HacerCalculos()
+                End Select
+                cargando = False
+            End If
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+
+#End Region
+
+    Private Sub dgRecibido_BeforeDelete(ByVal sender As Object, ByVal e As C1.Win.C1TrueDBGrid.CancelEventArgs) Handles dgRecibido.BeforeDelete
+        Try
+            If MessageBox.Show(rm.GetString("BORRARLINEA"), rm.GetString("ConfirmacionEliminacion"), MessageBoxButtons.YesNo) = DialogResult.Yes Then
+                e.Cancel = False
+            Else
+                e.Cancel = True
+            End If
+
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Sub
+
+End Class
+

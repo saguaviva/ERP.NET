@@ -1,0 +1,171 @@
+Module constantes
+
+#Region "Tamaños"
+
+    Friend Const AltoEtiquetaEnvio As Integer = 77
+    Friend Const AltoEtiquetaTejido As Integer = 79
+    Friend Const twins2mm As Integer = 55
+
+#End Region
+
+    Friend dtFiliales As New DataTable
+
+    Friend w As IO.StreamWriter = IO.File.AppendText("errores.err")
+
+    Public mHost As String
+
+
+    Friend Const pubAño As Integer = 2005
+    Friend Const siguiente As Short = 1
+    Friend Const anterior As Short = 2
+    Friend Const ultimo As Short = 3
+    Friend Const primero As Short = 4
+    Friend Const iraregistro As Short = 5
+    Friend Const iraRegistroNombre As Short = 6
+    Friend Const iraRegistroFila As Short = 7
+    Friend Const elMismo As Short = 8
+    Friend Const esCambioSeleccion As Short = -2
+    Friend Const noBoton As Short = 100
+    Friend Const siBoton As Short = 99
+    Public Const n1 As Object = Nothing
+    Friend idiomaImpresion As String = "es-ES"
+
+    Friend Const Compra = "C"
+    Friend Const Venta = "V"
+
+    Friend Const PAF = "D"
+    Friend Const Recibo = "R"
+
+    Friend Const Proforma As Char = "M"
+    Friend Const Albaran As Char = "A"
+    Friend Const Pedido As Char = "C"
+    Friend Const Factura As Char = "F"
+    Friend Const OrdenFabComplementos As Char = "O"
+    Friend Const OrdenModelos As Char = "P"
+    Friend Const Prenda As Char = "P"
+
+    Friend Const Modelo As Char = "M"
+    Friend Const Hilos As Char = "M"
+    Friend Const Muestra As Char = "M"
+    Friend Const Tejido As Char = "T"
+    Friend Const Fornitura As Char = "F"
+
+    Friend Const poner As Short = 110
+    Friend Const quitar As Short = 111
+
+    Friend Const soloLectura As Boolean = True
+    Friend Const modificable As Boolean = False
+
+    Friend Const esRegistroExistente As Boolean = True
+
+    Friend Const esListado As Short = 0
+    Friend Const esEleccion As Short = 1
+
+    Friend empresaPorDefecto As Char = "C"
+    Friend modoDebug As Boolean = False
+    Friend directorio As String
+
+    Friend HaciendoFormatBinding As Boolean = False
+
+#Region "NOMBRES DE TABLAS"
+
+
+    Friend Const tablaPAISES As String = "paises"
+    Friend Const tablaMuestras As String = "MOSTRES"
+    Friend Const tablaProveedores As String = "prove"
+    Friend Const tablaLineasDisposiciones As String = "ddispos"
+    Friend Const tablaClientes As String = "clients"
+    Friend Const tablaMaq As String = "MAQ"
+    Friend Const tablaTemporadas As String = "temporadas"
+    Friend Const tablaModelos As String = "models"
+    Friend Const tablaForniturasModelos As String = "mforni"
+    Friend Const tablaDisposiciones As String = "dispos"
+    Friend Const tablaColores As String = "color"
+    Friend Const tablaTallas As String = "TALLA"
+    Friend Const tablaFornituras As String = "forni"
+    Friend Const tablaTransportistas As String = "trans"
+    Friend Const tablaTrabajos As String = "treballs"
+    Friend Const tablaFormaPago As String = "forpag"
+    Friend Const tablaAcabados As String = "dacabats"
+    Friend Const tablaMaquinas As String = "maqui"
+    Friend Const tablaBancos As String = "bancs"
+    Friend Const tablaTejidos As String = "teixits"
+    Friend Const tablaHiloColores As String = "filcol"
+    Friend Const tablaComposicionTejidos As String = "mattei"
+    Friend Const tablaCompras As String = "cactur"
+    Friend Const tablaLineasCompras As String = "dcactu"
+    Friend Const tablaVentas As String = "factur"
+    Friend Const tablaLineasVenta As String = "dfactu"
+    Friend Const tablaRepresentantes As String = "repres"
+    Friend Const tablaLineasRemesas As String = "dremesas"
+    Friend Const tablaRemesas As String = "remesas"
+    Friend Const tablaEmpresas As String = "filiales"
+    Friend Const tablaIVA As String = "IVA"
+    Friend Const tablaHilos As String = "fil"
+    Friend Const tablaTalleres As String = "tallers"
+    Friend Const tablaOrdenesModelos As String = "cordre"
+
+#End Region
+
+#Region "NOMBRES DE CAMPOS"
+
+    Friend Const CCPAISES As String = "CODI"
+    Friend Const CNPAISES As String = "NOM"
+
+    Friend Const CCDisposiciones As String = "IDDispos"
+
+    Friend Const CCClients As String = "CODI"
+    Friend Const CNClients As String = "NOM"
+
+    Friend Const CCProve As String = "CODI"
+    Friend Const CNProve As String = "NOM"
+
+    Friend Const CCRemesor As String = "CODI"
+    Friend Const CNRemesor As String = "NOM"
+
+    Friend Const CCForni As String = "CODI"
+    Friend Const CNForni As String = "DESCRI"
+
+    Friend Const CCTrans As String = "CODI"
+    Friend Const CNTrans As String = "NOM"
+
+    Friend Const CCTallers As String = "CODI"
+    Friend Const CNTallers As String = "NOM"
+
+    Friend Const CCRepres As String = "CODI"
+    Friend Const CNRepres As String = "NOM"
+
+    Friend Const CCTreballs As String = "CODI"
+    Friend Const CNTreballs As String = "DESCRI"
+
+    Friend Const CCForpag As String = "CODI"
+    Friend Const CNForpag As String = "DESCRIPCIO"
+
+    Friend Const CCBancs As String = "CODI"
+    Friend Const CNBancs As String = "DESCRIPCIO"
+
+    Friend Const CCMaqui As String = "CODI"
+    Friend Const CNMaqui As String = "DESCRI"
+
+    Friend Const CCTeixits As String = "CODI"
+    Friend Const CNTeixits As String = "DESCRI"
+
+    Friend Const CCFil As String = "CODI"
+    Friend Const CNFil As String = "DESCRI"
+
+    Friend Const CCMuestra As String = "CODI"
+    Friend Const CNMuestra As String = "DESCRI"
+
+    Friend Const CCModelo As String = "CODI"
+    Friend Const CNModelo As String = "DESCRI"
+
+    Friend Const CCFiliales As String = "CODI"
+    Friend Const CNFiliales As String = "DESCRI"
+
+    Friend Const CNIVA As String = "DESCRIPCIO"
+    Friend Const CCIVA As String = "CODI"
+
+#End Region
+
+
+End Module

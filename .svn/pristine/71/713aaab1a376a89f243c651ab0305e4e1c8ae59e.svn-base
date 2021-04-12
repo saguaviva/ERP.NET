@@ -1,0 +1,2170 @@
+Imports CoreLab.MySql
+
+
+
+Public Class frmRemesas
+    Inherits aura2k3.frmBase
+
+#Region " Código generado por el Diseñador de Windows Forms "
+
+    Public Sub New()
+        MyBase.New()
+
+        'El Diseñador de Windows Forms requiere esta llamada.
+        InitializeComponent() : Dim tom As SMcMaster.TabOrderManager = New SMcMaster.TabOrderManager(Me) : tom.SetTabOrder(SMcMaster.TabOrderManager.TabScheme.AcrossFirst)
+
+        'Agregar cualquier inicialización después de la llamada a InitializeComponent()
+
+    End Sub
+
+    'Form reemplaza a Dispose para limpiar la lista de componentes.
+    Protected Overloads Overrides Sub Dispose(ByVal disposing As Boolean)
+        '! Seal for less overhead - Can declare NotInheritable Class
+        If disposing Then
+            If Not (components Is Nothing) Then
+                components.Dispose()
+            End If
+        End If
+       MyBase.Dispose(disposing)
+        frmChildForm = Nothing
+    End Sub
+
+    'Requerido por el Diseñador de Windows Forms
+    Private components As System.ComponentModel.IContainer
+
+    'NOTA: el Diseñador de Windows Forms requiere el siguiente procedimiento
+    'Puede modificarse utilizando el Diseñador de Windows Forms. 
+    'No lo modifique con el editor de código.
+
+    Friend WithEvents Label2 As System.Windows.Forms.Label
+    Friend WithEvents lblRemsor As System.Windows.Forms.Label
+    Friend WithEvents lblOficina As System.Windows.Forms.Label
+    Friend WithEvents lblCPYPoblacion As System.Windows.Forms.Label
+    'Leadedit.UI.Windows.FlatButton
+    Friend WithEvents Label1 As System.Windows.Forms.Label
+    Friend WithEvents btnElegirBanco As NETXP.Controls.XPButton
+    Friend WithEvents btnElegirCliente As NETXP.Controls.XPButton 'Leadedit.UI.Windows.FlatButton
+    Friend WithEvents btnVerEfectosSinRemetir As NETXP.Controls.XPButton 'Leadedit.UI.Windows.FlatButton
+    Friend WithEvents btnVerTodosLosEfectos As NETXP.Controls.XPButton 'Leadedit.UI.Windows.FlatButton
+    Friend WithEvents btnVerEfectosRemetidos As NETXP.Controls.XPButton 'Leadedit.UI.Windows.FlatButton
+    Friend WithEvents Label3 As System.Windows.Forms.Label
+    Friend WithEvents txtREMESOR As C1.Win.C1Input.C1TextBox
+    Friend WithEvents txtDOMREMESOR As C1.Win.C1Input.C1TextBox
+    Friend WithEvents txtOFICINA As C1.Win.C1Input.C1TextBox
+    Friend WithEvents tabCRemes As System.Windows.Forms.TabControl
+    Friend WithEvents tabRemes As System.Windows.Forms.TabPage
+    Friend WithEvents dtpFECHA As C1.Win.C1Input.C1DateEdit
+    Friend WithEvents tabVENCIMREMES As System.Windows.Forms.TabPage
+    Friend WithEvents dgRemesas As C1.Win.C1TrueDBGrid.C1TrueDBGrid
+    Friend WithEvents btnAñadirARemesa As NETXP.Controls.XPButton
+    Friend WithEvents dtpFinal As C1.Win.C1Input.C1DateEdit
+    Friend WithEvents dtpInicio As C1.Win.C1Input.C1DateEdit
+    Friend WithEvents c1pBtnFileOpen1 As C1.Win.C1PrintPreview.PreviewToolBarButton
+    Friend WithEvents c1pBtnFileSave1 As C1.Win.C1PrintPreview.PreviewToolBarButton
+    Friend WithEvents c1pBtnFilePrint1 As C1.Win.C1PrintPreview.PreviewToolBarButton
+    Friend WithEvents c1pBtnPageSetup1 As C1.Win.C1PrintPreview.PreviewToolBarButton
+    Friend WithEvents c1pBtnReflow1 As C1.Win.C1PrintPreview.PreviewToolBarButton
+    Friend WithEvents c1pBtnStop1 As C1.Win.C1PrintPreview.PreviewToolBarButton
+    Friend WithEvents c1pBtnDocInfo1 As C1.Win.C1PrintPreview.PreviewToolBarButton
+    Friend WithEvents c1pBtnSeparator1 As C1.Win.C1PrintPreview.PreviewToolBarButton
+    Friend WithEvents c1pBtnShowNavigationBar1 As C1.Win.C1PrintPreview.PreviewToolBarButton
+    Friend WithEvents c1pBtnSeparator2 As C1.Win.C1PrintPreview.PreviewToolBarButton
+    Friend WithEvents c1pBtnMouseHand1 As C1.Win.C1PrintPreview.PreviewToolBarButton
+    Friend WithEvents c1pBtnMouseZoom1 As C1.Win.C1PrintPreview.PreviewToolBarButton
+    Friend WithEvents c1pBtnMouseZoomOut1 As C1.Win.C1PrintPreview.PreviewToolBarButton
+    Friend WithEvents c1pBtnMouseSelect1 As C1.Win.C1PrintPreview.PreviewToolBarButton
+    Friend WithEvents c1pBtnFindText1 As C1.Win.C1PrintPreview.PreviewToolBarButton
+    Friend WithEvents c1pBtnSeparator3 As C1.Win.C1PrintPreview.PreviewToolBarButton
+    Friend WithEvents c1pBtnGoFirst1 As C1.Win.C1PrintPreview.PreviewToolBarButton
+    Friend WithEvents c1pBtnGoPrev1 As C1.Win.C1PrintPreview.PreviewToolBarButton
+    Friend WithEvents c1pBtnGoNext1 As C1.Win.C1PrintPreview.PreviewToolBarButton
+    Friend WithEvents c1pBtnGoLast1 As C1.Win.C1PrintPreview.PreviewToolBarButton
+    Friend WithEvents c1pBtnSeparator4 As C1.Win.C1PrintPreview.PreviewToolBarButton
+    Friend WithEvents c1pBtnHistoryPrev1 As C1.Win.C1PrintPreview.PreviewToolBarButton
+    Friend WithEvents c1pBtnHistoryNext1 As C1.Win.C1PrintPreview.PreviewToolBarButton
+    Friend WithEvents c1pBtnSeparator5 As C1.Win.C1PrintPreview.PreviewToolBarButton
+    Friend WithEvents c1pBtnZoomOut1 As C1.Win.C1PrintPreview.PreviewToolBarButton
+    Friend WithEvents c1pBtnZoomIn1 As C1.Win.C1PrintPreview.PreviewToolBarButton
+    Friend WithEvents c1pBtnSeparator6 As C1.Win.C1PrintPreview.PreviewToolBarButton
+    Friend WithEvents c1pBtnViewActualSize1 As C1.Win.C1PrintPreview.PreviewToolBarButton
+    Friend WithEvents c1pBtnViewFullPage1 As C1.Win.C1PrintPreview.PreviewToolBarButton
+    Friend WithEvents c1pBtnViewPageWidth1 As C1.Win.C1PrintPreview.PreviewToolBarButton
+    Friend WithEvents c1pBtnViewTwoPages1 As C1.Win.C1PrintPreview.PreviewToolBarButton
+    Friend WithEvents c1pBtnViewFourPages1 As C1.Win.C1PrintPreview.PreviewToolBarButton
+    Friend WithEvents c1pBtnSeparator7 As C1.Win.C1PrintPreview.PreviewToolBarButton
+    Friend WithEvents c1pBtnHelp1 As C1.Win.C1PrintPreview.PreviewToolBarButton
+    Friend WithEvents cboNOMBANC As C1.Win.C1List.C1Combo
+    Friend WithEvents lblIDREMESA As System.Windows.Forms.Label
+    Friend WithEvents WButton1 As NETXP.Controls.XPButton
+    Friend WithEvents XpGroupBox1 As NETXP.Controls.XPGroupBox
+    Friend WithEvents txtLINEA As C1.Win.C1Input.C1TextBox
+    Friend WithEvents lblLinea As System.Windows.Forms.Label
+    Friend WithEvents dtpFecha2 As C1.Win.C1Input.C1DateEdit
+    Friend WithEvents dtpFecha1 As C1.Win.C1Input.C1DateEdit
+    Friend WithEvents XpGroupBox3 As NETXP.Controls.XPGroupBox
+    Friend WithEvents cboCODI As C1.Win.C1List.C1Combo
+    Friend WithEvents XpGroupBox4 As NETXP.Controls.XPGroupBox
+    Friend WithEvents rdoCOBRO As System.Windows.Forms.RadioButton
+    Friend WithEvents rdoDESCUENTO As System.Windows.Forms.RadioButton
+    Friend WithEvents txtBANC As C1.Win.C1Input.C1TextBox
+    Friend WithEvents dgVenci As C1.Win.C1TrueDBGrid.C1TrueDBGrid
+    Friend WithEvents txtPROVREMESOR As C1.Win.C1Input.C1TextBox
+    Friend WithEvents txtPOBREMESOR As C1.Win.C1Input.C1TextBox
+    Friend WithEvents dgCuentas As C1.Win.C1TrueDBGrid.C1TrueDBGrid
+    Friend WithEvents cboCuentas As C1.Win.C1TrueDBGrid.C1TrueDBDropdown
+    Friend WithEvents Label4 As System.Windows.Forms.Label
+    Friend WithEvents CheckBox1 As System.Windows.Forms.CheckBox
+    Friend WithEvents cboDeLosClientes As C1.Win.C1List.C1Combo
+    Friend WithEvents ppRemesa As C1.Win.C1PrintPreview.C1PrintPreview
+    Friend WithEvents tabImpresion As System.Windows.Forms.TabPage
+    Friend WithEvents txtCPREMESOR As C1.Win.C1Input.C1TextBox
+    Friend WithEvents txtNOMREMESOR As C1.Win.C1Input.C1TextBox
+    Friend WithEvents XpGroupBox2 As NETXP.Controls.XPGroupBox
+    Friend WithEvents XpGroupBox5 As NETXP.Controls.XPGroupBox
+
+
+    <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent() 
+        Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(frmRemesas))
+        Me.lblRemsor = New System.Windows.Forms.Label
+        Me.Label2 = New System.Windows.Forms.Label
+        Me.lblOficina = New System.Windows.Forms.Label
+        Me.lblCPYPoblacion = New System.Windows.Forms.Label
+        Me.Label1 = New System.Windows.Forms.Label
+        Me.btnElegirBanco = New NETXP.Controls.XPButton
+        Me.btnElegirCliente = New NETXP.Controls.XPButton
+        Me.Label3 = New System.Windows.Forms.Label
+        Me.tabCRemes = New System.Windows.Forms.TabControl
+        Me.tabRemes = New System.Windows.Forms.TabPage
+        Me.XpGroupBox1 = New NETXP.Controls.XPGroupBox
+        Me.txtNOMREMESOR = New C1.Win.C1Input.C1TextBox
+        Me.txtLINEA = New C1.Win.C1Input.C1TextBox
+        Me.lblLinea = New System.Windows.Forms.Label
+        Me.lblIDREMESA = New System.Windows.Forms.Label
+        Me.cboCODI = New C1.Win.C1List.C1Combo
+        Me.txtREMESOR = New C1.Win.C1Input.C1TextBox
+        Me.cboNOMBANC = New C1.Win.C1List.C1Combo
+        Me.txtDOMREMESOR = New C1.Win.C1Input.C1TextBox
+        Me.txtBANC = New C1.Win.C1Input.C1TextBox
+        Me.txtPROVREMESOR = New C1.Win.C1Input.C1TextBox
+        Me.txtPOBREMESOR = New C1.Win.C1Input.C1TextBox
+        Me.txtCPREMESOR = New C1.Win.C1Input.C1TextBox
+        Me.dtpFECHA = New C1.Win.C1Input.C1DateEdit
+        Me.txtOFICINA = New C1.Win.C1Input.C1TextBox
+        Me.cboCuentas = New C1.Win.C1TrueDBGrid.C1TrueDBDropdown
+        Me.dgCuentas = New C1.Win.C1TrueDBGrid.C1TrueDBGrid
+        Me.XpGroupBox4 = New NETXP.Controls.XPGroupBox
+        Me.rdoDESCUENTO = New System.Windows.Forms.RadioButton
+        Me.rdoCOBRO = New System.Windows.Forms.RadioButton
+        Me.tabVENCIMREMES = New System.Windows.Forms.TabPage
+        Me.XpGroupBox3 = New NETXP.Controls.XPGroupBox
+        Me.XpGroupBox5 = New NETXP.Controls.XPGroupBox
+        Me.dtpInicio = New C1.Win.C1Input.C1DateEdit
+        Me.dtpFinal = New C1.Win.C1Input.C1DateEdit
+        Me.Label4 = New System.Windows.Forms.Label
+        Me.cboDeLosClientes = New C1.Win.C1List.C1Combo
+        Me.CheckBox1 = New System.Windows.Forms.CheckBox
+        Me.btnAñadirARemesa = New NETXP.Controls.XPButton
+        Me.XpGroupBox2 = New NETXP.Controls.XPGroupBox
+        Me.WButton1 = New NETXP.Controls.XPButton
+        Me.dtpFecha1 = New C1.Win.C1Input.C1DateEdit
+        Me.dtpFecha2 = New C1.Win.C1Input.C1DateEdit
+        Me.dgVenci = New C1.Win.C1TrueDBGrid.C1TrueDBGrid
+        Me.dgRemesas = New C1.Win.C1TrueDBGrid.C1TrueDBGrid
+        Me.tabImpresion = New System.Windows.Forms.TabPage
+        Me.ppRemesa = New C1.Win.C1PrintPreview.C1PrintPreview
+        Me.c1pBtnFileOpen1 = New C1.Win.C1PrintPreview.PreviewToolBarButton
+        Me.c1pBtnFileSave1 = New C1.Win.C1PrintPreview.PreviewToolBarButton
+        Me.c1pBtnFilePrint1 = New C1.Win.C1PrintPreview.PreviewToolBarButton
+        Me.c1pBtnPageSetup1 = New C1.Win.C1PrintPreview.PreviewToolBarButton
+        Me.c1pBtnReflow1 = New C1.Win.C1PrintPreview.PreviewToolBarButton
+        Me.c1pBtnStop1 = New C1.Win.C1PrintPreview.PreviewToolBarButton
+        Me.c1pBtnDocInfo1 = New C1.Win.C1PrintPreview.PreviewToolBarButton
+        Me.c1pBtnSeparator1 = New C1.Win.C1PrintPreview.PreviewToolBarButton
+        Me.c1pBtnShowNavigationBar1 = New C1.Win.C1PrintPreview.PreviewToolBarButton
+        Me.c1pBtnSeparator2 = New C1.Win.C1PrintPreview.PreviewToolBarButton
+        Me.c1pBtnMouseHand1 = New C1.Win.C1PrintPreview.PreviewToolBarButton
+        Me.c1pBtnMouseZoom1 = New C1.Win.C1PrintPreview.PreviewToolBarButton
+        Me.c1pBtnMouseZoomOut1 = New C1.Win.C1PrintPreview.PreviewToolBarButton
+        Me.c1pBtnMouseSelect1 = New C1.Win.C1PrintPreview.PreviewToolBarButton
+        Me.c1pBtnFindText1 = New C1.Win.C1PrintPreview.PreviewToolBarButton
+        Me.c1pBtnSeparator3 = New C1.Win.C1PrintPreview.PreviewToolBarButton
+        Me.c1pBtnGoFirst1 = New C1.Win.C1PrintPreview.PreviewToolBarButton
+        Me.c1pBtnGoPrev1 = New C1.Win.C1PrintPreview.PreviewToolBarButton
+        Me.c1pBtnGoNext1 = New C1.Win.C1PrintPreview.PreviewToolBarButton
+        Me.c1pBtnGoLast1 = New C1.Win.C1PrintPreview.PreviewToolBarButton
+        Me.c1pBtnSeparator4 = New C1.Win.C1PrintPreview.PreviewToolBarButton
+        Me.c1pBtnHistoryPrev1 = New C1.Win.C1PrintPreview.PreviewToolBarButton
+        Me.c1pBtnHistoryNext1 = New C1.Win.C1PrintPreview.PreviewToolBarButton
+        Me.c1pBtnSeparator5 = New C1.Win.C1PrintPreview.PreviewToolBarButton
+        Me.c1pBtnZoomOut1 = New C1.Win.C1PrintPreview.PreviewToolBarButton
+        Me.c1pBtnZoomIn1 = New C1.Win.C1PrintPreview.PreviewToolBarButton
+        Me.c1pBtnSeparator6 = New C1.Win.C1PrintPreview.PreviewToolBarButton
+        Me.c1pBtnViewActualSize1 = New C1.Win.C1PrintPreview.PreviewToolBarButton
+        Me.c1pBtnViewFullPage1 = New C1.Win.C1PrintPreview.PreviewToolBarButton
+        Me.c1pBtnViewPageWidth1 = New C1.Win.C1PrintPreview.PreviewToolBarButton
+        Me.c1pBtnViewTwoPages1 = New C1.Win.C1PrintPreview.PreviewToolBarButton
+        Me.c1pBtnViewFourPages1 = New C1.Win.C1PrintPreview.PreviewToolBarButton
+        Me.c1pBtnSeparator7 = New C1.Win.C1PrintPreview.PreviewToolBarButton
+        Me.c1pBtnHelp1 = New C1.Win.C1PrintPreview.PreviewToolBarButton
+        Me.tabCRemes.SuspendLayout()
+        Me.tabRemes.SuspendLayout()
+        Me.XpGroupBox1.SuspendLayout()
+        CType(Me.txtNOMREMESOR, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.txtLINEA, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.cboCODI, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.txtREMESOR, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.cboNOMBANC, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.txtDOMREMESOR, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.txtBANC, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.txtPROVREMESOR, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.txtPOBREMESOR, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.txtCPREMESOR, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.dtpFECHA, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.txtOFICINA, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.cboCuentas, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.dgCuentas, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.XpGroupBox4.SuspendLayout()
+        Me.tabVENCIMREMES.SuspendLayout()
+        Me.XpGroupBox3.SuspendLayout()
+        Me.XpGroupBox5.SuspendLayout()
+        CType(Me.dtpInicio, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.dtpFinal, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.cboDeLosClientes, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.XpGroupBox2.SuspendLayout()
+        CType(Me.dtpFecha1, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.dtpFecha2, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.dgVenci, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.dgRemesas, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.tabImpresion.SuspendLayout()
+        CType(Me.ppRemesa, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.SuspendLayout()
+        '
+        'cboSeleccionCentro
+        '
+        Me.cboSeleccionCentro.Location = New System.Drawing.Point(280, 7)
+        Me.cboSeleccionCentro.Name = "cboSeleccionCentro"
+        '
+        'btnVerLista
+        '
+        Me.btnVerLista.Location = New System.Drawing.Point(536, 59)
+        Me.btnVerLista.Name = "btnVerLista"
+        Me.btnVerLista.Size = New System.Drawing.Size(72, 19)
+        '
+        'btnActualizar
+        '
+        Me.btnActualizar.Location = New System.Drawing.Point(60, 63)
+        Me.btnActualizar.Name = "btnActualizar"
+        Me.btnActualizar.Size = New System.Drawing.Size(90, 19)
+        '
+        'btnNuevo
+        '
+        Me.btnNuevo.Location = New System.Drawing.Point(248, 45)
+        Me.btnNuevo.Name = "btnNuevo"
+        Me.btnNuevo.Size = New System.Drawing.Size(82, 37)
+        '
+        'btnBorrar
+        '
+        Me.btnBorrar.Location = New System.Drawing.Point(150, 45)
+        Me.btnBorrar.Name = "btnBorrar"
+        Me.btnBorrar.Size = New System.Drawing.Size(98, 18)
+        '
+        'arrayTabPages
+        '
+        Me.arrayTabPages.Controls.AddRange(New System.Windows.Forms.Control() {Me.tabRemes})
+        '
+        'btnTancar
+        '
+        Me.btnTancar.Location = New System.Drawing.Point(514, 46)
+        Me.btnTancar.Name = "btnTancar"
+        Me.btnTancar.Size = New System.Drawing.Size(72, 19)
+        '
+        'btnModificar
+        '
+        Me.btnModificar.Location = New System.Drawing.Point(148, 63)
+        Me.btnModificar.Name = "btnModificar"
+        Me.btnModificar.Size = New System.Drawing.Size(98, 19)
+        '
+        'btnUltimo
+        '
+        Me.btnUltimo.Location = New System.Drawing.Point(330, 63)
+        Me.btnUltimo.Name = "btnUltimo"
+        Me.btnUltimo.Size = New System.Drawing.Size(32, 19)
+        '
+        'arrayCombos
+        '
+        Me.arrayCombos.Controls.AddRange(New System.Windows.Forms.Control() {Me.cboNOMBANC})
+        '
+        'arrayBotones
+        '
+        Me.arrayBotones.Controls.AddRange(New System.Windows.Forms.Control() {Me.WButton1, Me.btnAñadirARemesa, Me.btnElegirBanco, Me.btnElegirCliente})
+        '
+        'btnPrimero
+        '
+        Me.btnPrimero.Location = New System.Drawing.Point(28, 56)
+        Me.btnPrimero.Name = "btnPrimero"
+        Me.btnPrimero.Size = New System.Drawing.Size(32, 18)
+        '
+        'arrayGrids
+        '
+        Me.arrayGrids.Controls.AddRange(New System.Windows.Forms.Control() {Me.dgCuentas, Me.dgRemesas, Me.dgVenci})
+        '
+        'arrayTextBox
+        '
+        Me.arrayTextBox.Controls.AddRange(New System.Windows.Forms.Control() {Me.txtBANC, Me.txtCPREMESOR, Me.txtDOMREMESOR, Me.txtLINEA, Me.txtOFICINA, Me.txtPOBREMESOR, Me.txtPROVREMESOR, Me.txtREMESOR, Me.txtNOMREMESOR})
+        '
+        'btnAnterior
+        '
+        Me.btnAnterior.Location = New System.Drawing.Point(28, 46)
+        Me.btnAnterior.Name = "btnAnterior"
+        Me.btnAnterior.Size = New System.Drawing.Size(32, 19)
+        '
+        'btnSiguiente
+        '
+        Me.btnSiguiente.Location = New System.Drawing.Point(330, 46)
+        Me.btnSiguiente.Name = "btnSiguiente"
+        Me.btnSiguiente.Size = New System.Drawing.Size(32, 19)
+        '
+        'arrayDateTime
+        '
+        Me.arrayDateTime.Controls.AddRange(New System.Windows.Forms.Control() {Me.dtpFECHA, Me.dtpFecha1, Me.dtpFecha2, Me.dtpFinal, Me.dtpInicio})
+        '
+        'btnRecargar
+        '
+        Me.btnRecargar.Location = New System.Drawing.Point(60, 41)
+        Me.btnRecargar.Name = "btnRecargar"
+        Me.btnRecargar.Size = New System.Drawing.Size(90, 18)
+        '
+        'sbtipo
+        '
+        Me.sbtipo.FlatStyle = System.Windows.Forms.FlatStyle.System
+        Me.sbtipo.Location = New System.Drawing.Point(28, 0)
+        Me.sbtipo.Name = "sbtipo"
+        Me.sbtipo.Size = New System.Drawing.Size(88, 15)
+        Me.sbtipo.Text = ""
+        '
+        'arrayRadios
+        '
+        Me.arrayRadios.Controls.AddRange(New System.Windows.Forms.Control() {Me.rdoCOBRO, Me.rdoDESCUENTO})
+        '
+        'lblRemsor
+        '
+        Me.lblRemsor.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.lblRemsor.Location = New System.Drawing.Point(8, 76)
+        Me.lblRemsor.Name = "lblRemsor"
+        Me.lblRemsor.Size = New System.Drawing.Size(70, 22)
+        Me.lblRemsor.TabIndex = 2
+        Me.lblRemsor.Text = "Per:"
+        Me.lblRemsor.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
+        '
+        'Label2
+        '
+        Me.Label2.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.Label2.Location = New System.Drawing.Point(8, 100)
+        Me.Label2.Name = "Label2"
+        Me.Label2.Size = New System.Drawing.Size(70, 22)
+        Me.Label2.TabIndex = 3
+        Me.Label2.Text = "Domicili"
+        Me.Label2.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
+        '
+        'lblOficina
+        '
+        Me.lblOficina.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.lblOficina.Location = New System.Drawing.Point(8, 164)
+        Me.lblOficina.Name = "lblOficina"
+        Me.lblOficina.Size = New System.Drawing.Size(70, 22)
+        Me.lblOficina.TabIndex = 5
+        Me.lblOficina.Text = "de l'oficina"
+        Me.lblOficina.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
+        '
+        'lblCPYPoblacion
+        '
+        Me.lblCPYPoblacion.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.lblCPYPoblacion.Location = New System.Drawing.Point(8, 124)
+        Me.lblCPYPoblacion.Name = "lblCPYPoblacion"
+        Me.lblCPYPoblacion.Size = New System.Drawing.Size(72, 22)
+        Me.lblCPYPoblacion.TabIndex = 15
+        Me.lblCPYPoblacion.Text = "CP i població"
+        Me.lblCPYPoblacion.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
+        '
+        'Label1
+        '
+        Me.Label1.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.Label1.Location = New System.Drawing.Point(8, 52)
+        Me.Label1.Name = "Label1"
+        Me.Label1.Size = New System.Drawing.Size(70, 22)
+        Me.Label1.TabIndex = 296
+        Me.Label1.Text = "Banc"
+        Me.Label1.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
+        '
+        'btnElegirBanco
+        '
+        Me.btnElegirBanco.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.btnElegirBanco.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft
+        Me.btnElegirBanco.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.btnElegirBanco.Location = New System.Drawing.Point(124, 52)
+        Me.btnElegirBanco.Name = "btnElegirBanco"
+        Me.btnElegirBanco.Size = New System.Drawing.Size(24, 18)
+        Me.btnElegirBanco.TabIndex = 299
+        Me.btnElegirBanco.TabStop = False
+        Me.btnElegirBanco.Text = "..."
+        '
+        'btnElegirCliente
+        '
+        Me.btnElegirCliente.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.btnElegirCliente.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft
+        Me.btnElegirCliente.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.btnElegirCliente.Location = New System.Drawing.Point(124, 76)
+        Me.btnElegirCliente.Name = "btnElegirCliente"
+        Me.btnElegirCliente.Size = New System.Drawing.Size(24, 19)
+        Me.btnElegirCliente.TabIndex = 301
+        Me.btnElegirCliente.TabStop = False
+        Me.btnElegirCliente.Text = "..."
+        Me.btnElegirCliente.Visible = False
+        '
+        'Label3
+        '
+        Me.Label3.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.Label3.Location = New System.Drawing.Point(264, 27)
+        Me.Label3.Name = "Label3"
+        Me.Label3.Size = New System.Drawing.Size(80, 19)
+        Me.Label3.TabIndex = 313
+        Me.Label3.Text = "Data"
+        Me.Label3.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
+        '
+        'tabCRemes
+        '
+        Me.tabCRemes.Controls.Add(Me.tabRemes)
+        Me.tabCRemes.Controls.Add(Me.tabVENCIMREMES)
+        Me.tabCRemes.Controls.Add(Me.tabImpresion)
+        Me.tabCRemes.ItemSize = New System.Drawing.Size(50, 18)
+        Me.tabCRemes.Location = New System.Drawing.Point(4, 7)
+        Me.tabCRemes.Name = "tabCRemes"
+        Me.tabCRemes.SelectedIndex = 0
+        Me.tabCRemes.Size = New System.Drawing.Size(976, 513)
+        Me.tabCRemes.TabIndex = 314
+        '
+        'tabRemes
+        '
+        Me.tabRemes.Controls.Add(Me.XpGroupBox1)
+        Me.tabRemes.Controls.Add(Me.cboCuentas)
+        Me.tabRemes.Controls.Add(Me.dgCuentas)
+        Me.tabRemes.Controls.Add(Me.XpGroupBox4)
+        Me.tabRemes.Location = New System.Drawing.Point(4, 22)
+        Me.tabRemes.Name = "tabRemes"
+        Me.tabRemes.Size = New System.Drawing.Size(968, 487)
+        Me.tabRemes.TabIndex = 0
+        Me.tabRemes.Text = "Remesa"
+        '
+        'XpGroupBox1
+        '
+        Me.XpGroupBox1.BackColor = System.Drawing.SystemColors.Control
+        Me.XpGroupBox1.Controls.Add(Me.txtNOMREMESOR)
+        Me.XpGroupBox1.Controls.Add(Me.txtLINEA)
+        Me.XpGroupBox1.Controls.Add(Me.lblLinea)
+        Me.XpGroupBox1.Controls.Add(Me.lblIDREMESA)
+        Me.XpGroupBox1.Controls.Add(Me.cboCODI)
+        Me.XpGroupBox1.Controls.Add(Me.Label1)
+        Me.XpGroupBox1.Controls.Add(Me.txtREMESOR)
+        Me.XpGroupBox1.Controls.Add(Me.cboNOMBANC)
+        Me.XpGroupBox1.Controls.Add(Me.btnElegirBanco)
+        Me.XpGroupBox1.Controls.Add(Me.btnElegirCliente)
+        Me.XpGroupBox1.Controls.Add(Me.txtDOMREMESOR)
+        Me.XpGroupBox1.Controls.Add(Me.txtBANC)
+        Me.XpGroupBox1.Controls.Add(Me.lblRemsor)
+        Me.XpGroupBox1.Controls.Add(Me.Label2)
+        Me.XpGroupBox1.Controls.Add(Me.lblCPYPoblacion)
+        Me.XpGroupBox1.Controls.Add(Me.txtPROVREMESOR)
+        Me.XpGroupBox1.Controls.Add(Me.txtPOBREMESOR)
+        Me.XpGroupBox1.Controls.Add(Me.txtCPREMESOR)
+        Me.XpGroupBox1.Controls.Add(Me.Label3)
+        Me.XpGroupBox1.Controls.Add(Me.dtpFECHA)
+        Me.XpGroupBox1.Controls.Add(Me.txtOFICINA)
+        Me.XpGroupBox1.Controls.Add(Me.lblOficina)
+        Me.XpGroupBox1.FlatStyle = System.Windows.Forms.FlatStyle.System
+        Me.XpGroupBox1.Location = New System.Drawing.Point(12, 20)
+        Me.XpGroupBox1.Name = "XpGroupBox1"
+        Me.XpGroupBox1.Size = New System.Drawing.Size(472, 304)
+        Me.XpGroupBox1.TabIndex = 334
+        Me.XpGroupBox1.TabStop = False
+        Me.XpGroupBox1.Text = "Remesa"
+        '
+        'txtNOMREMESOR
+        '
+        Me.txtNOMREMESOR.Location = New System.Drawing.Point(80, 76)
+        Me.txtNOMREMESOR.Name = "txtNOMREMESOR"
+        Me.txtNOMREMESOR.Size = New System.Drawing.Size(380, 20)
+        Me.txtNOMREMESOR.TabIndex = 336
+        Me.txtNOMREMESOR.Tag = Nothing
+        '
+        'txtLINEA
+        '
+        Me.txtLINEA.Location = New System.Drawing.Point(80, 196)
+        Me.txtLINEA.Multiline = True
+        Me.txtLINEA.Name = "txtLINEA"
+        Me.txtLINEA.Size = New System.Drawing.Size(340, 89)
+        Me.txtLINEA.TabIndex = 335
+        Me.txtLINEA.Tag = Nothing
+        '
+        'lblLinea
+        '
+        Me.lblLinea.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.lblLinea.Location = New System.Drawing.Point(8, 196)
+        Me.lblLinea.Name = "lblLinea"
+        Me.lblLinea.Size = New System.Drawing.Size(70, 22)
+        Me.lblLinea.TabIndex = 334
+        Me.lblLinea.Text = "Linia"
+        Me.lblLinea.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
+        '
+        'lblIDREMESA
+        '
+        Me.lblIDREMESA.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.lblIDREMESA.Location = New System.Drawing.Point(8, 24)
+        Me.lblIDREMESA.Name = "lblIDREMESA"
+        Me.lblIDREMESA.Size = New System.Drawing.Size(72, 22)
+        Me.lblIDREMESA.TabIndex = 332
+        Me.lblIDREMESA.Text = "Codi"
+        Me.lblIDREMESA.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
+        '
+        'cboCODI
+        '
+        Me.cboCODI.AddItemSeparator = Microsoft.VisualBasic.ChrW(59)
+        Me.cboCODI.Caption = ""
+        Me.cboCODI.CaptionHeight = 17
+        Me.cboCODI.CharacterCasing = System.Windows.Forms.CharacterCasing.Normal
+        Me.cboCODI.ColumnCaptionHeight = 17
+        Me.cboCODI.ColumnFooterHeight = 17
+        Me.cboCODI.ContentHeight = 16
+        Me.cboCODI.DeadAreaBackColor = System.Drawing.Color.Empty
+        Me.cboCODI.EditorBackColor = System.Drawing.SystemColors.Window
+        Me.cboCODI.EditorFont = New System.Drawing.Font("Tahoma", 8.25!)
+        Me.cboCODI.EditorForeColor = System.Drawing.SystemColors.WindowText
+        Me.cboCODI.EditorHeight = 16
+        Me.cboCODI.FlatStyle = C1.Win.C1List.FlatModeEnum.System
+        Me.cboCODI.GapHeight = 2
+        Me.cboCODI.Images.Add(CType(resources.GetObject("resource"), System.Drawing.Image))
+        Me.cboCODI.ItemHeight = 15
+        Me.cboCODI.Location = New System.Drawing.Point(80, 24)
+        Me.cboCODI.MatchEntryTimeout = CType(2000, Long)
+        Me.cboCODI.MaxDropDownItems = CType(5, Short)
+        Me.cboCODI.MaxLength = 32767
+        Me.cboCODI.MouseCursor = System.Windows.Forms.Cursors.Default
+        Me.cboCODI.Name = "cboCODI"
+        'Me.cbo.PartialRightColumn = False
+        Me.cboCODI.RowDivider.Color = System.Drawing.Color.DarkGray
+        Me.cboCODI.RowDivider.Style = C1.Win.C1List.LineStyleEnum.None
+        Me.cboCODI.RowSubDividerColor = System.Drawing.Color.DarkGray
+        Me.cboCODI.Size = New System.Drawing.Size(96, 22)
+        Me.cboCODI.TabIndex = 331
+        Me.cboCODI.Text = "C1Combo1"
+        Me.cboCODI.PropBag = "<?xml version=""1.0""?><Blob><Styles type=""C1.Win.C1List.Design.ContextWrapper""><Da" & _
+        "ta>Group{BackColor:ControlDark;Border:None,,0, 0, 0, 0;AlignVert:Center;}Style2{" & _
+        "}Style5{}Style4{}Style7{}Style6{}EvenRow{BackColor:Aqua;}Selected{ForeColor:High" & _
+        "lightText;BackColor:Highlight;}Style3{}Inactive{ForeColor:InactiveCaptionText;Ba" & _
+        "ckColor:InactiveCaption;}Footer{}Caption{AlignHorz:Center;}Normal{}HighlightRow{" & _
+        "ForeColor:HighlightText;BackColor:Highlight;}Style9{AlignHorz:Near;}OddRow{}Reco" & _
+        "rdSelector{AlignImage:Center;}Heading{Wrap:True;AlignVert:Center;Border:Raised,," & _
+        "1, 1, 1, 1;ForeColor:ControlText;BackColor:Control;}Style8{}Style10{}Style11{}St" & _
+        "yle1{}</Data></Styles><Splits><C1.Win.C1List.ListBoxView AllowColSelect=""False"" " & _
+        "Name="""" CaptionHeight=""17"" ColumnCaptionHeight=""17"" ColumnFooterHeight=""17"" Vert" & _
+        "icalScrollGroup=""1"" HorizontalScrollGroup=""1""><ClientRect>0, 0, 118, 158</Client" & _
+        "Rect><VScrollBar><Width>17</Width></VScrollBar><HScrollBar><Height>17</Height></" & _
+        "HScrollBar><CaptionStyle parent=""Style2"" me=""Style9"" /><EvenRowStyle parent=""Eve" & _
+        "nRow"" me=""Style7"" /><FooterStyle parent=""Footer"" me=""Style3"" /><GroupStyle paren" & _
+        "t=""Group"" me=""Style11"" /><HeadingStyle parent=""Heading"" me=""Style2"" /><HighLight" & _
+        "RowStyle parent=""HighlightRow"" me=""Style6"" /><InactiveStyle parent=""Inactive"" me" & _
+        "=""Style4"" /><OddRowStyle parent=""OddRow"" me=""Style8"" /><RecordSelectorStyle pare" & _
+        "nt=""RecordSelector"" me=""Style10"" /><SelectedStyle parent=""Selected"" me=""Style5"" " & _
+        "/><Style parent=""Normal"" me=""Style1"" /></C1.Win.C1List.ListBoxView></Splits><Nam" & _
+        "edStyles><Style parent="""" me=""Normal"" /><Style parent=""Normal"" me=""Heading"" /><S" & _
+        "tyle parent=""Heading"" me=""Footer"" /><Style parent=""Heading"" me=""Caption"" /><Styl" & _
+        "e parent=""Heading"" me=""Inactive"" /><Style parent=""Normal"" me=""Selected"" /><Style" & _
+        " parent=""Normal"" me=""HighlightRow"" /><Style parent=""Normal"" me=""EvenRow"" /><Styl" & _
+        "e parent=""Normal"" me=""OddRow"" /><Style parent=""Heading"" me=""RecordSelector"" /><S" & _
+        "tyle parent=""Caption"" me=""Group"" /></NamedStyles><vertSplits>1</vertSplits><horz" & _
+        "Splits>1</horzSplits><Layout>Modified</Layout><DefaultRecSelWidth>17</DefaultRec" & _
+        "SelWidth></Blob>"
+        '
+        'txtREMESOR
+        '
+        Me.txtREMESOR.Location = New System.Drawing.Point(80, 76)
+        Me.txtREMESOR.Name = "txtREMESOR"
+        Me.txtREMESOR.Size = New System.Drawing.Size(40, 20)
+        Me.txtREMESOR.TabIndex = 319
+        Me.txtREMESOR.Tag = Nothing
+        Me.txtREMESOR.Visible = False
+        '
+        'cboNOMBANC
+        '
+        Me.cboNOMBANC.AddItemSeparator = Microsoft.VisualBasic.ChrW(59)
+        Me.cboNOMBANC.Caption = ""
+        Me.cboNOMBANC.CaptionHeight = 17
+        Me.cboNOMBANC.CharacterCasing = System.Windows.Forms.CharacterCasing.Normal
+        Me.cboNOMBANC.ColumnCaptionHeight = 17
+        Me.cboNOMBANC.ColumnFooterHeight = 17
+        Me.cboNOMBANC.ContentHeight = 16
+        Me.cboNOMBANC.DeadAreaBackColor = System.Drawing.Color.Empty
+        Me.cboNOMBANC.EditorBackColor = System.Drawing.SystemColors.Window
+        Me.cboNOMBANC.EditorFont = New System.Drawing.Font("Tahoma", 8.25!)
+        Me.cboNOMBANC.EditorForeColor = System.Drawing.SystemColors.WindowText
+        Me.cboNOMBANC.EditorHeight = 16
+        Me.cboNOMBANC.GapHeight = 2
+        Me.cboNOMBANC.Images.Add(CType(resources.GetObject("resource1"), System.Drawing.Image))
+        Me.cboNOMBANC.ItemHeight = 15
+        Me.cboNOMBANC.Location = New System.Drawing.Point(156, 52)
+        Me.cboNOMBANC.MatchEntryTimeout = CType(2000, Long)
+        Me.cboNOMBANC.MaxDropDownItems = CType(5, Short)
+        Me.cboNOMBANC.MaxLength = 32767
+        Me.cboNOMBANC.MouseCursor = System.Windows.Forms.Cursors.Default
+        Me.cboNOMBANC.Name = "cboNOMBANC"
+        'Me.cbo.PartialRightColumn = False
+        Me.cboNOMBANC.RowDivider.Color = System.Drawing.Color.DarkGray
+        Me.cboNOMBANC.RowDivider.Style = C1.Win.C1List.LineStyleEnum.None
+        Me.cboNOMBANC.RowSubDividerColor = System.Drawing.Color.DarkGray
+        Me.cboNOMBANC.Size = New System.Drawing.Size(308, 22)
+        Me.cboNOMBANC.TabIndex = 330
+        Me.cboNOMBANC.Text = "C1Combo1"
+        Me.cboNOMBANC.PropBag = "<?xml version=""1.0""?><Blob><Styles type=""C1.Win.C1List.Design.ContextWrapper""><Da" & _
+        "ta>Group{AlignVert:Center;Border:None,,0, 0, 0, 0;BackColor:ControlDark;}Style2{" & _
+        "}Style5{}Style4{}Style7{}Style6{}EvenRow{BackColor:Aqua;}Selected{ForeColor:High" & _
+        "lightText;BackColor:Highlight;}Style3{}Inactive{ForeColor:InactiveCaptionText;Ba" & _
+        "ckColor:InactiveCaption;}Footer{}Caption{AlignHorz:Center;}Normal{}HighlightRow{" & _
+        "ForeColor:HighlightText;BackColor:Highlight;}Style1{}OddRow{}RecordSelector{Alig" & _
+        "nImage:Center;}Heading{Wrap:True;BackColor:Control;Border:Raised,,1, 1, 1, 1;For" & _
+        "eColor:ControlText;AlignVert:Center;}Style8{}Style10{}Style11{}Style9{AlignHorz:" & _
+        "Near;}</Data></Styles><Splits><C1.Win.C1List.ListBoxView AllowColSelect=""False"" " & _
+        "Name="""" CaptionHeight=""17"" ColumnCaptionHeight=""17"" ColumnFooterHeight=""17"" Vert" & _
+        "icalScrollGroup=""1"" HorizontalScrollGroup=""1""><ClientRect>0, 0, 116, 156</Client" & _
+        "Rect><VScrollBar><Width>17</Width></VScrollBar><HScrollBar><Height>17</Height></" & _
+        "HScrollBar><CaptionStyle parent=""Style2"" me=""Style9"" /><EvenRowStyle parent=""Eve" & _
+        "nRow"" me=""Style7"" /><FooterStyle parent=""Footer"" me=""Style3"" /><GroupStyle paren" & _
+        "t=""Group"" me=""Style11"" /><HeadingStyle parent=""Heading"" me=""Style2"" /><HighLight" & _
+        "RowStyle parent=""HighlightRow"" me=""Style6"" /><InactiveStyle parent=""Inactive"" me" & _
+        "=""Style4"" /><OddRowStyle parent=""OddRow"" me=""Style8"" /><RecordSelectorStyle pare" & _
+        "nt=""RecordSelector"" me=""Style10"" /><SelectedStyle parent=""Selected"" me=""Style5"" " & _
+        "/><Style parent=""Normal"" me=""Style1"" /></C1.Win.C1List.ListBoxView></Splits><Nam" & _
+        "edStyles><Style parent="""" me=""Normal"" /><Style parent=""Normal"" me=""Heading"" /><S" & _
+        "tyle parent=""Heading"" me=""Footer"" /><Style parent=""Heading"" me=""Caption"" /><Styl" & _
+        "e parent=""Heading"" me=""Inactive"" /><Style parent=""Normal"" me=""Selected"" /><Style" & _
+        " parent=""Normal"" me=""HighlightRow"" /><Style parent=""Normal"" me=""EvenRow"" /><Styl" & _
+        "e parent=""Normal"" me=""OddRow"" /><Style parent=""Heading"" me=""RecordSelector"" /><S" & _
+        "tyle parent=""Caption"" me=""Group"" /></NamedStyles><vertSplits>1</vertSplits><horz" & _
+        "Splits>1</horzSplits><Layout>Modified</Layout><DefaultRecSelWidth>17</DefaultRec" & _
+        "SelWidth></Blob>"
+        '
+        'txtDOMREMESOR
+        '
+        Me.txtDOMREMESOR.Location = New System.Drawing.Point(80, 100)
+        Me.txtDOMREMESOR.Name = "txtDOMREMESOR"
+        Me.txtDOMREMESOR.Size = New System.Drawing.Size(380, 20)
+        Me.txtDOMREMESOR.TabIndex = 322
+        Me.txtDOMREMESOR.Tag = Nothing
+        '
+        'txtBANC
+        '
+        Me.txtBANC.Location = New System.Drawing.Point(80, 52)
+        Me.txtBANC.Name = "txtBANC"
+        Me.txtBANC.Size = New System.Drawing.Size(40, 20)
+        Me.txtBANC.TabIndex = 315
+        Me.txtBANC.Tag = Nothing
+        '
+        'txtPROVREMESOR
+        '
+        Me.txtPROVREMESOR.Location = New System.Drawing.Point(344, 124)
+        Me.txtPROVREMESOR.Name = "txtPROVREMESOR"
+        Me.txtPROVREMESOR.Size = New System.Drawing.Size(116, 20)
+        Me.txtPROVREMESOR.TabIndex = 329
+        Me.txtPROVREMESOR.Tag = Nothing
+        '
+        'txtPOBREMESOR
+        '
+        Me.txtPOBREMESOR.Location = New System.Drawing.Point(140, 124)
+        Me.txtPOBREMESOR.Name = "txtPOBREMESOR"
+        Me.txtPOBREMESOR.Size = New System.Drawing.Size(200, 20)
+        Me.txtPOBREMESOR.TabIndex = 328
+        Me.txtPOBREMESOR.Tag = Nothing
+        '
+        'txtCPREMESOR
+        '
+        Me.txtCPREMESOR.Location = New System.Drawing.Point(80, 124)
+        Me.txtCPREMESOR.Name = "txtCPREMESOR"
+        Me.txtCPREMESOR.Size = New System.Drawing.Size(56, 20)
+        Me.txtCPREMESOR.TabIndex = 327
+        Me.txtCPREMESOR.Tag = Nothing
+        '
+        'dtpFECHA
+        '
+        '
+        'dtpFECHA.Calendar
+        '
+        Me.dtpFECHA.Calendar.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.dtpFECHA.FormatType = C1.Win.C1Input.FormatTypeEnum.ShortDate
+        Me.dtpFECHA.Location = New System.Drawing.Point(348, 26)
+        Me.dtpFECHA.Name = "dtpFECHA"
+        Me.dtpFECHA.Size = New System.Drawing.Size(116, 20)
+        Me.dtpFECHA.TabIndex = 325
+        Me.dtpFECHA.Tag = Nothing
+        '
+        'txtOFICINA
+        '
+        Me.txtOFICINA.Location = New System.Drawing.Point(80, 164)
+        Me.txtOFICINA.Name = "txtOFICINA"
+        Me.txtOFICINA.Size = New System.Drawing.Size(252, 20)
+        Me.txtOFICINA.TabIndex = 316
+        Me.txtOFICINA.Tag = Nothing
+        '
+        'cboCuentas
+        '
+        Me.cboCuentas.AllowColMove = True
+        Me.cboCuentas.AllowColSelect = True
+        Me.cboCuentas.AllowRowSizing = C1.Win.C1TrueDBGrid.RowSizingEnum.AllRows
+        Me.cboCuentas.AlternatingRows = False
+        Me.cboCuentas.CaptionHeight = 17
+        Me.cboCuentas.ColumnCaptionHeight = 17
+        Me.cboCuentas.ColumnFooterHeight = 17
+        Me.cboCuentas.FetchRowStyles = False
+        Me.cboCuentas.Images.Add(CType(resources.GetObject("resource2"), System.Drawing.Image))
+        Me.cboCuentas.Location = New System.Drawing.Point(504, 140)
+        Me.cboCuentas.Name = "cboCuentas"
+        Me.cboCuentas.RowDivider.Color = System.Drawing.Color.DarkGray
+        Me.cboCuentas.RowDivider.Style = C1.Win.C1TrueDBGrid.LineStyleEnum.Single
+        Me.cboCuentas.RowHeight = 15
+        Me.cboCuentas.RowSubDividerColor = System.Drawing.Color.DarkGray
+        Me.cboCuentas.ScrollTips = False
+        Me.cboCuentas.Size = New System.Drawing.Size(84, 104)
+        Me.cboCuentas.TabIndex = 340
+        Me.cboCuentas.Text = "C1TrueDBDropdown1"
+        Me.cboCuentas.ValueTranslate = True
+        Me.cboCuentas.Visible = False
+        Me.cboCuentas.PropBag = "<?xml version=""1.0""?><Blob><Styles type=""C1.Win.C1TrueDBGrid.Design.ContextWrappe" & _
+        "r""><Data>Group{BackColor:ControlDark;Border:None,,0, 0, 0, 0;AlignVert:Center;}E" & _
+        "ditor{}Style2{}Style5{}Style4{}Style7{}Style6{}EvenRow{BackColor:Aqua;}Selected{" & _
+        "ForeColor:HighlightText;BackColor:Highlight;}Style3{}Inactive{ForeColor:Inactive" & _
+        "CaptionText;BackColor:InactiveCaption;}FilterBar{}Footer{}Caption{AlignHorz:Cent" & _
+        "er;}Normal{Font:Microsoft Sans Serif, 8.25pt;}HighlightRow{ForeColor:HighlightTe" & _
+        "xt;BackColor:Highlight;}Style9{}OddRow{}RecordSelector{AlignImage:Center;}Headin" & _
+        "g{Wrap:True;AlignVert:Center;Border:Raised,,1, 1, 1, 1;ForeColor:ControlText;Bac" & _
+        "kColor:Control;}Style8{}Style10{AlignHorz:Near;}Style11{}Style12{}Style13{}Style" & _
+        "1{}</Data></Styles><Splits><C1.Win.C1TrueDBGrid.DropdownView HBarHeight=""16"" Nam" & _
+        "e="""" CaptionHeight=""17"" ColumnCaptionHeight=""17"" ColumnFooterHeight=""17"" Marquee" & _
+        "Style=""DottedCellBorder"" RecordSelectorWidth=""17"" DefRecSelWidth=""17"" RecordSele" & _
+        "ctors=""False"" VerticalScrollGroup=""1"" HorizontalScrollGroup=""1""><CaptionStyle pa" & _
+        "rent=""Style2"" me=""Style10"" /><EditorStyle parent=""Editor"" me=""Style5"" /><EvenRow" & _
+        "Style parent=""EvenRow"" me=""Style8"" /><FilterBarStyle parent=""FilterBar"" me=""Styl" & _
+        "e13"" /><FooterStyle parent=""Footer"" me=""Style3"" /><GroupStyle parent=""Group"" me=" & _
+        """Style12"" /><HeadingStyle parent=""Heading"" me=""Style2"" /><HighLightRowStyle pare" & _
+        "nt=""HighlightRow"" me=""Style7"" /><InactiveStyle parent=""Inactive"" me=""Style4"" /><" & _
+        "OddRowStyle parent=""OddRow"" me=""Style9"" /><RecordSelectorStyle parent=""RecordSel" & _
+        "ector"" me=""Style11"" /><SelectedStyle parent=""Selected"" me=""Style6"" /><Style pare" & _
+        "nt=""Normal"" me=""Style1"" /><ClientRect>0, 0, 80, 100</ClientRect><BorderSide>0</B" & _
+        "orderSide></C1.Win.C1TrueDBGrid.DropdownView></Splits><NamedStyles><Style parent" & _
+        "="""" me=""Normal"" /><Style parent=""Normal"" me=""Heading"" /><Style parent=""Heading"" " & _
+        "me=""Footer"" /><Style parent=""Heading"" me=""Caption"" /><Style parent=""Heading"" me=" & _
+        """Inactive"" /><Style parent=""Normal"" me=""Selected"" /><Style parent=""Normal"" me=""E" & _
+        "ditor"" /><Style parent=""Normal"" me=""HighlightRow"" /><Style parent=""Normal"" me=""E" & _
+        "venRow"" /><Style parent=""Normal"" me=""OddRow"" /><Style parent=""Heading"" me=""Recor" & _
+        "dSelector"" /><Style parent=""Normal"" me=""FilterBar"" /><Style parent=""Caption"" me=" & _
+        """Group"" /></NamedStyles><vertSplits>1</vertSplits><horzSplits>1</horzSplits><Lay" & _
+        "out>None</Layout><DefaultRecSelWidth>17</DefaultRecSelWidth><ClientArea>0, 0, 80" & _
+        ", 100</ClientArea></Blob>"
+        '
+        'dgCuentas
+        '
+        Me.dgCuentas.AllowAddNew = True
+        Me.dgCuentas.AllowDelete = True
+        Me.dgCuentas.CaptionHeight = 17
+        Me.dgCuentas.FlatStyle = C1.Win.C1TrueDBGrid.FlatModeEnum.System
+        Me.dgCuentas.GroupByCaption = "Drag a column header here to group by that column"
+        Me.dgCuentas.Images.Add(CType(resources.GetObject("resource3"), System.Drawing.Image))
+        Me.dgCuentas.Location = New System.Drawing.Point(488, 108)
+        Me.dgCuentas.MarqueeStyle = C1.Win.C1TrueDBGrid.MarqueeEnum.DottedCellBorder
+        Me.dgCuentas.Name = "dgCuentas"
+        Me.dgCuentas.PreviewInfo.Location = New System.Drawing.Point(0, 0)
+        Me.dgCuentas.PreviewInfo.Size = New System.Drawing.Size(0, 0)
+        Me.dgCuentas.PreviewInfo.ZoomFactor = 75
+        Me.dgCuentas.RecordSelectorWidth = 17
+        Me.dgCuentas.RowDivider.Color = System.Drawing.Color.DarkGray
+        Me.dgCuentas.RowDivider.Style = C1.Win.C1TrueDBGrid.LineStyleEnum.Single
+        Me.dgCuentas.RowHeight = 15
+        Me.dgCuentas.RowSubDividerColor = System.Drawing.Color.DarkGray
+        Me.dgCuentas.Size = New System.Drawing.Size(452, 210)
+        Me.dgCuentas.TabAction = C1.Win.C1TrueDBGrid.TabActionEnum.GridNavigation
+        Me.dgCuentas.TabIndex = 339
+        Me.dgCuentas.PropBag = "<?xml version=""1.0""?><Blob><Styles type=""C1.Win.C1TrueDBGrid.Design.ContextWrappe" & _
+        "r""><Data>Group{BackColor:ControlDark;Border:None,,0, 0, 0, 0;AlignVert:Center;}E" & _
+        "ditor{}Style2{}Style5{}Style4{}Style7{}Style6{}EvenRow{BackColor:Aqua;}Selected{" & _
+        "ForeColor:HighlightText;BackColor:Highlight;}Style3{}Inactive{ForeColor:Inactive" & _
+        "CaptionText;BackColor:InactiveCaption;}FilterBar{}Footer{}Caption{AlignHorz:Cent" & _
+        "er;}Style9{}Normal{Font:Microsoft Sans Serif, 8.25pt;}HighlightRow{ForeColor:Hig" & _
+        "hlightText;BackColor:Highlight;}Style14{}OddRow{}RecordSelector{AlignImage:Cente" & _
+        "r;}Style15{}Heading{Wrap:True;AlignVert:Center;Border:Raised,,1, 1, 1, 1;ForeCol" & _
+        "or:ControlText;BackColor:Control;}Style8{}Style10{AlignHorz:Near;}Style11{}Style" & _
+        "12{}Style13{}Style1{}</Data></Styles><Splits><C1.Win.C1TrueDBGrid.MergeView HBar" & _
+        "Height=""16"" Name="""" CaptionHeight=""17"" ColumnCaptionHeight=""17"" ColumnFooterHeig" & _
+        "ht=""17"" MarqueeStyle=""DottedCellBorder"" RecordSelectorWidth=""17"" DefRecSelWidth=" & _
+        """17"" VerticalScrollGroup=""1"" HorizontalScrollGroup=""1""><CaptionStyle parent=""Sty" & _
+        "le2"" me=""Style10"" /><EditorStyle parent=""Editor"" me=""Style5"" /><EvenRowStyle par" & _
+        "ent=""EvenRow"" me=""Style8"" /><FilterBarStyle parent=""FilterBar"" me=""Style13"" /><F" & _
+        "ooterStyle parent=""Footer"" me=""Style3"" /><GroupStyle parent=""Group"" me=""Style12""" & _
+        " /><HeadingStyle parent=""Heading"" me=""Style2"" /><HighLightRowStyle parent=""Highl" & _
+        "ightRow"" me=""Style7"" /><InactiveStyle parent=""Inactive"" me=""Style4"" /><OddRowSty" & _
+        "le parent=""OddRow"" me=""Style9"" /><RecordSelectorStyle parent=""RecordSelector"" me" & _
+        "=""Style11"" /><SelectedStyle parent=""Selected"" me=""Style6"" /><Style parent=""Norma" & _
+        "l"" me=""Style1"" /><ClientRect>0, 0, 448, 206</ClientRect><BorderSide>0</BorderSid" & _
+        "e></C1.Win.C1TrueDBGrid.MergeView></Splits><NamedStyles><Style parent="""" me=""Nor" & _
+        "mal"" /><Style parent=""Normal"" me=""Heading"" /><Style parent=""Heading"" me=""Footer""" & _
+        " /><Style parent=""Heading"" me=""Caption"" /><Style parent=""Heading"" me=""Inactive"" " & _
+        "/><Style parent=""Normal"" me=""Selected"" /><Style parent=""Normal"" me=""Editor"" /><S" & _
+        "tyle parent=""Normal"" me=""HighlightRow"" /><Style parent=""Normal"" me=""EvenRow"" /><" & _
+        "Style parent=""Normal"" me=""OddRow"" /><Style parent=""Heading"" me=""RecordSelector"" " & _
+        "/><Style parent=""Normal"" me=""FilterBar"" /><Style parent=""Caption"" me=""Group"" /><" & _
+        "/NamedStyles><vertSplits>1</vertSplits><horzSplits>1</horzSplits><Layout>None</L" & _
+        "ayout><DefaultRecSelWidth>17</DefaultRecSelWidth><ClientArea>0, 0, 448, 206</Cli" & _
+        "entArea><PrintPageHeaderStyle parent="""" me=""Style14"" /><PrintPageFooterStyle par" & _
+        "ent="""" me=""Style15"" /></Blob>"
+        '
+        'XpGroupBox4
+        '
+        Me.XpGroupBox4.BackColor = System.Drawing.SystemColors.Control
+        Me.XpGroupBox4.Controls.Add(Me.rdoDESCUENTO)
+        Me.XpGroupBox4.Controls.Add(Me.rdoCOBRO)
+        Me.XpGroupBox4.FlatStyle = System.Windows.Forms.FlatStyle.System
+        Me.XpGroupBox4.Location = New System.Drawing.Point(488, 19)
+        Me.XpGroupBox4.Name = "XpGroupBox4"
+        Me.XpGroupBox4.Size = New System.Drawing.Size(268, 81)
+        Me.XpGroupBox4.TabIndex = 338
+        Me.XpGroupBox4.TabStop = False
+        Me.XpGroupBox4.Text = "Tipus"
+        '
+        'rdoDESCUENTO
+        '
+        Me.rdoDESCUENTO.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.rdoDESCUENTO.Location = New System.Drawing.Point(144, 37)
+        Me.rdoDESCUENTO.Name = "rdoDESCUENTO"
+        Me.rdoDESCUENTO.Size = New System.Drawing.Size(104, 22)
+        Me.rdoDESCUENTO.TabIndex = 1
+        Me.rdoDESCUENTO.Text = "Descompte"
+        '
+        'rdoCOBRO
+        '
+        Me.rdoCOBRO.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.rdoCOBRO.Location = New System.Drawing.Point(28, 37)
+        Me.rdoCOBRO.Name = "rdoCOBRO"
+        Me.rdoCOBRO.Size = New System.Drawing.Size(104, 22)
+        Me.rdoCOBRO.TabIndex = 0
+        Me.rdoCOBRO.Text = "Cobrament"
+        '
+        'tabVENCIMREMES
+        '
+        Me.tabVENCIMREMES.Controls.Add(Me.XpGroupBox3)
+        Me.tabVENCIMREMES.Controls.Add(Me.dgRemesas)
+        Me.tabVENCIMREMES.Location = New System.Drawing.Point(4, 22)
+        Me.tabVENCIMREMES.Name = "tabVENCIMREMES"
+        Me.tabVENCIMREMES.Size = New System.Drawing.Size(968, 487)
+        Me.tabVENCIMREMES.TabIndex = 1
+        Me.tabVENCIMREMES.Text = "Detall"
+        '
+        'XpGroupBox3
+        '
+        Me.XpGroupBox3.BackColor = System.Drawing.SystemColors.Control
+        Me.XpGroupBox3.Controls.Add(Me.XpGroupBox5)
+        Me.XpGroupBox3.Controls.Add(Me.XpGroupBox2)
+        Me.XpGroupBox3.Controls.Add(Me.dgVenci)
+        Me.XpGroupBox3.FlatStyle = System.Windows.Forms.FlatStyle.System
+        Me.XpGroupBox3.Location = New System.Drawing.Point(20, 8)
+        Me.XpGroupBox3.Name = "XpGroupBox3"
+        Me.XpGroupBox3.Size = New System.Drawing.Size(928, 249)
+        Me.XpGroupBox3.TabIndex = 338
+        Me.XpGroupBox3.TabStop = False
+        Me.XpGroupBox3.Text = "Carregar efectes"
+        '
+        'XpGroupBox5
+        '
+        Me.XpGroupBox5.BackColor = System.Drawing.SystemColors.Control
+        Me.XpGroupBox5.Controls.Add(Me.dtpInicio)
+        Me.XpGroupBox5.Controls.Add(Me.dtpFinal)
+        Me.XpGroupBox5.Controls.Add(Me.Label4)
+        Me.XpGroupBox5.Controls.Add(Me.cboDeLosClientes)
+        Me.XpGroupBox5.Controls.Add(Me.CheckBox1)
+        Me.XpGroupBox5.Controls.Add(Me.btnAñadirARemesa)
+        Me.XpGroupBox5.FlatStyle = System.Windows.Forms.FlatStyle.System
+        Me.XpGroupBox5.Location = New System.Drawing.Point(8, 16)
+        Me.XpGroupBox5.Name = "XpGroupBox5"
+        Me.XpGroupBox5.Size = New System.Drawing.Size(596, 76)
+        Me.XpGroupBox5.TabIndex = 341
+        Me.XpGroupBox5.TabStop = False
+        '
+        'dtpInicio
+        '
+        '
+        'dtpInicio.Calendar
+        '
+        Me.dtpInicio.Calendar.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.dtpInicio.FormatType = C1.Win.C1Input.FormatTypeEnum.ShortDate
+        Me.dtpInicio.Location = New System.Drawing.Point(8, 20)
+        Me.dtpInicio.Name = "dtpInicio"
+        Me.dtpInicio.Size = New System.Drawing.Size(114, 20)
+        Me.dtpInicio.TabIndex = 334
+        Me.dtpInicio.Tag = Nothing
+        Me.dtpInicio.Value = New Date(2005, 5, 3, 0, 0, 0, 0)
+        '
+        'dtpFinal
+        '
+        '
+        'dtpFinal.Calendar
+        '
+        Me.dtpFinal.Calendar.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.dtpFinal.FormatType = C1.Win.C1Input.FormatTypeEnum.ShortDate
+        Me.dtpFinal.Location = New System.Drawing.Point(8, 44)
+        Me.dtpFinal.Name = "dtpFinal"
+        Me.dtpFinal.Size = New System.Drawing.Size(114, 20)
+        Me.dtpFinal.TabIndex = 335
+        Me.dtpFinal.Tag = Nothing
+        Me.dtpFinal.Value = New Date(2005, 5, 3, 0, 0, 0, 0)
+        '
+        'Label4
+        '
+        Me.Label4.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.Label4.Location = New System.Drawing.Point(224, 16)
+        Me.Label4.Name = "Label4"
+        Me.Label4.Size = New System.Drawing.Size(336, 22)
+        Me.Label4.TabIndex = 338
+        Me.Label4.Text = "Efectes del client:"
+        '
+        'cboDeLosClientes
+        '
+        Me.cboDeLosClientes.AddItemSeparator = Microsoft.VisualBasic.ChrW(59)
+        Me.cboDeLosClientes.AutoCompletion = True
+        Me.cboDeLosClientes.Caption = ""
+        Me.cboDeLosClientes.CaptionHeight = 17
+        Me.cboDeLosClientes.CharacterCasing = System.Windows.Forms.CharacterCasing.Normal
+        Me.cboDeLosClientes.ColumnCaptionHeight = 17
+        Me.cboDeLosClientes.ColumnFooterHeight = 17
+        Me.cboDeLosClientes.ContentHeight = 16
+        Me.cboDeLosClientes.DeadAreaBackColor = System.Drawing.Color.Empty
+        Me.cboDeLosClientes.EditorBackColor = System.Drawing.SystemColors.Window
+        Me.cboDeLosClientes.EditorFont = New System.Drawing.Font("Tahoma", 8.25!)
+        Me.cboDeLosClientes.EditorForeColor = System.Drawing.SystemColors.WindowText
+        Me.cboDeLosClientes.EditorHeight = 16
+        Me.cboDeLosClientes.GapHeight = 2
+        Me.cboDeLosClientes.Images.Add(CType(resources.GetObject("resource4"), System.Drawing.Image))
+        Me.cboDeLosClientes.ItemHeight = 15
+        Me.cboDeLosClientes.Location = New System.Drawing.Point(224, 40)
+        Me.cboDeLosClientes.MatchEntryTimeout = CType(2000, Long)
+        Me.cboDeLosClientes.MaxDropDownItems = CType(5, Short)
+        Me.cboDeLosClientes.MaxLength = 32767
+        Me.cboDeLosClientes.MouseCursor = System.Windows.Forms.Cursors.Default
+        Me.cboDeLosClientes.Name = "cboDeLosClientes"
+        'Me.cbo.PartialRightColumn = False
+        Me.cboDeLosClientes.RowDivider.Color = System.Drawing.Color.DarkGray
+        Me.cboDeLosClientes.RowDivider.Style = C1.Win.C1List.LineStyleEnum.None
+        Me.cboDeLosClientes.RowSubDividerColor = System.Drawing.Color.DarkGray
+        Me.cboDeLosClientes.Size = New System.Drawing.Size(336, 22)
+        Me.cboDeLosClientes.TabIndex = 337
+        Me.cboDeLosClientes.Text = "Escolleix un client"
+        Me.cboDeLosClientes.PropBag = "<?xml version=""1.0""?><Blob><Styles type=""C1.Win.C1List.Design.ContextWrapper""><Da" & _
+        "ta>Group{AlignVert:Center;Border:None,,0, 0, 0, 0;BackColor:ControlDark;}Style2{" & _
+        "}Style5{}Style4{}Style7{}Style6{}EvenRow{BackColor:Aqua;}Selected{ForeColor:High" & _
+        "lightText;BackColor:Highlight;}Style3{}Inactive{ForeColor:InactiveCaptionText;Ba" & _
+        "ckColor:InactiveCaption;}Footer{}Caption{AlignHorz:Center;}Normal{}HighlightRow{" & _
+        "ForeColor:HighlightText;BackColor:Highlight;}Style1{}OddRow{}RecordSelector{Alig" & _
+        "nImage:Center;}Heading{Wrap:True;BackColor:Control;Border:Raised,,1, 1, 1, 1;For" & _
+        "eColor:ControlText;AlignVert:Center;}Style8{}Style10{}Style11{}Style9{AlignHorz:" & _
+        "Near;}</Data></Styles><Splits><C1.Win.C1List.ListBoxView AllowColSelect=""False"" " & _
+        "Name="""" CaptionHeight=""17"" ColumnCaptionHeight=""17"" ColumnFooterHeight=""17"" Vert" & _
+        "icalScrollGroup=""1"" HorizontalScrollGroup=""1""><ClientRect>0, 0, 116, 156</Client" & _
+        "Rect><VScrollBar><Width>17</Width></VScrollBar><HScrollBar><Height>17</Height></" & _
+        "HScrollBar><CaptionStyle parent=""Style2"" me=""Style9"" /><EvenRowStyle parent=""Eve" & _
+        "nRow"" me=""Style7"" /><FooterStyle parent=""Footer"" me=""Style3"" /><GroupStyle paren" & _
+        "t=""Group"" me=""Style11"" /><HeadingStyle parent=""Heading"" me=""Style2"" /><HighLight" & _
+        "RowStyle parent=""HighlightRow"" me=""Style6"" /><InactiveStyle parent=""Inactive"" me" & _
+        "=""Style4"" /><OddRowStyle parent=""OddRow"" me=""Style8"" /><RecordSelectorStyle pare" & _
+        "nt=""RecordSelector"" me=""Style10"" /><SelectedStyle parent=""Selected"" me=""Style5"" " & _
+        "/><Style parent=""Normal"" me=""Style1"" /></C1.Win.C1List.ListBoxView></Splits><Nam" & _
+        "edStyles><Style parent="""" me=""Normal"" /><Style parent=""Normal"" me=""Heading"" /><S" & _
+        "tyle parent=""Heading"" me=""Footer"" /><Style parent=""Heading"" me=""Caption"" /><Styl" & _
+        "e parent=""Heading"" me=""Inactive"" /><Style parent=""Normal"" me=""Selected"" /><Style" & _
+        " parent=""Normal"" me=""HighlightRow"" /><Style parent=""Normal"" me=""EvenRow"" /><Styl" & _
+        "e parent=""Normal"" me=""OddRow"" /><Style parent=""Heading"" me=""RecordSelector"" /><S" & _
+        "tyle parent=""Caption"" me=""Group"" /></NamedStyles><vertSplits>1</vertSplits><horz" & _
+        "Splits>1</horzSplits><Layout>Modified</Layout><DefaultRecSelWidth>17</DefaultRec" & _
+        "SelWidth></Blob>"
+        '
+        'CheckBox1
+        '
+        Me.CheckBox1.Checked = True
+        Me.CheckBox1.CheckState = System.Windows.Forms.CheckState.Checked
+        Me.CheckBox1.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.CheckBox1.Location = New System.Drawing.Point(428, 16)
+        Me.CheckBox1.Name = "CheckBox1"
+        Me.CheckBox1.Size = New System.Drawing.Size(132, 23)
+        Me.CheckBox1.TabIndex = 339
+        Me.CheckBox1.Text = "De tots els clients"
+        '
+        'btnAñadirARemesa
+        '
+        Me.btnAñadirARemesa.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.btnAñadirARemesa.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft
+        Me.btnAñadirARemesa.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.btnAñadirARemesa.Location = New System.Drawing.Point(124, 16)
+        Me.btnAñadirARemesa.Name = "btnAñadirARemesa"
+        Me.btnAñadirARemesa.Size = New System.Drawing.Size(92, 49)
+        Me.btnAñadirARemesa.TabIndex = 331
+        Me.btnAñadirARemesa.TabStop = False
+        Me.btnAñadirARemesa.Text = "Carregar efectes entre aquestes dates"
+        '
+        'XpGroupBox2
+        '
+        Me.XpGroupBox2.BackColor = System.Drawing.SystemColors.Control
+        Me.XpGroupBox2.Controls.Add(Me.WButton1)
+        Me.XpGroupBox2.Controls.Add(Me.dtpFecha1)
+        Me.XpGroupBox2.Controls.Add(Me.dtpFecha2)
+        Me.XpGroupBox2.FlatStyle = System.Windows.Forms.FlatStyle.System
+        Me.XpGroupBox2.Location = New System.Drawing.Point(620, 16)
+        Me.XpGroupBox2.Name = "XpGroupBox2"
+        Me.XpGroupBox2.Size = New System.Drawing.Size(280, 80)
+        Me.XpGroupBox2.TabIndex = 340
+        Me.XpGroupBox2.TabStop = False
+        '
+        'WButton1
+        '
+        Me.WButton1.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.WButton1.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft
+        Me.WButton1.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.WButton1.Location = New System.Drawing.Point(128, 24)
+        Me.WButton1.Name = "WButton1"
+        Me.WButton1.Size = New System.Drawing.Size(112, 48)
+        Me.WButton1.TabIndex = 336
+        Me.WButton1.TabStop = False
+        Me.WButton1.Text = "Afegir efectes no remesos entre aquestes dates"
+        '
+        'dtpFecha1
+        '
+        '
+        'dtpFecha1.Calendar
+        '
+        Me.dtpFecha1.Calendar.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.dtpFecha1.FormatType = C1.Win.C1Input.FormatTypeEnum.ShortDate
+        Me.dtpFecha1.Location = New System.Drawing.Point(8, 24)
+        Me.dtpFecha1.Name = "dtpFecha1"
+        Me.dtpFecha1.Size = New System.Drawing.Size(114, 20)
+        Me.dtpFecha1.TabIndex = 337
+        Me.dtpFecha1.Tag = Nothing
+        Me.dtpFecha1.Value = New Date(2005, 5, 3, 0, 0, 0, 0)
+        '
+        'dtpFecha2
+        '
+        '
+        'dtpFecha2.Calendar
+        '
+        Me.dtpFecha2.Calendar.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.dtpFecha2.FormatType = C1.Win.C1Input.FormatTypeEnum.ShortDate
+        Me.dtpFecha2.Location = New System.Drawing.Point(8, 48)
+        Me.dtpFecha2.Name = "dtpFecha2"
+        Me.dtpFecha2.Size = New System.Drawing.Size(114, 20)
+        Me.dtpFecha2.TabIndex = 338
+        Me.dtpFecha2.Tag = Nothing
+        Me.dtpFecha2.Value = New Date(2005, 5, 3, 0, 0, 0, 0)
+        '
+        'dgVenci
+        '
+        Me.dgVenci.CaptionHeight = 17
+        Me.dgVenci.FlatStyle = C1.Win.C1TrueDBGrid.FlatModeEnum.System
+        Me.dgVenci.GroupByCaption = "Drag a column header here to group by that column"
+        Me.dgVenci.Images.Add(CType(resources.GetObject("resource5"), System.Drawing.Image))
+        Me.dgVenci.Location = New System.Drawing.Point(104, 100)
+        Me.dgVenci.MarqueeStyle = C1.Win.C1TrueDBGrid.MarqueeEnum.DottedCellBorder
+        Me.dgVenci.Name = "dgVenci"
+        Me.dgVenci.PreviewInfo.Location = New System.Drawing.Point(0, 0)
+        Me.dgVenci.PreviewInfo.Size = New System.Drawing.Size(0, 0)
+        Me.dgVenci.PreviewInfo.ZoomFactor = 75
+        Me.dgVenci.RecordSelectorWidth = 17
+        Me.dgVenci.RowDivider.Color = System.Drawing.Color.DarkGray
+        Me.dgVenci.RowDivider.Style = C1.Win.C1TrueDBGrid.LineStyleEnum.Single
+        Me.dgVenci.RowHeight = 15
+        Me.dgVenci.RowSubDividerColor = System.Drawing.Color.DarkGray
+        Me.dgVenci.Size = New System.Drawing.Size(720, 137)
+        Me.dgVenci.TabAction = C1.Win.C1TrueDBGrid.TabActionEnum.GridNavigation
+        Me.dgVenci.TabIndex = 336
+        Me.dgVenci.Text = "C1TrueDBGrid1"
+        Me.dgVenci.PropBag = "<?xml version=""1.0""?><Blob><Styles type=""C1.Win.C1TrueDBGrid.Design.ContextWrappe" & _
+        "r""><Data>Group{AlignVert:Center;Border:None,,0, 0, 0, 0;BackColor:ControlDark;}E" & _
+        "ditor{}Style2{}Style5{}Style4{}Style7{}Style6{}EvenRow{BackColor:Aqua;}Selected{" & _
+        "ForeColor:HighlightText;BackColor:Highlight;}Style3{}Inactive{ForeColor:Inactive" & _
+        "CaptionText;BackColor:InactiveCaption;}FilterBar{}Footer{}Caption{AlignHorz:Cent" & _
+        "er;}Style1{}Normal{Font:Microsoft Sans Serif, 8.25pt;}HighlightRow{ForeColor:Hig" & _
+        "hlightText;BackColor:Highlight;}Style12{}OddRow{}RecordSelector{AlignImage:Cente" & _
+        "r;}Style13{}Heading{Wrap:True;BackColor:Control;Border:Raised,,1, 1, 1, 1;ForeCo" & _
+        "lor:ControlText;AlignVert:Center;}Style8{}Style10{AlignHorz:Near;}Style11{}Style" & _
+        "14{}Style15{}Style9{}</Data></Styles><Splits><C1.Win.C1TrueDBGrid.MergeView HBar" & _
+        "Height=""16"" Name="""" CaptionHeight=""17"" ColumnCaptionHeight=""17"" ColumnFooterHeig" & _
+        "ht=""17"" MarqueeStyle=""DottedCellBorder"" RecordSelectorWidth=""17"" DefRecSelWidth=" & _
+        """17"" VerticalScrollGroup=""1"" HorizontalScrollGroup=""1""><CaptionStyle parent=""Sty" & _
+        "le2"" me=""Style10"" /><EditorStyle parent=""Editor"" me=""Style5"" /><EvenRowStyle par" & _
+        "ent=""EvenRow"" me=""Style8"" /><FilterBarStyle parent=""FilterBar"" me=""Style13"" /><F" & _
+        "ooterStyle parent=""Footer"" me=""Style3"" /><GroupStyle parent=""Group"" me=""Style12""" & _
+        " /><HeadingStyle parent=""Heading"" me=""Style2"" /><HighLightRowStyle parent=""Highl" & _
+        "ightRow"" me=""Style7"" /><InactiveStyle parent=""Inactive"" me=""Style4"" /><OddRowSty" & _
+        "le parent=""OddRow"" me=""Style9"" /><RecordSelectorStyle parent=""RecordSelector"" me" & _
+        "=""Style11"" /><SelectedStyle parent=""Selected"" me=""Style6"" /><Style parent=""Norma" & _
+        "l"" me=""Style1"" /><ClientRect>0, 0, 716, 133</ClientRect><BorderSide>0</BorderSid" & _
+        "e></C1.Win.C1TrueDBGrid.MergeView></Splits><NamedStyles><Style parent="""" me=""Nor" & _
+        "mal"" /><Style parent=""Normal"" me=""Heading"" /><Style parent=""Heading"" me=""Footer""" & _
+        " /><Style parent=""Heading"" me=""Caption"" /><Style parent=""Heading"" me=""Inactive"" " & _
+        "/><Style parent=""Normal"" me=""Selected"" /><Style parent=""Normal"" me=""Editor"" /><S" & _
+        "tyle parent=""Normal"" me=""HighlightRow"" /><Style parent=""Normal"" me=""EvenRow"" /><" & _
+        "Style parent=""Normal"" me=""OddRow"" /><Style parent=""Heading"" me=""RecordSelector"" " & _
+        "/><Style parent=""Normal"" me=""FilterBar"" /><Style parent=""Caption"" me=""Group"" /><" & _
+        "/NamedStyles><vertSplits>1</vertSplits><horzSplits>1</horzSplits><Layout>None</L" & _
+        "ayout><DefaultRecSelWidth>17</DefaultRecSelWidth><ClientArea>0, 0, 716, 133</Cli" & _
+        "entArea><PrintPageHeaderStyle parent="""" me=""Style14"" /><PrintPageFooterStyle par" & _
+        "ent="""" me=""Style15"" /></Blob>"
+        '
+        'dgRemesas
+        '
+        Me.dgRemesas.CaptionHeight = 17
+        Me.dgRemesas.FlatStyle = C1.Win.C1TrueDBGrid.FlatModeEnum.System
+        Me.dgRemesas.GroupByCaption = "Drag a column header here to group by that column"
+        Me.dgRemesas.Images.Add(CType(resources.GetObject("resource6"), System.Drawing.Image))
+        Me.dgRemesas.Location = New System.Drawing.Point(20, 260)
+        Me.dgRemesas.MarqueeStyle = C1.Win.C1TrueDBGrid.MarqueeEnum.DottedCellBorder
+        Me.dgRemesas.Name = "dgRemesas"
+        Me.dgRemesas.PreviewInfo.Location = New System.Drawing.Point(0, 0)
+        Me.dgRemesas.PreviewInfo.Size = New System.Drawing.Size(0, 0)
+        Me.dgRemesas.PreviewInfo.ZoomFactor = 75
+        Me.dgRemesas.RecordSelectorWidth = 17
+        Me.dgRemesas.RowDivider.Color = System.Drawing.Color.DarkGray
+        Me.dgRemesas.RowDivider.Style = C1.Win.C1TrueDBGrid.LineStyleEnum.Single
+        Me.dgRemesas.RowHeight = 15
+        Me.dgRemesas.RowSubDividerColor = System.Drawing.Color.DarkGray
+        Me.dgRemesas.Size = New System.Drawing.Size(924, 219)
+        Me.dgRemesas.TabAction = C1.Win.C1TrueDBGrid.TabActionEnum.GridNavigation
+        Me.dgRemesas.TabIndex = 332
+        Me.dgRemesas.Text = "C1TrueDBGrid1"
+        Me.dgRemesas.PropBag = "<?xml version=""1.0""?><Blob><Styles type=""C1.Win.C1TrueDBGrid.Design.ContextWrappe" & _
+        "r""><Data>Group{AlignVert:Center;Border:None,,0, 0, 0, 0;BackColor:ControlDark;}E" & _
+        "ditor{}Style2{}Style5{}Style4{}Style7{}Style6{}EvenRow{BackColor:Aqua;}Selected{" & _
+        "ForeColor:HighlightText;BackColor:Highlight;}Style3{}Inactive{ForeColor:Inactive" & _
+        "CaptionText;BackColor:InactiveCaption;}FilterBar{}Footer{}Caption{AlignHorz:Cent" & _
+        "er;}Style1{}Normal{Font:Microsoft Sans Serif, 8.25pt;}HighlightRow{ForeColor:Hig" & _
+        "hlightText;BackColor:Highlight;}Style12{}OddRow{}RecordSelector{AlignImage:Cente" & _
+        "r;}Style13{}Heading{Wrap:True;BackColor:Control;Border:Raised,,1, 1, 1, 1;ForeCo" & _
+        "lor:ControlText;AlignVert:Center;}Style8{}Style10{AlignHorz:Near;}Style11{}Style" & _
+        "14{}Style15{}Style9{}</Data></Styles><Splits><C1.Win.C1TrueDBGrid.MergeView HBar" & _
+        "Height=""16"" Name="""" CaptionHeight=""17"" ColumnCaptionHeight=""17"" ColumnFooterHeig" & _
+        "ht=""17"" MarqueeStyle=""DottedCellBorder"" RecordSelectorWidth=""17"" DefRecSelWidth=" & _
+        """17"" VerticalScrollGroup=""1"" HorizontalScrollGroup=""1""><CaptionStyle parent=""Sty" & _
+        "le2"" me=""Style10"" /><EditorStyle parent=""Editor"" me=""Style5"" /><EvenRowStyle par" & _
+        "ent=""EvenRow"" me=""Style8"" /><FilterBarStyle parent=""FilterBar"" me=""Style13"" /><F" & _
+        "ooterStyle parent=""Footer"" me=""Style3"" /><GroupStyle parent=""Group"" me=""Style12""" & _
+        " /><HeadingStyle parent=""Heading"" me=""Style2"" /><HighLightRowStyle parent=""Highl" & _
+        "ightRow"" me=""Style7"" /><InactiveStyle parent=""Inactive"" me=""Style4"" /><OddRowSty" & _
+        "le parent=""OddRow"" me=""Style9"" /><RecordSelectorStyle parent=""RecordSelector"" me" & _
+        "=""Style11"" /><SelectedStyle parent=""Selected"" me=""Style6"" /><Style parent=""Norma" & _
+        "l"" me=""Style1"" /><ClientRect>0, 0, 920, 215</ClientRect><BorderSide>0</BorderSid" & _
+        "e></C1.Win.C1TrueDBGrid.MergeView></Splits><NamedStyles><Style parent="""" me=""Nor" & _
+        "mal"" /><Style parent=""Normal"" me=""Heading"" /><Style parent=""Heading"" me=""Footer""" & _
+        " /><Style parent=""Heading"" me=""Caption"" /><Style parent=""Heading"" me=""Inactive"" " & _
+        "/><Style parent=""Normal"" me=""Selected"" /><Style parent=""Normal"" me=""Editor"" /><S" & _
+        "tyle parent=""Normal"" me=""HighlightRow"" /><Style parent=""Normal"" me=""EvenRow"" /><" & _
+        "Style parent=""Normal"" me=""OddRow"" /><Style parent=""Heading"" me=""RecordSelector"" " & _
+        "/><Style parent=""Normal"" me=""FilterBar"" /><Style parent=""Caption"" me=""Group"" /><" & _
+        "/NamedStyles><vertSplits>1</vertSplits><horzSplits>1</horzSplits><Layout>None</L" & _
+        "ayout><DefaultRecSelWidth>17</DefaultRecSelWidth><ClientArea>0, 0, 920, 215</Cli" & _
+        "entArea><PrintPageHeaderStyle parent="""" me=""Style14"" /><PrintPageFooterStyle par" & _
+        "ent="""" me=""Style15"" /></Blob>"
+        '
+        'tabImpresion
+        '
+        Me.tabImpresion.Controls.Add(Me.ppRemesa)
+        Me.tabImpresion.Location = New System.Drawing.Point(4, 22)
+        Me.tabImpresion.Name = "tabImpresion"
+        Me.tabImpresion.Size = New System.Drawing.Size(968, 487)
+        Me.tabImpresion.TabIndex = 2
+        Me.tabImpresion.Text = "Impresió"
+        '
+        'ppRemesa
+        '
+        Me.ppRemesa.C1DPageSettings = "color:False;landscape:False;margins:100,100,100,100;papersize:827,1169,QQA0AA=="
+        Me.ppRemesa.Location = New System.Drawing.Point(24, 15)
+        Me.ppRemesa.Name = "ppRemesa"
+        Me.ppRemesa.NavigationBar.Cursor = System.Windows.Forms.Cursors.Default
+        Me.ppRemesa.NavigationBar.Font = New System.Drawing.Font("Tahoma", 8.25!)
+        Me.ppRemesa.NavigationBar.OutlineView.Cursor = System.Windows.Forms.Cursors.Default
+        Me.ppRemesa.NavigationBar.OutlineView.Font = New System.Drawing.Font("Tahoma", 8.25!)
+        Me.ppRemesa.NavigationBar.OutlineView.Indent = 19
+        Me.ppRemesa.NavigationBar.OutlineView.ItemHeight = 17
+        Me.ppRemesa.NavigationBar.OutlineView.TabIndex = 0
+        Me.ppRemesa.NavigationBar.OutlineView.Visible = False
+        Me.ppRemesa.NavigationBar.Padding = New System.Drawing.Point(6, 3)
+        Me.ppRemesa.NavigationBar.TabIndex = 2
+        Me.ppRemesa.NavigationBar.ThumbnailsView.AutoArrange = True
+        Me.ppRemesa.NavigationBar.ThumbnailsView.Cursor = System.Windows.Forms.Cursors.Default
+        Me.ppRemesa.NavigationBar.ThumbnailsView.Font = New System.Drawing.Font("Tahoma", 8.25!)
+        Me.ppRemesa.NavigationBar.ThumbnailsView.TabIndex = 0
+        Me.ppRemesa.NavigationBar.ThumbnailsView.Visible = False
+        Me.ppRemesa.NavigationBar.Visible = False
+        Me.ppRemesa.NavigationBar.Width = 160
+        Me.ppRemesa.Size = New System.Drawing.Size(616, 465)
+        Me.ppRemesa.Splitter.Cursor = System.Windows.Forms.Cursors.VSplit
+        Me.ppRemesa.Splitter.Width = 3
+        Me.ppRemesa.StatusBar.Cursor = System.Windows.Forms.Cursors.Default
+        Me.ppRemesa.StatusBar.Font = New System.Drawing.Font("Tahoma", 8.25!)
+        Me.ppRemesa.StatusBar.TabIndex = 4
+        Me.ppRemesa.TabIndex = 0
+        Me.ppRemesa.ToolBar.Buttons.AddRange(New System.Windows.Forms.ToolBarButton() {Me.c1pBtnFileOpen1, Me.c1pBtnFileSave1, Me.c1pBtnFilePrint1, Me.c1pBtnPageSetup1, Me.c1pBtnReflow1, Me.c1pBtnStop1, Me.c1pBtnDocInfo1, Me.c1pBtnSeparator1, Me.c1pBtnShowNavigationBar1, Me.c1pBtnSeparator2, Me.c1pBtnMouseHand1, Me.c1pBtnMouseZoom1, Me.c1pBtnMouseZoomOut1, Me.c1pBtnMouseSelect1, Me.c1pBtnFindText1, Me.c1pBtnSeparator3, Me.c1pBtnGoFirst1, Me.c1pBtnGoPrev1, Me.c1pBtnGoNext1, Me.c1pBtnGoLast1, Me.c1pBtnSeparator4, Me.c1pBtnHistoryPrev1, Me.c1pBtnHistoryNext1, Me.c1pBtnSeparator5, Me.c1pBtnZoomOut1, Me.c1pBtnZoomIn1, Me.c1pBtnSeparator6, Me.c1pBtnViewActualSize1, Me.c1pBtnViewFullPage1, Me.c1pBtnViewPageWidth1, Me.c1pBtnViewTwoPages1, Me.c1pBtnViewFourPages1, Me.c1pBtnSeparator7, Me.c1pBtnHelp1})
+        Me.ppRemesa.ToolBar.Cursor = System.Windows.Forms.Cursors.Default
+        Me.ppRemesa.ToolBar.Font = New System.Drawing.Font("Tahoma", 8.25!)
+        '
+        'c1pBtnFileOpen1
+        '
+        Me.c1pBtnFileOpen1.Action = C1.Win.C1PrintPreview.ToolBarButtonActionEnum.FileOpen
+        Me.c1pBtnFileOpen1.ImageIndex = 0
+        Me.c1pBtnFileOpen1.ToolTipText = "File Open"
+        '
+        'c1pBtnFileSave1
+        '
+        Me.c1pBtnFileSave1.Action = C1.Win.C1PrintPreview.ToolBarButtonActionEnum.FileSave
+        Me.c1pBtnFileSave1.ImageIndex = 1
+        Me.c1pBtnFileSave1.ToolTipText = "File Save"
+        '
+        'c1pBtnFilePrint1
+        '
+        Me.c1pBtnFilePrint1.Action = C1.Win.C1PrintPreview.ToolBarButtonActionEnum.FilePrint
+        Me.c1pBtnFilePrint1.ImageIndex = 2
+        Me.c1pBtnFilePrint1.ToolTipText = "Print"
+        '
+        'c1pBtnPageSetup1
+        '
+        Me.c1pBtnPageSetup1.Action = C1.Win.C1PrintPreview.ToolBarButtonActionEnum.PageSetup
+        Me.c1pBtnPageSetup1.ImageIndex = 3
+        Me.c1pBtnPageSetup1.ToolTipText = "Page Setup"
+        '
+        'c1pBtnReflow1
+        '
+        Me.c1pBtnReflow1.Action = C1.Win.C1PrintPreview.ToolBarButtonActionEnum.Reflow
+        Me.c1pBtnReflow1.ImageIndex = 4
+        Me.c1pBtnReflow1.ToolTipText = "Reflow"
+        '
+        'c1pBtnStop1
+        '
+        Me.c1pBtnStop1.Action = C1.Win.C1PrintPreview.ToolBarButtonActionEnum.Stop
+        Me.c1pBtnStop1.ImageIndex = 5
+        Me.c1pBtnStop1.ToolTipText = "Stop"
+        Me.c1pBtnStop1.Visible = False
+        '
+        'c1pBtnDocInfo1
+        '
+        Me.c1pBtnDocInfo1.Action = C1.Win.C1PrintPreview.ToolBarButtonActionEnum.DocInfo
+        Me.c1pBtnDocInfo1.Enabled = False
+        Me.c1pBtnDocInfo1.ImageIndex = 26
+        Me.c1pBtnDocInfo1.ToolTipText = "Document information"
+        '
+        'c1pBtnSeparator1
+        '
+        Me.c1pBtnSeparator1.Action = C1.Win.C1PrintPreview.ToolBarButtonActionEnum.None
+        Me.c1pBtnSeparator1.Style = System.Windows.Forms.ToolBarButtonStyle.Separator
+        '
+        'c1pBtnShowNavigationBar1
+        '
+        Me.c1pBtnShowNavigationBar1.Action = C1.Win.C1PrintPreview.ToolBarButtonActionEnum.ShowNavigationBar
+        Me.c1pBtnShowNavigationBar1.ImageIndex = 6
+        Me.c1pBtnShowNavigationBar1.Style = System.Windows.Forms.ToolBarButtonStyle.ToggleButton
+        Me.c1pBtnShowNavigationBar1.ToolTipText = "Show Navigation Bar"
+        '
+        'c1pBtnSeparator2
+        '
+        Me.c1pBtnSeparator2.Action = C1.Win.C1PrintPreview.ToolBarButtonActionEnum.None
+        Me.c1pBtnSeparator2.Style = System.Windows.Forms.ToolBarButtonStyle.Separator
+        '
+        'c1pBtnMouseHand1
+        '
+        Me.c1pBtnMouseHand1.Action = C1.Win.C1PrintPreview.ToolBarButtonActionEnum.MouseHand
+        Me.c1pBtnMouseHand1.ImageIndex = 7
+        Me.c1pBtnMouseHand1.Pushed = True
+        Me.c1pBtnMouseHand1.Style = System.Windows.Forms.ToolBarButtonStyle.ToggleButton
+        Me.c1pBtnMouseHand1.ToolTipText = "Hand Tool"
+        '
+        'c1pBtnMouseZoom1
+        '
+        Me.c1pBtnMouseZoom1.Action = C1.Win.C1PrintPreview.ToolBarButtonActionEnum.MouseZoom
+        Me.c1pBtnMouseZoom1.ImageIndex = 8
+        Me.c1pBtnMouseZoom1.Style = System.Windows.Forms.ToolBarButtonStyle.DropDownButton
+        Me.c1pBtnMouseZoom1.ToolTipText = "Zoom In Tool"
+        '
+        'c1pBtnMouseZoomOut1
+        '
+        Me.c1pBtnMouseZoomOut1.Action = C1.Win.C1PrintPreview.ToolBarButtonActionEnum.MouseZoomOut
+        Me.c1pBtnMouseZoomOut1.ImageIndex = 25
+        Me.c1pBtnMouseZoomOut1.Style = System.Windows.Forms.ToolBarButtonStyle.DropDownButton
+        Me.c1pBtnMouseZoomOut1.ToolTipText = "Zoom Out Tool"
+        Me.c1pBtnMouseZoomOut1.Visible = False
+        '
+        'c1pBtnMouseSelect1
+        '
+        Me.c1pBtnMouseSelect1.Action = C1.Win.C1PrintPreview.ToolBarButtonActionEnum.MouseSelect
+        Me.c1pBtnMouseSelect1.ImageIndex = 9
+        Me.c1pBtnMouseSelect1.Style = System.Windows.Forms.ToolBarButtonStyle.ToggleButton
+        Me.c1pBtnMouseSelect1.ToolTipText = "Select Text"
+        '
+        'c1pBtnFindText1
+        '
+        Me.c1pBtnFindText1.Action = C1.Win.C1PrintPreview.ToolBarButtonActionEnum.FindText
+        Me.c1pBtnFindText1.ImageIndex = 10
+        Me.c1pBtnFindText1.ToolTipText = "Find Text"
+        '
+        'c1pBtnSeparator3
+        '
+        Me.c1pBtnSeparator3.Action = C1.Win.C1PrintPreview.ToolBarButtonActionEnum.None
+        Me.c1pBtnSeparator3.Style = System.Windows.Forms.ToolBarButtonStyle.Separator
+        '
+        'c1pBtnGoFirst1
+        '
+        Me.c1pBtnGoFirst1.Action = C1.Win.C1PrintPreview.ToolBarButtonActionEnum.GoFirst
+        Me.c1pBtnGoFirst1.Enabled = False
+        Me.c1pBtnGoFirst1.ImageIndex = 11
+        Me.c1pBtnGoFirst1.ToolTipText = "First Page"
+        '
+        'c1pBtnGoPrev1
+        '
+        Me.c1pBtnGoPrev1.Action = C1.Win.C1PrintPreview.ToolBarButtonActionEnum.GoPrev
+        Me.c1pBtnGoPrev1.Enabled = False
+        Me.c1pBtnGoPrev1.ImageIndex = 12
+        Me.c1pBtnGoPrev1.ToolTipText = "Previous Page"
+        '
+        'c1pBtnGoNext1
+        '
+        Me.c1pBtnGoNext1.Action = C1.Win.C1PrintPreview.ToolBarButtonActionEnum.GoNext
+        Me.c1pBtnGoNext1.ImageIndex = 13
+        Me.c1pBtnGoNext1.ToolTipText = "Next Page"
+        '
+        'c1pBtnGoLast1
+        '
+        Me.c1pBtnGoLast1.Action = C1.Win.C1PrintPreview.ToolBarButtonActionEnum.GoLast
+        Me.c1pBtnGoLast1.ImageIndex = 14
+        Me.c1pBtnGoLast1.ToolTipText = "Last Page"
+        '
+        'c1pBtnSeparator4
+        '
+        Me.c1pBtnSeparator4.Action = C1.Win.C1PrintPreview.ToolBarButtonActionEnum.None
+        Me.c1pBtnSeparator4.Style = System.Windows.Forms.ToolBarButtonStyle.Separator
+        '
+        'c1pBtnHistoryPrev1
+        '
+        Me.c1pBtnHistoryPrev1.Action = C1.Win.C1PrintPreview.ToolBarButtonActionEnum.HistoryPrev
+        Me.c1pBtnHistoryPrev1.Enabled = False
+        Me.c1pBtnHistoryPrev1.ImageIndex = 15
+        Me.c1pBtnHistoryPrev1.Style = System.Windows.Forms.ToolBarButtonStyle.DropDownButton
+        Me.c1pBtnHistoryPrev1.ToolTipText = "Previous View"
+        '
+        'c1pBtnHistoryNext1
+        '
+        Me.c1pBtnHistoryNext1.Action = C1.Win.C1PrintPreview.ToolBarButtonActionEnum.HistoryNext
+        Me.c1pBtnHistoryNext1.Enabled = False
+        Me.c1pBtnHistoryNext1.ImageIndex = 16
+        Me.c1pBtnHistoryNext1.Style = System.Windows.Forms.ToolBarButtonStyle.DropDownButton
+        Me.c1pBtnHistoryNext1.ToolTipText = "Next View"
+        '
+        'c1pBtnSeparator5
+        '
+        Me.c1pBtnSeparator5.Action = C1.Win.C1PrintPreview.ToolBarButtonActionEnum.None
+        Me.c1pBtnSeparator5.Style = System.Windows.Forms.ToolBarButtonStyle.Separator
+        Me.c1pBtnSeparator5.Visible = False
+        '
+        'c1pBtnZoomOut1
+        '
+        Me.c1pBtnZoomOut1.Action = C1.Win.C1PrintPreview.ToolBarButtonActionEnum.ZoomOut
+        Me.c1pBtnZoomOut1.ImageIndex = 17
+        Me.c1pBtnZoomOut1.ToolTipText = "Zoom Out"
+        Me.c1pBtnZoomOut1.Visible = False
+        '
+        'c1pBtnZoomIn1
+        '
+        Me.c1pBtnZoomIn1.Action = C1.Win.C1PrintPreview.ToolBarButtonActionEnum.ZoomIn
+        Me.c1pBtnZoomIn1.ImageIndex = 18
+        Me.c1pBtnZoomIn1.ToolTipText = "Zoom In"
+        Me.c1pBtnZoomIn1.Visible = False
+        '
+        'c1pBtnSeparator6
+        '
+        Me.c1pBtnSeparator6.Action = C1.Win.C1PrintPreview.ToolBarButtonActionEnum.None
+        Me.c1pBtnSeparator6.Style = System.Windows.Forms.ToolBarButtonStyle.Separator
+        Me.c1pBtnSeparator6.Visible = False
+        '
+        'c1pBtnViewActualSize1
+        '
+        Me.c1pBtnViewActualSize1.Action = C1.Win.C1PrintPreview.ToolBarButtonActionEnum.ViewActualSize
+        Me.c1pBtnViewActualSize1.ImageIndex = 19
+        Me.c1pBtnViewActualSize1.Style = System.Windows.Forms.ToolBarButtonStyle.ToggleButton
+        Me.c1pBtnViewActualSize1.ToolTipText = "Actual Size"
+        '
+        'c1pBtnViewFullPage1
+        '
+        Me.c1pBtnViewFullPage1.Action = C1.Win.C1PrintPreview.ToolBarButtonActionEnum.ViewFullPage
+        Me.c1pBtnViewFullPage1.ImageIndex = 20
+        Me.c1pBtnViewFullPage1.Pushed = True
+        Me.c1pBtnViewFullPage1.Style = System.Windows.Forms.ToolBarButtonStyle.ToggleButton
+        Me.c1pBtnViewFullPage1.ToolTipText = "Full Page"
+        '
+        'c1pBtnViewPageWidth1
+        '
+        Me.c1pBtnViewPageWidth1.Action = C1.Win.C1PrintPreview.ToolBarButtonActionEnum.ViewPageWidth
+        Me.c1pBtnViewPageWidth1.ImageIndex = 21
+        Me.c1pBtnViewPageWidth1.Style = System.Windows.Forms.ToolBarButtonStyle.ToggleButton
+        Me.c1pBtnViewPageWidth1.ToolTipText = "Page Width"
+        '
+        'c1pBtnViewTwoPages1
+        '
+        Me.c1pBtnViewTwoPages1.Action = C1.Win.C1PrintPreview.ToolBarButtonActionEnum.ViewTwoPages
+        Me.c1pBtnViewTwoPages1.ImageIndex = 22
+        Me.c1pBtnViewTwoPages1.Style = System.Windows.Forms.ToolBarButtonStyle.ToggleButton
+        Me.c1pBtnViewTwoPages1.ToolTipText = "Two Pages"
+        '
+        'c1pBtnViewFourPages1
+        '
+        Me.c1pBtnViewFourPages1.Action = C1.Win.C1PrintPreview.ToolBarButtonActionEnum.ViewFourPages
+        Me.c1pBtnViewFourPages1.ImageIndex = 23
+        Me.c1pBtnViewFourPages1.Style = System.Windows.Forms.ToolBarButtonStyle.DropDownButton
+        Me.c1pBtnViewFourPages1.ToolTipText = "Four Pages"
+        '
+        'c1pBtnSeparator7
+        '
+        Me.c1pBtnSeparator7.Action = C1.Win.C1PrintPreview.ToolBarButtonActionEnum.None
+        Me.c1pBtnSeparator7.Style = System.Windows.Forms.ToolBarButtonStyle.Separator
+        Me.c1pBtnSeparator7.Visible = False
+        '
+        'c1pBtnHelp1
+        '
+        Me.c1pBtnHelp1.Action = C1.Win.C1PrintPreview.ToolBarButtonActionEnum.Help
+        Me.c1pBtnHelp1.ImageIndex = 24
+        Me.c1pBtnHelp1.ToolTipText = "Help"
+        Me.c1pBtnHelp1.Visible = False
+        '
+        'frmRemesas
+        '
+        Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
+        Me.ClientSize = New System.Drawing.Size(992, 570)
+        Me.Controls.Add(Me.tabCRemes)
+        Me.Cursor = System.Windows.Forms.Cursors.Default
+        Me.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!)
+        Me.Name = "frmRemesas"
+        Me.Text = "Remeses"
+        Me.Controls.SetChildIndex(Me.btnActualizar, 0)
+        Me.Controls.SetChildIndex(Me.btnModificar, 0)
+        Me.Controls.SetChildIndex(Me.btnUltimo, 0)
+        Me.Controls.SetChildIndex(Me.btnBorrar, 0)
+        Me.Controls.SetChildIndex(Me.btnNuevo, 0)
+        Me.Controls.SetChildIndex(Me.btnRecargar, 0)
+        Me.Controls.SetChildIndex(Me.cboSeleccionCentro, 0)
+        Me.Controls.SetChildIndex(Me.tabCRemes, 0)
+        Me.Controls.SetChildIndex(Me.sbtipo, 0)
+        Me.Controls.SetChildIndex(Me.btnTancar, 0)
+        Me.Controls.SetChildIndex(Me.btnAnterior, 0)
+        Me.Controls.SetChildIndex(Me.btnSiguiente, 0)
+        Me.Controls.SetChildIndex(Me.btnVerLista, 0)
+        Me.Controls.SetChildIndex(Me.btnPrimero, 0)
+        Me.tabCRemes.ResumeLayout(False)
+        Me.tabRemes.ResumeLayout(False)
+        Me.XpGroupBox1.ResumeLayout(False)
+        CType(Me.txtNOMREMESOR, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.txtLINEA, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.cboCODI, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.txtREMESOR, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.cboNOMBANC, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.txtDOMREMESOR, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.txtBANC, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.txtPROVREMESOR, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.txtPOBREMESOR, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.txtCPREMESOR, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.dtpFECHA, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.txtOFICINA, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.cboCuentas, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.dgCuentas, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.XpGroupBox4.ResumeLayout(False)
+        Me.tabVENCIMREMES.ResumeLayout(False)
+        Me.XpGroupBox3.ResumeLayout(False)
+        Me.XpGroupBox5.ResumeLayout(False)
+        CType(Me.dtpInicio, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.dtpFinal, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.cboDeLosClientes, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.XpGroupBox2.ResumeLayout(False)
+        CType(Me.dtpFecha1, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.dtpFecha2, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.dgVenci, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.dgRemesas, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.tabImpresion.ResumeLayout(False)
+        CType(Me.ppRemesa, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.ResumeLayout(False)
+
+    End Sub
+
+#End Region
+
+    Shared frmChildForm As frmRemesas
+    Public Shared Function GetInstance() As frmRemesas
+        If frmChildForm Is Nothing Then
+            frmChildForm = New frmRemesas
+
+        End If
+        Return frmChildForm
+    End Function
+
+#Region "VARIABLES"
+
+    Private remesaActual As clsRemesa
+    Private ponercomonoremes As Boolean = False
+
+#End Region
+
+#Region "INICIALIZAR"
+
+    Private Sub HacerBindings()
+        Try
+            HacerBindingsTodos(remesaActual.dvForm)
+            AñadirBinding(cboCODI, remesaActual.dvForm, "CODI")
+
+            AñadirBindingCombo(cboCODI, remesaActual.dvIdentificadores, "CODI", "CODI")
+            AñadirBindingCombo(cboNOMBANC, remesaActual.dtBancs, CCBancs, CNBancs)
+            AñadirBindingCombo(cboDeLosClientes, remesaActual.dtClients, "CODI", "NOM")
+
+            dgRemesas.SetDataBinding(remesaActual.lineasRemesa.dvForm, "")
+            dgCuentas.SetDataBinding(remesaActual.cuentasRemesa.dvForm, "")
+
+            'AñadirBinding(txt, dvRemesas, "POBREMESOR")
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub IniciarForm(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
+        Cursor = Cursors.WaitCursor
+        Try
+            cargando = True
+            remesaActual = New clsRemesa(ds.Tables("REMESAS"), empresaPorDefecto, Me.BindingContext)
+            HacerBindings()
+            IniciarDgRemesas()
+            IniciarDGCuentas()
+            PonerModificables(soloLectura)
+            MoverActual()
+
+            PSBTIPO(remesaActual.centro) : cargando = False
+            PonerHandlersErroresParaGrids()
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+        Cursor = Cursors.Default
+    End Sub
+
+#End Region
+
+#Region "MODIFICAR DB"
+
+    Friend Overrides Sub btnBorrar_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) 'Handles btnBorrar.Click
+        Try
+            If MessageBox.Show(rm.GetString("BorrarRemesa"), rm.GetString("ConfirmacionEliminacion"), MessageBoxButtons.YesNo) = DialogResult.Yes Then
+                cargando = True
+                editando = True
+                remesaActual.borrar() : ActualizarOrigen()
+                PSBTIPO(remesaActual.centro) : cargando = False
+                editando = False
+            End If
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Friend Overrides Sub btnNuevo_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) 'Handles btnNuevo.Click
+        Try
+            If consulta() Then
+                cargando = True
+                EsRegistroNuevo = True
+                'QuitarTabPages()
+                PonerModificables(modificable)
+                PonerControlesNuevo(True)
+                remesaActual.NuevoRegistro()
+
+                'se le pasa esto pq todavia no sabemos que hilo es el que se va a introducir
+                MoverActual(True)
+                PSBTIPO(remesaActual.centro) : cargando = False
+            End If
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Friend Overrides Sub btnModificar_Click(ByVal sender As Object, ByVal e As System.EventArgs) 'Handles btnModificar.Click
+        Try
+            If Not editando Then
+                cargando = True
+                editando = True
+                PonerModificables(modificable)
+                PSBTIPO(remesaActual.centro)
+                cargando = False
+            End If
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub ActualizarOrigen()
+        Try
+            If editando Then
+                editando = False
+                'remesaActual.tabla.AcceptChanges()
+                PonerModificables(soloLectura)
+            End If
+            If EsRegistroNuevo Then
+                editando = True
+                PonerControlesNuevo(False)
+                PonerModificables(modificable)
+                'PonerTabPages()
+                EsRegistroNuevo = False
+                MoverActual()
+            End If
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Friend Overrides Sub btnActualizar_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) 'Handles btnActualizar.Click
+        Try
+            cargando = True
+            If remesaActual.TieneCambios Then
+                Select Case MessageBox.Show(rm.GetString("QUIERECONFIRMARLOSCAMBIOS"), rm.GetString("INFORMACION"), MessageBoxButtons.YesNoCancel)
+                    Case DialogResult.Cancel
+                        cargando = False
+                        Exit Sub
+                    Case DialogResult.No
+                        remesaActual.tabla.RejectChanges()
+                        cargando = False
+                        Exit Sub
+                End Select
+            End If
+
+            remesaActual.ActualizarOrigen() : ActualizarOrigen()
+            If Not desplazando Then PSBTIPO(remesaActual.centro) : cargando = False
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+
+#End Region
+
+#Region "ESPECÍFICO"
+
+    Private Sub IniciarDGCuentas()
+        Dim i As Integer
+        Try
+            OcultarColumnasDG(dgCuentas)
+            i = 0
+            AñadirBindingCombo(cboCuentas, remesaActual.dtCuentas, "CUENTA", "CUENTA")
+            OcultarMostrarColumnaCbo(cboCuentas, "TIPO", False)
+            PPCol2("CUENTA", dgCuentas, rm.GetString("CUENTA"), "", True, 200, _
+                        False, C1.Win.C1TrueDBGrid.PresentationEnum.ComboBox, False, 200, i, False, cboCuentas)
+
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Sub
+    Private Sub IniciarDGVencim()
+        Dim i As Integer
+        Try
+            dgVenci.SetDataBinding(remesaActual.dvVencimientos, "")
+            OcultarColumnasDG(dgVenci)
+            i = 0
+
+            PPCol2("FRA", dgVenci, rm.GetString("NUMEFECTO"), "", True, 80, _
+                        False, C1.Win.C1TrueDBGrid.PresentationEnum.Normal, False, 80, i, False)
+            i = i + 1
+            PPCol2("NOMCLIENT", dgVenci, rm.GetString("NOMCLIENT"), "", True, 125, _
+                        False, C1.Win.C1TrueDBGrid.PresentationEnum.Normal, False, 125, i, False)
+            i = i + 1
+            PPCol2("PLAZA", dgVenci, rm.GetString("PLAZA"), "", True, 125, _
+                        False, C1.Win.C1TrueDBGrid.PresentationEnum.Normal, False, 125, i, False)
+            i = i + 1
+            PPCol2("VENCIM", dgVenci, rm.GetString("VENCIMIENTO"), "Short Date", True, 125, _
+                        False, C1.Win.C1TrueDBGrid.PresentationEnum.Normal, False, 125, i, False)
+            i = i + 1
+            PPCol2("REMES", dgVenci, rm.GetString("REMESADO"), "", True, 125, _
+                        False, C1.Win.C1TrueDBGrid.PresentationEnum.CheckBox, False, 125, i, False)
+
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Sub
+    Private Sub IniciarDgRemesas()
+        Dim i As Integer
+        Try
+            OcultarColumnasDG(dgRemesas)
+            i = 0
+
+            PPCol2("NEFECTO", dgRemesas, rm.GetString("NUMEFECTO"), "", True, 125, _
+                        False, C1.Win.C1TrueDBGrid.PresentationEnum.Normal, False, 125, i, False)
+            i = i + 1
+            'AñadirTextButton("ELEGIREFECTO", "", 17, ts, dgRemesas, colElegirEfecto)
+
+            PPCol2("NOMCLIENT", dgRemesas, rm.GetString("NOMCLIENT"), "", True, 250, _
+                False, C1.Win.C1TrueDBGrid.PresentationEnum.Normal, False, 250, i, False)
+
+            PPCol2("PLAZA", dgRemesas, rm.GetString("PLAZA"), "", True, 250, _
+                False, C1.Win.C1TrueDBGrid.PresentationEnum.Normal, False, 250, i, False)
+
+            PPCol2("IMPORT", dgRemesas, rm.GetString("IMPORTE"), "", True, 100, _
+                False, C1.Win.C1TrueDBGrid.PresentationEnum.Normal, False, 100, i, False)
+
+            PPCol2("VENCIM", dgRemesas, "Venciment", "Short Date", True, 100, _
+                False, C1.Win.C1TrueDBGrid.PresentationEnum.Normal, False, 100, i, False)
+
+            'AñadirCheckBoxColumn("REMES", "Ya remes", 50, ts, True, colRemes, dgRemesas)
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+
+    End Sub
+    Private Sub dgCuentas_BeforeColUpdate(ByVal sender As Object, ByVal e As C1.Win.C1TrueDBGrid.BeforeColUpdateEventArgs) Handles dgVenci.BeforeColUpdate
+        Try
+            If Not cargando Then
+                cargando = True
+                Select Case e.Column.DataColumn.DataField
+                    Case "REMES"
+                        remesaActual.Remetir()
+                        btnRecargar_Click(Nothing, Nothing)
+                End Select
+                cargando = False
+            End If
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub dgRemesas_BeforeDelete(ByVal sender As Object, ByVal e As C1.Win.C1TrueDBGrid.CancelEventArgs) Handles dgRemesas.BeforeDelete
+        Try
+            If MessageBox.Show(rm.GetString("CONFELIMLINREMESA"), "", MessageBoxButtons.YesNo) = DialogResult.Yes Then
+                remesaActual.lineasRemesa.borrarLineaActual()
+            Else
+                e.Cancel = True
+            End If
+
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Sub
+    Private Sub CheckBox1_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles CheckBox1.CheckedChanged
+        Try
+            If CheckBox1.Checked = False Then
+                cboDeLosClientes.Visible = True
+            Else
+                cboDeLosClientes.Visible = False
+            End If
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub tabCRemes_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles tabCRemes.SelectedIndexChanged
+        Try
+            If tabCRemes.SelectedTab Is tabImpresion Then
+                ppRemesa.Document = remesaActual.imprimirRemesa
+            End If
+
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Sub
+    Private Sub PonerFotoBanco(ByVal cod As String)
+        Dim obj As Object
+        Try
+            Dim cmdSel As New MySqlCommand("SELECT LOGO FROM BANCS WHERE CODI = """ & cod & """ ", cnn)
+
+            ACN()
+            obj = cmdSel.ExecuteScalar
+            CCN()
+            If Not IsDBNull(obj) Then
+                If Not obj Is Nothing Then
+                    ' e.Value is the original value
+
+                    Dim img() As Byte = CType(obj, Byte())
+                    ' Performs the conversion
+                    Dim ms As System.IO.MemoryStream = New System.IO.MemoryStream
+                    Dim offset As Integer = 0 ' 78
+                    ms.Write(img, offset, img.Length - offset)
+                    Dim bmp As Bitmap = New Bitmap(ms)
+                    ms.Close()
+                    ' pibLOGO.Image = bmp
+                Else
+                    'pibLOGO.Image = Nothing
+                End If
+            End If
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Function ComprobarFechas(ByVal d1 As Date, ByVal d2 As Date) As Object
+        '! Changed ComprobarFechas to Object
+        Try
+            If d1.CompareTo(d2) <= 0 Then
+                Return True
+            Else
+                Return False
+            End If
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Function
+    Private Sub btnAñadirARemesa_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnAñadirARemesa.Click
+        Try
+            If CheckBox1.Checked = True Then
+                remesaActual.CargarVencimientos(nz(dtpInicio.Value, ""), nz(dtpFinal.Value, ""))
+            Else
+                remesaActual.CargarVencimientos(nz(dtpInicio.Value, ""), nz(dtpFinal.Value, ""), nzn(cboDeLosClientes.SelectedValue, 0))
+            End If
+            dgVenci.SetDataBinding(remesaActual.dvVencimientos, "")
+            IniciarDGVencim()
+
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Sub
+    Private Sub WButton1_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles WButton1.Click
+        Try
+            If ComprobarFechas(dtpInicio.Value, dtpFinal.Value) Then
+                'messagebox.Show(rm.GetString("QUIERESDESCARGAR")
+                If CheckBox1.Checked = True Then
+                    remesaActual.RemetirIntervalo(nz(dtpFecha1.Value, ""), nz(dtpFecha2.Value, ""))
+                Else
+                    remesaActual.RemetirIntervalo(nz(dtpFecha1.Value, ""), nz(dtpFecha2.Value, ""), nzn(cboDeLosClientes.SelectedValue, 0))
+                End If
+                'Else
+                'MessageBox.Show("Interval de dates incorrecte")
+            End If
+
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Sub
+    Private Sub txtBANC_Validated(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtBANC.Validated
+        Try
+            If PuedoModificar() Then
+                cargando = True
+                remesaActual.BANC = nz(txtBANC.Text, "")
+                MoverActual()
+                'PonerFotoBanco(remesaActual.BANC)
+                cargando = False
+            End If
+
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Sub
+    Private Sub rdoCOBRO_CheckedChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles rdoCOBRO.CheckedChanged
+        Try
+            If PuedoModificar() Then
+                cargando = True
+                If rdoCOBRO.Checked = True Then
+                    remesaActual.COBRO = True
+                    remesaActual.DESCUENTO = False
+                End If
+                If remesaActual.DESCUENTO = True Then
+                    remesaActual.dtCuentas.DefaultView.RowFilter = "TIPO = 'C'"
+                    remesaActual.cuentasRemesa.dvForm.Table.Clear()
+                Else
+                    remesaActual.dtCuentas.DefaultView.RowFilter = "TIPO = 'D'"
+                    remesaActual.cuentasRemesa.dvForm.Table.Clear()
+                End If
+                PSBTIPO(remesaActual.centro) : cargando = False
+            End If
+        Catch ex As Exception
+            LOG(ex.ToString) : CCN() : cargando = False
+        End Try
+    End Sub
+    Private Sub rdoDESCUENTO_CheckedChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles rdoDESCUENTO.CheckedChanged
+        Try
+            If PuedoModificar() Then
+                cargando = True
+                If rdoDESCUENTO.Checked = True Then
+                    remesaActual.COBRO = False
+                    remesaActual.DESCUENTO = True
+                End If
+                If remesaActual.DESCUENTO = True Then
+                    remesaActual.dtCuentas.DefaultView.RowFilter = "TIPO = 'C'"
+                    remesaActual.cuentasRemesa.dvForm.Table.Clear()
+                Else
+                    remesaActual.dtCuentas.DefaultView.RowFilter = "TIPO = 'D'"
+                    remesaActual.cuentasRemesa.dvForm.Table.Clear()
+                End If
+                PSBTIPO(remesaActual.centro) : cargando = False
+            End If
+        Catch ex As Exception
+            LOG(ex.ToString) : CCN() : cargando = False
+        End Try
+    End Sub
+
+#End Region
+
+#Region "IMPRESIÓN"
+
+    Private Sub btnImprimir_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
+        Try
+            'remesaActual.ImprimirRemesa()
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+            CCN()
+
+        End Try
+
+    End Sub
+
+#End Region
+
+#Region "COMUNES"
+
+    Private Sub PonerModificables(Optional ByVal b As Boolean = False)
+        Try
+            PonerMod(b)
+            If Not b Then : cboCODI.DataSource = Nothing
+            Else : AñadirBindingCombo(cboCODI, remesaActual.dvIdentificadores, "CODI", "CODI") : remesaActual.tabla.AcceptChanges() : End If
+
+            cboCODI.LimitToList = b
+            cboCODI.SuperBack = b
+            cboCODI.ReadOnly = editando Or EsRegistroNuevo
+
+            txtCPREMESOR.ReadOnly = True
+            txtDOMREMESOR.ReadOnly = True
+            txtPOBREMESOR.ReadOnly = True
+            txtPROVREMESOR.ReadOnly = True
+            txtREMESOR.ReadOnly = True
+
+            ModiNuev(b)
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub PonerControlesNuevo(ByVal b As Boolean)
+        Try
+            If Not b Then
+                btnActualizar.Text = rm.GetString("CONFIRMAR")
+            Else
+                btnActualizar.Text = rm.GetString("ACTUALIZAR")
+            End If
+            ModiNuev(b)
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Friend Sub btnRecargar_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnRecargar.Click
+        Try
+            cargando = True
+            Dim id As Object
+            id = cboCODI.Text
+            remesaActual.ActualizarOrigen()
+            remesaActual.CambiarAReg(id, iraregistro)
+            MoverActual()
+            cargando = False
+
+        Catch ex As Exception
+            LOG(ex.ToString) : CCN() : cargando = False
+        End Try
+    End Sub
+
+#End Region
+
+#Region "DESPLAZARSE"
+
+    Private Sub MoverActual(Optional ByVal nuevo As Boolean = False)
+        Try
+            cargando = True
+            remesaActual.MoverActual()
+            'dgCuentas.Rebind(True)
+            'dgCuentas.SetDataBinding(remesaActual.cuentasRemesa.dvForm, "")
+            PSBTIPO(remesaActual.centro) : cargando = False
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Friend Overrides Sub btnSiguiente_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) 'Handles btnSiguiente.Click
+        Try
+            cargando = True
+            remesaActual.SiguienteReg() ': ActualizarOrigen()
+            MoverActual()
+            PSBTIPO(remesaActual.centro) : cargando = False
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Friend Overrides Sub btnUltimo_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) 'Handles btnUltimo.Click
+        Try
+            cargando = True
+            remesaActual.UltimoReg() : ActualizarOrigen()
+            MoverActual()
+            PSBTIPO(remesaActual.centro) : cargando = False
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Friend Overrides Sub btnAnterior_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) 'Handles btnAnterior.Click
+        Try
+            cargando = True
+            remesaActual.AnteriorReg() : ActualizarOrigen()
+            MoverActual()
+            PSBTIPO(remesaActual.centro) : cargando = False
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Protected Friend Overrides Sub btnPrimero_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) 'Handles btnPrimero.Click
+        Try
+            cargando = True
+            remesaActual.PrimeroReg() : ActualizarOrigen()
+            MoverActual()
+            PSBTIPO(remesaActual.centro) : cargando = False
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+
+#End Region
+
+#Region "SELECCIÓN REGISTRO"
+
+#Region "SELECCION CENTRO"
+
+    Private Sub cboSeleccion_ItemChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles cboSeleccionCentro.SelectionChangeCommitted
+        Try
+            If consulta() Then
+                cargando = True
+                remesaActual.cambioCentro(nz(cboSeleccionCentro.SelectedValue, empresaPorDefecto), primero)
+                'remesaActual.tabla.AcceptChanges()
+                cboSeleccionCentro.SelectedValue = remesaActual.centro
+                MoverActual()
+                cargando = False
+            Else
+                If EsRegistroNuevo And Not cargando Then
+                    cargando = True
+                    remesaActual.centro = nz(cboSeleccionCentro.SelectedValue, empresaPorDefecto)
+                    remesaActual.tabla.Clear()
+                    remesaActual.NuevoRegistro()
+                    PSBTIPO(remesaActual.centro)
+                    MoverActual()
+                    cargando = False
+                End If
+            End If
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+
+#End Region
+
+    Private Sub cboCODI_KeyPress(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyPressEventArgs) Handles cboCODI.KeyPress
+        Try
+            If editando Or EsRegistroNuevo Then : cboCODI.AutoCompletion = False
+            Else : cboCODI.AutoCompletion = True : End If
+
+        Catch ex As Exception
+            MessageBox.Show(ex.ToString)
+        End Try
+    End Sub
+    Private Sub cboCODI_ItemChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cboCODI.SelectedValueChanged
+        Try
+            If consulta() Then
+                cargando = True
+                remesaActual.CambiarAReg(nzn(cboCODI.WillChangeToValue, 0), iraregistro)
+                MoverActual()
+                PSBTIPO(remesaActual.centro) : cargando = False
+            End If
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+
+#End Region
+
+#Region "ELECCIONES"
+
+    Private Sub btnElegirBanco_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnElegirBanco.Click
+        Try
+            'RellenarListaDescuento()
+            'RellenarListaCobro()
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub cboNombreBanco_SelectedValueChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cboNOMBANC.SelectedValueChanged
+        Try
+            If PuedoModificar() Then
+                cargando = True
+                remesaActual.BANC = nz(cboNOMBANC.WillChangeToValue, "")
+                MoverActual()
+                'PonerFotoBanco(remesaActual.BANC)
+                cargando = False
+            End If
+
+        Catch ex As Exception
+            LOG(ex.ToString) : CCN() : cargando = False
+        End Try
+    End Sub
+    Private Sub txtREMESOR_Validated(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtREMESOR.Validated
+        Try
+            If PuedoModificar() Then cargando = True : remesaActual.REMESOR = nzn(txtREMESOR.Text, 0) : btnRecargar_Click(Nothing, Nothing) : cargando = False
+
+        Catch ex As Exception
+            LOG(ex.ToString) : CCN() : cargando = False
+        End Try
+    End Sub
+
+#End Region
+
+#Region "ORGANIZAR"
+
+    Private Sub dgCuentas_AfterUpdate(ByVal sender As Object, ByVal e As System.EventArgs) Handles dgCuentas.AfterUpdate
+        Try
+            AutoSizeCC(dgCuentas)
+            remesaActual.OFICINA = cboCuentas.Columns("DOM").Value & " " & cboCuentas.Columns("POB").Value & " " & cboCuentas.Columns("CP").Value
+
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Sub
+
+#End Region
+
+    Private Sub dgCuentas_BeforeDelete(ByVal sender As Object, ByVal e As C1.Win.C1TrueDBGrid.CancelEventArgs) Handles dgCuentas.BeforeDelete
+        Try
+            If MessageBox.Show(rm.GetString("BORRARLINEA"), rm.GetString("ConfirmacionEliminacion"), MessageBoxButtons.YesNo) = DialogResult.Yes Then
+                e.Cancel = False
+            Else
+                e.Cancel = True
+            End If
+
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Sub
+    Private Sub dgVenci_BeforeDelete(ByVal sender As Object, ByVal e As C1.Win.C1TrueDBGrid.CancelEventArgs) Handles dgVenci.BeforeDelete
+        Try
+            If MessageBox.Show(rm.GetString("BORRARLINEA"), rm.GetString("ConfirmacionEliminacion"), MessageBoxButtons.YesNo) = DialogResult.Yes Then
+                e.Cancel = False
+            Else
+                e.Cancel = True
+            End If
+
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Sub
+
+End Class

@@ -1,0 +1,442 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 1.3
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">1.3</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1">this is my long string</data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        [base64 mime encoded serialized .NET Framework object]
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        [base64 mime encoded string representing a byte array form of the .NET Framework object]
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used forserialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2"/>
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" msdata:Ordinal="1"/>
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3"/>
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4"/>
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required"/>
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>1.3</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=1.0.5000.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=1.0.5000.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="MenuBar1.Text">
+    <value>Barra Menú</value>
+  </data>
+  <data name="mnuBaseDeDatos.Text">
+    <value>&amp;Base de Datos</value>
+  </data>
+  <data name="MnuClientes.Text">
+    <value>&amp;Clientes</value>
+  </data>
+  <data name="MnuTalleres.Text">
+    <value>T&amp;alleres</value>
+  </data>
+  <data name="MnuProveedores.Text">
+    <value>&amp;Proveedores</value>
+  </data>
+  <data name="MnuTransportistas.Text">
+    <value>Tra&amp;nsportistas</value>
+  </data>
+  <data name="MnuRepresentantes.Text">
+    <value>&amp;Representantes</value>
+  </data>
+  <data name="MnuOperaciones.Text">
+    <value>Operaciones</value>
+  </data>
+  <data name="MnuMaquinas.Text">
+    <value>Máquinas</value>
+  </data>
+  <data name="MnuHilos.Shortcut" type="System.Windows.Forms.Shortcut, System.Windows.Forms, Version=1.0.5000.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>CtrlF1</value>
+  </data>
+  <data name="MnuHilos.Text">
+    <value>&amp;Hilos</value>
+  </data>
+  <data name="MnuTejidos.Text">
+    <value>Tejidos</value>
+  </data>
+  <data name="MnuTejidos2.Text">
+    <value>&amp;Tejidos</value>
+  </data>
+  <data name="MnuDisposiciones.Text">
+    <value>&amp;Disposiciones</value>
+  </data>
+  <data name="MnuFornituras.Text">
+    <value>&amp;Fornituras</value>
+  </data>
+  <data name="MnuMuestras.Text">
+    <value>&amp;Muestras</value>
+  </data>
+  <data name="mnuModelos.Text">
+    <value>M&amp;odelos</value>
+  </data>
+  <data name="MnuBancos.Text">
+    <value>Bancos / Cajas</value>
+  </data>
+  <data name="mnuFormadepago.Text">
+    <value>Formas de pago</value>
+  </data>
+  <data name="MnuTipodeIVA.Text">
+    <value>Tipo de IVA</value>
+  </data>
+  <data name="mnuTemporadas.Text">
+    <value>Temporadas</value>
+  </data>
+  <data name="mnuEmpresas.Text">
+    <value>Empresas</value>
+  </data>
+  <data name="mnuCompras.Text">
+    <value>&amp;Compras</value>
+  </data>
+  <data name="mnuTejidoCompraPedidos.Text">
+    <value>Pedidos de Tejidos</value>
+  </data>
+  <data name="mnuCompraMuestrasPedidos.Text">
+    <value>Pedidos de Hilos</value>
+  </data>
+  <data name="mnuMuestrasCompraAlbaranes.Text">
+    <value>Albaranes de Entrega Hilos</value>
+  </data>
+  <data name="mnuOrdenesFabricacionMuestras.Text">
+    <value>Ordenes de Fabricación Muestras</value>
+  </data>
+  <data name="mnuCompraFornituras.Text">
+    <value>Pedidos de Fornituras</value>
+  </data>
+  <data name="mnuOrdenesFabricacion.Text">
+    <value>Ordenes de Fabricación Modelos</value>
+  </data>
+  <data name="mnuVentas.Text">
+    <value>&amp;Ventas</value>
+  </data>
+  <data name="mnuTejidoVentaPedido.Text">
+    <value>Pedidos Tejidos/Muestras</value>
+  </data>
+  <data name="mnuTejidoVentaAlbaran.Text">
+    <value>Alabaranes Tejidos/Muestras</value>
+  </data>
+  <data name="mnuBtnFacturaProforma.Text">
+    <value>Factura Proforma-Tejidos/Muestras</value>
+  </data>
+  <data name="mnuTejidoVentaFactura.Text">
+    <value>Facturas de Tejidos/Muestras</value>
+  </data>
+  <data name="mnuVentaModelosAlbaranes.Text">
+    <value>Albaranes Modelos</value>
+  </data>
+  <data name="mnuVentaModelosFacturas.Text">
+    <value>Facturas Modelos</value>
+  </data>
+  <data name="mnuRemesas.Text">
+    <value>Remesas</value>
+  </data>
+  <data name="mnuListados.Text">
+    <value>Listados</value>
+  </data>
+  <data name="mnuListadoClientes.Text">
+    <value>Listado Clientes</value>
+  </data>
+  <data name="mnuListadoProveedores.Text">
+    <value>Listado Proveedores</value>
+  </data>
+  <data name="mnuListadoTalleres.Text">
+    <value>Listado Talleres</value>
+  </data>
+  <data name="mnuListadoTransportistas.Text">
+    <value>Listado Transportistas</value>
+  </data>
+  <data name="mnuListadoRepresentantes.Text">
+    <value>Listado Representantes</value>
+  </data>
+  <data name="mnuListadoBancos.Text">
+    <value>Listado Bancos</value>
+  </data>
+  <data name="mnuListadoOperaciones.Text">
+    <value>Listado Operaciones</value>
+  </data>
+  <data name="mnuListadoMaquinas.Text">
+    <value>Listado Máquinas</value>
+  </data>
+  <data name="mnListadoTejidos.Text">
+    <value>Listado Tejidos</value>
+  </data>
+  <data name="mnuListadoDisposiciones.Text">
+    <value>Listado Disposicones</value>
+  </data>
+  <data name="mnuListadoHilos.Text">
+    <value>Listado Hilos</value>
+  </data>
+  <data name="mnuListadoMuestras.Text">
+    <value>Listado Muestras</value>
+  </data>
+  <data name="mnuListadoModelos.Text">
+    <value>Listado Modelos</value>
+  </data>
+  <data name="mnuListadosCompra.Text">
+    <value>Listado Compras</value>
+  </data>
+  <data name="mnuListadoVentas.Text">
+    <value>Listado Ventas</value>
+  </data>
+  <data name="mnuControlStockHilos.Text">
+    <value>Hilos</value>
+  </data>
+  <data name="mnuControlStockTejidos.Text">
+    <value>Tejidos</value>
+  </data>
+  <data name="MenuButtonItem17.Text">
+    <value>Modelos</value>
+  </data>
+  <data name="mnuEstadisticas.Text">
+    <value>Estadísticas</value>
+  </data>
+  <data name="mnuEstFacturacion.Text">
+    <value>Facturación por Clientes</value>
+  </data>
+  <data name="mnuFacturacionArticulos.Text">
+    <value>Facturación por Articulos</value>
+  </data>
+  <data name="mnuVentana.Text">
+    <value>Ventanas</value>
+  </data>
+  <data name="mnuCerrarTodas.Text">
+    <value>Cerrar Todas</value>
+  </data>
+  <data name="mnuMinimizarTodas.Text">
+    <value>Minimizar Todas</value>
+  </data>
+  <data name="mnuOrganizacion.Text">
+    <value>Organización Automática</value>
+  </data>
+  <data name="MenuItem31.Text">
+    <value>Horizontal</value>
+  </data>
+  <data name="mnuEnviarErrores.Text">
+    <value>Errores</value>
+  </data>
+  <data name="mnuErrores.Text">
+    <value>Enviar Errores</value>
+  </data>
+  <data name="mnuAyuda.Text">
+    <value>Ayuda</value>
+  </data>
+  <data name="mnuActualizarPrograma.Text">
+    <value>Actualizar Programa</value>
+  </data>
+  <data name="mnuArchivo.Text">
+    <value>&amp;Opciones</value>
+  </data>
+  <data name="mnuCastellano.Text">
+    <value>Castellano</value>
+  </data>
+  <data name="mnuCatalan.Text">
+    <value>Catalán</value>
+  </data>
+  <data name="mnuConfig.Text">
+    <value>Configuración</value>
+  </data>
+  <data name="mnuSalir.Text">
+    <value>Salir</value>
+  </data>
+  <data name="ExplorerBarBoxItem1.Text">
+    <value>Clientes</value>
+  </data>
+  <data name="ExplorerBarBoxItem7.Text">
+    <value>Pedidos de Tejidos</value>
+  </data>
+  <data name="ExplorerBarBoxItem13.Text">
+    <value>Pedidos Tejidos/Muestras</value>
+  </data>
+  <data name="ExplorerBarBoxItem19.Text">
+    <value>Clientes</value>
+  </data>
+  <data name="ebbOtrasTablas.Text">
+    <value>Otras Tablas</value>
+  </data>
+  <data name="ExplorerBarBoxItem35.Text">
+    <value>Bancos</value>
+  </data>
+  <data name="ExplorerBarBoxItem36.Text">
+    <value>Formas de pago</value>
+  </data>
+  <data name="ExplorerBarBox4.Text">
+    <value>Listados</value>
+  </data>
+  <data name="ExplorerBarBoxItem20.Text">
+    <value>Talleres</value>
+  </data>
+  <data name="ExplorerBarBoxItem22.Text">
+    <value>Proveedores</value>
+  </data>
+  <data name="ExplorerBarBoxItem21.Text">
+    <value>Representantes</value>
+  </data>
+  <data name="ExplorerBarBoxItem23.Text">
+    <value>Transportistas</value>
+  </data>
+  <data name="ExplorerBarBoxItem24.Text">
+    <value>Hilos</value>
+  </data>
+  <data name="ExplorerBarBoxItem17.Text">
+    <value>Tejidos</value>
+  </data>
+  <data name="ExplorerBarBoxItem32.Text">
+    <value>Muestras</value>
+  </data>
+  <data name="ExplorerBarBoxItem34.Text">
+    <value>Fornituras</value>
+  </data>
+  <data name="ExplorerBarBoxItem33.Text">
+    <value>Modelos</value>
+  </data>
+  <data name="ExplorerBarBox3.Text">
+    <value>Ventas</value>
+  </data>
+  <data name="ExplorerBarBoxItem14.Text">
+    <value>Alabaranes Tejidos/Muestras</value>
+  </data>
+  <data name="ExplorerBarBoxItem18.Text">
+    <value>Albaranes Modelos</value>
+  </data>
+  <data name="ExplorerBarBoxItem16.Text">
+    <value>Facturas Proforma Tejidos/Muestras</value>
+  </data>
+  <data name="ExplorerBarBoxItem15.Text">
+    <value>Facturas de Tejidos/Muestras</value>
+  </data>
+  <data name="ExplorerBarBoxItem25.Text">
+    <value>Remesas</value>
+  </data>
+  <data name="ExplorerBarBox2.Text">
+    <value>Compras</value>
+  </data>
+  <data name="ExplorerBarBoxItem8.Text">
+    <value>Pedidos de Hilos</value>
+  </data>
+  <data name="ExplorerBarBoxItem12.Text">
+    <value>Pedidos de Fornituras</value>
+  </data>
+  <data name="ExplorerBarBoxItem9.Text">
+    <value>Algaranes de Entrega Hilos</value>
+  </data>
+  <data name="ExplorerBarBoxItem10.Text">
+    <value>Ordenes de Fabricación Muestras</value>
+  </data>
+  <data name="ExplorerBarBoxItem11.Text">
+    <value>Ordenes de Fabricación Modelos</value>
+  </data>
+  <data name="ExplorerBarBox5.Text">
+    <value>Articulos</value>
+  </data>
+  <data name="ExplorerBarBoxItem6.Text">
+    <value>Hilos</value>
+  </data>
+  <data name="ExplorerBarBoxItem26.Text">
+    <value>Tejidos</value>
+  </data>
+  <data name="ExplorerBarBoxItem27.Text">
+    <value>Disposiciones Tejidos</value>
+  </data>
+  <data name="ExplorerBarBoxItem30.Text">
+    <value>Muestras</value>
+  </data>
+  <data name="ExplorerBarBoxItem28.Text">
+    <value>Fornituras</value>
+  </data>
+  <data name="ExplorerBarBoxItem29.Text">
+    <value>Modelos</value>
+  </data>
+  <data name="ExplorerBarBox1.Text">
+    <value>Base de datos</value>
+  </data>
+  <data name="ExplorerBarBoxItem2.Text">
+    <value>Talleres</value>
+  </data>
+  <data name="ExplorerBarBoxItem3.Text">
+    <value>Proveedores</value>
+  </data>
+  <data name="ExplorerBarBoxItem4.Text">
+    <value>Transportistas</value>
+  </data>
+  <data name="ExplorerBarBoxItem5.Text">
+    <value>Representantes</value>
+  </data>
+</root>

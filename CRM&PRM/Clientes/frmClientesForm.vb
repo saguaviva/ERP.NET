@@ -1,0 +1,3528 @@
+Imports C1.Win.C1TrueDBGrid
+Imports MySql.Data.MySqlClient : Imports clsFuncionesLOG : Imports clsFuncionesC1 : Imports clsFuncionesUtiles : Imports clsConstantes : Imports clsOtrasFunciones
+Imports Access = Microsoft.Office.Interop.Access
+Imports C1.Win.C1PrintPreview
+
+
+Public Class frmClientesForm
+    Inherits aura2k3.frmBase
+
+#Region " Código generado por el Diseñador de Windows Forms "
+
+    Public Sub New()
+        MyBase.New()
+
+        'El Diseñador de Windows Forms requiere esta llamada.
+        InitializeComponent() : Dim tom As SMcMaster.TabOrderManager = New SMcMaster.TabOrderManager(Me) : tom.SetTabOrder(SMcMaster.TabOrderManager.TabScheme.AcrossFirst)
+
+        'Agregar cualquier inicialización después de la llamada a InitializeComponent()
+
+    End Sub
+
+    'Form reemplaza a Dispose para limpiar la lista de componentes.
+    Protected Overloads Overrides Sub Dispose(ByVal disposing As Boolean)
+        If disposing Then
+            If Not (components Is Nothing) Then
+                components.Dispose()
+            End If
+        End If
+        MyBase.Dispose(disposing)
+        frmChildForm = Nothing
+    End Sub
+
+    'Requerido por el Diseñador de Windows Forms
+    Private components As System.ComponentModel.IContainer
+
+    'NOTA: el Diseñador de Windows Forms requiere el siguiente procedimiento
+    'Puede modificarse utilizando el Diseñador de Windows Forms. 
+    'No lo modifique con el editor de código.
+
+    Friend WithEvents lblTransportista As Label 'label
+    Friend WithEvents lblDiasPago As Label
+    Friend WithEvents lblCuentaContable As Label
+    Friend WithEvents btnElegirTransportista As C1.Win.C1Input.C1Button
+    Friend WithEvents btnElegirFormaPago As C1.Win.C1Input.C1Button
+    Friend WithEvents btnElegirBanco As C1.Win.C1Input.C1Button
+    Friend WithEvents lblFormaPago As Label
+    Friend WithEvents lblRepresentant As Label
+    Friend WithEvents lblNumCompte As Label
+    Friend WithEvents lblBanc As Label
+    Friend WithEvents txtDia2 As C1.Win.C1Input.C1TextBox
+    Friend WithEvents txtDia3 As C1.Win.C1Input.C1TextBox
+    Friend WithEvents btnElegirRepresentate As C1.Win.C1Input.C1Button
+    Friend WithEvents lblPais As Label
+    Friend WithEvents txtFAX As C1.Win.C1Input.C1TextBox
+    Friend WithEvents txtNIF As C1.Win.C1Input.C1TextBox
+    Friend WithEvents lblCP As Label
+    Friend WithEvents lblFax As Label
+    Friend WithEvents lblPoblacion As Label
+    Friend WithEvents lblNombre As Label
+    Friend WithEvents lblContacte As Label
+    Friend WithEvents lblTelefonos As Label
+    Friend WithEvents lblProvincia As Label
+    Friend WithEvents btnElegirCliente As C1.Win.C1Input.C1Button
+    Friend WithEvents lblDomicilio As Label
+    Friend WithEvents lblCodigoCliente As Label
+    Friend WithEvents txtCP As C1.Win.C1Input.C1TextBox
+    Friend WithEvents comboIVA As C1.Win.C1List.C1Combo
+    Friend WithEvents chkCartera As System.Windows.Forms.CheckBox
+    Friend WithEvents chkTraspas As System.Windows.Forms.CheckBox
+    Friend WithEvents lblIvaHilo As Label
+    Friend WithEvents lblNotas As Label
+    Friend WithEvents btnPrimeraDireccion As C1.Win.C1Input.C1Button
+    Friend WithEvents btnUltimaDireccion As C1.Win.C1Input.C1Button
+    Friend WithEvents txtDireccionEnvio As C1.Win.C1Input.C1TextBox
+    Friend WithEvents txtFAXEnvio As C1.Win.C1Input.C1TextBox
+    Friend WithEvents txtTelefonoEnvio As C1.Win.C1Input.C1TextBox
+    Friend WithEvents txtPoblacionEnvio As C1.Win.C1Input.C1TextBox
+    Friend WithEvents txtProvinciaEnvio As C1.Win.C1Input.C1TextBox
+    Friend WithEvents txtCPEnvio As C1.Win.C1Input.C1TextBox
+    Friend WithEvents tabPageDirecciones As System.Windows.Forms.TabPage
+    Friend WithEvents tabControlClientes As System.Windows.Forms.TabControl
+    Friend WithEvents btnBorrarEmail As C1.Win.C1Input.C1Button
+    Friend WithEvents gpTrans As System.Windows.Forms.GroupBox
+    Friend WithEvents lblPes As Label
+    Friend WithEvents txtPes As C1.Win.C1Input.C1TextBox
+    Friend WithEvents txtBultos As C1.Win.C1Input.C1TextBox
+    Friend WithEvents btnEtiquetasEnvio As C1.Win.C1Input.C1Button
+    Friend WithEvents txtPaisEnvio As C1.Win.C1Input.C1TextBox
+    Friend WithEvents lblObserv As Label
+    Friend WithEvents lblServicio As Label
+    Friend WithEvents txtObservSeur As C1.Win.C1Input.C1TextBox
+    Friend WithEvents txtServicio As C1.Win.C1Input.C1TextBox
+    Friend WithEvents lblTipoTransporte As Label
+    Friend WithEvents txtPesoSeur As C1.Win.C1Input.C1TextBox
+    Friend WithEvents txtTipoPorte As C1.Win.C1Input.C1TextBox
+    Friend WithEvents txtBultosSeur As C1.Win.C1Input.C1TextBox
+    Friend WithEvents lblCodigoSeur As Label
+    Friend WithEvents txtTelefonoCodigo As C1.Win.C1Input.C1TextBox
+    Friend WithEvents btnImprirSeur As C1.Win.C1Input.C1Button
+    Friend WithEvents lblNIF As Label
+    Friend WithEvents btnNuevaDireccion As C1.Win.C1Input.C1Button
+    Friend WithEvents btnAnteriorDireccion As C1.Win.C1Input.C1Button
+    Friend WithEvents btnSiguienteDireccion As C1.Win.C1Input.C1Button
+    Friend WithEvents btnBorrarDireccion As C1.Win.C1Input.C1Button
+    Friend WithEvents txtWEB As C1.Win.C1Input.C1TextBox
+    Friend WithEvents txtEmail2 As C1.Win.C1Input.C1TextBox
+    Friend WithEvents Button1 As C1.Win.C1Input.C1Button
+    Friend WithEvents Button2 As C1.Win.C1Input.C1Button
+    Friend WithEvents Button3 As C1.Win.C1Input.C1Button
+    Friend WithEvents tabPageCliente As System.Windows.Forms.TabPage
+    Friend WithEvents gbDatosBanco As System.Windows.Forms.GroupBox
+    Friend WithEvents lblDTOPorForma As System.Windows.Forms.Label
+    Friend WithEvents lblOficina As System.Windows.Forms.Label
+    Friend WithEvents lblDias As System.Windows.Forms.Label
+    Friend WithEvents gbDatosCliente As System.Windows.Forms.GroupBox
+    Friend WithEvents lblEmails As System.Windows.Forms.Label
+    Friend WithEvents gbDireccionesEnvio As System.Windows.Forms.GroupBox
+    Friend WithEvents lblFAXEnvio As System.Windows.Forms.Label
+    Friend WithEvents lblTelEnvio As System.Windows.Forms.Label
+    Friend WithEvents lblPobEnvio As System.Windows.Forms.Label
+    Friend WithEvents lblProvEnvio As System.Windows.Forms.Label
+    Friend WithEvents lblCPEnvio As System.Windows.Forms.Label
+    Friend WithEvents lblPaisEnvio As System.Windows.Forms.Label
+    Friend WithEvents lblDomEnvio As System.Windows.Forms.Label
+    Friend WithEvents gbEtiquetasEnvio As System.Windows.Forms.GroupBox
+    Friend WithEvents lblBultosEnvio As System.Windows.Forms.Label
+    Friend WithEvents gbEnvioSeur As System.Windows.Forms.GroupBox
+    Friend WithEvents lblBultosSeur As System.Windows.Forms.Label
+    Friend WithEvents lblPeso As System.Windows.Forms.Label
+    Friend WithEvents lblPesoEnvioSeur As System.Windows.Forms.Label
+    Friend WithEvents lblTransportista2 As System.Windows.Forms.Label
+    Friend WithEvents lblWeb As System.Windows.Forms.Label
+    Friend WithEvents lblDomicilioEnvio As System.Windows.Forms.Label
+    Friend WithEvents cboid As C1.Win.C1List.C1Combo
+    Friend WithEvents C1TextBox1 As C1.Win.C1Input.C1TextBox
+    Friend WithEvents Label1 As System.Windows.Forms.Label
+    Friend WithEvents dgDirecciones As C1.Win.C1TrueDBGrid.C1TrueDBGrid
+    Friend WithEvents txtTEL2 As C1.Win.C1Input.C1TextBox
+    Friend WithEvents Label2 As System.Windows.Forms.Label
+    Friend WithEvents dtpFECHARECOGIDA As C1.Win.C1Input.C1DateEdit
+    Friend WithEvents txtDOM As C1.Win.C1Input.C1TextBox
+    Friend WithEvents txtPROV As C1.Win.C1Input.C1TextBox
+    Friend WithEvents cboNOMBANC As C1.Win.C1List.C1Combo
+    Friend WithEvents txtBANC As C1.Win.C1Input.C1TextBox
+    Friend WithEvents txtDIA1 As C1.Win.C1Input.C1TextBox
+    Friend WithEvents txtEMAIL1 As C1.Win.C1Input.C1TextBox
+    Friend WithEvents txtPOB As C1.Win.C1Input.C1TextBox
+    Friend WithEvents txtTRANS As C1.Win.C1Input.C1TextBox
+    Friend WithEvents txtPAIS As C1.Win.C1Input.C1TextBox
+    Friend WithEvents txtCONTACTE As C1.Win.C1Input.C1TextBox
+    Friend WithEvents txtTEL As C1.Win.C1Input.C1TextBox
+    Friend WithEvents cboNOMTRANS As C1.Win.C1List.C1Combo
+    Friend WithEvents txtDC As C1.Win.C1Input.C1TextBox
+    Friend WithEvents txtCTA As C1.Win.C1Input.C1TextBox
+    Friend WithEvents txtOFI As C1.Win.C1Input.C1TextBox
+    Friend WithEvents txtCOFI As C1.Win.C1Input.C1TextBox
+    Friend WithEvents txtFORMA As C1.Win.C1Input.C1TextBox
+    Friend WithEvents txtSUBCTA As C1.Win.C1Input.C1TextBox
+    Friend WithEvents txtDTOFORMA As C1.Win.C1Input.C1TextBox
+    Friend WithEvents cboNOMREPRES As C1.Win.C1List.C1Combo
+    Friend WithEvents cboNOMFORMA As C1.Win.C1List.C1Combo
+    Friend WithEvents txtNOTES As C1.Win.C1Input.C1TextBox
+    Friend WithEvents rdoPORTSDEBUTS As System.Windows.Forms.RadioButton
+    Friend WithEvents rdoPORTSPAGATS As System.Windows.Forms.RadioButton
+    Friend WithEvents txtCODI As C1.Win.C1Input.C1TextBox
+    Friend WithEvents txtREPRES As C1.Win.C1Input.C1TextBox
+    Friend WithEvents lblNUMEROPROVE As System.Windows.Forms.Label
+    Friend WithEvents txtNUMEROPROVE As C1.Win.C1Input.C1TextBox
+    Friend WithEvents rdoDireccionFicha As System.Windows.Forms.RadioButton
+    Friend WithEvents rdoDireccionSeleccionada As System.Windows.Forms.RadioButton
+    Friend WithEvents chkMESESCOMPLETOS As System.Windows.Forms.CheckBox
+    Friend WithEvents lblEmpresa As System.Windows.Forms.Label
+    Friend WithEvents cboEmpresaEnvio As C1.Win.C1List.C1Combo
+    Friend WithEvents Label3 As System.Windows.Forms.Label
+    Friend WithEvents Label4 As System.Windows.Forms.Label
+    Friend WithEvents Label5 As System.Windows.Forms.Label
+    Friend WithEvents Label6 As System.Windows.Forms.Label
+    Friend WithEvents cb2NOM As C1.Win.C1List.C1Combo
+    Friend WithEvents tx2CODI As C1.Win.C1Input.C1TextBox
+    Friend WithEvents Label7 As System.Windows.Forms.Label
+    Friend WithEvents cbooNOMTRANS2 As C1.Win.C1List.C1Combo
+    Friend WithEvents lblINCOTERM As System.Windows.Forms.Label
+    Friend WithEvents ppv2 As C1.Win.C1Preview.C1PrintPreviewControl
+    Friend WithEvents lblIBAN As Label
+    Friend WithEvents txtIBAN As C1.Win.C1Input.C1TextBox
+    Friend WithEvents lblSWIFT As Label
+    Friend WithEvents txtSWIFT As C1.Win.C1Input.C1TextBox
+    Friend WithEvents chkBLOQUEADO As C1.Win.C1Input.C1CheckBox
+    Friend WithEvents cboINCOTERM As C1.Win.C1List.C1Combo
+
+
+    <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmClientesForm))
+        Me.tabControlClientes = New System.Windows.Forms.TabControl()
+        Me.tabPageCliente = New System.Windows.Forms.TabPage()
+        Me.gpTrans = New System.Windows.Forms.GroupBox()
+        Me.lblINCOTERM = New System.Windows.Forms.Label()
+        Me.cboINCOTERM = New C1.Win.C1List.C1Combo()
+        Me.rdoPORTSPAGATS = New System.Windows.Forms.RadioButton()
+        Me.lblTransportista2 = New System.Windows.Forms.Label()
+        Me.txtTRANS = New C1.Win.C1Input.C1TextBox()
+        Me.btnElegirTransportista = New C1.Win.C1Input.C1Button()
+        Me.cboNOMTRANS = New C1.Win.C1List.C1Combo()
+        Me.gbDatosBanco = New System.Windows.Forms.GroupBox()
+        Me.lblSWIFT = New System.Windows.Forms.Label()
+        Me.txtSWIFT = New C1.Win.C1Input.C1TextBox()
+        Me.lblIBAN = New System.Windows.Forms.Label()
+        Me.txtIBAN = New C1.Win.C1Input.C1TextBox()
+        Me.chkMESESCOMPLETOS = New System.Windows.Forms.CheckBox()
+        Me.cboNOMFORMA = New C1.Win.C1List.C1Combo()
+        Me.lblDTOPorForma = New System.Windows.Forms.Label()
+        Me.txtDTOFORMA = New C1.Win.C1Input.C1TextBox()
+        Me.txtOFI = New C1.Win.C1Input.C1TextBox()
+        Me.lblOficina = New System.Windows.Forms.Label()
+        Me.cboNOMBANC = New C1.Win.C1List.C1Combo()
+        Me.cboNOMREPRES = New C1.Win.C1List.C1Combo()
+        Me.txtREPRES = New C1.Win.C1Input.C1TextBox()
+        Me.txtFORMA = New C1.Win.C1Input.C1TextBox()
+        Me.lblDias = New System.Windows.Forms.Label()
+        Me.lblCuentaContable = New System.Windows.Forms.Label()
+        Me.btnElegirFormaPago = New C1.Win.C1Input.C1Button()
+        Me.txtCOFI = New C1.Win.C1Input.C1TextBox()
+        Me.txtBANC = New C1.Win.C1Input.C1TextBox()
+        Me.btnElegirBanco = New C1.Win.C1Input.C1Button()
+        Me.lblFormaPago = New System.Windows.Forms.Label()
+        Me.lblRepresentant = New System.Windows.Forms.Label()
+        Me.lblBanc = New System.Windows.Forms.Label()
+        Me.txtDia2 = New C1.Win.C1Input.C1TextBox()
+        Me.txtDia3 = New C1.Win.C1Input.C1TextBox()
+        Me.txtDIA1 = New C1.Win.C1Input.C1TextBox()
+        Me.btnElegirRepresentate = New C1.Win.C1Input.C1Button()
+        Me.txtSUBCTA = New C1.Win.C1Input.C1TextBox()
+        Me.Label4 = New System.Windows.Forms.Label()
+        Me.Label3 = New System.Windows.Forms.Label()
+        Me.txtCTA = New C1.Win.C1Input.C1TextBox()
+        Me.txtDC = New C1.Win.C1Input.C1TextBox()
+        Me.gbDatosCliente = New System.Windows.Forms.GroupBox()
+        Me.chkBLOQUEADO = New C1.Win.C1Input.C1CheckBox()
+        Me.txtNUMEROPROVE = New C1.Win.C1Input.C1TextBox()
+        Me.lblNUMEROPROVE = New System.Windows.Forms.Label()
+        Me.txtTEL2 = New C1.Win.C1Input.C1TextBox()
+        Me.Label2 = New System.Windows.Forms.Label()
+        Me.cboid = New C1.Win.C1List.C1Combo()
+        Me.lblWeb = New System.Windows.Forms.Label()
+        Me.Button3 = New C1.Win.C1Input.C1Button()
+        Me.Button2 = New C1.Win.C1Input.C1Button()
+        Me.txtEmail2 = New C1.Win.C1Input.C1TextBox()
+        Me.txtEMAIL1 = New C1.Win.C1Input.C1TextBox()
+        Me.txtWEB = New C1.Win.C1Input.C1TextBox()
+        Me.lblNIF = New System.Windows.Forms.Label()
+        Me.txtPAIS = New C1.Win.C1Input.C1TextBox()
+        Me.lblEmails = New System.Windows.Forms.Label()
+        Me.lblPais = New System.Windows.Forms.Label()
+        Me.txtFAX = New C1.Win.C1Input.C1TextBox()
+        Me.txtPOB = New C1.Win.C1Input.C1TextBox()
+        Me.txtDOM = New C1.Win.C1Input.C1TextBox()
+        Me.txtCODI = New C1.Win.C1Input.C1TextBox()
+        Me.txtCONTACTE = New C1.Win.C1Input.C1TextBox()
+        Me.txtTEL = New C1.Win.C1Input.C1TextBox()
+        Me.txtNIF = New C1.Win.C1Input.C1TextBox()
+        Me.lblCP = New System.Windows.Forms.Label()
+        Me.lblFax = New System.Windows.Forms.Label()
+        Me.lblPoblacion = New System.Windows.Forms.Label()
+        Me.lblNombre = New System.Windows.Forms.Label()
+        Me.lblContacte = New System.Windows.Forms.Label()
+        Me.lblTelefonos = New System.Windows.Forms.Label()
+        Me.lblProvincia = New System.Windows.Forms.Label()
+        Me.btnElegirCliente = New C1.Win.C1Input.C1Button()
+        Me.lblDomicilio = New System.Windows.Forms.Label()
+        Me.txtPROV = New C1.Win.C1Input.C1TextBox()
+        Me.lblCodigoCliente = New System.Windows.Forms.Label()
+        Me.txtCP = New C1.Win.C1Input.C1TextBox()
+        Me.Button1 = New C1.Win.C1Input.C1Button()
+        Me.txtNOTES = New C1.Win.C1Input.C1TextBox()
+        Me.chkCartera = New System.Windows.Forms.CheckBox()
+        Me.chkTraspas = New System.Windows.Forms.CheckBox()
+        Me.lblNotas = New System.Windows.Forms.Label()
+        Me.lblIvaHilo = New System.Windows.Forms.Label()
+        Me.comboIVA = New C1.Win.C1List.C1Combo()
+        Me.tabPageDirecciones = New System.Windows.Forms.TabPage()
+        Me.ppv2 = New C1.Win.C1Preview.C1PrintPreviewControl()
+        Me.cb2NOM = New C1.Win.C1List.C1Combo()
+        Me.tx2CODI = New C1.Win.C1Input.C1TextBox()
+        Me.Label5 = New System.Windows.Forms.Label()
+        Me.Label6 = New System.Windows.Forms.Label()
+        Me.gbDireccionesEnvio = New System.Windows.Forms.GroupBox()
+        Me.dgDirecciones = New C1.Win.C1TrueDBGrid.C1TrueDBGrid()
+        Me.C1TextBox1 = New C1.Win.C1Input.C1TextBox()
+        Me.Label1 = New System.Windows.Forms.Label()
+        Me.lblDomicilioEnvio = New System.Windows.Forms.Label()
+        Me.btnAnteriorDireccion = New C1.Win.C1Input.C1Button()
+        Me.btnSiguienteDireccion = New C1.Win.C1Input.C1Button()
+        Me.btnBorrarDireccion = New C1.Win.C1Input.C1Button()
+        Me.btnNuevaDireccion = New C1.Win.C1Input.C1Button()
+        Me.txtPaisEnvio = New C1.Win.C1Input.C1TextBox()
+        Me.btnPrimeraDireccion = New C1.Win.C1Input.C1Button()
+        Me.btnUltimaDireccion = New C1.Win.C1Input.C1Button()
+        Me.txtFAXEnvio = New C1.Win.C1Input.C1TextBox()
+        Me.txtTelefonoEnvio = New C1.Win.C1Input.C1TextBox()
+        Me.lblFAXEnvio = New System.Windows.Forms.Label()
+        Me.lblTelEnvio = New System.Windows.Forms.Label()
+        Me.txtPoblacionEnvio = New C1.Win.C1Input.C1TextBox()
+        Me.lblPobEnvio = New System.Windows.Forms.Label()
+        Me.lblProvEnvio = New System.Windows.Forms.Label()
+        Me.lblCPEnvio = New System.Windows.Forms.Label()
+        Me.txtProvinciaEnvio = New C1.Win.C1Input.C1TextBox()
+        Me.txtCPEnvio = New C1.Win.C1Input.C1TextBox()
+        Me.txtDireccionEnvio = New C1.Win.C1Input.C1TextBox()
+        Me.gbEtiquetasEnvio = New System.Windows.Forms.GroupBox()
+        Me.Label7 = New System.Windows.Forms.Label()
+        Me.cbooNOMTRANS2 = New C1.Win.C1List.C1Combo()
+        Me.cboEmpresaEnvio = New C1.Win.C1List.C1Combo()
+        Me.lblEmpresa = New System.Windows.Forms.Label()
+        Me.rdoDireccionSeleccionada = New System.Windows.Forms.RadioButton()
+        Me.rdoDireccionFicha = New System.Windows.Forms.RadioButton()
+        Me.lblPes = New System.Windows.Forms.Label()
+        Me.lblBultosEnvio = New System.Windows.Forms.Label()
+        Me.txtPes = New C1.Win.C1Input.C1TextBox()
+        Me.btnEtiquetasEnvio = New C1.Win.C1Input.C1Button()
+        Me.txtBultos = New C1.Win.C1Input.C1TextBox()
+        Me.gbEnvioSeur = New System.Windows.Forms.GroupBox()
+        Me.lblCodigoSeur = New System.Windows.Forms.Label()
+        Me.txtTelefonoCodigo = New C1.Win.C1Input.C1TextBox()
+        Me.lblBultosSeur = New System.Windows.Forms.Label()
+        Me.txtBultosSeur = New C1.Win.C1Input.C1TextBox()
+        Me.lblPeso = New System.Windows.Forms.Label()
+        Me.lblTipoTransporte = New System.Windows.Forms.Label()
+        Me.txtPesoSeur = New C1.Win.C1Input.C1TextBox()
+        Me.txtTipoPorte = New C1.Win.C1Input.C1TextBox()
+        Me.lblPesoEnvioSeur = New System.Windows.Forms.Label()
+        Me.lblObserv = New System.Windows.Forms.Label()
+        Me.lblServicio = New System.Windows.Forms.Label()
+        Me.txtObservSeur = New C1.Win.C1Input.C1TextBox()
+        Me.btnImprirSeur = New C1.Win.C1Input.C1Button()
+        Me.txtServicio = New C1.Win.C1Input.C1TextBox()
+        CType(Me.btnRecargar,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.btnSiguiente,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.btnAnterior,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.btnPrimero,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.btnUltimo,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.btnModificar,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.btnTancar,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.btnBorrar,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.btnNuevo,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.btnActualizar,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.btnVerLista,System.ComponentModel.ISupportInitialize).BeginInit
+        Me.tabControlClientes.SuspendLayout
+        Me.tabPageCliente.SuspendLayout
+        Me.gpTrans.SuspendLayout
+        CType(Me.cboINCOTERM,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.txtTRANS,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.btnElegirTransportista,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.cboNOMTRANS,System.ComponentModel.ISupportInitialize).BeginInit
+        Me.gbDatosBanco.SuspendLayout
+        CType(Me.txtSWIFT,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.txtIBAN,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.cboNOMFORMA,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.txtDTOFORMA,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.txtOFI,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.cboNOMBANC,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.cboNOMREPRES,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.txtREPRES,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.txtFORMA,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.btnElegirFormaPago,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.txtCOFI,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.txtBANC,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.btnElegirBanco,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.txtDia2,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.txtDia3,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.txtDIA1,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.btnElegirRepresentate,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.txtSUBCTA,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.txtCTA,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.txtDC,System.ComponentModel.ISupportInitialize).BeginInit
+        Me.gbDatosCliente.SuspendLayout
+        CType(Me.chkBLOQUEADO,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.txtNUMEROPROVE,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.txtTEL2,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.cboid,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.Button3,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.Button2,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.txtEmail2,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.txtEMAIL1,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.txtWEB,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.txtPAIS,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.txtFAX,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.txtPOB,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.txtDOM,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.txtCODI,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.txtCONTACTE,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.txtTEL,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.txtNIF,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.btnElegirCliente,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.txtPROV,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.txtCP,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.Button1,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.txtNOTES,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.comboIVA,System.ComponentModel.ISupportInitialize).BeginInit
+        Me.tabPageDirecciones.SuspendLayout
+        CType(Me.ppv2,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.ppv2.PreviewPane,System.ComponentModel.ISupportInitialize).BeginInit
+        Me.ppv2.SuspendLayout
+        CType(Me.cb2NOM,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.tx2CODI,System.ComponentModel.ISupportInitialize).BeginInit
+        Me.gbDireccionesEnvio.SuspendLayout
+        CType(Me.dgDirecciones,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.C1TextBox1,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.btnAnteriorDireccion,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.btnSiguienteDireccion,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.btnBorrarDireccion,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.btnNuevaDireccion,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.txtPaisEnvio,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.btnPrimeraDireccion,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.btnUltimaDireccion,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.txtFAXEnvio,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.txtTelefonoEnvio,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.txtPoblacionEnvio,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.txtProvinciaEnvio,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.txtCPEnvio,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.txtDireccionEnvio,System.ComponentModel.ISupportInitialize).BeginInit
+        Me.gbEtiquetasEnvio.SuspendLayout
+        CType(Me.cbooNOMTRANS2,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.cboEmpresaEnvio,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.txtPes,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.btnEtiquetasEnvio,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.txtBultos,System.ComponentModel.ISupportInitialize).BeginInit
+        Me.gbEnvioSeur.SuspendLayout
+        CType(Me.txtTelefonoCodigo,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.txtBultosSeur,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.txtPesoSeur,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.txtTipoPorte,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.txtObservSeur,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.btnImprirSeur,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.txtServicio,System.ComponentModel.ISupportInitialize).BeginInit
+        Me.SuspendLayout
+        '
+        'sbtipo
+        '
+        Me.sbtipo.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.sbtipo.Location = New System.Drawing.Point(7, 177)
+        Me.sbtipo.Size = New System.Drawing.Size(123, 19)
+        Me.sbtipo.Text = ""
+        '
+        'btnRecargar
+        '
+        Me.btnRecargar.Location = New System.Drawing.Point(84, 123)
+        Me.btnRecargar.Size = New System.Drawing.Size(140, 28)
+        '
+        'btnSiguiente
+        '
+        Me.btnSiguiente.Location = New System.Drawing.Point(431, 147)
+        Me.btnSiguiente.Size = New System.Drawing.Size(45, 29)
+        '
+        'btnAnterior
+        '
+        Me.btnAnterior.Location = New System.Drawing.Point(39, 147)
+        Me.btnAnterior.Size = New System.Drawing.Size(45, 29)
+        '
+        'btnPrimero
+        '
+        Me.btnPrimero.Location = New System.Drawing.Point(39, 123)
+        Me.btnPrimero.Size = New System.Drawing.Size(45, 28)
+        '
+        'btnUltimo
+        '
+        Me.btnUltimo.Location = New System.Drawing.Point(431, 123)
+        Me.btnUltimo.Size = New System.Drawing.Size(45, 28)
+        '
+        'btnModificar
+        '
+        Me.btnModificar.Location = New System.Drawing.Point(207, 147)
+        Me.btnModificar.Size = New System.Drawing.Size(140, 29)
+        Me.btnModificar.TabIndex = 0
+        '
+        'btnTancar
+        '
+        Me.btnTancar.Location = New System.Drawing.Point(602, 147)
+        Me.btnTancar.Size = New System.Drawing.Size(112, 29)
+        Me.btnTancar.TabIndex = 1
+        '
+        'btnBorrar
+        '
+        Me.btnBorrar.Location = New System.Drawing.Point(319, 147)
+        Me.btnBorrar.Size = New System.Drawing.Size(140, 29)
+        '
+        'btnNuevo
+        '
+        Me.btnNuevo.Location = New System.Drawing.Point(207, 123)
+        Me.btnNuevo.Size = New System.Drawing.Size(115, 56)
+        '
+        'btnActualizar
+        '
+        Me.btnActualizar.Location = New System.Drawing.Point(84, 147)
+        Me.btnActualizar.Size = New System.Drawing.Size(140, 29)
+        '
+        'btnVerLista
+        '
+        Me.btnVerLista.Location = New System.Drawing.Point(602, 123)
+        Me.btnVerLista.Size = New System.Drawing.Size(112, 28)
+        '
+        'cboSeleccionCentro
+        '
+        Me.cboSeleccionCentro.ItemHeight = 17
+        Me.cboSeleccionCentro.Location = New System.Drawing.Point(564, 7)
+        Me.cboSeleccionCentro.Size = New System.Drawing.Size(218, 25)
+        '
+        'tabControlClientes
+        '
+        Me.tabControlClientes.Controls.Add(Me.tabPageCliente)
+        Me.tabControlClientes.Controls.Add(Me.tabPageDirecciones)
+        Me.tabControlClientes.ItemSize = New System.Drawing.Size(62, 18)
+        Me.tabControlClientes.Location = New System.Drawing.Point(10, 12)
+        Me.tabControlClientes.Name = "tabControlClientes"
+        Me.tabControlClientes.SelectedIndex = 0
+        Me.tabControlClientes.Size = New System.Drawing.Size(1212, 635)
+        Me.tabControlClientes.TabIndex = 3
+        '
+        'tabPageCliente
+        '
+        Me.tabPageCliente.BackColor = System.Drawing.Color.FromArgb(CType(CType(230,Byte),Integer), CType(CType(200,Byte),Integer), CType(CType(166,Byte),Integer))
+        Me.tabPageCliente.Controls.Add(Me.gpTrans)
+        Me.tabPageCliente.Controls.Add(Me.gbDatosBanco)
+        Me.tabPageCliente.Controls.Add(Me.gbDatosCliente)
+        Me.tabPageCliente.Controls.Add(Me.txtNOTES)
+        Me.tabPageCliente.Controls.Add(Me.chkCartera)
+        Me.tabPageCliente.Controls.Add(Me.chkTraspas)
+        Me.tabPageCliente.Controls.Add(Me.lblNotas)
+        Me.tabPageCliente.Controls.Add(Me.lblIvaHilo)
+        Me.tabPageCliente.Controls.Add(Me.comboIVA)
+        Me.tabPageCliente.Location = New System.Drawing.Point(4, 22)
+        Me.tabPageCliente.Name = "tabPageCliente"
+        Me.tabPageCliente.Size = New System.Drawing.Size(1204, 609)
+        Me.tabPageCliente.TabIndex = 0
+        Me.tabPageCliente.Text = "Client"
+        '
+        'gpTrans
+        '
+        Me.gpTrans.Anchor = CType((System.Windows.Forms.AnchorStyles.Left Or System.Windows.Forms.AnchorStyles.Right),System.Windows.Forms.AnchorStyles)
+        Me.gpTrans.Controls.Add(Me.lblINCOTERM)
+        Me.gpTrans.Controls.Add(Me.cboINCOTERM)
+        Me.gpTrans.Controls.Add(Me.rdoPORTSPAGATS)
+        Me.gpTrans.Controls.Add(Me.lblTransportista2)
+        Me.gpTrans.Controls.Add(Me.txtTRANS)
+        Me.gpTrans.Controls.Add(Me.btnElegirTransportista)
+        Me.gpTrans.Controls.Add(Me.cboNOMTRANS)
+        Me.gpTrans.Location = New System.Drawing.Point(11, 462)
+        Me.gpTrans.Name = "gpTrans"
+        Me.gpTrans.Size = New System.Drawing.Size(507, 104)
+        Me.gpTrans.TabIndex = 383
+        Me.gpTrans.TabStop = false
+        '
+        'lblINCOTERM
+        '
+        Me.lblINCOTERM.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.lblINCOTERM.Location = New System.Drawing.Point(-6, 64)
+        Me.lblINCOTERM.Name = "lblINCOTERM"
+        Me.lblINCOTERM.Size = New System.Drawing.Size(241, 25)
+        Me.lblINCOTERM.TabIndex = 379
+        Me.lblINCOTERM.Text = "Tipus Enviament (INCOTERM)"
+        Me.lblINCOTERM.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        '
+        'cboINCOTERM
+        '
+        Me.cboINCOTERM.AutoCompletion = true
+        Me.cboINCOTERM.AutoSelect = true
+        Me.cboINCOTERM.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+        Me.cboINCOTERM.Caption = ""
+        Me.cboINCOTERM.CharacterCasing = System.Windows.Forms.CharacterCasing.Normal
+        Me.cboINCOTERM.ContentHeight = 18
+        Me.cboINCOTERM.Cursor = System.Windows.Forms.Cursors.Default
+        Me.cboINCOTERM.DeadAreaBackColor = System.Drawing.Color.Empty
+        Me.cboINCOTERM.Images.Add(CType(resources.GetObject("cboINCOTERM.Images"),System.Drawing.Image))
+        Me.cboINCOTERM.Location = New System.Drawing.Point(252, 64)
+        Me.cboINCOTERM.MatchEntryTimeout = CType(100,Long)
+        Me.cboINCOTERM.MaxDropDownItems = CType(5,Short)
+        Me.cboINCOTERM.MaxLength = 35
+        Me.cboINCOTERM.MouseCursor = System.Windows.Forms.Cursors.Default
+        Me.cboINCOTERM.Name = "cboINCOTERM"
+        Me.cboINCOTERM.RowSubDividerColor = System.Drawing.Color.DarkGray
+        Me.cboINCOTERM.Size = New System.Drawing.Size(263, 21)
+        Me.cboINCOTERM.TabIndex = 378
+        Me.cboINCOTERM.PropBag = resources.GetString("cboINCOTERM.PropBag")
+        '
+        'rdoPORTSPAGATS
+        '
+        Me.rdoPORTSPAGATS.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.rdoPORTSPAGATS.Location = New System.Drawing.Point(526, 64)
+        Me.rdoPORTSPAGATS.Name = "rdoPORTSPAGATS"
+        Me.rdoPORTSPAGATS.Size = New System.Drawing.Size(124, 30)
+        Me.rdoPORTSPAGATS.TabIndex = 3
+        Me.rdoPORTSPAGATS.Text = "Ports Pagats"
+        Me.rdoPORTSPAGATS.Visible = false
+        '
+        'lblTransportista2
+        '
+        Me.lblTransportista2.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.lblTransportista2.Location = New System.Drawing.Point(17, 28)
+        Me.lblTransportista2.Name = "lblTransportista2"
+        Me.lblTransportista2.Size = New System.Drawing.Size(134, 25)
+        Me.lblTransportista2.TabIndex = 377
+        Me.lblTransportista2.Text = "Transportista"
+        Me.lblTransportista2.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        '
+        'txtTRANS
+        '
+        Me.txtTRANS.Location = New System.Drawing.Point(151, 28)
+        Me.txtTRANS.Name = "txtTRANS"
+        Me.txtTRANS.Size = New System.Drawing.Size(73, 21)
+        Me.txtTRANS.TabIndex = 0
+        Me.txtTRANS.Tag = Nothing
+        '
+        'btnElegirTransportista
+        '
+        Me.btnElegirTransportista.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.btnElegirTransportista.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft
+        Me.btnElegirTransportista.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.btnElegirTransportista.Location = New System.Drawing.Point(224, 28)
+        Me.btnElegirTransportista.Name = "btnElegirTransportista"
+        Me.btnElegirTransportista.Size = New System.Drawing.Size(34, 25)
+        Me.btnElegirTransportista.TabIndex = 1
+        Me.btnElegirTransportista.TabStop = false
+        Me.btnElegirTransportista.Text = "..."
+        Me.btnElegirTransportista.UseVisualStyleBackColor = true
+        '
+        'cboNOMTRANS
+        '
+        Me.cboNOMTRANS.AutoCompletion = true
+        Me.cboNOMTRANS.AutoSelect = true
+        Me.cboNOMTRANS.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+        Me.cboNOMTRANS.Caption = ""
+        Me.cboNOMTRANS.CharacterCasing = System.Windows.Forms.CharacterCasing.Normal
+        Me.cboNOMTRANS.ContentHeight = 18
+        Me.cboNOMTRANS.Cursor = System.Windows.Forms.Cursors.Default
+        Me.cboNOMTRANS.DeadAreaBackColor = System.Drawing.Color.Empty
+        Me.cboNOMTRANS.Images.Add(CType(resources.GetObject("cboNOMTRANS.Images"),System.Drawing.Image))
+        Me.cboNOMTRANS.Location = New System.Drawing.Point(269, 30)
+        Me.cboNOMTRANS.MatchEntryTimeout = CType(100,Long)
+        Me.cboNOMTRANS.MaxDropDownItems = CType(5,Short)
+        Me.cboNOMTRANS.MaxLength = 35
+        Me.cboNOMTRANS.MouseCursor = System.Windows.Forms.Cursors.Default
+        Me.cboNOMTRANS.Name = "cboNOMTRANS"
+        Me.cboNOMTRANS.RowSubDividerColor = System.Drawing.Color.DarkGray
+        Me.cboNOMTRANS.Size = New System.Drawing.Size(375, 21)
+        Me.cboNOMTRANS.TabIndex = 1
+        Me.cboNOMTRANS.PropBag = resources.GetString("cboNOMTRANS.PropBag")
+        '
+        'gbDatosBanco
+        '
+        Me.gbDatosBanco.Anchor = System.Windows.Forms.AnchorStyles.Left
+        Me.gbDatosBanco.Controls.Add(Me.lblSWIFT)
+        Me.gbDatosBanco.Controls.Add(Me.txtSWIFT)
+        Me.gbDatosBanco.Controls.Add(Me.lblIBAN)
+        Me.gbDatosBanco.Controls.Add(Me.txtIBAN)
+        Me.gbDatosBanco.Controls.Add(Me.chkMESESCOMPLETOS)
+        Me.gbDatosBanco.Controls.Add(Me.cboNOMFORMA)
+        Me.gbDatosBanco.Controls.Add(Me.lblDTOPorForma)
+        Me.gbDatosBanco.Controls.Add(Me.txtDTOFORMA)
+        Me.gbDatosBanco.Controls.Add(Me.txtOFI)
+        Me.gbDatosBanco.Controls.Add(Me.lblOficina)
+        Me.gbDatosBanco.Controls.Add(Me.cboNOMBANC)
+        Me.gbDatosBanco.Controls.Add(Me.cboNOMREPRES)
+        Me.gbDatosBanco.Controls.Add(Me.txtREPRES)
+        Me.gbDatosBanco.Controls.Add(Me.txtFORMA)
+        Me.gbDatosBanco.Controls.Add(Me.lblDias)
+        Me.gbDatosBanco.Controls.Add(Me.lblCuentaContable)
+        Me.gbDatosBanco.Controls.Add(Me.btnElegirFormaPago)
+        Me.gbDatosBanco.Controls.Add(Me.txtCOFI)
+        Me.gbDatosBanco.Controls.Add(Me.txtBANC)
+        Me.gbDatosBanco.Controls.Add(Me.btnElegirBanco)
+        Me.gbDatosBanco.Controls.Add(Me.lblFormaPago)
+        Me.gbDatosBanco.Controls.Add(Me.lblRepresentant)
+        Me.gbDatosBanco.Controls.Add(Me.lblBanc)
+        Me.gbDatosBanco.Controls.Add(Me.txtDia2)
+        Me.gbDatosBanco.Controls.Add(Me.txtDia3)
+        Me.gbDatosBanco.Controls.Add(Me.txtDIA1)
+        Me.gbDatosBanco.Controls.Add(Me.btnElegirRepresentate)
+        Me.gbDatosBanco.Controls.Add(Me.txtSUBCTA)
+        Me.gbDatosBanco.Controls.Add(Me.Label4)
+        Me.gbDatosBanco.Controls.Add(Me.Label3)
+        Me.gbDatosBanco.Controls.Add(Me.txtCTA)
+        Me.gbDatosBanco.Controls.Add(Me.txtDC)
+        Me.gbDatosBanco.Location = New System.Drawing.Point(661, 307)
+        Me.gbDatosBanco.Name = "gbDatosBanco"
+        Me.gbDatosBanco.Size = New System.Drawing.Size(540, 279)
+        Me.gbDatosBanco.TabIndex = 0
+        Me.gbDatosBanco.TabStop = false
+        '
+        'lblSWIFT
+        '
+        Me.lblSWIFT.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.lblSWIFT.Location = New System.Drawing.Point(8, 129)
+        Me.lblSWIFT.Name = "lblSWIFT"
+        Me.lblSWIFT.Size = New System.Drawing.Size(135, 20)
+        Me.lblSWIFT.TabIndex = 393
+        Me.lblSWIFT.Text = "SWIFT"
+        Me.lblSWIFT.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        '
+        'txtSWIFT
+        '
+        Me.txtSWIFT.Location = New System.Drawing.Point(157, 126)
+        Me.txtSWIFT.Name = "txtSWIFT"
+        Me.txtSWIFT.Size = New System.Drawing.Size(347, 21)
+        Me.txtSWIFT.TabIndex = 392
+        Me.txtSWIFT.Tag = Nothing
+        '
+        'lblIBAN
+        '
+        Me.lblIBAN.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.lblIBAN.Location = New System.Drawing.Point(8, 101)
+        Me.lblIBAN.Name = "lblIBAN"
+        Me.lblIBAN.Size = New System.Drawing.Size(135, 20)
+        Me.lblIBAN.TabIndex = 391
+        Me.lblIBAN.Text = "IBAN"
+        Me.lblIBAN.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        '
+        'txtIBAN
+        '
+        Me.txtIBAN.Location = New System.Drawing.Point(157, 97)
+        Me.txtIBAN.Name = "txtIBAN"
+        Me.txtIBAN.Size = New System.Drawing.Size(347, 21)
+        Me.txtIBAN.TabIndex = 390
+        Me.txtIBAN.Tag = Nothing
+        '
+        'chkMESESCOMPLETOS
+        '
+        Me.chkMESESCOMPLETOS.BackColor = System.Drawing.Color.Transparent
+        Me.chkMESESCOMPLETOS.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.chkMESESCOMPLETOS.Location = New System.Drawing.Point(280, 214)
+        Me.chkMESESCOMPLETOS.Name = "chkMESESCOMPLETOS"
+        Me.chkMESESCOMPLETOS.Size = New System.Drawing.Size(185, 25)
+        Me.chkMESESCOMPLETOS.TabIndex = 387
+        Me.chkMESESCOMPLETOS.Text = "Mesos complets"
+        Me.chkMESESCOMPLETOS.UseVisualStyleBackColor = false
+        '
+        'cboNOMFORMA
+        '
+        Me.cboNOMFORMA.AutoCompletion = true
+        Me.cboNOMFORMA.AutoSelect = true
+        Me.cboNOMFORMA.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+        Me.cboNOMFORMA.Caption = ""
+        Me.cboNOMFORMA.CharacterCasing = System.Windows.Forms.CharacterCasing.Normal
+        Me.cboNOMFORMA.ContentHeight = 18
+        Me.cboNOMFORMA.Cursor = System.Windows.Forms.Cursors.Default
+        Me.cboNOMFORMA.DeadAreaBackColor = System.Drawing.Color.Empty
+        Me.cboNOMFORMA.Images.Add(CType(resources.GetObject("cboNOMFORMA.Images"),System.Drawing.Image))
+        Me.cboNOMFORMA.Location = New System.Drawing.Point(274, 185)
+        Me.cboNOMFORMA.MatchEntryTimeout = CType(100,Long)
+        Me.cboNOMFORMA.MaxDropDownItems = CType(5,Short)
+        Me.cboNOMFORMA.MaxLength = 35
+        Me.cboNOMFORMA.MouseCursor = System.Windows.Forms.Cursors.Default
+        Me.cboNOMFORMA.Name = "cboNOMFORMA"
+        Me.cboNOMFORMA.RowSubDividerColor = System.Drawing.Color.DarkGray
+        Me.cboNOMFORMA.Size = New System.Drawing.Size(230, 21)
+        Me.cboNOMFORMA.TabIndex = 386
+        Me.cboNOMFORMA.PropBag = resources.GetString("cboNOMFORMA.PropBag")
+        '
+        'lblDTOPorForma
+        '
+        Me.lblDTOPorForma.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.lblDTOPorForma.Location = New System.Drawing.Point(287, 241)
+        Me.lblDTOPorForma.Name = "lblDTOPorForma"
+        Me.lblDTOPorForma.Size = New System.Drawing.Size(191, 24)
+        Me.lblDTOPorForma.TabIndex = 385
+        Me.lblDTOPorForma.Text = "Dte. per forma de pagament"
+        Me.lblDTOPorForma.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        '
+        'txtDTOFORMA
+        '
+        Me.txtDTOFORMA.Location = New System.Drawing.Point(475, 241)
+        Me.txtDTOFORMA.Name = "txtDTOFORMA"
+        Me.txtDTOFORMA.Size = New System.Drawing.Size(62, 21)
+        Me.txtDTOFORMA.TabIndex = 14
+        Me.txtDTOFORMA.Tag = Nothing
+        Me.txtDTOFORMA.Value = "_"
+        '
+        'txtOFI
+        '
+        Me.txtOFI.Location = New System.Drawing.Point(241, 42)
+        Me.txtOFI.Name = "txtOFI"
+        Me.txtOFI.Size = New System.Drawing.Size(263, 21)
+        Me.txtOFI.TabIndex = 5
+        Me.txtOFI.Tag = Nothing
+        '
+        'lblOficina
+        '
+        Me.lblOficina.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.lblOficina.Location = New System.Drawing.Point(17, 47)
+        Me.lblOficina.Name = "lblOficina"
+        Me.lblOficina.Size = New System.Drawing.Size(134, 19)
+        Me.lblOficina.TabIndex = 383
+        Me.lblOficina.Text = "Oficina"
+        Me.lblOficina.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        '
+        'cboNOMBANC
+        '
+        Me.cboNOMBANC.AutoCompletion = true
+        Me.cboNOMBANC.AutoSelect = true
+        Me.cboNOMBANC.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+        Me.cboNOMBANC.Caption = ""
+        Me.cboNOMBANC.CharacterCasing = System.Windows.Forms.CharacterCasing.Normal
+        Me.cboNOMBANC.ContentHeight = 18
+        Me.cboNOMBANC.Cursor = System.Windows.Forms.Cursors.Default
+        Me.cboNOMBANC.DeadAreaBackColor = System.Drawing.Color.Empty
+        Me.cboNOMBANC.Images.Add(CType(resources.GetObject("cboNOMBANC.Images"),System.Drawing.Image))
+        Me.cboNOMBANC.Location = New System.Drawing.Point(274, 15)
+        Me.cboNOMBANC.MatchEntryTimeout = CType(100,Long)
+        Me.cboNOMBANC.MaxDropDownItems = CType(5,Short)
+        Me.cboNOMBANC.MaxLength = 35
+        Me.cboNOMBANC.MouseCursor = System.Windows.Forms.Cursors.Default
+        Me.cboNOMBANC.Name = "cboNOMBANC"
+        Me.cboNOMBANC.RowSubDividerColor = System.Drawing.Color.DarkGray
+        Me.cboNOMBANC.Size = New System.Drawing.Size(230, 21)
+        Me.cboNOMBANC.TabIndex = 1
+        Me.cboNOMBANC.PropBag = resources.GetString("cboNOMBANC.PropBag")
+        '
+        'cboNOMREPRES
+        '
+        Me.cboNOMREPRES.AutoCompletion = true
+        Me.cboNOMREPRES.AutoSelect = true
+        Me.cboNOMREPRES.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+        Me.cboNOMREPRES.Caption = ""
+        Me.cboNOMREPRES.CharacterCasing = System.Windows.Forms.CharacterCasing.Normal
+        Me.cboNOMREPRES.ContentHeight = 18
+        Me.cboNOMREPRES.Cursor = System.Windows.Forms.Cursors.Default
+        Me.cboNOMREPRES.DeadAreaBackColor = System.Drawing.Color.Empty
+        Me.cboNOMREPRES.Images.Add(CType(resources.GetObject("cboNOMREPRES.Images"),System.Drawing.Image))
+        Me.cboNOMREPRES.Location = New System.Drawing.Point(274, 155)
+        Me.cboNOMREPRES.MatchEntryTimeout = CType(100,Long)
+        Me.cboNOMREPRES.MaxDropDownItems = CType(5,Short)
+        Me.cboNOMREPRES.MaxLength = 35
+        Me.cboNOMREPRES.MouseCursor = System.Windows.Forms.Cursors.Default
+        Me.cboNOMREPRES.Name = "cboNOMREPRES"
+        Me.cboNOMREPRES.RowSubDividerColor = System.Drawing.Color.DarkGray
+        Me.cboNOMREPRES.Size = New System.Drawing.Size(230, 21)
+        Me.cboNOMREPRES.TabIndex = 7
+        Me.cboNOMREPRES.PropBag = resources.GetString("cboNOMREPRES.PropBag")
+        '
+        'txtREPRES
+        '
+        Me.txtREPRES.Location = New System.Drawing.Point(157, 155)
+        Me.txtREPRES.Name = "txtREPRES"
+        Me.txtREPRES.Size = New System.Drawing.Size(73, 21)
+        Me.txtREPRES.TabIndex = 6
+        Me.txtREPRES.Tag = Nothing
+        '
+        'txtFORMA
+        '
+        Me.txtFORMA.Location = New System.Drawing.Point(157, 185)
+        Me.txtFORMA.Name = "txtFORMA"
+        Me.txtFORMA.Size = New System.Drawing.Size(73, 21)
+        Me.txtFORMA.TabIndex = 8
+        Me.txtFORMA.Tag = Nothing
+        '
+        'lblDias
+        '
+        Me.lblDias.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.lblDias.Location = New System.Drawing.Point(17, 219)
+        Me.lblDias.Name = "lblDias"
+        Me.lblDias.Size = New System.Drawing.Size(134, 20)
+        Me.lblDias.TabIndex = 376
+        Me.lblDias.Text = "Dies"
+        Me.lblDias.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        '
+        'lblCuentaContable
+        '
+        Me.lblCuentaContable.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.lblCuentaContable.Location = New System.Drawing.Point(0, 244)
+        Me.lblCuentaContable.Name = "lblCuentaContable"
+        Me.lblCuentaContable.Size = New System.Drawing.Size(134, 24)
+        Me.lblCuentaContable.TabIndex = 373
+        Me.lblCuentaContable.Text = "Cta. Contable"
+        Me.lblCuentaContable.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        '
+        'btnElegirFormaPago
+        '
+        Me.btnElegirFormaPago.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.btnElegirFormaPago.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft
+        Me.btnElegirFormaPago.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.btnElegirFormaPago.Location = New System.Drawing.Point(230, 185)
+        Me.btnElegirFormaPago.Name = "btnElegirFormaPago"
+        Me.btnElegirFormaPago.Size = New System.Drawing.Size(33, 24)
+        Me.btnElegirFormaPago.TabIndex = 22
+        Me.btnElegirFormaPago.TabStop = false
+        Me.btnElegirFormaPago.Text = "..."
+        Me.btnElegirFormaPago.UseVisualStyleBackColor = true
+        '
+        'txtCOFI
+        '
+        Me.txtCOFI.Location = New System.Drawing.Point(157, 42)
+        Me.txtCOFI.Name = "txtCOFI"
+        Me.txtCOFI.Size = New System.Drawing.Size(73, 21)
+        Me.txtCOFI.TabIndex = 4
+        Me.txtCOFI.Tag = Nothing
+        '
+        'txtBANC
+        '
+        Me.txtBANC.Location = New System.Drawing.Point(157, 15)
+        Me.txtBANC.Name = "txtBANC"
+        Me.txtBANC.Size = New System.Drawing.Size(73, 21)
+        Me.txtBANC.TabIndex = 0
+        Me.txtBANC.Tag = Nothing
+        '
+        'btnElegirBanco
+        '
+        Me.btnElegirBanco.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.btnElegirBanco.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft
+        Me.btnElegirBanco.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.btnElegirBanco.Location = New System.Drawing.Point(230, 15)
+        Me.btnElegirBanco.Name = "btnElegirBanco"
+        Me.btnElegirBanco.Size = New System.Drawing.Size(33, 24)
+        Me.btnElegirBanco.TabIndex = 13
+        Me.btnElegirBanco.TabStop = false
+        Me.btnElegirBanco.Text = "..."
+        Me.btnElegirBanco.UseVisualStyleBackColor = true
+        '
+        'lblFormaPago
+        '
+        Me.lblFormaPago.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.lblFormaPago.Location = New System.Drawing.Point(17, 185)
+        Me.lblFormaPago.Name = "lblFormaPago"
+        Me.lblFormaPago.Size = New System.Drawing.Size(134, 24)
+        Me.lblFormaPago.TabIndex = 360
+        Me.lblFormaPago.Text = "Forma pagament"
+        Me.lblFormaPago.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        '
+        'lblRepresentant
+        '
+        Me.lblRepresentant.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.lblRepresentant.Location = New System.Drawing.Point(17, 155)
+        Me.lblRepresentant.Name = "lblRepresentant"
+        Me.lblRepresentant.Size = New System.Drawing.Size(134, 25)
+        Me.lblRepresentant.TabIndex = 358
+        Me.lblRepresentant.Text = "Representant"
+        Me.lblRepresentant.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        '
+        'lblBanc
+        '
+        Me.lblBanc.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.lblBanc.Location = New System.Drawing.Point(17, 20)
+        Me.lblBanc.Name = "lblBanc"
+        Me.lblBanc.Size = New System.Drawing.Size(134, 19)
+        Me.lblBanc.TabIndex = 356
+        Me.lblBanc.Text = "Banc"
+        Me.lblBanc.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        '
+        'txtDia2
+        '
+        Me.txtDia2.Location = New System.Drawing.Point(196, 214)
+        Me.txtDia2.Name = "txtDia2"
+        Me.txtDia2.Size = New System.Drawing.Size(34, 21)
+        Me.txtDia2.TabIndex = 11
+        Me.txtDia2.Tag = Nothing
+        '
+        'txtDia3
+        '
+        Me.txtDia3.Location = New System.Drawing.Point(235, 214)
+        Me.txtDia3.Name = "txtDia3"
+        Me.txtDia3.Size = New System.Drawing.Size(34, 21)
+        Me.txtDia3.TabIndex = 12
+        Me.txtDia3.Tag = Nothing
+        '
+        'txtDIA1
+        '
+        Me.txtDIA1.Location = New System.Drawing.Point(157, 214)
+        Me.txtDIA1.Name = "txtDIA1"
+        Me.txtDIA1.Size = New System.Drawing.Size(33, 21)
+        Me.txtDIA1.TabIndex = 10
+        Me.txtDIA1.Tag = Nothing
+        '
+        'btnElegirRepresentate
+        '
+        Me.btnElegirRepresentate.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.btnElegirRepresentate.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft
+        Me.btnElegirRepresentate.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.btnElegirRepresentate.Location = New System.Drawing.Point(230, 155)
+        Me.btnElegirRepresentate.Name = "btnElegirRepresentate"
+        Me.btnElegirRepresentate.Size = New System.Drawing.Size(33, 25)
+        Me.btnElegirRepresentate.TabIndex = 19
+        Me.btnElegirRepresentate.TabStop = false
+        Me.btnElegirRepresentate.Text = "..."
+        Me.btnElegirRepresentate.UseVisualStyleBackColor = true
+        '
+        'txtSUBCTA
+        '
+        Me.txtSUBCTA.Location = New System.Drawing.Point(138, 244)
+        Me.txtSUBCTA.Name = "txtSUBCTA"
+        Me.txtSUBCTA.Size = New System.Drawing.Size(145, 21)
+        Me.txtSUBCTA.TabIndex = 13
+        Me.txtSUBCTA.Tag = Nothing
+        '
+        'Label4
+        '
+        Me.Label4.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.Label4.Location = New System.Drawing.Point(246, 74)
+        Me.Label4.Name = "Label4"
+        Me.Label4.Size = New System.Drawing.Size(56, 20)
+        Me.Label4.TabIndex = 389
+        Me.Label4.Text = "Núm:"
+        Me.Label4.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        '
+        'Label3
+        '
+        Me.Label3.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.Label3.Location = New System.Drawing.Point(6, 74)
+        Me.Label3.Name = "Label3"
+        Me.Label3.Size = New System.Drawing.Size(134, 20)
+        Me.Label3.TabIndex = 388
+        Me.Label3.Text = "DC"
+        Me.Label3.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        '
+        'txtCTA
+        '
+        Me.txtCTA.Location = New System.Drawing.Point(308, 69)
+        Me.txtCTA.MaxLength = 255
+        Me.txtCTA.Name = "txtCTA"
+        Me.txtCTA.Size = New System.Drawing.Size(196, 21)
+        Me.txtCTA.TabIndex = 3
+        Me.txtCTA.Tag = Nothing
+        '
+        'txtDC
+        '
+        Me.txtDC.Location = New System.Drawing.Point(157, 69)
+        Me.txtDC.Name = "txtDC"
+        Me.txtDC.Size = New System.Drawing.Size(73, 21)
+        Me.txtDC.TabIndex = 2
+        Me.txtDC.Tag = Nothing
+        '
+        'gbDatosCliente
+        '
+        Me.gbDatosCliente.Anchor = System.Windows.Forms.AnchorStyles.Left
+        Me.gbDatosCliente.Controls.Add(Me.chkBLOQUEADO)
+        Me.gbDatosCliente.Controls.Add(Me.txtNUMEROPROVE)
+        Me.gbDatosCliente.Controls.Add(Me.lblNUMEROPROVE)
+        Me.gbDatosCliente.Controls.Add(Me.txtTEL2)
+        Me.gbDatosCliente.Controls.Add(Me.Label2)
+        Me.gbDatosCliente.Controls.Add(Me.cboid)
+        Me.gbDatosCliente.Controls.Add(Me.lblWeb)
+        Me.gbDatosCliente.Controls.Add(Me.Button3)
+        Me.gbDatosCliente.Controls.Add(Me.Button2)
+        Me.gbDatosCliente.Controls.Add(Me.txtEmail2)
+        Me.gbDatosCliente.Controls.Add(Me.txtEMAIL1)
+        Me.gbDatosCliente.Controls.Add(Me.txtWEB)
+        Me.gbDatosCliente.Controls.Add(Me.lblNIF)
+        Me.gbDatosCliente.Controls.Add(Me.txtPAIS)
+        Me.gbDatosCliente.Controls.Add(Me.lblEmails)
+        Me.gbDatosCliente.Controls.Add(Me.lblPais)
+        Me.gbDatosCliente.Controls.Add(Me.txtFAX)
+        Me.gbDatosCliente.Controls.Add(Me.txtPOB)
+        Me.gbDatosCliente.Controls.Add(Me.txtDOM)
+        Me.gbDatosCliente.Controls.Add(Me.txtCODI)
+        Me.gbDatosCliente.Controls.Add(Me.txtCONTACTE)
+        Me.gbDatosCliente.Controls.Add(Me.txtTEL)
+        Me.gbDatosCliente.Controls.Add(Me.txtNIF)
+        Me.gbDatosCliente.Controls.Add(Me.lblCP)
+        Me.gbDatosCliente.Controls.Add(Me.lblFax)
+        Me.gbDatosCliente.Controls.Add(Me.lblPoblacion)
+        Me.gbDatosCliente.Controls.Add(Me.lblNombre)
+        Me.gbDatosCliente.Controls.Add(Me.lblContacte)
+        Me.gbDatosCliente.Controls.Add(Me.lblTelefonos)
+        Me.gbDatosCliente.Controls.Add(Me.lblProvincia)
+        Me.gbDatosCliente.Controls.Add(Me.btnElegirCliente)
+        Me.gbDatosCliente.Controls.Add(Me.lblDomicilio)
+        Me.gbDatosCliente.Controls.Add(Me.txtPROV)
+        Me.gbDatosCliente.Controls.Add(Me.lblCodigoCliente)
+        Me.gbDatosCliente.Controls.Add(Me.txtCP)
+        Me.gbDatosCliente.Controls.Add(Me.Button1)
+        Me.gbDatosCliente.Location = New System.Drawing.Point(11, 2)
+        Me.gbDatosCliente.Name = "gbDatosCliente"
+        Me.gbDatosCliente.Size = New System.Drawing.Size(644, 453)
+        Me.gbDatosCliente.TabIndex = 378
+        Me.gbDatosCliente.TabStop = false
+        '
+        'chkBLOQUEADO
+        '
+        Me.chkBLOQUEADO.BorderStyle = System.Windows.Forms.BorderStyle.None
+        Me.chkBLOQUEADO.Location = New System.Drawing.Point(454, 20)
+        Me.chkBLOQUEADO.Name = "chkBLOQUEADO"
+        Me.chkBLOQUEADO.Size = New System.Drawing.Size(145, 29)
+        Me.chkBLOQUEADO.TabIndex = 397
+        Me.chkBLOQUEADO.Text = "Bloquear"
+        Me.chkBLOQUEADO.UseVisualStyleBackColor = false
+        Me.chkBLOQUEADO.Value = Nothing
+        '
+        'txtNUMEROPROVE
+        '
+        Me.txtNUMEROPROVE.Location = New System.Drawing.Point(140, 418)
+        Me.txtNUMEROPROVE.MaxLength = 40
+        Me.txtNUMEROPROVE.Name = "txtNUMEROPROVE"
+        Me.txtNUMEROPROVE.Size = New System.Drawing.Size(319, 21)
+        Me.txtNUMEROPROVE.TabIndex = 396
+        Me.txtNUMEROPROVE.Tag = Nothing
+        '
+        'lblNUMEROPROVE
+        '
+        Me.lblNUMEROPROVE.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.lblNUMEROPROVE.Location = New System.Drawing.Point(6, 418)
+        Me.lblNUMEROPROVE.Name = "lblNUMEROPROVE"
+        Me.lblNUMEROPROVE.Size = New System.Drawing.Size(140, 20)
+        Me.lblNUMEROPROVE.TabIndex = 395
+        Me.lblNUMEROPROVE.Text = "Número Proveïdor"
+        Me.lblNUMEROPROVE.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
+        '
+        'txtTEL2
+        '
+        Me.txtTEL2.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom)  _
+            Or System.Windows.Forms.AnchorStyles.Left)  _
+            Or System.Windows.Forms.AnchorStyles.Right),System.Windows.Forms.AnchorStyles)
+        Me.txtTEL2.Location = New System.Drawing.Point(454, 236)
+        Me.txtTEL2.MaxLength = 15
+        Me.txtTEL2.Name = "txtTEL2"
+        Me.txtTEL2.Size = New System.Drawing.Size(173, 21)
+        Me.txtTEL2.TabIndex = 392
+        Me.txtTEL2.Tag = Nothing
+        '
+        'Label2
+        '
+        Me.Label2.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.Label2.Location = New System.Drawing.Point(353, 241)
+        Me.Label2.Name = "Label2"
+        Me.Label2.Size = New System.Drawing.Size(95, 19)
+        Me.Label2.TabIndex = 393
+        Me.Label2.Text = "Telèfon 2"
+        Me.Label2.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        '
+        'cboid
+        '
+        Me.cboid.AutoCompletion = true
+        Me.cboid.Caption = ""
+        Me.cboid.CharacterCasing = System.Windows.Forms.CharacterCasing.Normal
+        Me.cboid.ContentHeight = 18
+        Me.cboid.DeadAreaBackColor = System.Drawing.Color.Empty
+        Me.cboid.EditorBackColor = System.Drawing.Color.PapayaWhip
+        Me.cboid.Images.Add(CType(resources.GetObject("cboid.Images"),System.Drawing.Image))
+        Me.cboid.Location = New System.Drawing.Point(140, 49)
+        Me.cboid.MatchEntryTimeout = CType(2000,Long)
+        Me.cboid.MaxDropDownItems = CType(15,Short)
+        Me.cboid.MaxLength = 35
+        Me.cboid.MouseCursor = System.Windows.Forms.Cursors.Default
+        Me.cboid.Name = "cboid"
+        Me.cboid.RowSubDividerColor = System.Drawing.Color.DarkGray
+        Me.cboid.Size = New System.Drawing.Size(487, 23)
+        Me.cboid.TabIndex = 391
+        Me.cboid.Text = "C1Combo1"
+        Me.cboid.PropBag = resources.GetString("cboid.PropBag")
+        '
+        'lblWeb
+        '
+        Me.lblWeb.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.lblWeb.Location = New System.Drawing.Point(6, 359)
+        Me.lblWeb.Name = "lblWeb"
+        Me.lblWeb.Size = New System.Drawing.Size(134, 20)
+        Me.lblWeb.TabIndex = 389
+        Me.lblWeb.Text = "Web"
+        Me.lblWeb.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        '
+        'Button3
+        '
+        Me.Button3.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.Button3.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft
+        Me.Button3.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.Button3.Location = New System.Drawing.Point(554, 354)
+        Me.Button3.Name = "Button3"
+        Me.Button3.Size = New System.Drawing.Size(34, 25)
+        Me.Button3.TabIndex = 388
+        Me.Button3.TabStop = false
+        Me.Button3.Text = "..."
+        Me.Button3.UseVisualStyleBackColor = true
+        '
+        'Button2
+        '
+        Me.Button2.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.Button2.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft
+        Me.Button2.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.Button2.Location = New System.Drawing.Point(454, 295)
+        Me.Button2.Name = "Button2"
+        Me.Button2.Size = New System.Drawing.Size(33, 25)
+        Me.Button2.TabIndex = 387
+        Me.Button2.TabStop = false
+        Me.Button2.Text = "..."
+        Me.Button2.UseVisualStyleBackColor = true
+        '
+        'txtEmail2
+        '
+        Me.txtEmail2.Location = New System.Drawing.Point(140, 325)
+        Me.txtEmail2.MaxLength = 40
+        Me.txtEmail2.Name = "txtEmail2"
+        Me.txtEmail2.Size = New System.Drawing.Size(314, 21)
+        Me.txtEmail2.TabIndex = 10
+        Me.txtEmail2.Tag = Nothing
+        '
+        'txtEMAIL1
+        '
+        Me.txtEMAIL1.Location = New System.Drawing.Point(140, 295)
+        Me.txtEMAIL1.MaxLength = 40
+        Me.txtEMAIL1.Name = "txtEMAIL1"
+        Me.txtEMAIL1.Size = New System.Drawing.Size(314, 21)
+        Me.txtEMAIL1.TabIndex = 9
+        Me.txtEMAIL1.Tag = Nothing
+        '
+        'txtWEB
+        '
+        Me.txtWEB.Location = New System.Drawing.Point(140, 354)
+        Me.txtWEB.MaxLength = 40
+        Me.txtWEB.Name = "txtWEB"
+        Me.txtWEB.Size = New System.Drawing.Size(414, 21)
+        Me.txtWEB.TabIndex = 11
+        Me.txtWEB.Tag = Nothing
+        '
+        'lblNIF
+        '
+        Me.lblNIF.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.lblNIF.Location = New System.Drawing.Point(6, 153)
+        Me.lblNIF.Name = "lblNIF"
+        Me.lblNIF.Size = New System.Drawing.Size(134, 18)
+        Me.lblNIF.TabIndex = 380
+        Me.lblNIF.Text = "NIF"
+        Me.lblNIF.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        '
+        'txtPAIS
+        '
+        Me.txtPAIS.Location = New System.Drawing.Point(140, 207)
+        Me.txtPAIS.MaxLength = 30
+        Me.txtPAIS.Name = "txtPAIS"
+        Me.txtPAIS.Size = New System.Drawing.Size(203, 21)
+        Me.txtPAIS.TabIndex = 4
+        Me.txtPAIS.Tag = Nothing
+        '
+        'lblEmails
+        '
+        Me.lblEmails.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.lblEmails.Location = New System.Drawing.Point(6, 295)
+        Me.lblEmails.Name = "lblEmails"
+        Me.lblEmails.Size = New System.Drawing.Size(134, 20)
+        Me.lblEmails.TabIndex = 378
+        Me.lblEmails.Text = "Emails"
+        Me.lblEmails.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        '
+        'lblPais
+        '
+        Me.lblPais.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.lblPais.Location = New System.Drawing.Point(6, 212)
+        Me.lblPais.Name = "lblPais"
+        Me.lblPais.Size = New System.Drawing.Size(134, 18)
+        Me.lblPais.TabIndex = 375
+        Me.lblPais.Text = "Pais"
+        Me.lblPais.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        '
+        'txtFAX
+        '
+        Me.txtFAX.Location = New System.Drawing.Point(140, 266)
+        Me.txtFAX.MaxLength = 15
+        Me.txtFAX.Name = "txtFAX"
+        Me.txtFAX.Size = New System.Drawing.Size(203, 21)
+        Me.txtFAX.TabIndex = 8
+        Me.txtFAX.Tag = Nothing
+        '
+        'txtPOB
+        '
+        Me.txtPOB.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom)  _
+            Or System.Windows.Forms.AnchorStyles.Left)  _
+            Or System.Windows.Forms.AnchorStyles.Right),System.Windows.Forms.AnchorStyles)
+        Me.txtPOB.Location = New System.Drawing.Point(454, 177)
+        Me.txtPOB.MaxLength = 30
+        Me.txtPOB.Name = "txtPOB"
+        Me.txtPOB.Size = New System.Drawing.Size(173, 21)
+        Me.txtPOB.TabIndex = 5
+        Me.txtPOB.Tag = Nothing
+        '
+        'txtDOM
+        '
+        Me.txtDOM.Location = New System.Drawing.Point(140, 84)
+        Me.txtDOM.Multiline = true
+        Me.txtDOM.Name = "txtDOM"
+        Me.txtDOM.Size = New System.Drawing.Size(487, 59)
+        Me.txtDOM.TabIndex = 2
+        Me.txtDOM.Tag = Nothing
+        '
+        'txtCODI
+        '
+        Me.txtCODI.BackColor = System.Drawing.Color.PeachPuff
+        Me.txtCODI.Location = New System.Drawing.Point(140, 20)
+        Me.txtCODI.Name = "txtCODI"
+        Me.txtCODI.Size = New System.Drawing.Size(73, 21)
+        Me.txtCODI.TabIndex = 0
+        Me.txtCODI.Tag = Nothing
+        '
+        'txtCONTACTE
+        '
+        Me.txtCONTACTE.Location = New System.Drawing.Point(140, 384)
+        Me.txtCONTACTE.MaxLength = 40
+        Me.txtCONTACTE.Name = "txtCONTACTE"
+        Me.txtCONTACTE.Size = New System.Drawing.Size(487, 21)
+        Me.txtCONTACTE.TabIndex = 12
+        Me.txtCONTACTE.Tag = Nothing
+        '
+        'txtTEL
+        '
+        Me.txtTEL.Location = New System.Drawing.Point(140, 236)
+        Me.txtTEL.MaxLength = 15
+        Me.txtTEL.Name = "txtTEL"
+        Me.txtTEL.Size = New System.Drawing.Size(203, 21)
+        Me.txtTEL.TabIndex = 7
+        Me.txtTEL.Tag = Nothing
+        '
+        'txtNIF
+        '
+        Me.txtNIF.Location = New System.Drawing.Point(140, 148)
+        Me.txtNIF.MaxLength = 12
+        Me.txtNIF.Name = "txtNIF"
+        Me.txtNIF.Size = New System.Drawing.Size(203, 21)
+        Me.txtNIF.TabIndex = 6
+        Me.txtNIF.Tag = Nothing
+        '
+        'lblCP
+        '
+        Me.lblCP.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.lblCP.Location = New System.Drawing.Point(353, 212)
+        Me.lblCP.Name = "lblCP"
+        Me.lblCP.Size = New System.Drawing.Size(95, 17)
+        Me.lblCP.TabIndex = 351
+        Me.lblCP.Text = "C. Postal"
+        Me.lblCP.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        '
+        'lblFax
+        '
+        Me.lblFax.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.lblFax.Location = New System.Drawing.Point(6, 271)
+        Me.lblFax.Name = "lblFax"
+        Me.lblFax.Size = New System.Drawing.Size(134, 18)
+        Me.lblFax.TabIndex = 362
+        Me.lblFax.Text = "Fax"
+        Me.lblFax.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        '
+        'lblPoblacion
+        '
+        Me.lblPoblacion.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.lblPoblacion.Location = New System.Drawing.Point(353, 182)
+        Me.lblPoblacion.Name = "lblPoblacion"
+        Me.lblPoblacion.Size = New System.Drawing.Size(95, 20)
+        Me.lblPoblacion.TabIndex = 361
+        Me.lblPoblacion.Text = "Població"
+        Me.lblPoblacion.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        '
+        'lblNombre
+        '
+        Me.lblNombre.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.lblNombre.Location = New System.Drawing.Point(6, 54)
+        Me.lblNombre.Name = "lblNombre"
+        Me.lblNombre.Size = New System.Drawing.Size(134, 19)
+        Me.lblNombre.TabIndex = 349
+        Me.lblNombre.Text = "Nom Client"
+        Me.lblNombre.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        '
+        'lblContacte
+        '
+        Me.lblContacte.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.lblContacte.Location = New System.Drawing.Point(6, 389)
+        Me.lblContacte.Name = "lblContacte"
+        Me.lblContacte.Size = New System.Drawing.Size(134, 18)
+        Me.lblContacte.TabIndex = 355
+        Me.lblContacte.Text = "Contacte"
+        Me.lblContacte.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        '
+        'lblTelefonos
+        '
+        Me.lblTelefonos.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.lblTelefonos.Location = New System.Drawing.Point(6, 241)
+        Me.lblTelefonos.Name = "lblTelefonos"
+        Me.lblTelefonos.Size = New System.Drawing.Size(134, 19)
+        Me.lblTelefonos.TabIndex = 354
+        Me.lblTelefonos.Text = "Telèfon 1"
+        Me.lblTelefonos.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        '
+        'lblProvincia
+        '
+        Me.lblProvincia.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.lblProvincia.Location = New System.Drawing.Point(6, 182)
+        Me.lblProvincia.Name = "lblProvincia"
+        Me.lblProvincia.Size = New System.Drawing.Size(134, 20)
+        Me.lblProvincia.TabIndex = 352
+        Me.lblProvincia.Text = "Provincia"
+        Me.lblProvincia.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        '
+        'btnElegirCliente
+        '
+        Me.btnElegirCliente.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.btnElegirCliente.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft
+        Me.btnElegirCliente.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.btnElegirCliente.Location = New System.Drawing.Point(213, 20)
+        Me.btnElegirCliente.Name = "btnElegirCliente"
+        Me.btnElegirCliente.Size = New System.Drawing.Size(33, 23)
+        Me.btnElegirCliente.TabIndex = 1
+        Me.btnElegirCliente.TabStop = false
+        Me.btnElegirCliente.Text = "..."
+        Me.btnElegirCliente.UseVisualStyleBackColor = true
+        Me.btnElegirCliente.Visible = false
+        '
+        'lblDomicilio
+        '
+        Me.lblDomicilio.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.lblDomicilio.Location = New System.Drawing.Point(6, 84)
+        Me.lblDomicilio.Name = "lblDomicilio"
+        Me.lblDomicilio.Size = New System.Drawing.Size(134, 17)
+        Me.lblDomicilio.TabIndex = 350
+        Me.lblDomicilio.Text = "Domicili"
+        Me.lblDomicilio.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        '
+        'txtPROV
+        '
+        Me.txtPROV.Location = New System.Drawing.Point(140, 177)
+        Me.txtPROV.MaxLength = 30
+        Me.txtPROV.Name = "txtPROV"
+        Me.txtPROV.Size = New System.Drawing.Size(203, 21)
+        Me.txtPROV.TabIndex = 3
+        Me.txtPROV.Tag = Nothing
+        '
+        'lblCodigoCliente
+        '
+        Me.lblCodigoCliente.BackColor = System.Drawing.Color.FromArgb(CType(CType(230,Byte),Integer), CType(CType(200,Byte),Integer), CType(CType(166,Byte),Integer))
+        Me.lblCodigoCliente.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.lblCodigoCliente.Location = New System.Drawing.Point(6, 20)
+        Me.lblCodigoCliente.Name = "lblCodigoCliente"
+        Me.lblCodigoCliente.Size = New System.Drawing.Size(134, 23)
+        Me.lblCodigoCliente.TabIndex = 348
+        Me.lblCodigoCliente.Text = "Codi Client"
+        Me.lblCodigoCliente.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        '
+        'txtCP
+        '
+        Me.txtCP.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom)  _
+            Or System.Windows.Forms.AnchorStyles.Left)  _
+            Or System.Windows.Forms.AnchorStyles.Right),System.Windows.Forms.AnchorStyles)
+        Me.txtCP.Location = New System.Drawing.Point(454, 207)
+        Me.txtCP.MaxLength = 5
+        Me.txtCP.Name = "txtCP"
+        Me.txtCP.Size = New System.Drawing.Size(173, 21)
+        Me.txtCP.TabIndex = 3
+        Me.txtCP.Tag = Nothing
+        '
+        'Button1
+        '
+        Me.Button1.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.Button1.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft
+        Me.Button1.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.Button1.Location = New System.Drawing.Point(454, 325)
+        Me.Button1.Name = "Button1"
+        Me.Button1.Size = New System.Drawing.Size(33, 25)
+        Me.Button1.TabIndex = 386
+        Me.Button1.TabStop = false
+        Me.Button1.Text = "..."
+        Me.Button1.UseVisualStyleBackColor = true
+        '
+        'txtNOTES
+        '
+        Me.txtNOTES.Anchor = System.Windows.Forms.AnchorStyles.Right
+        Me.txtNOTES.Location = New System.Drawing.Point(658, 6)
+        Me.txtNOTES.Multiline = true
+        Me.txtNOTES.Name = "txtNOTES"
+        Me.txtNOTES.ScrollBars = System.Windows.Forms.ScrollBars.Vertical
+        Me.txtNOTES.Size = New System.Drawing.Size(540, 295)
+        Me.txtNOTES.TabIndex = 0
+        Me.txtNOTES.Tag = Nothing
+        '
+        'chkCartera
+        '
+        Me.chkCartera.BackColor = System.Drawing.Color.Transparent
+        Me.chkCartera.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.chkCartera.Location = New System.Drawing.Point(347, 577)
+        Me.chkCartera.Name = "chkCartera"
+        Me.chkCartera.Size = New System.Drawing.Size(90, 24)
+        Me.chkCartera.TabIndex = 2
+        Me.chkCartera.Text = "Cartera"
+        Me.chkCartera.UseVisualStyleBackColor = false
+        Me.chkCartera.Visible = false
+        '
+        'chkTraspas
+        '
+        Me.chkTraspas.BackColor = System.Drawing.Color.Transparent
+        Me.chkTraspas.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.chkTraspas.Location = New System.Drawing.Point(454, 577)
+        Me.chkTraspas.Name = "chkTraspas"
+        Me.chkTraspas.Size = New System.Drawing.Size(184, 24)
+        Me.chkTraspas.TabIndex = 3
+        Me.chkTraspas.Text = "Traspassada Compte"
+        Me.chkTraspas.UseVisualStyleBackColor = false
+        Me.chkTraspas.Visible = false
+        '
+        'lblNotas
+        '
+        Me.lblNotas.Anchor = System.Windows.Forms.AnchorStyles.None
+        Me.lblNotas.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.lblNotas.Location = New System.Drawing.Point(599, -72)
+        Me.lblNotas.Name = "lblNotas"
+        Me.lblNotas.Size = New System.Drawing.Size(140, 25)
+        Me.lblNotas.TabIndex = 370
+        Me.lblNotas.Text = "Notes"
+        Me.lblNotas.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
+        '
+        'lblIvaHilo
+        '
+        Me.lblIvaHilo.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.lblIvaHilo.Location = New System.Drawing.Point(22, 582)
+        Me.lblIvaHilo.Name = "lblIvaHilo"
+        Me.lblIvaHilo.Size = New System.Drawing.Size(73, 18)
+        Me.lblIvaHilo.TabIndex = 367
+        Me.lblIvaHilo.Text = "IVA"
+        Me.lblIvaHilo.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
+        '
+        'comboIVA
+        '
+        Me.comboIVA.AutoCompletion = true
+        Me.comboIVA.AutoSelect = true
+        Me.comboIVA.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+        Me.comboIVA.Caption = ""
+        Me.comboIVA.CharacterCasing = System.Windows.Forms.CharacterCasing.Normal
+        Me.comboIVA.ContentHeight = 18
+        Me.comboIVA.Cursor = System.Windows.Forms.Cursors.Default
+        Me.comboIVA.DeadAreaBackColor = System.Drawing.Color.Empty
+        Me.comboIVA.Images.Add(CType(resources.GetObject("comboIVA.Images"),System.Drawing.Image))
+        Me.comboIVA.Location = New System.Drawing.Point(106, 577)
+        Me.comboIVA.MatchEntryTimeout = CType(100,Long)
+        Me.comboIVA.MaxDropDownItems = CType(5,Short)
+        Me.comboIVA.MaxLength = 32767
+        Me.comboIVA.MouseCursor = System.Windows.Forms.Cursors.Default
+        Me.comboIVA.Name = "comboIVA"
+        Me.comboIVA.RowSubDividerColor = System.Drawing.Color.DarkGray
+        Me.comboIVA.Size = New System.Drawing.Size(185, 21)
+        Me.comboIVA.TabIndex = 1
+        Me.comboIVA.PropBag = resources.GetString("comboIVA.PropBag")
+        '
+        'tabPageDirecciones
+        '
+        Me.tabPageDirecciones.BackColor = System.Drawing.Color.FromArgb(CType(CType(230,Byte),Integer), CType(CType(200,Byte),Integer), CType(CType(166,Byte),Integer))
+        Me.tabPageDirecciones.Controls.Add(Me.ppv2)
+        Me.tabPageDirecciones.Controls.Add(Me.cb2NOM)
+        Me.tabPageDirecciones.Controls.Add(Me.tx2CODI)
+        Me.tabPageDirecciones.Controls.Add(Me.Label5)
+        Me.tabPageDirecciones.Controls.Add(Me.Label6)
+        Me.tabPageDirecciones.Controls.Add(Me.gbDireccionesEnvio)
+        Me.tabPageDirecciones.Controls.Add(Me.gbEtiquetasEnvio)
+        Me.tabPageDirecciones.Controls.Add(Me.gbEnvioSeur)
+        Me.tabPageDirecciones.Font = New System.Drawing.Font("Tahoma", 8.25!)
+        Me.tabPageDirecciones.Location = New System.Drawing.Point(4, 22)
+        Me.tabPageDirecciones.Name = "tabPageDirecciones"
+        Me.tabPageDirecciones.Size = New System.Drawing.Size(1204, 609)
+        Me.tabPageDirecciones.TabIndex = 4
+        Me.tabPageDirecciones.Text = "Adreces Enviament - Etiquetes"
+        '
+        'ppv2
+        '
+        Me.ppv2.AvailablePreviewActions = CType(((((C1.Win.C1Preview.C1PreviewActionFlags.FileOpen Or C1.Win.C1Preview.C1PreviewActionFlags.FileSave)  _
+            Or C1.Win.C1Preview.C1PreviewActionFlags.PageSetup)  _
+            Or C1.Win.C1Preview.C1PreviewActionFlags.Print)  _
+            Or C1.Win.C1Preview.C1PreviewActionFlags.Reflow),C1.Win.C1Preview.C1PreviewActionFlags)
+        Me.ppv2.Location = New System.Drawing.Point(588, 341)
+        Me.ppv2.Name = "ppv2"
+        Me.ppv2.NavigationPanelVisible = false
+        '
+        'ppv2.PreviewPane
+        '
+        Me.ppv2.PreviewPane.IntegrateExternalTools = true
+        '
+        '
+        '
+        Me.ppv2.PreviewPane.PrintOptions.CenterPage = false
+        Me.ppv2.PreviewPane.TabIndex = 0
+        Me.ppv2.Size = New System.Drawing.Size(609, 265)
+        Me.ppv2.StatusBarVisible = false
+        Me.ppv2.TabIndex = 396
+        Me.ppv2.Text = "C1PrintPreviewControl1"
+        '
+        '
+        '
+        Me.ppv2.ToolBars.File.Open.Image = CType(resources.GetObject("ppv2.ToolBars.File.Open.Image"),System.Drawing.Image)
+        Me.ppv2.ToolBars.File.Open.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.ppv2.ToolBars.File.Open.Name = "btnFileOpen"
+        Me.ppv2.ToolBars.File.Open.Size = New System.Drawing.Size(39, 24)
+        Me.ppv2.ToolBars.File.Open.Tag = "C1PreviewActionEnum.FileOpen"
+        Me.ppv2.ToolBars.File.Open.ToolTipText = "Open File"
+        '
+        '
+        '
+        Me.ppv2.ToolBars.File.PageSetup.Image = CType(resources.GetObject("ppv2.ToolBars.File.PageSetup.Image"),System.Drawing.Image)
+        Me.ppv2.ToolBars.File.PageSetup.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.ppv2.ToolBars.File.PageSetup.Name = "btnPageSetup"
+        Me.ppv2.ToolBars.File.PageSetup.Size = New System.Drawing.Size(29, 24)
+        Me.ppv2.ToolBars.File.PageSetup.Tag = "C1PreviewActionEnum.PageSetup"
+        Me.ppv2.ToolBars.File.PageSetup.ToolTipText = "Page Setup"
+        '
+        '
+        '
+        Me.ppv2.ToolBars.File.Parameters.Image = CType(resources.GetObject("ppv2.ToolBars.File.Parameters.Image"),System.Drawing.Image)
+        Me.ppv2.ToolBars.File.Parameters.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.ppv2.ToolBars.File.Parameters.Name = "btnParameters"
+        Me.ppv2.ToolBars.File.Parameters.Size = New System.Drawing.Size(23, 22)
+        Me.ppv2.ToolBars.File.Parameters.Tag = "C1PreviewActionEnum.Parameters"
+        Me.ppv2.ToolBars.File.Parameters.ToolTipText = "Report Parameters"
+        Me.ppv2.ToolBars.File.Parameters.Visible = false
+        '
+        '
+        '
+        Me.ppv2.ToolBars.File.Print.Image = CType(resources.GetObject("ppv2.ToolBars.File.Print.Image"),System.Drawing.Image)
+        Me.ppv2.ToolBars.File.Print.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.ppv2.ToolBars.File.Print.Name = "btnPrint"
+        Me.ppv2.ToolBars.File.Print.Size = New System.Drawing.Size(29, 24)
+        Me.ppv2.ToolBars.File.Print.Tag = "C1PreviewActionEnum.Print"
+        Me.ppv2.ToolBars.File.Print.ToolTipText = "Print"
+        '
+        '
+        '
+        Me.ppv2.ToolBars.File.PrintLayout.Image = CType(resources.GetObject("ppv2.ToolBars.File.PrintLayout.Image"),System.Drawing.Image)
+        Me.ppv2.ToolBars.File.PrintLayout.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.ppv2.ToolBars.File.PrintLayout.Name = "btnPrintLayout"
+        Me.ppv2.ToolBars.File.PrintLayout.Size = New System.Drawing.Size(23, 22)
+        Me.ppv2.ToolBars.File.PrintLayout.Tag = "C1PreviewActionEnum.PrintLayout"
+        Me.ppv2.ToolBars.File.PrintLayout.ToolTipText = "Print Layout"
+        Me.ppv2.ToolBars.File.PrintLayout.Visible = false
+        '
+        '
+        '
+        Me.ppv2.ToolBars.File.Reflow.Image = CType(resources.GetObject("ppv2.ToolBars.File.Reflow.Image"),System.Drawing.Image)
+        Me.ppv2.ToolBars.File.Reflow.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.ppv2.ToolBars.File.Reflow.Name = "btnReflow"
+        Me.ppv2.ToolBars.File.Reflow.Size = New System.Drawing.Size(29, 24)
+        Me.ppv2.ToolBars.File.Reflow.Tag = "C1PreviewActionEnum.Reflow"
+        Me.ppv2.ToolBars.File.Reflow.ToolTipText = "Reflow"
+        '
+        '
+        '
+        Me.ppv2.ToolBars.File.Save.Image = CType(resources.GetObject("ppv2.ToolBars.File.Save.Image"),System.Drawing.Image)
+        Me.ppv2.ToolBars.File.Save.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.ppv2.ToolBars.File.Save.Name = "btnFileSave"
+        Me.ppv2.ToolBars.File.Save.Size = New System.Drawing.Size(29, 24)
+        Me.ppv2.ToolBars.File.Save.Tag = "C1PreviewActionEnum.FileSave"
+        Me.ppv2.ToolBars.File.Save.ToolTipText = "Save File"
+        '
+        '
+        '
+        Me.ppv2.ToolBars.File.Stop.Image = CType(resources.GetObject("ppv2.ToolBars.File.Stop.Image"),System.Drawing.Image)
+        Me.ppv2.ToolBars.File.Stop.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.ppv2.ToolBars.File.Stop.Name = "btnStop"
+        Me.ppv2.ToolBars.File.Stop.Size = New System.Drawing.Size(23, 22)
+        Me.ppv2.ToolBars.File.Stop.Tag = "C1PreviewActionEnum.Stop"
+        Me.ppv2.ToolBars.File.Stop.ToolTipText = "Stop"
+        Me.ppv2.ToolBars.File.Stop.Visible = false
+        '
+        '
+        '
+        Me.ppv2.ToolBars.Navigation.GoFirst.Image = CType(resources.GetObject("ppv2.ToolBars.Navigation.GoFirst.Image"),System.Drawing.Image)
+        Me.ppv2.ToolBars.Navigation.GoFirst.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.ppv2.ToolBars.Navigation.GoFirst.Name = "btnGoFirst"
+        Me.ppv2.ToolBars.Navigation.GoFirst.Size = New System.Drawing.Size(23, 22)
+        Me.ppv2.ToolBars.Navigation.GoFirst.Tag = "C1PreviewActionEnum.GoFirst"
+        Me.ppv2.ToolBars.Navigation.GoFirst.ToolTipText = "Go To First Page"
+        Me.ppv2.ToolBars.Navigation.GoFirst.Visible = false
+        '
+        '
+        '
+        Me.ppv2.ToolBars.Navigation.GoLast.Image = CType(resources.GetObject("ppv2.ToolBars.Navigation.GoLast.Image"),System.Drawing.Image)
+        Me.ppv2.ToolBars.Navigation.GoLast.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.ppv2.ToolBars.Navigation.GoLast.Name = "btnGoLast"
+        Me.ppv2.ToolBars.Navigation.GoLast.Size = New System.Drawing.Size(23, 22)
+        Me.ppv2.ToolBars.Navigation.GoLast.Tag = "C1PreviewActionEnum.GoLast"
+        Me.ppv2.ToolBars.Navigation.GoLast.ToolTipText = "Go To Last Page"
+        Me.ppv2.ToolBars.Navigation.GoLast.Visible = false
+        '
+        '
+        '
+        Me.ppv2.ToolBars.Navigation.GoNext.Image = CType(resources.GetObject("ppv2.ToolBars.Navigation.GoNext.Image"),System.Drawing.Image)
+        Me.ppv2.ToolBars.Navigation.GoNext.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.ppv2.ToolBars.Navigation.GoNext.Name = "btnGoNext"
+        Me.ppv2.ToolBars.Navigation.GoNext.Size = New System.Drawing.Size(23, 22)
+        Me.ppv2.ToolBars.Navigation.GoNext.Tag = "C1PreviewActionEnum.GoNext"
+        Me.ppv2.ToolBars.Navigation.GoNext.ToolTipText = "Go To Next Page"
+        Me.ppv2.ToolBars.Navigation.GoNext.Visible = false
+        '
+        '
+        '
+        Me.ppv2.ToolBars.Navigation.GoPrev.Image = CType(resources.GetObject("ppv2.ToolBars.Navigation.GoPrev.Image"),System.Drawing.Image)
+        Me.ppv2.ToolBars.Navigation.GoPrev.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.ppv2.ToolBars.Navigation.GoPrev.Name = "btnGoPrev"
+        Me.ppv2.ToolBars.Navigation.GoPrev.Size = New System.Drawing.Size(23, 22)
+        Me.ppv2.ToolBars.Navigation.GoPrev.Tag = "C1PreviewActionEnum.GoPrev"
+        Me.ppv2.ToolBars.Navigation.GoPrev.ToolTipText = "Go To Previous Page"
+        Me.ppv2.ToolBars.Navigation.GoPrev.Visible = false
+        '
+        '
+        '
+        Me.ppv2.ToolBars.Navigation.HistoryNext.Image = CType(resources.GetObject("ppv2.ToolBars.Navigation.HistoryNext.Image"),System.Drawing.Image)
+        Me.ppv2.ToolBars.Navigation.HistoryNext.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.ppv2.ToolBars.Navigation.HistoryNext.Name = "btnHistoryNext"
+        Me.ppv2.ToolBars.Navigation.HistoryNext.Size = New System.Drawing.Size(32, 22)
+        Me.ppv2.ToolBars.Navigation.HistoryNext.Tag = "C1PreviewActionEnum.HistoryNext"
+        Me.ppv2.ToolBars.Navigation.HistoryNext.ToolTipText = "Next View"
+        Me.ppv2.ToolBars.Navigation.HistoryNext.Visible = false
+        '
+        '
+        '
+        Me.ppv2.ToolBars.Navigation.HistoryPrev.Image = CType(resources.GetObject("ppv2.ToolBars.Navigation.HistoryPrev.Image"),System.Drawing.Image)
+        Me.ppv2.ToolBars.Navigation.HistoryPrev.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.ppv2.ToolBars.Navigation.HistoryPrev.Name = "btnHistoryPrev"
+        Me.ppv2.ToolBars.Navigation.HistoryPrev.Size = New System.Drawing.Size(32, 22)
+        Me.ppv2.ToolBars.Navigation.HistoryPrev.Tag = "C1PreviewActionEnum.HistoryPrev"
+        Me.ppv2.ToolBars.Navigation.HistoryPrev.ToolTipText = "Previous View"
+        Me.ppv2.ToolBars.Navigation.HistoryPrev.Visible = false
+        '
+        '
+        '
+        Me.ppv2.ToolBars.Navigation.LblOfPages.Name = "lblOfPages"
+        Me.ppv2.ToolBars.Navigation.LblOfPages.Size = New System.Drawing.Size(27, 22)
+        Me.ppv2.ToolBars.Navigation.LblOfPages.Tag = "C1PreviewActionEnum.GoPageCount"
+        Me.ppv2.ToolBars.Navigation.LblOfPages.Text = "of 0"
+        Me.ppv2.ToolBars.Navigation.LblOfPages.Visible = false
+        '
+        '
+        '
+        Me.ppv2.ToolBars.Navigation.LblPage.Name = "lblPage"
+        Me.ppv2.ToolBars.Navigation.LblPage.Size = New System.Drawing.Size(33, 22)
+        Me.ppv2.ToolBars.Navigation.LblPage.Tag = "C1PreviewActionEnum.GoPageLabel"
+        Me.ppv2.ToolBars.Navigation.LblPage.Text = "Page"
+        Me.ppv2.ToolBars.Navigation.LblPage.Visible = false
+        '
+        '
+        '
+        Me.ppv2.ToolBars.Navigation.NavigationPane.Image = CType(resources.GetObject("ppv2.ToolBars.Navigation.NavigationPane.Image"),System.Drawing.Image)
+        Me.ppv2.ToolBars.Navigation.NavigationPane.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.ppv2.ToolBars.Navigation.NavigationPane.Name = "btnNavigationPane"
+        Me.ppv2.ToolBars.Navigation.NavigationPane.Size = New System.Drawing.Size(23, 22)
+        Me.ppv2.ToolBars.Navigation.NavigationPane.Tag = "C1PreviewActionEnum.NavigationPane"
+        Me.ppv2.ToolBars.Navigation.NavigationPane.ToolTipText = "Navigation Pane"
+        Me.ppv2.ToolBars.Navigation.NavigationPane.Visible = false
+        '
+        '
+        '
+        Me.ppv2.ToolBars.Navigation.PageNo.Font = New System.Drawing.Font("Segoe UI", 9!)
+        Me.ppv2.ToolBars.Navigation.PageNo.Name = "txtPageNo"
+        Me.ppv2.ToolBars.Navigation.PageNo.Size = New System.Drawing.Size(34, 25)
+        Me.ppv2.ToolBars.Navigation.PageNo.Tag = "C1PreviewActionEnum.GoPageNumber"
+        Me.ppv2.ToolBars.Navigation.PageNo.Text = "1"
+        Me.ppv2.ToolBars.Navigation.PageNo.Visible = false
+        Me.ppv2.ToolBars.Navigation.ToolTipPageNo = Nothing
+        '
+        '
+        '
+        Me.ppv2.ToolBars.Page.Continuous.Image = CType(resources.GetObject("ppv2.ToolBars.Page.Continuous.Image"),System.Drawing.Image)
+        Me.ppv2.ToolBars.Page.Continuous.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.ppv2.ToolBars.Page.Continuous.Name = "btnPageContinuous"
+        Me.ppv2.ToolBars.Page.Continuous.Size = New System.Drawing.Size(23, 22)
+        Me.ppv2.ToolBars.Page.Continuous.Tag = "C1PreviewActionEnum.PageContinuous"
+        Me.ppv2.ToolBars.Page.Continuous.ToolTipText = "Continuous View"
+        Me.ppv2.ToolBars.Page.Continuous.Visible = false
+        '
+        '
+        '
+        Me.ppv2.ToolBars.Page.Facing.Image = CType(resources.GetObject("ppv2.ToolBars.Page.Facing.Image"),System.Drawing.Image)
+        Me.ppv2.ToolBars.Page.Facing.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.ppv2.ToolBars.Page.Facing.Name = "btnPageFacing"
+        Me.ppv2.ToolBars.Page.Facing.Size = New System.Drawing.Size(23, 22)
+        Me.ppv2.ToolBars.Page.Facing.Tag = "C1PreviewActionEnum.PageFacing"
+        Me.ppv2.ToolBars.Page.Facing.ToolTipText = "Pages Facing View"
+        Me.ppv2.ToolBars.Page.Facing.Visible = false
+        '
+        '
+        '
+        Me.ppv2.ToolBars.Page.FacingContinuous.Image = CType(resources.GetObject("ppv2.ToolBars.Page.FacingContinuous.Image"),System.Drawing.Image)
+        Me.ppv2.ToolBars.Page.FacingContinuous.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.ppv2.ToolBars.Page.FacingContinuous.Name = "btnPageFacingContinuous"
+        Me.ppv2.ToolBars.Page.FacingContinuous.Size = New System.Drawing.Size(23, 22)
+        Me.ppv2.ToolBars.Page.FacingContinuous.Tag = "C1PreviewActionEnum.PageFacingContinuous"
+        Me.ppv2.ToolBars.Page.FacingContinuous.ToolTipText = "Pages Facing Continuous View"
+        Me.ppv2.ToolBars.Page.FacingContinuous.Visible = false
+        '
+        '
+        '
+        Me.ppv2.ToolBars.Page.Single.Image = CType(resources.GetObject("ppv2.ToolBars.Page.Single.Image"),System.Drawing.Image)
+        Me.ppv2.ToolBars.Page.Single.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.ppv2.ToolBars.Page.Single.Name = "btnPageSingle"
+        Me.ppv2.ToolBars.Page.Single.Size = New System.Drawing.Size(23, 22)
+        Me.ppv2.ToolBars.Page.Single.Tag = "C1PreviewActionEnum.PageSingle"
+        Me.ppv2.ToolBars.Page.Single.ToolTipText = "Single Page View"
+        Me.ppv2.ToolBars.Page.Single.Visible = false
+        '
+        '
+        '
+        Me.ppv2.ToolBars.Search.CloseSearch.Image = CType(resources.GetObject("ppv2.ToolBars.Search.CloseSearch.Image"),System.Drawing.Image)
+        Me.ppv2.ToolBars.Search.CloseSearch.Name = "btnCloseSearch"
+        Me.ppv2.ToolBars.Search.CloseSearch.Size = New System.Drawing.Size(23, 22)
+        Me.ppv2.ToolBars.Search.CloseSearch.Tag = "C1PreviewActionEnum.CloseSearch"
+        Me.ppv2.ToolBars.Search.CloseSearch.ToolTipText = "Close"
+        Me.ppv2.ToolBars.Search.CloseSearch.Visible = false
+        '
+        '
+        '
+        Me.ppv2.ToolBars.Search.MatchCase.Name = "btnMatchCase"
+        Me.ppv2.ToolBars.Search.MatchCase.Size = New System.Drawing.Size(73, 22)
+        Me.ppv2.ToolBars.Search.MatchCase.Tag = "C1PreviewActionEnum.MatchCase"
+        Me.ppv2.ToolBars.Search.MatchCase.Text = "Match Case"
+        Me.ppv2.ToolBars.Search.MatchCase.ToolTipText = "Search with case sensitivity"
+        Me.ppv2.ToolBars.Search.MatchCase.Visible = false
+        '
+        '
+        '
+        Me.ppv2.ToolBars.Search.MatchWholeWord.Name = "btnMatchWholeWord"
+        Me.ppv2.ToolBars.Search.MatchWholeWord.Size = New System.Drawing.Size(77, 22)
+        Me.ppv2.ToolBars.Search.MatchWholeWord.Tag = "C1PreviewActionEnum.MatchWholeWord"
+        Me.ppv2.ToolBars.Search.MatchWholeWord.Text = "Whole Word"
+        Me.ppv2.ToolBars.Search.MatchWholeWord.ToolTipText = "Match whole word only"
+        Me.ppv2.ToolBars.Search.MatchWholeWord.Visible = false
+        '
+        '
+        '
+        Me.ppv2.ToolBars.Search.SearchLabel.Name = "lblSearch"
+        Me.ppv2.ToolBars.Search.SearchLabel.Size = New System.Drawing.Size(33, 22)
+        Me.ppv2.ToolBars.Search.SearchLabel.Tag = "C1PreviewActionEnum.SearchLabel"
+        Me.ppv2.ToolBars.Search.SearchLabel.Text = "Find:"
+        Me.ppv2.ToolBars.Search.SearchLabel.Visible = false
+        '
+        '
+        '
+        Me.ppv2.ToolBars.Search.SearchNext.Image = CType(resources.GetObject("ppv2.ToolBars.Search.SearchNext.Image"),System.Drawing.Image)
+        Me.ppv2.ToolBars.Search.SearchNext.Name = "btnSearchNext"
+        Me.ppv2.ToolBars.Search.SearchNext.Size = New System.Drawing.Size(23, 22)
+        Me.ppv2.ToolBars.Search.SearchNext.Tag = "C1PreviewActionEnum.SearchNext"
+        Me.ppv2.ToolBars.Search.SearchNext.ToolTipText = "Search Next"
+        Me.ppv2.ToolBars.Search.SearchNext.Visible = false
+        '
+        '
+        '
+        Me.ppv2.ToolBars.Search.SearchPrevious.Image = CType(resources.GetObject("ppv2.ToolBars.Search.SearchPrevious.Image"),System.Drawing.Image)
+        Me.ppv2.ToolBars.Search.SearchPrevious.Name = "btnSearchPrevious"
+        Me.ppv2.ToolBars.Search.SearchPrevious.Size = New System.Drawing.Size(23, 22)
+        Me.ppv2.ToolBars.Search.SearchPrevious.Tag = "C1PreviewActionEnum.SearchPrevious"
+        Me.ppv2.ToolBars.Search.SearchPrevious.ToolTipText = "Search Previous"
+        Me.ppv2.ToolBars.Search.SearchPrevious.Visible = false
+        '
+        '
+        '
+        Me.ppv2.ToolBars.Search.SearchText.Font = New System.Drawing.Font("Segoe UI", 9!)
+        Me.ppv2.ToolBars.Search.SearchText.Name = "txtSearchText"
+        Me.ppv2.ToolBars.Search.SearchText.Size = New System.Drawing.Size(280, 27)
+        Me.ppv2.ToolBars.Search.SearchText.Tag = "C1PreviewActionEnum.SearchText"
+        Me.ppv2.ToolBars.Search.SearchText.Visible = false
+        '
+        '
+        '
+        Me.ppv2.ToolBars.Text.Find.Image = CType(resources.GetObject("ppv2.ToolBars.Text.Find.Image"),System.Drawing.Image)
+        Me.ppv2.ToolBars.Text.Find.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.ppv2.ToolBars.Text.Find.Name = "btnFind"
+        Me.ppv2.ToolBars.Text.Find.Size = New System.Drawing.Size(23, 22)
+        Me.ppv2.ToolBars.Text.Find.Tag = "C1PreviewActionEnum.Find"
+        Me.ppv2.ToolBars.Text.Find.ToolTipText = "Find Text"
+        Me.ppv2.ToolBars.Text.Find.Visible = false
+        '
+        '
+        '
+        Me.ppv2.ToolBars.Text.Hand.Image = CType(resources.GetObject("ppv2.ToolBars.Text.Hand.Image"),System.Drawing.Image)
+        Me.ppv2.ToolBars.Text.Hand.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.ppv2.ToolBars.Text.Hand.Name = "btnHandTool"
+        Me.ppv2.ToolBars.Text.Hand.Size = New System.Drawing.Size(23, 22)
+        Me.ppv2.ToolBars.Text.Hand.Tag = "C1PreviewActionEnum.HandTool"
+        Me.ppv2.ToolBars.Text.Hand.ToolTipText = "Hand Tool"
+        Me.ppv2.ToolBars.Text.Hand.Visible = false
+        '
+        '
+        '
+        Me.ppv2.ToolBars.Text.SelectText.Image = CType(resources.GetObject("ppv2.ToolBars.Text.SelectText.Image"),System.Drawing.Image)
+        Me.ppv2.ToolBars.Text.SelectText.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.ppv2.ToolBars.Text.SelectText.Name = "btnSelectTextTool"
+        Me.ppv2.ToolBars.Text.SelectText.Size = New System.Drawing.Size(23, 22)
+        Me.ppv2.ToolBars.Text.SelectText.Tag = "C1PreviewActionEnum.SelectTextTool"
+        Me.ppv2.ToolBars.Text.SelectText.ToolTipText = "Text Select Tool"
+        Me.ppv2.ToolBars.Text.SelectText.Visible = false
+        '
+        '
+        '
+        Me.ppv2.ToolBars.Zoom.DropZoomFactor.Name = "dropZoomFactor"
+        Me.ppv2.ToolBars.Zoom.DropZoomFactor.Size = New System.Drawing.Size(13, 22)
+        Me.ppv2.ToolBars.Zoom.DropZoomFactor.Tag = "C1PreviewActionEnum.ZoomFactor"
+        Me.ppv2.ToolBars.Zoom.DropZoomFactor.Visible = false
+        Me.ppv2.ToolBars.Zoom.ToolTipToolZoomIn = Nothing
+        Me.ppv2.ToolBars.Zoom.ToolTipToolZoomOut = Nothing
+        Me.ppv2.ToolBars.Zoom.ToolTipZoomFactor = Nothing
+        '
+        '
+        '
+        Me.ppv2.ToolBars.Zoom.ZoomFactor.Font = New System.Drawing.Font("Segoe UI", 9!)
+        Me.ppv2.ToolBars.Zoom.ZoomFactor.Name = "txtZoomFactor"
+        Me.ppv2.ToolBars.Zoom.ZoomFactor.Size = New System.Drawing.Size(47, 27)
+        Me.ppv2.ToolBars.Zoom.ZoomFactor.Tag = "C1PreviewActionEnum.ZoomFactor"
+        Me.ppv2.ToolBars.Zoom.ZoomFactor.Text = "100%"
+        Me.ppv2.ToolBars.Zoom.ZoomFactor.Visible = false
+        '
+        '
+        '
+        Me.ppv2.ToolBars.Zoom.ZoomIn.Image = CType(resources.GetObject("ppv2.ToolBars.Zoom.ZoomIn.Image"),System.Drawing.Image)
+        Me.ppv2.ToolBars.Zoom.ZoomIn.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.ppv2.ToolBars.Zoom.ZoomIn.Name = "btnZoomIn"
+        Me.ppv2.ToolBars.Zoom.ZoomIn.Size = New System.Drawing.Size(23, 22)
+        Me.ppv2.ToolBars.Zoom.ZoomIn.Tag = "C1PreviewActionEnum.ZoomIn"
+        Me.ppv2.ToolBars.Zoom.ZoomIn.ToolTipText = "Zoom In"
+        Me.ppv2.ToolBars.Zoom.ZoomIn.Visible = false
+        '
+        '
+        '
+        Me.ppv2.ToolBars.Zoom.ZoomInTool.Image = CType(resources.GetObject("ppv2.ToolBars.Zoom.ZoomInTool.Image"),System.Drawing.Image)
+        Me.ppv2.ToolBars.Zoom.ZoomInTool.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.ppv2.ToolBars.Zoom.ZoomInTool.Name = "itemZoomInTool"
+        Me.ppv2.ToolBars.Zoom.ZoomInTool.Size = New System.Drawing.Size(193, 26)
+        Me.ppv2.ToolBars.Zoom.ZoomInTool.Tag = "C1PreviewActionEnum.ZoomInTool"
+        Me.ppv2.ToolBars.Zoom.ZoomInTool.Text = "Zoom In Tool"
+        '
+        '
+        '
+        Me.ppv2.ToolBars.Zoom.ZoomOut.Image = CType(resources.GetObject("ppv2.ToolBars.Zoom.ZoomOut.Image"),System.Drawing.Image)
+        Me.ppv2.ToolBars.Zoom.ZoomOut.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.ppv2.ToolBars.Zoom.ZoomOut.Name = "btnZoomOut"
+        Me.ppv2.ToolBars.Zoom.ZoomOut.Size = New System.Drawing.Size(23, 22)
+        Me.ppv2.ToolBars.Zoom.ZoomOut.Tag = "C1PreviewActionEnum.ZoomOut"
+        Me.ppv2.ToolBars.Zoom.ZoomOut.ToolTipText = "Zoom Out"
+        Me.ppv2.ToolBars.Zoom.ZoomOut.Visible = false
+        '
+        '
+        '
+        Me.ppv2.ToolBars.Zoom.ZoomOutTool.Image = CType(resources.GetObject("ppv2.ToolBars.Zoom.ZoomOutTool.Image"),System.Drawing.Image)
+        Me.ppv2.ToolBars.Zoom.ZoomOutTool.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.ppv2.ToolBars.Zoom.ZoomOutTool.Name = "itemZoomOutTool"
+        Me.ppv2.ToolBars.Zoom.ZoomOutTool.Size = New System.Drawing.Size(193, 26)
+        Me.ppv2.ToolBars.Zoom.ZoomOutTool.Tag = "C1PreviewActionEnum.ZoomOutTool"
+        Me.ppv2.ToolBars.Zoom.ZoomOutTool.Text = "Zoom Out Tool"
+        '
+        '
+        '
+        Me.ppv2.ToolBars.Zoom.ZoomTool.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ppv2.ToolBars.Zoom.ZoomInTool, Me.ppv2.ToolBars.Zoom.ZoomOutTool})
+        Me.ppv2.ToolBars.Zoom.ZoomTool.Image = CType(resources.GetObject("ppv2.ToolBars.Zoom.ZoomTool.Image"),System.Drawing.Image)
+        Me.ppv2.ToolBars.Zoom.ZoomTool.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.ppv2.ToolBars.Zoom.ZoomTool.Name = "btnZoomTool"
+        Me.ppv2.ToolBars.Zoom.ZoomTool.Size = New System.Drawing.Size(32, 22)
+        Me.ppv2.ToolBars.Zoom.ZoomTool.Tag = "C1PreviewActionEnum.ZoomInTool"
+        Me.ppv2.ToolBars.Zoom.ZoomTool.ToolTipText = "Zoom In Tool"
+        Me.ppv2.ToolBars.Zoom.ZoomTool.Visible = false
+        '
+        'cb2NOM
+        '
+        Me.cb2NOM.AutoCompletion = true
+        Me.cb2NOM.Caption = ""
+        Me.cb2NOM.CharacterCasing = System.Windows.Forms.CharacterCasing.Normal
+        Me.cb2NOM.DeadAreaBackColor = System.Drawing.Color.Empty
+        Me.cb2NOM.EditorBackColor = System.Drawing.Color.PapayaWhip
+        Me.cb2NOM.EditorFont = New System.Drawing.Font("Microsoft Sans Serif", 8.25!)
+        Me.cb2NOM.Images.Add(CType(resources.GetObject("cb2NOM.Images"),System.Drawing.Image))
+        Me.cb2NOM.Location = New System.Drawing.Point(370, 10)
+        Me.cb2NOM.MatchEntryTimeout = CType(2000,Long)
+        Me.cb2NOM.MaxDropDownItems = CType(15,Short)
+        Me.cb2NOM.MaxLength = 35
+        Me.cb2NOM.MouseCursor = System.Windows.Forms.Cursors.Default
+        Me.cb2NOM.Name = "cb2NOM"
+        Me.cb2NOM.RowSubDividerColor = System.Drawing.Color.DarkGray
+        Me.cb2NOM.Size = New System.Drawing.Size(487, 24)
+        Me.cb2NOM.TabIndex = 395
+        Me.cb2NOM.Text = "C1Combo1"
+        Me.cb2NOM.PropBag = resources.GetString("cb2NOM.PropBag")
+        '
+        'tx2CODI
+        '
+        Me.tx2CODI.BackColor = System.Drawing.Color.PeachPuff
+        Me.tx2CODI.Location = New System.Drawing.Point(140, 10)
+        Me.tx2CODI.Name = "tx2CODI"
+        Me.tx2CODI.Size = New System.Drawing.Size(73, 22)
+        Me.tx2CODI.TabIndex = 392
+        Me.tx2CODI.Tag = Nothing
+        '
+        'Label5
+        '
+        Me.Label5.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.Label5.Location = New System.Drawing.Point(235, 10)
+        Me.Label5.Name = "Label5"
+        Me.Label5.Size = New System.Drawing.Size(135, 26)
+        Me.Label5.TabIndex = 394
+        Me.Label5.Text = "Nom Client"
+        Me.Label5.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        '
+        'Label6
+        '
+        Me.Label6.BackColor = System.Drawing.Color.FromArgb(CType(CType(230,Byte),Integer), CType(CType(200,Byte),Integer), CType(CType(166,Byte),Integer))
+        Me.Label6.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.Label6.Location = New System.Drawing.Point(6, 10)
+        Me.Label6.Name = "Label6"
+        Me.Label6.Size = New System.Drawing.Size(134, 26)
+        Me.Label6.TabIndex = 393
+        Me.Label6.Text = "Codi Client"
+        Me.Label6.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        '
+        'gbDireccionesEnvio
+        '
+        Me.gbDireccionesEnvio.Controls.Add(Me.dgDirecciones)
+        Me.gbDireccionesEnvio.Controls.Add(Me.C1TextBox1)
+        Me.gbDireccionesEnvio.Controls.Add(Me.Label1)
+        Me.gbDireccionesEnvio.Controls.Add(Me.lblDomicilioEnvio)
+        Me.gbDireccionesEnvio.Controls.Add(Me.btnAnteriorDireccion)
+        Me.gbDireccionesEnvio.Controls.Add(Me.btnSiguienteDireccion)
+        Me.gbDireccionesEnvio.Controls.Add(Me.btnBorrarDireccion)
+        Me.gbDireccionesEnvio.Controls.Add(Me.btnNuevaDireccion)
+        Me.gbDireccionesEnvio.Controls.Add(Me.txtPaisEnvio)
+        Me.gbDireccionesEnvio.Controls.Add(Me.btnPrimeraDireccion)
+        Me.gbDireccionesEnvio.Controls.Add(Me.btnUltimaDireccion)
+        Me.gbDireccionesEnvio.Controls.Add(Me.txtFAXEnvio)
+        Me.gbDireccionesEnvio.Controls.Add(Me.txtTelefonoEnvio)
+        Me.gbDireccionesEnvio.Controls.Add(Me.lblFAXEnvio)
+        Me.gbDireccionesEnvio.Controls.Add(Me.lblTelEnvio)
+        Me.gbDireccionesEnvio.Controls.Add(Me.txtPoblacionEnvio)
+        Me.gbDireccionesEnvio.Controls.Add(Me.lblPobEnvio)
+        Me.gbDireccionesEnvio.Controls.Add(Me.lblProvEnvio)
+        Me.gbDireccionesEnvio.Controls.Add(Me.lblCPEnvio)
+        Me.gbDireccionesEnvio.Controls.Add(Me.txtProvinciaEnvio)
+        Me.gbDireccionesEnvio.Controls.Add(Me.txtCPEnvio)
+        Me.gbDireccionesEnvio.Controls.Add(Me.txtDireccionEnvio)
+        Me.gbDireccionesEnvio.Location = New System.Drawing.Point(6, 49)
+        Me.gbDireccionesEnvio.Name = "gbDireccionesEnvio"
+        Me.gbDireccionesEnvio.Size = New System.Drawing.Size(1310, 286)
+        Me.gbDireccionesEnvio.TabIndex = 368
+        Me.gbDireccionesEnvio.TabStop = false
+        Me.gbDireccionesEnvio.Text = "Direccions enviament"
+        '
+        'dgDirecciones
+        '
+        Me.dgDirecciones.AllowAddNew = true
+        Me.dgDirecciones.AllowDelete = true
+        Me.dgDirecciones.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom)  _
+            Or System.Windows.Forms.AnchorStyles.Left)  _
+            Or System.Windows.Forms.AnchorStyles.Right),System.Windows.Forms.AnchorStyles)
+        Me.dgDirecciones.CaptionHeight = 17
+        Me.dgDirecciones.GroupByCaption = "Drag a column header here to group by that column"
+        Me.dgDirecciones.Images.Add(CType(resources.GetObject("dgDirecciones.Images"),System.Drawing.Image))
+        Me.dgDirecciones.Location = New System.Drawing.Point(17, 36)
+        Me.dgDirecciones.Name = "dgDirecciones"
+        Me.dgDirecciones.PreviewInfo.Location = New System.Drawing.Point(0, 0)
+        Me.dgDirecciones.PreviewInfo.Size = New System.Drawing.Size(0, 0)
+        Me.dgDirecciones.PreviewInfo.ZoomFactor = 75R
+        Me.dgDirecciones.PrintInfo.MeasurementDevice = C1.Win.C1TrueDBGrid.PrintInfo.MeasurementDeviceEnum.Screen
+        Me.dgDirecciones.PrintInfo.MeasurementPrinterName = Nothing
+        Me.dgDirecciones.RowHeight = 15
+        Me.dgDirecciones.Size = New System.Drawing.Size(1271, 240)
+        Me.dgDirecciones.TabAction = C1.Win.C1TrueDBGrid.TabActionEnum.GridNavigation
+        Me.dgDirecciones.TabIndex = 360
+        Me.dgDirecciones.Text = "C1TrueDBGrid1"
+        Me.dgDirecciones.UseCompatibleTextRendering = false
+        Me.dgDirecciones.WrapCellPointer = true
+        Me.dgDirecciones.PropBag = resources.GetString("dgDirecciones.PropBag")
+        '
+        'C1TextBox1
+        '
+        Me.C1TextBox1.Location = New System.Drawing.Point(157, 340)
+        Me.C1TextBox1.MaxLength = 40
+        Me.C1TextBox1.Name = "C1TextBox1"
+        Me.C1TextBox1.Size = New System.Drawing.Size(487, 22)
+        Me.C1TextBox1.TabIndex = 358
+        Me.C1TextBox1.Tag = Nothing
+        Me.C1TextBox1.Visible = false
+        '
+        'Label1
+        '
+        Me.Label1.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.Label1.Location = New System.Drawing.Point(45, 345)
+        Me.Label1.Name = "Label1"
+        Me.Label1.Size = New System.Drawing.Size(101, 18)
+        Me.Label1.TabIndex = 359
+        Me.Label1.Text = "Contacte"
+        Me.Label1.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
+        Me.Label1.Visible = false
+        '
+        'lblDomicilioEnvio
+        '
+        Me.lblDomicilioEnvio.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.lblDomicilioEnvio.Location = New System.Drawing.Point(45, 49)
+        Me.lblDomicilioEnvio.Name = "lblDomicilioEnvio"
+        Me.lblDomicilioEnvio.Size = New System.Drawing.Size(101, 20)
+        Me.lblDomicilioEnvio.TabIndex = 357
+        Me.lblDomicilioEnvio.Text = "Domicili"
+        Me.lblDomicilioEnvio.TextAlign = System.Drawing.ContentAlignment.BottomLeft
+        Me.lblDomicilioEnvio.Visible = false
+        '
+        'btnAnteriorDireccion
+        '
+        Me.btnAnteriorDireccion.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.btnAnteriorDireccion.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft
+        Me.btnAnteriorDireccion.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.btnAnteriorDireccion.Location = New System.Drawing.Point(213, 453)
+        Me.btnAnteriorDireccion.Name = "btnAnteriorDireccion"
+        Me.btnAnteriorDireccion.Size = New System.Drawing.Size(45, 25)
+        Me.btnAnteriorDireccion.TabIndex = 356
+        Me.btnAnteriorDireccion.TabStop = false
+        Me.btnAnteriorDireccion.Text = "<"
+        Me.btnAnteriorDireccion.UseVisualStyleBackColor = true
+        Me.btnAnteriorDireccion.Visible = false
+        '
+        'btnSiguienteDireccion
+        '
+        Me.btnSiguienteDireccion.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.btnSiguienteDireccion.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft
+        Me.btnSiguienteDireccion.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.btnSiguienteDireccion.Location = New System.Drawing.Point(493, 453)
+        Me.btnSiguienteDireccion.Name = "btnSiguienteDireccion"
+        Me.btnSiguienteDireccion.Size = New System.Drawing.Size(45, 25)
+        Me.btnSiguienteDireccion.TabIndex = 355
+        Me.btnSiguienteDireccion.TabStop = false
+        Me.btnSiguienteDireccion.Text = ">"
+        Me.btnSiguienteDireccion.UseVisualStyleBackColor = true
+        Me.btnSiguienteDireccion.Visible = false
+        '
+        'btnBorrarDireccion
+        '
+        Me.btnBorrarDireccion.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.btnBorrarDireccion.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft
+        Me.btnBorrarDireccion.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.btnBorrarDireccion.Location = New System.Drawing.Point(258, 478)
+        Me.btnBorrarDireccion.Name = "btnBorrarDireccion"
+        Me.btnBorrarDireccion.Size = New System.Drawing.Size(235, 24)
+        Me.btnBorrarDireccion.TabIndex = 354
+        Me.btnBorrarDireccion.TabStop = false
+        Me.btnBorrarDireccion.Text = "Borrar adressa"
+        Me.btnBorrarDireccion.UseVisualStyleBackColor = true
+        Me.btnBorrarDireccion.Visible = false
+        '
+        'btnNuevaDireccion
+        '
+        Me.btnNuevaDireccion.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.btnNuevaDireccion.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft
+        Me.btnNuevaDireccion.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.btnNuevaDireccion.Location = New System.Drawing.Point(258, 453)
+        Me.btnNuevaDireccion.Name = "btnNuevaDireccion"
+        Me.btnNuevaDireccion.Size = New System.Drawing.Size(235, 25)
+        Me.btnNuevaDireccion.TabIndex = 353
+        Me.btnNuevaDireccion.TabStop = false
+        Me.btnNuevaDireccion.Text = "Nova adressa"
+        Me.btnNuevaDireccion.UseVisualStyleBackColor = true
+        Me.btnNuevaDireccion.Visible = false
+        '
+        'txtPaisEnvio
+        '
+        Me.txtPaisEnvio.Location = New System.Drawing.Point(157, 231)
+        Me.txtPaisEnvio.Name = "txtPaisEnvio"
+        Me.txtPaisEnvio.Size = New System.Drawing.Size(353, 22)
+        Me.txtPaisEnvio.TabIndex = 4
+        Me.txtPaisEnvio.Tag = Nothing
+        Me.txtPaisEnvio.Visible = false
+        '
+        'btnPrimeraDireccion
+        '
+        Me.btnPrimeraDireccion.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.btnPrimeraDireccion.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft
+        Me.btnPrimeraDireccion.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.btnPrimeraDireccion.Location = New System.Drawing.Point(213, 478)
+        Me.btnPrimeraDireccion.Name = "btnPrimeraDireccion"
+        Me.btnPrimeraDireccion.Size = New System.Drawing.Size(45, 24)
+        Me.btnPrimeraDireccion.TabIndex = 7
+        Me.btnPrimeraDireccion.TabStop = false
+        Me.btnPrimeraDireccion.Text = "<<"
+        Me.btnPrimeraDireccion.UseVisualStyleBackColor = true
+        Me.btnPrimeraDireccion.Visible = false
+        '
+        'btnUltimaDireccion
+        '
+        Me.btnUltimaDireccion.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.btnUltimaDireccion.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft
+        Me.btnUltimaDireccion.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.btnUltimaDireccion.Location = New System.Drawing.Point(493, 478)
+        Me.btnUltimaDireccion.Name = "btnUltimaDireccion"
+        Me.btnUltimaDireccion.Size = New System.Drawing.Size(45, 24)
+        Me.btnUltimaDireccion.TabIndex = 9
+        Me.btnUltimaDireccion.TabStop = false
+        Me.btnUltimaDireccion.Text = ">>"
+        Me.btnUltimaDireccion.UseVisualStyleBackColor = true
+        Me.btnUltimaDireccion.Visible = false
+        '
+        'txtFAXEnvio
+        '
+        Me.txtFAXEnvio.Location = New System.Drawing.Point(672, 177)
+        Me.txtFAXEnvio.Name = "txtFAXEnvio"
+        Me.txtFAXEnvio.Size = New System.Drawing.Size(241, 22)
+        Me.txtFAXEnvio.TabIndex = 6
+        Me.txtFAXEnvio.Tag = Nothing
+        Me.txtFAXEnvio.Visible = false
+        '
+        'txtTelefonoEnvio
+        '
+        Me.txtTelefonoEnvio.Location = New System.Drawing.Point(672, 143)
+        Me.txtTelefonoEnvio.Name = "txtTelefonoEnvio"
+        Me.txtTelefonoEnvio.Size = New System.Drawing.Size(241, 22)
+        Me.txtTelefonoEnvio.TabIndex = 5
+        Me.txtTelefonoEnvio.Tag = Nothing
+        Me.txtTelefonoEnvio.Visible = false
+        '
+        'lblFAXEnvio
+        '
+        Me.lblFAXEnvio.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.lblFAXEnvio.Location = New System.Drawing.Point(560, 182)
+        Me.lblFAXEnvio.Name = "lblFAXEnvio"
+        Me.lblFAXEnvio.Size = New System.Drawing.Size(101, 20)
+        Me.lblFAXEnvio.TabIndex = 351
+        Me.lblFAXEnvio.Text = "Fax"
+        Me.lblFAXEnvio.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
+        Me.lblFAXEnvio.Visible = false
+        '
+        'lblTelEnvio
+        '
+        Me.lblTelEnvio.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.lblTelEnvio.Location = New System.Drawing.Point(560, 148)
+        Me.lblTelEnvio.Name = "lblTelEnvio"
+        Me.lblTelEnvio.Size = New System.Drawing.Size(101, 19)
+        Me.lblTelEnvio.TabIndex = 350
+        Me.lblTelEnvio.Text = "Telèfon(s)"
+        Me.lblTelEnvio.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
+        Me.lblTelEnvio.Visible = false
+        '
+        'txtPoblacionEnvio
+        '
+        Me.txtPoblacionEnvio.Location = New System.Drawing.Point(157, 197)
+        Me.txtPoblacionEnvio.Name = "txtPoblacionEnvio"
+        Me.txtPoblacionEnvio.Size = New System.Drawing.Size(353, 22)
+        Me.txtPoblacionEnvio.TabIndex = 3
+        Me.txtPoblacionEnvio.Tag = Nothing
+        Me.txtPoblacionEnvio.Visible = false
+        '
+        'lblPobEnvio
+        '
+        Me.lblPobEnvio.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.lblPobEnvio.Location = New System.Drawing.Point(45, 202)
+        Me.lblPobEnvio.Name = "lblPobEnvio"
+        Me.lblPobEnvio.Size = New System.Drawing.Size(78, 20)
+        Me.lblPobEnvio.TabIndex = 346
+        Me.lblPobEnvio.Text = "Població"
+        Me.lblPobEnvio.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
+        Me.lblPobEnvio.Visible = false
+        '
+        'lblProvEnvio
+        '
+        Me.lblProvEnvio.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.lblProvEnvio.Location = New System.Drawing.Point(45, 167)
+        Me.lblProvEnvio.Name = "lblProvEnvio"
+        Me.lblProvEnvio.Size = New System.Drawing.Size(101, 20)
+        Me.lblProvEnvio.TabIndex = 345
+        Me.lblProvEnvio.Text = "Provincia"
+        Me.lblProvEnvio.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
+        Me.lblProvEnvio.Visible = false
+        '
+        'lblCPEnvio
+        '
+        Me.lblCPEnvio.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.lblCPEnvio.Location = New System.Drawing.Point(45, 133)
+        Me.lblCPEnvio.Name = "lblCPEnvio"
+        Me.lblCPEnvio.Size = New System.Drawing.Size(101, 20)
+        Me.lblCPEnvio.TabIndex = 344
+        Me.lblCPEnvio.Text = "C. Postal"
+        Me.lblCPEnvio.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
+        Me.lblCPEnvio.Visible = false
+        '
+        'txtProvinciaEnvio
+        '
+        Me.txtProvinciaEnvio.Location = New System.Drawing.Point(157, 162)
+        Me.txtProvinciaEnvio.Name = "txtProvinciaEnvio"
+        Me.txtProvinciaEnvio.Size = New System.Drawing.Size(353, 22)
+        Me.txtProvinciaEnvio.TabIndex = 2
+        Me.txtProvinciaEnvio.Tag = Nothing
+        Me.txtProvinciaEnvio.Visible = false
+        '
+        'txtCPEnvio
+        '
+        Me.txtCPEnvio.Location = New System.Drawing.Point(157, 128)
+        Me.txtCPEnvio.Name = "txtCPEnvio"
+        Me.txtCPEnvio.Size = New System.Drawing.Size(117, 22)
+        Me.txtCPEnvio.TabIndex = 1
+        Me.txtCPEnvio.Tag = Nothing
+        Me.txtCPEnvio.Visible = false
+        '
+        'txtDireccionEnvio
+        '
+        Me.txtDireccionEnvio.Location = New System.Drawing.Point(157, 49)
+        Me.txtDireccionEnvio.Multiline = true
+        Me.txtDireccionEnvio.Name = "txtDireccionEnvio"
+        Me.txtDireccionEnvio.Size = New System.Drawing.Size(565, 64)
+        Me.txtDireccionEnvio.TabIndex = 0
+        Me.txtDireccionEnvio.Tag = Nothing
+        Me.txtDireccionEnvio.Visible = false
+        '
+        'gbEtiquetasEnvio
+        '
+        Me.gbEtiquetasEnvio.Controls.Add(Me.Label7)
+        Me.gbEtiquetasEnvio.Controls.Add(Me.cbooNOMTRANS2)
+        Me.gbEtiquetasEnvio.Controls.Add(Me.cboEmpresaEnvio)
+        Me.gbEtiquetasEnvio.Controls.Add(Me.lblEmpresa)
+        Me.gbEtiquetasEnvio.Controls.Add(Me.rdoDireccionSeleccionada)
+        Me.gbEtiquetasEnvio.Controls.Add(Me.rdoDireccionFicha)
+        Me.gbEtiquetasEnvio.Controls.Add(Me.lblPes)
+        Me.gbEtiquetasEnvio.Controls.Add(Me.lblBultosEnvio)
+        Me.gbEtiquetasEnvio.Controls.Add(Me.txtPes)
+        Me.gbEtiquetasEnvio.Controls.Add(Me.btnEtiquetasEnvio)
+        Me.gbEtiquetasEnvio.Controls.Add(Me.txtBultos)
+        Me.gbEtiquetasEnvio.Location = New System.Drawing.Point(6, 335)
+        Me.gbEtiquetasEnvio.Name = "gbEtiquetasEnvio"
+        Me.gbEtiquetasEnvio.Size = New System.Drawing.Size(565, 275)
+        Me.gbEtiquetasEnvio.TabIndex = 367
+        Me.gbEtiquetasEnvio.TabStop = false
+        Me.gbEtiquetasEnvio.Text = "Etiquetes enviament"
+        '
+        'Label7
+        '
+        Me.Label7.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.Label7.Location = New System.Drawing.Point(28, 167)
+        Me.Label7.Name = "Label7"
+        Me.Label7.Size = New System.Drawing.Size(112, 25)
+        Me.Label7.TabIndex = 381
+        Me.Label7.Text = "Transportista"
+        Me.Label7.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        '
+        'cbooNOMTRANS2
+        '
+        Me.cbooNOMTRANS2.AutoCompletion = true
+        Me.cbooNOMTRANS2.AutoSelect = true
+        Me.cbooNOMTRANS2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+        Me.cbooNOMTRANS2.Caption = ""
+        Me.cbooNOMTRANS2.CharacterCasing = System.Windows.Forms.CharacterCasing.Normal
+        Me.cbooNOMTRANS2.Cursor = System.Windows.Forms.Cursors.Default
+        Me.cbooNOMTRANS2.DeadAreaBackColor = System.Drawing.Color.Empty
+        Me.cbooNOMTRANS2.EditorFont = New System.Drawing.Font("Microsoft Sans Serif", 8.25!)
+        Me.cbooNOMTRANS2.Images.Add(CType(resources.GetObject("cbooNOMTRANS2.Images"),System.Drawing.Image))
+        Me.cbooNOMTRANS2.Location = New System.Drawing.Point(146, 167)
+        Me.cbooNOMTRANS2.MatchEntryTimeout = CType(100,Long)
+        Me.cbooNOMTRANS2.MaxDropDownItems = CType(5,Short)
+        Me.cbooNOMTRANS2.MaxLength = 35
+        Me.cbooNOMTRANS2.MouseCursor = System.Windows.Forms.Cursors.Default
+        Me.cbooNOMTRANS2.Name = "cbooNOMTRANS2"
+        Me.cbooNOMTRANS2.RowSubDividerColor = System.Drawing.Color.DarkGray
+        Me.cbooNOMTRANS2.Size = New System.Drawing.Size(375, 22)
+        Me.cbooNOMTRANS2.TabIndex = 379
+        Me.cbooNOMTRANS2.PropBag = resources.GetString("cbooNOMTRANS2.PropBag")
+        '
+        'cboEmpresaEnvio
+        '
+        Me.cboEmpresaEnvio.Caption = ""
+        Me.cboEmpresaEnvio.CharacterCasing = System.Windows.Forms.CharacterCasing.Normal
+        Me.cboEmpresaEnvio.DeadAreaBackColor = System.Drawing.Color.Empty
+        Me.cboEmpresaEnvio.Images.Add(CType(resources.GetObject("cboEmpresaEnvio.Images"),System.Drawing.Image))
+        Me.cboEmpresaEnvio.Location = New System.Drawing.Point(146, 138)
+        Me.cboEmpresaEnvio.MatchEntryTimeout = CType(2000,Long)
+        Me.cboEmpresaEnvio.MaxDropDownItems = CType(5,Short)
+        Me.cboEmpresaEnvio.MaxLength = 32767
+        Me.cboEmpresaEnvio.MouseCursor = System.Windows.Forms.Cursors.Default
+        Me.cboEmpresaEnvio.Name = "cboEmpresaEnvio"
+        Me.cboEmpresaEnvio.RowSubDividerColor = System.Drawing.Color.DarkGray
+        Me.cboEmpresaEnvio.Size = New System.Drawing.Size(169, 25)
+        Me.cboEmpresaEnvio.TabIndex = 370
+        Me.cboEmpresaEnvio.PropBag = resources.GetString("cboEmpresaEnvio.PropBag")
+        '
+        'lblEmpresa
+        '
+        Me.lblEmpresa.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.lblEmpresa.Location = New System.Drawing.Point(28, 138)
+        Me.lblEmpresa.Name = "lblEmpresa"
+        Me.lblEmpresa.Size = New System.Drawing.Size(112, 24)
+        Me.lblEmpresa.TabIndex = 369
+        Me.lblEmpresa.Text = "Empresa"
+        Me.lblEmpresa.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        '
+        'rdoDireccionSeleccionada
+        '
+        Me.rdoDireccionSeleccionada.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.rdoDireccionSeleccionada.Location = New System.Drawing.Point(179, 44)
+        Me.rdoDireccionSeleccionada.Name = "rdoDireccionSeleccionada"
+        Me.rdoDireccionSeleccionada.Size = New System.Drawing.Size(336, 30)
+        Me.rdoDireccionSeleccionada.TabIndex = 367
+        Me.rdoDireccionSeleccionada.Text = "Adreça Seleccionada en Taula"
+        '
+        'rdoDireccionFicha
+        '
+        Me.rdoDireccionFicha.Checked = true
+        Me.rdoDireccionFicha.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.rdoDireccionFicha.Location = New System.Drawing.Point(22, 44)
+        Me.rdoDireccionFicha.Name = "rdoDireccionFicha"
+        Me.rdoDireccionFicha.Size = New System.Drawing.Size(146, 30)
+        Me.rdoDireccionFicha.TabIndex = 366
+        Me.rdoDireccionFicha.TabStop = true
+        Me.rdoDireccionFicha.Text = "Direcció Fitxa"
+        '
+        'lblPes
+        '
+        Me.lblPes.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.lblPes.Location = New System.Drawing.Point(241, 89)
+        Me.lblPes.Name = "lblPes"
+        Me.lblPes.Size = New System.Drawing.Size(112, 24)
+        Me.lblPes.TabIndex = 364
+        Me.lblPes.Text = "Pes"
+        Me.lblPes.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        '
+        'lblBultosEnvio
+        '
+        Me.lblBultosEnvio.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.lblBultosEnvio.Location = New System.Drawing.Point(28, 89)
+        Me.lblBultosEnvio.Name = "lblBultosEnvio"
+        Me.lblBultosEnvio.Size = New System.Drawing.Size(112, 24)
+        Me.lblBultosEnvio.TabIndex = 363
+        Me.lblBultosEnvio.Text = "Bultos"
+        Me.lblBultosEnvio.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        '
+        'txtPes
+        '
+        Me.txtPes.Location = New System.Drawing.Point(358, 89)
+        Me.txtPes.MaxLength = 30
+        Me.txtPes.Name = "txtPes"
+        Me.txtPes.Size = New System.Drawing.Size(84, 22)
+        Me.txtPes.TabIndex = 1
+        Me.txtPes.Tag = Nothing
+        '
+        'btnEtiquetasEnvio
+        '
+        Me.btnEtiquetasEnvio.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.btnEtiquetasEnvio.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft
+        Me.btnEtiquetasEnvio.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.btnEtiquetasEnvio.Location = New System.Drawing.Point(398, 207)
+        Me.btnEtiquetasEnvio.Name = "btnEtiquetasEnvio"
+        Me.btnEtiquetasEnvio.Size = New System.Drawing.Size(134, 44)
+        Me.btnEtiquetasEnvio.TabIndex = 365
+        Me.btnEtiquetasEnvio.TabStop = false
+        Me.btnEtiquetasEnvio.Text = "Imprimir Etiquetes"
+        Me.btnEtiquetasEnvio.UseVisualStyleBackColor = true
+        '
+        'txtBultos
+        '
+        Me.txtBultos.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!)
+        Me.txtBultos.Location = New System.Drawing.Point(146, 89)
+        Me.txtBultos.MaxLength = 5
+        Me.txtBultos.Name = "txtBultos"
+        Me.txtBultos.Size = New System.Drawing.Size(84, 21)
+        Me.txtBultos.TabIndex = 0
+        Me.txtBultos.Tag = Nothing
+        '
+        'gbEnvioSeur
+        '
+        Me.gbEnvioSeur.Controls.Add(Me.lblCodigoSeur)
+        Me.gbEnvioSeur.Controls.Add(Me.txtTelefonoCodigo)
+        Me.gbEnvioSeur.Controls.Add(Me.lblBultosSeur)
+        Me.gbEnvioSeur.Controls.Add(Me.txtBultosSeur)
+        Me.gbEnvioSeur.Controls.Add(Me.lblPeso)
+        Me.gbEnvioSeur.Controls.Add(Me.lblTipoTransporte)
+        Me.gbEnvioSeur.Controls.Add(Me.txtPesoSeur)
+        Me.gbEnvioSeur.Controls.Add(Me.txtTipoPorte)
+        Me.gbEnvioSeur.Controls.Add(Me.lblPesoEnvioSeur)
+        Me.gbEnvioSeur.Controls.Add(Me.lblObserv)
+        Me.gbEnvioSeur.Controls.Add(Me.lblServicio)
+        Me.gbEnvioSeur.Controls.Add(Me.txtObservSeur)
+        Me.gbEnvioSeur.Controls.Add(Me.btnImprirSeur)
+        Me.gbEnvioSeur.Controls.Add(Me.txtServicio)
+        Me.gbEnvioSeur.Location = New System.Drawing.Point(11, 625)
+        Me.gbEnvioSeur.Name = "gbEnvioSeur"
+        Me.gbEnvioSeur.Size = New System.Drawing.Size(67, 25)
+        Me.gbEnvioSeur.TabIndex = 0
+        Me.gbEnvioSeur.TabStop = false
+        Me.gbEnvioSeur.Text = "Envio Seur"
+        Me.gbEnvioSeur.Visible = false
+        '
+        'lblCodigoSeur
+        '
+        Me.lblCodigoSeur.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.lblCodigoSeur.Location = New System.Drawing.Point(22, 187)
+        Me.lblCodigoSeur.Name = "lblCodigoSeur"
+        Me.lblCodigoSeur.Size = New System.Drawing.Size(112, 25)
+        Me.lblCodigoSeur.TabIndex = 375
+        Me.lblCodigoSeur.Text = "Telèfon o codi"
+        Me.lblCodigoSeur.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
+        '
+        'txtTelefonoCodigo
+        '
+        Me.txtTelefonoCodigo.Location = New System.Drawing.Point(146, 182)
+        Me.txtTelefonoCodigo.MaxLength = 30
+        Me.txtTelefonoCodigo.Name = "txtTelefonoCodigo"
+        Me.txtTelefonoCodigo.Size = New System.Drawing.Size(235, 22)
+        Me.txtTelefonoCodigo.TabIndex = 6
+        Me.txtTelefonoCodigo.Tag = Nothing
+        '
+        'lblBultosSeur
+        '
+        Me.lblBultosSeur.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.lblBultosSeur.Location = New System.Drawing.Point(22, 153)
+        Me.lblBultosSeur.Name = "lblBultosSeur"
+        Me.lblBultosSeur.Size = New System.Drawing.Size(112, 24)
+        Me.lblBultosSeur.TabIndex = 373
+        Me.lblBultosSeur.Text = "Bultos"
+        Me.lblBultosSeur.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
+        '
+        'txtBultosSeur
+        '
+        Me.txtBultosSeur.Location = New System.Drawing.Point(146, 148)
+        Me.txtBultosSeur.MaxLength = 30
+        Me.txtBultosSeur.Name = "txtBultosSeur"
+        Me.txtBultosSeur.Size = New System.Drawing.Size(128, 22)
+        Me.txtBultosSeur.TabIndex = 4
+        Me.txtBultosSeur.Tag = Nothing
+        '
+        'lblPeso
+        '
+        Me.lblPeso.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.lblPeso.Location = New System.Drawing.Point(291, 148)
+        Me.lblPeso.Name = "lblPeso"
+        Me.lblPeso.Size = New System.Drawing.Size(112, 24)
+        Me.lblPeso.TabIndex = 371
+        Me.lblPeso.Text = "Pes"
+        Me.lblPeso.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
+        '
+        'lblTipoTransporte
+        '
+        Me.lblTipoTransporte.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.lblTipoTransporte.Location = New System.Drawing.Point(22, 118)
+        Me.lblTipoTransporte.Name = "lblTipoTransporte"
+        Me.lblTipoTransporte.Size = New System.Drawing.Size(112, 25)
+        Me.lblTipoTransporte.TabIndex = 370
+        Me.lblTipoTransporte.Text = "Tipo de Porte"
+        Me.lblTipoTransporte.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
+        '
+        'txtPesoSeur
+        '
+        Me.txtPesoSeur.Location = New System.Drawing.Point(409, 148)
+        Me.txtPesoSeur.MaxLength = 30
+        Me.txtPesoSeur.Name = "txtPesoSeur"
+        Me.txtPesoSeur.Size = New System.Drawing.Size(95, 22)
+        Me.txtPesoSeur.TabIndex = 5
+        Me.txtPesoSeur.Tag = Nothing
+        '
+        'txtTipoPorte
+        '
+        Me.txtTipoPorte.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!)
+        Me.txtTipoPorte.Location = New System.Drawing.Point(146, 118)
+        Me.txtTipoPorte.MaxLength = 5
+        Me.txtTipoPorte.Name = "txtTipoPorte"
+        Me.txtTipoPorte.Size = New System.Drawing.Size(156, 21)
+        Me.txtTipoPorte.TabIndex = 3
+        Me.txtTipoPorte.Tag = Nothing
+        '
+        'lblPesoEnvioSeur
+        '
+        Me.lblPesoEnvioSeur.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.lblPesoEnvioSeur.Location = New System.Drawing.Point(22, 84)
+        Me.lblPesoEnvioSeur.Name = "lblPesoEnvioSeur"
+        Me.lblPesoEnvioSeur.Size = New System.Drawing.Size(112, 24)
+        Me.lblPesoEnvioSeur.TabIndex = 367
+        Me.lblPesoEnvioSeur.Text = "Data Recollida"
+        Me.lblPesoEnvioSeur.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
+        '
+        'lblObserv
+        '
+        Me.lblObserv.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.lblObserv.Location = New System.Drawing.Point(22, 54)
+        Me.lblObserv.Name = "lblObserv"
+        Me.lblObserv.Size = New System.Drawing.Size(112, 25)
+        Me.lblObserv.TabIndex = 364
+        Me.lblObserv.Text = "Observacions"
+        Me.lblObserv.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
+        '
+        'lblServicio
+        '
+        Me.lblServicio.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.lblServicio.Location = New System.Drawing.Point(22, 20)
+        Me.lblServicio.Name = "lblServicio"
+        Me.lblServicio.Size = New System.Drawing.Size(112, 24)
+        Me.lblServicio.TabIndex = 363
+        Me.lblServicio.Text = "Servicio"
+        Me.lblServicio.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
+        '
+        'txtObservSeur
+        '
+        Me.txtObservSeur.Location = New System.Drawing.Point(146, 49)
+        Me.txtObservSeur.MaxLength = 30
+        Me.txtObservSeur.Name = "txtObservSeur"
+        Me.txtObservSeur.Size = New System.Drawing.Size(375, 22)
+        Me.txtObservSeur.TabIndex = 1
+        Me.txtObservSeur.Tag = Nothing
+        '
+        'btnImprirSeur
+        '
+        Me.btnImprirSeur.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.btnImprirSeur.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft
+        Me.btnImprirSeur.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.btnImprirSeur.Location = New System.Drawing.Point(414, 182)
+        Me.btnImprirSeur.Name = "btnImprirSeur"
+        Me.btnImprirSeur.Size = New System.Drawing.Size(112, 30)
+        Me.btnImprirSeur.TabIndex = 365
+        Me.btnImprirSeur.TabStop = false
+        Me.btnImprirSeur.Text = "Imprimir"
+        Me.btnImprirSeur.UseVisualStyleBackColor = true
+        '
+        'txtServicio
+        '
+        Me.txtServicio.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!)
+        Me.txtServicio.Location = New System.Drawing.Point(146, 20)
+        Me.txtServicio.MaxLength = 5
+        Me.txtServicio.Name = "txtServicio"
+        Me.txtServicio.Size = New System.Drawing.Size(84, 21)
+        Me.txtServicio.TabIndex = 0
+        Me.txtServicio.Tag = Nothing
+        '
+        'frmClientesForm
+        '
+        Me.AutoScaleBaseSize = New System.Drawing.Size(7, 16)
+        Me.BackColor = System.Drawing.Color.FromArgb(CType(CType(230,Byte),Integer), CType(CType(200,Byte),Integer), CType(CType(166,Byte),Integer))
+        Me.ClientSize = New System.Drawing.Size(1223, 726)
+        Me.Controls.Add(Me.tabControlClientes)
+        Me.Cursor = System.Windows.Forms.Cursors.Default
+        Me.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!)
+        Me.MaximumSize = New System.Drawing.Size(13999, 12306)
+        Me.MinimumSize = New System.Drawing.Size(0, 479)
+        Me.Name = "frmClientesForm"
+        Me.Text = " Clients"
+        Me.Controls.SetChildIndex(Me.cboSeleccionCentro, 0)
+        Me.Controls.SetChildIndex(Me.sbtipo, 0)
+        Me.Controls.SetChildIndex(Me.btnActualizar, 0)
+        Me.Controls.SetChildIndex(Me.btnNuevo, 0)
+        Me.Controls.SetChildIndex(Me.btnBorrar, 0)
+        Me.Controls.SetChildIndex(Me.btnTancar, 0)
+        Me.Controls.SetChildIndex(Me.btnUltimo, 0)
+        Me.Controls.SetChildIndex(Me.btnPrimero, 0)
+        Me.Controls.SetChildIndex(Me.btnAnterior, 0)
+        Me.Controls.SetChildIndex(Me.btnSiguiente, 0)
+        Me.Controls.SetChildIndex(Me.btnRecargar, 0)
+        Me.Controls.SetChildIndex(Me.btnVerLista, 0)
+        Me.Controls.SetChildIndex(Me.btnModificar, 0)
+        Me.Controls.SetChildIndex(Me.tabControlClientes, 0)
+        CType(Me.btnRecargar,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.btnSiguiente,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.btnAnterior,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.btnPrimero,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.btnUltimo,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.btnModificar,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.btnTancar,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.btnBorrar,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.btnNuevo,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.btnActualizar,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.btnVerLista,System.ComponentModel.ISupportInitialize).EndInit
+        Me.tabControlClientes.ResumeLayout(false)
+        Me.tabPageCliente.ResumeLayout(false)
+        Me.tabPageCliente.PerformLayout
+        Me.gpTrans.ResumeLayout(false)
+        Me.gpTrans.PerformLayout
+        CType(Me.cboINCOTERM,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.txtTRANS,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.btnElegirTransportista,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.cboNOMTRANS,System.ComponentModel.ISupportInitialize).EndInit
+        Me.gbDatosBanco.ResumeLayout(false)
+        Me.gbDatosBanco.PerformLayout
+        CType(Me.txtSWIFT,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.txtIBAN,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.cboNOMFORMA,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.txtDTOFORMA,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.txtOFI,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.cboNOMBANC,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.cboNOMREPRES,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.txtREPRES,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.txtFORMA,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.btnElegirFormaPago,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.txtCOFI,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.txtBANC,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.btnElegirBanco,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.txtDia2,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.txtDia3,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.txtDIA1,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.btnElegirRepresentate,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.txtSUBCTA,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.txtCTA,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.txtDC,System.ComponentModel.ISupportInitialize).EndInit
+        Me.gbDatosCliente.ResumeLayout(false)
+        Me.gbDatosCliente.PerformLayout
+        CType(Me.chkBLOQUEADO,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.txtNUMEROPROVE,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.txtTEL2,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.cboid,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.Button3,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.Button2,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.txtEmail2,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.txtEMAIL1,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.txtWEB,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.txtPAIS,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.txtFAX,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.txtPOB,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.txtDOM,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.txtCODI,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.txtCONTACTE,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.txtTEL,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.txtNIF,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.btnElegirCliente,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.txtPROV,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.txtCP,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.Button1,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.txtNOTES,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.comboIVA,System.ComponentModel.ISupportInitialize).EndInit
+        Me.tabPageDirecciones.ResumeLayout(false)
+        Me.tabPageDirecciones.PerformLayout
+        CType(Me.ppv2.PreviewPane,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.ppv2,System.ComponentModel.ISupportInitialize).EndInit
+        Me.ppv2.ResumeLayout(false)
+        Me.ppv2.PerformLayout
+        CType(Me.cb2NOM,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.tx2CODI,System.ComponentModel.ISupportInitialize).EndInit
+        Me.gbDireccionesEnvio.ResumeLayout(false)
+        CType(Me.dgDirecciones,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.C1TextBox1,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.btnAnteriorDireccion,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.btnSiguienteDireccion,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.btnBorrarDireccion,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.btnNuevaDireccion,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.txtPaisEnvio,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.btnPrimeraDireccion,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.btnUltimaDireccion,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.txtFAXEnvio,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.txtTelefonoEnvio,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.txtPoblacionEnvio,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.txtProvinciaEnvio,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.txtCPEnvio,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.txtDireccionEnvio,System.ComponentModel.ISupportInitialize).EndInit
+        Me.gbEtiquetasEnvio.ResumeLayout(false)
+        Me.gbEtiquetasEnvio.PerformLayout
+        CType(Me.cbooNOMTRANS2,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.cboEmpresaEnvio,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.txtPes,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.btnEtiquetasEnvio,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.txtBultos,System.ComponentModel.ISupportInitialize).EndInit
+        Me.gbEnvioSeur.ResumeLayout(false)
+        CType(Me.txtTelefonoCodigo,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.txtBultosSeur,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.txtPesoSeur,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.txtTipoPorte,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.txtObservSeur,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.btnImprirSeur,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.txtServicio,System.ComponentModel.ISupportInitialize).EndInit
+        Me.ResumeLayout(false)
+
+End Sub
+
+#End Region
+
+    Shared frmChildForm As frmClientesForm
+    Public Shared Function GetInstance() As frmClientesForm
+        If frmChildForm Is Nothing Then
+            frmChildForm = New frmClientesForm
+        End If
+        Return frmChildForm
+    End Function
+
+#Region "VARIABLES"
+
+    Public registroActual As clsCliente
+    Private tTbtnElegirCliente As New ToolTip
+
+#End Region
+
+#Region "INICIALIZAR"
+
+    Private Sub IniciarForm(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
+        Cursor = Cursors.WaitCursor
+        Try
+            cargando = True
+            Me.arrayTextBox = New System.Windows.Forms.Control() {
+                Me.C1TextBox1, Me.txtBANC, Me.txtBultos, Me.txtBultosSeur, Me.txtCOFI,
+                Me.txtCONTACTE, Me.txtCP, Me.txtCPEnvio, Me.txtCTA, Me.txtDC, Me.txtDIA1,
+                Me.txtDOM, Me.txtDTOFORMA, Me.txtDia2, Me.txtDia3, Me.txtDireccionEnvio,
+                Me.txtEMAIL1, Me.txtEmail2, Me.txtFAX, Me.txtFAXEnvio, Me.txtFORMA, Me.txtNIF,
+                Me.txtNOTES, Me.txtNUMEROPROVE, Me.txtOFI, Me.txtObservSeur, Me.txtPAIS,
+                Me.txtPOB, Me.txtPROV, Me.txtPaisEnvio, Me.txtPes, Me.txtPesoSeur,
+                Me.txtPoblacionEnvio, Me.txtProvinciaEnvio, Me.txtREPRES, Me.txtSUBCTA,
+                Me.txtServicio, Me.txtTEL, Me.txtTEL2, Me.txtTRANS, Me.txtTelefonoCodigo,
+                Me.txtTelefonoEnvio, Me.txtTipoPorte, Me.txtWEB, Me.tx2CODI, Me.txtIBAN, Me.txtSWIFT}
+            Me.arrayBotones = New System.Windows.Forms.Control() {Me.btnAnteriorDireccion, Me.btnBorrarDireccion, Me.btnElegirBanco, Me.btnElegirCliente, Me.btnElegirFormaPago, Me.btnElegirRepresentate, Me.btnElegirTransportista, Me.btnEtiquetasEnvio, Me.btnNuevaDireccion, Me.btnPrimeraDireccion, Me.btnSiguienteDireccion, Me.btnUltimaDireccion}
+            'Me.arrayGrids.Controls.AddRange(New System.Windows.Forms.Control() {Me.dgDirecciones})
+            Me.arrayGrids = New Control() {Me.dgDirecciones}
+            Me.arrayCheckBox = New System.Windows.Forms.Control() {Me.chkCartera, Me.chkTraspas, Me.chkMESESCOMPLETOS, chkBLOQUEADO}
+            Me.arrayCombos = New System.Windows.Forms.Control() {Me.cboNOMBANC, Me.cboNOMREPRES, Me.cboNOMTRANS, Me.comboIVA, Me.cboNOMFORMA, Me.cb2NOM, Me.cboINCOTERM}
+            Me.arrayTabPages = New System.Windows.Forms.Control() {Me.tabPageCliente, Me.tabPageDirecciones, Me.txtNUMEROPROVE}
+
+            ACN()
+            'ForzarTextBoxEntero(txtCODI)
+            InicializarToolTips()
+            tabla = tablaClientes
+            registroActual = New clsCliente(ds.Tables(tablaClientes), "C", BindingContext)
+            HacerBindings()
+            InciarDGDirecciones()
+            PonerModificables(soloLectura)
+            PSBTIPO(registroActual.centro)
+            AutoSizeControles()
+            Cursor = Cursors.Default
+            CCN()
+            PonerHandlersErroresParaGrids()
+            registroActual.tabla.AcceptChanges()
+            'cboEmpresaEnvio.SelectedValue = cboSeleccionCentro.SelectedValue
+
+
+            cargando = False
+
+        Catch ex As Exception
+            LOG(ex.ToString) : CCN() : cargando = False
+        End Try
+        Cursor = Cursors.Default
+    End Sub
+    Private Sub InciarDGDirecciones()
+        Dim i As Integer
+        Try
+            OcultarColumnasDG(dgDirecciones)
+            i = 0
+
+            PPCol2("NOM", dgDirecciones, rm.GetString("NOMBRE"), "", _
+                    True, 90, False, PresentationEnum.Normal, False, 90, i, False)
+            i = i + 1
+
+            PPCol2("DOM", dgDirecciones, rm.GetString("DIRECCION"), "", _
+                    True, 250, False, PresentationEnum.Normal, False, 250, i, False)
+            i = i + 1
+            PPCol2("CP", dgDirecciones, rm.GetString("CP"), "", _
+                                            True, 70, False, PresentationEnum.Normal, False, 70, i, False)
+            i = i + 1
+            PPCol2("POB", dgDirecciones, rm.GetString("POBLACION"), "", _
+                    True, 70, False, PresentationEnum.Normal, False, 70, i, False)
+
+            i = i + 1
+            PPCol2("PROV", dgDirecciones, rm.GetString("PROVINCIA"), "", _
+                    True, 70, False, PresentationEnum.Normal, False, 70, i, False)
+
+            i = i + 1
+
+            PPCol2("PAIS", dgDirecciones, rm.GetString("PAIS"), "", _
+                    True, 70, False, PresentationEnum.Normal, False, 70, i, False)
+            i = i + 1
+
+            PPCol2("TEL", dgDirecciones, rm.GetString("TELEFONO"), "", _
+                    True, 70, False, PresentationEnum.Normal, False, 70, i, False)
+            i = i + 1
+
+            PPCol2("CONTACTE", dgDirecciones, rm.GetString("CONTACTO"), "", _
+                    True, 150, False, PresentationEnum.Normal, False, 150, i, False)
+            dgDirecciones.RowHeight = dgDirecciones.RowHeight * 2
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+
+    End Sub
+    Private Sub HacerBindings()
+        Try
+            HacerBindingsTodos(registroActual.dvForm)
+            Me.txtCODI.DataBindings.Add(New System.Windows.Forms.Binding("Text", registroActual.dvForm, "CODI"))
+            cboid.DataBindings.Add(New Binding("Text", registroActual.dvForm, "NOM"))
+            CrearBindingIVA(comboIVA, registroActual.dvForm)
+            dgDirecciones.SetDataBinding(registroActual.direcciones.dvForm, "")
+            AñadirBindingCombo(cboNOMBANC, registroActual.dtBancs, CCBancs, CNBancs)
+            AñadirBindingCombo(cboNOMREPRES, registroActual.dtRepres, CCRepres, CNRepres)
+            AñadirBindingCombo(cboNOMTRANS, registroActual.dtTrans, CCTrans, CNTrans)
+            AñadirBindingCombo(cbooNOMTRANS2, registroActual.dtTrans.Copy, CCTrans, CNTrans)
+            AñadirBindingCombo(cboNOMFORMA, registroActual.dtForpag, CCForpag, CNForpag)
+            AñadirBindingCombo(cboINCOTERM, registroActual.dtIncoterms, "NOMBRE", "NOMBRE")
+
+            AñadirBindingCombo(cboEmpresaEnvio, dtFiliales, "CODI", "DESCRI")
+            'AñadirBindingCombo(cboid, registroActual.dvIdentificadores, CCClients, CNClients)
+
+            'OcultarMostrarColumnaCbo(cboID, "CENTRO", False)
+
+        Catch ex As Exception
+            LOG(ex.ToString) : CCN() : cargando = False
+        End Try
+    End Sub
+    Private Sub InicializarToolTips()
+        Try
+            tTbtnElegirCliente.Active = True
+            tTbtnElegirCliente.SetToolTip(btnElegirCliente, "Escollir Client...")
+
+        Catch ex As Exception
+            LOG(ex.ToString) : CCN() : cargando = False
+        End Try
+    End Sub
+
+#End Region
+
+#Region "MODIFICAR DB"
+    Private Sub ActualizarOrigen()
+        Try
+            If editando Then
+                editando = False
+                'registroActual.tabla.AcceptChanges()
+                PonerModificables(soloLectura)
+                'cboid.Text = registroActual.NOM
+            End If
+            If EsRegistroNuevo Then
+                editando = True : PSBTIPO(registroActual.centro)
+                tabControlClientes.TabPages.Add(tabPageDirecciones)
+                PonerControlesNuevo(True)
+                EsRegistroNuevo = False
+            End If
+
+        Catch ex As Exception
+            LOG(ex.ToString) : CCN() : cargando = False
+        End Try
+    End Sub
+    Friend Overrides Sub btnActualizar_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) 'Handles btnActualizar.Click
+        Try
+            cargando = True
+            If registroActual.TieneCambios Then
+
+                Select Case MessageBox.Show(rm.GetString("QUIERECONFIRMARLOSCAMBIOS"), rm.GetString("INFORMACION"), MessageBoxButtons.YesNoCancel)
+                    Case DialogResult.Cancel
+                        cargando = False
+                        Exit Sub
+                    Case DialogResult.No
+                        registroActual.tabla.RejectChanges()
+                        registroActual.direcciones.tabla.RejectChanges()
+                        cargando = False
+                        Exit Sub
+                End Select
+            End If
+
+            registroActual.ActualizarOrigen() : ActualizarOrigen()
+            PSBTIPO(registroActual.centro) : cargando = False
+            CCN()
+
+        Catch ex As Exception
+            LOG(ex.ToString) : CCN() : cargando = False
+        End Try
+    End Sub
+    Friend Overrides Sub btnBorrar_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) 'Handles btnBorrar.Click
+        Try
+            cargando = True
+            If MessageBox.Show(rm.GetString("BorrarCliente"), rm.GetString("ConfirmacionEliminacion"), MessageBoxButtons.YesNo) = DialogResult.Yes Then
+                editando = True
+                registroActual.borrar() : ActualizarOrigen()
+                editando = False
+            End If
+            PSBTIPO(registroActual.centro) : cargando = False
+        Catch ex As Exception
+            LOG(ex.ToString) : CCN() : cargando = False
+        End Try
+    End Sub
+    Friend Overrides Sub btnModificar_Click(ByVal sender As Object, ByVal e As System.EventArgs)
+        Try
+            If Not editando Then
+                cargando = True
+                editando = True
+                PonerModificables(modificable)
+                PSBTIPO(registroActual.centro) : cargando = False
+            End If
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Friend Overrides Sub btnNuevo_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) 'Handles btnNuevo.Click
+        Try
+            cargando = True
+            PonerControlesNuevo(False)
+            PonerModificables(modificable)
+            EsRegistroNuevo = True
+            tabControlClientes.TabPages.Remove(tabPageDirecciones)
+
+            registroActual.NuevoRegistro()
+            cboSeleccionCentro.SelectedValue = registroActual.centro
+            chkCartera.Checked = False
+            PSBTIPO(registroActual.centro) : cargando = False
+
+        Catch ex As Exception
+            LOG(ex.ToString) : CCN() : cargando = False
+        End Try
+    End Sub
+
+#Region "DIRECCIONES"
+
+#End Region
+
+#End Region
+
+#Region "ESPECÍFICO"
+
+    Private Sub rdoPortsDeguts_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles rdoPORTSDEBUTS.CheckedChanged
+        Try
+            If PuedoModificar() Then
+                cargando = True
+                If rdoPORTSDEBUTS.Checked = True Then
+                    registroActual.PORTSDEBUTS = True
+                    registroActual.PORTSPAGATS = False
+                End If
+                PSBTIPO(registroActual.centro) : cargando = False
+            End If
+        Catch ex As Exception
+            LOG(ex.ToString) : CCN() : cargando = False
+        End Try
+    End Sub
+    Private Sub rdoPortsPagats_CheckedChanged(ByVal sender As Object, ByVal e As System.EventArgs) 'Handles rdoPortsPagats.CheckedChanged
+        Try
+            If PuedoModificar() Then
+                cargando = True
+                If rdoPORTSPAGATS.Checked = True Then
+                    registroActual.PORTSDEBUTS = False
+                    registroActual.PORTSPAGATS = True
+                End If
+                PSBTIPO(registroActual.centro) : cargando = False
+            End If
+        Catch ex As Exception
+            LOG(ex.ToString) : CCN() : cargando = False
+        End Try
+    End Sub
+
+#End Region
+
+#Region "IMPRESIÓN"
+
+    Private Sub btnEtiquetasEnvio_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnEtiquetasEnvio.Click
+        Try
+            registroActual.NOMTRANS2 = general.nz(cbooNOMTRANS2.Text, "")
+            If rdoDireccionSeleccionada.Checked = True Then
+                If dgDirecciones.SelectedRows.Count = 0 OrElse dgDirecciones.SelectedRows.Count > 1 Then
+                    MessageBox.Show(rm.GetString("SELECIONAUNADIRECCION"))
+                Else
+                    ppv2.Document = registroActual.ImprimirEtiquetasEnvio(nzn(txtBultos.Text, 0), nzn(txtPes.Value, 0), cboEmpresaEnvio.SelectedValue, True)
+                End If
+            Else
+                ppv2.Document = registroActual.ImprimirEtiquetasEnvio(nzn(txtBultos.Text, 0), nzn(txtPes.Value, 0), cboEmpresaEnvio.SelectedValue)
+            End If
+
+
+        Catch ex As Exception
+            LOG(ex.ToString) : CCN() : cargando = False
+        End Try
+    End Sub
+    Private Sub btnImprirSeur_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnImprirSeur.Click
+        Dim accessDir As New AccessDirecto(tabla)
+        Dim cnTemp As New OleDb.OleDbConnection("Provider=Microsoft.Jet.OLEDB.4.0;Data Source=access\temp.mdb;User Id=admin;Password=;")
+        Dim datos As New ArrayList
+        Dim strSQL As String
+        Dim cmdIns As New OleDb.OleDbCommand
+        Dim oAccess As Access.Application = accessDir.abrirAccess(False, "Etiquetes Enviament")
+        Dim i As Integer = 0
+        Try
+            If txtBultosSeur.Text = 0 Then
+                MessageBox.Show(rm.GetString("NUMBULTOSINCO"), "Error", MessageBoxButtons.OK) 'Número de bultos incorrecte
+            Else
+
+                accessDir.BorrarDatosTablaAccess("tSEUR")
+
+                cmdIns.Connection = cnTemp
+                'MessageBox.Show(strCliewnte)
+                'En los pedidos de venta el proveedor es el cliente por una futura unificacion de las dos funciones
+                strSQL = "INSERT INTO tSEUR (" & _
+                    " FECHARECOGIDA," & _
+                    " OBSERV," & _
+                    " SERVICIO," & _
+                    " TIPOPORTE," & _
+                    " BULTOS, " & _
+                    " KILOS," & _
+                    " POB, " & _
+                    " PROV, " & _
+                    " TELF, " & _
+                    " CP, " & _
+                    " NOMBRE, " & _
+                    " DOM," & _
+                    " BULTON " & _
+                    " ) VALUES("
+
+                strSQL = strSQL & _
+                " """ & CType(dtpFECHARECOGIDA.Value, Date) & """," & _
+                " """ & general.NS(txtObservSeur.Text) & """ ," & _
+                " """ & general.NS(txtServicio.Text) & """," & _
+                " """ & general.NS(txtTipoPorte.Text) & """," & _
+                " """ & general.NS(txtBultosSeur.Text) & """," & _
+                " """ & general.NS(txtPesoSeur.Text) & """ ," & _
+                " """ & general.NS(txtPoblacionEnvio.Text) & """," & _
+                " """ & general.NS(txtProvinciaEnvio.Text) & """," & _
+                " """ & general.NS(txtTelefonoCodigo.Text) & """ ," & _
+                " """ & general.NS(txtCPEnvio.Text) & """," & _
+                " """ & general.NS(cboid.Text) & """," & _
+                " """ & general.NS(txtDireccionEnvio.Text) & """, "
+
+                cmdIns.CommandText = strSQL
+                cnTemp.Open()
+                For i = 1 To CType(txtBultosSeur.Text, Integer)
+
+                    cmdIns.CommandText = strSQL & """" & i & """)"
+                    cmdIns.ExecuteNonQuery()
+                Next
+                cnTemp.Close()
+                'CargarInformeAccess("iETIQUETASENVIO", oAccess)
+                oAccess.Visible = True
+            End If
+        Catch ex As Exception
+            LOG(ex.ToString) : CCN() : cargando = False : oAccess.Quit(Access.AcQuitOption.acQuitSaveNone) : oAccess = Nothing
+        End Try
+    End Sub
+
+#End Region
+
+#Region "COMUNES"
+
+    Private Sub btnVerLista_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnVerLista.Click
+        Try
+            Cursor = Cursors.WaitCursor
+            Dim f As frmClientesLista = frmClientesLista.GetInstance(esListado)
+            f.MdiParent = Me.MdiParent
+            AddHandler f.Closed, AddressOf CType(Me.MdiParent, frmPrincipal).childCerrado
+            AddHandler f.Load, AddressOf CType(Me.MdiParent, frmPrincipal).childAbierto : AddHandler f.Activated, AddressOf CType(Me.MdiParent, frmPrincipal).childOcultandoMostrando
+            f.Show()
+            f.BringToFront()
+            Cursor = Cursors.Default
+
+        Catch ex As Exception
+            LOG(ex.ToString) : CCN() : cargando = False
+        End Try
+    End Sub
+    Private Sub PonerControlesNuevo(ByVal b As Boolean)
+        Try
+            If Not b Then
+                btnActualizar.Text = rm.GetString("CONFIRMAR")
+            Else
+                btnActualizar.Text = rm.GetString("ACTUALIZAR")
+            End If
+            If Not b Then
+                cboid.DropMode = C1.Win.C1List.DropModeEnum.Manual
+            Else
+                cboid.DropMode = C1.Win.C1List.DropModeEnum.Automatic
+            End If
+
+            cboid.AutoCompletion = Not editando
+            ModiNuev(b)
+
+        Catch ex As Exception
+            LOG(ex.ToString) : CCN() : cargando = False
+        End Try
+    End Sub
+    Private Sub PonerModificables(Optional ByVal b As Boolean = False)
+        Try
+            PonerMod(b)
+            If Not b Then : cboid.DataSource = Nothing
+            Else : AñadirBindingCombo(cboid, registroActual.dvIdentificadores, CCClients, CNClients) : registroActual.tabla.AcceptChanges() : End If
+
+            cboid.LimitToList = b
+            cboid.SuperBack = b
+            txtCODI.ReadOnly = editando Or EsRegistroNuevo
+            btnPrimeraDireccion.Enabled = True
+            btnEtiquetasEnvio.Enabled = True
+
+            btnImprirSeur.Enabled = True
+            txtTelefonoCodigo.ReadOnly = False
+            txtPesoSeur.ReadOnly = False
+            txtBultosSeur.ReadOnly = False
+            txtTipoPorte.ReadOnly = False
+            'dtpFECHARECOGIDA.Enabled = True
+            txtServicio.ReadOnly = False
+            txtObservSeur.ReadOnly = False
+            txtBultos.ReadOnly = False
+            txtPes.ReadOnly = False
+
+            ModiNuev(b)
+
+        Catch ex As Exception
+            LOG(ex.ToString) : CCN() : cargando = False
+        End Try
+    End Sub
+    Friend Sub btnRecargar_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnRecargar.Click
+        Try
+            cargando = True
+            Dim id As Object
+            id = txtCODI.Text
+            registroActual.ActualizarOrigen()
+            registroActual.CambiarAReg(id, iraregistro)
+            cargando = False
+
+        Catch ex As Exception
+            LOG(ex.ToString) : CCN() : cargando = False
+        End Try
+    End Sub
+
+#End Region
+
+#Region "DESPLAZARSE"
+
+    Protected Friend Overrides Sub btnPrimero_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) 'Handles btnPrimero.Click
+        Try
+            cargando = True
+            registroActual.PrimeroReg() : ActualizarOrigen()
+            PSBTIPO(registroActual.centro) : cargando = False
+
+        Catch ex As Exception
+            LOG(ex.ToString) : CCN() : cargando = False
+        End Try
+    End Sub
+    Friend Overrides Sub btnUltimo_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) 'Handles btnUltimo.Click
+        Try
+            cargando = True
+            registroActual.UltimoReg() : ActualizarOrigen()
+            PSBTIPO(registroActual.centro) : cargando = False
+
+        Catch ex As Exception
+            LOG(ex.ToString) : CCN() : cargando = False
+        End Try
+    End Sub
+    Friend Overrides Sub btnAnterior_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) 'Handles btnAnterior.Click
+        Try
+            cargando = True
+            registroActual.AnteriorReg() : ActualizarOrigen()
+            PSBTIPO(registroActual.centro) : cargando = False
+
+        Catch ex As Exception
+            LOG(ex.ToString) : CCN() : cargando = False
+        End Try
+    End Sub
+    Friend Overrides Sub btnSiguiente_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) 'Handles btnSiguiente.Click
+        Try
+            cargando = True
+            registroActual.SiguienteReg() : ActualizarOrigen()
+            PSBTIPO(registroActual.centro)
+            cargando = False
+
+        Catch ex As Exception
+            LOG(ex.ToString) : CCN() : cargando = False
+        End Try
+    End Sub
+
+#End Region
+
+#Region "SELECCIÓN REGISTRO"
+
+    Private Sub btnElegirCliente_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnElegirCliente.Click
+        Try
+            If PuedoModificar() Then
+                cargando = True
+                Cursor = Cursors.WaitCursor
+                Dim f As frmClientesLista = frmClientesLista.GetInstance(esEleccion)
+                f.ShowDialog()
+                Cursor = Cursors.Default
+                If Not f.dr Is Nothing Then
+                    registroActual.CambiarAReg(f.dr("CODI"), iraregistro)
+                End If
+                f = Nothing
+                cargando = False
+            End If
+        Catch ex As Exception
+            LOG(ex.ToString) : CCN() : cargando = False
+        End Try
+
+    End Sub
+    Private Sub txtID_KeyPress(ByVal sender As System.Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles txtCODI.KeyDown '!!!
+        Try
+            If consulta() Then
+                cargando = True
+                If e.KeyCode = Keys.Enter OrElse e.KeyCode = Keys.Tab Then
+                    ValidarCambio()
+                Else
+                    BindingContext(registroActual.dvForm).SuspendBinding()
+                    PSBTIPO(registroActual.centro)
+                End If
+                cargando = False
+            End If
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub txtCODI_Validated(ByVal sender As Object, ByVal e As System.EventArgs) Handles txtCODI.Validated '!!!
+        If Not cargando Then
+            cargando = True
+            ValidarCambio()
+            cargando = False
+        End If
+    End Sub
+    Private Sub ValidarCambio()
+        Try
+            If Not EsRegistroNuevo AndAlso Not editando Then
+                Dim IDAbuscar As Integer
+                cargando = True
+                IDAbuscar = nzn(txtCODI.Text, 0)
+                BindingContext(registroActual.dvForm).ResumeBinding()
+                registroActual.CambiarAReg(IDAbuscar, iraregistro)
+                PSBTIPO(registroActual.centro) : cargando = False
+            Else
+                If EsRegistroNuevo Then
+                    'BindingContext(registroActual.dvForm).SuspendBinding()
+                    If ExisteID(tabla, nzn(txtCODI.Text, -1), registroActual.centro) Then 'registroActual.dvForm.Find(nzn(txtID.Text, 0)) <> -1 Then
+                        MessageBox.Show(rm.GetString("CODIGOYAEXISTENTE"), "", MessageBoxButtons.OK)
+                        txtCODI.Focus()
+                        BindingContext(registroActual.dvForm).ResumeBinding()
+                    End If
+                End If
+            End If
+
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Sub
+    Private Sub cboid_SelChange(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cboid.RowChange
+        Try
+            If consulta() Then
+                cargando = True
+                registroActual.CambiarAReg(general.ponercontrabarrasreal(nzn(cboid.WillChangeToValue, 0)), iraregistro)
+                PSBTIPO(registroActual.centro) : cargando = False
+            End If
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Sub
+    Private Sub cboID_KeyPress(ByVal sender As System.Object, ByVal e As System.Windows.Forms.KeyPressEventArgs) Handles cboid.KeyPress
+        Try
+            If editando Or EsRegistroNuevo Then
+                cboid.AutoCompletion = False
+            Else
+                cboid.AutoCompletion = True
+            End If
+
+        Catch ex As Exception
+            MessageBox.Show(ex.ToString)
+        End Try
+    End Sub
+
+#Region "SELECCION CENTRO"
+
+    Private Sub cboSeleccion_ItemChanged(ByVal sender As Object, ByVal e As System.EventArgs) _
+                                                 Handles cboSeleccionCentro.SelectionChangeCommitted
+        Try
+            If consulta() Then
+                cargando = True
+                registroActual.cambioCentro(general.nz(cboSeleccionCentro.SelectedValue, empresaPorDefecto), primero)
+                'registroActual.tabla.AcceptChanges()
+                cboSeleccionCentro.SelectedValue = registroActual.centro
+                'cboID.ReBind(True)
+                cargando = False
+            Else
+                If EsRegistroNuevo And Not cargando Then
+                    cargando = True
+                    registroActual.centro = general.nz(cboSeleccionCentro.SelectedValue, empresaPorDefecto)
+                    registroActual.tabla.Clear()
+                    registroActual.NuevoRegistro()
+                    PSBTIPO(registroActual.centro)
+                End If
+                cargando = False
+            End If
+            'cboEmpresaEnvio.SelectedValue = cboSeleccionCentro.SelectedValue
+
+        Catch ex As Exception
+            LOG(ex.ToString) : CCN() : cargando = False
+        End Try
+    End Sub
+
+#End Region
+
+#End Region
+
+#Region "ELECCIONES"
+
+    Private Sub btnElegirBanco_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnElegirBanco.Click
+        Try
+            Cursor = Cursors.WaitCursor
+            Dim f As frmBancosLista = frmBancosLista.GetInstance(esEleccion)
+            f.ShowDialog()
+            Cursor = Cursors.Default
+
+            If Not f.dr Is Nothing Then registroActual.BANC = f.dr("CODI")
+            f = Nothing
+
+        Catch ex As Exception
+            LOG(ex.ToString) : CCN() : cargando = False
+        End Try
+    End Sub
+    Private Sub btnElegirFormaPago_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnElegirFormaPago.Click
+        Try
+            Cursor = Cursors.WaitCursor
+            Dim f As frmPagoLista = frmPagoLista.GetInstance(esEleccion)
+            f.ShowDialog()
+            Cursor = Cursors.Default
+            If Not f.dr Is Nothing Then registroActual.FORMA = f.dr("CODI")
+            f = Nothing
+
+        Catch ex As Exception
+            LOG(ex.ToString) : CCN() : cargando = False
+        End Try
+    End Sub
+    Private Sub btnElegirTransportista_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnElegirTransportista.Click
+        Try
+            Cursor = Cursors.WaitCursor
+            Dim f As frmTransportistasLista = frmTransportistasLista.GetInstance(esEleccion)
+            f.ShowDialog()
+            Cursor = Cursors.Default
+            If Not f.dr Is Nothing Then
+                registroActual.TRANS = f.dr("CODI")
+            End If
+            f = Nothing
+
+        Catch ex As Exception
+            LOG(ex.ToString) : CCN() : cargando = False
+        End Try
+    End Sub
+    Private Sub btnElegirRepresentate_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnElegirRepresentate.Click
+        Try
+            Cursor = Cursors.WaitCursor
+            Dim f As frmRepresentantesLista = frmRepresentantesLista.GetInstance(esEleccion)
+            f.ShowDialog()
+            If Not f.dr Is Nothing Then
+                registroActual.REPRES = f.dr("CODI")
+            End If
+            Cursor = Cursors.Default
+
+            f = Nothing
+
+        Catch ex As Exception
+            LOG(ex.ToString) : CCN() : cargando = False
+        End Try
+    End Sub
+    Private Sub comboIVA_SelChange(ByVal sender As Object, ByVal e As System.EventArgs) Handles comboIVA.SelectedValueChanged
+        Try
+            If PuedoModificar() Then cargando = True : registroActual.IVA = comboIVA.SelectedValue : cargando = False
+
+        Catch ex As Exception
+            LOG(ex.ToString) : CCN() : cargando = False
+        End Try
+    End Sub
+    Private Sub cboFormaDePago_selectedValueChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cboNOMFORMA.SelectedValueChanged
+        Try
+            If PuedoModificar() Then cargando = True : registroActual.FORMA = general.nz(cboNOMFORMA.WillChangeToValue, "") : cargando = False
+
+
+        Catch ex As Exception
+            LOG(ex.ToString) : CCN() : cargando = False
+        End Try
+    End Sub
+    Private Sub cboIncoterm_selectedValueChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cboINCOTERM.SelectedValueChanged
+        Try
+            If PuedoModificar() Then cargando = True : registroActual.INCOTERM = general.nz(cboINCOTERM.WillChangeToValue, "") : cargando = False
+
+        Catch ex As Exception
+            LOG(ex.ToString) : CCN() : cargando = False
+        End Try
+    End Sub
+    Private Sub cboNombreRepresentante_SelectedValueChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cboNOMREPRES.SelectedValueChanged
+        Try
+            If PuedoModificar() Then cargando = True : registroActual.REPRES = nzn(cboNOMREPRES.WillChangeToValue, 0) : cargando = False
+
+
+        Catch ex As Exception
+            LOG(ex.ToString) : CCN() : cargando = False
+        End Try
+    End Sub
+    Private Sub cboNombreBanco_SelectedValueChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cboNOMBANC.SelectedValueChanged
+        Try
+            If PuedoModificar() Then cargando = True : registroActual.BANC = general.nz(cboNOMBANC.WillChangeToValue, "") : cargando = False
+
+        Catch ex As Exception
+            LOG(ex.ToString) : CCN() : cargando = False
+        End Try
+    End Sub
+    Private Sub cboNombreTransportista_SelectedValueChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cboNOMTRANS.SelectedValueChanged
+        Try
+            If PuedoModificar() Then cargando = True : registroActual.TRANS = nzn(cboNOMTRANS.WillChangeToValue, 0) : cargando = False
+
+        Catch ex As Exception
+            LOG(ex.ToString) : CCN() : cargando = False
+        End Try
+    End Sub
+    Private Sub txtCodigoBanco_Validated(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles txtBANC.Validated
+        Try
+            If PuedoModificar() Then cargando = True : registroActual.BANC = general.nz(txtBANC.Text, "") : cargando = False
+
+        Catch ex As Exception
+            LOG(ex.ToString) : CCN() : cargando = False
+        End Try
+    End Sub
+    Private Sub txtCodigoFormaPago_Validated(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles txtFORMA.Validated
+        Try
+            If PuedoModificar() Then cargando = True : registroActual.FORMA = general.nz(txtFORMA.Text, "") : cargando = False
+
+        Catch ex As Exception
+            LOG(ex.ToString) : CCN() : cargando = False
+        End Try
+    End Sub
+    Private Sub txtCodigoRepresentante_Validated(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles txtREPRES.Validated
+        Try
+            If PuedoModificar() Then cargando = True : registroActual.REPRES = nzn(txtREPRES.Text, 0) : cargando = False
+
+        Catch ex As Exception
+            LOG(ex.ToString) : CCN() : cargando = False
+        End Try
+    End Sub
+    Private Sub txtCodigoTransportista_Validated(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles txtTRANS.Validated
+        Try
+            If PuedoModificar() Then cargando = True : registroActual.TRANS = nzn(txtTRANS.Text, 0) : cargando = False
+
+        Catch ex As Exception
+            LOG(ex.ToString) : CCN() : cargando = False
+        End Try
+    End Sub
+
+#End Region
+
+    Private Sub dgDirecciones_BeforeDelete(ByVal sender As Object, ByVal e As C1.Win.C1TrueDBGrid.CancelEventArgs) Handles dgDirecciones.BeforeDelete
+        Try
+            If MessageBox.Show(rm.GetString("BORRARLINEA"), rm.GetString("ConfirmacionEliminacion"), MessageBoxButtons.YesNo) = DialogResult.Yes Then
+                e.Cancel = False
+            Else
+                e.Cancel = True
+            End If
+
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Sub
+    Private Sub dgPedidosCliente_BeforeDelete(ByVal sender As System.Object, ByVal e As C1.Win.C1TrueDBGrid.CancelEventArgs)
+        Try
+            If MessageBox.Show(rm.GetString("BORRARLINEA"), rm.GetString("ConfirmacionEliminacion"), MessageBoxButtons.YesNo) = DialogResult.Yes Then
+                e.Cancel = False
+            Else
+                e.Cancel = True
+            End If
+
+
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Sub
+    Private Sub frm_Closed(ByVal sender As Object, ByVal e As System.EventArgs) Handles MyBase.Closed
+        GrabaParametro(registroActual.CODI, "cliente")
+    End Sub
+
+    Private Sub tabControlClientes_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles tabControlClientes.SelectedIndexChanged
+        Try
+            If tabControlClientes.SelectedTab Is tabPageDirecciones Then
+                cbooNOMTRANS2.Text = registroActual.NOMTRANS
+            End If
+
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Sub
+End Class

@@ -1,0 +1,26 @@
+Building documentation...
+Initializing...
+An error occured while trying to build the documentation.
+
+
+
+Exception: NDoc.Core.DocumenterException
+El proceso no puede obtener acceso al archivo "aura2k3.ds11.filDataTable.AddfilRow_overloads.html" porque está siendo utilizado en otro proceso.
+
+Exception: System.IO.IOException
+El proceso no puede obtener acceso al archivo "aura2k3.ds11.filDataTable.AddfilRow_overloads.html" porque está siendo utilizado en otro proceso.
+
+
+
+Exception: NDoc.Core.DocumenterException
+   at NDoc.Documenter.Msdn.MsdnDocumenter.Build(Project project)
+   at NDoc.Gui.BuildWorker.ThreadProc()
+
+Exception: System.IO.IOException
+   at System.IO.Directory.DeleteHelper(String fullPath, String userPath, Boolean recursive)
+   at System.IO.Directory.Delete(String fullPath, String userPath, Boolean recursive)
+   at NDoc.Core.Workspace.CleanIntermediates()
+   at NDoc.Core.Workspace.Clean()
+   at NDoc.Documenter.Msdn.MsdnDocumenter.Build(Project project)
+
+

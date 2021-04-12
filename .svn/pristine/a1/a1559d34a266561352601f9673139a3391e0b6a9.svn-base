@@ -1,0 +1,643 @@
+Public Class frmVentaFacturaProforma
+    Inherits aura2k3.frmVentaPAFPlantilla
+
+#Region " Código generado por el Diseñador de Windows Forms "
+
+    Public Sub New()
+        MyBase.New()
+
+        'El Diseñador de Windows Forms requiere esta llamada.
+        InitializeComponent()
+
+        'Agregar cualquier inicialización después de la llamada a InitializeComponent()
+
+    End Sub
+
+    'Form reemplaza a Dispose para limpiar la lista de componentes.
+    Protected Overloads Overrides Sub Dispose(ByVal disposing As Boolean)
+        If disposing Then
+            If Not (components Is Nothing) Then
+                components.Dispose()
+            End If
+        End If
+        MyBase.Dispose(disposing)
+        frmChildForm = Nothing
+    End Sub
+
+    'Requerido por el Diseñador de Windows Forms
+    Private components As System.ComponentModel.IContainer
+
+    'NOTA: el Diseñador de Windows Forms requiere el siguiente procedimiento
+    'Puede modificarse utilizando el Diseñador de Windows Forms. 
+    'No lo modifique con el editor de código.
+    <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
+        Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(frmVentaFacturaProforma))
+        CType(Me.cboKM, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.dgConsumos, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.txtP_DTE, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.txtBASE1, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.txtBRUT1, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.txtIVA1, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.txtDTE1, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.txtRE1, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.cboSeleccionClienteParaPAF, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.cboFRA, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.txtCOMIS, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.dtpAFechaRecibo, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.dtpDeFechaRecibo, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.cboAFacturaRecibo, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.cboColor, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.cboDeFacuraRecibo, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.txtCLIENT, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.cboNOMCLIENT, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.txtTOTAL, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.dtpDATA, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.txtREPRES, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.ppFitxa, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.txtOBSERV, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.cboNOMREPRES, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.txvTOTAL, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.tabPageRecibos.SuspendLayout()
+        CType(Me.cboTalla, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.cboTipo, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.cboMuestra2, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.txCFRA, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.txCNOMCLIENT, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.cboMuestra, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.dgLineasPAFVenta, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.txcCLIENT, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.cboDOM, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.txtALBCLI, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.dtcDATA, System.ComponentModel.ISupportInitialize).BeginInit()
+        '
+        'GroupBox4
+        '
+        Me.GroupBox4.Name = "GroupBox4"
+        '
+        'cboKM
+        '
+        Me.cboKM.Images.Add(CType(resources.GetObject("resource"), System.Drawing.Image))
+        Me.cboKM.Name = "cboKM"
+        Me.cboKM.RowDivider.Color = System.Drawing.Color.DarkGray
+        Me.cboKM.RowDivider.Style = C1.Win.C1TrueDBGrid.LineStyleEnum.Single
+        '
+        'lblRE
+        '
+        Me.lblRE.Name = "lblRE"
+        '
+        'rdoVerPAFDeCliente
+        '
+        Me.rdoVerPAFDeCliente.Name = "rdoVerPAFDeCliente"
+        '
+        'dgConsumos
+        '
+        Me.dgConsumos.Images.Add(CType(resources.GetObject("resource1"), System.Drawing.Image))
+        Me.dgConsumos.Name = "dgConsumos"
+        Me.dgConsumos.PreviewInfo.Location = New System.Drawing.Point(0, 0)
+        Me.dgConsumos.PreviewInfo.Size = New System.Drawing.Size(0, 0)
+        Me.dgConsumos.PreviewInfo.ZoomFactor = 75
+        Me.dgConsumos.RowDivider.Color = System.Drawing.Color.DarkGray
+        Me.dgConsumos.RowDivider.Style = C1.Win.C1TrueDBGrid.LineStyleEnum.Single
+        '
+        'lblNumeroPAF
+        '
+        Me.lblNumeroPAF.Name = "lblNumeroPAF"
+        '
+        'lblImpReciboAFecha
+        '
+        Me.lblImpReciboAFecha.Name = "lblImpReciboAFecha"
+        '
+        'GroupBox3
+        '
+        Me.GroupBox3.Name = "GroupBox3"
+        '
+        'txtP_DTE
+        '
+        Me.txtP_DTE.Name = "txtP_DTE"
+        '
+        'lblImpReciboDeFecha
+        '
+        Me.lblImpReciboDeFecha.Name = "lblImpReciboDeFecha"
+        '
+        'txtBASE1
+        '
+        Me.txtBASE1.Name = "txtBASE1"
+        '
+        'lblRepresentante
+        '
+        Me.lblRepresentante.Name = "lblRepresentante"
+        '
+        'txtBRUT1
+        '
+        Me.txtBRUT1.DisplayFormat.CustomFormat = "#,##0.00"
+        Me.txtBRUT1.DisplayFormat.FormatType = C1.Win.C1Input.FormatTypeEnum.CustomFormat
+        Me.txtBRUT1.DisplayFormat.Inherit = C1.Win.C1Input.FormatInfoInheritFlags.None
+        Me.txtBRUT1.Name = "txtBRUT1"
+        '
+        'txtIVA1
+        '
+        Me.txtIVA1.Name = "txtIVA1"
+        '
+        'txtDTE1
+        '
+        Me.txtDTE1.Name = "txtDTE1"
+        '
+        'txtRE1
+        '
+        Me.txtRE1.Name = "txtRE1"
+        '
+        'cboSeleccionClienteParaPAF
+        '
+        Me.cboSeleccionClienteParaPAF.Images.Add(CType(resources.GetObject("resource2"), System.Drawing.Image))
+        Me.cboSeleccionClienteParaPAF.Name = "cboSeleccionClienteParaPAF"
+        Me.cboSeleccionClienteParaPAF.RowDivider.Color = System.Drawing.Color.DarkGray
+        Me.cboSeleccionClienteParaPAF.RowDivider.Style = C1.Win.C1List.LineStyleEnum.None
+        '
+        'cboFRA
+        '
+        Me.cboFRA.Images.Add(CType(resources.GetObject("resource3"), System.Drawing.Image))
+        Me.cboFRA.Name = "cboFRA"
+        Me.cboFRA.RowDivider.Color = System.Drawing.Color.DarkGray
+        Me.cboFRA.RowDivider.Style = C1.Win.C1List.LineStyleEnum.None
+        '
+        'gbCentro
+        '
+        Me.gbCentro.Name = "gbCentro"
+        
+        'txtCOMIS
+        '
+        Me.txtCOMIS.Name = "txtCOMIS"
+        '
+        'rdoVerTodasPAF
+        '
+        Me.rdoVerTodasPAF.Name = "rdoVerTodasPAF"
+        '
+        'dtpAFechaRecibo
+        '
+        '
+        'dtpAFechaRecibo.Calendar
+        '
+        Me.dtpAFechaRecibo.Calendar.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.dtpAFechaRecibo.Name = "dtpAFechaRecibo"
+        '
+        'dtpDeFechaRecibo
+        '
+        '
+        'dtpDeFechaRecibo.Calendar
+        '
+        Me.dtpDeFechaRecibo.Calendar.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.dtpDeFechaRecibo.Name = "dtpDeFechaRecibo"
+        '
+        'cboAFacturaRecibo
+        '
+        Me.cboAFacturaRecibo.Images.Add(CType(resources.GetObject("resource5"), System.Drawing.Image))
+        Me.cboAFacturaRecibo.Name = "cboAFacturaRecibo"
+        Me.cboAFacturaRecibo.RowDivider.Color = System.Drawing.Color.DarkGray
+        Me.cboAFacturaRecibo.RowDivider.Style = C1.Win.C1List.LineStyleEnum.None
+        '
+        'cboColor
+        '
+        Me.cboColor.Images.Add(CType(resources.GetObject("resource6"), System.Drawing.Image))
+        Me.cboColor.Name = "cboColor"
+        Me.cboColor.RowDivider.Color = System.Drawing.Color.DarkGray
+        Me.cboColor.RowDivider.Style = C1.Win.C1TrueDBGrid.LineStyleEnum.Single
+        '
+        'tabPagePAF
+        '
+        Me.tabPagePAF.Name = "tabPagePAF"
+        '
+        'cboDeFacuraRecibo
+        '
+        Me.cboDeFacuraRecibo.Images.Add(CType(resources.GetObject("resource7"), System.Drawing.Image))
+        Me.cboDeFacuraRecibo.Name = "cboDeFacuraRecibo"
+        Me.cboDeFacuraRecibo.RowDivider.Color = System.Drawing.Color.DarkGray
+        Me.cboDeFacuraRecibo.RowDivider.Style = C1.Win.C1List.LineStyleEnum.None
+        '
+        'lblAFactura
+        '
+        Me.lblAFactura.Name = "lblAFactura"
+        '
+        'lblCliente
+        '
+        Me.lblCliente.Name = "lblCliente"
+        Me.lblCliente.Text = "Client"
+        '
+        'lblDeFactura
+        '
+        Me.lblDeFactura.Name = "lblDeFactura"
+        '
+        'btnGenerarRecibo
+        '
+        Me.btnGenerarRecibo.Name = "btnGenerarRecibo"
+        '
+        'btnElegirCliente
+        '
+        Me.btnElegirCliente.Name = "btnElegirCliente"
+        '
+        'Label6
+        '
+        Me.Label6.Name = "Label6"
+        '
+        'txtCLIENT
+        '
+        Me.txtCLIENT.Name = "txtCLIENT"
+        '
+        'cboNOMCLIENT
+        '
+        Me.cboNOMCLIENT.Images.Add(CType(resources.GetObject("resource8"), System.Drawing.Image))
+        Me.cboNOMCLIENT.Name = "cboNOMCLIENT"
+        Me.cboNOMCLIENT.RowDivider.Color = System.Drawing.Color.DarkGray
+        Me.cboNOMCLIENT.RowDivider.Style = C1.Win.C1List.LineStyleEnum.None
+        '
+        'btnElegirRepresentate
+        '
+        Me.btnElegirRepresentate.Name = "btnElegirRepresentate"
+        '
+        'lblTotal
+        '
+        Me.lblTotal.Name = "lblTotal"
+        '
+        'gbEleccionClientesPAF
+        '
+        Me.gbEleccionClientesPAF.Name = "gbEleccionClientesPAF"
+        '
+        'txtTOTAL
+        '
+        Me.txtTOTAL.Name = "txtTOTAL"
+        '
+        'dtpDATA
+        '
+        '
+        'dtpDATA.Calendar
+        '
+        Me.dtpDATA.Calendar.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.dtpDATA.Name = "dtpDATA"
+        '
+        'lblObservaciones
+        '
+        Me.lblObservaciones.Name = "lblObservaciones"
+        '
+        'txtREPRES
+        '
+        Me.txtREPRES.Name = "txtREPRES"
+        '
+        'lblTotalBruto
+        '
+        Me.lblTotalBruto.Name = "lblTotalBruto"
+        '
+        'lblBase
+        '
+        Me.lblBase.Name = "lblBase"
+        '
+        'lblPedido
+        '
+        Me.lblPedido.Name = "lblPedido"
+        Me.lblPedido.Text = "Factura"
+        '
+        'lblFecha
+        '
+        Me.lblFecha.Name = "lblFecha"
+        '
+        'lblDescuento
+        '
+        Me.lblDescuento.Name = "lblDescuento"
+        '
+        'ppFitxa
+        '
+        Me.ppFitxa.ExportOptions.Content = New C1.Win.C1PrintPreview.ExporterOptions() {New C1.Win.C1PrintPreview.ExporterOptions("XlsExportProvider", "C1.C1PrintDocument.Export.XlsOptionsForm", True, False)}
+        Me.ppFitxa.Name = "ppFitxa"
+        Me.ppFitxa.NavigationBar.Cursor = System.Windows.Forms.Cursors.Default
+        Me.ppFitxa.NavigationBar.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!)
+        Me.ppFitxa.NavigationBar.OutlineView.Cursor = System.Windows.Forms.Cursors.Default
+        Me.ppFitxa.NavigationBar.OutlineView.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!)
+        Me.ppFitxa.NavigationBar.OutlineView.Indent = 19
+        Me.ppFitxa.NavigationBar.OutlineView.ItemHeight = 16
+        Me.ppFitxa.NavigationBar.OutlineView.TabIndex = 132
+        Me.ppFitxa.NavigationBar.OutlineView.Visible = False
+        Me.ppFitxa.NavigationBar.Padding = New System.Drawing.Point(6, 3)
+        Me.ppFitxa.NavigationBar.TabIndex = 130
+        Me.ppFitxa.NavigationBar.ThumbnailsView.AutoArrange = True
+        Me.ppFitxa.NavigationBar.ThumbnailsView.Cursor = System.Windows.Forms.Cursors.Default
+        Me.ppFitxa.NavigationBar.ThumbnailsView.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!)
+        Me.ppFitxa.NavigationBar.ThumbnailsView.TabIndex = 134
+        Me.ppFitxa.NavigationBar.ThumbnailsView.Visible = False
+        Me.ppFitxa.NavigationBar.Visible = False
+        Me.ppFitxa.NavigationBar.Width = 160
+        Me.ppFitxa.PreviewPane.ZoomFactor = 0.5!
+        Me.ppFitxa.PreviewPane.ZoomMode = C1.Win.C1PrintPreview.ZoomModeEnum.Custom
+        Me.ppFitxa.Splitter.Cursor = System.Windows.Forms.Cursors.VSplit
+        Me.ppFitxa.Splitter.Width = 3
+        Me.ppFitxa.StatusBar.Cursor = System.Windows.Forms.Cursors.Default
+        Me.ppFitxa.StatusBar.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!)
+        Me.ppFitxa.StatusBar.TabIndex = 138
+        Me.ppFitxa.ToolBar.Cursor = System.Windows.Forms.Cursors.Default
+        Me.ppFitxa.ToolBar.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!)
+        Me.ppFitxa.ToolBar.ImageSet = C1.Win.C1PrintPreview.ToolBarImageSetEnum.XpStyle16
+        Me.ppFitxa.UIStrings.Content = New String(-1) {}
+        '
+        'txtOBSERV
+        '
+        Me.txtOBSERV.Name = "txtOBSERV"
+        '
+        'chkTRASPAS
+        '
+        Me.chkTRASPAS.Name = "chkTRASPAS"
+        '
+        'cboNOMREPRES
+        '
+        Me.cboNOMREPRES.Images.Add(CType(resources.GetObject("resource9"), System.Drawing.Image))
+        Me.cboNOMREPRES.Name = "cboNOMREPRES"
+        Me.cboNOMREPRES.RowDivider.Color = System.Drawing.Color.DarkGray
+        Me.cboNOMREPRES.RowDivider.Style = C1.Win.C1List.LineStyleEnum.None
+        '
+        'txvTOTAL
+        '
+        Me.txvTOTAL.Name = "txvTOTAL"
+        '
+        'tabPageTraspasoPAF
+        '
+        Me.tabPageTraspasoPAF.Name = "tabPageTraspasoPAF"
+        '
+        'tabPageVencimientos
+        '
+        Me.tabPageVencimientos.Name = "tabPageVencimientos"
+        '
+        'tabPageImpresionPAF
+        '
+        Me.tabPageImpresionPAF.Name = "tabPageImpresionPAF"
+        '
+        'tabPageRecibos
+        '
+        Me.tabPageRecibos.Name = "tabPageRecibos"
+        Me.tabPageRecibos.Controls.SetChildIndex(Me.btnGenerarRecibo, 0)
+        Me.tabPageRecibos.Controls.SetChildIndex(Me.ppFitxa, 0)
+        Me.tabPageRecibos.Controls.SetChildIndex(Me.GroupBox4, 0)
+        '
+        'tabPageConsumo
+        '
+        Me.tabPageConsumo.Name = "tabPageConsumo"
+        '
+        'gbVencimPAF
+        '
+        Me.gbVencimPAF.Name = "gbVencimPAF"
+        '
+        'gbVencim
+        '
+        Me.gbVencim.Name = "gbVencim"
+        '
+        'lblPAF
+        '
+        Me.lblPAF.Name = "lblPAF"
+        '
+        'cboTalla
+        '
+        Me.cboTalla.Images.Add(CType(resources.GetObject("resource10"), System.Drawing.Image))
+        Me.cboTalla.Name = "cboTalla"
+        Me.cboTalla.RowDivider.Color = System.Drawing.Color.DarkGray
+        Me.cboTalla.RowDivider.Style = C1.Win.C1TrueDBGrid.LineStyleEnum.Single
+        '
+        'cboTipo
+        '
+        Me.cboTipo.Images.Add(CType(resources.GetObject("resource11"), System.Drawing.Image))
+        Me.cboTipo.Name = "cboTipo"
+        Me.cboTipo.RowDivider.Color = System.Drawing.Color.DarkGray
+        Me.cboTipo.RowDivider.Style = C1.Win.C1TrueDBGrid.LineStyleEnum.Single
+        '
+        'cboMuestra2
+        '
+        Me.cboMuestra2.Images.Add(CType(resources.GetObject("resource12"), System.Drawing.Image))
+        Me.cboMuestra2.Name = "cboMuestra2"
+        Me.cboMuestra2.RowDivider.Color = System.Drawing.Color.DarkGray
+        Me.cboMuestra2.RowDivider.Style = C1.Win.C1TrueDBGrid.LineStyleEnum.Single
+        '
+        'txCFRA
+        '
+        Me.txCFRA.Name = "txCFRA"
+        '
+        'txCNOMCLIENT
+        '
+        Me.txCNOMCLIENT.Name = "txCNOMCLIENT"
+        '
+        'cboMuestra
+        '
+        Me.cboMuestra.Images.Add(CType(resources.GetObject("resource13"), System.Drawing.Image))
+        Me.cboMuestra.Name = "cboMuestra"
+        Me.cboMuestra.RowDivider.Color = System.Drawing.Color.DarkGray
+        Me.cboMuestra.RowDivider.Style = C1.Win.C1TrueDBGrid.LineStyleEnum.Single
+        '
+        'dgLineasPAFVenta
+        '
+        Me.dgLineasPAFVenta.Images.Add(CType(resources.GetObject("resource14"), System.Drawing.Image))
+        Me.dgLineasPAFVenta.Name = "dgLineasPAFVenta"
+        Me.dgLineasPAFVenta.PreviewInfo.Location = New System.Drawing.Point(0, 0)
+        Me.dgLineasPAFVenta.PreviewInfo.Size = New System.Drawing.Size(0, 0)
+        Me.dgLineasPAFVenta.PreviewInfo.ZoomFactor = 75
+        Me.dgLineasPAFVenta.RowDivider.Color = System.Drawing.Color.DarkGray
+        Me.dgLineasPAFVenta.RowDivider.Style = C1.Win.C1TrueDBGrid.LineStyleEnum.Single
+        '
+        'chkSumadoEstoc
+        '
+        Me.chkSumadoEstoc.Name = "chkSumadoEstoc"
+        '
+        'tabControlPAFVentas
+        '
+        Me.tabControlPAFVentas.Name = "tabControlPAFVentas"
+        '
+        'gb
+        '
+        Me.gb.Name = "gb"
+        '
+        'txcCLIENT
+        '
+        Me.txcCLIENT.Name = "txcCLIENT"
+        '
+        'lblDireccionDeEnvio
+        '
+        Me.lblDireccionDeEnvio.Name = "lblDireccionDeEnvio"
+        '
+        'cboDOM
+        '
+        Me.cboDOM.Images.Add(CType(resources.GetObject("resource15"), System.Drawing.Image))
+        Me.cboDOM.Name = "cboDOM"
+        Me.cboDOM.RowDivider.Color = System.Drawing.Color.DarkGray
+        Me.cboDOM.RowDivider.Style = C1.Win.C1List.LineStyleEnum.None
+        '
+        'chkCondicionFecha
+        '
+        Me.chkCondicionFecha.Name = "chkCondicionFecha"
+        '
+        'lblPedidoCliente
+        '
+        Me.lblPedidoCliente.Name = "lblPedidoCliente"
+        '
+        'txtALBCLI
+        '
+        Me.txtALBCLI.Name = "txtALBCLI"
+        '
+        'lblIVA
+        '
+        Me.lblIVA.Name = "lblIVA"
+        '
+        'dtcDATA
+        '
+        '
+        'dtcDATA.Calendar
+        '
+        Me.dtcDATA.Calendar.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.dtcDATA.Name = "dtcDATA"
+        '
+        'lblComisio
+        '
+        Me.lblComisio.Name = "lblComisio"
+        '
+        'lblTantoPorCientoDescuento
+        '
+        Me.lblTantoPorCientoDescuento.Name = "lblTantoPorCientoDescuento"
+        '
+        'lblFechaPAF
+        '
+        Me.lblFechaPAF.Name = "lblFechaPAF"
+        '
+        'lblClienteConsumos
+        '
+        Me.lblClienteConsumos.Name = "lblClienteConsumos"
+        '
+        'btnUltimo
+        '
+        Me.btnUltimo.Location = New System.Drawing.Point(372, 572)
+        Me.btnUltimo.Name = "btnUltimo"
+        '
+        'btnPrimero
+        '
+        Me.btnPrimero.Location = New System.Drawing.Point(70, 572)
+        Me.btnPrimero.Name = "btnPrimero"
+        '
+        'cboSeleccionCentro
+        '
+        Me.cboSeleccionCentro.Location = New System.Drawing.Point(832, 5)
+        Me.cboSeleccionCentro.Name = "cboSeleccionCentro"
+        '
+        'sbtipo
+        '
+        Me.sbtipo.FlatStyle = System.Windows.Forms.FlatStyle.System
+        Me.sbtipo.Location = New System.Drawing.Point(5, 592)
+        Me.sbtipo.Name = "sbtipo"
+        '
+        'btnVerLista
+        '
+        Me.btnVerLista.Location = New System.Drawing.Point(901, 572)
+        Me.btnVerLista.Name = "btnVerLista"
+        '
+        'btnActualizar
+        '
+        Me.btnActualizar.Location = New System.Drawing.Point(102, 572)
+        Me.btnActualizar.Name = "btnActualizar"
+        '
+        'btnAnterior
+        '
+        Me.btnAnterior.Location = New System.Drawing.Point(70, 592)
+        Me.btnAnterior.Name = "btnAnterior"
+        '
+        'btnRecargar
+        '
+        Me.btnRecargar.Location = New System.Drawing.Point(102, 592)
+        Me.btnRecargar.Name = "btnRecargar"
+        '
+        'btnNuevo
+        '
+        Me.btnNuevo.Location = New System.Drawing.Point(290, 572)
+        Me.btnNuevo.Name = "btnNuevo"
+        '
+        'btnBorrar
+        '
+        Me.btnBorrar.Location = New System.Drawing.Point(192, 592)
+        Me.btnBorrar.Name = "btnBorrar"
+        '
+        'btnTancar
+        '
+        Me.btnTancar.Location = New System.Drawing.Point(901, 592)
+        Me.btnTancar.Name = "btnTancar"
+        '
+        'btnModificar
+        '
+        Me.btnModificar.Location = New System.Drawing.Point(192, 572)
+        Me.btnModificar.Name = "btnModificar"
+        '
+        'btnSiguiente
+        '
+        Me.btnSiguiente.Location = New System.Drawing.Point(372, 592)
+        Me.btnSiguiente.Name = "btnSiguiente"
+        '
+        'frmVentaFacturaProforma
+        '
+        Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
+        Me.ClientSize = New System.Drawing.Size(992, 618)
+        Me.Name = "frmVentaFacturaProforma"
+        Me.Text = "Factura Proforma"
+        CType(Me.cboKM, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.dgConsumos, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.txtP_DTE, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.txtBASE1, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.txtBRUT1, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.txtIVA1, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.txtDTE1, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.txtRE1, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.cboSeleccionClienteParaPAF, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.cboFRA, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.txtCOMIS, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.dtpAFechaRecibo, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.dtpDeFechaRecibo, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.cboAFacturaRecibo, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.cboColor, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.cboDeFacuraRecibo, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.txtCLIENT, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.cboNOMCLIENT, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.txtTOTAL, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.dtpDATA, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.txtREPRES, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.ppFitxa, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.txtOBSERV, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.cboNOMREPRES, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.txvTOTAL, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.tabPageRecibos.ResumeLayout(False)
+        CType(Me.cboTalla, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.cboTipo, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.cboMuestra2, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.txCFRA, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.txCNOMCLIENT, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.cboMuestra, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.dgLineasPAFVenta, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.txcCLIENT, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.cboDOM, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.txtALBCLI, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.dtcDATA, System.ComponentModel.ISupportInitialize).EndInit()
+
+    End Sub
+
+#End Region
+
+    Shared frmChildForm As frmVentaFacturaProforma
+    Public Shared Function GetInstance() As frmVentaFacturaProforma
+        If frmChildForm Is Nothing Then
+            frmChildForm = New frmVentaFacturaProforma
+
+        End If
+        Return frmChildForm
+    End Function
+
+    Private Sub IniciarForm(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
+        Cursor = Cursors.WaitCursor
+        Try
+            cargando = True
+            tabla = tablaVentas
+            IniciarDocumento(Proforma)
+            cargando = False
+            PonerHandlersErroresParaGrids()
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+        Cursor = Cursors.Default
+    End Sub
+
+End Class

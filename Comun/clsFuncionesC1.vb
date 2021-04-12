@@ -1,0 +1,499 @@
+Imports clsFuncionesLOG
+Imports clsFuncionesUtiles
+
+Public Class clsFuncionesC1
+
+
+    'Private Sub esEntero(ByVal sender As Object, ByVal e As System.EventArgs)
+    '    Try
+    '        If Not HaciendoFormatBinding Then
+    '            With DirectCast(sender, C1.Win.C1Input.C1TextBox)
+    '                If .Text.Length <> 0 Then
+    '                    If .Text.LastIndexOf(".") <> -1 Then
+    '                        .Text = .Text.Substring(0, .Text.Length - 1)
+    '                        .Select(.TextLength, 0)
+    '                        Return
+    '                    End If
+    '                    If .Text.LastIndexOf(",") <> -1 Then
+    '                        .Text = .Text.Substring(0, .Text.Length - 1)
+    '                        .Select(.TextLength, 0)
+    '                        Return
+    '                    End If
+    '                    If Not IsNumeric(.Text) Then
+    '                        .Text = .Text.Substring(0, .Text.Length - 1)
+    '                        .Select(.TextLength, 0)
+    '                        Return
+    '                    End If
+    '                End If
+    '            End With
+    '        End If
+
+    '    Catch ex As Exception
+    '        clsFuncionesLOG.LOG(ex.ToString) : CCN()
+    '    End Try
+    'End Sub
+    'Private Sub esDoble(ByVal sender As Object, ByVal e As System.EventArgs)
+    '    Try
+    '        If Not HaciendoFormatBinding Then
+    '            With DirectCast(sender, C1.Win.C1Input.C1TextBox)
+    '                If .Text.Length <> 0 Then
+    '                    If .Text.LastIndexOf(".") <> -1 Then
+    '                        .Text = .Text.Replace(".", ",")
+    '                        .Select(.TextLength, 0)
+    '                        Return
+    '                    End If
+    '                    'If .Text.IndexOf("-", 1) <> -1 Then
+    '                    '    Dim T As String
+    '                    '    T = .Text.Substring(
+
+    '                    '    .Text = .Text.Replace("-", "")
+    '                    '    .Select(.TextLength, 0)
+    '                    '    Return
+    '                    'End If
+
+    '                    'If .Text.Substring(0, 1) = "-" AndAlso .Text.Length = 1 Then
+    '                    '    Return
+    '                    'End If
+    '                    'If (.Text.Substring(0, 1) = "-" AndAlso IsNumeric(.Text.Substring(1, .Text.Length - 1))) Then
+    '                    '    Return
+    '                    'End If
+    '                    'If Not IsNumeric(.Text) Then
+    '                    '    .Text = .Text.Substring(0, .Text.Length - 1)
+    '                    '    .Select(.TextLength, 0)
+    '                    '    Return
+    '                    'End If
+    '                End If
+    '            End With
+    '        End If
+
+    '    Catch ex As Exception
+    '        clsFuncionesLOG.LOG(ex.ToString) : CCN()
+    '    End Try
+    'End Sub
+    'Sub ForzarTextBoxDoble(ByVal ctl As C1.Win.C1Input.C1TextBox)
+    '    Try
+    '        AddHandler ctl.TextChanged, AddressOf esDoble
+    '    Catch ex As Exception
+    '        clsFuncionesLOG.LOG(ex.ToString) : CCN()
+    '    End Try
+    'End Sub
+    'Sub ForzarTextBoxEntero(ByVal ctl As C1.Win.C1Input.C1TextBox)
+    '    Try
+    '        AddHandler ctl.TextChanged, AddressOf esEntero
+    '    Catch ex As Exception
+    '        clsFuncionesLOG.LOG(ex.ToString) : CCN()
+    '    End Try
+    'End Sub
+    Shared Sub PonerVisibleColumnaCBO(ByRef cbo As C1.Win.C1List.C1Combo, ByVal nom As String, ByVal orden As Integer)
+        Dim dc As C1.Win.C1List.C1DisplayColumn
+
+        Try
+            dc = cbo.Splits(0).DisplayColumns(nom)
+
+            cbo.Splits(0).DisplayColumns.RemoveAt(cbo.Splits(0).DisplayColumns.IndexOf(dc))
+            cbo.Splits(0).DisplayColumns.Insert(orden, dc)
+            cbo.Splits(0).DisplayColumns(nom).Visible = True
+
+        Catch ex As Exception
+            clsFuncionesLOG.LOG(ex.ToString) : CCN()
+        End Try
+    End Sub
+    Shared Sub PonerVisibleColumnaTrueDropDown(ByRef cbo As C1.Win.C1TrueDBGrid.C1TrueDBDropdown, ByVal nom As String, ByVal orden As Integer)
+        Dim dc As C1.Win.C1TrueDBGrid.C1DisplayColumn
+
+        Try
+            dc = cbo.DisplayColumns(nom)
+
+            cbo.DisplayColumns.RemoveAt(cbo.DisplayColumns.IndexOf(dc))
+            cbo.DisplayColumns.Insert(orden, dc)
+            cbo.DisplayColumns(nom).Visible = True
+
+        Catch ex As Exception
+            clsFuncionesLOG.LOG(ex.ToString) : CCN()
+        End Try
+    End Sub
+
+    Shared Sub OcultarTodasColumnaCbo(ByVal cbo As C1.Win.C1List.C1Combo)
+        Dim i As Integer
+        Try
+            For i = 0 To cbo.Splits(0).DisplayColumns.Count - 1
+                If cbo.Splits(0).DisplayColumns(i).Name <> "NOM" AndAlso cbo.Splits(0).DisplayColumns(i).Name <> "CODI" Then
+                    cbo.Splits(0).DisplayColumns(i).Visible = False
+                End If
+            Next
+            AutosizeColumnasCombo(cbo)
+
+        Catch ex As Exception
+            clsFuncionesLOG.LOG(ex.ToString) : CCN()
+        End Try
+
+    End Sub
+    Shared Sub OcultarTodasColumnaCbo(ByVal cbo As C1.Win.C1TrueDBGrid.C1TrueDBDropdown)
+        Dim i As Integer
+        Try
+            For i = 0 To cbo.DisplayColumns.Count - 1
+                If cbo.DisplayColumns(i).Name <> "NOM" AndAlso cbo.DisplayColumns(i).Name <> "CODI" Then
+                    cbo.DisplayColumns(i).Visible = False
+                End If
+            Next
+            'AutosizeColumnasCombo(cbo)
+
+        Catch ex As Exception
+            clsFuncionesLOG.LOG(ex.ToString) : CCN()
+        End Try
+
+    End Sub
+    'Funcion que oculta o muestra las columnas de un C1Combo, además hace autosize de las columnas
+    Shared Sub OcultarMostrarColumnaCbo(ByRef cbo As C1.Win.C1List.C1Combo, ByVal nombreColumna As String, ByVal esVisible As Boolean)
+        Try
+            Try
+                cbo.Splits(0).DisplayColumns(nombreColumna).Visible = esVisible
+            Catch ex As Exception
+                'clsFuncionesLOG.LOG(ex.ToString)
+            End Try
+
+            AutosizeColumnasCombo(cbo)
+
+        Catch ex As Exception
+            clsFuncionesLOG.LOG(ex.ToString) : CCN()
+        End Try
+    End Sub
+    'Funcion que oculta o muestra las columnas de un C1Combo, además hace autosize de las columnas
+    Shared Sub OcultarMostrarColumnaCbo(ByRef cbo As C1.Win.C1List.C1List, ByVal nombreColumna As String, ByVal esVisible As Boolean)
+        Try
+            Try
+                '!!!!
+                If Not cbo.Splits(0).DisplayColumns.Item(nombreColumna) Is Nothing Then
+                    cbo.Splits(0).DisplayColumns(nombreColumna).Visible = esVisible
+                End If
+            Catch ex As Exception
+                'clsFuncionesLOG.LOG(ex.ToString)
+            End Try
+
+            AutosizeColumnasCombo(cbo)
+
+        Catch ex As Exception
+            clsFuncionesLOG.LOG(ex.ToString) : CCN()
+        End Try
+    End Sub
+    'Funcion que oculta o muestra las columnas de un C1Combo, además hace autosize de las columnas
+    Shared Sub OcultarMostrarColumnaCbo(ByVal cbo As C1.Win.C1List.C1Combo, ByVal nombreColumna As String, ByVal NOMBRECOLUMNA2 As String, ByVal esVisible As Boolean)
+        Try
+            cbo.Splits(0).DisplayColumns(nombreColumna).Visible = esVisible
+            cbo.Splits(0).DisplayColumns(NOMBRECOLUMNA2).Visible = esVisible
+            AutosizeColumnasCombo(cbo)
+
+        Catch ex As Exception
+            clsFuncionesLOG.LOG(ex.ToString) : CCN()
+        End Try
+    End Sub
+    Shared Sub OcultarMostrarColumnaCbo(ByRef cbo As C1.Win.C1TrueDBGrid.C1TrueDBDropdown, ByVal nombreColumna As String, ByVal esVisible As Boolean)
+        Try
+            AutosizeColumnasTrueDBDropdown(cbo)
+            cbo.DisplayColumns(nombreColumna).Visible = esVisible
+
+        Catch ex As Exception
+            If nombreColumna = "CENTRO" Then
+                'clsFuncionesLOG.LOG(ex.ToString, True)
+            Else
+                clsFuncionesLOG.LOG(ex.ToString)
+            End If
+            CCN()
+        End Try
+    End Sub
+    Shared Sub OcultarColumnaDropDown(ByVal cbo As C1.Win.C1TrueDBGrid.C1TrueDBDropdown)
+        Dim i As Integer
+        Try
+            For i = 0 To cbo.DisplayColumns.Count - 1
+                cbo.DisplayColumns(i).Visible = False
+            Next
+
+        Catch ex As Exception
+            clsFuncionesLOG.LOG(ex.ToString) : CCN()
+        End Try
+    End Sub
+    Shared Sub OcultarColumnasDG(ByVal dg As C1.Win.C1TrueDBGrid.C1TrueDBGrid)
+        Dim j, i As Integer
+        Try
+            For j = 0 To dg.Splits.Count - 1
+                For i = 0 To dg.Splits(j).DisplayColumns.Count - 1
+                    dg.Splits(j).DisplayColumns(i).Visible = False
+                Next
+            Next
+
+        Catch ex As Exception
+            clsFuncionesLOG.LOG(ex.ToString) : CCN()
+        End Try
+    End Sub
+    Shared Function NumeroFilas2(ByVal dg As C1.Win.C1TrueDBGrid.C1TrueDBGrid) As Integer
+        Dim numRows As Integer
+        Try
+            numRows = dg.BindingContext(dg.DataSource, dg.DataMember).Count
+            Return numRows
+
+        Catch ex As Exception
+            clsFuncionesLOG.LOG(ex.ToString) : CCN()
+        End Try
+    End Function
+    Shared Sub autosizeDropDown(ByVal dc As C1.Win.C1TrueDBGrid.C1DisplayColumnCollection)
+        Dim i As Integer
+        Try
+            For i = 0 To dc.Count - 1
+                dc(i).AutoSize()
+            Next
+
+        Catch ex As Exception
+            clsFuncionesLOG.LOG(ex.ToString) : CCN()
+        End Try
+    End Sub
+
+    Public Shared Sub PPCol2(ByRef nombre As String, _
+                        ByRef dg As C1.Win.C1TrueDBGrid.C1TrueDBGrid, _
+                        ByVal caption As String, _
+                        ByVal formatonumero As String, _
+                        ByVal visible As Boolean, _
+                        ByVal minWidth As Integer, _
+                        ByVal autosize As Boolean, _
+                        ByRef presentacion As C1.Win.C1TrueDBGrid.PresentationEnum, _
+                        ByVal boton As Boolean, _
+                        ByVal ancho As Integer, _
+                        ByVal orden As Integer, _
+                        ByVal permitirDimensionar As Boolean, _
+                        Optional ByVal truedrop As C1.Win.C1TrueDBGrid.C1TrueDBDropdown = Nothing, _
+                        Optional ByVal editable As Boolean = True, _
+                        Optional ByVal split As Integer = 0, _
+                        Optional ByVal alineacion As C1.Win.C1TrueDBGrid.AlignHorzEnum = C1.Win.C1TrueDBGrid.AlignHorzEnum.Justify, _
+                        Optional ByVal estilo As C1.Win.C1TrueDBGrid.Style = Nothing, _
+                        Optional ByVal expresionRegularEstilo As String = "")
+
+        Dim dc As C1.Win.C1TrueDBGrid.C1DisplayColumn
+        Dim cd1 As C1.Win.C1TrueDBGrid.C1DisplayColumn
+        Try
+            If caption Is Nothing Then caption = ""
+
+            dc = dg.Splits(0).DisplayColumns.Item(nombre)
+
+            dc.AutoComplete = True
+            If Not orden = -1 Then
+                dg.Splits(0).DisplayColumns.RemoveAt(dg.Splits(0).DisplayColumns.IndexOf(dc))
+                dg.Splits(split).DisplayColumns.Insert(orden, dc)
+            End If
+
+            cd1 = dg.Splits(split).DisplayColumns(nombre)
+            cd1.Visible = visible
+            If dg.DataSource.GetType.ToString = "System.Data.DataView" Then
+                If DirectCast(dg.DataSource, DataView).Table.Columns(nombre).MaxLength > 0 Then
+                    cd1.DataColumn.DataWidth = DirectCast(dg.DataSource, DataView).Table.Columns(nombre).MaxLength
+                End If
+            End If
+            cd1.AllowFocus = editable
+            If Not editable Then
+                cd1.Style.BackColor = System.Drawing.Color.LightGray
+            Else
+                cd1.Style.BackColor = System.Drawing.Color.White
+            End If
+            'cd1.DataColumn.FilterMultiSelect = True
+            If Not truedrop Is Nothing Then
+                cd1.DataColumn.DropDown = truedrop
+                cd1.DataColumn.DropDown.AllowColMove = False
+
+                'cd1.AllowFocus = editable
+                autosizeDropDown(cd1.DataColumn.DropDown.DisplayColumns)
+            Else
+                cd1.DataColumn.ValueItems.Presentation = presentacion
+                If presentacion = C1.Win.C1TrueDBGrid.PresentationEnum.CheckBox Then
+                    cd1.Style.HorizontalAlignment = C1.Win.C1TrueDBGrid.AlignHorzEnum.Center
+                Else
+                    cd1.Style.HorizontalAlignment = alineacion
+                End If
+            End If
+
+            cd1.OwnerDraw = True
+
+            If autosize Then : cd1.AutoSize() : End If
+
+            cd1.ButtonText = boton
+            cd1.HeadingStyle.HorizontalAlignment = C1.Win.C1TrueDBGrid.AlignHorzEnum.Center
+            If boton Then cd1.ButtonAlways = True
+            cd1.MinWidth = ancho
+            cd1.Width = ancho
+            cd1.AllowSizing = permitirDimensionar
+            cd1.DataColumn.Caption = caption
+            cd1.Style.WrapText = True
+            ' cd1.FetchStyle = True
+            If Not estilo Is Nothing Then dc.AddRegexCellStyle(C1.Win.C1TrueDBGrid.CellStyleFlag.AllCells, estilo, expresionRegularEstilo)
+
+            If Not formatonumero = "" Then
+                cd1.DataColumn.NumberFormat = formatonumero
+            End If
+
+        Catch ex As Exception
+            clsFuncionesLOG.LOG(ex.ToString) : CCN() : Throw ex
+        End Try
+    End Sub
+    Shared Sub PPCol(ByRef c As C1.Win.C1TrueDBGrid.C1DisplayColumn, ByVal caption As String, Optional ByVal formatonumero As String = "", Optional ByVal visible As Boolean = True, Optional ByVal minWidth As Integer = 0, Optional ByVal autosize As Boolean = False, Optional ByVal orden As Integer = -1, Optional ByVal dg As C1.Win.C1TrueDBGrid.C1TrueDBGrid = Nothing)
+        Dim dc As C1.Win.C1TrueDBGrid.C1DisplayColumn
+        Try
+            c.Visible = visible
+            c.MinWidth = minWidth
+            If caption Is Nothing Then caption = "€€€"
+
+            If autosize Then
+                c.AutoSize()
+            End If
+            c.DataColumn.Caption = caption
+            If Not formatonumero = "" Then
+                c.DataColumn.NumberFormat = formatonumero
+            End If
+            If Not orden = -1 Then
+                dc = c
+                dg.Splits(0).DisplayColumns.RemoveAt(dg.Splits(0).DisplayColumns.IndexOf(dc))
+                dg.Splits(0).DisplayColumns.Insert(orden, dc)
+            End If
+
+        Catch ex As Exception
+            clsFuncionesLOG.LOG(ex.ToString) : CCN()
+        End Try
+    End Sub
+    Shared Function esGrupoOCombo(ByVal tipo As String)
+        Try
+            Return tipo = "System.Windows.Forms.Form+ControlCollection" Or _
+                        tipo = "System.Windows.Forms.GroupBox" Or _
+                        tipo = "System.Windows.Forms.TabControl" Or _
+                        tipo = "C1.Win.C1List.C1Combo"
+
+        Catch ex As Exception
+            clsFuncionesLOG.LOG(ex.ToString) : Throw ex
+        End Try
+    End Function
+    Shared Sub AutoSizeCC(ByVal cbo As Object)
+        'Se recorre todos los cbo que encuetre y los autosize
+        Dim i, j As Integer
+        Try
+            If cbo.GetType.ToString = "System.Windows.Forms.GroupBox" Then
+                For i = 0 To CType(cbo, System.Windows.Forms.GroupBox).Controls.Count - 1
+                    If esGrupoOCombo(cbo.Controls(i).GetType.ToString) Then
+                        AutoSizeCC(cbo.Controls(i))
+                    End If
+                Next
+            End If
+            If cbo.GetType.ToString = "System.Windows.Forms.TabPage" Then
+                For i = 0 To CType(cbo, System.Windows.Forms.TabPage).Controls.Count - 1
+                    AutoSizeCC(cbo.Controls(i))
+                Next
+            End If
+            If cbo.GetType.ToString = "System.Windows.Forms.TabControl" Then
+                For i = 0 To CType(cbo, System.Windows.Forms.TabControl).TabCount - 1
+                    For j = 0 To CType(cbo, System.Windows.Forms.TabControl).TabPages.Count - 1
+                        AutoSizeCC(CType(cbo, System.Windows.Forms.TabControl).TabPages(i))
+                    Next
+                Next
+            End If
+            If cbo.GetType.ToString = "C1.Win.C1TrueDBGrid.C1TrueDBDropdown" Then
+                AutosizeColumnasTrueDBDropdown(cbo)
+            End If
+            If cbo.GetType.ToString = "C1.Win.C1List.C1Combo" Then
+                AutosizeColumnasCombo(cbo)
+            End If
+            If cbo.GetType.ToString = "System.Windows.Forms.Form+ControlCollection" Then
+                For i = 0 To cbo.count - 1
+                    If cbo(i).GetType.ToString = "C1.Win.C1List.C1Combo" Then
+                        AutosizeColumnasCombo(cbo(i))
+                    End If
+                    If cbo(i).GetType.ToString = "System.Windows.Forms.GroupBox" Then
+                        AutoSizeCC(cbo(i))
+                    End If
+                    If cbo(i).GetType.ToString = "System.Windows.Forms.TabControl" Then
+                        AutoSizeCC(cbo(i))
+                    End If
+                Next
+            End If
+            If cbo.GetType.ToString = "C1.Win.C1TrueDBGrid.C1TrueDBGrid" Then
+                With DirectCast(cbo, C1.Win.C1TrueDBGrid.C1TrueDBGrid)
+                    For i = 0 To .Splits(0).DisplayColumns.Count - 1
+                        .Splits(0).DisplayColumns(i).AutoSize()
+                        If .Splits(0).DisplayColumns(i).Width < .Splits(0).DisplayColumns(i).MinWidth Then
+                            .Splits(0).DisplayColumns(i).Width = .Splits(0).DisplayColumns(i).MinWidth
+                        End If
+                        If .Splits(0).DisplayColumns(i).DataColumn.NumberFormat <> "" Then
+                            .Splits(0).DisplayColumns(i).Width = .Splits(0).DisplayColumns(i).Width + 10
+                        End If
+                    Next
+                End With
+            End If
+            If cbo.GetType.ToString = "C1.Win.C1List.C1List" Then
+                With DirectCast(cbo, C1.Win.C1List.C1List)
+                    For i = 0 To .Splits(0).DisplayColumns.Count - 1
+                        .Splits(0).DisplayColumns(i).AutoSize()
+                        If .Splits(0).DisplayColumns(i).Width < .Splits(0).DisplayColumns(i).MinWidth Then
+                            .Splits(0).DisplayColumns(i).Width = .Splits(0).DisplayColumns(i).MinWidth
+                        End If
+                        If .Splits(0).DisplayColumns(i).DataColumn.NumberFormat <> "" Then
+                            .Splits(0).DisplayColumns(i).Width = .Splits(0).DisplayColumns(i).Width + 10
+                        End If
+                    Next
+                End With
+            End If
+        Catch ex As Exception
+            clsFuncionesLOG.LOG(ex.ToString) : CCN()
+        End Try
+    End Sub
+    Shared Sub AutosizeColumnasCombo(ByRef cbo As Object)
+        Dim i As Integer
+        Dim tam As Integer = 0
+        Try
+            Select Case cbo.GetType.ToString
+                Case "C1.Win.C1List.C1Combo"
+                    With DirectCast(cbo, C1.Win.C1List.C1Combo)
+                        For i = 0 To .Splits(0).DisplayColumns.Count - 1
+                            If .Splits(0).DisplayColumns(i).Visible = True Then
+                                .Splits(0).DisplayColumns(i).AutoSize()
+                                tam = tam + .Splits(0).DisplayColumns(i).Width
+                            End If
+                        Next
+                    End With
+                Case "C1.Win.C1TrueDBGrid.C1TrueDBDropdown"
+                    'With DirectCast(cbo, C1.Win.C1TrueDBGrid.C1TrueDBDropdown)
+                    '    For i = 0 To .Splits(0).DisplayColumns.Count - 1
+                    '        If .Splits(0).DisplayColumns(i).Visible = True Then
+                    '            .Splits(0).DisplayColumns(i).AutoSize()
+                    '            tam = tam + .Splits(0).DisplayColumns(i).Width
+                    '        End If
+                    '    Next
+                    'End With
+            End Select
+
+            'Esto es para el tamaño del dropdown
+            If Not cbo.GetType.ToString = "C1.Win.C1List.C1List" Then
+                With DirectCast(cbo, C1.Win.C1List.C1Combo)
+                    .DropDownWidth = tam + 25
+                    .DropdownPosition = C1.Win.C1List.DropdownPositionEnum.LeftDown
+                End With
+            End If
+
+        Catch ex As Exception
+            clsFuncionesLOG.LOG(ex.ToString) : CCN()
+        End Try
+    End Sub
+    Shared Sub AutosizeColumnasTrueDBDropdown(ByRef cbo As C1.Win.C1TrueDBGrid.C1TrueDBDropdown)
+        Dim i As Integer
+        Dim tam As Integer
+        Try
+
+            For i = 0 To cbo.DisplayColumns.Count - 1
+                If cbo.DisplayColumns(i).Visible = True Then
+                    cbo.DisplayColumns(i).AutoSize()
+                    If cbo.DisplayColumns(i).Width = 0 Then
+                        cbo.DisplayColumns(i).Width = cbo.DisplayColumns(i).MinWidth
+                    End If
+                    tam = tam + cbo.DisplayColumns(i).Width
+                End If
+            Next
+            cbo.Width = tam + 25
+        Catch ex As Exception
+            clsFuncionesLOG.LOG(ex.ToString) : CCN()
+        End Try
+    End Sub
+
+
+End Class

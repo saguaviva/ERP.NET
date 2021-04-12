@@ -1,0 +1,3629 @@
+Imports MySql.Data.MySqlClient : Imports clsFuncionesLOG : Imports clsFuncionesC1 : Imports clsFuncionesUtiles : Imports clsConstantes : Imports clsOtrasFunciones
+Imports Excel = Microsoft.Office.Interop.Excel
+
+Public Class clsPAFVenta
+    Inherits clsADO
+
+#Region "VARIABLES"
+
+    Friend PAFDestino As clsPAFCompra
+    Friend PCompraHilo As clsPAFCompra
+    Friend lineasVenta As clsLineasVenta
+    Friend vencimientos As clsVencimientos
+    Friend documento As String
+    'Ahora que estan agrupadas las facturas hay que poner el tipo para las prendas
+    Friend tipo As String
+    Friend IDCliente As Integer = -1
+    'Para el traspaso
+    Public dtTraspaso As New DataTable
+    Public dvTraspaso As New DataView
+    Public detalleImpresion As clsImpresionVenta
+    Public detalleImpresion2 As clsImpresionVenta2
+
+    Public mClienteSel As Integer = -1
+    Private colorIndexCentro As Integer
+    Public dtDireccionesEnvio As DataTable
+
+    Friend dtRepres As New DataTable("REPRES")
+    Friend dtclients As New DataTable("CLIENTS")
+    Friend dtBancs As New DataTable("BANCS")
+    Friend dtForpag As New DataTable("FORPAG")
+    Public dtColoresPrendas As New DataTable
+    Friend dtClientConPAF As New DataTable
+    'Friend dtTeixits As New DataTable("TEIXITS") '!!!!!! Quien la carga??
+
+#End Region
+
+#Region "CAMPOS"
+
+    '+--------------+-----------------------+------+-----+---------+-------+
+    '| Field        | Type                  | Null | Key | Default | Extra |
+    '+--------------+-----------------------+------+-----+---------+-------+
+    '| TIPUS        | char(1)               | NO   | PRI |         |       |
+    '| DOCUMENT     | char(1)               | NO   | PRI |         |       |
+    '| FRA          | int(11)               | NO   | PRI | 0       |       |
+    '| CLIENT       | int(11)               | YES  |     | NULL    |       |
+    '| DATA         | date                  | YES  |     | NULL    |       |
+    '| BASE1        | double                | YES  |     | NULL    |       |
+    '| P_IVA1       | double                | YES  |     | NULL    |       |
+    '| IVA1         | double                | YES  |     | NULL    |       |
+    '| TOTAL        | double                | YES  |     | NULL    |       |
+    '| P_DTE        | double                | YES  |     | NULL    |       |
+    '| DTE1         | double                | YES  |     | NULL    |       |
+    '| BRUT1        | double                | YES  |     | NULL    |       |
+    '| TRASPAS      | char(1)               | YES  |     | NULL    |       |
+    '| P_RE1        | double                | YES  |     | NULL    |       |
+    '| RE1          | double                | YES  |     | NULL    |       |
+    '| VENCIM       | char(1)               | YES  |     | NULL    |       |
+    '| TRASPASF     | tinyint(1)            | YES  |     | NULL    |       |
+    '| OBSERV       | mediumtext            | YES  |     | NULL    |       |
+    '| REPRES       | int(11)               | YES  |     | NULL    |       |
+    '| COMIS        | double                | YES  |     | NULL    |       |
+    '| CENTRO       | char(1)               | NO   | PRI | C       |       |
+    '| ORDRE        | double(15,0) unsigned | YES  |     | NULL    |       |
+    '| PREU         | double(15,3)          | YES  |     | NULL    |       |
+    '| ALBCLI       | varchar(255)          | YES  |     | NULL    |       |
+    '| TALLA01      | char(3)               | YES  |     | NULL    |       |
+    '| TALLA02      | char(3)               | YES  |     | NULL    |       |
+    '| TALLA03      | char(3)               | YES  |     | NULL    |       |
+    '| TALLA04      | char(3)               | YES  |     | NULL    |       |
+    '| TALLA05      | char(3)               | YES  |     | NULL    |       |
+    '| TALLA06      | char(3)               | YES  |     | NULL    |       |
+    '| TALLA07      | char(3)               | YES  |     | NULL    |       |
+    '| TALLA08      | char(3)               | YES  |     | NULL    |       |
+    '| TALLA09      | char(3)               | YES  |     | NULL    |       |
+    '| TALLA10      | char(3)               | YES  |     | NULL    |       |
+    '| MODEL        | varchar(10)           | YES  |     | NULL    |       |
+    '| SERIE        | varchar(10)           | YES  |     | NULL    |       |
+    '| EXPEDICIO    | double(15,3)          | YES  |     | NULL    |       |
+    '| TEMPORADA    | varchar(15)           | YES  |     | NULL    |       |
+    '| OBSERVOCULTA | mediumtext            | YES  |     | NULL    |       |
+    '+-----------+-----------------------+------+-----+---------+-------+
+    '38 rows
+    Private mTIPUS As String
+    Public Property TIPUS() As String
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mTIPUS = general.nz(dvForm(PA).Row("TIPUS"), "")
+            Catch ex As Exception : End Try
+            Return general.nz(mTIPUS, "")
+        End Get
+        Set(ByVal Value As String)
+            If PA() = -1 Then Exit Property
+            If general.nz(Value, "") <> general.nz(TIPUS, "") Then
+                mTIPUS = general.nz(Value, "")
+                dvForm(PA).Row("TIPUS") = general.nz(mTIPUS, "") : guardarDV()
+            End If
+        End Set
+    End Property
+
+    Private mincoterm As String
+    Public Property incoterm() As String
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mincoterm = general.nz(dvForm(PA).Row("incoterm"), "")
+            Catch ex As Exception : End Try
+            Return general.nz(mincoterm, "")
+        End Get
+        Set(ByVal Value As String)
+            If PA() = -1 Then Exit Property
+            If general.nz(Value, "") <> general.nz(incoterm, "") Then
+                mincoterm = general.nz(Value, "")
+                dvForm(PA).Row("incoterm") = general.nz(mincoterm, "") : guardarDV()
+            End If
+        End Set
+    End Property
+
+    Private msemanas As String
+    Public Property semanas() As String
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                msemanas = general.nz(dvForm(PA).Row("semanas"), "")
+            Catch ex As Exception : End Try
+            Return general.nz(msemanas, "")
+        End Get
+        Set(ByVal Value As String)
+            If PA() = -1 Then Exit Property
+            If general.nz(Value, "") <> general.nz(semanas, "") Then
+                msemanas = general.nz(Value, "")
+                dvForm(PA).Row("semanas") = general.nz(msemanas, "") : guardarDV()
+            End If
+        End Set
+    End Property
+
+    Private mDOM As String
+    Public Property DOM() As String
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mDOM = general.nz(dvForm(PA).Row("DOM"), "")
+            Catch ex As Exception : End Try
+            Return general.nz(mDOM, "")
+        End Get
+        Set(ByVal Value As String)
+            If PA() = -1 Then Exit Property
+            If general.nz(Value, "") <> general.nz(DOM, "") Then
+                mDOM = general.nz(Value, "")
+                dvForm(PA).Row("DOM") = general.nz(mDOM, "") : guardarDV()
+            End If
+        End Set
+    End Property
+
+    Private mBANCO As String
+    Public Property BANCO() As String
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mBANCO = general.nz(dvForm(PA).Row("BANCO"), "")
+            Catch ex As Exception : End Try
+            Return general.nz(mBANCO, "")
+        End Get
+        Set(ByVal Value As String)
+            If PA() = -1 Then Exit Property
+            If general.nz(Value, "") <> general.nz(BANCO, "") Then
+                mBANCO = general.nz(Value, "")
+                dvForm(PA).Row("BANCO") = general.nz(mBANCO, "") : guardarDV()
+            End If
+        End Set
+    End Property
+
+    Private mDOM2 As String
+    Public Property DOM2() As String
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mDOM2 = general.nz(dvForm(PA).Row("DOM2"), "")
+            Catch ex As Exception : End Try
+            Return general.nz(mDOM2, "")
+        End Get
+        Set(ByVal Value As String)
+            If PA() = -1 Then Exit Property
+            If general.nz(Value, "") <> general.nz(DOM2, "") Then
+                mDOM2 = general.nz(Value, "")
+                dvForm(PA).Row("DOM2") = general.nz(mDOM2, "") : guardarDV()
+            End If
+        End Set
+    End Property
+
+    Private mPROV As String
+    Public Property PROV() As String
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mPROV = general.nz(dvForm(PA).Row("PROV"), "")
+            Catch ex As Exception : End Try
+            Return general.nz(mPROV, "")
+        End Get
+        Set(ByVal Value As String)
+            If PA() = -1 Then Exit Property
+            If general.nz(Value, "") <> general.nz(PROV, "") Then
+                mPROV = general.nz(Value, "")
+                dvForm(PA).Row("PROV") = general.nz(mPROV, "") : guardarDV()
+            End If
+        End Set
+    End Property
+
+    Private mPOB As String
+    Public Property POB() As String
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mPOB = general.nz(dvForm(PA).Row("POB"), "")
+            Catch ex As Exception : End Try
+            Return general.nz(mPOB, "")
+        End Get
+        Set(ByVal Value As String)
+            If PA() = -1 Then Exit Property
+            If general.nz(Value, "") <> general.nz(POB, "") Then
+                mPOB = general.nz(Value, "")
+                dvForm(PA).Row("POB") = general.nz(mPOB, "") : guardarDV()
+            End If
+        End Set
+    End Property
+
+    Private mPAIS As String
+    Public Property PAIS() As String
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mPAIS = general.nz(dvForm(PA).Row("PAIS"), "")
+            Catch ex As Exception : End Try
+            Return general.nz(mPAIS, "")
+        End Get
+        Set(ByVal Value As String)
+            If PA() = -1 Then Exit Property
+            If general.nz(Value, "") <> general.nz(PAIS, "") Then
+                mPAIS = general.nz(Value, "")
+                dvForm(PA).Row("PAIS") = general.nz(mPAIS, "") : guardarDV()
+            End If
+        End Set
+    End Property
+
+    Private mDOCUMENT As String
+    Public Property DOCUMENT() As String
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mDOCUMENT = general.nz(dvForm(PA).Row("DOCUMENT"), "")
+            Catch ex As Exception : End Try
+            Return general.nz(mDOCUMENT, "")
+        End Get
+        Set(ByVal Value As String)
+            If PA() = -1 Then Exit Property
+            If general.nz(Value, "") <> general.nz(DOCUMENT, "") Then
+                mDOCUMENT = general.nz(Value, "")
+                dvForm(PA).Row("DOCUMENT") = general.nz(mDOCUMENT, "") : guardarDV()
+            End If
+        End Set
+    End Property
+
+    Private mFRA As Integer
+    Public Property FRA() As Integer
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mFRA = nzn(dvForm(PA).Row("FRA"), 0)
+            Catch ex As Exception : End Try
+            Return nzn(mFRA, 0)
+        End Get
+        Set(ByVal Value As Integer)
+            If PA() = -1 Then Exit Property
+            If nzn(Value, 0) <> nzn(FRA, 0) Then
+                mFRA = nzn(Value, 0)
+                dvForm(PA).Row("FRA") = nzn(mFRA, 0) : guardarDV()
+            End If
+        End Set
+    End Property
+
+    Private mCLIENT As Integer
+    Public Property CLIENT() As Integer
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mCLIENT = nzn(dvForm(PA).Row("CLIENT"), 0)
+            Catch ex As Exception : End Try
+            Return nzn(mCLIENT, 0)
+        End Get
+        Set(ByVal Value As Integer)
+            If PA() = -1 Then Exit Property
+            If esCodigoExistente(dtclients, CCClients, Value) Then
+                If nzn(Value, 0) <> 0 Then
+                    mCLIENT = nzn(Value, 0)
+                    dvForm(PA).Row("NOMCLIENT") = general.OBN(Value, dtclients, CNClients)
+                    dvForm(PA).Row("CLIENT") = nzn(Value, 0) : guardarDV()
+                Else
+                    dvForm(PA).Row("CLIENT") = DBNull.Value
+
+                    dvForm(PA).Row("NOMCLIENT") = "" : guardarDV()
+                End If
+            Else
+                dvForm(PA).Row("CLIENT") = DBNull.Value
+
+                dvForm(PA).Row("NOMCLIENT") = "" : guardarDV()
+                MessageBox.Show(rm.GetString("NOEXISTECLIENTS"))
+            End If
+        End Set
+    End Property
+
+    Private mNOMCLIENT As String
+    Public Property NOMCLIENT() As String
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mNOMCLIENT = general.nz(dvForm(PA).Row("NOMCLIENT"), "")
+            Catch ex As Exception : End Try
+            Return general.nz(mNOMCLIENT, "")
+        End Get
+        Set(ByVal Value As String)
+            If PA() = -1 Then Exit Property
+            mNOMCLIENT = general.nz(Value, "")
+            If tabla.GetChanges Is Nothing Then
+                dvForm(PA).Row("NOMCLIENT") = general.nz(Value, "") : guardarDV()
+                tabla.AcceptChanges()
+            Else
+                dvForm(PA).Row("NOMCLIENT") = general.nz(Value, "") : guardarDV()
+            End If
+        End Set
+    End Property
+
+    Private mDATA As Date
+    Public Property DATA() As Date
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mDATA = dvForm(PA).Row("DATA")
+            Catch ex As Exception : End Try
+            Return mDATA
+        End Get
+        Set(ByVal Value As Date)
+            If PA() = -1 Then Exit Property
+            If Value <> DATA Then
+                mDATA = Value
+                dvForm(PA).Row("DATA") = mDATA : guardarDV()
+            End If
+        End Set
+    End Property
+
+    Private mBASE1 As Double
+    Public Property BASE1() As Double
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mBASE1 = nzn(dvForm(PA).Row("BASE1"), 0)
+            Catch ex As Exception : End Try
+            Return nzn(mBASE1, 0)
+        End Get
+        Set(ByVal Value As Double)
+            If PA() = -1 Then Exit Property
+            If nzn(Value, 0) <> nzn(BASE1, 0) Then
+                mBASE1 = nzn(Value, 0)
+                dvForm(PA).Row("BASE1") = nzn(mBASE1, 0) : guardarDV()
+            End If
+        End Set
+    End Property
+
+    Private mP_IVA1 As Double
+    Public Property P_IVA1() As Double
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mP_IVA1 = nzn(dvForm(PA).Row("P_IVA1"), 0)
+            Catch ex As Exception : End Try
+            Return nzn(mP_IVA1, 0)
+        End Get
+        Set(ByVal Value As Double)
+            If PA() = -1 Then Exit Property
+            If nzn(Value, 0) <> nzn(P_IVA1, 0) Then
+                mP_IVA1 = nzn(Value, 0)
+                dvForm(PA).Row("P_IVA1") = nzn(mP_IVA1, 0) : guardarDV()
+            End If
+        End Set
+    End Property
+
+    Private mIVA1 As Double
+    Public Property IVA1() As Double
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mIVA1 = nzn(dvForm(PA).Row("IVA1"), 0)
+            Catch ex As Exception : End Try
+            Return nzn(mIVA1, 0)
+        End Get
+        Set(ByVal Value As Double)
+            If PA() = -1 Then Exit Property
+            If nzn(Value, 0) <> nzn(IVA1, 0) Then
+                mIVA1 = nzn(Value, 0)
+                dvForm(PA).Row("IVA1") = nzn(mIVA1, 0) : guardarDV()
+            End If
+        End Set
+    End Property
+
+    Private mTOTAL As Double
+    Public Property TOTAL() As Double
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mTOTAL = nzn(dvForm(PA).Row("TOTAL"), 0)
+            Catch ex As Exception : End Try
+            Return nzn(mTOTAL, 0)
+        End Get
+        Set(ByVal Value As Double)
+            If PA() = -1 Then Exit Property
+            If nzn(Value, 0) <> nzn(TOTAL, 0) Then
+                mTOTAL = nzn(Value, 0)
+                dvForm(PA).Row("TOTAL") = nzn(mTOTAL, 0) : guardarDV()
+            End If
+        End Set
+    End Property
+
+    Private mP_DTE As Double
+    Public Property P_DTE() As Double
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mP_DTE = nzn(dvForm(PA).Row("P_DTE"), 0)
+            Catch ex As Exception : End Try
+            Return nzn(mP_DTE, 0)
+        End Get
+        Set(ByVal Value As Double)
+            If PA() = -1 Then Exit Property
+            If nzn(Value, 0) <> nzn(P_DTE, 0) Then
+                mP_DTE = nzn(Value, 0)
+                dvForm(PA).Row("P_DTE") = nzn(mP_DTE, 0) : guardarDV()
+            End If
+        End Set
+    End Property
+
+    Private mDTE1 As Double
+    Public Property DTE1() As Double
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mDTE1 = nzn(dvForm(PA).Row("DTE1"), 0)
+            Catch ex As Exception : End Try
+            Return nzn(mDTE1, 0)
+        End Get
+        Set(ByVal Value As Double)
+            If PA() = -1 Then Exit Property
+            If nzn(Value, 0) <> nzn(DTE1, 0) Then
+                mDTE1 = nzn(Value, 0)
+                dvForm(PA).Row("DTE1") = nzn(mDTE1, 0) : guardarDV()
+            End If
+        End Set
+    End Property
+
+    Private mBRUT1 As Double
+    Public Property BRUT1() As Double
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mBRUT1 = nzn(dvForm(PA).Row("BRUT1"), 0)
+            Catch ex As Exception : End Try
+            Return nzn(mBRUT1, 0)
+        End Get
+        Set(ByVal Value As Double)
+            If PA() = -1 Then Exit Property
+            If nzn(Value, 0) <> nzn(BRUT1, 0) Then
+                mBRUT1 = nzn(Value, 0)
+                dvForm(PA).Row("BRUT1") = nzn(mBRUT1, 0) : guardarDV()
+            End If
+        End Set
+    End Property
+    Private mTRASPAS As Boolean
+    Public Property TRASPAS() As Boolean
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mTRASPAS = dvForm(PA).Row("TRASPAS")
+            Catch ex As Exception : End Try
+            Return mTRASPAS
+        End Get
+        Set(ByVal Value As Boolean)
+            If PA() = -1 Then Exit Property
+            If Value <> TRASPAS Then
+                mTRASPAS = Value
+                dvForm(PA).Row("TRASPAS") = mTRASPAS : guardarDV()
+            End If
+        End Set
+    End Property
+
+    Private mP_RE1 As Double
+    Public Property P_RE1() As Double
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mP_RE1 = nzn(dvForm(PA).Row("P_RE1"), 0)
+            Catch ex As Exception : End Try
+            Return nzn(mP_RE1, 0)
+        End Get
+        Set(ByVal Value As Double)
+            If PA() = -1 Then Exit Property
+            If nzn(Value, 0) <> nzn(P_RE1, 0) Then
+                mP_RE1 = nzn(Value, 0)
+                dvForm(PA).Row("P_RE1") = nzn(mP_RE1, 0) : guardarDV()
+            End If
+        End Set
+    End Property
+
+    Private mRE1 As Double
+    Public Property RE1() As Double
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mRE1 = nzn(dvForm(PA).Row("RE1"), 0)
+            Catch ex As Exception : End Try
+            Return nzn(mRE1, 0)
+        End Get
+        Set(ByVal Value As Double)
+            If PA() = -1 Then Exit Property
+            If nzn(Value, 0) <> nzn(RE1, 0) Then
+                mRE1 = nzn(Value, 0)
+                dvForm(PA).Row("RE1") = nzn(mRE1, 0) : guardarDV()
+            End If
+        End Set
+    End Property
+
+    Private mVENCIM As String
+    Public Property VENCIM() As String
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mVENCIM = general.nz(dvForm(PA).Row("VENCIM"), "")
+            Catch ex As Exception : End Try
+            Return general.nz(mVENCIM, "")
+        End Get
+        Set(ByVal Value As String)
+            If PA() = -1 Then Exit Property
+            If general.nz(Value, "") <> general.nz(VENCIM, "") Then
+                mVENCIM = general.nz(Value, "")
+                dvForm(PA).Row("VENCIM") = general.nz(mVENCIM, "") : guardarDV()
+            End If
+        End Set
+    End Property
+
+    Private mTRASPASF As Boolean
+    Public Property TRASPASF() As Boolean
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mTRASPASF = dvForm(PA).Row("TRASPASF")
+            Catch ex As Exception : End Try
+            Return mTRASPASF
+        End Get
+        Set(ByVal Value As Boolean)
+            If PA() = -1 Then Exit Property
+            If Value <> TRASPASF Then
+                mTRASPASF = Value
+                dvForm(PA).Row("TRASPASF") = mTRASPASF : guardarDV()
+            End If
+        End Set
+    End Property
+
+    Private mOBSERVOculto As String
+    Public Property OBSERVOculto() As String
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mOBSERVOculto = general.nz(dvForm(PA).Row("OBSERVOCULTA"), "")
+            Catch ex As Exception : End Try
+            Return general.nz(mOBSERVOculto, "")
+        End Get
+        Set(ByVal Value As String)
+            If PA() = -1 Then Exit Property
+            If general.nz(Value, "") <> general.nz(OBSERVOculto, "") Then
+                mOBSERVOculto = general.nz(Value, "")
+                dvForm(PA).Row("OBSERVOCULTA") = general.nz(mOBSERVOculto, "") : guardarDV()
+            End If
+        End Set
+    End Property
+
+    Private mOBSERV As String
+    Public Property OBSERV() As String
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mOBSERV = general.nz(dvForm(PA).Row("OBSERV"), "")
+            Catch ex As Exception : End Try
+            Return general.nz(mOBSERV, "")
+        End Get
+        Set(ByVal Value As String)
+            If PA() = -1 Then Exit Property
+            If general.nz(Value, "") <> general.nz(OBSERV, "") Then
+                mOBSERV = general.nz(Value, "")
+                dvForm(PA).Row("OBSERV") = general.nz(mOBSERV, "") : guardarDV()
+            End If
+        End Set
+    End Property
+
+    Private mREPRES As Integer
+    Public Property REPRES() As Integer
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mREPRES = nzn(dvForm(PA).Row("REPRES"), 0)
+            Catch ex As Exception : End Try
+            Return nzn(mREPRES, 0)
+        End Get
+        Set(ByVal Value As Integer)
+            If PA() = -1 Then Exit Property
+            If esCodigoExistente(dtRepres, CCRepres, Value) Then
+                If nzn(Value, 0) <> 0 Then
+                    mREPRES = nzn(Value, 0)
+                    dvForm(PA).Row("NOMREPRES") = general.OBN(Value, dtRepres, CNRepres)
+                    dvForm(PA).Row("REPRES") = nzn(Value, 0) : guardarDV()
+                Else
+                    dvForm(PA).Row("REPRES") = DBNull.Value
+
+                    dvForm(PA).Row("NOMREPRES") = "" : guardarDV()
+                End If
+            Else
+                dvForm(PA).Row("REPRES") = DBNull.Value
+
+                dvForm(PA).Row("NOMREPRES") = "" : guardarDV()
+                MessageBox.Show(rm.GetString("NOEXISTEREPRES"))
+            End If
+        End Set
+    End Property
+
+    Private mNOMREPRES As String
+    Public Property NOMREPRES() As String
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mNOMREPRES = general.nz(dvForm(PA).Row("NOMREPRES"), "")
+            Catch ex As Exception : End Try
+            Return general.nz(mNOMREPRES, "")
+        End Get
+        Set(ByVal Value As String)
+            If PA() = -1 Then Exit Property
+            mNOMREPRES = general.nz(Value, "")
+            If tabla.GetChanges Is Nothing Then
+                dvForm(PA).Row("NOMREPRES") = general.nz(Value, "") : guardarDV()
+                tabla.AcceptChanges()
+            Else
+                dvForm(PA).Row("NOMREPRES") = general.nz(Value, "") : guardarDV()
+            End If
+        End Set
+    End Property
+
+    Private mCOMIS As Double
+    Public Property COMIS() As Double
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mCOMIS = nzn(dvForm(PA).Row("COMIS"), 0)
+            Catch ex As Exception : End Try
+            Return nzn(mCOMIS, 0)
+        End Get
+        Set(ByVal Value As Double)
+            If PA() = -1 Then Exit Property
+            If nzn(Value, 0) <> nzn(COMIS, 0) Then
+                mCOMIS = nzn(Value, 0)
+                dvForm(PA).Row("COMIS") = nzn(mCOMIS, 0) : guardarDV()
+            End If
+        End Set
+    End Property
+
+    Private mORDRE As Double
+    Public Property ORDRE() As Double
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mORDRE = nzn(dvForm(PA).Row("ORDRE"), 0)
+            Catch ex As Exception : End Try
+            Return nzn(mORDRE, 0)
+        End Get
+        Set(ByVal Value As Double)
+            If PA() = -1 Then Exit Property
+            If nzn(Value, 0) <> nzn(ORDRE, 0) Then
+                mORDRE = nzn(Value, 0)
+                dvForm(PA).Row("ORDRE") = nzn(mORDRE, 0) : guardarDV()
+            End If
+        End Set
+    End Property
+
+    Private mPREU As Double
+    Public Property PREU() As Double
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mPREU = nzn(dvForm(PA).Row("PREU"), 0)
+            Catch ex As Exception : End Try
+            Return nzn(mPREU, 0)
+        End Get
+        Set(ByVal Value As Double)
+            If PA() = -1 Then Exit Property
+            If nzn(Value, 0) <> nzn(PREU, 0) Then
+                mPREU = nzn(Value, 0)
+                dvForm(PA).Row("PREU") = nzn(mPREU, 0) : guardarDV()
+            End If
+        End Set
+    End Property
+
+    Private mALBCLI As String
+    Public Property ALBCLI() As String
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mALBCLI = general.nz(dvForm(PA).Row("ALBCLI"), "")
+            Catch ex As Exception : End Try
+            Return general.nz(mALBCLI, "")
+        End Get
+        Set(ByVal Value As String)
+            If PA() = -1 Then Exit Property
+            If general.nz(Value, "") <> general.nz(ALBCLI, "") Then
+                mALBCLI = general.nz(Value, "")
+                dvForm(PA).Row("ALBCLI") = general.nz(mALBCLI, "") : guardarDV()
+            End If
+        End Set
+    End Property
+
+    Private mTALLA01 As String
+    Public Property TALLA01() As String
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mTALLA01 = general.nz(dvForm(PA).Row("TALLA01"), "")
+            Catch ex As Exception : End Try
+            Return general.nz(mTALLA01, "")
+        End Get
+        Set(ByVal Value As String)
+            If PA() = -1 Then Exit Property
+            If general.nz(Value, "") <> general.nz(TALLA01, "") Then
+                mTALLA01 = general.nz(Value, "")
+                dvForm(PA).Row("TALLA01") = general.nz(mTALLA01, "") : guardarDV()
+            End If
+        End Set
+    End Property
+
+    Private mTALLA02 As String
+    Public Property TALLA02() As String
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mTALLA02 = general.nz(dvForm(PA).Row("TALLA02"), "")
+            Catch ex As Exception : End Try
+            Return general.nz(mTALLA02, "")
+        End Get
+        Set(ByVal Value As String)
+            If PA() = -1 Then Exit Property
+            If general.nz(Value, "") <> general.nz(TALLA02, "") Then
+                mTALLA02 = general.nz(Value, "")
+                dvForm(PA).Row("TALLA02") = general.nz(mTALLA02, "") : guardarDV()
+            End If
+        End Set
+    End Property
+
+    Private mTALLA03 As String
+    Public Property TALLA03() As String
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mTALLA03 = general.nz(dvForm(PA).Row("TALLA03"), "")
+            Catch ex As Exception : End Try
+            Return general.nz(mTALLA03, "")
+        End Get
+        Set(ByVal Value As String)
+            If PA() = -1 Then Exit Property
+            If general.nz(Value, "") <> general.nz(TALLA03, "") Then
+                mTALLA03 = general.nz(Value, "")
+                dvForm(PA).Row("TALLA03") = general.nz(mTALLA03, "") : guardarDV()
+            End If
+        End Set
+    End Property
+
+    Private mTALLA04 As String
+    Public Property TALLA04() As String
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mTALLA04 = general.nz(dvForm(PA).Row("TALLA04"), "")
+            Catch ex As Exception : End Try
+            Return general.nz(mTALLA04, "")
+        End Get
+        Set(ByVal Value As String)
+            If PA() = -1 Then Exit Property
+            If general.nz(Value, "") <> general.nz(TALLA04, "") Then
+                mTALLA04 = general.nz(Value, "")
+                dvForm(PA).Row("TALLA04") = general.nz(mTALLA04, "") : guardarDV()
+            End If
+        End Set
+    End Property
+
+    Private mTALLA05 As String
+    Public Property TALLA05() As String
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mTALLA05 = general.nz(dvForm(PA).Row("TALLA05"), "")
+            Catch ex As Exception : End Try
+            Return general.nz(mTALLA05, "")
+        End Get
+        Set(ByVal Value As String)
+            If PA() = -1 Then Exit Property
+            If general.nz(Value, "") <> general.nz(TALLA05, "") Then
+                mTALLA05 = general.nz(Value, "")
+                dvForm(PA).Row("TALLA05") = general.nz(mTALLA05, "") : guardarDV()
+            End If
+        End Set
+    End Property
+
+    Private mTALLA06 As String
+    Public Property TALLA06() As String
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mTALLA06 = general.nz(dvForm(PA).Row("TALLA06"), "")
+            Catch ex As Exception : End Try
+            Return general.nz(mTALLA06, "")
+        End Get
+        Set(ByVal Value As String)
+            If PA() = -1 Then Exit Property
+            If general.nz(Value, "") <> general.nz(TALLA06, "") Then
+                mTALLA06 = general.nz(Value, "")
+                dvForm(PA).Row("TALLA06") = general.nz(mTALLA06, "") : guardarDV()
+            End If
+        End Set
+    End Property
+
+    Private mTALLA07 As String
+    Public Property TALLA07() As String
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mTALLA07 = general.nz(dvForm(PA).Row("TALLA07"), "")
+            Catch ex As Exception : End Try
+            Return general.nz(mTALLA07, "")
+        End Get
+        Set(ByVal Value As String)
+            If PA() = -1 Then Exit Property
+            If general.nz(Value, "") <> general.nz(TALLA07, "") Then
+                mTALLA07 = general.nz(Value, "")
+                dvForm(PA).Row("TALLA07") = general.nz(mTALLA07, "") : guardarDV()
+            End If
+        End Set
+    End Property
+
+    Private mTALLA08 As String
+    Public Property TALLA08() As String
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mTALLA08 = general.nz(dvForm(PA).Row("TALLA08"), "")
+            Catch ex As Exception : End Try
+            Return general.nz(mTALLA08, "")
+        End Get
+        Set(ByVal Value As String)
+            If PA() = -1 Then Exit Property
+            If general.nz(Value, "") <> general.nz(TALLA08, "") Then
+                mTALLA08 = general.nz(Value, "")
+                dvForm(PA).Row("TALLA08") = general.nz(mTALLA08, "") : guardarDV()
+            End If
+        End Set
+    End Property
+
+    Private mTALLA09 As String
+    Public Property TALLA09() As String
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mTALLA09 = general.nz(dvForm(PA).Row("TALLA09"), "")
+            Catch ex As Exception : End Try
+            Return general.nz(mTALLA09, "")
+        End Get
+        Set(ByVal Value As String)
+            If PA() = -1 Then Exit Property
+            If general.nz(Value, "") <> general.nz(TALLA09, "") Then
+                mTALLA09 = general.nz(Value, "")
+                dvForm(PA).Row("TALLA09") = general.nz(mTALLA09, "") : guardarDV()
+            End If
+        End Set
+    End Property
+
+    Private mTALLA10 As String
+    Public Property TALLA10() As String
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mTALLA10 = general.nz(dvForm(PA).Row("TALLA10"), "")
+            Catch ex As Exception : End Try
+            Return general.nz(mTALLA10, "")
+        End Get
+        Set(ByVal Value As String)
+            If PA() = -1 Then Exit Property
+            If general.nz(Value, "") <> general.nz(TALLA10, "") Then
+                mTALLA10 = general.nz(Value, "")
+                dvForm(PA).Row("TALLA10") = general.nz(mTALLA10, "") : guardarDV()
+            End If
+        End Set
+    End Property
+
+    Private mMODEL As String
+    Public Property MODEL() As String
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mMODEL = general.nz(dvForm(PA).Row("MODEL"), "")
+            Catch ex As Exception : End Try
+            Return general.nz(mMODEL, "")
+        End Get
+        Set(ByVal Value As String)
+            If PA() = -1 Then Exit Property
+            If general.nz(Value, "") <> general.nz(MODEL, "") Then
+                mMODEL = general.nz(Value, "")
+                dvForm(PA).Row("MODEL") = general.nz(mMODEL, "") : guardarDV()
+            End If
+        End Set
+    End Property
+
+    Private mSERIE As String
+    Public Property SERIE() As String
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mSERIE = general.nz(dvForm(PA).Row("SERIE"), "")
+            Catch ex As Exception : End Try
+            Return general.nz(mSERIE, "")
+        End Get
+        Set(ByVal Value As String)
+            If PA() = -1 Then Exit Property
+            If general.nz(Value, "") <> general.nz(SERIE, "") Then
+                mSERIE = general.nz(Value, "")
+                dvForm(PA).Row("SERIE") = general.nz(mSERIE, "") : guardarDV()
+            End If
+        End Set
+    End Property
+
+    Private mEXPEDICIO As Double
+    Public Property EXPEDICIO() As Double
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mEXPEDICIO = nzn(dvForm(PA).Row("EXPEDICIO"), 0)
+            Catch ex As Exception : End Try
+            Return nzn(mEXPEDICIO, 0)
+        End Get
+        Set(ByVal Value As Double)
+            If PA() = -1 Then Exit Property
+            If nzn(Value, 0) <> nzn(EXPEDICIO, 0) Then
+                mEXPEDICIO = nzn(Value, 0)
+                dvForm(PA).Row("EXPEDICIO") = nzn(mEXPEDICIO, 0) : guardarDV()
+            End If
+        End Set
+    End Property
+
+    Private mTEMPORADA As String
+    Public Property TEMPORADA() As String
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mTEMPORADA = general.nz(dvForm(PA).Row("TEMPORADA"), "")
+            Catch ex As Exception : End Try
+            Return general.nz(mTEMPORADA, "")
+        End Get
+        Set(ByVal Value As String)
+            If PA() = -1 Then Exit Property
+            If general.nz(Value, "") <> general.nz(TEMPORADA, "") Then
+                mTEMPORADA = general.nz(Value, "")
+                dvForm(PA).Row("TEMPORADA") = general.nz(mTEMPORADA, "") : guardarDV()
+            End If
+        End Set
+    End Property
+
+#End Region
+
+#Region "CAMPOS PROPIOS"
+
+    Private mDIA1 As Integer
+    Public Property DIA1() As Integer
+        Get
+            Try
+                mDIA1 = general.nz(dvForm(PA).Row("DIA1"), "")
+            Catch ex As Exception : End Try
+            Return general.nz(mDIA1, "")
+        End Get
+        Set(ByVal Value As Integer)
+            mDIA1 = general.nz(Value, "")
+            If tabla.GetChanges Is Nothing Then
+                dvForm(PA).Row("DIA1") = general.nz(Value, "") : guardarDV()
+                tabla.AcceptChanges()
+            Else
+                dvForm(PA).Row("DIA1") = general.nz(Value, "") : guardarDV()
+            End If
+        End Set
+    End Property
+
+    Private mDIA2 As Integer
+    Public Property DIA2() As Integer
+        Get
+            Try
+                mDIA2 = general.nz(dvForm(PA).Row("DIA2"), "")
+            Catch ex As Exception : End Try
+            Return general.nz(mDIA2, "")
+        End Get
+        Set(ByVal Value As Integer)
+            mDIA2 = general.nz(Value, "")
+            If tabla.GetChanges Is Nothing Then
+                dvForm(PA).Row("DIA2") = general.nz(Value, "") : guardarDV()
+                tabla.AcceptChanges()
+            Else
+                dvForm(PA).Row("DIA2") = general.nz(Value, "") : guardarDV()
+            End If
+        End Set
+    End Property
+
+    Private mDIA3 As Integer
+    Public Property DIA3() As Integer
+        Get
+            Try
+                mDIA3 = general.nz(dvForm(PA).Row("DIA3"), "")
+            Catch ex As Exception : End Try
+            Return general.nz(mDIA3, "")
+        End Get
+        Set(ByVal Value As Integer)
+            mDIA3 = general.nz(Value, "")
+            If tabla.GetChanges Is Nothing Then
+                dvForm(PA).Row("DIA3") = general.nz(Value, "") : guardarDV()
+                tabla.AcceptChanges()
+            Else
+                dvForm(PA).Row("DIA3") = general.nz(Value, "") : guardarDV()
+            End If
+        End Set
+    End Property
+
+    Private mFORMA As String
+    Public Property FORMA() As String
+        Get
+            Try
+                mFORMA = general.nz(dvForm(PA).Row("FORMA"), "")
+            Catch ex As Exception : End Try
+            Return general.nz(mFORMA, "")
+        End Get
+        Set(ByVal Value As String)
+            mFORMA = general.nz(Value, "")
+            If tabla.GetChanges Is Nothing Then
+                dvForm(PA).Row("FORMA") = general.nz(Value, "") : guardarDV()
+                tabla.AcceptChanges()
+            Else
+                dvForm(PA).Row("FORMA") = general.nz(Value, "") : guardarDV()
+            End If
+        End Set
+    End Property
+
+    Private mcta As String
+    Public Property cta() As String
+        Get
+            Try
+                mcta = general.nz(dvForm(PA).Row("cta"), "")
+            Catch ex As Exception : End Try
+            Return general.nz(mcta, "")
+        End Get
+        Set(ByVal Value As String)
+            mcta = general.nz(Value, "")
+            If tabla.GetChanges Is Nothing Then
+                dvForm(PA).Row("cta") = general.nz(Value, "") : guardarDV()
+                tabla.AcceptChanges()
+            Else
+                dvForm(PA).Row("cta") = general.nz(Value, "") : guardarDV()
+            End If
+        End Set
+    End Property
+    Private mNUMEROPROVE As String
+    Public Property NUMEROPROVE() As String
+        Get
+            Try
+                mNUMEROPROVE = general.nz(dvForm(PA).Row("NUMEROPROVE"), "")
+            Catch ex As Exception : End Try
+            Return general.nz(mNUMEROPROVE, "")
+        End Get
+        Set(ByVal Value As String)
+            mNUMEROPROVE = general.nz(Value, "")
+            If tabla.GetChanges Is Nothing Then
+                dvForm(PA).Row("NUMEROPROVE") = general.nz(Value, "") : guardarDV()
+                tabla.AcceptChanges()
+            Else
+                dvForm(PA).Row("NUMEROPROVE") = general.nz(Value, "") : guardarDV()
+            End If
+        End Set
+    End Property
+    Private mDTOFORMA As Double
+    Public Property DTOFORMA() As Double
+        Get
+            Try
+                mDTOFORMA = nzn(dvForm(PA).Row("DTOFORMA"), 0)
+            Catch ex As Exception : End Try
+            Return nzn(mDTOFORMA, 0)
+        End Get
+        Set(ByVal Value As Double)
+            mDTOFORMA = nzn(Value, 0)
+            If tabla.GetChanges Is Nothing Then
+                dvForm(PA).Row("DTOFORMA") = nzn(Value, 0) : guardarDV() : Debug.WriteLine(Value)
+                tabla.AcceptChanges()
+            Else
+                dvForm(PA).Row("DTOFORMA") = nzn(Value, 0) : guardarDV() : Debug.WriteLine(Value)
+            End If
+        End Set
+    End Property
+
+    Private mREPRECLIENT As Integer
+    Public Property REPRECLIENT() As Integer
+        Get
+            Try
+                mREPRECLIENT = nzn(dvForm(PA).Row("REPRECLIENT"), 0)
+            Catch ex As Exception : End Try
+            Return nzn(mREPRECLIENT, 0)
+        End Get
+        Set(ByVal Value As Integer)
+            mREPRECLIENT = nzn(Value, 0)
+            If tabla.GetChanges Is Nothing Then
+                dvForm(PA).Row("REPRECLIENT") = general.nz(Value, "") : guardarDV()
+                tabla.AcceptChanges()
+            Else
+                dvForm(PA).Row("REPRECLIENT") = general.nz(Value, "") : guardarDV()
+            End If
+        End Set
+    End Property
+
+    Private mBANC As String
+    Public Property BANC() As String
+        Get
+            Try
+                mBANC = general.nz(dvForm(PA).Row("BANC"), "")
+            Catch ex As Exception : End Try
+            Return general.nz(mBANC, "")
+        End Get
+        Set(ByVal Value As String)
+            mBANC = general.nz(Value, "")
+            If tabla.GetChanges Is Nothing Then
+                dvForm(PA).Row("BANC") = general.nz(Value, "") : guardarDV()
+                tabla.AcceptChanges()
+            Else
+                dvForm(PA).Row("BANC") = general.nz(Value, "") : guardarDV()
+            End If
+        End Set
+    End Property
+
+    Private mCOFI As String
+    Public Property COFI() As String
+        Get
+            Try
+                mCOFI = general.nz(dvForm(PA).Row("COFI"), "")
+            Catch ex As Exception : End Try
+            Return general.nz(mCOFI, "")
+        End Get
+        Set(ByVal Value As String)
+            mCOFI = general.nz(Value, "")
+            If tabla.GetChanges Is Nothing Then
+                dvForm(PA).Row("COFI") = general.nz(Value, "") : guardarDV()
+                tabla.AcceptChanges()
+            Else
+                dvForm(PA).Row("COFI") = general.nz(Value, "") : guardarDV()
+            End If
+        End Set
+    End Property
+
+    Private mOFI As String
+    Public Property OFI() As String
+        Get
+            Try
+                mOFI = general.nz(dvForm(PA).Row("OFI"), "")
+            Catch ex As Exception : End Try
+            Return general.nz(mOFI, "")
+        End Get
+        Set(ByVal Value As String)
+            mOFI = general.nz(Value, "")
+            If tabla.GetChanges Is Nothing Then
+                dvForm(PA).Row("OFI") = general.nz(Value, "") : guardarDV()
+                tabla.AcceptChanges()
+            Else
+                dvForm(PA).Row("OFI") = general.nz(Value, "") : guardarDV()
+            End If
+        End Set
+    End Property
+
+    Private mDC As String
+    Public Property DC() As String
+        Get
+            Try
+                mDC = general.nz(dvForm(PA).Row("DC"), "")
+            Catch ex As Exception : End Try
+            Return general.nz(mDC, "")
+        End Get
+        Set(ByVal Value As String)
+            mDC = general.nz(Value, "")
+            If tabla.GetChanges Is Nothing Then
+                dvForm(PA).Row("DC") = general.nz(Value, "") : guardarDV()
+                tabla.AcceptChanges()
+            Else
+                dvForm(PA).Row("DC") = general.nz(Value, "") : guardarDV()
+            End If
+        End Set
+    End Property
+
+    Private mNOMBANC As String
+    Public Property NOMBANC() As String
+        Get
+            Try
+                mNOMBANC = general.nz(dvForm(PA).Row("NOMBANC"), "")
+            Catch ex As Exception : End Try
+            Return general.nz(mNOMBANC, "")
+        End Get
+        Set(ByVal Value As String)
+            mNOMBANC = general.nz(Value, "")
+            If tabla.GetChanges Is Nothing Then
+                dvForm(PA).Row("NOMBANC") = general.nz(Value, "") : guardarDV()
+                tabla.AcceptChanges()
+            Else
+                dvForm(PA).Row("NOMBANC") = general.nz(Value, "") : guardarDV()
+            End If
+        End Set
+    End Property
+
+    Private mNUMEROPAG As Integer
+    Public Property NUMEROPAG() As Integer
+        Get
+            Try
+                mNUMEROPAG = nzn(dvForm(PA).Row("NUMEROPAG"), 0)
+            Catch ex As Exception : End Try
+            Return nzn(mNUMEROPAG, 0)
+        End Get
+        Set(ByVal Value As Integer)
+            mNUMEROPAG = nzn(Value, 0)
+            If tabla.GetChanges Is Nothing Then
+                dvForm(PA).Row("NUMEROPAG") = nzn(Value, 0) : guardarDV() : Debug.WriteLine(Value)
+                tabla.AcceptChanges()
+            Else
+                dvForm(PA).Row("NUMEROPAG") = nzn(Value, 0) : guardarDV() : Debug.WriteLine(Value)
+            End If
+        End Set
+    End Property
+    Private mDIESPAG As Integer
+    Public Property DIESPAG() As Integer
+        Get
+            Try
+                mDIESPAG = nzn(dvForm(PA).Row("DIESPAG"), 0)
+            Catch ex As Exception : End Try
+            Return nzn(mDIESPAG, 0)
+        End Get
+        Set(ByVal Value As Integer)
+            mDIESPAG = nzn(Value, 0)
+            If tabla.GetChanges Is Nothing Then
+                dvForm(PA).Row("DIESPAG") = nzn(Value, 0) : guardarDV() : Debug.WriteLine(Value)
+                tabla.AcceptChanges()
+            Else
+                dvForm(PA).Row("DIESPAG") = nzn(Value, 0) : guardarDV() : Debug.WriteLine(Value)
+            End If
+        End Set
+    End Property
+
+    Private mVEZ1FORPAG As Integer
+    Public Property VEZ1FORPAG() As Integer
+        Get
+            Try
+                mVEZ1FORPAG = nzn(dvForm(PA).Row("VEZ1FORPAG"), 0)
+            Catch ex As Exception : End Try
+            Return nzn(mVEZ1FORPAG, 0)
+        End Get
+        Set(ByVal Value As Integer)
+            mVEZ1FORPAG = nzn(Value, 0)
+            If tabla.GetChanges Is Nothing Then
+                dvForm(PA).Row("VEZ1FORPAG") = nzn(Value, 0) : guardarDV() : Debug.WriteLine(Value)
+                tabla.AcceptChanges()
+            Else
+                dvForm(PA).Row("VEZ1FORPAG") = nzn(Value, 0) : guardarDV() : Debug.WriteLine(Value)
+            End If
+        End Set
+    End Property
+
+    Private mNOMFORMA As String
+    Public Property NOMFORMA() As String
+        Get
+            Try
+                mNOMFORMA = general.nz(dvForm(PA).Row("NOMFORMA"), "")
+            Catch ex As Exception : End Try
+            Return general.nz(mNOMFORMA, "")
+        End Get
+        Set(ByVal Value As String)
+            mNOMFORMA = general.nz(Value, "")
+            If tabla.GetChanges Is Nothing Then
+                dvForm(PA).Row("NOMFORMA") = general.nz(Value, "") : guardarDV()
+                tabla.AcceptChanges()
+            Else
+                dvForm(PA).Row("NOMFORMA") = general.nz(Value, "") : guardarDV()
+            End If
+        End Set
+    End Property
+
+
+    Private mCOMISREPRESENTANT As Double
+    Public Property COMISREPRESENTANT() As Double
+        Get
+            Try
+                mCOMISREPRESENTANT = nzn(dvForm(PA).Row("COMISREPRESENTANT"), 0)
+            Catch ex As Exception : End Try
+            Return nzn(mCOMISREPRESENTANT, 0)
+        End Get
+        Set(ByVal Value As Double)
+            mCOMISREPRESENTANT = nzn(Value, 0)
+            If tabla.GetChanges Is Nothing Then
+                dvForm(PA).Row("COMISREPRESENTANT") = nzn(Value, 0) : guardarDV() : Debug.WriteLine(Value)
+                tabla.AcceptChanges()
+            Else
+                dvForm(PA).Row("COMISREPRESENTANT") = nzn(Value, 0) : guardarDV() : Debug.WriteLine(Value)
+            End If
+        End Set
+    End Property
+    Private mMESESCOMPLETOS As Boolean
+    Public Property MESESCOMPLETOS() As Boolean
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mMESESCOMPLETOS = dvForm(PA).Row("MESESCOMPLETOS")
+            Catch ex As Exception : End Try
+            Return mMESESCOMPLETOS
+        End Get
+        Set(ByVal Value As Boolean)
+            If PA() = -1 Then Exit Property
+            If Value <> MESESCOMPLETOS Then
+                mMESESCOMPLETOS = Value
+                dvForm(PA).Row("MESESCOMPLETOS") = mMESESCOMPLETOS : guardarDV()
+            End If
+        End Set
+    End Property
+
+    Private mIBAN As String
+    Public Property IBAN() As String
+        Get
+            Try
+                mIBAN = CType(general.nz(dvForm(PA).Row("IBAN"), ""), String)
+            Catch ex As Exception : End Try
+            Return CType(general.nz(mIBAN, ""), String)
+        End Get
+        Set(ByVal Value As String)
+            mIBAN = CType(general.nz(Value, ""), String)
+            If tabla.GetChanges Is Nothing Then
+                dvForm(PA).Row("IBAN") = general.nz(Value, "") : guardarDV()
+                tabla.AcceptChanges()
+            Else
+                dvForm(PA).Row("IBAN") = general.nz(Value, "") : guardarDV()
+            End If
+        End Set
+    End Property
+
+    Private mSWIFT As String
+    Public Property SWIFT() As String
+        Get
+            Try
+                mSWIFT = CType(general.nz(dvForm(PA).Row("SWIFT"), ""), String)
+            Catch ex As Exception : End Try
+            Return CType(general.nz(mSWIFT, ""), String)
+        End Get
+        Set(ByVal Value As String)
+            mSWIFT = CType(general.nz(Value, ""), String)
+            If tabla.GetChanges Is Nothing Then
+                dvForm(PA).Row("SWIFT") = general.nz(Value, "") : guardarDV()
+                tabla.AcceptChanges()
+            Else
+                dvForm(PA).Row("SWIFT") = general.nz(Value, "") : guardarDV()
+            End If
+        End Set
+    End Property
+#End Region
+
+#Region "INICIAR"
+
+    Public Sub New(ByVal tabla As DataTable, ByVal centro As String, ByRef bindingcontext As BindingContext, ByVal documento As String, ByVal tipo As String)
+
+        MyBase.New(tabla, centro, bindingcontext)
+        Dim sqlSel As String
+        Try
+            Me.documento = documento
+            Me.tipo = tipo
+            Me.centro = centro
+
+            sqlSinWhere = "SELECT FACTUR.* FROM FACTUR "
+
+            sqlSel = sqlSinWhere & genWhere() & " LIMIT 1"
+
+            cmdSel.CommandText = sqlSel
+
+            da.SelectCommand = cmdSel
+
+            numeroRegistros = obtenerNumeroReg(tabla.TableName, "")
+
+            dvForm.Sort = "FRA"
+
+            CargaTablas()
+            dvIdentificadores.RowFilter = "CENTRO = '" & centro & "' "
+            AñadirColumnasNoAsociadas()
+
+            CargarPAF()
+
+            IniciarLineas() : PonerNombres()
+
+            'If DOCUMENT = Factura Then CargaDireccionesEnvio()
+            'CargaDireccionesEnvio()
+            PonerDatosCliente()
+            tabla.AcceptChanges()
+
+            DespertarHandlers()
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+
+    'En fra le pasamos el que queremos cargar. Puede que no exista. En este caso si se le pasa nuevoRegistro = true generamos un nuevo PAFP con
+    'fra = al nuevoFRA
+    Public Sub New(ByVal tabla As DataTable, ByVal centro As String, ByRef bindingcontext As BindingContext, ByVal documentoNUEVO As String,
+                    ByVal tipo As String, ByVal soloClase As Boolean, ByVal nuevoFRA As Integer, ByVal nuevoRegistro As Boolean,
+                    Optional ByVal pafAcopiar As clsPAFVenta = Nothing,
+                    Optional ByVal dtclients As DataTable = Nothing,
+                    Optional ByVal dtForpag As DataTable = Nothing,
+                    Optional ByVal dtRepres As DataTable = Nothing,
+                    Optional ByVal dtBancs As DataTable = Nothing)
+
+        MyBase.New(tabla, centro, bindingcontext)
+        Dim sqlSel As String
+        Try
+            Me.documento = documentoNUEVO
+            Me.tipo = tipo
+            Me.centro = centro
+            Me.soloClase = soloClase
+            Me.esRegistroNuevo = nuevoRegistro
+
+            sqlSinWhere = "SELECT FACTUR.* FROM FACTUR "
+
+            sqlSel = sqlSinWhere & genWhere() & " AND FRA = " & nuevoFRA & " "
+
+            cmdSel.CommandText = sqlSel
+
+            da.SelectCommand = cmdSel
+            numeroRegistros = CInt(obtenerNumeroReg(tabla.TableName, ""))
+            dvForm.Sort = "FRA"
+
+            'Esto carga las tablas en caso de que se las pasen
+            If dtclients Is Nothing Then
+                CargaTablas()
+            Else
+                Me.dtclients = dtclients
+                Me.dtForpag = dtForpag
+                Me.dtRepres = dtRepres
+                Me.dtBancs = dtBancs
+            End If
+
+            AñadirColumnasNoAsociadas()
+
+            da.Fill(tabla)
+
+            PonerNombres()
+            If dvIdentificadores.Count <> 0 Then
+                dvIdentificadores.RowFilter = "CENTRO = '" & centro & "' "
+            End If
+
+            If nuevoRegistro AndAlso tabla.Rows.Count = 0 Then
+                Dim dr As DataRow
+                dr = tabla.NewRow
+                CopiarFila(pafAcopiar.tabla.Rows(0), dr)
+                Me.documento = documentoNUEVO
+                Me.FRA = nuevoFRA
+                Me.tipo = tipo
+                If documentoNUEVO = Factura Then dr("OBSERV") = "" : dr("OBSERVOCULTA") = ""
+                dr("DOCUMENT") = documentoNUEVO
+                dr("FRA") = nuevoFRA
+
+                tabla.Rows.Add(dr)
+
+                IniciarLineas()
+                lineasVenta.tabla.Clear()
+            Else
+                tabla.AcceptChanges()
+                IniciarLineas()
+            End If
+            lineasVenta.tabla.AcceptChanges()
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    'Carga el último PAFP visitado o el último si no existe este
+    Private Sub CargarPAF()
+        Try
+            UltimoCodigo = CargaParametro("" & documento & tipo & "V" & centro & "")
+            numeroRegistroActual = ObtenerNumeroRegistro(UltimoCodigo)
+            If numeroRegistroActual = -1 Then
+                CargarRegistro(ultimo)
+            Else
+                CambiarAReg(UltimoCodigo, "", iraregistro)
+            End If
+
+        Catch ex As Exception
+            CargarRegistro(ultimo)
+        End Try
+    End Sub
+    Private Sub AñadirColumnasNoAsociadas()
+        Try
+            If Not tabla.Columns.Contains("REPRECLIENT") Then
+                tabla.Columns.Add(New DataColumn("POB"))
+                tabla.Columns.Add(New DataColumn("PROV"))
+                tabla.Columns.Add(New DataColumn("DOM2"))
+                tabla.Columns.Add(New DataColumn("PAIS"))
+                tabla.Columns.Add(New DataColumn("DIA1"))
+                tabla.Columns.Add(New DataColumn("DIA2"))
+                tabla.Columns.Add(New DataColumn("DIA3"))
+                tabla.Columns.Add(New DataColumn("NUMEROPROVE"))
+                tabla.Columns.Add(New DataColumn("FORMA"))
+                tabla.Columns.Add(New DataColumn("cta"))
+                tabla.Columns.Add(New DataColumn("REPRECLIENT"))
+                tabla.Columns.Add(New DataColumn("DTOFORMA"))
+                tabla.Columns.Add(New DataColumn("BANC"))
+                tabla.Columns.Add(New DataColumn("NOMBANC"))
+                tabla.Columns.Add(New DataColumn("DC"))
+                tabla.Columns.Add(New DataColumn("OFI"))
+                tabla.Columns.Add(New DataColumn("COFI"))
+                tabla.Columns.Add(New DataColumn("NUMEROPAG"))
+                tabla.Columns.Add(New DataColumn("DIESPAG"))
+                tabla.Columns.Add(New DataColumn("MESESCOMPLETOS"))
+                tabla.Columns.Add(New DataColumn("VEZ1FORPAG"))
+                tabla.Columns.Add(New DataColumn("NOMFORMA"))
+                tabla.Columns.Add(New DataColumn("COMISREPRESENTANT"))
+                tabla.Columns.Add(New DataColumn("SWIFT"))
+                tabla.Columns.Add(New DataColumn("IBAN"))
+            End If
+
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Sub
+    Private Sub CrearTabladtColores()
+        Try
+            Dim dcMODCOL As New DataColumn("MODCOL")
+            Dim dcSERIE As New DataColumn("SERIE")
+            Dim dcCLIENT As New DataColumn("CLIENT")
+            Dim dcMODEL As New DataColumn("MODEL")
+            Dim dcTEMPORADA As New DataColumn("TEMPORADA")
+            Dim dcCENTRO As New DataColumn("CENTRO")
+            dtColoresPrendas.Columns.Add(dcMODCOL)
+            dtColoresPrendas.Columns("MODCOL").Caption = rm.GetString("COLOR")
+            dtColoresPrendas.Columns.Add(dcSERIE)
+            dtColoresPrendas.Columns.Add(dcCLIENT)
+            dtColoresPrendas.Columns.Add(dcMODEL)
+            dtColoresPrendas.Columns.Add(dcTEMPORADA)
+            dtColoresPrendas.Columns.Add(dcCENTRO)
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub CargaTablas()
+        Try
+            If tipo = Prenda Then CrearTabladtColores() : CargarColoresregistroActual()
+
+            CargaTablaClientes()
+            CargaTablaForma()
+            CargarIdentificadores()
+            CargaTablaRepresentantes()
+            CargarClientesConPAF()
+            CargaTabla(tablaBancos, CCBancs, CNBancs, dtBancs, True)
+
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Sub
+    Private Sub CargarClientesConPAF()
+        Dim cmd As New MySqlCommand("SELECT DISTINCT CLIENT AS CODI FROM FACTUR WHERE DOCUMENT = """ & documento & """ AND TIPUS = """ & tipo & """ ", cnn)
+        Dim dar As MySqlDataReader
+        Dim dr As DataRow
+        Dim dc1 As New DataColumn("CODI")
+        Dim dc2 As New DataColumn("NOM")
+        Dim i As Integer
+        Try
+            ACN()
+            dar = cmd.ExecuteReader
+            dtClientConPAF = New DataTable
+            dtClientConPAF.Columns.Clear()
+            dtClientConPAF.Columns.Add(dc1)
+            dtClientConPAF.Columns("CODI").Caption = rm.GetString("CODIGO")
+            dtClientConPAF.Columns.Add(dc2)
+            dtClientConPAF.Columns("NOM").Caption = rm.GetString("NOMBRE")
+
+            While dar.Read
+                dr = dtClientConPAF.NewRow
+                dr("CODI") = dar("CODI")
+                dtClientConPAF.Rows.Add(dr)
+            End While
+
+            'Le ponemos los nombres a los proveedores
+            For i = 0 To dtClientConPAF.Rows.Count - 1
+                dtClientConPAF.Rows(i).Item("NOM") = general.OBN(dtClientConPAF.Rows(i).Item("CODI"), dtclients)
+            Next
+            dtClientConPAF.DefaultView.Sort = "NOM"
+            dar.Close()
+            CCN()
+
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Sub
+    Public Overrides Sub CargarIdentificadores()
+        Dim a As New ArrayList
+        Dim i As Integer
+        Try
+            a.Add("FRA")
+            a.Add("CLIENT")
+
+            'Dim c As New MySqlCommand("SELECT FRA, CLIENT, CENTRO FROM FACTUR " & _
+            '                            " WHERE DOCUMENT = """ & documento & """", cnn)
+
+            If Not IDCliente = -1 Then
+                CargaTabla(tablaVentas, a, dtIdentificadores, True, " DOCUMENT = """ & documento & """ AND TIPUS = """ & tipo & """ AND CLIENT = """ & CLIENT & """  ") 'AND DATA >= """ & pubAño & "-01-01"" ") 'AND CENTRO = """ & centro & """ ")
+            Else
+                CargaTabla(tablaVentas, a, dtIdentificadores, True, " DOCUMENT = """ & documento & """ AND TIPUS = """ & tipo & """ ") 'AND DATA >= """ & pubAño & "-01-01"" ") ' AND CENTRO = """ & centro & """ ")
+            End If
+
+            'Le ponemos los nombres a los proveedores
+            dtIdentificadores.Columns("FRA").Caption = rm.GetString("NUMERO")
+            dtIdentificadores.Columns("CLIENT").Caption = rm.GetString("CLIENTE")
+            If Not dtIdentificadores.Columns.Contains("NOMCLIENT") Then dtIdentificadores.Columns.Add(New DataColumn("NOMCLIENT"))
+            dtIdentificadores.Columns("NOMCLIENT").Caption = rm.GetString("NOMCLIENT")
+            For i = 0 To dtIdentificadores.Rows.Count - 1
+                dtIdentificadores.Rows(i).Item("NOMCLIENT") = general.OBN(dtIdentificadores.Rows(i).Item("CLIENT"), dtclients)
+            Next
+            dvIdentificadores = dtIdentificadores.DefaultView
+
+            If mClienteSel = -1 Then : dvIdentificadores.RowFilter = ""
+            Else : dvIdentificadores.RowFilter = "CLIENT = '" & mClienteSel & "' AND CENTRO = '" & centro & "' " : End If
+
+            dvIdentificadores.Sort = "FRA DESC"
+
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Sub
+
+#End Region
+
+#Region "CARGA TABLAS"
+    Private Sub CargaTablaForma()
+        Try
+            Dim cmdSelect As New MySqlCommand
+            Dim daSelect As New MySqlDataAdapter
+
+            cmdSelect.Connection = cnn
+            cmdSelect.CommandText = " SELECT FORPAG.CODI, forpag.nro AS NUMEROPAG, " &
+            " forpag.dies AS DIESPAG, forpag.V_1 AS VEZ1FORPAG, forpag.DESCRIPCIO AS NOMFORMA FROM FORPAG "
+
+
+            daSelect.SelectCommand = cmdSelect
+            ACN()
+            dtForpag.Rows.Clear()
+            daSelect.Fill(dtForpag)
+            dtForpag.DefaultView.Sort = "NOMFORMA"
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub CargaTablaClientes()
+        Try
+            Dim cmdSelect As New MySqlCommand
+            Dim daSelect As New MySqlDataAdapter
+
+            cmdSelect.Connection = cnn
+            cmdSelect.CommandText =
+                        " SELECT clients.CODI, " &
+                        " clients.NOM, " &
+                        " clients.POB, " &
+                        " clients.DOM, " &
+                        " clients.PROV, " &
+                        " clients.PAIS, " &
+                        " clients.INCOTERM, " &
+                        " IVA.IVA, IVA.RE, " &
+                        " clients.MESESCOMPLETOS, " &
+                        " clients.DIA1,clients.DIA2,clients.DIA3, " &
+                        " clients.FORMA,clients.CTA,clients.DTOFORMA, clients.NUMEROPROVE, " &
+                        " clients.REPRES AS REPRECLIENT, clients.BANC, clients.COFI, clients.OFI, clients.CENTRO, " &
+                        " clients.DC, clients.IBAN, clients.SWIFT " &
+                        " FROM CLIENTS LEFT JOIN IVA ON (IVA.CODI = CLIENTS.IVA) " '&
+            '" WHERE clients.BLOQUEADO <> 1 "
+
+            daSelect.SelectCommand = cmdSelect
+            ACN()
+            dtclients.Rows.Clear()
+            daSelect.Fill(dtclients)
+            dtclients.DefaultView.Sort = "CODI"
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub CargaTablaRepresentantes()
+        Try
+            Dim cmdSelect As New MySqlCommand
+            Dim daSelect As New MySqlDataAdapter
+
+            cmdSelect.Connection = cnn
+            cmdSelect.CommandText = "SELECT CODI, NOM, COMIS, CENTRO FROM REPRES"
+
+            daSelect.SelectCommand = cmdSelect
+            ACN()
+            dtRepres.Rows.Clear()
+            daSelect.Fill(dtRepres)
+            dtRepres.DefaultView.Sort = "CODI"
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+#End Region
+
+#Region "DESOFIMIENTO"
+    Public Overloads Sub SiguienteReg()
+        Try
+            ACN()
+            ActualizarOrigen()
+            MyBase.SiguienteReg()
+            MoverActual()
+            CCN()
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Public Overloads Sub AnteriorReg()
+        Try
+            ACN()
+            ActualizarOrigen()
+            Me.CargarRegistro(anterior)
+            MoverActual()
+            CCN()
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Public Overloads Sub UltimoReg()
+        Try
+            ACN()
+            ActualizarOrigen()
+            Me.CargarRegistro(ultimo)
+            MoverActual()
+            CCN()
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Public Overloads Sub PrimeroReg()
+        Try
+            ACN()
+            ActualizarOrigen()
+            Me.CargarRegistro(primero)
+            MoverActual()
+            CCN()
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Public Overloads Sub CambiarAReg(ByVal id As String, ByVal accion As Integer)
+        Try
+            ACN()
+            ActualizarOrigen()
+            MyBase.CambiarAReg(id, "", accion)
+            MoverActual()
+            CCN()
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+#End Region
+
+#Region "ORGANIZAR"
+    Public Sub PonerDatosOrdenSeleccionado()
+        Dim cmd As New MySqlCommand("SELECT * FROM CORDRE WHERE ORDRE = " & ORDRE & " AND CENTRO = """ & centro & """ ", cnn)
+        Dim da As MySqlDataReader
+        Try
+            ACN()
+            da = cmd.ExecuteReader
+            While da.Read
+                CLIENT = nzn(da("CLIENT"), 0)
+                MODEL = da("MODEL")
+                REPRES = nzn(da("REPRES"), 0)
+                COMIS = nzn(da("COMIS"), 0)
+                SERIE = general.nz(da("SERIE"), "")
+                TEMPORADA = general.nz(da("TEMPORADA"), "")
+                centro = general.nz(da("CENTRO"), "C")
+                TALLA01 = general.nz(da("TALLA01"), "")
+                TALLA02 = general.nz(da("TALLA02"), "")
+                TALLA03 = general.nz(da("TALLA03"), "")
+                TALLA04 = general.nz(da("TALLA04"), "")
+                TALLA05 = general.nz(da("TALLA05"), "")
+                TALLA06 = general.nz(da("TALLA06"), "")
+                TALLA07 = general.nz(da("TALLA07"), "")
+                TALLA08 = general.nz(da("TALLA08"), "")
+                TALLA09 = general.nz(da("TALLA09"), "")
+                TALLA10 = general.nz(da("TALLA10"), "")
+            End While
+            da.Close()
+            CCN()
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Function TratarDelete(ByVal accion As Integer, ByVal dt As DataTable)
+        Try
+            If Not accion = ultimo AndAlso dt.Rows.Count = 0 Then
+                'Quiere decir que ha habido un delete
+                Me.CargarRegistro(ultimo)
+                CCN()
+                Return True
+            End If
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Function
+    Public Overrides Sub NuevoRegistro()
+        Dim drNew As DataRow
+        Dim cm As CurrencyManager
+        Try
+            ActualizarOrigen()
+            tabla.Clear()
+            cm = bc(dvForm)
+            drNew = tabla.NewRow()
+
+            drNew.Item("CENTRO") = general.nz(centro, empresaPorDefecto)
+            drNew.Item("FRA") = GetNumeroUltimoPAF(documento, centro) + 1
+            drNew.Item("DOCUMENT") = documento
+            drNew.Item("DATA") = Date.Now
+            drNew.Item("TRASPAS") = False
+            drNew.Item("TIPUS") = tipo
+
+            tabla.Rows.Add(drNew)
+            cm.Position = 1
+            Try
+                guardarDV()
+            Catch ex As Exception
+            End Try
+            numeroRegistroActual = numeroRegistroActual + 1
+            MoverActual()
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub CanviarLineas()
+        Try
+            'Dim ts As Threading.ThreadStart = New Threading.ThreadStart(AddressOf lineasVenta.CambioDetalle)
+            'Dim ts2 As Threading.ThreadStart
+            'Dim t2 As Threading.Thread
+            'lineasVenta.PAFF = Me
+            'Dim t As Threading.Thread = New Threading.Thread(ts)
+
+            't.Start()
+            If Not PA() = -1 Then lineasVenta.CambioDetalle(centro, Me)
+            If documento = Factura Then
+                'ts2 = New Threading.ThreadStart(AddressOf vencimientos.CambioDetalle)
+                'vencimientos.PAFF = Me
+                't2 = New Threading.Thread(ts2)
+                't2.Start()
+                vencimientos.CambioDetalle(centro, Me)
+                detalleImpresion.CambioDetalle(centro, Me)
+                detalleImpresion2.CambioDetalle(centro, Me)
+            End If
+            If documento = Albaran Then
+                detalleImpresion.CambioDetalle(centro, Me)
+            End If
+            'Dim i, j As Integer
+            'Do
+            '    j = 0
+            '    ' Comprobar si alguno de los Threads está "vivo"
+            '    ' si es así, indicarlo para que continúe el bucle
+            '    If t.IsAlive And t2.IsAlive Then
+            '        j = 1
+            '        'Exit For
+            '    End If
+
+            '    ' Esto es necesario, para que todo siga funcionando
+            '    'System.Windows.Forms.Application.DoEvents()
+            'Loop While j = 1
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub MoverActual()
+        Try
+            cargando = True
+            CanviarLineas()
+            PonerNombres()
+            If TIPUS = Prenda Then
+                'PonerFiltroIdentificadores '!!! prendas
+                CargarColoresregistroActual()
+            End If
+            'If DOCUMENT = Factura Then
+            CargaDireccionesEnvio()
+            'End If
+            cargando = False
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+
+#Region "PRENDAS"
+    Public Sub TratarSeleccion()
+        Try
+            If TEMPORADA <> "" And SERIE <> "" And CLIENT <> 0 And CLIENT <> -1 And MODEL <> "" Then
+                CargarColoresregistroActual()
+            Else
+                'PonerRowFilterDVSeleccionModelos()
+                'CargarTablasOrden()
+            End If
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub CargarColoresregistroActual() '(ByRef cbo As C1.Win.C1List.C1Combo, Optional ByVal deiniciardg As Boolean = False)
+        Dim dar As MySqlDataReader
+        Dim dr As DataRow
+        Dim cmdSel As New MySqlCommand(" SELECT DISTINCT MODCOL FROM MODCOL " &
+                    " WHERE MODEL = """ & MODEL & """ AND " &
+                    " CLIENT = """ & CLIENT & """ AND " &
+                    " TEMPORADA = """ & TEMPORADA & """ AND " &
+                    " SERIE = """ & SERIE & """ " &
+                    " AND CENTRO = """ & centro & """ ", cnn)
+        Try
+            dtColoresPrendas.Columns("MODCOL").Caption = rm.GetString("COLOR")
+
+            ACN()
+            dar = cmdSel.ExecuteReader
+            dtColoresPrendas.Clear()
+            While dar.Read
+                dr = dtColoresPrendas.NewRow
+                dr("MODCOL") = dar("MODCOL")
+                dtColoresPrendas.Rows.Add(dr)
+            End While
+            dar.Close()
+            CCN()
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN() : dar.Close()
+        End Try
+    End Sub
+#End Region
+
+    Private Sub IniciarLineas()
+        Try
+            If soloClase = False Then
+                lineasVenta = New clsLineasVenta(ds.Tables("dfactu"), Me.centro, Me.bc, Me, esRegistroNuevo)
+            Else
+                lineasVenta = New clsLineasVenta(New aura2k3.ds11.dfactuDataTable, Me.centro, Me.bc, Me, esRegistroNuevo)
+            End If
+
+            If soloClase = False Then
+                Select Case documento
+                    Case Factura
+                        CargarImpresiones()
+                        vencimientos = New clsVencimientos(New aura2k3.ds11.vencimDataTable, Me.centro, Me.bc, Me)
+                    Case Albaran
+                        CargarImpresiones()
+                End Select
+
+            End If
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Friend Overrides Sub PonerNombres()
+        Dim aceptarCambiosAlFinal As Boolean = False
+        Try
+            If tabla.GetChanges Is Nothing Then aceptarCambiosAlFinal = True
+            'NOMCLIENT = DLookUp("NOM", "CLIENTS", " CODI = """ & CLIENT & """ ")
+            DormirHandlers()
+            If CLIENT <> 0 Then
+
+                Try : NOMCLIENT = CType(general.OBN(CLIENT, dtclients), String) : Catch ex As Exception : LOG(ex.ToString) : End Try
+                Try
+                    BANC = CType(general.OBN(CLIENT, dtclients, "BANC"), String)
+                Catch ex As Exception
+                    LOG(ex.ToString)
+                End Try
+                Try
+                    MESESCOMPLETOS = CBool(general.OBN(CLIENT, dtclients, "MESESCOMPLETOS"))
+                Catch ex As Exception : LOG(ex.ToString) : End Try
+
+                Try : REPRECLIENT = CInt(general.OBN(CLIENT, dtclients, "REPRECLIENT", "CODI", True)) : Catch ex As Exception : LOG(ex.ToString) : End Try
+                Try : REPRES = CInt(general.OBN(REPRECLIENT, dtclients, "REPRECLIENT", "CODI", True)) : Catch ex As Exception : LOG(ex.ToString) : End Try
+                If REPRES <> REPRECLIENT Then
+                    REPRES = REPRECLIENT
+                End If
+                Try : NOMREPRES = CType(general.OBN(REPRES, dtRepres), String) : Catch ex As Exception : LOG(ex.ToString) : End Try
+
+
+                Try : DIA1 = CInt(general.OBN(CLIENT, dtclients, "DIA1", "CODI", True)) : Catch ex As Exception : LOG(ex.ToString) : End Try
+                Try : DIA2 = CInt(general.OBN(CLIENT, dtclients, "DIA2", "CODI", True)) : Catch ex As Exception : LOG(ex.ToString) : End Try
+                Try : DIA3 = CInt(general.OBN(CLIENT, dtclients, "DIA3", "CODI", True)) : Catch ex As Exception : LOG(ex.ToString) : End Try
+                Try : NUMEROPROVE = CType(general.OBN(CLIENT, dtclients, "NUMEROPROVE", "CODI", False), String) : Catch ex As Exception : LOG(ex.ToString) : End Try
+                Try : FORMA = CType(general.OBN(CLIENT, dtclients, "FORMA"), String) : Catch ex As Exception : LOG(ex.ToString) : End Try
+                Try : cta = CType(general.OBN(CLIENT, dtclients, "CTA"), String) : Catch ex As Exception : LOG(ex.ToString) : End Try
+
+                Try : COFI = CType(general.OBN(CLIENT, dtclients, "COFI"), String) : Catch ex As Exception : LOG(ex.ToString) : End Try
+                Try : OFI = CType(general.OBN(CLIENT, dtclients, "OFI"), String) : Catch ex As Exception : LOG(ex.ToString) : End Try
+                Try : DC = CType(general.OBN(CLIENT, dtclients, "DC"), String) : Catch ex As Exception : LOG(ex.ToString) : End Try
+                Try : DTOFORMA = CDbl(general.OBN(CLIENT, dtclients, "DTOFORMA", "CODI", True)) : Catch ex As Exception : LOG(ex.ToString) : End Try
+
+                Try : NOMBANC = CType(general.OBN(BANC, dtBancs, "DESCRIPCIO"), String) : Catch ex As Exception : LOG(ex.ToString) : End Try
+
+
+                Try : COMISREPRESENTANT = CDbl(general.OBN(CLIENT, dtRepres, "COMIS", "CODI", True)) : Catch ex As Exception : LOG(ex.ToString) : End Try
+                Try : NUMEROPAG = CInt(general.OBN(FORMA, dtForpag, "NUMEROPAG", "CODI", True)) : Catch ex As Exception : LOG(ex.ToString) : End Try
+                Try : DIESPAG = CInt(general.OBN(FORMA, dtForpag, "DIESPAG", "CODI", True)) : Catch ex As Exception : LOG(ex.ToString) : End Try
+                Try : VEZ1FORPAG = CInt(general.OBN(FORMA, dtForpag, "VEZ1FORPAG", "CODI", True)) : Catch ex As Exception : LOG(ex.ToString) : End Try
+                Try : NOMFORMA = CType(general.OBN(FORMA, dtForpag, "NOMFORMA"), String) : Catch ex As Exception : LOG(ex.ToString) : End Try
+
+                Try : DOM2 = CType(general.OBN(CLIENT, dtclients, "DOM", "CODI", False), String) : Catch ex As Exception : LOG(ex.ToString) : End Try
+                Try : PROV = CType(general.OBN(CLIENT, dtclients, "PROV", "CODI", False), String) : Catch ex As Exception : LOG(ex.ToString) : End Try
+                Try : PAIS = CType(general.OBN(CLIENT, dtclients, "PAIS", "CODI", False), String) : Catch ex As Exception : LOG(ex.ToString) : End Try
+                Try : POB = CType(general.OBN(CLIENT, dtclients, "POB", "CODI", False), String) : Catch ex As Exception : LOG(ex.ToString) : End Try
+                Try : IBAN = CType(general.OBN(CLIENT, dtclients, "IBAN", "CODI", False), String) : Catch ex As Exception : LOG(ex.ToString) : End Try
+                Try : SWIFT = CType(general.OBN(CLIENT, dtclients, "SWIFT", "CODI", False), String) : Catch ex As Exception : LOG(ex.ToString) : End Try
+
+
+                'Try : P_IVA1 = general.OBN(CLIENT, dtclients, "IVA", "CODI", True) : Catch ex As Exception : LOG(ex.ToString) : End Try
+                Select Case CDate(general.nz(DATA, 0))
+                    Case Is >= CDate("#1/7/2010#")
+                        P_IVA1 = CDbl(general.OBN(CLIENT, dtclients, "IVA", "CODI", True))
+                    Case Else
+                        If P_IVA1 <> general.OBN(CLIENT, dtclients, "IVA", "CODI", True) Then
+                            If general.nz(P_IVA1, 0) = 0 Then P_IVA1 = CDbl(general.OBN(CLIENT, dtclients, "IVA", "CODI", True))
+                        Else
+                            'NO TOCO NADA DEJO EL IVA POR DEFECTO
+                        End If
+                End Select
+
+                Try : P_RE1 = CDbl(general.OBN(CLIENT, dtclients, "RE", "CODI", True)) : Catch ex As Exception : LOG(ex.ToString) : End Try
+
+                If aceptarCambiosAlFinal AndAlso (Not tabla.GetChanges Is Nothing) Then tabla.AcceptChanges()
+            End If
+            DespertarHandlers()
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False
+        End Try
+    End Sub
+    Private Function ComprobarActualizacion() As Double
+        Dim numer As Double
+        Try
+            numer = GetNumeroUltimoPAF(DOCUMENT, centro) + 1
+            If numer <> FRA Then Return numer
+
+            Return FRA
+
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Function
+    Public Sub actualizarNumeraciones()
+        Try
+            FRA = ComprobarActualizacion()
+            ActualizarNum("FACTUR", DOCUMENT, centro, FRA, TIPUS)
+
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Sub
+    Public Overrides Sub ActualizarOrigen(Optional ByVal nocerrar As Boolean = False, Optional ByVal hackDetalle As Boolean = False)
+        Try
+            'If FRA <> lineasVenta.FRA And lineasVenta.dvForm.Count <> 0 Then
+            '    MessageBox.Show("ERROR")
+            '    Exit Sub
+            'End If
+            MyBase.ActualizarOrigen(True, hackDetalle)
+            If lineasVenta Is Nothing Then
+            Else
+                lineasVenta.ActualizarOrigen(True, True)
+                If DOCUMENT = Factura AndAlso soloClase = False Then
+                    vencimientos.ActualizarOrigen(True, True)
+                    detalleImpresion.ActualizarOrigen(True, True)
+                    detalleImpresion2.ActualizarOrigen(True, True)
+                End If
+                If DOCUMENT = Albaran AndAlso soloClase = False Then
+                    detalleImpresion.ActualizarOrigen(True, True)
+                End If
+            End If
+
+        Catch ex As Exception
+            If ex.ToString.Substring(0, 9) = "Duplicate" Then
+                'La única posibilidad de que este dupliacado es que alguien haya insertado otro antes
+                FRA = GetNumeroUltimoPAF(DOCUMENT, centro) + 1
+                Try
+                    MyBase.ActualizarOrigen(True)
+                    lineasVenta.ActualizarOrigen(True, True)
+                    If DOCUMENT = Factura Then vencimientos.ActualizarOrigen(True, True)
+                Catch ex2 As Exception
+                    'Throw ex
+                End Try
+            End If
+            'Throw ex
+            'LOG(ex.ToString) 
+            cargando = False : CCN()
+        End Try
+    End Sub
+    Public Function ObtenerDocNuevo(ByVal afacturaproforma As Boolean) As Object
+        Try
+            If afacturaproforma = True Then
+                Return "M"
+            End If
+            Select Case documento
+                Case "C" : Return "A"
+                Case "A" : Return "F"
+            End Select
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Function
+    Private Sub BorrarLineasDondeSeHayaTraspasado()
+        Dim cmdUpd As New MySqlCommand
+        Try
+            cmdUpd.Connection = cnn
+
+            Select Case DOCUMENT
+                Case Pedido
+                    cmdUpd.CommandText = "UPDATE " & tablaLineasVenta & "  " &
+                        " SET COMAN = 0  WHERE ( CENTRO = """ & centro & """ AND DOCUMENT = ""A"" AND  COMAN = """ & FRA & """)"
+                    cmdUpd.ExecuteNonQuery()
+                    cmdUpd.CommandText = "UPDATE " & tablaLineasVenta & "   " &
+                        " SET COMAN = 0  WHERE ( CENTRO = """ & centro & """ AND DOCUMENT = ""F"" AND  COMAN = """ & FRA & """)"
+                    cmdUpd.ExecuteNonQuery()
+                Case Albaran
+                    cmdUpd.CommandText = "UPDATE " & tablaLineasVenta & "   " &
+                        " SET ALBAR = 0  WHERE ( CENTRO = """ & centro & """ AND DOCUMENT = ""F"" AND  ALBAR = """ & FRA & """)"
+                    cmdUpd.ExecuteNonQuery()
+
+            End Select
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Public Overloads Sub borrar()
+        Try
+            ACN()
+            BorrarLineasDondeSeHayaTraspasado()
+            lineasVenta.BorrarActualDVDetalle(True)
+            If DOCUMENT = Factura Then vencimientos.BorrarActualDVDetalle(True)
+            MyBase.borrar()
+            MoverActual()
+            CCN()
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Public Sub PonerDatosRepre()
+        Try
+            NOMREPRES = general.OBN(REPRES, dtRepres)
+            COMIS = general.OBN(REPRES, dtRepres, "COMIS", "CODI", True)
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Public Sub PonerDatosCliente()
+        Try
+            PonerNombres()
+            'Solo ponemos el incoterm cuando se seleciona un nuevo cliente
+            Try : incoterm = general.OBN(CLIENT, dtclients, "INCOTERM", "CODI") : Catch ex As Exception : LOG(ex.ToString) : End Try
+            If COMIS <> general.OBN(REPRES, dtRepres, "COMIS", "CODI", True) Then
+                Try : COMIS = general.OBN(REPRES, dtRepres, "COMIS", "CODI", True) : Catch ex As Exception : LOG(ex.ToString) : End Try
+            End If
+            lineasVenta.ADMuestras(CLIENT)
+            DOM = ""
+            CargaDireccionesEnvio()
+            lineasVenta.dvMuestras.RowFilter = "CLIENT = '" & CLIENT & "' AND CENTRO = '" & centro & "'"
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub CargaDireccionesEnvio()
+        Dim cmd As New MySqlCommand
+        Dim dar As MySqlDataReader
+        Dim dr As DataRow
+        Try
+            cmd.CommandText = "SELECT * FROM ADRES WHERE CODI = """ & CLIENT & """ "
+            cmd.Connection = cnn
+            Dim da As New MySqlDataAdapter(cmd)
+            dtDireccionesEnvio = New DataTable '(cmd)
+            dtDireccionesEnvio.Clear()
+            ACN()
+            da.Fill(dtDireccionesEnvio)
+            'dtDireccionesEnvio.Fill()
+            CCN()
+            dtDireccionesEnvio.DefaultView.Sort = "DOM"
+
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Sub
+
+#End Region
+
+#Region "CALCULOS"
+    Friend Sub ActualizarTotalesPAF(ByVal forzarActualizarPrecios As Boolean)
+        Try
+            If forzarActualizarPrecios OrElse (Not tabla.GetChanges Is Nothing Or Not lineasVenta.tabla.GetChanges Is Nothing) Then
+
+                Dim tempTOTAL As Double
+                Dim unidadesTotal As Double
+                Dim importeParaDescontar As Double
+                tempTOTAL = TOTAL
+                Select Case TIPUS
+                    Case Prenda
+                        unidadesTotal = sumaTotal("TALLA01", lineasVenta.dvForm) +
+                                        sumaTotal("TALLA02", lineasVenta.dvForm) +
+                                        sumaTotal("TALLA03", lineasVenta.dvForm) +
+                                        sumaTotal("TALLA04", lineasVenta.dvForm) +
+                                        sumaTotal("TALLA05", lineasVenta.dvForm) +
+                                        sumaTotal("TALLA06", lineasVenta.dvForm) +
+                                        sumaTotal("TALLA07", lineasVenta.dvForm) +
+                                        sumaTotal("TALLA08", lineasVenta.dvForm) +
+                                        sumaTotal("TALLA09", lineasVenta.dvForm) +
+                                        sumaTotal("TALLA10", lineasVenta.dvForm)
+                        'roundnum(nzn(unidadesTotal * PREU, 0), 2) '
+                        BRUT1 = sumaTotal("IMPORT", lineasVenta.dvForm)
+                        If lineasVenta.dvForm.ToTable.Columns.Contains("DESCRI") Then
+                             'lineasVenta.dvForm.RowFilter=""
+                            lineasVenta.dvForm.RowFilter = "Isnull([DESCRI], '') <> 'TRANSIT AND COURIER CHARGES'"
+                        End If
+                        DTE1 = roundnum((P_DTE / 100 + DTOFORMA / 100) * sumaTotal("IMPORT", lineasVenta.dvForm), 2)
+                        BASE1 = roundnum(sumaTotal("IMPORT", lineasVenta.dvForm) - DTE1, 2)
+                        IVA1 = roundnum(BASE1 * IIf(nzn(P_IVA1, 0) = -1, 0, nzn(P_IVA1, 0)) / 100, 2)
+                        RE1 = roundnum(BASE1 * IIf(nzn(P_RE1, 0) = -1, 0, nzn(P_RE1, 0)) / 100, 2)
+                        TOTAL = roundnum((BRUT1 - DTE1) + IVA1 + RE1, 2)
+                        lineasVenta.dvForm.RowFilter = ""
+                    Case Else
+                        BRUT1 = sumaTotal("IMPORT", lineasVenta.dvForm)
+                        lineasVenta.dvForm.RowFilter = "DESCRI <> 'TRANSIT AND COURIER CHARGES'"
+                        DTE1 = roundnum((P_DTE / 100 + DTOFORMA / 100) * sumaTotal("IMPORT", lineasVenta.dvForm), 2)
+                        BASE1 = roundnum(sumaTotal("IMPORT", lineasVenta.dvForm) - DTE1, 2)
+                        IVA1 = roundnum(BASE1 * IIf(nzn(P_IVA1, 0) = -1, 0, nzn(P_IVA1, 0)) / 100, 2)
+                        RE1 = roundnum(BASE1 * IIf(nzn(P_RE1, 0) = -1, 0, nzn(P_RE1, 0)) / 100, 2)
+                        TOTAL = roundnum((BRUT1 - DTE1) + IVA1 + RE1, 2)
+                        lineasVenta.dvForm.RowFilter = ""
+                End Select
+                If DOCUMENT = Factura AndAlso tempTOTAL <> TOTAL Then
+                    MessageBox.Show("L'import de la factura ha canviat es recalcularan els venciments")
+                    vencimientos.LimpiarActualesVencimientos()
+                    Me.vencimientos.GenerarVencimientos()
+                End If
+            End If
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+            CCN()
+        End Try
+    End Sub
+    Friend Sub ActualizarTotalesPAF2()
+        Try
+            If Not PA() = -1 Then
+                BRUT1 = sumaTotal("IMPORT", lineasVenta.dvForm)
+                lineasVenta.dvForm.RowFilter = "DESCRI <> 'TRANSIT AND COURIER CHARGES'"
+                DTE1 = (P_DTE / 100 + DTOFORMA / 100) * sumaTotal("IMPORT", lineasVenta.dvForm)
+                BASE1 = roundnum(BRUT1 - DTE1, 2)
+                IVA1 = roundnum(BASE1 * IIf(nzn(P_IVA1, 0) = -1, 0, nzn(P_IVA1, 0)) / 100, 2)
+                RE1 = roundnum(BASE1 * IIf(nzn(P_RE1, 0) = -1, 0, nzn(P_RE1, 0)) / 100, 2)
+                TOTAL = roundnum(BASE1 + IVA1 + RE1, 2)
+                lineasVenta.dvForm.RowFilter = ""
+            End If
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+            CCN()
+        End Try
+    End Sub
+    Friend Sub DespertarHandlers()
+
+        Try : AddHandler tabla.ColumnChanged, New DataColumnChangeEventHandler(AddressOf CanviarColumnaPAF) : Catch : End Try
+        If lineasVenta Is Nothing
+            Else
+            Try : AddHandler lineasVenta.tabla.RowChanged, AddressOf lineasVenta.RowChanged : Catch : End Try
+
+        End If
+        
+    End Sub
+    Friend Sub DormirHandlers()
+
+        'Try : RemoveHandler tabla.ColumnChanged, New DataColumnChangeEventHandler(AddressOf CanviarColumnaPAF) : Catch : End Try
+        Try : RemoveHandler tabla.ColumnChanged, AddressOf CanviarColumnaPAF : Catch : End Try
+        If lineasVenta Is Nothing Then
+        Else
+            Try : RemoveHandler lineasVenta.tabla.RowChanged, AddressOf lineasVenta.RowChanged : Catch : End Try
+
+        End If
+
+    End Sub
+    Private Sub CanviarColumnaPAF(ByVal sender As Object, ByVal e As DataColumnChangeEventArgs)
+
+        Try
+            guardarDV()
+            If e.Column.ColumnName = "P_DTE" Then
+                If Not tabla.GetChanges Is Nothing Then
+                    DormirHandlers()
+                    ActualizarTotalesPAF(False)
+                    DespertarHandlers()
+                End If
+            End If
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+            CCN()
+        End Try
+
+    End Sub
+#End Region
+
+#Region "OVERRIDES"
+    Friend Overrides Function TieneCambios() As Boolean
+        Try
+            guardarDV()
+            Select Case DOCUMENT
+                Case Factura
+                    If Not tabla.GetChanges Is Nothing OrElse lineasVenta.TieneCambios OrElse vencimientos.TieneCambios Then
+                        Return True
+                    Else
+                        Return False
+                    End If
+
+                Case Else
+                    If Not tabla.GetChanges Is Nothing OrElse lineasVenta.TieneCambios Then
+                        Return True
+                    Else
+                        Return False
+                    End If
+
+            End Select
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Function
+    Private Function HaySeleccion() As Boolean
+        Try
+            If mClienteSel = -1 Then Return False
+            Return True
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Function
+    Friend Overrides Function genWhere() As String
+        Dim ret As String
+        Try
+
+            If HaySeleccion() Then
+                ret = " WHERE factur.CENTRO = """ & general.nz(centro, empresaPorDefecto) & """ AND DOCUMENT = """ & documento & """ AND TIPUS = """ & tipo & """ AND CLIENT = " & mClienteSel & " "
+            Else
+                ret = " WHERE factur.CENTRO = """ & general.nz(centro, empresaPorDefecto) & """ AND DOCUMENT = """ & documento & """ AND TIPUS = """ & tipo & """ "
+            End If
+
+            Return ret
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Function
+    Friend Overrides Function GenOrder() As String
+        Try
+            Return " ORDER BY FRA "
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Function
+    Friend Function genWhereSubSelect(ByVal esCambio As Boolean) As String
+        Try
+            If esCambio AndAlso Not HaySeleccion() Then
+                Return " M1.CLIENT = " & mClienteSel & " AND DOCUMENT = """ & documento & """ AND TIPUS = """ & tipo & """ AND CENTRO = """ & centro & """ AND "
+            Else
+                If HaySeleccion() Then
+                    Return " CLIENT = " & mClienteSel & " AND DOCUMENT = """ & documento & """ AND TIPUS = """ & tipo & """ AND CENTRO = """ & centro & """ AND "
+                Else
+                    Return " DOCUMENT = """ & documento & """ AND TIPUS = """ & tipo & """ AND CENTRO = """ & centro & """ AND "
+                End If
+            End If
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Function
+    Friend Overrides Function genWhereNumeroRegistros() As String
+        Dim ret As String
+        Try
+            If Not HaySeleccion() Then
+                ret = " WHERE factur.CENTRO = """ & general.nz(centro, empresaPorDefecto) & """ AND DOCUMENT = """ & documento & """ AND TIPUS = """ & tipo & """ "
+            Else
+                ret = genWhereSeleccion("")
+            End If
+
+            Return ret
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Function
+    Private Function GenWhereConTodo(ByVal id As Object, ByVal esCambio As Boolean) As String
+        Dim ret As String
+        Try
+
+            If Not HaySeleccion() Then 'AndAlso Not esCambio Then
+                'Debe ser un cambio Como id seguro que no será nothing mirmaos cual es el numero
+                'Aqui nunca se llega
+                ret = " WHERE FRA = """ & id & """ AND DOCUMENT = """ & documento & """ AND TIPUS = """ & tipo & """ AND " & WCNoTabla() & " "
+            Else
+                'Que sea nothing quiere decir que ha habido un ir a registro
+                If id Is Nothing OrElse esCambio Then
+                    'DOCUMENT = """ & documento & """ AND 
+                    ret = " WHERE  " & WCNoTabla() & " AND CLIENT = """ & mClienteSel & """ AND DOCUMENT = """ & documento & """ AND TIPUS = """ & tipo & """ "
+                Else
+                    ret = " WHERE  " & WCNoTabla() & " AND DOCUMENT = """ & documento & """ AND TIPUS = """ & tipo & """ " &
+                            " AND FRA = """ & id & """ AND CLIENT = """ & mClienteSel & """ "
+                End If
+            End If
+
+            Return ret
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Function
+    Friend Function genWhereSeleccion(ByVal tabla As String) As String
+        Try
+            Dim ret As String
+            Dim i As Integer
+            ret = " WHERE factur.CENTRO = """ & general.nz(centro, empresaPorDefecto) & """ AND DOCUMENT = """ & documento & """ AND TIPUS = """ & tipo & """ "
+
+            If mClienteSel <> -1 Then
+                ret = ret & " AND " & tabla & "CLIENT = " & mClienteSel & " "
+            End If
+
+            Return ret
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Function
+    Friend Overrides Function ObtenerNumeroRegistro(ByVal id As Object) As Integer
+        Dim esCambio As Boolean = False
+        Dim idx As Object
+        If id Is Nothing Then : id = FRA : Else
+            If id.GetType Is GetType(Integer) Then
+                If id = esCambioSeleccion Then : esCambio = True : End If
+            End If
+        End If
+        Dim cmdSelect As MySqlCommand
+        Try
+
+            cmdSelect = New MySqlCommand
+            cmdSelect.CommandText = " SELECT (SELECT COUNT(*) " &
+                            " FROM " & t() & " AS M2 WHERE " & genWhereSubSelect(esCambio) & " " &
+                            " M2.FRA < M1.FRA) AS rownum FROM " & t() & " AS M1 " &
+                            " " & GenWhereConTodo(id, esCambio) & " " & GenOrder()
+
+            cmdSelect.Connection = cnn
+            idx = cmdSelect.ExecuteScalar
+            If idx Is Nothing Then Return -1
+            Return idx
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Function
+
+#End Region
+
+#Region "IMPRESION"
+    Public Sub InicializarImpresion()
+        Try
+            Select Case DOCUMENT
+                Case Albaran
+
+                    detalleImpresion.AñadirLineaDetalleImpresion("WEIGHT", "")
+                    detalleImpresion.AñadirLineaDetalleImpresion("GROSS", "")
+                    detalleImpresion.AñadirLineaDetalleImpresion("NET", "")
+                    'detalleImpresion.AñadirLineaDetalleImpresion("INCOTERM", incoterm)
+                    detalleImpresion.AñadirLineaDetalleImpresion("PAYMENT CONDITIONS", NOMFORMA)
+                    detalleImpresion.AñadirLineaDetalleImpresion("CUSTOM CODE", "")
+
+
+                Case Factura
+                    If detalleImpresion2.dvForm.Count = 0 Then
+                        'detalleImpresion.AñadirLineaDetalleImpresion("INCOTERM", incoterm)
+                        detalleImpresion2.AñadirLineaDetalleImpresion("Prices Exclude VAT", "")
+                    End If
+            End Select
+
+
+
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Sub
+    'Funcion que carga los 
+    Public Sub CargarImpresiones()
+        Dim cmdSelect As New MySqlCommand
+        Dim daSelect As New MySqlDataAdapter
+        Try
+            detalleImpresion = New clsImpresionVenta(New aura2k3.ds11.dfaturimpresionDataTable, Me.centro, Me.bc, Me)
+            detalleImpresion2 = New clsImpresionVenta2(New aura2k3.ds11.facturimpresionDataTable, Me.centro, Me.bc, Me)
+
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Sub
+    'arrayDatosFactura
+    '1-> INCOTERM
+    Public Sub ImprimirPAF(ByVal deDoc As Integer, ByVal aDoc As Integer, ByVal extrangero As Boolean, Optional ByVal arrayDatosFactura As ArrayList = Nothing)
+        Dim clsImp As clsImpresionPAFPO
+        Dim numActual As Integer
+        Dim tempPAF As clsPAFVenta
+        Dim idx As Integer
+        Try
+
+            tempPAF = New clsPAFVenta(New aura2k3.ds11.facturDataTable, centro, Me.bc, DOCUMENT, TIPUS)
+            For numActual = deDoc To aDoc
+                tempPAF.CambiarAReg(numActual, iraregistro)
+                If DOCUMENT = Factura Then
+                    tempPAF.vencimientos.GenerarVencimientos()
+                    tempPAF.ActualizarOrigen()
+                End If
+                Select Case DOCUMENT
+                    Case Factura
+                        Select Case TIPUS
+                            Case Prenda
+                                clsImp = New clsImpresionPAFPO(tempPAF.DOCUMENT, Muestra, Venta, tempPAF.dvForm,
+                                    tempPAF.lineasVenta.dvForm, extrangero, tempPAF.vencimientos.dvForm, True, arrayDatosFactura,
+                                    tempPAF.detalleImpresion.dvForm, tempPAF.detalleImpresion2.dvForm)
+                            Case Else
+                                clsImp = New clsImpresionPAFPO(tempPAF.DOCUMENT, Muestra, Venta, tempPAF.dvForm,
+                                    tempPAF.lineasVenta.dvForm, extrangero, tempPAF.vencimientos.dvForm, False, arrayDatosFactura,
+                                    tempPAF.detalleImpresion.dvForm, tempPAF.detalleImpresion2.dvForm)
+                        End Select
+                    Case Albaran
+                        Select Case TIPUS
+                            Case Prenda
+                                clsImp = New clsImpresionPAFPO(tempPAF.DOCUMENT, Muestra, Venta, tempPAF.dvForm,
+                                    tempPAF.lineasVenta.dvForm, extrangero, Nothing, True, arrayDatosFactura,
+                                    tempPAF.detalleImpresion.dvForm, tempPAF.detalleImpresion2.dvForm)
+                            Case Else
+                                clsImp = New clsImpresionPAFPO(tempPAF.DOCUMENT, Muestra, Venta, tempPAF.dvForm,
+                                    tempPAF.lineasVenta.dvForm, extrangero, Nothing, False, arrayDatosFactura,
+                                    tempPAF.detalleImpresion.dvForm)
+                        End Select
+                    Case Else
+                        Select Case TIPUS
+                            Case Prenda
+                                clsImp = New clsImpresionPAFPO(tempPAF.DOCUMENT, Muestra, Venta, tempPAF.dvForm, tempPAF.lineasVenta.dvForm, extrangero, Nothing, True)
+                            Case Else
+                                clsImp = New clsImpresionPAFPO(tempPAF.DOCUMENT, Muestra, Venta, tempPAF.dvForm, tempPAF.lineasVenta.dvForm, extrangero)
+                        End Select
+                End Select
+
+                clsImp.ImprimirDocumento(True)
+            Next
+            MoverActual()
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Public Function obtenerStringDireccionEnvio() As String
+        Dim cmdSel As New MySqlCommand
+        Dim str As String
+        Dim idx As Integer
+        Dim dareader As MySqlDataReader
+        Try
+
+            If dtDireccionesEnvio.Rows.Count <> 0 Then
+                idx = dtDireccionesEnvio.DefaultView.Find(DOM)
+                If idx <> -1 Then
+                    With dtDireccionesEnvio.DefaultView(dtDireccionesEnvio.DefaultView.Find(DOM))
+                        str = .Item("NOM") & vbLf & .Item("DOM") & vbLf & .Item("CP") & " " & .Item("POB") & vbLf & .Item("PROV") & vbLf & .Item("PAIS")
+                    End With
+                Else
+                    str = ""
+                End If
+
+            Else
+                str = ""
+            End If
+
+            Return str
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Function
+    Private Function obtenerDatosCliente(ByVal cliente As Integer) As String
+        Dim cmdSel As New MySqlCommand
+        Dim str As String
+        Dim dareader As MySqlDataReader
+        Try
+
+            str = "SELECT NOM, DOM, CP, PROV, POB, NIF FROM " & tablaClientes & " WHERE CODI = """ & cliente & """ "
+            cmdSel.CommandText = str
+            cmdSel.Connection = cnn
+            ACN()
+            dareader = cmdSel.ExecuteReader
+
+            While dareader.Read
+                With dareader
+                    str = .Item("NOM") & vbCrLf & .Item("DOM") & vbCrLf & .Item("CP") & " " & .Item("POB") & vbCrLf & .Item("PROV") & vbCrLf & .Item("NIF")
+                End With
+            End While
+            dareader.Close()
+            CCN()
+            Return str
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Function
+    Private Function ObtenerFechaDePedido(ByVal fra1 As Integer) As DateTime
+        Dim cmdSel As MySqlCommand
+        Dim d As DateTime
+        Try
+            cmdSel = New MySqlCommand("SELECT DATA FROM FACTUR WHERE DOCUMENT = ""C"" AND FRA = " & fra1 & " AND CENTRO = """ & centro & """", cnn)
+            ACN()
+            d = cmdSel.ExecuteScalar
+            CCN()
+            Return d.ToShortDateString
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Function
+    Private Function ObtenerFechaDePedidoString(ByVal fra1 As Integer) As String
+        Dim cmdSel As MySqlCommand
+        Dim d As Object
+        Try
+            cmdSel = New MySqlCommand("SELECT DATA FROM FACTUR WHERE DOCUMENT = ""C"" AND FRA = " & fra1 & " AND CENTRO = """ & centro & """", cnn)
+            ACN()
+            d = cmdSel.ExecuteScalar
+            CCN()
+            If d Is Nothing Then
+                Return ""
+            Else
+                Return d.ToShortDateString
+            End If
+
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Function
+    Private Function ObtenerPedidoDeFactura() As Integer
+
+        Try
+            'El problema es que una facuta puede venir de varias pedidos
+            Return lineasVenta.COMAN
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Function
+    Public Sub ImprimirFacturaVenta()
+        Dim cnTemp As New OleDb.OleDbConnection("Provider=Microsoft.Jet.OLEDB.4.0;Data Source=access\temp.mdb;User Id=admin;Password=;")
+        Dim strSQL As String
+        Dim cmdIns As New OleDb.OleDbCommand
+        Dim strCliente As String
+        Dim cuenta As String
+        Dim V1 As String = ""
+        Dim V1i As String = ""
+        Dim V2 As String = ""
+        Dim V2i As String = ""
+        Dim V3 As String = ""
+        Dim V3i As String = ""
+        Dim accessDir As New AccessDirecto(tabla.TableName)
+        Try
+            accessDir.BorrarDatosTablaAccess("VENTAS")
+            accessDir.BorrarDatosTablaAccess("DVENTAS")
+
+            cmdIns.Connection = cnTemp
+            strCliente = obtenerDatosCliente(CLIENT)
+            '" """ & CType(.Item("IMPORT"), Double) & """, " & _
+            '" """ & CType(.Item("VENCIM"), Date).ToLongDateString.ToString & """, " & _
+            Dim cont As Integer = vencimientos.dvForm.Count
+            Select Case cont
+                Case 1
+                    V1 = vencimientos.dvForm(0).Item("VENCIM")
+                    V1i = vencimientos.dvForm(0).Item("IMPORT")
+                Case 2
+                    V1 = vencimientos.dvForm(0).Item("VENCIM")
+                    V1i = vencimientos.dvForm(0).Item("IMPORT")
+                    V2 = vencimientos.dvForm(1).Item("VENCIM")
+                    V2i = vencimientos.dvForm(1).Item("IMPORT")
+                Case 3
+                    V1 = vencimientos.dvForm(0).Item("VENCIM")
+                    V1i = vencimientos.dvForm(0).Item("IMPORT")
+                    V2 = vencimientos.dvForm(1).Item("VENCIM")
+                    V2i = vencimientos.dvForm(1).Item("IMPORT")
+                    V3 = vencimientos.dvForm(2).Item("VENCIM")
+                    V3i = vencimientos.dvForm(2).Item("IMPORT")
+            End Select
+
+            'En los pedidos de venta el proveedor es el cliente por una futura unificacion de las dos funciones
+            strSQL = "INSERT INTO VENTAS ( FRA, TIPO, DATA, CLIENTE, DIRECCIONENTREGA,  NPEDIDO, FECHAPEDIDO, AGENCIA, OBSERVACIONES, FORMAPAGO, DTO, IMPORTEDTO,  IMPORTEIVA, BRUT, BASE, IVA, RE, TOTAL, VENCIMIENTOIMPORTE1, VENCIMIENTOIMPORTE2,  VENCIMIENTOIMPORTE3, VENCIMIENTOFECHA1, VENCIMIENTOFECHA2, VENCIMIENTOFECHA3, DIRECCIONBANCO, BANCO, CTA ) VALUES("
+            cuenta = BANC & " " & COFI & " " & DC & " " & cta
+            '!!!!!!!!!!!!!!!!!
+
+            strSQL = strSQL & FRA & ", ""T"" , """ & DATA.ToShortDateString & """, " &
+                " """ & general.NS(strCliente) & """, "" "", " &
+                " """ & ObtenerPedidoDeFactura() & """, " &
+                " """ & ObtenerFechaDePedido(ObtenerPedidoDeFactura()) & """, " &
+                " """", """ & general.NS(OBSERV) & """, " &
+                " """ & NOMFORMA & """, " &
+                " """ & P_DTE & """, """ & DTE1 & """, " &
+                " """ & IVA1 & """, """ & BRUT1 & """, " &
+                " """ & BASE1 & """, " &
+                " """ & P_IVA1 & """, " &
+                " """ & P_RE1 & """, " &
+                " """ & TOTAL & """, " &
+                " """ & V1i & """, """ & V2i & """, """ & V3i & """, """ & V1 & """, """ & V2 & """, " &
+                " """ & V3 & """, """ & OFI & """, " &
+                " """ & NOMBANC & """, """ & cuenta & """)"
+
+            cmdIns.CommandText = strSQL
+            cnTemp.Open()
+            cmdIns.ExecuteNonQuery()
+            cnTemp.Close()
+
+            strSQL = "INSERT INTO DVENTAS (FRA, TEIXIT, DESCRI, COLOR, MAQUINA, UNITATS, PREU, DTO, IMPORT, ALBARAN, MEDIDAS) VALUES( """ & FRA & """ ,"
+            '! Changed strSQLoriginal to Object
+            Dim strSQLoriginal As Object = strSQL
+            Dim i As Integer
+            For i = 0 To lineasVenta.dvForm.Count - 1
+                With lineasVenta.dvForm(i)
+
+                    strSQL = strSQL & """"
+                    strSQL = strSQL & .Item("MOSTRA") & """,""" & .Item("DESCRI") & """, """ & .Item("COLOR") & """, 0, """ & .Item("UNITATS") & """, """ & .Item("PREU") & """, """ & .Item("DTE") & """, """ & .Item("IMPORT") & """, """ & .Item("ALBAR") & ""","""")"
+
+                End With
+                cmdIns.CommandText = strSQL
+                cnTemp.Open()
+                cmdIns.ExecuteNonQuery()
+                cnTemp.Close()
+                strSQL = strSQLoriginal
+            Next
+            accessDir.CargarInformeAccess("iVENTAFACTURA", "Venda")
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+
+    End Sub
+    Private Function tieneVencimientos(ByVal numero As Double) As Boolean
+        Dim cmd As New MySqlCommand("SELECT COUNT(*) FROM VENCIM WHERE FRA = """ & numero & """ AND CENTRO = """ & centro & """ ", cnn)
+        Try
+            Return IIf(nzn(cmd.ExecuteScalar(), 0) = 0, False, True)
+
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Function
+    Private Function estaDentroFechas(ByVal numero As Double, ByVal FECHA1 As Date, ByVal FECHA2 As Date) As Boolean
+        Dim cmd As New MySqlCommand("SELECT COUNT(*) FROM FACTUR WHERE  " &
+            " FRA = """ & numero & """ AND " &
+            " DATA >= """ & ConvertirAfechaMysql(FECHA1.Date) & """ AND  " &
+            " DATA <= """ & ConvertirAfechaMysql(FECHA2.Date) & """ ", cnn)
+        Try
+            Return IIf(nzn(cmd.ExecuteScalar(), 0) = 0, False, True)
+
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Function
+    Private Function GenerarVencimNoGenerados(ByVal FRA1 As Double, ByVal FRA2 As Double, ByVal FECHA1 As Date, ByVal FECHA2 As Date, ByVal conIntervaloFechas As Boolean)
+        Dim numero As Integer
+        Try
+            ACN()
+            For numero = FRA1 To FRA2
+                If conIntervaloFechas Then
+                    If estaDentroFechas(numero, FECHA1, FECHA2) AndAlso Not tieneVencimientos(numero) Then
+                        GenerearVencimiento(numero)
+                    End If
+                Else
+                    If Not tieneVencimientos(numero) Then
+                        GenerearVencimiento(numero)
+                    End If
+                End If
+            Next
+            CCN()
+
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Function
+    Private Sub GenerearVencimiento(ByVal numero As Double)
+        Try
+            Dim tempPAF As New clsPAFVenta(New aura2k3.ds11.facturDataTable, centro, Me.bc, Factura, TIPUS, False, numero, False)
+            'tempPAF.CambiarAReg(numero, iraregistro)
+            tempPAF.vencimientos.GenerarVencimientos()
+            If numero = FRA Then CanviarLineas()
+            tempPAF.ActualizarOrigen()
+            tempPAF = Nothing
+
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Sub
+    Public Function ImprimirRecibos(ByVal FRA1 As Double, ByVal FRA2 As Double, ByVal FECHA1 As Date, ByVal FECHA2 As Date, ByVal conIntervaloFechas As Boolean)
+        Dim clsImp As clsImpresionPAFPO
+        Try
+            If conIntervaloFechas Then ComprobarIntervaloFechas(FECHA1, FECHA2)
+
+            ComprobarIntervaloPedidos(FRA1, FRA2)
+            GenerarVencimNoGenerados(FRA1, FRA2, FECHA1, FECHA2, conIntervaloFechas)
+            If FRA1 = FRA Then MoverActual()
+            clsImp = New clsImpresionPAFPO(DOCUMENT, Muestra, Venta, Me.dvForm, lineasVenta.dvForm, False)
+            Return clsImp.ImprimirRecibos(FRA1, FRA2, FECHA1, FECHA2, conIntervaloFechas)
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Function
+
+#End Region
+
+#Region "TRASPASO"
+
+#Region "FUNCIONES UTILES"
+    Private Function ComprobarIntervaloPedidos(ByVal paf1 As Integer, ByVal paf2 As Integer) As Boolean
+        If (paf2 < paf1) Then
+            Dim e As New Exception("IPedidoNoValido")
+            Throw e
+        End If
+        If paf2 = paf1 Then : Return False
+        Else : Return True : End If
+
+    End Function
+    Private Function ComprobarIntervaloFechas(ByVal fecha1 As Date, ByVal fecha2 As Date) As Boolean
+
+        If (fecha2 < fecha1) Then
+            Dim e As New Exception("IFechaNoValido")
+            Throw e
+        End If
+        If fecha2 = fecha1 Then : Return False
+        Else : Return True : End If
+
+    End Function
+    Private Function ComprobarIntervalosClientes(ByVal cliente1 As Integer, ByVal cliente2 As Integer) As Boolean
+
+        If cliente2 < cliente1 Then
+            Dim e As New Exception("IClienteNoValido")
+            Throw e
+        End If
+
+        If cliente2 = cliente1 Then : Return False
+        Else : Return True : End If
+
+    End Function
+    Private Sub ComprobarAlbaran(ByVal AF As Double, ByVal aproforma As Boolean)
+
+        'Hay que comprobar que exista el AF que vamos a crear
+        'y si existe mirar si el cliente es el mismo
+        Dim cmdSelectAF As New MySqlCommand
+        cmdSelectAF.Connection = cnn
+        cmdSelectAF.CommandText = "SELECT FRA, CLIENT FROM " &
+                                        " " & tablaVentas & " WHERE " &
+                                        " (factur.DOCUMENT = """ & ObtenerDocNuevo(aproforma) & """ AND TIPUS = """ & tipo & """ AND " &
+                                        " factur.FRA = """ & AF & """ AND " &
+                                        " factur.CENTRO = """ & centro & """)"
+        ACN()
+        Dim daRead As MySqlDataReader = cmdSelectAF.ExecuteReader()
+
+        'MessageBox.Show(count)
+        Dim i As Integer = 0
+        While daRead.Read
+            i = i + 1
+            If Not daRead("CLIENT") = CLIENT Then
+                daRead.Close()
+                CCN()
+                MessageBox.Show(rm.GetString("ALBDESTINONOCLIENTE"))
+                Dim exc As New Exception(rm.GetString("NOEXISTEALBAR"))
+                Throw exc
+            End If
+        End While
+        If (i = 0) Then
+            'MessageBox.Show("error")
+            daRead.Close()
+            CCN()
+            MessageBox.Show(rm.GetString("NOEXITEDOCDESTINO"))
+            Dim exc As New Exception(rm.GetString("NOEXISTEALBAR"))
+            Throw exc
+        End If
+        daRead.Close()
+        CCN()
+
+    End Sub
+    Private Function NumeroLineasPAF(ByVal documento As String, ByVal PAF As Double) As Integer
+        'Devuelve el numero de lineas del PAF pasado
+        Try
+            Dim cmdSelectPAF As New MySqlCommand
+            cmdSelectPAF.Connection = cnn
+            cmdSelectPAF.CommandText = "select count(*) from " & tablaLineasVenta & " WHERE  " &
+                    " (DOCUMENT = """ & documento & """ AND TIPUS = """ & tipo & """ AND  " &
+                    " FRA = " & PAF & " AND  " &
+                    " CENTRO = """ & centro & """)"
+            ACN()
+            Dim count As Integer = cmdSelectPAF.ExecuteScalar()
+            CCN()
+            Return count
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+
+    End Function
+    Private Function YaTraspasados(ByVal PAF1 As Integer, ByVal PAF2 As Integer) As Boolean
+        Try
+            Dim cmdSelectPAF As New MySqlCommand
+            cmdSelectPAF.Connection = cnn
+
+            ACN()
+            If PAF2 = -1 Then
+                'No es un intervalo
+                cmdSelectPAF.CommandText = "SELECT TRASPAS FROM " & tablaVentas & " " &
+                    " WHERE (DOCUMENT = """ & documento & """ AND TIPUS = """ & tipo & """ AND " &
+                    " FRA = " & PAF1 & " AND " &
+                    " CENTRO = """ & centro & """) ORDER BY fra DESC"
+
+                'traspas = cmdSelectPAF.ExecuteScalar
+                If IsDBNull(cmdSelectPAF.ExecuteScalar) Then '.GetType.Equals(GetType(System.DBNull))) Then
+                    Return False
+                End If
+            Else
+                cmdSelectPAF.CommandText = "SELECT TRASPAS FROM " & tablaVentas & "  " &
+                    " WHERE (DOCUMENT = """ & documento & """ AND TIPUS = """ & tipo & """ AND  " &
+                    " FRA >= " & PAF1 & " AND  " &
+                    " FRA <= " & PAF2 & " AND  " &
+                    " CENTRO = """ & centro & """) ORDER BY fra DESC"
+
+                ACN()
+                Dim DataReader As MySqlDataReader = cmdSelectPAF.ExecuteReader()
+
+                'Es un intervalo hay que mirar todos los PAF del intervalo y 
+                'devolver true si todos los del intervalo estan traspasados
+                While DataReader.Read
+                    If DataReader.Item(0) = False Then
+                        DataReader.Close()
+                        CCN()
+                        Return False
+                    End If
+                End While
+                DataReader.Close()
+                CCN()
+                Return True
+
+            End If
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Function
+#End Region
+
+    Private Function ObtenerDocumentoATraspasar(ByVal i As Integer, ByVal traspasables As ArrayList) As clsPAFVenta
+        Dim docATraspasar As clsPAFVenta
+        Try
+            docATraspasar = New clsPAFVenta(New aura2k3.ds11.facturDataTable, centro, bc, DOCUMENT, TIPUS, False, traspasables(i), False)
+            Return docATraspasar
+
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Function
+    Public Function ObtenerDocumentoNuevo(ByVal docATraspasar As clsPAFVenta, ByVal nuevodocumento As String, ByVal nuevoFRA As Long) As clsPAFVenta
+        Dim nuevoDoc As clsPAFVenta
+        Try
+            nuevoDoc = New clsPAFVenta(New aura2k3.ds11.facturDataTable, docATraspasar.centro, bc, nuevodocumento, docATraspasar.tipo, True, nuevoFRA, True, docATraspasar, dtclients, dtForpag, dtRepres, dtBancs)
+            Return nuevoDoc
+
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Function
+
+    'Private Function TraspasarLineasANuevoDocumento(ByVal i As Integer, ByVal documentonuevo As Char, ByVal docATraspasar As clsPAFVenta, ByVal nuevoDoc As clsPAFVenta)
+    '    Dim j As Integer
+    '    Try
+    '        For j = 0 To nuevoDoc.lineasVenta.dvForm.Count - 1
+    '            Select Case documentonuevo
+    '                Case Albaran
+    '                    nuevoDoc.lineasVenta.dvForm(j).Item("COMAN") = docATraspasar.FRA
+    '                Case Factura
+    '                    Select Case TIPUS
+    '                        Case Prenda
+    '                            nuevoDoc.lineasVenta.dvForm(j).Item("ALBAR") = docATraspasar.FRA
+    '                            nuevoDoc.lineasVenta.dvForm(j).Item("MOSTRA") = docATraspasar.MODEL
+    '                            nuevoDoc.lineasVenta.dvForm(j).Item("SERIE") = docATraspasar.SERIE
+    '                            nuevoDoc.lineasVenta.dvForm(j).Item("TEMPORADA") = docATraspasar.TEMPORADA
+    '                            nuevoDoc.lineasVenta.dvForm(j).Item("PREU") = docATraspasar.PREU
+    '                            nuevoDoc.lineasVenta.dvForm(j).Item("ORDRE") = docATraspasar.ORDRE
+    '                            nuevoDoc.lineasVenta.dvForm(j).Item("UNITATS") = sumarUnidades(j, nuevoDoc)
+    '                            nuevoDoc.lineasVenta.dvForm(j).Item("IMPORT") = nuevoDoc.lineasVenta.dvForm(j).Item("UNITATS") * docATraspasar.PREU
+
+    '                        Case Else : nuevoDoc.lineasVenta.dvForm(j).Item("ALBAR") = docATraspasar.FRA
+
+    '                    End Select
+
+    '            End Select
+    '        Next
+
+
+    '    Catch ex As Exception
+    '        LOG(ex.ToString)
+    '    End Try
+    'End Function
+    Public Function getNumeroNuevaLinea() As Integer
+        Dim i As Integer
+        Dim maxLinea, maxLinea2 As Integer
+        Try
+            ' .lineasVenta.dvForm(nuevoDoc.lineasVenta.dvForm.Count - 1).Item("NLINEA") + 1 + j
+            maxLinea = -1
+            For i = 0 To lineasVenta.dvForm.Count - 1
+                maxLinea2 = lineasVenta.dvForm(i).Item("NLINEA")
+                If maxLinea2 > maxLinea Then
+                    maxLinea = maxLinea2
+                End If
+            Next
+            If maxLinea = -1 Then maxLinea = 1
+
+            Return maxLinea + 1
+
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Function
+    Private Function TrasapasarLineasADocumento(ByVal documentonuevo As Char, ByVal docATraspasar As clsPAFVenta, ByVal nuevoDoc As clsPAFVenta)
+        Dim j As Integer
+        Dim dr As DataRow
+        Try
+            For j = 0 To docATraspasar.lineasVenta.dvForm.Count - 1
+
+                dr = nuevoDoc.lineasVenta.tabla.NewRow
+                CopiarFila(docATraspasar.lineasVenta.tabla.Rows(j), dr)
+
+                If nuevoDoc.lineasVenta.dvForm.Count = 0 Then
+                    dr("NLINEA") = 1
+                Else
+                    dr("NLINEA") = nuevoDoc.getNumeroNuevaLinea()
+                End If
+
+                Select Case documentonuevo
+                    Case Albaran
+                        dr("COMAN") = docATraspasar.FRA
+                    Case Factura
+                        Select Case TIPUS
+                            Case Prenda
+                                dr("ALBAR") = docATraspasar.FRA
+                                dr("MOSTRA") = docATraspasar.MODEL
+                                dr("SERIE") = docATraspasar.SERIE
+                                dr("TEMPORADA") = docATraspasar.TEMPORADA
+                                dr("PREU") = docATraspasar.PREU
+                                dr("ORDRE") = docATraspasar.ORDRE
+                                dr("UNITATS") = sumarUnidades(dr)
+                                dr("IMPORT") = dr("UNITATS") * docATraspasar.PREU
+
+                            Case Else
+                                dr("ALBAR") = docATraspasar.FRA
+
+                        End Select
+
+                End Select
+                nuevoDoc.lineasVenta.tabla.Rows.Add(dr)
+                nuevoDoc.lineasVenta.ActualizarDetalle()
+            Next
+
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Function
+    Private Function sumarUnidades(ByVal j As Integer, ByVal nuevoDoc As clsPAFVenta) As Double
+        Try
+            Return nzn(nuevoDoc.lineasVenta.dvForm(j).Item("TALLA01"), 0) +
+                    nzn(nuevoDoc.lineasVenta.dvForm(j).Item("TALLA02"), 0) +
+                    nzn(nuevoDoc.lineasVenta.dvForm(j).Item("TALLA03"), 0) +
+                    nzn(nuevoDoc.lineasVenta.dvForm(j).Item("TALLA04"), 0) +
+                    nzn(nuevoDoc.lineasVenta.dvForm(j).Item("TALLA05"), 0) +
+                    nzn(nuevoDoc.lineasVenta.dvForm(j).Item("TALLA06"), 0) +
+                    nzn(nuevoDoc.lineasVenta.dvForm(j).Item("TALLA07"), 0) +
+                    nzn(nuevoDoc.lineasVenta.dvForm(j).Item("TALLA08"), 0) +
+                    nzn(nuevoDoc.lineasVenta.dvForm(j).Item("TALLA09"), 0) +
+                    nzn(nuevoDoc.lineasVenta.dvForm(j).Item("TALLA10"), 0)
+
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Function
+    Private Function sumarUnidades(ByVal dr As DataRow) As Double
+        Try
+            Return nzn(dr("TALLA01"), 0) +
+                    nzn(dr("TALLA02"), 0) +
+                    nzn(dr("TALLA03"), 0) +
+                    nzn(dr("TALLA04"), 0) +
+                    nzn(dr("TALLA05"), 0) +
+                    nzn(dr("TALLA06"), 0) +
+                    nzn(dr("TALLA07"), 0) +
+                    nzn(dr("TALLA08"), 0) +
+                    nzn(dr("TALLA09"), 0) +
+                    nzn(dr("TALLA10"), 0)
+
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Function
+    Private Function yaHaSidoTraspasdoAlgunAlbaranConEsteCliente(ByVal traspasados As ArrayList, ByVal cliente As Integer) As Integer
+        Dim str As String
+        Dim numeroPAF As Integer
+        Dim clientePAF As Integer
+        Dim i As Integer
+
+        Try
+            For i = 0 To traspasados.Count - 1
+                str = traspasados(i)
+                numeroPAF = str.Substring(0, str.IndexOf(";"))
+                clientePAF = str.Substring(str.IndexOf(";") + 1, str.Length - str.IndexOf(";") - 1)
+                If clientePAF = cliente Then Return numeroPAF
+            Next
+            Return -1
+
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Function
+    'Crea los documentos nuevos dependiendo de a que documento queremos trasapasar
+    Private Sub crearPAFS(ByVal traspasables As ArrayList, ByVal apaf As Integer, ByVal afecha As Date, ByVal afacturaproforma As Boolean)
+        Dim fecha, documentonuevo As String
+        Dim i As Integer
+        Dim UltimoPAF As Double
+        Dim docATraspasar, nuevoDoc As clsPAFVenta
+        'traspasados contiene FRA;CLIENTE por cada posicion del arraylist
+        Dim traspasados As New ArrayList
+        Try
+            documentonuevo = ObtenerDocNuevo(afacturaproforma)
+            'En trasp tenemos los FRA que queremos traspasar
+            For i = 0 To traspasables.Count - 1
+                'Si el que estamos mirando actualmente tiene el mismo cliente que uno traspasado con anterioridad en traspasables entonces se ha
+                'de copiar donde se haya traspasdo ese documento anteriormente
+                If apaf = 0 Then
+                    UltimoPAF = GetNumeroUltimoPAF(documentonuevo, centro) + 1
+                Else
+                    UltimoPAF = apaf
+                End If
+
+                'Cargamos el actual, si se hace desde tejidos/complmentos en TIPUS = "T" y si se hace desde prendas TIPUS = "P"
+                docATraspasar = ObtenerDocumentoATraspasar(i, traspasables)
+
+                If docATraspasar.lineasVenta.dvForm.Count = 0 Then
+                    MessageBox.Show("No es pot traspassar el document: " & docATraspasar.FRA & " No te cap linia al detall")
+                Else
+                    If yaHaSidoTraspasdoAlgunAlbaranConEsteCliente(traspasados, docATraspasar.CLIENT) <> -1 Then
+                        UltimoPAF = yaHaSidoTraspasdoAlgunAlbaranConEsteCliente(traspasados, docATraspasar.CLIENT)
+                    Else
+                        traspasados.Add(UltimoPAF & ";" & CLIENT)
+                    End If
+
+                    nuevoDoc = ObtenerDocumentoNuevo(docATraspasar, documentonuevo, UltimoPAF)
+
+                    'Ponemos la fecha del nuevo DOC
+                    If apaf = 0 Then
+                        fecha = ConvertirAfechaMysql(afecha)
+                        nuevoDoc.DATA = fecha
+                    End If
+
+                    TrasapasarLineasADocumento(documentonuevo, docATraspasar, nuevoDoc)
+
+                    If documentonuevo <> Proforma Then
+                        docATraspasar.TRASPAS = True
+                        If docATraspasar.FRA = FRA Then
+                            TRASPAS = True
+                            tabla.AcceptChanges()
+                        End If
+                    End If
+
+                    docATraspasar.ActualizarOrigen(True, True)
+
+                    If nuevoDoc.DOCUMENT = Factura Then
+                        'Aqui ya podemos llamar a crear los vencimintos pero antes hay que hacerles el new
+                        If docATraspasar.ALBCLI <> "" Then
+                            If nuevoDoc.OBSERV = "" Then
+                                nuevoDoc.OBSERV = "ORDER: " & nuevoDoc.ALBCLI
+                            Else
+                                If nuevoDoc.OBSERV.IndexOf(docATraspasar.ALBCLI) = -1 Then
+                                    nuevoDoc.OBSERV = nuevoDoc.OBSERV & "-" & docATraspasar.ALBCLI
+                                End If
+
+                            End If
+
+                            If nuevoDoc.OBSERVOculto = "" Then
+                                nuevoDoc.OBSERVOculto = "ORDER: " & nuevoDoc.ALBCLI
+                            Else
+                                If nuevoDoc.OBSERVOculto.IndexOf(docATraspasar.ALBCLI) = -1 Then
+                                    nuevoDoc.OBSERVOculto = nuevoDoc.OBSERVOculto & "-" & docATraspasar.ALBCLI
+                                End If
+
+                            End If
+
+                        End If
+
+                        nuevoDoc.vencimientos = New clsVencimientos(New aura2k3.ds11.vencimDataTable, Me.centro, Me.bc, nuevoDoc)
+                        nuevoDoc.vencimientos.LimpiarActualesVencimientos()
+                        nuevoDoc.ActualizarTotalesPAF(True)
+                        nuevoDoc.vencimientos.GenerarVencimientos()
+                        'Esto lo hago separadao pq nuevoDoc lo hemos creado solo con la clase
+                        nuevoDoc.ActualizarOrigen(True, True)
+                        nuevoDoc.vencimientos.ActualizarOrigen(True, True)
+                    End If
+
+                    'Si no es una factura no he actualizado el origen del nuevoDoc todavía
+                    If nuevoDoc.DOCUMENT <> Factura Then
+                        nuevoDoc.ActualizarTotalesPAF(True)
+                        nuevoDoc.ActualizarOrigen(True, True)
+                    End If
+
+                    'Actualizamos las numeraciones para los nuevos documentos
+                    'Habria que tener en cuenta que puede alguien crear un nuevo documento guardarlo en el proceso de antes
+                    'cosa muy muy dificil (descartado de momento)
+                    If apaf = 0 Then ActualizarNum(tablaVentas, documentonuevo, centro, UltimoPAF, nuevoDoc.TIPUS)
+                    UltimoPAF = UltimoPAF + 1
+
+                End If
+            Next
+            Dim str, str2 As String
+            Dim numeroPAF As Integer
+            If traspasados.Count = 0 Then
+                str2 = "No s'ha traspassat a cap document"
+            Else
+                str2 = "S'ha fet el traspàs al document/s:"
+                For i = 0 To traspasados.Count - 1
+                    str = traspasados(i)
+                    numeroPAF = str.Substring(0, str.IndexOf(";"))
+                    str2 = str2 & " " & numeroPAF
+                Next
+            End If
+            MessageBox.Show(str2, rm.GetString("INFORMACION"))
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    'La siguiente funcion se encargade rellenar el arraylist Traspasables con los PA que se pueden traspasar
+    Private Sub InsertarPAF(ByRef Traspasables As ArrayList, ByVal paf1 As Integer, ByVal paf2 As Integer,
+                    ByVal cliente1 As Integer, ByVal cliente2 As Integer,
+                    ByVal fecha1 As Date, ByVal fecha2 As Date,
+                    Optional ByVal InsertarPAF As Boolean = False)
+        Dim strSQL As String
+        Dim DataReader As MySqlDataReader
+        Dim cmdSelPAF As MySqlCommand
+        Try
+
+            strSQL = "SELECT FRA FROM " & tablaVentas & " WHERE " &
+            " (CENTRO = """ & centro & """ AND " &
+            " DOCUMENT = """ & DOCUMENT & """ AND TIPUS = """ & tipo & """ AND " &
+            " TRASPAS = ""0"" "
+
+            'La consulta nos devolverá los PAF q cumplan el intervalo
+            'es decir los q tenemos que poner en traspasables para traspasarlo
+            'dgTraspas.SelectedRows.Item("FRA")
+
+            strSQL = strSQL & "AND FRA >= " & paf1 & "  AND FRA <= " & paf2 & " "
+
+            strSQL = strSQL & "AND DATA >= """ & ConvertirAfechaMysql(fecha1) & """  AND DATA <= """ & ConvertirAfechaMysql(fecha2) & """ "
+
+            strSQL = strSQL & "AND CLIENT >= " & cliente1 & " AND  CLIENT <= " & cliente2 & ") ORDER by FRA"
+            cmdSelPAF = New MySqlCommand(strSQL, cnn)
+            ACN()
+            DataReader = cmdSelPAF.ExecuteReader()
+
+            While DataReader.Read
+                If Not Traspasables.Contains(DataReader.Item(0)) Then Traspasables.Add(DataReader.Item(0))
+            End While
+            DataReader.Close()
+            CCN()
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub HacerTraspaso(ByVal apaf As Integer, ByVal paf1 As Integer, ByVal paf2 As Integer,
+                            ByVal fecha1 As Date, ByVal fecha2 As Date,
+                            ByVal cliente1 As Integer, ByVal cliente2 As Integer,
+                            ByVal afecha As Date, ByVal afacturaproforma As Boolean)
+
+        Dim Traspasables As New ArrayList
+        Dim dv As DataView
+        Try
+            Me.ActualizarOrigen(True)
+            dv = tabla.DefaultView
+            'La siguiente funcion se encargade rellenar el arraylist Traspasables con los PA que se pueden traspasar
+            InsertarPAF(Traspasables, paf1, paf2, cliente1, cliente2, fecha1, fecha2, afacturaproforma)
+            crearPAFS(Traspasables, apaf, afecha, afacturaproforma)
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Public Sub Traspasar(ByVal apaf As Integer, ByVal afecha As Date,
+                         ByVal paf1 As Integer, ByVal paf2 As Integer,
+                         ByVal fecha1 As Date, ByVal fecha2 As Date,
+                         ByVal cliente1 As Integer, ByVal cliente2 As Integer, ByVal aproforma As Boolean)
+        Try
+
+            Dim bp, bf, bc As Boolean
+            'Estas funciones devuelven una excepcion si no son correctos los intervalos
+            'Si son correctos devuelven true en caso de que sea un intervalo y false
+            'si se a introducido un solo valor como intervalo
+
+            bp = ComprobarIntervaloPedidos(paf1, paf2)
+            bf = ComprobarIntervaloFechas(fecha1, fecha2)
+            bc = ComprobarIntervalosClientes(cliente1, cliente2)
+
+            If YaTraspasados(paf1, paf2) = False Then
+                'Quiere decir que alguno de los PAF del intervalo 
+                'no ha sido traspasado
+                If apaf = 0 Then
+                    If CDate(Format(afecha.Date, "dd/MM/yyyy")) < CDate(Format(DATA.Date, "dd/MM/yyyy")) Then
+                        If MessageBox.Show(rm.GetString("FECHAFRADESTINOMENORALBARAN"), "", MessageBoxButtons.YesNo) = DialogResult.Yes Then 'rm.GetString("FECHAFRADESTINOMENORALBARAN"), "", MessageBoxButtons.YesNo) = DialogResult.Yes Then
+                            HacerTraspaso(apaf, paf1, paf2, fecha1, fecha2, cliente1, cliente2, afecha, aproforma)
+                        Else
+                            Exit Sub
+                        End If
+                    Else
+                        HacerTraspaso(apaf, paf1, paf2, fecha1, fecha2, cliente1, cliente2, afecha, aproforma)
+                    End If
+                Else
+                    ComprobarAlbaran(apaf, aproforma)
+                    HacerTraspaso(apaf, paf1, paf2, fecha1, fecha2, cliente1, cliente2, afecha, aproforma)
+                End If
+                MessageBox.Show(rm.GetString("TRASPASOCOMPLETO"))
+            Else
+                MessageBox.Show(rm.GetString("YATRASPASADO"))
+            End If
+
+
+        Catch ex As Exception
+
+            If (ex.Message = "IPedidoNoValido") Then MessageBox.Show(rm.GetString("INTERVALONOVALIDO"))
+            If (ex.Message = "IFechaNoValido") Then MessageBox.Show(rm.GetString("INTERVALONOVALIDO"))
+            If (ex.Message = "IClienteNoValido") Then MessageBox.Show(rm.GetString("INTERVALONOVALIDO"))
+
+        End Try
+    End Sub
+    Public Sub TraspasarLinea(ByVal p As Point)
+        Dim f As New frmTraspasoLineaPAF
+        Dim dv As New DataView
+        Try
+            If TRASPAS = False Then
+                'Ahora hay que tener cuidado al poner el TIPO no es el del PAF es el de la linea
+                f.PAF = Me
+                f.localizacion = p
+                f.ShowDialog()
+                f = Nothing
+            Else
+                MessageBox.Show(rm.GetString("NOTRASPLINIASDOCTRAS"))
+            End If
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+
+#End Region
+
+#Region "CAMBIO CENTRO"
+
+    Public Overloads Function cambioCentro(ByVal centro As Char, ByVal iralregistro As Integer) As Boolean
+        Try
+            If MyBase.cambioCentro(centro, iralregistro) Then
+                MoverActual()
+                Return True
+            Else
+                Return False
+            End If
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+
+    End Function
+
+#End Region
+
+#Region "SELECCION PAF"
+
+    Public Sub ElegirCliente(ByVal cliente As Integer)
+        Try
+            ACN()
+            mClienteSel = cliente
+            'Esto no se necesita solo puede estar en modo consulta para cambiar de cliente
+            'Me.ActualizarOrigen(True, True)
+            numeroRegistros = obtenerNumeroReg(t, "")
+            If cliente <> -1 Then
+                If numeroRegistros = 0 Then Exit Sub
+                Me.CargarRegistro(ultimo, esCambioSeleccion)
+                MoverActual()
+            Else
+                numeroRegistroActual = ObtenerNumeroRegistro(Nothing)
+            End If
+            If mClienteSel = -1 Then : dvIdentificadores.RowFilter = ""
+            Else : dvIdentificadores.RowFilter = "CLIENT = '" & mClienteSel & "' AND CENTRO = '" & centro & "' " : End If
+
+            CCN()
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+
+#End Region
+
+#Region "CREAR PEDIDOS HILOS"
+
+    Public Function CrearPediDo(ByVal prove As Integer, ByVal articulo As String, ByVal color As String, ByVal unidades As Integer) As Integer
+
+        Try
+            ds = New aura2k3.ds11
+            PCompraHilo = New clsPAFCompra(ds.Tables(tablaCompras), Me.centro, bc, "C", "M")
+            PCompraHilo.AñadirRegistro(prove)
+            PCompraHilo.lineasCompra.AñadirLinea(articulo, color, unidades)
+            Return PCompraHilo.FRA
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False
+        End Try
+    End Function
+
+#End Region
+
+#Region "ORDENES COMPLEMENTOS"
+
+    Public Sub GenerarOrden(ByVal p As Point)
+        Dim f As New frmTraspasoLineaPAF
+        Dim dv As New DataView
+        Try
+            If TRASPAS = False Then
+                'Ahora hay que tener cuidado al poner el TIPO no es el del PAF es el de la linea
+                f.PAF = Me
+                f.OCV = OrdenFabComplementos
+                f.localizacion = p
+                f.ShowDialog()
+                f = Nothing
+            Else
+                MessageBox.Show(rm.GetString("NOTRASPLINIASDOCTRAS"))
+            End If
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+
+    End Sub
+
+    Friend Function ClienteBloqueado() As Boolean
+        Dim cmd As New MySqlCommand
+        Dim dt As New DataTable
+
+        Try
+            cmd.CommandText = "SELECT BLOQUEADO FROM CLIENTS WHERE CODI = """ & CLIENT & """ "
+            cmd.Connection = cnn
+            Dim da As New MySqlDataAdapter(cmd)
+            ACN()
+            da.Fill(dt)
+            'dtDireccionesEnvio.Fill()
+            CCN()
+            dtDireccionesEnvio.DefaultView.Sort = "DOM"
+            If dt.Rows.Count > 0 Then
+                Return CBool(dt.Rows(0)(0))
+            Else
+                Return False
+            End If
+        Catch ex As Exception
+            LOG(ex.ToString)
+            Return False
+        End Try
+
+    End Function
+
+#End Region
+
+End Class
+
+'#Region "ACCESS"
+
+'Public Sub ImprimirAlbaranVentaAccess()
+'    Dim cnTemp As New OleDb.OleDbConnection("Provider=Microsoft.Jet.OLEDB.4.0;Data Source=access\temp.mdb;User Id=admin;Password=;")
+
+
+'    Dim strSQL As String
+'    Dim cmdIns As New OleDb.OleDbCommand
+'    Dim i As Integer
+'    Dim strCliente As String
+'    Dim accessDir As New AccessDirecto(tabla.TableName)
+'    Try
+'        'Borramos las tablas CPTEJIDO y DCPTEJIDO
+'        accessDir.BorrarDatosTablaAccess("VENTAS")
+'        accessDir.BorrarDatosTablaAccess("DVENTAS")
+
+'        'Introducimos los datos CPTEJIDO y DCPTEJIDO
+
+'        cmdIns.Connection = cnTemp
+'        strCliente = obtenerDatosCliente(CLIENT)
+
+'        'MessageBox.Show(strCliewnte)
+'        'En los pedidos de venta el proveedor es el cliente por una futura unificacion de las dos funciones
+'        strSQL = "INSERT INTO VENTAS ( FRA, TIPO, DATA, CLIENTE, DIRECCIONENTREGA,  NPEDIDO, FECHAPEDIDO, AGENCIA, OBSERVACIONES, FORMAPAGO, DTO, IMPORTEDTO,  IMPORTEIVA, BRUT, BASE, IVA, RE, TOTAL, VENCIMIENTOIMPORTE1, VENCIMIENTOIMPORTE2,  VENCIMIENTOIMPORTE3, VENCIMIENTOFECHA1, VENCIMIENTOFECHA2, VENCIMIENTOFECHA3) VALUES("
+
+
+'        strSQL = strSQL & FRA & ", ""T"" , """ & DATA & """, """ & strCliente & """, """", " & _
+'                " """ & ObtenerPedidoDeFactura() & """, " & _
+'                " """ & ObtenerFechaDePedido(ObtenerPedidoDeFactura()) & """, " & _
+'                " """", """", """", ""0"", ""0"", """ & IVA1 & """, """ & BRUT1 & """, " & _
+'                " """ & BASE1 & """, ""0"", ""0"", """ & TOTAL & """, ""0"", ""0"", ""0"", " & _
+'                " ""01/01/1900"", ""01/01/1900"", ""01/01/1900"")"
+
+'        cmdIns.CommandText = strSQL
+'        cnTemp.Open()
+'        cmdIns.ExecuteNonQuery()
+'        cnTemp.Close()
+
+'        strSQL = "INSERT INTO DVENTAS (FRA, TEIXIT, DESCRI, COLOR, MAQUINA, UNITATS, PREU, DTO, IMPORT, ALBARAN, MEDIDAS) VALUES( """ & FRA & """ ,"
+'        '! Changed strSQLoriginal to Object
+'        Dim strSQLoriginal As Object = strSQL
+
+'        For i = 0 To lineasVenta.dvForm.Count - 1
+'            With lineasVenta.dvForm(i)
+
+'                strSQL = strSQL & """"
+
+'                strSQL = strSQL & .Item("MOSTRA") & """, """ & .Item("DESCRI") & """, """ & .Item("COLOR") & """, 0, """ & .Item("UNITATS") & """, """ & .Item("PREU") & """, """ & .Item("DTE") & """, """ & .Item("IMPORT") & """, 0, """ & general.NS(.Item("KM")) & """)" ', general.NS(.Item("TALLA"))) & """)"
+'                '!!!!!!!!!!!!!! hay que añadir otro en el access
+'            End With
+'            cmdIns.CommandText = strSQL
+'            cnTemp.Open()
+'            cmdIns.ExecuteNonQuery()
+'            cnTemp.Close()
+'            strSQL = strSQLoriginal
+'        Next
+
+'        accessDir.CargarInformeAccess("iVENTAALBARAN", "Venda")
+'    Catch ex As Exception
+'        LOG(ex.ToString) : cargando = False : CCN()
+'    End Try
+
+'End Sub
+'Public Sub ImprimirPedidoVentaEnAccess()
+'    Dim strCliente As String
+'    Dim cnTemp As New OleDb.OleDbConnection("Provider=Microsoft.Jet.OLEDB.4.0;Data Source=access\temp.mdb;User Id=admin;Password=;")
+'    Dim accessDir As New AccessDirecto(tabla.TableName)
+'    Dim strSQL As String
+'    Dim cmdIns As New OleDb.OleDbCommand
+'    Try
+'        'Borramos las tablas CPTEJIDO y DCPTEJIDO
+'        accessDir.BorrarDatosTablaAccess("CPTEJIDO")
+'        accessDir.BorrarDatosTablaAccess("DCPTEJIDO")
+
+'        'Introducimos los datos CPTEJIDO y DCPTEJIDO
+'        cmdIns.Connection = cnTemp
+'        strCliente = obtenerDatosCliente(CLIENT)
+
+
+'        'En los pedidos de venta el proveedor es el cliente por una futura unificacion de las dos funciones
+'        strSQL = "INSERT INTO CPTEJIDO (FRA, DATA, PROVE, BRUT, BASE, IVA, RE, TOTAL, TPIVA,TPRE,OBSERV,TIPO) VALUES("
+
+
+'        strSQL = strSQL & FRA & ", """ & DATA & """, """ & general.NS(strCliente) & """, """ & BRUT1 & """, " & _
+'        " """ & BASE1 & """, " & _
+'        "  """ & IVA1 & """, " & _
+'        "  """ & RE1 & """, " & _
+'        "  """ & TOTAL & """, " & _
+'        "  """ & P_IVA1 & """, " & _
+'        "  """ & P_RE1 & """,  " & _
+'        " """ & general.NS(OBSERV) & """, ""T"") "
+'        '!!!!!!!!!!!!!!!!
+'        cmdIns.CommandText = strSQL
+'        cnTemp.Open()
+'        cmdIns.ExecuteNonQuery()
+'        cnTemp.Close()
+
+
+'        strSQL = "INSERT INTO DCPTEJIDO (FRA, TEIXIT, DESCRI, COLOR, MAQUINA, UNITATS, PREU, DTO, IMPORT) VALUES( """ & FRA & """ ,"
+'        '! Changed strSQLoriginal to Object
+'        Dim strSQLoriginal As Object = strSQL
+'        Dim i As Integer
+'        For i = 0 To lineasVenta.dvForm.Count - 1
+'            With lineasVenta.dvForm(i)
+
+'                strSQL = strSQL & """"
+
+'                strSQL = strSQL & general.NS(.Item("MOSTRA")) & """,""" & general.NS(.Item("DESCRI")) & """, """ & general.NS(.Item("COLOR")) & """, 0, """ & general.NS(.Item("UNITATS"), True) & " " & general.NS(.Item("KM")) & """, """ & general.NS(.Item("PREU"), True) & """, """ & general.NS(.Item("DTE"), True) & """, """ & general.NS(.Item("IMPORT"), True) & """)"
+'            End With
+'            cmdIns.CommandText = strSQL
+'            cnTemp.Open()
+'            cmdIns.ExecuteNonQuery()
+'            cnTemp.Close()
+'            strSQL = strSQLoriginal
+'        Next
+'        accessDir.CargarInformeAccess("iVENTAPEDIDO", "Venda")
+
+
+'    Catch ex As Exception
+'        LOG(ex.ToString) : cargando = False : CCN()
+'    End Try
+
+'End Sub
+
+'#End Region

@@ -1,0 +1,799 @@
+Imports MySql.Data.MySqlClient : Imports clsFuncionesLOG : Imports clsFuncionesC1 : Imports clsFuncionesUtiles : Imports clsConstantes
+Imports System.IO
+Imports System.Collections
+Imports System.Runtime.Serialization
+Imports System.Runtime.Serialization.Formatters.Binary
+
+Public MustInherit Class clsADO
+
+#Region "VARIABLES"
+
+    Friend ds As New aura2k3.ds11
+    Friend bc As BindingContext
+    Friend tabla As New DataTable
+    Friend dtIdentificadores As New DataTable
+    Friend dvIdentificadores As New DataView
+    Friend sqlSinWhere As String
+    Friend cmdSel As MySqlCommand
+    Friend da As MySqlDataAdapter
+    Friend dvForm As New DataView
+    Friend centro As String
+    Friend numeroRegistros As Integer
+    Friend numeroRegistroActual As Integer
+    Friend cerrando As Boolean = False
+    Friend esRegistroNuevo As Boolean = False
+    Friend editando As Boolean = False
+    Friend desplazando As Boolean = False
+    Friend empresa As Char = "C"
+    Friend cargando As Boolean = False
+    Friend soloClase As Boolean = False
+    Private cmdUpd As MySqlCommand
+    Private cmdDel As MySqlCommand
+    Private cmdIns As MySqlCommand
+    Friend UltimoCodigo As Object
+    Public general As New clsFuncionesUtiles
+
+#End Region
+
+#Region "INICIALIZACION"
+    Public Sub New()
+
+    End Sub
+
+    Public Sub New(ByVal tabl As DataTable, _
+                    ByVal cen As String, _
+                    ByRef BindingContext As BindingContext, Optional ByVal campoI As String = "CODI")
+        Try
+            tabla = tabl
+            ACN()
+            bc = BindingContext
+            centro = cen
+
+            GenerarSQLs()
+            AgregarParametros()
+
+            If campoI <> "ESDETALLE" Then
+                numeroRegistroActual = 0
+                numeroRegistros = CInt(obtenerNumeroReg(tabla.TableName, ""))
+            End If
+
+            da = New MySqlDataAdapter(cmdSel.CommandText, cnn)
+            da.AcceptChangesDuringFill = True
+            da.UpdateCommand = cmdUpd
+            da.DeleteCommand = cmdDel
+            da.InsertCommand = cmdIns
+
+            dvForm = tabla.DefaultView
+            dvIdentificadores = dtIdentificadores.DefaultView
+            AddHandler tabla.ColumnChanging, AddressOf Guarda
+            ACN()
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+
+    End Sub
+    Private Sub Guarda(ByVal e As Object, ByVal sender As System.data.DataColumnChangeEventArgs)
+        Try
+            If Not sender.Row.RowState = DataRowState.Unchanged And Not sender.Row.RowState = DataRowState.Detached Then
+                guardarDV()
+            End If
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False
+        End Try
+    End Sub
+    Protected Friend Sub GenerarSQLs()
+        Try
+            cmdSel = New MySqlCommand
+            cmdSel.Connection = cnn
+
+            cmdIns = New MySqlCommand(GenerarSQLInsert, cnn)
+            cmdDel = New MySqlCommand(GenerarSQLDelete, cnn)
+            cmdUpd = New MySqlCommand(GenerarSQLUpdate, cnn)
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False
+        End Try
+    End Sub
+
+#End Region
+
+#Region "PARAMETROS"
+
+    Protected Friend Sub AgregarParametros()
+        Try
+            AñadirParametros(cmdUpd)
+            AñadirParametros(cmdIns)
+            AñadirParametrosIdentificador(cmdDel)
+            AñadirParametrosIdentificador(cmdUpd)
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False
+        End Try
+    End Sub
+    Sub AñadirParametros(ByVal cmd As IDbCommand)
+        Dim i As Integer
+        Try
+            For i = 0 To tabla.Columns.Count - 1
+                If Not esCampoDeNombre(tabla.Columns(i).ColumnName) Then
+                    añadirParametro(cmd, TipoNET2SQL(tabla.Columns(i).DataType), tabla.Columns(i).ColumnName)
+                End If
+            Next
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Sub AñadirParametrosIdentificador(ByVal cmd As MySqlCommand)
+        Dim i As Integer
+        Try
+            For i = 0 To tabla.Columns.Count - 1
+                If Not esCampoDeNombre(tabla.Columns(i).ColumnName) Then
+
+                    Dim u As System.Data.UniqueConstraint
+                    u = tabla.Constraints(0)
+                    If esPrimaryKey(u, tabla.Columns(i).ColumnName) Then
+                        añadirParametroIdentificador(cmd, TipoNET2SQL(tabla.Columns(i).DataType), tabla.Columns(i).ColumnName)
+                    End If
+                End If
+            Next
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+
+#End Region
+
+#Region "FUNCIONES UTILIES"
+
+    'Esta funcion devuelve el where para el centro muy ultilizado
+    Friend Overridable Function WCNoTabla() As String
+        Return " CENTRO = """ & centro & """ "
+    End Function
+    'Esta funcion devuelve el where para el centro muy ultilizado
+    Protected Friend Function WC() As String
+        Return " " & tabla.TableName & ".CENTRO = """ & centro & """ "
+    End Function
+    Protected Friend Function t() As String
+        'Esta funcion devuelve el where para el centro muy ultilizado
+        Return tabla.TableName
+    End Function
+    Protected Friend Sub guardarDV()
+        Dim bmPublishers As BindingManagerBase
+        Dim drvRow As DataRowView
+        Try
+            bmPublishers = bc(dvForm)
+            If Not bmPublishers.Count = 0 Then
+                'Get the binding manager base object
+                'Get the data row view for the current row
+                drvRow = CType(bmPublishers.Current, DataRowView)
+                'If Not drvRow.Row.RowState = DataRowState.Unchanged And Not drvRow.Row.RowState = DataRowState.Detached Then
+                If drvRow.IsEdit Then drvRow.EndEdit()
+                'End If
+            End If
+
+        Catch ex As Exception
+            Debug.WriteLine("guardarDV:-> " & ex.ToString)
+        End Try
+    End Sub
+    Protected Function PA() As Integer
+        Try
+            Dim idx As Integer = bc(dvForm).Position()
+            Return idx
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Function
+    Protected Function PA(ByVal dv As DataView) As Integer
+        Try
+            Dim idx As Integer = bc(dv).Position()
+            Return idx
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Function
+    Private Function GetRowActualDV() As DataRow
+        Dim bm As BindingManagerBase
+        Dim drv As DataRowView
+        Try
+            bm = bc(dvForm)
+            drv = CType(bm.Current, DataRowView)
+            Return drv.Row
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Function
+
+#End Region
+
+#Region "GENERACION SQLs"
+
+    Protected Friend Function GenerarSQLInsert() As String
+        Dim i As Integer
+        Dim sqlIns As String
+        Dim sqlIns2 As String
+        Try
+            sqlIns = "INSERT INTO " & tabla.TableName & " ("
+            For i = 0 To tabla.Columns.Count - 1
+                If Not esCampoDeNombre(tabla.Columns(i).ColumnName) Then
+                    sqlIns = sqlIns & tabla.Columns(i).ColumnName & ","
+                    'Ahora los parametros
+                    sqlIns2 = sqlIns2 & "@p" & tabla.Columns(i).ColumnName & ","
+                End If
+            Next
+            sqlIns = sqlIns.Substring(0, sqlIns.Length - 1) & ") VALUES (" & sqlIns2
+
+            sqlIns = sqlIns.Substring(0, sqlIns.Length - 1) & ")"
+
+            Return sqlIns
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Function
+    Protected Friend Function GenerarSQLDelete() As String
+        Dim i As Integer
+        Dim sqldel As String
+        Try
+            sqldel = "DELETE FROM " & tabla.TableName & " WHERE ("
+            For i = 0 To tabla.Columns.Count - 1
+                If Not esCampoDeNombre(tabla.Columns(i).ColumnName) Then
+                    Dim u As System.Data.UniqueConstraint
+                    u = tabla.Constraints(0)
+                    If esPrimaryKey(u, tabla.Columns(i).ColumnName) Then
+                        sqldel = sqldel & tabla.Columns(i).ColumnName & " = @pi" & tabla.Columns(i).ColumnName & " AND "
+                    End If
+                End If
+            Next
+            sqldel = sqldel.Substring(0, sqldel.Length - 4) & ")"
+            Return sqldel
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Function
+    Protected Friend Function GenerarSQLUpdate() As String
+        Dim i As Integer
+        Dim sqlUpd As String
+        Try
+            sqlUpd = "UPDATE " & tabla.TableName & " SET "
+            For i = 0 To tabla.Columns.Count - 1
+                If Not esCampoDeNombre(tabla.Columns(i).ColumnName) Then
+                    sqlUpd = sqlUpd & tabla.Columns(i).ColumnName & " = @p" & tabla.Columns(i).ColumnName & ","
+                End If
+            Next
+
+            sqlUpd = sqlUpd.Substring(0, sqlUpd.Length - 1) & " WHERE ("
+
+            For i = 0 To tabla.Columns.Count - 1
+                If Not esCampoDeNombre(tabla.Columns(i).ColumnName) Then
+                    Dim u As System.Data.UniqueConstraint
+                    u = tabla.Constraints(0)
+                    If esPrimaryKey(u, tabla.Columns(i).ColumnName) Then
+
+                        sqlUpd = sqlUpd & tabla.Columns(i).ColumnName & " = @pi" & tabla.Columns(i).ColumnName & " AND "
+                    End If
+                End If
+            Next
+            sqlUpd = sqlUpd.Substring(0, sqlUpd.Length - 4) & ")"
+            Return sqlUpd
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Function
+
+#End Region
+
+#Region "DESPLAZAMIENTO"
+
+    Public Overridable Sub SiguienteReg()
+        Try
+            ActualizarOrigen()
+            CargarRegistro(siguiente)
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Public Overridable Sub AnteriorReg()
+        Try
+            ActualizarOrigen()
+            CargarRegistro(anterior)
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Public Overridable Sub UltimoReg()
+        Try
+            ActualizarOrigen()
+            CargarRegistro(ultimo)
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Public Overridable Sub PrimeroReg()
+        Try
+            ActualizarOrigen()
+            CargarRegistro(primero)
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Public Overridable Sub CambiarAReg(ByVal id As Object, ByVal SQL As String, ByVal accion As Object)
+        Dim cmd As MySqlCommand
+        Dim idx As Integer
+        Try
+            If Not cargando Then
+                cargando = True
+                ActualizarOrigen()
+                ACN()
+                bc.Item(dvForm).SuspendBinding()
+
+                Select Case accion
+                    Case iraregistro
+                        CargarRegistro(accion, id)
+
+                        'Este case ya no utlizado 'deprecated
+                    Case iraRegistroNombre
+                        cmd = New MySqlCommand(SQL, cnn)
+                        idx = cmd.ExecuteScalar
+                        If idx = -1 Then
+                            MessageBox.Show(rm.GetString("NOEXISTEREGISTRO"))
+                        Else
+                            CargarRegistro(accion, idx)
+                        End If
+
+                    Case iraRegistroFila
+                        CargarRegistro(iraRegistroFila, id, SQL)
+
+                End Select
+
+                bc.Item(dvForm).ResumeBinding()
+                cargando = False
+            End If
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Protected Friend Sub LimpiarTabla()
+        Try
+            'tabla.AcceptChanges()
+            'guardarDV()
+            tabla.Rows.Clear()
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False
+        End Try
+    End Sub
+    Public Function ActualizarRegistroActual(ByVal accion As Integer, ByVal id As Object) As Boolean
+        Dim siguienteRegistro As Integer
+        Dim haySeleccion As Boolean = False
+        Try
+            If Not id Is Nothing Then
+                If IsNumeric(id) AndAlso Not esUnaDatarow(id) Then
+                    If Not id = -1 Then : haySeleccion = True : End If
+                    If id = esCambioSeleccion Then
+                        haySeleccion = True
+                    End If
+                End If
+            End If
+
+            Select Case accion
+                Case elMismo
+                    If haySeleccion Then : siguienteRegistro = ObtenerNumeroRegistro(Nothing)
+                    Else : siguienteRegistro = numeroRegistroActual : End If
+
+                    If siguienteRegistro > numeroRegistros - 1 Then : Beep() : Return False
+                    Else : numeroRegistroActual = siguienteRegistro : End If
+
+                Case siguiente
+                    If haySeleccion Then : siguienteRegistro = ObtenerNumeroRegistro(Nothing) + 1
+                    Else : siguienteRegistro = numeroRegistroActual + 1 : End If
+
+                    If siguienteRegistro > numeroRegistros - 1 Then : Beep() : Return False
+                    Else : numeroRegistroActual = siguienteRegistro : End If
+
+                Case anterior
+
+                    siguienteRegistro = numeroRegistroActual - 1
+
+                    If siguienteRegistro < 0 Then
+                        Beep() : Return False
+                    Else : numeroRegistroActual = siguienteRegistro
+                    End If
+
+                Case ultimo
+                    If numeroRegistroActual = numeroRegistros - 1 Then
+                        'Ya estamos en el último
+                        numeroRegistroActual = numeroRegistros - 1
+                        Beep()
+                        If haySeleccion Then
+                            Return True
+                        Else
+                            Return False
+                        End If
+
+                    Else
+                        numeroRegistroActual = numeroRegistros - 1
+                    End If
+
+                Case primero
+                    'If haySeleccion Then
+                    'numeroRegistroActual = ObtenerNumeroRegistro(id)
+                    'numeroRegistroActual = 0
+                    'Else : numeroRegistroActual = 0
+                    'End If
+                    If numeroRegistroActual <> 0 Then
+                        numeroRegistroActual = 0
+                        Beep()
+                        'Return False
+                    End If
+
+                Case iraregistro, iraRegistroNombre, iraRegistroFila
+
+                    siguienteRegistro = ObtenerNumeroRegistro(id)
+
+                    If siguienteRegistro = -1 Then
+                        Beep()
+                        MessageBox.Show(rm.GetString("NOEXISTEREGISTRO"))
+                        Return False
+                    Else
+                        numeroRegistroActual = siguienteRegistro
+                    End If
+            End Select
+
+            Return True
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Function
+    Public Overridable Function CargarRegistro(ByVal accion As Integer, _
+                                        Optional ByVal id As Object = Nothing, _
+                                        Optional ByVal sql As String = "") _
+                                        As Boolean
+        Try
+
+            'Actualiza el registro actual buscando cual es la posicion actual
+            If ActualizarRegistroActual(accion, id) = False Then : Return False : End If
+
+            If numeroRegistroActual = -1 Then Return False
+
+            LimpiarTabla()
+
+            Select Case accion
+                Case iraRegistroFila
+                    da.SelectCommand.CommandText = sql
+
+                Case Else
+                    da.SelectCommand.CommandText = sqlSinWhere & genWhere() & GenOrder() & _
+                                                                " LIMIT " & numeroRegistroActual & ",1"
+            End Select
+
+            da.Fill(tabla)
+
+            If Not id Is Nothing AndAlso id.GetType Is GetType(Integer) Then
+                If id = esCambioSeleccion Then numeroRegistroActual = 0
+            End If
+
+            tabla.AcceptChanges()
+            Return True
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Function
+
+#End Region
+
+#Region "MODIFICAR ORIGEN"
+
+    Protected Friend Overridable Sub BorrarActualDVDetalle(Optional ByVal NOCERRAR As Boolean = False)
+        Dim i As Integer
+        Dim dr1 As DataRow
+        Try
+            Dim dr(dvForm.Count - 1) As DataRow
+            For i = 0 To dvForm.Count - 1
+                dr(i) = dvForm(i).Row
+            Next
+            For Each dr1 In dr
+                dr1.Delete()
+            Next
+            ActualizarOrigen(True, True)
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+            CCN()
+        End Try
+    End Sub
+    Protected Friend Overridable Sub BorrarActualDV(Optional ByVal NOCERRAR As Boolean = False)
+        Dim dr As DataRow
+        Try
+            If Not dvForm.Count = 0 Then
+                dr = GetRowActualDV()
+                dr.Delete()
+
+                If Not tabla.GetChanges Is Nothing Then
+                    ACN()
+                    LOG("ACTUALIZANDO BD: " & tabla.TableName, True)
+                    If mHost <> "127.0.0.1" Then
+                        da.Update(tabla)
+                    Else
+                        '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                        'MessageBox.Show("ESTAS EN MODE LOCAL NO ES PODEN GUARDAR LES MODIFICACIONS, SI VOL GUARDAR ELS CANVIS CONECTIS AL SERVIDOR EN OPCIONS -> CONFIGURACIÓ", rm.GetString("INFORMACION"), MessageBoxButtons.OK, MessageBoxIcon.Information, MessageBoxDefaultButton.Button2, MessageBoxOptions.DefaultDesktopOnly)
+                        da.Update(tabla)
+
+                        'If modoDebug Then
+                        '    da.Update(tabla)
+                        'Else
+                        '    tabla.RejectChanges()
+                        'End If
+
+                    End If
+
+                    If Not NOCERRAR Then
+                        CCN()
+                    End If
+                End If
+                tabla.AcceptChanges()
+            End If
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+            CCN()
+        End Try
+    End Sub
+    'Cuando carga el formulario o hay una modificación del dataset hay que cargar los identificadores
+    Public Overridable Sub CargarIdentificadores()
+
+    End Sub
+    'Los identificadores solo se deberia cargar si es un delete o si la modificación afecta a la columna CODI
+    Public Overridable Function seHaModificadoElID() As Boolean
+        Try
+            Return True
+
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Function
+    '********************************************************
+    'Funcion que actualiza el origen en caso de que tenga cambios. Si los hay actualizar el numero de registros
+    'Tambien mira que no se hayan añadido nuevos registros. Si es así cargamos los identificadores
+    '********************************************************
+    Public Overridable Sub ActualizarOrigen(Optional ByVal NOCERRAR As Boolean = False, Optional ByVal hackDetalle As Boolean = False)
+        Dim cambios As Boolean = False
+        Dim tempNumeroRegistros As Integer
+        Try
+            Try : guardarDV() : Catch ex As Exception : End Try
+
+            If Not tabla.GetChanges Is Nothing Then : cambios = True : End If
+
+            If cambios Then
+                ACN()
+                LOG("ACTUALIZANDO BD: " & tabla.TableName, True)
+                If mHost <> "127.0.0.1" Then
+                    da.Update(tabla)
+                Else
+                    '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                    'MessageBox.Show("ESTÀ EN MODE LOCAL NO ES PODEN GUARDAR LES MODIFICACIONS, SI VOL GUARDAR ELS CANVIS CONECTIS AL SERVIDOR EN OPCIONS -> CONFIGURACIÓ", rm.GetString("INFORMACION"), MessageBoxButtons.OK, MessageBoxIcon.Information, MessageBoxDefaultButton.Button2, MessageBoxOptions.DefaultDesktopOnly)
+                    da.Update(tabla)
+                    'If modoDebug Then
+                    'da.Update(tabla)
+                    'Else
+                    '    tabla.RejectChanges()
+                    'End If
+                End If
+                If soloClase = False AndAlso seHaModificadoElID() Then CargarIdentificadores()
+                If Not NOCERRAR Then : CCN() : End If
+                tabla.AcceptChanges()
+            End If
+            If cambios AndAlso hackDetalle = False Then
+                ACN()
+                'Si hay cambios es posible que el cambio sea del identificador por lo que hay que ver que posición
+                'ocupa hora 
+                numeroRegistroActual = ObtenerNumeroRegistro(Nothing)
+            End If
+            tempNumeroRegistros = numeroRegistros
+
+            'Si ha habido una modificacion en el numero de registros volvemos a cargar los identificadores de los combo
+            If hackDetalle = False Then
+                tempNumeroRegistros = numeroRegistros
+                numeroRegistros = obtenerNumeroReg(tabla.TableName, "")
+                If numeroRegistros <> tempNumeroRegistros Then CargarIdentificadores()
+            End If
+
+        Catch ex As Exception
+            If ex.ToString.Substring(0, 9) = "Duplicate" Then
+                'MessageBox.Show(rm.GetString("REGISTRODUPLICADO"))
+                Throw ex
+            Else
+                LOG(ex.ToString) : cargando = False : CCN()
+            End If
+            cnn.Close()
+        End Try
+    End Sub
+    Public Overridable Sub borrar()
+        Try
+            BorrarActualDV()
+            numeroRegistros = numeroRegistros - 1
+
+            If numeroRegistroActual + 1 >= numeroRegistros Then
+                CargarRegistro(ultimo)
+            Else
+                CargarRegistro(elMismo)
+            End If
+            If seHaModificadoElID() Then
+                CargarIdentificadores()
+            End If
+            PonerNombres()
+            tabla.AcceptChanges()
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+
+#End Region
+
+#Region "ORGANIZAR"
+    ''' -----------------------------------------------------------------------------
+    ''' <summary>
+    ''' Funcion que devuelve el Nuevo ID
+    ''' </summary>
+    ''' <returns></returns>
+    ''' <remarks>
+    ''' </remarks>
+    ''' <history>
+    ''' 	[Sergio]	20/04/2005	Created
+    ''' </history>
+    ''' -----------------------------------------------------------------------------
+    Protected Friend Function ObtenerNuevoID() As Integer
+        Dim idx As Integer
+        Dim cmdSel As MySqlCommand
+        Try
+            cmdSel = New MySqlCommand("SELECT CODI FROM " & tabla.TableName & " ORDER BY CODI DESC LIMIT 1", cnn)
+            ACN()
+            idx = CInt(cmdSel.ExecuteScalar)
+            CCN()
+            Return idx + 1
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Function
+    Public Overridable Sub NuevoRegistro()
+        Dim drNew As DataRow
+        Dim cm As CurrencyManager
+        Try
+            ActualizarOrigen()
+            tabla.Clear()
+            cm = CType(bc(dvForm), CurrencyManager)
+            drNew = tabla.NewRow()
+
+            If tabla.Columns("CODI").DataType.GetTypeCode(tabla.Columns("CODI").DataType) = TypeCode.String Then
+                drNew.Item("CODI") = ""
+            Else
+                drNew.Item("CODI") = ObtenerNuevoID()
+            End If
+            drNew.Item("CENTRO") = centro
+            If drNew.Table.Columns.Contains("TABULAR") Then
+                drNew("TUBULAR") = False
+            End If
+            tabla.Rows.Add(drNew)
+            cm.Position = 1
+            numeroRegistros = numeroRegistros + 1
+
+            Try
+                guardarDV()
+            Catch ex As Exception
+            End Try
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Friend Overridable Sub PonerNombres()
+    End Sub
+    Public Overridable Function cambioCentro(ByVal centro As Char, ByVal iralregistro As Integer) As Boolean
+        Dim tempcentro As String = Me.centro
+        Dim tempNumeroRegistros As Integer
+        Try
+            Me.centro = centro
+            tempNumeroRegistros = CInt(obtenerNumeroReg(t, ""))
+
+            If tempNumeroRegistros = 0 Then
+                MessageBox.Show(rm.GetString("NOREGISTROENCENTRO"))
+                Me.centro = tempcentro : Return False
+            Else
+                numeroRegistroActual = -1
+                numeroRegistros = tempNumeroRegistros
+                CargarRegistro(iralregistro)
+            End If
+            PonerNombres()
+            dvIdentificadores.RowFilter = "CENTRO = '" & centro & "' "
+            tabla.AcceptChanges()
+            Return True
+
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Function
+    Friend Function esCodigoExistente(ByVal dt As DataTable, ByVal ID As String, ByVal CODI As Object) As Boolean
+        Dim dv As New DataView
+        Dim i As Integer
+        Try
+            dv = dt.DefaultView
+            dv.Sort = ID
+            i = dv.Find(CODI)
+
+            If CODI Is Nothing Then
+                Return True
+            End If
+            If CODI.GetType Is GetType(String) AndAlso CODI = "" Then
+                Return True
+            End If
+
+            If CODI.GetType Is GetType(Integer) AndAlso CODI = 0 Then
+                Return True
+            End If
+
+            If CODI.GetType Is GetType(Double) AndAlso CODI = 0 Then
+                Return True
+            End If
+            If i < 0 Then
+                Return False
+            End If
+            Return True
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Function
+    Friend Function obtenerNumeroReg(ByVal tabla As String, ByVal where As String) As Object
+        Try
+            ACN()
+            Dim cmd As New MySqlCommand("SELECT COUNT(*) FROM " & tabla & " " & genWhereNumeroRegistros(), cnn)
+
+            Return cmd.ExecuteScalar
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Function
+    Friend Function esUnaDatarow(ByVal id As Object) As Boolean
+        Try
+            If id.GetType Is GetType(DataRow) OrElse id.GetType().BaseType.Name = GetType(DataRow).Name Then
+                Return True
+            Else
+                Return False
+            End If
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Function
+
+
+#End Region
+
+#Region "MUSTOVERRIDE"
+
+    Friend MustOverride Function GenOrder() As String
+    Friend MustOverride Function genWhere() As String
+    Friend MustOverride Function ObtenerNumeroRegistro(ByVal id As Object) As Integer
+    Friend MustOverride Function genWhereNumeroRegistros() As String
+    Friend MustOverride Function TieneCambios() As Boolean
+
+#End Region
+
+End Class

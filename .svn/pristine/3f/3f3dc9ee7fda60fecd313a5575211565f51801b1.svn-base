@@ -1,0 +1,794 @@
+Imports CoreLab.MySql
+Public Class clsDetallePAFCompraModelo
+    Inherits clsADO
+
+#Region "CAMPOS"
+
+    Private mORDRE As Double
+    Public Property ORDRE() As Double
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mORDRE = nzn(dvForm(PA).Row("ORDRE"), 0)
+            Catch ex As Exception : End Try
+            Return nzn(mORDRE, 0)
+        End Get
+        Set(ByVal Value As Double)
+            If PA() = -1 Then Exit Property
+            mORDRE = nzn(Value, 0)
+            dvForm(PA).Row("ORDRE") = nzn(Value, 0) : guardarDV()
+        End Set
+    End Property
+
+    Private mEXPEDICIO As Double
+    Public Property EXPEDICIO() As Double
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mEXPEDICIO = nzn(dvForm(PA).Row("EXPEDICIO"), 0)
+            Catch ex As Exception : End Try
+            Return nzn(mEXPEDICIO, 0)
+        End Get
+        Set(ByVal Value As Double)
+            If PA() = -1 Then Exit Property
+            mEXPEDICIO = nzn(Value, 0)
+            dvForm(PA).Row("EXPEDICIO") = nzn(Value, 0) : guardarDV()
+        End Set
+    End Property
+
+    Private mFABRICACIO As Double
+    Public Property FABRICACIO() As Double
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mFABRICACIO = nzn(dvForm(PA).Row("FABRICACIO"), 0)
+            Catch ex As Exception : End Try
+            Return nzn(mFABRICACIO, 0)
+        End Get
+        Set(ByVal Value As Double)
+            If PA() = -1 Then Exit Property
+            mFABRICACIO = nzn(Value, 0)
+            dvForm(PA).Row("FABRICACIO") = nzn(Value, 0) : guardarDV()
+        End Set
+    End Property
+
+    Private mCOLOR As String
+    Public Property COLOR() As String
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mCOLOR = nz(dvForm(PA).Row("COLOR"), "")
+            Catch ex As Exception : End Try
+            Return nz(mCOLOR, "")
+        End Get
+        Set(ByVal Value As String)
+            If PA() = -1 Then Exit Property
+            mCOLOR = nz(Value, "")
+            dvForm(PA).Row("COLOR") = nz(Value, "") : guardarDV()
+        End Set
+    End Property
+
+    Private mLINEA As Integer
+    Public Property LINEA() As Integer
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mLINEA = nzn(dvForm(PA).Row("LINEA"), 0)
+            Catch ex As Exception : End Try
+            Return nzn(mLINEA, 0)
+        End Get
+        Set(ByVal Value As Integer)
+            If PA() = -1 Then Exit Property
+            mLINEA = nzn(Value, 0)
+            dvForm(PA).Row("LINEA") = nzn(Value, 0) : guardarDV()
+        End Set
+    End Property
+
+    Private mTALL1 As Double
+    Public Property TALL1() As Double
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mTALL1 = nzn(dvForm(PA).Row("TALL1"), 0)
+            Catch ex As Exception : End Try
+            Return nzn(mTALL1, 0)
+        End Get
+        Set(ByVal Value As Double)
+            If PA() = -1 Then Exit Property
+            mTALL1 = nzn(Value, 0)
+            dvForm(PA).Row("TALL1") = nzn(Value, 0) : guardarDV()
+        End Set
+    End Property
+
+    Private mTALL2 As Double
+    Public Property TALL2() As Double
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mTALL2 = nzn(dvForm(PA).Row("TALL2"), 0)
+            Catch ex As Exception : End Try
+            Return nzn(mTALL2, 0)
+        End Get
+        Set(ByVal Value As Double)
+            If PA() = -1 Then Exit Property
+            mTALL2 = nzn(Value, 0)
+            dvForm(PA).Row("TALL2") = nzn(Value, 0) : guardarDV()
+        End Set
+    End Property
+
+    Private mTALL3 As Double
+    Public Property TALL3() As Double
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mTALL3 = nzn(dvForm(PA).Row("TALL3"), 0)
+            Catch ex As Exception : End Try
+            Return nzn(mTALL3, 0)
+        End Get
+        Set(ByVal Value As Double)
+            If PA() = -1 Then Exit Property
+            mTALL3 = nzn(Value, 0)
+            dvForm(PA).Row("TALL3") = nzn(Value, 0) : guardarDV()
+        End Set
+    End Property
+
+    Private mTALL4 As Double
+    Public Property TALL4() As Double
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mTALL4 = nzn(dvForm(PA).Row("TALL4"), 0)
+            Catch ex As Exception : End Try
+            Return nzn(mTALL4, 0)
+        End Get
+        Set(ByVal Value As Double)
+            If PA() = -1 Then Exit Property
+            mTALL4 = nzn(Value, 0)
+            dvForm(PA).Row("TALL4") = nzn(Value, 0) : guardarDV()
+        End Set
+    End Property
+
+    Private mTALL5 As Double
+    Public Property TALL5() As Double
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mTALL5 = nzn(dvForm(PA).Row("TALL5"), 0)
+            Catch ex As Exception : End Try
+            Return nzn(mTALL5, 0)
+        End Get
+        Set(ByVal Value As Double)
+            If PA() = -1 Then Exit Property
+            mTALL5 = nzn(Value, 0)
+            dvForm(PA).Row("TALL5") = nzn(Value, 0) : guardarDV()
+        End Set
+    End Property
+
+    Private mTALL6 As Double
+    Public Property TALL6() As Double
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mTALL6 = nzn(dvForm(PA).Row("TALL6"), 0)
+            Catch ex As Exception : End Try
+            Return nzn(mTALL6, 0)
+        End Get
+        Set(ByVal Value As Double)
+            If PA() = -1 Then Exit Property
+            mTALL6 = nzn(Value, 0)
+            dvForm(PA).Row("TALL6") = nzn(Value, 0) : guardarDV()
+        End Set
+    End Property
+
+    Private mTALL7 As Double
+    Public Property TALL7() As Double
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mTALL7 = nzn(dvForm(PA).Row("TALL7"), 0)
+            Catch ex As Exception : End Try
+            Return nzn(mTALL7, 0)
+        End Get
+        Set(ByVal Value As Double)
+            If PA() = -1 Then Exit Property
+            mTALL7 = nzn(Value, 0)
+            dvForm(PA).Row("TALL7") = nzn(Value, 0) : guardarDV()
+        End Set
+    End Property
+
+    Private mTALL8 As Double
+    Public Property TALL8() As Double
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mTALL8 = nzn(dvForm(PA).Row("TALL8"), 0)
+            Catch ex As Exception : End Try
+            Return nzn(mTALL8, 0)
+        End Get
+        Set(ByVal Value As Double)
+            If PA() = -1 Then Exit Property
+            mTALL8 = nzn(Value, 0)
+            dvForm(PA).Row("TALL8") = nzn(Value, 0) : guardarDV()
+        End Set
+    End Property
+
+    Private mTALL9 As Double
+    Public Property TALL9() As Double
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mTALL9 = nzn(dvForm(PA).Row("TALL9"), 0)
+            Catch ex As Exception : End Try
+            Return nzn(mTALL9, 0)
+        End Get
+        Set(ByVal Value As Double)
+            If PA() = -1 Then Exit Property
+            mTALL9 = nzn(Value, 0)
+            dvForm(PA).Row("TALL9") = nzn(Value, 0) : guardarDV()
+        End Set
+    End Property
+
+    Private mTALL10 As Double
+    Public Property TALL10() As Double
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mTALL10 = nzn(dvForm(PA).Row("TALL10"), 0)
+            Catch ex As Exception : End Try
+            Return nzn(mTALL10, 0)
+        End Get
+        Set(ByVal Value As Double)
+            If PA() = -1 Then Exit Property
+            mTALL10 = nzn(Value, 0)
+            dvForm(PA).Row("TALL10") = nzn(Value, 0) : guardarDV()
+        End Set
+    End Property
+
+    Private mTARA1 As Double
+    Public Property TARA1() As Double
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mTARA1 = nzn(dvForm(PA).Row("TARA1"), 0)
+            Catch ex As Exception : End Try
+            Return nzn(mTARA1, 0)
+        End Get
+        Set(ByVal Value As Double)
+            If PA() = -1 Then Exit Property
+            mTARA1 = nzn(Value, 0)
+            dvForm(PA).Row("TARA1") = nzn(Value, 0) : guardarDV()
+        End Set
+    End Property
+
+    Private mTARA2 As Double
+    Public Property TARA2() As Double
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mTARA2 = nzn(dvForm(PA).Row("TARA2"), 0)
+            Catch ex As Exception : End Try
+            Return nzn(mTARA2, 0)
+        End Get
+        Set(ByVal Value As Double)
+            If PA() = -1 Then Exit Property
+            mTARA2 = nzn(Value, 0)
+            dvForm(PA).Row("TARA2") = nzn(Value, 0) : guardarDV()
+        End Set
+    End Property
+
+    Private mTARA3 As Double
+    Public Property TARA3() As Double
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mTARA3 = nzn(dvForm(PA).Row("TARA3"), 0)
+            Catch ex As Exception : End Try
+            Return nzn(mTARA3, 0)
+        End Get
+        Set(ByVal Value As Double)
+            If PA() = -1 Then Exit Property
+            mTARA3 = nzn(Value, 0)
+            dvForm(PA).Row("TARA3") = nzn(Value, 0) : guardarDV()
+        End Set
+    End Property
+
+    Private mTARA4 As Double
+    Public Property TARA4() As Double
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mTARA4 = nzn(dvForm(PA).Row("TARA4"), 0)
+            Catch ex As Exception : End Try
+            Return nzn(mTARA4, 0)
+        End Get
+        Set(ByVal Value As Double)
+            If PA() = -1 Then Exit Property
+            mTARA4 = nzn(Value, 0)
+            dvForm(PA).Row("TARA4") = nzn(Value, 0) : guardarDV()
+        End Set
+    End Property
+
+    Private mTARA5 As Double
+    Public Property TARA5() As Double
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mTARA5 = nzn(dvForm(PA).Row("TARA5"), 0)
+            Catch ex As Exception : End Try
+            Return nzn(mTARA5, 0)
+        End Get
+        Set(ByVal Value As Double)
+            If PA() = -1 Then Exit Property
+            mTARA5 = nzn(Value, 0)
+            dvForm(PA).Row("TARA5") = nzn(Value, 0) : guardarDV()
+        End Set
+    End Property
+
+    Private mTARA6 As Double
+    Public Property TARA6() As Double
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mTARA6 = nzn(dvForm(PA).Row("TARA6"), 0)
+            Catch ex As Exception : End Try
+            Return nzn(mTARA6, 0)
+        End Get
+        Set(ByVal Value As Double)
+            If PA() = -1 Then Exit Property
+            mTARA6 = nzn(Value, 0)
+            dvForm(PA).Row("TARA6") = nzn(Value, 0) : guardarDV()
+        End Set
+    End Property
+
+    Private mTARA7 As Double
+    Public Property TARA7() As Double
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mTARA7 = nzn(dvForm(PA).Row("TARA7"), 0)
+            Catch ex As Exception : End Try
+            Return nzn(mTARA7, 0)
+        End Get
+        Set(ByVal Value As Double)
+            If PA() = -1 Then Exit Property
+            mTARA7 = nzn(Value, 0)
+            dvForm(PA).Row("TARA7") = nzn(Value, 0) : guardarDV()
+        End Set
+    End Property
+
+    Private mTARA8 As Double
+    Public Property TARA8() As Double
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mTARA8 = nzn(dvForm(PA).Row("TARA8"), 0)
+            Catch ex As Exception : End Try
+            Return nzn(mTARA8, 0)
+        End Get
+        Set(ByVal Value As Double)
+            If PA() = -1 Then Exit Property
+            mTARA8 = nzn(Value, 0)
+            dvForm(PA).Row("TARA8") = nzn(Value, 0) : guardarDV()
+        End Set
+    End Property
+
+    Private mTARA9 As Double
+    Public Property TARA9() As Double
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mTARA9 = nzn(dvForm(PA).Row("TARA9"), 0)
+            Catch ex As Exception : End Try
+            Return nzn(mTARA9, 0)
+        End Get
+        Set(ByVal Value As Double)
+            If PA() = -1 Then Exit Property
+            mTARA9 = nzn(Value, 0)
+            dvForm(PA).Row("TARA9") = nzn(Value, 0) : guardarDV()
+        End Set
+    End Property
+
+    Private mTARA10 As Double
+    Public Property TARA10() As Double
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mTARA10 = nzn(dvForm(PA).Row("TARA10"), 0)
+            Catch ex As Exception : End Try
+            Return nzn(mTARA10, 0)
+        End Get
+        Set(ByVal Value As Double)
+            If PA() = -1 Then Exit Property
+            mTARA10 = nzn(Value, 0)
+            dvForm(PA).Row("TARA10") = nzn(Value, 0) : guardarDV()
+        End Set
+    End Property
+
+    Private mALB1 As Double
+    Public Property ALB1() As Double
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mALB1 = nzn(dvForm(PA).Row("ALB1"), 0)
+            Catch ex As Exception : End Try
+            Return nzn(mALB1, 0)
+        End Get
+        Set(ByVal Value As Double)
+            If PA() = -1 Then Exit Property
+            mALB1 = nzn(Value, 0)
+            dvForm(PA).Row("ALB1") = nzn(Value, 0) : guardarDV()
+        End Set
+    End Property
+
+    Private mALB2 As Double
+    Public Property ALB2() As Double
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mALB2 = nzn(dvForm(PA).Row("ALB2"), 0)
+            Catch ex As Exception : End Try
+            Return nzn(mALB2, 0)
+        End Get
+        Set(ByVal Value As Double)
+            If PA() = -1 Then Exit Property
+            mALB2 = nzn(Value, 0)
+            dvForm(PA).Row("ALB2") = nzn(Value, 0) : guardarDV()
+        End Set
+    End Property
+
+    Private mALB3 As Double
+    Public Property ALB3() As Double
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mALB3 = nzn(dvForm(PA).Row("ALB3"), 0)
+            Catch ex As Exception : End Try
+            Return nzn(mALB3, 0)
+        End Get
+        Set(ByVal Value As Double)
+            If PA() = -1 Then Exit Property
+            mALB3 = nzn(Value, 0)
+            dvForm(PA).Row("ALB3") = nzn(Value, 0) : guardarDV()
+        End Set
+    End Property
+
+    Private mALB4 As Double
+    Public Property ALB4() As Double
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mALB4 = nzn(dvForm(PA).Row("ALB4"), 0)
+            Catch ex As Exception : End Try
+            Return nzn(mALB4, 0)
+        End Get
+        Set(ByVal Value As Double)
+            If PA() = -1 Then Exit Property
+            mALB4 = nzn(Value, 0)
+            dvForm(PA).Row("ALB4") = nzn(Value, 0) : guardarDV()
+        End Set
+    End Property
+
+    Private mALB5 As Double
+    Public Property ALB5() As Double
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mALB5 = nzn(dvForm(PA).Row("ALB5"), 0)
+            Catch ex As Exception : End Try
+            Return nzn(mALB5, 0)
+        End Get
+        Set(ByVal Value As Double)
+            If PA() = -1 Then Exit Property
+            mALB5 = nzn(Value, 0)
+            dvForm(PA).Row("ALB5") = nzn(Value, 0) : guardarDV()
+        End Set
+    End Property
+
+    Private mALB6 As Double
+    Public Property ALB6() As Double
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mALB6 = nzn(dvForm(PA).Row("ALB6"), 0)
+            Catch ex As Exception : End Try
+            Return nzn(mALB6, 0)
+        End Get
+        Set(ByVal Value As Double)
+            If PA() = -1 Then Exit Property
+            mALB6 = nzn(Value, 0)
+            dvForm(PA).Row("ALB6") = nzn(Value, 0) : guardarDV()
+        End Set
+    End Property
+
+    Private mALB7 As Double
+    Public Property ALB7() As Double
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mALB7 = nzn(dvForm(PA).Row("ALB7"), 0)
+            Catch ex As Exception : End Try
+            Return nzn(mALB7, 0)
+        End Get
+        Set(ByVal Value As Double)
+            If PA() = -1 Then Exit Property
+            mALB7 = nzn(Value, 0)
+            dvForm(PA).Row("ALB7") = nzn(Value, 0) : guardarDV()
+        End Set
+    End Property
+
+    Private mALB8 As Double
+    Public Property ALB8() As Double
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mALB8 = nzn(dvForm(PA).Row("ALB8"), 0)
+            Catch ex As Exception : End Try
+            Return nzn(mALB8, 0)
+        End Get
+        Set(ByVal Value As Double)
+            If PA() = -1 Then Exit Property
+            mALB8 = nzn(Value, 0)
+            dvForm(PA).Row("ALB8") = nzn(Value, 0) : guardarDV()
+        End Set
+    End Property
+
+    Private mALB9 As Double
+    Public Property ALB9() As Double
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mALB9 = nzn(dvForm(PA).Row("ALB9"), 0)
+            Catch ex As Exception : End Try
+            Return nzn(mALB9, 0)
+        End Get
+        Set(ByVal Value As Double)
+            If PA() = -1 Then Exit Property
+            mALB9 = nzn(Value, 0)
+            dvForm(PA).Row("ALB9") = nzn(Value, 0) : guardarDV()
+        End Set
+    End Property
+
+    Private mALB10 As Double
+    Public Property ALB10() As Double
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mALB10 = nzn(dvForm(PA).Row("ALB10"), 0)
+            Catch ex As Exception : End Try
+            Return nzn(mALB10, 0)
+        End Get
+        Set(ByVal Value As Double)
+            If PA() = -1 Then Exit Property
+            mALB10 = nzn(Value, 0)
+            dvForm(PA).Row("ALB10") = nzn(Value, 0) : guardarDV()
+        End Set
+    End Property
+
+    Private mESTOC As String
+    Public Property ESTOC() As String
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mESTOC = nz(dvForm(PA).Row("ESTOC"), "")
+            Catch ex As Exception : End Try
+            Return nz(mESTOC, "")
+        End Get
+        Set(ByVal Value As String)
+            If PA() = -1 Then Exit Property
+            mESTOC = nz(Value, "")
+            dvForm(PA).Row("ESTOC") = nz(Value, "") : guardarDV()
+        End Set
+    End Property
+
+    Private mQUANTITAT As Integer
+    Public Property QUANTITAT() As Integer
+        Get
+            If PA() = -1 Then Exit Property
+            Try
+                mQUANTITAT = nzn(dvForm(PA).Row("QUANTITAT"), 0)
+            Catch ex As Exception : End Try
+            Return nzn(mQUANTITAT, 0)
+        End Get
+        Set(ByVal Value As Integer)
+            If PA() = -1 Then Exit Property
+            mQUANTITAT = nzn(Value, 0)
+            dvForm(PA).Row("QUANTITAT") = nzn(Value, 0) : guardarDV()
+        End Set
+    End Property
+
+#End Region
+
+#Region "VARIABLES"
+
+    Private orden As clsOrdenModelo
+
+#End Region
+
+    Public Sub New(ByVal tabla As DataTable, _
+                    ByVal centro As String, _
+                    ByRef bindingcontext As BindingContext, ByVal ord As clsOrdenModelo)
+
+        MyBase.New(tabla, centro, bindingcontext)
+        Dim sqlSel As String
+        Try
+            orden = ord
+            sqlSinWhere = "SELECT * FROM ORDRE "
+
+            sqlSel = sqlSinWhere & " WHERE ORDRE = " & orden.ORDRE & " AND CENTRO = """ & orden.centro & """ "
+            cmdSel.CommandText = sqlSel
+            da.SelectCommand = cmdSel
+            da.Fill(tabla)
+            If tabla.Columns("ELEGIRTEJIDO") Is Nothing Then
+                tabla.Columns.Add("TRASPASARLINEA")
+            End If
+            tabla.AcceptChanges()
+            dvForm.Sort = "LINEA"
+            PonerDefaults()
+            DespertarHandlers()
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub PonerDefaults()
+        Try
+            With dvForm.Table
+                .Columns("ORDRE").DefaultValue = orden.ORDRE
+                .Columns("EXPEDICIO").DefaultValue = orden.EXPEDICIO
+                .Columns("ESTOC").DefaultValue = ""
+                .Columns("LINEA").DefaultValue = 10000
+                .Columns("CENTRO").DefaultValue = orden.centro
+            End With
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Friend Sub CambioDetalle(ByVal centro As String, ByVal ord As clsOrdenModelo)
+        Try
+            Dim sqlSel As String
+            orden = ord
+            Me.centro = centro
+            sqlSel = sqlSinWhere & " WHERE ORDRE = " & orden.ORDRE & " AND CENTRO = """ & orden.centro & """ "
+
+            cmdSel.CommandText = sqlSel
+            dvForm.Sort = "LINEA"
+            da.SelectCommand = cmdSel
+            tabla.Clear()
+            da.Fill(tabla)
+
+            PonerDefaults()
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Public Sub DormirHandlers()
+        RemoveHandler tabla.RowChanged, AddressOf RowChanged
+        RemoveHandler tabla.ColumnChanged, AddressOf CambioColumna
+    End Sub
+    Public Sub DespertarHandlers()
+        AddHandler tabla.RowChanged, AddressOf RowChanged
+        AddHandler tabla.ColumnChanged, AddressOf CambioColumna
+    End Sub
+    Friend Sub RowChanged(ByVal sender As Object, ByVal e As System.data.DataRowChangeEventArgs)
+        Try
+            DormirHandlers()
+            If LINEA = 10000 Then
+                Try
+                    If dvForm(dvForm.Count - 2).Item("LINEA") = -1 Then
+                        LINEA = 1
+                    Else
+                        LINEA = dvForm(dvForm.Count - 2).Item("LINEA") + 1
+                    End If
+
+                Catch ex As Exception
+                    LINEA = 1
+                End Try
+            End If
+            DespertarHandlers()
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub CambioColumna(ByVal sender As System.Object, ByVal e As System.Data.DataColumnChangeEventArgs)
+        Try
+            guardarDV()
+            If Not tabla.GetChanges Is Nothing Then
+                DormirHandlers()
+                QUANTITAT = TALL1 + TALL2 + TALL3 + TALL4 + TALL5 + TALL6 + TALL7 + TALL8 + TALL9 + TALL10
+                DespertarHandlers()
+            End If
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+
+#Region "OVERRIDES"
+
+    Friend Overrides Function TieneCambios() As Boolean
+        Try
+            guardarDV()
+            If Not tabla.GetChanges Is Nothing Then
+                Return True
+            Else
+                Return False
+            End If
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Function
+    Friend Overrides Function genWhere() As String
+        Try
+            Dim ret As String
+
+            ret = "WHERE " & tabla.TableName & ".CENTRO = """ & centro & """"
+
+            Return ret
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Function
+    Friend Overrides Function GenOrder() As String
+        Try
+            Return ""
+            'Return " ORDER BY TEMPORADA, CLIENT, SERIE, CODI "
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Function
+    Friend Overrides Function ObtenerNumeroRegistro(ByVal id As Object) As Integer
+        If id Is Nothing Then
+            id = ORDRE
+        End If
+
+        Dim cmd As New MySqlCommand(" SELECT " & _
+           " (SELECT COUNT(*) " & _
+           " FROM " & tabla.TableName & " AS M2 WHERE " & _
+           " M2.CODI < M1.CODI AND  " & WCNoTabla() & " ) AS rownum FROM " & tabla.TableName & " AS M1  WHERE CODI = """ & id & """ AND " & WCNoTabla() & GenOrder(), cnn)
+        Try
+            Dim idx As Object = cmd.ExecuteScalar()
+
+            If idx Is Nothing Then Return -1
+            Return idx '- 1
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Function
+    Friend Overrides Function genWhereNumeroRegistros() As String
+        Try
+            Return genWhere()
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Function
+
+#End Region
+
+End Class
+
+'Public Overrides Sub borrar()
+'    Dim i As Integer
+'    Dim a As New ArrayList
+'    Dim key(2) As Object
+'    Try
+'        For i = 0 To dvForm.Count - 1
+'            a.Add(dvForm(i).Item("LINEA"))
+'        Next
+'        key(0) = ORDRE
+'        key(2) = centro
+'        For i = 0 To a.Count - 1
+'            key(1) = a(i)
+'            tabla.Rows.Find(key).Delete()
+'        Next
+
+'        ActualizarOrigen(True, True)
+
+'    Catch ex As Exception
+'        LOG(ex.ToString) : cargando = False : CCN()
+'    End Try
+'End Sub

@@ -1,0 +1,345 @@
+Imports MySql.Data.MySqlClient : Imports clsFuncionesLOG : Imports clsFuncionesC1 : Imports clsFuncionesUtiles : Imports clsConstantes
+Public Class clsDirecciones
+    Inherits clsADO
+
+#Region "CAMPOS"
+
+    Private mCODI As Integer
+    Public Property CODI() As Integer
+        Get
+            Try
+                mCODI = nzn(dvForm(pa).Row("CODI"), 0)
+            Catch ex As Exception : End Try
+            Return nzn(mCODI, 0)
+        End Get
+        Set(ByVal Value As Integer)
+            If esCodigoExistente(dtClients, CCClients, Value) Then
+                mCODI = nzn(Value, 0)
+                dvForm(pa).Row("NOMCLIENT") = general.OBN(Value, dtClients, CNClients)
+                dvForm(pa).Row("CODI") = nzn(Value, 0) : guardarDV()
+            Else
+                dvForm(pa).Row("CODI") = 0
+
+                dvForm(pa).Row("NOMCLIENT") = "" : guardarDV()
+                MessageBox.Show(rm.GetString("NOEXISTECLIENT"))
+            End If
+        End Set
+    End Property
+
+    Private mNOM As String
+    Public Property NOM() As String
+        Get
+            Try
+                mNOM = general.nz(dvForm(pa).Row("NOM"), "")
+            Catch ex As Exception : End Try
+            Return general.nz(mNOM, "")
+        End Get
+        Set(ByVal Value As String)
+            mNOM = general.nz(Value, "")
+            If tabla.GetChanges Is Nothing Then
+                dvForm(pa).Row("NOM") = general.nz(Value, "") : guardarDV()
+                tabla.AcceptChanges()
+            Else
+                dvForm(pa).Row("NOM") = general.nz(Value, "") : guardarDV()
+            End If
+        End Set
+    End Property
+
+    Private mDOM As String
+    Public Property DOM() As String
+        Get
+            Try
+                mDOM = general.nz(dvForm(pa).Row("DOM"), "")
+            Catch ex As Exception : End Try
+            Return general.nz(mDOM, "")
+        End Get
+        Set(ByVal Value As String)
+            mDOM = general.nz(Value, "")
+            dvForm(pa).Row("DOM") = general.nz(Value, "") : guardarDV()
+        End Set
+    End Property
+
+    Private mPROV As String
+    Public Property PROV() As String
+        Get
+            Try
+                mPROV = general.nz(dvForm(pa).Row("PROV"), "")
+            Catch ex As Exception : End Try
+            Return general.nz(mPROV, "")
+        End Get
+        Set(ByVal Value As String)
+            mPROV = general.nz(Value, "")
+            dvForm(pa).Row("PROV") = general.nz(Value, "") : guardarDV()
+        End Set
+    End Property
+
+    Private mPOB As String
+    Public Property POB() As String
+        Get
+            Try
+                mPOB = general.nz(dvForm(pa).Row("POB"), "")
+            Catch ex As Exception : End Try
+            Return general.nz(mPOB, "")
+        End Get
+        Set(ByVal Value As String)
+            mPOB = general.nz(Value, "")
+            dvForm(pa).Row("POB") = general.nz(Value, "") : guardarDV()
+        End Set
+    End Property
+
+    Private mCP As Integer
+    Public Property CP() As Integer
+        Get
+            Try
+                mCP = nzn(dvForm(pa).Row("CP"), 0)
+            Catch ex As Exception : End Try
+            Return nzn(mCP, 0)
+        End Get
+        Set(ByVal Value As Integer)
+            mCP = nzn(Value, 0)
+            dvForm(pa).Row("CP") = nzn(Value, 0) : guardarDV()
+        End Set
+    End Property
+
+    Private mTEL As String
+    Public Property TEL() As String
+        Get
+            Try
+                mTEL = general.nz(dvForm(pa).Row("TEL"), "")
+            Catch ex As Exception : End Try
+            Return general.nz(mTEL, "")
+        End Get
+        Set(ByVal Value As String)
+            mTEL = general.nz(Value, "")
+            dvForm(pa).Row("TEL") = general.nz(Value, "") : guardarDV()
+        End Set
+    End Property
+
+    Private mFAX As String
+    Public Property FAX() As String
+        Get
+            Try
+                mFAX = general.nz(dvForm(pa).Row("FAX"), "")
+            Catch ex As Exception : End Try
+            Return general.nz(mFAX, "")
+        End Get
+        Set(ByVal Value As String)
+            mFAX = general.nz(Value, "")
+            dvForm(pa).Row("FAX") = general.nz(Value, "") : guardarDV()
+        End Set
+    End Property
+
+    Private mCONTACTE As String
+    Public Property CONTACTE() As String
+        Get
+            If PA = -1 Then Exit Property
+            Try
+                mCONTACTE = general.nz(dvForm(pa).Row("CONTACTE"), "")
+            Catch ex As Exception : End Try
+            Return general.nz(mCONTACTE, "")
+        End Get
+        Set(ByVal Value As String)
+            If PA = -1 Then Exit Property
+            If general.nz(Value, "") <> general.nz(CONTACTE, "") Then
+                mCONTACTE = general.nz(Value, "")
+                dvForm(pa).Row("CONTACTE") = general.nz(mCONTACTE, "") : guardarDV()
+            End If
+        End Set
+    End Property
+
+    Private mPAIS As String
+    Public Property PAIS() As String
+        Get
+            Try
+                mPAIS = general.nz(dvForm(PA).Row("PAIS"), "")
+            Catch ex As Exception : End Try
+            Return general.nz(mPAIS, "")
+        End Get
+        Set(ByVal Value As String)
+            mPAIS = general.nz(Value, "")
+            dvForm(PA).Row("PAIS") = general.nz(Value, "") : guardarDV()
+        End Set
+    End Property
+
+
+#End Region
+
+#Region "VARIABLES"
+
+    Friend dtClients As New DataTable("CLIENTS")
+    Private cliente As clsCliente
+
+#End Region
+
+    Public Sub New(ByVal tabla As DataTable, _
+                ByVal centro As String, ByRef bindingcontext As BindingContext, ByVal clie As clsCliente)
+
+        MyBase.New(tabla, centro, bindingcontext)
+        Dim sqlSel As String
+
+        Try
+            cliente = clie
+            'CargaTabla(tablaClientes, CCClients, CNClients, dtClients, True)
+
+            sqlSinWhere = "SELECT ADRES.*, " & _
+                            " filiales.DESCRI AS NOMCENTRO " & _
+                            " FROM ADRES " & _
+                            " LEFT JOIN filiales ON (filiales.CODI = ADRES.CENTRO) "
+            sqlSel = sqlSinWhere & _
+                        " WHERE ADRES.CENTRO = """ & cliente.centro & """ AND ADRES.CODI = " & cliente.CODI & " ORDER BY ADRES.DOM "
+            '" LIMIT 1"
+            cmdSel.CommandText = sqlSel
+
+            dvForm.Sort = "DOM"
+            da.SelectCommand = cmdSel
+            da.Fill(tabla)
+            PonerDefaults()
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Private Sub PonerDefaults()
+        Try
+            With dvForm.Table
+                .Columns("CODI").DefaultValue = cliente.CODI
+                .Columns("NOM").DefaultValue = cliente.NOM
+                .Columns("CONTACTE").DefaultValue = ""
+                .Columns("DOM").DefaultValue = ""
+                .Columns("TEL").DefaultValue = DBNull.Value
+                .Columns("FAX").DefaultValue = DBNull.Value
+                .Columns("CP").DefaultValue = DBNull.Value
+                .Columns("PROV").DefaultValue = ""
+                .Columns("POB").DefaultValue = ""
+                .Columns("PAIS").DefaultValue = ""
+                .Columns("CENTRO").DefaultValue = cliente.centro
+            End With
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Friend Sub CambioDetalle(ByVal centro As String, ByVal clie As clsCliente)
+        Dim sqlSel As String
+        Try
+            cliente = clie
+            Me.centro = centro
+            sqlSinWhere = "SELECT ADRES.*, " & _
+                       " filiales.DESCRI AS NOMCENTRO " & _
+                       " FROM ADRES " & _
+                       " LEFT JOIN filiales ON (filiales.CODI = ADRES.CENTRO) "
+
+            sqlSel = sqlSinWhere & _
+                        " WHERE ADRES.CENTRO = """ & cliente.centro & """ AND " & _
+                        " ADRES.CODI = " & cliente.CODI & " ORDER BY ADRES.DOM "
+
+
+            cmdSel.CommandText = sqlSel
+            da.SelectCommand = cmdSel
+            tabla.Clear()
+            da.Fill(tabla)
+            PonerDefaults()
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+
+#Region "OVERRIDES"
+
+    Friend Overrides Function TieneCambios() As Boolean
+        Try
+            guardarDV()
+            If Not tabla.GetChanges Is Nothing Then
+                Return True
+            Else
+                Return False
+            End If
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Function
+    Public Overrides Sub borrar()
+        Try
+            'BorrarActualDVDetalle()
+            dvForm(PA).Delete()
+            Me.ActualizarOrigen()
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Friend Overrides Function genWhere() As String
+        Try
+            Dim ret As String
+
+            ret = "WHERE " & tabla.TableName & ".CENTRO = """ & centro & """"
+
+            Return ret
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Function
+    Friend Overrides Function GenOrder() As String
+        Try
+            Return ""
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Function
+    Friend Overrides Function ObtenerNumeroRegistro(ByVal id As Object) As Integer
+        If id Is Nothing Then
+            id = CODI
+        End If
+
+        Dim cmd As New MySqlCommand(" SELECT " & _
+           " (SELECT COUNT(*) " & _
+           " FROM " & tabla.TableName & " AS M2 WHERE " & _
+           " M2.CODI < M1.CODI AND  " & WCNoTabla() & " ) AS rownum FROM " & tabla.TableName & " AS M1  WHERE CODI = """ & id & """ AND " & WCNoTabla() & GenOrder(), cnn)
+        Try
+            Dim idx As Object = cmd.ExecuteScalar()
+            If idx Is Nothing Then Return -1
+
+            Return idx '- 1
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Function
+    Friend Overrides Function genWhereNumeroRegistros() As String
+        Try
+            Return genWhere()
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Function
+#End Region
+
+    Public Sub ActualizarDetalle()
+        Dim i As Integer
+        Dim cambio As Boolean = False
+        Try
+            For i = 0 To dvForm.Count - 1
+                If general.nz(dvForm(i).Item("CODI"), "") <> general.nz(cliente.CODI, "") Then dvForm(i).Item("CODI") = nzn(cliente.CODI, 0) : cambio = True
+                If general.nz(dvForm(i).Item("CENTRO"), "") <> general.nz(cliente.centro, "") Then dvForm(i).Item("CENTRO") = general.nz(cliente.centro, "") : cambio = True
+            Next
+            If cambio Then guardarDV()
+
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Sub
+    Public Overrides Sub ActualizarOrigen(Optional ByVal nocerrar As Boolean = False, Optional ByVal hackDetalle As Boolean = False)
+        Try
+            ActualizarDetalle()
+            MyBase.ActualizarOrigen(True, True)
+
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Sub
+
+End Class

@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>C1.Win.DashboardLayout.4.Design</name>
+    </assembly>
+    <members>
+        <member name="M:C1.Win.Layout.Design.DashboardParentControlDesigner._enableDesignMode(System.ComponentModel.IComponent,System.String)">
+            <summary>
+            This method does exactly what ParentControlDesigner.EnableDesignMode does, but
+            because we also need _disableDesignMode, this method is used for clarity.
+            </summary>
+            <param name="c">The nested component to enable design mode for.</param>
+            <param name="name">The nested component's name.</param>
+        </member>
+        <member name="M:C1.Win.Layout.Design.DashboardParentControlDesigner._disableDesignMode(System.ComponentModel.IComponent)">
+            <summary>
+            This method must be called for all components that _enableDesignMode was called on,
+            when our design component is being removed (ComponentRemoving).
+            Otherwise, the VS designer gets confused, e.g. the following sequence:
+            - drop a C1DashboardLayout on the form;
+            - delete it;
+            - undo the deletion;
+            - delete it again.
+            results in junk in form's generated code - nested components that design mode was
+            enabled for appear as standalone components on the form.
+            </summary>
+            <param name="c">The nested component to disable design mode for.</param>
+        </member>
+    </members>
+</doc>

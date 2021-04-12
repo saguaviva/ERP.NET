@@ -1,0 +1,837 @@
+Imports CoreLab.MySql
+
+Module funcionesUtiles
+
+    Friend cnn As CoreLab.MySql.MySqlConnection
+
+    Friend monitor As CoreLab.MySql.MySqlMonitor
+    Private Declare Function GetSystemMenu Lib "user32" Alias "GetSystemMenu" (ByVal hwnd As Long, ByVal bRevert As Long) As Long
+    Private Declare Function RemoveMenu Lib "user32" Alias "RemoveMenu" (ByVal hMenu As Long, ByVal nPosition As Long, ByVal wFlags As Long) As Long
+    Private Const MF_BYPOSITION = &H400&
+
+#Region "CONEXION"
+
+    Friend Sub ACN()
+        Try
+            If Not cnn.State = ConnectionState.Open Then : cnn.Open() : End If
+
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Sub
+    Friend Sub CCN()
+        Try
+            If Not cnn.State = ConnectionState.Closed Then : cnn.Close() : End If
+
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Sub
+
+#End Region
+
+#Region "PARAMETROS"
+
+    Friend Sub añadirParametroIdentificador(ByRef cmd As MySqlCommand, ByVal tipo As String, ByVal campo As String)
+
+        Select Case tipo
+            Case "double" : cmd.Parameters.Add(New MySqlParameter("pi" & campo, MySqlType.Double, 0, System.Data.ParameterDirection.Input, True, CType(0, Byte), CType(0, Byte), campo, System.Data.DataRowVersion.Original, Nothing))
+            Case "varchar" : cmd.Parameters.Add(New MySqlParameter("pi" & campo, MySqlType.VarChar, 0, System.Data.ParameterDirection.Input, True, CType(0, Byte), CType(0, Byte), campo, System.Data.DataRowVersion.Original, Nothing))
+            Case "int" : cmd.Parameters.Add(New MySqlParameter("pi" & campo, MySqlType.Int, 0, System.Data.ParameterDirection.Input, True, CType(0, Byte), CType(0, Byte), campo, System.Data.DataRowVersion.Original, Nothing))
+            Case "integer" : cmd.Parameters.Add(New MySqlParameter("pi" & campo, MySqlType.Int, 0, System.Data.ParameterDirection.Input, True, CType(0, Byte), CType(0, Byte), campo, System.Data.DataRowVersion.Original, Nothing))
+            Case "tinyint" : cmd.Parameters.Add(New MySqlParameter("pi" & campo, MySqlType.TinyInt, 0, System.Data.ParameterDirection.Input, True, CType(0, Byte), CType(0, Byte), campo, System.Data.DataRowVersion.Original, Nothing))
+            Case "date" : cmd.Parameters.Add(New MySqlParameter("pi" & campo, MySqlType.Date, 0, System.Data.ParameterDirection.Input, True, CType(0, Byte), CType(0, Byte), campo, System.Data.DataRowVersion.Original, Nothing))
+            Case "text" : cmd.Parameters.Add(New MySqlParameter("pi" & campo, MySqlType.Text, 0, System.Data.ParameterDirection.Input, True, CType(0, Byte), CType(0, Byte), campo, System.Data.DataRowVersion.Original, Nothing))
+            Case "tinyintunsigned" : cmd.Parameters.Add(New MySqlParameter("pi" & campo, MySqlType.TinyInt, 1, System.Data.ParameterDirection.Input, True, CType(0, Byte), CType(0, Byte), campo, System.Data.DataRowVersion.Original, Nothing))
+            Case "blob" : cmd.Parameters.Add(New MySqlParameter("pi" & campo, MySqlType.Blob, 0, System.Data.ParameterDirection.Input, True, CType(0, Byte), CType(0, Byte), campo, System.Data.DataRowVersion.Original, Nothing))
+        End Select
+
+    End Sub
+    Friend Sub añadirParametro(ByRef cmd As IDbCommand, ByVal tipo As String, ByVal campo As String, Optional ByVal BD As String = "MYSQL")
+
+        'Case "System.String" : Return "string"
+        'Case "System.Integer" : Return "integer"
+        'Case "System.Date" : Return "date"
+        'Case "System.Double" : Return "double"
+        'Case "System.Int32" : Return "integer"
+        'Case "System.Int16" : Return "integer"
+        'Case "System.DateTime" : Return "date"
+        'Case "System.Boolean" : Return "boolean"
+        'Case "System.Char" : Return "string"
+        'Case "System.Decimal" : Return "double"
+        'Case "System.Single" : Return "double"
+
+        Select Case BD
+            Case "MYSQL"
+                Select Case tipo
+                    Case "double" : cmd.Parameters.Add(New MySqlParameter("p" & campo, MySqlType.Double, 0, campo))
+                    Case "varchar" : cmd.Parameters.Add(New MySqlParameter("p" & campo, MySqlType.VarChar, 0, campo))
+                    Case "int" : cmd.Parameters.Add(New MySqlParameter("p" & campo, MySqlType.Int, 0, campo))
+                    Case "integer" : cmd.Parameters.Add(New MySqlParameter("p" & campo, MySqlType.Int, 0, campo))
+                    Case "tinyint" : cmd.Parameters.Add(New MySqlParameter("p" & campo, MySqlType.TinyInt, 0, campo))
+                    Case "date" : cmd.Parameters.Add(New MySqlParameter("p" & campo, MySqlType.Date, 0, campo))
+                    Case "text" : cmd.Parameters.Add(New MySqlParameter("p" & campo, MySqlType.Text, 0, campo))
+                    Case "tinyintunsigned" : cmd.Parameters.Add(New MySqlParameter("p" & campo, MySqlType.TinyInt, 1, campo))
+                    Case "blob" : cmd.Parameters.Add(New MySqlParameter("p" & campo, MySqlType.Blob, 0, campo))
+                End Select
+            Case "ACCESS"
+                Select Case tipo
+                    Case "double" : cmd.Parameters.Add(New OleDb.OleDbParameter("p" & campo, OleDb.OleDbType.Double, 0, campo))
+                    Case "varchar" : cmd.Parameters.Add(New OleDb.OleDbParameter("p" & campo, OleDb.OleDbType.VarChar, 0, campo))
+                    Case "int" : cmd.Parameters.Add(New OleDb.OleDbParameter("p" & campo, OleDb.OleDbType.Integer, 0, campo))
+                    Case "integer" : cmd.Parameters.Add(New OleDb.OleDbParameter("p" & campo, OleDb.OleDbType.Integer, 0, campo))
+                    Case "tinyint" : cmd.Parameters.Add(New OleDb.OleDbParameter("p" & campo, OleDb.OleDbType.TinyInt, 0, campo))
+                    Case "date" : cmd.Parameters.Add(New OleDb.OleDbParameter("p" & campo, OleDb.OleDbType.Date, 0, campo))
+                    Case "text" : cmd.Parameters.Add(New OleDb.OleDbParameter("p" & campo, OleDb.OleDbType.VarChar, 0, campo))
+                    Case "string" : cmd.Parameters.Add(New OleDb.OleDbParameter("p" & campo, OleDb.OleDbType.VarChar, 0, campo))
+                    Case "tinyintunsigned" : cmd.Parameters.Add(New OleDb.OleDbParameter("p" & campo, OleDb.OleDbType.Boolean, 1, campo))
+                    Case "blob" : cmd.Parameters.Add(New OleDb.OleDbParameter("p" & campo, OleDb.OleDbType.LongVarBinary, 0, campo))
+                    Case "boolean" : cmd.Parameters.Add(New OleDb.OleDbParameter("p" & campo, OleDb.OleDbType.Boolean, 0, campo))
+                End Select
+        End Select
+
+    End Sub
+    'Friend Sub añadirParametro(ByRef cmd As oled, ByVal tipo As String, ByVal campo As String)
+
+    '    Select Case tipo
+    '        Case "double" : cmd.Parameters.Add(New MySqlParameter("p" & campo, MySqlType.Double, 0, campo))
+    '        Case "varchar" : cmd.Parameters.Add(New MySqlParameter("p" & campo, MySqlType.VarChar, 0, campo))
+    '        Case "int" : cmd.Parameters.Add(New MySqlParameter("p" & campo, MySqlType.Int, 0, campo))
+    '        Case "integer" : cmd.Parameters.Add(New MySqlParameter("p" & campo, MySqlType.Int, 0, campo))
+    '        Case "tinyint" : cmd.Parameters.Add(New MySqlParameter("p" & campo, MySqlType.TinyInt, 0, campo))
+    '        Case "date" : cmd.Parameters.Add(New MySqlParameter("p" & campo, MySqlType.Date, 0, campo))
+    '        Case "text" : cmd.Parameters.Add(New MySqlParameter("p" & campo, MySqlType.Text, 0, campo))
+    '        Case "tinyintunsigned" : cmd.Parameters.Add(New MySqlParameter("p" & campo, MySqlType.TinyInt, 1, campo))
+    '        Case "blob" : cmd.Parameters.Add(New MySqlParameter("p" & campo, MySqlType.Blob, 0, campo))
+    '    End Select
+
+    'End Sub
+#End Region
+
+#Region "ORGANIZAR"
+
+    Public Sub ActualizarNum(ByVal tabla As String, ByVal documento As String, ByVal centr As String, ByVal codi As Double, Optional ByVal tipo As String = "M")
+        Dim cmd As New MySqlCommand
+        Try
+
+            If tipo = Fornitura Then tipo = "T"
+            If tabla.ToUpper = "FACTUR" Or tabla.ToUpper = "ORDRE" Then
+                tipo = "M"
+            End If
+
+            cmd.Connection = cnn
+            cmd.CommandText = "UPDATE NUMERACIONES SET " & _
+                " CODI = " & codi & " " & _
+                " WHERE " & _
+                " TABLA = """ & tabla & """ AND " & _
+                " TIPUS = """ & tipo & """ AND " & _
+                " CENTRO = """ & centr & """ AND " & _
+                " DOCUMENT = """ & documento & """ "
+            ACN()
+            cmd.ExecuteNonQuery()
+            CCN()
+
+        Catch ex As Exception
+            LOG(ex.ToString) : CCN()
+        End Try
+    End Sub
+    Friend Function TipoNET2SQL(ByVal tipo As System.Type) As String
+        Try
+            Select Case tipo.FullName.ToString
+                Case "System.String" : Return "varchar"
+                Case "System.Char" : Return "varchar"
+                Case "System.Integer" : Return "integer"
+                Case "System.Int64" : Return "integer"
+                Case "System.Int32" : Return "integer"
+                Case "System.Int16" : Return "integer"
+                Case "System.Date" : Return "date"
+                Case "System.DateTime" : Return "date"
+                Case "System.Double" : Return "double"
+                Case "System.Decimal" : Return "double"
+                Case "System.Single" : Return "double"
+                Case "System.Boolean" : Return "tinyintunsigned"
+                Case "System.Byte" : Return "tinyintunsigned"
+                Case "System.Byte[]" : Return "blob"
+            End Select
+            MessageBox.Show("TIPO " & tipo.FullName.ToString)
+
+        Catch ex As Exception
+            LOG(ex.ToString) : CCN()
+        End Try
+    End Function
+    Friend Function esPrimaryKey(ByVal cons As System.Data.UniqueConstraint, ByVal columna As String) As Boolean
+        Dim e As IEnumerator
+        Try
+            e = cons.Columns.GetEnumerator
+            While e.MoveNext
+                If String.Compare(columna, e.Current.Caption, True) = 0 Then
+                    Return True
+                End If
+            End While
+
+            Return False
+
+        Catch ex As Exception
+            LOG(ex.ToString) : CCN()
+        End Try
+    End Function
+    Friend Function NS(ByVal str As Object, Optional ByVal esNumero As Boolean = False) As String
+        Try
+            If Not IsDBNull(str) AndAlso Not str Is Nothing Then
+                str = CType(str, String)
+                str = str.Replace("""", "\""")
+                str = str.Replace(":", "::")
+                If esNumero Then
+                    str = str.Replace(",", ".")
+                End If
+                Return str
+            Else
+                If esNumero Then
+                    Return nzn(str, 0)
+                End If
+            End If
+        Catch ex As Exception
+            LOG(ex.ToString) : CCN()
+        End Try
+    End Function
+    Friend Sub AñadirBinding(ByVal c As Object, ByVal dv As DataView, ByVal campo As String, Optional ByVal elementoBinding As String = "Text")
+        Try
+            c.databindings.add(New Binding(elementoBinding, dv, campo))
+
+        Catch ex As Exception
+            LOG(ex.ToString) : CCN()
+        End Try
+    End Sub
+    Friend Sub AñadirBindingCombo(ByVal c As C1.Win.C1List.C1Combo, ByVal dv As DataView, ByVal valuemember As String, ByVal DisplayMember As String)
+        Dim i As Integer
+        Try
+            With c
+                .DataSource = dv
+                .DisplayMember = DisplayMember
+                .ValueMember = valuemember
+            End With
+            Try : OcultarMostrarColumnaCbo(c, "CENTRO", False) : Catch ex As Exception : End Try
+            If Not dv Is Nothing Then
+                For i = 0 To dv.Table.Columns.Count - 1
+                    c.Columns(dv.Table.Columns(i).ColumnName).Caption = dv.Table.Columns(i).Caption
+                Next
+            End If
+            AutosizeColumnasCombo(c)
+
+        Catch ex As Exception
+            LOG(ex.ToString) : CCN()
+        End Try
+    End Sub
+    Friend Sub AñadirBindingCombo(ByVal c As C1.Win.C1List.C1Combo, ByVal dt As DataTable, ByVal valuemember As String, ByVal DisplayMember As String)
+        Dim i As Integer
+        
+        Try
+            With c
+                .DataSource = dt
+                .DisplayMember = DisplayMember
+                .ValueMember = valuemember
+            End With
+
+            Dim j As Integer
+            Try : OcultarMostrarColumnaCbo(c, "CENTRO", False) : Catch ex As Exception : End Try
+            If Not dt Is Nothing Then
+                If dt.GetType Is GetType(DataTable) OrElse dt.GetType().BaseType.Name = GetType(DataTable).Name Then
+                    For i = 0 To CType(dt, DataTable).Columns.Count - 1
+                        c.Columns(CType(dt, DataTable).Columns(i).ColumnName).Caption = CType(dt, DataTable).Columns(i).Caption
+                    Next
+                End If
+            End If
+
+            'AutosizeColumnasCombo(c)
+
+        Catch ex As Exception
+            LOG(ex.ToString) : CCN()
+        End Try
+    End Sub
+    Friend Sub AñadirBindingCombo(ByVal c As C1.Win.C1TrueDBGrid.C1TrueDBDropdown, ByVal dt As DataTable, ByVal ListField As String, ByVal DataField As String)
+        Dim i As Integer
+        Try
+            With c
+                .DataSource = dt
+                .DataField = DataField
+                .DataMember = DataField
+                .ListField = ListField
+            End With
+            Try : OcultarMostrarColumnaCbo(c, "CENTRO", False) : Catch ex As Exception : End Try
+            If Not dt Is Nothing Then
+                For i = 0 To dt.Columns.Count - 1
+                    c.Columns(dt.Columns(i).ColumnName).Caption = dt.Columns(i).Caption
+                Next
+            End If
+            AutosizeColumnasTrueDBDropdown(c)
+
+        Catch ex As Exception
+            LOG(ex.ToString) : CCN()
+        End Try
+    End Sub
+    Friend Sub AñadirBindingCombo(ByVal c As C1.Win.C1TrueDBGrid.C1TrueDBDropdown, ByVal dv As DataView, ByVal ListField As String, ByVal DataField As String)
+        Dim i As Integer
+        Try
+            With c
+                .DataSource = dv
+                .DataField = DataField
+                .DataMember = DataField
+                .ListField = ListField
+            End With
+            c.Rebind(False)
+            Try : OcultarMostrarColumnaCbo(c, "CENTRO", False) : Catch ex As Exception : End Try
+            Try
+                If Not dv Is Nothing Then
+                    For i = 0 To dv.Table.Columns.Count - 1
+                        c.Columns(dv.Table.Columns(i).ColumnName).Caption = dv.Table.Columns(i).Caption
+                    Next
+                End If
+            Catch ex As Exception
+            End Try
+
+            AutosizeColumnasTrueDBDropdown(c)
+
+        Catch ex As Exception
+            LOG(ex.ToString) : CCN()
+        End Try
+    End Sub
+    'Le pasamos el nombre de la lista y nos devuelve el nombre del campo
+    Friend Function ponercontrabarrasreal(ByRef valorcampo As String) As Object
+        Try
+            If valorcampo Is Nothing Then
+                Return Nothing
+            End If
+            valorcampo = nz(valorcampo.Replace("""", "\"""), "")
+            Return valorcampo
+        Catch ex As Exception
+            LOG(ex.ToString) : CCN()
+        End Try
+    End Function
+    Function nzn(ByVal str As Object, ByVal defecto As Object) As Double
+        Try
+            If str Is Nothing OrElse IsDBNull(str) Then
+                Return defecto
+            Else
+                If Not IsNumeric(str) Then
+                    Return defecto
+                Else
+                    Return str
+                End If
+            End If
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Function
+    Function nz(ByVal str As Object, ByVal defecto As Object, Optional ByVal numerico As Boolean = False, Optional ByVal esFecha As Boolean = False) As Object
+        Try
+            If numerico = True Then
+                If str Is Nothing OrElse IsDBNull(str) OrElse str = "" Then
+                    Return defecto
+                Else : Return str
+                End If
+            Else
+                If str Is Nothing OrElse IsDBNull(str) Then : Return defecto
+                Else
+                    If esFecha Then : Return DirectCast(str, Date).ToShortDateString
+                    Else : Return str : End If
+                End If
+            End If
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Function
+    Friend Function OBN(ByVal codi As Object, ByVal dt As DataTable, Optional ByVal nombre As String = "NOM", _
+                            Optional ByVal IDSORT As String = "CODI", Optional ByVal esNumerico As Boolean = False) As Object
+        Try
+            Dim dv As New DataView
+            dv = dt.DefaultView
+            dv.Sort = IDSORT
+            Dim i As Integer = dv.Find(codi)
+            If i > -1 Then
+                If Not esNumerico Then : Return nz(dv(i).Item(nombre), "")
+                Else : Return nzn(dv(i).Item(nombre), 0) : End If
+            Else
+                Return Nothing
+            End If
+        Catch ex As Exception
+            LOG(ex.ToString) : CCN()
+        End Try
+    End Function
+    Public Function DLookUp(ByVal sChamp$, ByVal sTable$, ByVal sCritere$, _
+     Optional ByVal bPromptErr As Boolean = True) As Object
+
+        ' Implementation de la fonction DLookUp d'Access en VB7 :
+        ' Relever la valeur d'un champ d'une table avec un critère
+        ' si la base, la table et le critère sont inchangés depuis le dernier appel,
+        ' une mémorisation permet de gagner du temps !
+
+        Dim ht As New Hashtable ' Conserver de la valeur des champs
+        Dim sMemRq$ ' Conserver les paramètres de la requête
+
+        ' Si on relance la même requête, on lit directement le champ dans le ht
+        'If "coespunt" & sTable & sCritere = sMemRq Then
+        'DLookUp = ht(sChamp)
+        'Exit Function
+        'End If
+
+        ' Objet commande = requête
+        Dim oCmd As New MySqlCommand
+        oCmd.Connection = cnn ' La connexion doit bien sûr être ouverte avant
+        ACN()
+        oCmd.CommandType = CommandType.Text
+        oCmd.CommandText = "Select * From " & sTable
+        If sCritere <> "" Then oCmd.CommandText &= " Where " & sCritere
+        Dim sMsgErr$ = _
+            "Erreur lors de l'exécution de la requête dans DLookUp :" & vbLf & _
+            oCmd.CommandText
+
+        ' Création d'un DataReader pour récupérer la valeur des champs
+        Dim dr As MySqlDataReader
+        Try
+            dr = oCmd.ExecuteReader(CommandBehavior.SingleRow)
+        Catch ex As Exception
+            If bPromptErr Then MsgBox(sMsgErr & vbLf & Err.Description, MsgBoxStyle.Critical)
+            Exit Function
+        End Try
+
+        If Not dr.HasRows Then
+            ' Aucune donnée retournée : DLookUp renvoi DBNull
+            DLookUp = System.DBNull.Value
+        Else
+
+            ' Lire les champs
+            dr.Read()
+
+            ' Stocker les champs ds le ht pour les retrouver facilement
+            ' au prochain appel identique
+            If Not IsNothing(ht) Then ht.Clear()
+            Dim i% ' Nb. de champs de la requête
+            For i = 0 To dr.FieldCount - 1
+                ht.Add(dr.GetName(i), dr.GetValue(i))
+            Next i
+            sMemRq = "coespunt" & sTable & sCritere
+
+            ' Lire la valeur du champ
+            Try
+                DLookUp = dr.Item(sChamp)
+            Catch ex As IndexOutOfRangeException
+                If bPromptErr Then MsgBox( _
+                    "Champ introuvable dans la requête dans DLookUp :" & vbLf & _
+                    oCmd.CommandText & vbLf & Err.Description, MsgBoxStyle.Critical)
+            Catch ex As Exception
+                If bPromptErr Then MsgBox(sMsgErr & vbLf & _
+                    Err.Description, MsgBoxStyle.Critical)
+            End Try
+
+        End If
+        dr.Close()
+
+    End Function
+    Public Function roundnum(ByVal num As Double, ByVal place As Integer) As Double
+
+        Dim n As Double
+
+        n = num * Math.Pow(10, place)
+
+        n = Math.Sign(n) * Math.Abs(Math.Floor(n + 0.51)) '+ 0.5
+
+        Return n / Math.Pow(10, place)
+
+    End Function
+    Function esCampoDeNombre(ByVal campo As String) As Boolean
+        Try
+            Select Case campo
+                Case "NOMACABADOR" : Return True
+                Case "NOMTEIXIDOR" : Return True
+                Case "NOMPROVE" : Return True
+                Case "NOMCLIENT" : Return True
+                Case "NOMESTAMPADOR" : Return True
+                Case "NOMREPRES" : Return True
+                Case "NOMTRANS" : Return True
+                Case "NOMTALLER" : Return True
+                Case "NOMTEJEDOR" : Return True
+                Case "NOMCONFEC" : Return True
+                Case "NOMTINT" : Return True
+                Case "NOMACA" : Return True
+                Case "NOMESTAM" : Return True
+                Case "NOMTINT" : Return True
+                Case "NOMMAQUI" : Return True
+                Case "NOMBANC" : Return True
+                Case "NOMIVA" : Return True
+                Case "NOMFORMA" : Return True
+                Case "NOMFILIAL" : Return True
+                Case "DESCRITEIXIT" : Return True
+            End Select
+            Return False
+
+        Catch ex As Exception
+            LOG(ex.ToString) : CCN()
+        End Try
+    End Function
+    Friend Function ConvertirAfechaMysql(ByVal fecha As Date) As String
+        Try
+            Return fecha.Year & "-" & fecha.Month & "-" & fecha.Day
+        Catch ex As Exception
+            LOG(ex.ToString) : CCN()
+        End Try
+    End Function
+    Function GetCampo(ByVal tabla As String, ByVal campo As String, ByVal id1 As Object, _
+                        ByVal tipoid1 As String, Optional ByVal id2 As String = "", _
+                        Optional ByVal id3 As String = "", Optional ByVal id4 As String = "") As Object
+
+        Try
+            'Ahora la funcion solo vale si el identificador es codi
+            Dim cmdSel As New MySqlCommand
+
+            'cn2 = cnn.ConnectionString
+            cmdSel.Connection = cnn
+            If Not IsDBNull(id1) Then
+                Select Case tipoid1
+                    Case "double" : id1 = CType(id1, System.Double)
+                    Case "string" : id1 = CType(id1, System.String)
+                    Case "integer" : id1 = CType(id1, System.Int32)
+                    Case "text" : id1 = CType(id1, System.String)
+                End Select
+                cmdSel.CommandText = "SELECT " & campo & " FROM " & tabla & " WHERE (CODI = """ & id1 & """)"
+                'ccn()
+                ACN()
+                GetCampo = cmdSel.ExecuteScalar
+                CCN()
+            Else
+                Return ""
+            End If
+        Catch ex As Exception
+            LOG(ex.ToString) : CCN()
+        End Try
+    End Function
+    Friend Function sumaTotal(ByVal campo As String, ByVal dv As DataView) As Double
+        Dim i As Integer
+        Dim suma As Double
+        Try
+            For i = 0 To dv.Count - 1
+                suma = suma + nzn(dv(i).Item(campo), 0)
+            Next
+            Return nzn(suma, 0)
+        Catch ex As Exception
+            LOG(ex.ToString)
+            CCN()
+        End Try
+    End Function
+
+#End Region
+
+#Region "CARGAR"
+
+    Friend Sub CargarTablas(ByVal aTablaOriginal As ArrayList, ByVal aCampoCODIGO As ArrayList, ByVal aCampoNOMBRE As ArrayList, ByRef aDT As ArrayList, ByVal nocerrarconexion As Boolean)
+        Dim cmdSel As New MySqlCommand
+        Dim dar As MySqlDataReader
+        Dim SQL As String
+        Dim i As Integer
+        Dim dr As DataRow
+        Try
+            cmdSel.Connection = cnn
+            ACN()
+            For i = 0 To aTablaOriginal.Count - 1
+                SQL = "SELECT DISTINCT " & aCampoCODIGO(i) & ", " & aCampoNOMBRE(i) & "  FROM " & aTablaOriginal(i) & "  ORDER BY " & aCampoNOMBRE(i) & ""
+                cmdSel.CommandText = SQL
+                dar = cmdSel.ExecuteReader
+                DirectCast(aDT(i), DataTable).Clear()
+                Try
+                    DirectCast(aDT(i), DataTable).Columns.Add(New DataColumn(aCampoCODIGO(i)))
+                    DirectCast(aDT(i), DataTable).Columns.Add(New DataColumn(aCampoNOMBRE(i)))
+
+                Catch ex As Exception
+
+                End Try
+
+
+                While dar.Read
+                    dr = CType(aDT(i), DataTable).NewRow
+                    dr(aCampoCODIGO(i)) = dar(aCampoCODIGO(i))
+                    dr(aCampoNOMBRE(i)) = dar(aCampoNOMBRE(i))
+                    CType(aDT(i), DataTable).Rows.Add(dr)
+                End While
+                dar.Close()
+            Next
+            PonerCaptions(CType(aDT(i), DataTable))
+            If Not cnn.State = ConnectionState.Closed AndAlso Not nocerrarconexion Then
+                cnn.Close()
+            End If
+
+        Catch ex As Exception
+            LOG(ex.ToString) : CCN()
+        End Try
+    End Sub
+    Friend Sub PonerCaptions(ByVal dt As DataTable)
+        Dim i As Integer
+        Try
+            For i = 0 To dt.Columns.Count - 1
+                With dt.Columns(i)
+                    Select Case .ColumnName
+                        Case "NOM"
+                            .Caption = rm.GetString("NOMBRE")
+                        Case "CODI"
+                            .Caption = rm.GetString("CODIGO")
+                        Case "CLIENT"
+                            .Caption = rm.GetString("CLIENTE")
+                        Case "PROVE"
+                            .Caption = rm.GetString("PROVEEDOR")
+                        Case "FIL"
+                            .Caption = rm.GetString("HILO")
+
+                        Case "DESCRI", "DESCRIPCION", "DESCRIPCIO"
+                            .Caption = rm.GetString("DESCRIPCION")
+                    End Select
+                End With
+            Next
+
+        Catch ex As Exception
+            MessageBox.Show(ex.ToString)
+        End Try
+    End Sub
+    'A este cargatabla le pasamos un arraylist campos y genera automaticamente los campos que necesitamos
+    Friend Sub CargaTabla(ByVal tablaOriginal As String, ByVal campos As ArrayList, ByRef dt As DataTable, ByVal nocerrar As Boolean)
+        Dim cmdSelect As New MySqlCommand
+        Dim daSelect As New MySqlDataAdapter
+        Try
+            cmdSelect.Connection = cnn
+
+            cmdSelect.CommandText = "SELECT DISTINCT CENTRO "
+            Dim i As Integer
+            For i = 0 To campos.Count - 1
+                cmdSelect.CommandText = cmdSelect.CommandText & "," & campos(i) & " "
+            Next
+            cmdSelect.CommandText = cmdSelect.CommandText & " FROM " & tablaOriginal & " "
+
+            daSelect.SelectCommand = cmdSelect
+            ACN()
+            dt.Rows.Clear()
+            daSelect.Fill(dt)
+            PonerCaptions(dt)
+            If Not cnn.State = ConnectionState.Closed AndAlso Not nocerrar Then
+                cnn.Close()
+            End If
+
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Sub
+    Friend Sub CargaTabla(ByVal tablaOriginal As String, ByVal campos As ArrayList, ByRef dt As DataTable, ByVal nocerrar As Boolean, ByVal sqlWhere As String)
+        Dim cmdSelect As New MySqlCommand
+        Dim daSelect As New MySqlDataAdapter
+        Try
+            cmdSelect.Connection = cnn
+
+            cmdSelect.CommandText = "SELECT DISTINCT CENTRO "
+            Dim i As Integer
+            For i = 0 To campos.Count - 1
+                cmdSelect.CommandText = cmdSelect.CommandText & "," & campos(i) & " "
+            Next
+            cmdSelect.CommandText = cmdSelect.CommandText & " FROM " & tablaOriginal & " WHERE " & sqlWhere
+
+            daSelect.SelectCommand = cmdSelect
+            ACN()
+            dt.Rows.Clear()
+            daSelect.Fill(dt)
+            PonerCaptions(dt)
+            If Not cnn.State = ConnectionState.Closed AndAlso Not nocerrar Then
+                cnn.Close()
+            End If
+
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Sub
+    Friend Sub CargaTabla(ByVal tablaOriginal As String, ByVal campoCODIGO As String, ByVal campoNOMBRE As String, ByRef dt As DataTable, Optional ByVal nocerrar As Boolean = False, Optional ByVal centr As String = "C")
+        Dim cmdSelect As New MySqlCommand
+        Dim daSelect As New MySqlDataAdapter
+        Try
+            cmdSelect.Connection = cnn
+            cmdSelect.CommandText = "SELECT DISTINCT " & campoCODIGO & ", " & _
+                        " " & campoNOMBRE & ", CENTRO  " & _
+                        " FROM " & tablaOriginal & "  " '& _
+
+            daSelect.SelectCommand = cmdSelect
+            ACN()
+            dt.Rows.Clear()
+            daSelect.Fill(dt)
+            PonerCaptions(dt)
+            If Not cnn.State = ConnectionState.Closed AndAlso Not nocerrar Then
+                cnn.Close()
+            End If
+        Catch ex As Exception
+            LOG(ex.ToString) : CCN()
+        End Try
+    End Sub
+    'Version del cargaTabla con el sql
+    Friend Sub CargaTabla(ByVal tablaOriginal As String, ByRef dt As DataTable, ByVal sql As String, Optional ByVal nocerrar As Boolean = False)
+        Dim cmdSelect As New MySqlCommand
+        Dim daSelect As New MySqlDataAdapter
+        Try
+            cmdSelect.Connection = cnn
+            cmdSelect.CommandText = sql
+
+            daSelect.SelectCommand = cmdSelect
+            ACN()
+            dt.Rows.Clear()
+            daSelect.Fill(dt)
+            PonerCaptions(dt)
+            If Not cnn.State = ConnectionState.Closed AndAlso Not nocerrar Then
+                cnn.Close()
+            End If
+        Catch ex As Exception
+            LOG(ex.ToString) : CCN()
+        End Try
+    End Sub
+
+#End Region
+
+    Friend Sub CopiarFila(ByRef filaOrigen As DataRow, ByRef filaDestino As DataRow)
+        Dim i As Integer
+        Try
+            For i = 0 To filaOrigen.Table.Columns.Count - 1
+                Try : filaDestino(filaOrigen.Table.Columns(i).ColumnName) = filaOrigen(filaOrigen.Table.Columns(i).ColumnName) : Catch ex As Exception : End Try
+            Next
+
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Sub
+    'Crea el nodo sino existe y si exite graba el codigo
+    Friend Sub GrabaParametro(ByVal codigo As Object, ByVal nombreparametro As String)
+        Try
+            'Dim xmlDoc As Xml.XmlDocument = New Xml.XmlDocument
+            Dim xmlDoc As xmlExtension = New xmlExtension
+            Dim tempnodeList As Xml.XmlNodeList
+            Dim tempnode As Xml.XmlNode
+
+            directorio = directorio & "\"
+            xmlDoc.Load(directorio & "conf\ultimos.xml")
+
+            Try
+                tempnodeList = xmlDoc.SelectNodes("//" & nombreparametro)
+            Catch ex As Exception
+                LOG(ex.ToString)
+            End Try
+
+            If tempnodeList.Count = 0 Then
+                'Hay que crear el nodo
+                tempnode = xmlDoc.CreateNode(Xml.XmlNodeType.Element, nombreparametro, "")
+                xmlDoc.AddNode(tempnode, nombreparametro)
+                tempnodeList = xmlDoc.SelectNodes("//" & nombreparametro)
+                'xmlDoc.AppendChild(tempnode)
+            End If
+
+            For Each tempnode In tempnodeList
+                tempnode.InnerText = codigo
+            Next
+            ' 2. Save the modified XML to a file in Unicode format.
+            xmlDoc.PreserveWhitespace = True
+            Dim wrtr As Xml.XmlTextWriter = New Xml.XmlTextWriter(directorio & "conf\ultimos.xml", System.Text.Encoding.Unicode)
+            xmlDoc.WriteTo(wrtr)
+            wrtr.Close()
+
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Sub
+    Friend Function CargaParametro(ByVal nombreparametro As String) As Object
+        Dim xmlDoc As Xml.XmlDocument = New Xml.XmlDocument
+        Dim tempnode As Xml.XmlNode
+        Dim registro As Object
+
+        Try
+            directorio = CurDir() & "/"
+            xmlDoc.Load(directorio & "conf\ultimos.xml")
+
+            For Each tempnode In xmlDoc.DocumentElement.ChildNodes
+                Select Case tempnode.Name
+                    Case nombreparametro
+                        registro = tempnode.InnerText
+                End Select
+            Next
+            Return registro
+
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Function
+    Friend Function ObtenerLocalizacion(ByVal c As Control) As Point
+        Try
+            Dim p As Point
+            If c.Parent Is Nothing Then
+                Return New Point(0, 0)
+            Else
+                Dim pTemp As Point
+                pTemp = ObtenerLocalizacion(c.Parent)
+                p.X = c.Location.X + pTemp.X
+                p.Y = c.Location.Y + pTemp.Y
+                Return p
+            End If
+
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Function
+
+    'Leer parametro tabla parámetros
+    Private Function leerParametro(ByVal tipo As String, ByVal contenido As String) As String
+        Dim cmd As CoreLab.MySql.MySqlCommand
+        Dim ret As String
+        Try
+            cmd = New MySqlCommand("SELECT * FROM PARAMETROS WHERE TIPO = """ & tipo & """ AND CONTENIDO = """ & contenido & """ ", cnn)
+            ACN()
+            ret = cmd.ExecuteScalar
+            CCN()
+            Return ret
+
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Function
+    'Grabar parametro tabla parámetros
+    Private Function grabarParametro(ByVal tipo As String, ByVal contenido As String, ByVal descripcion As String)
+        Dim cmd As CoreLab.MySql.MySqlCommand
+        Dim ret As String
+        Try
+            cmd = New MySqlCommand("SELECT COUNT(*) FROM PARAMETROS WHERE TIPO = """ & tipo & """ AND CONTENIDO = """ & contenido & """ ", cnn)
+            ACN()
+            If nz(cmd.ExecuteScalar, 0) = 0 Then
+                'INSERTAMOS
+                cmd = New MySqlCommand("INSERT INTO PARAMETROS (TIPO, CONTENIDO, DESCRIPCION) VALUES (""" & tipo & """, """ & contenido & """, """ & descripcion & """) ", cnn)
+                cmd.ExecuteNonQuery()
+            Else
+                'ACTUALIZAMOS
+                cmd = New MySqlCommand("UPDATE PARAMETROS SET CONTENIDO = """ & contenido & """, DESCRIPCION = """ & descripcion & """ ", cnn)
+                cmd.ExecuteNonQuery()
+            End If
+            CCN()
+            Return ret
+
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Function
+
+    'Carga una imagen que se le pasa en el control que se le pasa por referencia
+    Public Function CargarImagen(ByVal obj As Object, ByRef control As PictureBox)
+        Try
+            If Not obj Is Nothing Then
+                ' e.Value is the original value
+                Dim img() As Byte = CType(obj, Byte())
+                ' Performs the conversion
+                Dim ms As System.IO.MemoryStream = New System.IO.MemoryStream
+                Dim offset As Integer = 0 ' 78
+                ms.Write(img, offset, img.Length - offset)
+                Dim bmp As Bitmap = New Bitmap(ms)
+                ms.Close()
+                control.Image = bmp
+            Else
+                control.Image = Nothing
+            End If
+
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Function
+End Module

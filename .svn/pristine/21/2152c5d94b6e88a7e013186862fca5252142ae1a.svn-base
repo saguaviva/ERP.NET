@@ -1,0 +1,1749 @@
+Imports CoreLab.MySql
+Imports C1.Win.C1TrueDBGrid
+
+
+Public Class frmDisposicion
+    Inherits aura2k3.frmBase
+
+#Region " Código generado por el Diseñador de Windows Forms "
+
+    Public Sub New()
+        MyBase.New()
+
+        'El Diseñador de Windows Forms requiere esta llamada.
+        InitializeComponent() : Dim tom As SMcMaster.TabOrderManager = New SMcMaster.TabOrderManager(Me) : tom.SetTabOrder(SMcMaster.TabOrderManager.TabScheme.AcrossFirst)
+
+        'Agregar cualquier inicialización después de la llamada a InitializeComponent()
+
+    End Sub
+
+    'Form reemplaza a Dispose para limpiar la lista de componentes.
+    Protected Overloads Overrides Sub Dispose(ByVal disposing As Boolean)
+        '! Seal for less overhead - Can declare NotInheritable Class
+        If disposing Then
+            If Not (components Is Nothing) Then
+                components.Dispose()
+            End If
+        End If
+       MyBase.Dispose(disposing)
+        frmChildForm = Nothing
+    End Sub
+
+    'Requerido por el Diseñador de Windows Forms
+    Private components As System.ComponentModel.IContainer
+
+    'NOTA: el Diseñador de Windows Forms requiere el siguiente procedimiento
+    'Puede modificarse utilizando el Diseñador de Windows Forms. 
+    'No lo modifique con el editor de código.
+
+    'System.Windows.Forms.DateTimePicker
+    
+    Friend WithEvents btnImprimir As NETXP.Controls.XPButton 
+    Friend WithEvents cboTejedor As C1.Win.C1TrueDBGrid.C1TrueDBDropdown
+    Friend WithEvents cboTejido As C1.Win.C1TrueDBGrid.C1TrueDBDropdown
+    Friend WithEvents dgDdispos As C1.Win.C1TrueDBGrid.C1TrueDBGrid
+    Friend WithEvents txtTotalPiezas As C1.Win.C1Input.C1TextBox
+    Friend WithEvents lblTotalKGS As Label
+    Friend WithEvents lblTotalPiezas As Label
+    Friend WithEvents gb1 As System.Windows.Forms.GroupBox
+    Friend WithEvents lblFechaRecibido As Label
+    Friend WithEvents lblFecha As Label
+    Friend WithEvents lblDisposicion As Label
+    Friend WithEvents lblCliente As Label
+    Friend WithEvents btnElegirCliente As NETXP.Controls.XPButton
+    Friend WithEvents lblAcabador As Label
+    Friend WithEvents Label3 As Label
+    Friend WithEvents Label2 As Label
+    Friend WithEvents tabControlDisposiciones As System.Windows.Forms.TabControl
+    Friend WithEvents tabPageDisposicion As System.Windows.Forms.TabPage
+    Friend WithEvents lblPedido As Label
+    Friend WithEvents btnElegirAcabador As NETXP.Controls.XPButton
+    Friend WithEvents btnEscogerColorExistente As NETXP.Controls.XPButton
+    Friend WithEvents txtColor As C1.Win.C1Input.C1TextBox
+    Friend WithEvents dtpDRECEPCION As C1.Win.C1Input.C1DateEdit
+    Friend WithEvents dtpFECHA As C1.Win.C1Input.C1DateEdit
+    Friend WithEvents txtany As C1.Win.C1Input.C1TextBox
+    Friend WithEvents txtCLIENT As C1.Win.C1Input.C1TextBox
+    Friend WithEvents txtcolorcliente As C1.Win.C1Input.C1TextBox
+    Friend WithEvents txtTotalKG As C1.Win.C1Input.C1TextBox
+    Friend WithEvents txtOBSERV As C1.Win.C1Input.C1TextBox
+    Friend WithEvents txtCOMANDA As C1.Win.C1Input.C1TextBox
+    Friend WithEvents cboNOMCLIENT As C1.Win.C1List.C1Combo
+    Friend WithEvents cboNOMACABADOR As C1.Win.C1List.C1Combo
+    Friend WithEvents txtACABADOR As C1.Win.C1Input.C1TextBox
+    Friend WithEvents txtCODICLIENT As C1.Win.C1Input.C1TextBox
+    Friend WithEvents chkANULADA As System.Windows.Forms.CheckBox
+    Friend WithEvents chkRECIBIDO As System.Windows.Forms.CheckBox
+    Friend WithEvents btnElegirAcabadorPorDefecto As NETXP.Controls.XPButton
+    Friend WithEvents cboIDDispos As C1.Win.C1List.C1Combo
+
+    <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent() 
+        Dim resources As System.Resources.ResourceManager = New System.Resources.ResourceManager(GetType(frmDisposicion))
+        Me.btnImprimir = New NETXP.Controls.XPButton
+        Me.cboTejedor = New C1.Win.C1TrueDBGrid.C1TrueDBDropdown
+        Me.cboTejido = New C1.Win.C1TrueDBGrid.C1TrueDBDropdown
+        Me.tabControlDisposiciones = New System.Windows.Forms.TabControl
+        Me.tabPageDisposicion = New System.Windows.Forms.TabPage
+        Me.dgDdispos = New C1.Win.C1TrueDBGrid.C1TrueDBGrid
+        Me.txtOBSERV = New C1.Win.C1Input.C1TextBox
+        Me.txtTotalPiezas = New C1.Win.C1Input.C1TextBox
+        Me.txtTotalKG = New C1.Win.C1Input.C1TextBox
+        Me.lblTotalKGS = New System.Windows.Forms.Label
+        Me.lblTotalPiezas = New System.Windows.Forms.Label
+        Me.gb1 = New System.Windows.Forms.GroupBox
+        Me.cboIDDispos = New C1.Win.C1List.C1Combo
+        Me.btnElegirAcabadorPorDefecto = New NETXP.Controls.XPButton
+        Me.dtpFECHA = New C1.Win.C1Input.C1DateEdit
+        Me.dtpDRECEPCION = New C1.Win.C1Input.C1DateEdit
+        Me.txtColor = New C1.Win.C1Input.C1TextBox
+        Me.btnEscogerColorExistente = New NETXP.Controls.XPButton
+        Me.chkANULADA = New System.Windows.Forms.CheckBox
+        Me.btnElegirAcabador = New NETXP.Controls.XPButton
+        Me.lblPedido = New System.Windows.Forms.Label
+        Me.txtCOMANDA = New C1.Win.C1Input.C1TextBox
+        Me.cboNOMCLIENT = New C1.Win.C1List.C1Combo
+        Me.cboNOMACABADOR = New C1.Win.C1List.C1Combo
+        Me.chkRECIBIDO = New System.Windows.Forms.CheckBox
+        Me.lblFechaRecibido = New System.Windows.Forms.Label
+        Me.lblFecha = New System.Windows.Forms.Label
+        Me.txtCODICLIENT = New C1.Win.C1Input.C1TextBox
+        Me.txtany = New C1.Win.C1Input.C1TextBox
+        Me.lblDisposicion = New System.Windows.Forms.Label
+        Me.txtCLIENT = New C1.Win.C1Input.C1TextBox
+        Me.lblCliente = New System.Windows.Forms.Label
+        Me.btnElegirCliente = New NETXP.Controls.XPButton
+        Me.txtACABADOR = New C1.Win.C1Input.C1TextBox
+        Me.lblAcabador = New System.Windows.Forms.Label
+        Me.Label3 = New System.Windows.Forms.Label
+        Me.Label2 = New System.Windows.Forms.Label
+        Me.txtcolorcliente = New C1.Win.C1Input.C1TextBox
+        CType(Me.cboTejedor, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.cboTejido, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.tabControlDisposiciones.SuspendLayout()
+        Me.tabPageDisposicion.SuspendLayout()
+        CType(Me.dgDdispos, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.txtOBSERV, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.txtTotalPiezas, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.txtTotalKG, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.gb1.SuspendLayout()
+        CType(Me.cboIDDispos, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.dtpFECHA, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.dtpDRECEPCION, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.txtColor, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.txtCOMANDA, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.cboNOMCLIENT, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.cboNOMACABADOR, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.txtCODICLIENT, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.txtany, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.txtCLIENT, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.txtACABADOR, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.txtcolorcliente, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.SuspendLayout()
+        '
+        'arrayEtiquetas
+        '
+        Me.arrayEtiquetas.Controls.AddRange(New System.Windows.Forms.Control() {Me.Label2, Me.Label3, Me.lblAcabador, Me.lblCliente, Me.lblDisposicion, Me.lblFecha, Me.lblFechaRecibido, Me.lblPedido, Me.lblTotalKGS, Me.lblTotalPiezas})
+        '
+        'btnBorrar
+        '
+        Me.btnBorrar.Location = New System.Drawing.Point(150, 56)
+        Me.btnBorrar.Name = "btnBorrar"
+        '
+        'btnNuevo
+        '
+        Me.btnNuevo.Location = New System.Drawing.Point(248, 36)
+        Me.btnNuevo.Name = "btnNuevo"
+        '
+        'btnModificar
+        '
+        Me.btnModificar.Location = New System.Drawing.Point(150, 36)
+        Me.btnModificar.Name = "btnModificar"
+        '
+        'btnVerLista
+        '
+        Me.btnVerLista.Location = New System.Drawing.Point(560, 92)
+        Me.btnVerLista.Name = "btnVerLista"
+        '
+        'arrayCheckBox
+        '
+        Me.arrayCheckBox.Controls.AddRange(New System.Windows.Forms.Control() {Me.chkANULADA, Me.chkRECIBIDO})
+        '
+        'btnTancar
+        '
+        Me.btnTancar.Location = New System.Drawing.Point(560, 112)
+        Me.btnTancar.Name = "btnTancar"
+        '
+        'sbtipo
+        '
+        Me.sbtipo.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.sbtipo.Location = New System.Drawing.Point(5, 183)
+        Me.sbtipo.Name = "sbtipo"
+        Me.sbtipo.Text = ""
+        '
+        'arrayTabPages
+        '
+        Me.arrayTabPages.Controls.AddRange(New System.Windows.Forms.Control() {Me.tabPageDisposicion})
+        '
+        'btnRecargar
+        '
+        Me.btnRecargar.Location = New System.Drawing.Point(60, 56)
+        Me.btnRecargar.Name = "btnRecargar"
+        '
+        'btnActualizar
+        '
+        Me.btnActualizar.Location = New System.Drawing.Point(60, 36)
+        Me.btnActualizar.Name = "btnActualizar"
+        '
+        'btnSiguiente
+        '
+        Me.btnSiguiente.Location = New System.Drawing.Point(330, 56)
+        Me.btnSiguiente.Name = "btnSiguiente"
+        '
+        'arrayBotones
+        '
+        Me.arrayBotones.Controls.AddRange(New System.Windows.Forms.Control() {Me.btnElegirAcabador, Me.btnElegirCliente, Me.btnEscogerColorExistente})
+        '
+        'btnAnterior
+        '
+        Me.btnAnterior.Location = New System.Drawing.Point(28, 56)
+        Me.btnAnterior.Name = "btnAnterior"
+        '
+        'btnPrimero
+        '
+        Me.btnPrimero.Location = New System.Drawing.Point(28, 36)
+        Me.btnPrimero.Name = "btnPrimero"
+        '
+        'cboSeleccionCentro
+        '
+        Me.cboSeleccionCentro.Name = "cboSeleccionCentro"
+        '
+        'btnUltimo
+        '
+        Me.btnUltimo.Location = New System.Drawing.Point(330, 36)
+        Me.btnUltimo.Name = "btnUltimo"
+        '
+        'btnImprimir
+        '
+        Me.btnImprimir.Anchor = System.Windows.Forms.AnchorStyles.Bottom
+        Me.btnImprimir.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.btnImprimir.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft
+        Me.btnImprimir.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.btnImprimir.Location = New System.Drawing.Point(818, 580)
+        Me.btnImprimir.Name = "btnImprimir"
+        Me.btnImprimir.Size = New System.Drawing.Size(72, 20)
+        Me.btnImprimir.TabIndex = 9
+        Me.btnImprimir.Text = "Imprimir"
+        '
+        'cboTejedor
+        '
+        Me.cboTejedor.AllowColMove = False
+        Me.cboTejedor.AllowColSelect = True
+        Me.cboTejedor.AllowRowSizing = C1.Win.C1TrueDBGrid.RowSizingEnum.AllRows
+        Me.cboTejedor.AlternatingRows = True
+        Me.cboTejedor.CaptionHeight = 17
+        Me.cboTejedor.ColumnCaptionHeight = 17
+        Me.cboTejedor.ColumnFooterHeight = 17
+        Me.cboTejedor.ExtendRightColumn = True
+        Me.cboTejedor.FetchRowStyles = True
+        Me.cboTejedor.FlatStyle = C1.Win.C1TrueDBGrid.FlatModeEnum.System
+        Me.cboTejedor.Images.Add(CType(resources.GetObject("resource"), System.Drawing.Image))
+        Me.cboTejedor.Location = New System.Drawing.Point(24, 168)
+        Me.cboTejedor.Name = "cboTejedor"
+        Me.cboTejedor.RowDivider.Color = System.Drawing.Color.DarkGray
+        Me.cboTejedor.RowDivider.Style = C1.Win.C1TrueDBGrid.LineStyleEnum.Single
+        Me.cboTejedor.RowHeight = 15
+        Me.cboTejedor.RowSubDividerColor = System.Drawing.Color.DarkGray
+        Me.cboTejedor.ScrollTips = False
+        Me.cboTejedor.Size = New System.Drawing.Size(156, 156)
+        Me.cboTejedor.TabIndex = 259
+        Me.cboTejedor.TabStop = False
+        Me.cboTejedor.Text = "C1TrueDBDropdown1"
+        Me.cboTejedor.ValueTranslate = True
+        Me.cboTejedor.Visible = False
+        Me.cboTejedor.PropBag = "<?xml version=""1.0""?><Blob><Styles type=""C1.Win.C1TrueDBGrid.Design.ContextWrappe" & _
+        "r""><Data>Group{AlignVert:Center;Border:None,,0, 0, 0, 0;BackColor:ControlDark;}E" & _
+        "ditor{}Style2{}Style5{}Style4{}Style7{}Style6{}EvenRow{BackColor:Aqua;}Selected{" & _
+        "ForeColor:HighlightText;BackColor:Highlight;}Style3{}Inactive{ForeColor:Inactive" & _
+        "CaptionText;BackColor:InactiveCaption;}FilterBar{}Footer{}Caption{AlignHorz:Cent" & _
+        "er;}Normal{Font:Microsoft Sans Serif, 8.25pt;}HighlightRow{ForeColor:HighlightTe" & _
+        "xt;BackColor:Highlight;}Style1{}OddRow{}RecordSelector{AlignImage:Center;}Headin" & _
+        "g{Wrap:True;BackColor:Control;Border:Raised,,1, 1, 1, 1;ForeColor:ControlText;Al" & _
+        "ignVert:Center;}Style8{}Style10{AlignHorz:Near;}Style11{}Style12{}Style13{}Style" & _
+        "9{}</Data></Styles><Splits><C1.Win.C1TrueDBGrid.DropdownView AllowColMove=""False" & _
+        """ Name="""" AlternatingRowStyle=""True"" CaptionHeight=""17"" ColumnCaptionHeight=""17""" & _
+        " ColumnFooterHeight=""17"" ExtendRightColumn=""True"" FetchRowStyles=""True"" MarqueeS" & _
+        "tyle=""DottedCellBorder"" RecordSelectorWidth=""17"" DefRecSelWidth=""17"" RecordSelec" & _
+        "tors=""False"" VerticalScrollGroup=""1"" HorizontalScrollGroup=""1""><CaptionStyle par" & _
+        "ent=""Style2"" me=""Style10"" /><EditorStyle parent=""Editor"" me=""Style5"" /><EvenRowS" & _
+        "tyle parent=""EvenRow"" me=""Style8"" /><FilterBarStyle parent=""FilterBar"" me=""Style" & _
+        "13"" /><FooterStyle parent=""Footer"" me=""Style3"" /><GroupStyle parent=""Group"" me=""" & _
+        "Style12"" /><HeadingStyle parent=""Heading"" me=""Style2"" /><HighLightRowStyle paren" & _
+        "t=""HighlightRow"" me=""Style7"" /><InactiveStyle parent=""Inactive"" me=""Style4"" /><O" & _
+        "ddRowStyle parent=""OddRow"" me=""Style9"" /><RecordSelectorStyle parent=""RecordSele" & _
+        "ctor"" me=""Style11"" /><SelectedStyle parent=""Selected"" me=""Style6"" /><Style paren" & _
+        "t=""Normal"" me=""Style1"" /><ClientRect>0, 0, 152, 152</ClientRect><BorderSide>0</B" & _
+        "orderSide></C1.Win.C1TrueDBGrid.DropdownView></Splits><NamedStyles><Style parent" & _
+        "="""" me=""Normal"" /><Style parent=""Normal"" me=""Heading"" /><Style parent=""Heading"" " & _
+        "me=""Footer"" /><Style parent=""Heading"" me=""Caption"" /><Style parent=""Heading"" me=" & _
+        """Inactive"" /><Style parent=""Normal"" me=""Selected"" /><Style parent=""Normal"" me=""E" & _
+        "ditor"" /><Style parent=""Normal"" me=""HighlightRow"" /><Style parent=""Normal"" me=""E" & _
+        "venRow"" /><Style parent=""Normal"" me=""OddRow"" /><Style parent=""Heading"" me=""Recor" & _
+        "dSelector"" /><Style parent=""Normal"" me=""FilterBar"" /><Style parent=""Caption"" me=" & _
+        """Group"" /></NamedStyles><vertSplits>1</vertSplits><horzSplits>1</horzSplits><Lay" & _
+        "out>None</Layout><DefaultRecSelWidth>17</DefaultRecSelWidth><ClientArea>0, 0, 15" & _
+        "2, 152</ClientArea></Blob>"
+        '
+        'cboTejido
+        '
+        Me.cboTejido.AllowColMove = False
+        Me.cboTejido.AllowColSelect = True
+        Me.cboTejido.AllowRowSizing = C1.Win.C1TrueDBGrid.RowSizingEnum.None
+        Me.cboTejido.AlternatingRows = True
+        Me.cboTejido.CaptionHeight = 17
+        Me.cboTejido.ColumnCaptionHeight = 17
+        Me.cboTejido.ColumnFooterHeight = 17
+        Me.cboTejido.ExtendRightColumn = True
+        Me.cboTejido.FetchRowStyles = True
+        Me.cboTejido.FlatStyle = C1.Win.C1TrueDBGrid.FlatModeEnum.System
+        Me.cboTejido.Images.Add(CType(resources.GetObject("resource1"), System.Drawing.Image))
+        Me.cboTejido.Location = New System.Drawing.Point(188, 168)
+        Me.cboTejido.Name = "cboTejido"
+        Me.cboTejido.RowDivider.Color = System.Drawing.Color.DarkGray
+        Me.cboTejido.RowDivider.Style = C1.Win.C1TrueDBGrid.LineStyleEnum.Single
+        Me.cboTejido.RowHeight = 15
+        Me.cboTejido.RowSubDividerColor = System.Drawing.Color.DarkGray
+        Me.cboTejido.ScrollTips = False
+        Me.cboTejido.Size = New System.Drawing.Size(160, 156)
+        Me.cboTejido.TabIndex = 260
+        Me.cboTejido.TabStop = False
+        Me.cboTejido.Text = "C1TrueDBDropdown1"
+        Me.cboTejido.ValueTranslate = True
+        Me.cboTejido.Visible = False
+        Me.cboTejido.PropBag = "<?xml version=""1.0""?><Blob><Styles type=""C1.Win.C1TrueDBGrid.Design.ContextWrappe" & _
+        "r""><Data>Group{BackColor:ControlDark;Border:None,,0, 0, 0, 0;AlignVert:Center;}E" & _
+        "ditor{}Style2{}Style5{}Style4{}Style7{}Style6{}EvenRow{BackColor:Aqua;}Selected{" & _
+        "ForeColor:HighlightText;BackColor:Highlight;}Style3{}Inactive{ForeColor:Inactive" & _
+        "CaptionText;BackColor:InactiveCaption;}FilterBar{}Footer{}Caption{AlignHorz:Cent" & _
+        "er;}Normal{Font:Microsoft Sans Serif, 8.25pt;}HighlightRow{ForeColor:HighlightTe" & _
+        "xt;BackColor:Highlight;}Style9{}OddRow{}RecordSelector{AlignImage:Center;}Headin" & _
+        "g{Wrap:True;AlignVert:Center;Border:Raised,,1, 1, 1, 1;ForeColor:ControlText;Bac" & _
+        "kColor:Control;}Style8{}Style10{AlignHorz:Near;}Style11{}Style12{}Style13{}Style" & _
+        "1{}</Data></Styles><Splits><C1.Win.C1TrueDBGrid.DropdownView AllowColMove=""False" & _
+        """ Name="""" AllowRowSizing=""None"" AlternatingRowStyle=""True"" CaptionHeight=""17"" Co" & _
+        "lumnCaptionHeight=""17"" ColumnFooterHeight=""17"" ExtendRightColumn=""True"" FetchRow" & _
+        "Styles=""True"" MarqueeStyle=""DottedCellBorder"" RecordSelectorWidth=""17"" DefRecSel" & _
+        "Width=""17"" RecordSelectors=""False"" VerticalScrollGroup=""1"" HorizontalScrollGroup" & _
+        "=""1""><CaptionStyle parent=""Style2"" me=""Style10"" /><EditorStyle parent=""Editor"" m" & _
+        "e=""Style5"" /><EvenRowStyle parent=""EvenRow"" me=""Style8"" /><FilterBarStyle parent" & _
+        "=""FilterBar"" me=""Style13"" /><FooterStyle parent=""Footer"" me=""Style3"" /><GroupSty" & _
+        "le parent=""Group"" me=""Style12"" /><HeadingStyle parent=""Heading"" me=""Style2"" /><H" & _
+        "ighLightRowStyle parent=""HighlightRow"" me=""Style7"" /><InactiveStyle parent=""Inac" & _
+        "tive"" me=""Style4"" /><OddRowStyle parent=""OddRow"" me=""Style9"" /><RecordSelectorSt" & _
+        "yle parent=""RecordSelector"" me=""Style11"" /><SelectedStyle parent=""Selected"" me=""" & _
+        "Style6"" /><Style parent=""Normal"" me=""Style1"" /><ClientRect>0, 0, 156, 152</Clien" & _
+        "tRect><BorderSide>0</BorderSide></C1.Win.C1TrueDBGrid.DropdownView></Splits><Nam" & _
+        "edStyles><Style parent="""" me=""Normal"" /><Style parent=""Normal"" me=""Heading"" /><S" & _
+        "tyle parent=""Heading"" me=""Footer"" /><Style parent=""Heading"" me=""Caption"" /><Styl" & _
+        "e parent=""Heading"" me=""Inactive"" /><Style parent=""Normal"" me=""Selected"" /><Style" & _
+        " parent=""Normal"" me=""Editor"" /><Style parent=""Normal"" me=""HighlightRow"" /><Style" & _
+        " parent=""Normal"" me=""EvenRow"" /><Style parent=""Normal"" me=""OddRow"" /><Style pare" & _
+        "nt=""Heading"" me=""RecordSelector"" /><Style parent=""Normal"" me=""FilterBar"" /><Styl" & _
+        "e parent=""Caption"" me=""Group"" /></NamedStyles><vertSplits>1</vertSplits><horzSpl" & _
+        "its>1</horzSplits><Layout>None</Layout><DefaultRecSelWidth>17</DefaultRecSelWidt" & _
+        "h><ClientArea>0, 0, 156, 152</ClientArea></Blob>"
+        '
+        'tabControlDisposiciones
+        '
+        Me.tabControlDisposiciones.Controls.Add(Me.tabPageDisposicion)
+        Me.tabControlDisposiciones.ItemSize = New System.Drawing.Size(60, 18)
+        Me.tabControlDisposiciones.Location = New System.Drawing.Point(4, 4)
+        Me.tabControlDisposiciones.Name = "tabControlDisposiciones"
+        Me.tabControlDisposiciones.SelectedIndex = 0
+        Me.tabControlDisposiciones.Size = New System.Drawing.Size(980, 544)
+        Me.tabControlDisposiciones.TabIndex = 261
+        '
+        'tabPageDisposicion
+        '
+        Me.tabPageDisposicion.Controls.Add(Me.cboTejedor)
+        Me.tabPageDisposicion.Controls.Add(Me.cboTejido)
+        Me.tabPageDisposicion.Controls.Add(Me.dgDdispos)
+        Me.tabPageDisposicion.Controls.Add(Me.txtOBSERV)
+        Me.tabPageDisposicion.Controls.Add(Me.txtTotalPiezas)
+        Me.tabPageDisposicion.Controls.Add(Me.txtTotalKG)
+        Me.tabPageDisposicion.Controls.Add(Me.lblTotalKGS)
+        Me.tabPageDisposicion.Controls.Add(Me.lblTotalPiezas)
+        Me.tabPageDisposicion.Controls.Add(Me.gb1)
+        Me.tabPageDisposicion.Location = New System.Drawing.Point(4, 22)
+        Me.tabPageDisposicion.Name = "tabPageDisposicion"
+        Me.tabPageDisposicion.Size = New System.Drawing.Size(972, 518)
+        Me.tabPageDisposicion.TabIndex = 0
+        Me.tabPageDisposicion.Text = "Disposició"
+        '
+        'dgDdispos
+        '
+        Me.dgDdispos.AllowAddNew = True
+        Me.dgDdispos.AllowDelete = True
+        Me.dgDdispos.AllowSort = False
+        Me.dgDdispos.Caption = "TEIXITS"
+        Me.dgDdispos.CaptionHeight = 18
+        Me.dgDdispos.ExtendRightColumn = True
+        Me.dgDdispos.GroupByCaption = "Drag a column header here to group by that column"
+        Me.dgDdispos.Images.Add(CType(resources.GetObject("resource2"), System.Drawing.Image))
+        Me.dgDdispos.LinesPerRow = 2
+        Me.dgDdispos.Location = New System.Drawing.Point(8, 136)
+        Me.dgDdispos.MarqueeStyle = C1.Win.C1TrueDBGrid.MarqueeEnum.DottedCellBorder
+        Me.dgDdispos.Name = "dgDdispos"
+        Me.dgDdispos.PreviewInfo.Location = New System.Drawing.Point(0, 0)
+        Me.dgDdispos.PreviewInfo.Size = New System.Drawing.Size(0, 0)
+        Me.dgDdispos.PreviewInfo.ZoomFactor = 75
+        Me.dgDdispos.RecordSelectorWidth = 17
+        Me.dgDdispos.RowDivider.Color = System.Drawing.Color.DarkGray
+        Me.dgDdispos.RowDivider.Style = C1.Win.C1TrueDBGrid.LineStyleEnum.Single
+        Me.dgDdispos.RowHeight = 30
+        Me.dgDdispos.RowSubDividerColor = System.Drawing.Color.DarkGray
+        Me.dgDdispos.Size = New System.Drawing.Size(956, 260)
+        Me.dgDdispos.SpringMode = True
+        Me.dgDdispos.TabAction = C1.Win.C1TrueDBGrid.TabActionEnum.ColumnNavigation
+        Me.dgDdispos.TabIndex = 267
+        Me.dgDdispos.Text = "C1TrueDBGrid1"
+        Me.dgDdispos.WrapCellPointer = True
+        Me.dgDdispos.PropBag = "<?xml version=""1.0""?><Blob><Styles type=""C1.Win.C1TrueDBGrid.Design.ContextWrappe" & _
+        "r""><Data>Group{BackColor:ControlDark;Border:None,,0, 0, 0, 0;AlignVert:Center;}E" & _
+        "ditor{}Style2{}Style5{}Style4{}Style7{}Style6{}EvenRow{BackColor:Aqua;}Selected{" & _
+        "ForeColor:HighlightText;BackColor:Highlight;}Style3{}Inactive{ForeColor:Inactive" & _
+        "CaptionText;BackColor:InactiveCaption;}FilterBar{}Footer{}Caption{Font:Microsoft" & _
+        " Sans Serif, 9pt, style=Bold;AlignHorz:Center;ForeColor:ControlText;BackColor:Co" & _
+        "ral;}Style9{}Normal{Font:Microsoft Sans Serif, 8.25pt;AlignHorz:Justify;AlignVer" & _
+        "t:Center;}HighlightRow{ForeColor:HighlightText;BackColor:Highlight;}Style12{}Odd" & _
+        "Row{}RecordSelector{AlignImage:Center;}Style13{}Heading{Wrap:True;AlignVert:Cent" & _
+        "er;Border:Raised,,1, 1, 1, 1;ForeColor:ControlText;BackColor:Control;}Style8{}St" & _
+        "yle10{AlignHorz:Near;}Style11{}Style14{}Style15{}Style16{}Style17{}Style1{}</Dat" & _
+        "a></Styles><Splits><C1.Win.C1TrueDBGrid.MergeView Name="""" CaptionHeight=""17"" Col" & _
+        "umnCaptionHeight=""17"" ColumnFooterHeight=""17"" ExtendRightColumn=""True"" MarqueeSt" & _
+        "yle=""DottedCellBorder"" RecordSelectorWidth=""17"" DefRecSelWidth=""17"" VerticalScro" & _
+        "llGroup=""1"" HorizontalScrollGroup=""1"" SpringMode=""True""><CaptionStyle parent=""St" & _
+        "yle2"" me=""Style10"" /><EditorStyle parent=""Editor"" me=""Style5"" /><EvenRowStyle pa" & _
+        "rent=""EvenRow"" me=""Style8"" /><FilterBarStyle parent=""FilterBar"" me=""Style13"" /><" & _
+        "FooterStyle parent=""Footer"" me=""Style3"" /><GroupStyle parent=""Group"" me=""Style12" & _
+        """ /><HeadingStyle parent=""Heading"" me=""Style2"" /><HighLightRowStyle parent=""High" & _
+        "lightRow"" me=""Style7"" /><InactiveStyle parent=""Inactive"" me=""Style4"" /><OddRowSt" & _
+        "yle parent=""OddRow"" me=""Style9"" /><RecordSelectorStyle parent=""RecordSelector"" m" & _
+        "e=""Style11"" /><SelectedStyle parent=""Selected"" me=""Style6"" /><Style parent=""Norm" & _
+        "al"" me=""Style1"" /><ClientRect>0, 18, 952, 238</ClientRect><BorderSide>0</BorderS" & _
+        "ide></C1.Win.C1TrueDBGrid.MergeView></Splits><NamedStyles><Style parent="""" me=""N" & _
+        "ormal"" /><Style parent=""Normal"" me=""Heading"" /><Style parent=""Heading"" me=""Foote" & _
+        "r"" /><Style parent=""Heading"" me=""Caption"" /><Style parent=""Heading"" me=""Inactive" & _
+        """ /><Style parent=""Normal"" me=""Selected"" /><Style parent=""Normal"" me=""Editor"" />" & _
+        "<Style parent=""Normal"" me=""HighlightRow"" /><Style parent=""Normal"" me=""EvenRow"" /" & _
+        "><Style parent=""Normal"" me=""OddRow"" /><Style parent=""Heading"" me=""RecordSelector" & _
+        """ /><Style parent=""Normal"" me=""FilterBar"" /><Style parent=""Caption"" me=""Group"" /" & _
+        "></NamedStyles><vertSplits>1</vertSplits><horzSplits>1</horzSplits><Layout>None<" & _
+        "/Layout><DefaultRecSelWidth>17</DefaultRecSelWidth><ClientArea>0, 0, 952, 256</C" & _
+        "lientArea><PrintPageHeaderStyle parent="""" me=""Style16"" /><PrintPageFooterStyle p" & _
+        "arent="""" me=""Style17"" /></Blob>"
+        '
+        'txtOBSERV
+        '
+        Me.txtOBSERV.Location = New System.Drawing.Point(12, 408)
+        Me.txtOBSERV.Multiline = True
+        Me.txtOBSERV.Name = "txtOBSERV"
+        Me.txtOBSERV.ScrollBars = System.Windows.Forms.ScrollBars.Vertical
+        Me.txtOBSERV.Size = New System.Drawing.Size(776, 96)
+        Me.txtOBSERV.TabIndex = 266
+        Me.txtOBSERV.Tag = Nothing
+        '
+        'txtTotalPiezas
+        '
+        Me.txtTotalPiezas.Location = New System.Drawing.Point(904, 408)
+        Me.txtTotalPiezas.Name = "txtTotalPiezas"
+        Me.txtTotalPiezas.Size = New System.Drawing.Size(60, 20)
+        Me.txtTotalPiezas.TabIndex = 265
+        Me.txtTotalPiezas.Tag = Nothing
+        Me.txtTotalPiezas.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        '
+        'txtTotalKG
+        '
+        Me.txtTotalKG.Location = New System.Drawing.Point(904, 436)
+        Me.txtTotalKG.Name = "txtTotalKG"
+        Me.txtTotalKG.Size = New System.Drawing.Size(60, 20)
+        Me.txtTotalKG.TabIndex = 264
+        Me.txtTotalKG.Tag = Nothing
+        Me.txtTotalKG.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        '
+        'lblTotalKGS
+        '
+        Me.lblTotalKGS.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.lblTotalKGS.Location = New System.Drawing.Point(824, 440)
+        Me.lblTotalKGS.Name = "lblTotalKGS"
+        Me.lblTotalKGS.Size = New System.Drawing.Size(80, 18)
+        Me.lblTotalKGS.TabIndex = 263
+        Me.lblTotalKGS.Text = "Total kgs."
+        '
+        'lblTotalPiezas
+        '
+        Me.lblTotalPiezas.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.lblTotalPiezas.Location = New System.Drawing.Point(824, 408)
+        Me.lblTotalPiezas.Name = "lblTotalPiezas"
+        Me.lblTotalPiezas.Size = New System.Drawing.Size(80, 18)
+        Me.lblTotalPiezas.TabIndex = 262
+        Me.lblTotalPiezas.Text = "Total Peces"
+        '
+        'gb1
+        '
+        Me.gb1.Controls.Add(Me.cboIDDispos)
+        Me.gb1.Controls.Add(Me.btnElegirAcabadorPorDefecto)
+        Me.gb1.Controls.Add(Me.dtpFECHA)
+        Me.gb1.Controls.Add(Me.dtpDRECEPCION)
+        Me.gb1.Controls.Add(Me.txtColor)
+        Me.gb1.Controls.Add(Me.btnEscogerColorExistente)
+        Me.gb1.Controls.Add(Me.chkANULADA)
+        Me.gb1.Controls.Add(Me.btnElegirAcabador)
+        Me.gb1.Controls.Add(Me.lblPedido)
+        Me.gb1.Controls.Add(Me.txtCOMANDA)
+        Me.gb1.Controls.Add(Me.cboNOMCLIENT)
+        Me.gb1.Controls.Add(Me.cboNOMACABADOR)
+        Me.gb1.Controls.Add(Me.chkRECIBIDO)
+        Me.gb1.Controls.Add(Me.lblFechaRecibido)
+        Me.gb1.Controls.Add(Me.lblFecha)
+        Me.gb1.Controls.Add(Me.txtCODICLIENT)
+        Me.gb1.Controls.Add(Me.txtany)
+        Me.gb1.Controls.Add(Me.lblDisposicion)
+        Me.gb1.Controls.Add(Me.txtCLIENT)
+        Me.gb1.Controls.Add(Me.lblCliente)
+        Me.gb1.Controls.Add(Me.btnElegirCliente)
+        Me.gb1.Controls.Add(Me.txtACABADOR)
+        Me.gb1.Controls.Add(Me.lblAcabador)
+        Me.gb1.Controls.Add(Me.Label3)
+        Me.gb1.Controls.Add(Me.Label2)
+        Me.gb1.Controls.Add(Me.txtcolorcliente)
+        Me.gb1.Location = New System.Drawing.Point(8, 4)
+        Me.gb1.Name = "gb1"
+        Me.gb1.Size = New System.Drawing.Size(968, 124)
+        Me.gb1.TabIndex = 261
+        Me.gb1.TabStop = False
+        '
+        'cboIDDispos
+        '
+        Me.cboIDDispos.AddItemSeparator = Microsoft.VisualBasic.ChrW(59)
+        Me.cboIDDispos.AutoCompletion = True
+        Me.cboIDDispos.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+        Me.cboIDDispos.Caption = ""
+        Me.cboIDDispos.CaptionHeight = 17
+        Me.cboIDDispos.CharacterCasing = System.Windows.Forms.CharacterCasing.Normal
+        Me.cboIDDispos.ColumnCaptionHeight = 17
+        Me.cboIDDispos.ColumnFooterHeight = 17
+        Me.cboIDDispos.ContentHeight = 15
+        Me.cboIDDispos.DeadAreaBackColor = System.Drawing.Color.Empty
+        Me.cboIDDispos.EditorBackColor = System.Drawing.SystemColors.Window
+        Me.cboIDDispos.EditorFont = New System.Drawing.Font("Microsoft Sans Serif", 8.25!)
+        Me.cboIDDispos.EditorForeColor = System.Drawing.SystemColors.WindowText
+        Me.cboIDDispos.EditorHeight = 15
+        Me.cboIDDispos.GapHeight = 2
+        Me.cboIDDispos.Images.Add(CType(resources.GetObject("resource3"), System.Drawing.Image))
+        Me.cboIDDispos.ItemHeight = 15
+        Me.cboIDDispos.Location = New System.Drawing.Point(160, 17)
+        Me.cboIDDispos.MatchEntryTimeout = CType(2000, Long)
+        Me.cboIDDispos.MaxDropDownItems = CType(15, Short)
+        Me.cboIDDispos.MaxLength = 10
+        Me.cboIDDispos.MouseCursor = System.Windows.Forms.Cursors.Default
+        Me.cboIDDispos.Name = "cboIDDispos"
+        'Me.cbo.PartialRightColumn = False
+        Me.cboIDDispos.RowDivider.Color = System.Drawing.Color.DarkGray
+        Me.cboIDDispos.RowDivider.Style = C1.Win.C1List.LineStyleEnum.None
+        Me.cboIDDispos.RowSubDividerColor = System.Drawing.Color.DarkGray
+        Me.cboIDDispos.Size = New System.Drawing.Size(68, 19)
+        Me.cboIDDispos.TabIndex = 281
+        Me.cboIDDispos.PropBag = "<?xml version=""1.0""?><Blob><Styles type=""C1.Win.C1List.Design.ContextWrapper""><Da" & _
+        "ta>Group{AlignVert:Center;Border:None,,0, 0, 0, 0;BackColor:ControlDark;}Style2{" & _
+        "}Style5{}Style4{}Style7{}Style6{}EvenRow{BackColor:Aqua;}Selected{ForeColor:High" & _
+        "lightText;BackColor:Highlight;}Style3{}Inactive{ForeColor:InactiveCaptionText;Ba" & _
+        "ckColor:InactiveCaption;}Footer{}Caption{AlignHorz:Center;}Normal{BackColor:Ligh" & _
+        "tSteelBlue;}HighlightRow{ForeColor:HighlightText;BackColor:Highlight;}Style1{}Od" & _
+        "dRow{}RecordSelector{AlignImage:Center;}Heading{Wrap:True;BackColor:Control;Bord" & _
+        "er:Raised,,1, 1, 1, 1;ForeColor:ControlText;AlignVert:Center;}Style8{}Style10{}S" & _
+        "tyle11{}Style9{AlignHorz:Near;}</Data></Styles><Splits><C1.Win.C1List.ListBoxVie" & _
+        "w AllowColSelect=""False"" Name="""" CaptionHeight=""17"" ColumnCaptionHeight=""17"" Col" & _
+        "umnFooterHeight=""17"" VerticalScrollGroup=""1"" HorizontalScrollGroup=""1""><ClientRe" & _
+        "ct>0, 0, 116, 156</ClientRect><VScrollBar><Width>17</Width></VScrollBar><HScroll" & _
+        "Bar><Height>17</Height></HScrollBar><CaptionStyle parent=""Style2"" me=""Style9"" />" & _
+        "<EvenRowStyle parent=""EvenRow"" me=""Style7"" /><FooterStyle parent=""Footer"" me=""St" & _
+        "yle3"" /><GroupStyle parent=""Group"" me=""Style11"" /><HeadingStyle parent=""Heading""" & _
+        " me=""Style2"" /><HighLightRowStyle parent=""HighlightRow"" me=""Style6"" /><InactiveS" & _
+        "tyle parent=""Inactive"" me=""Style4"" /><OddRowStyle parent=""OddRow"" me=""Style8"" />" & _
+        "<RecordSelectorStyle parent=""RecordSelector"" me=""Style10"" /><SelectedStyle paren" & _
+        "t=""Selected"" me=""Style5"" /><Style parent=""Normal"" me=""Style1"" /></C1.Win.C1List." & _
+        "ListBoxView></Splits><NamedStyles><Style parent="""" me=""Normal"" /><Style parent=""" & _
+        "Normal"" me=""Heading"" /><Style parent=""Heading"" me=""Footer"" /><Style parent=""Head" & _
+        "ing"" me=""Caption"" /><Style parent=""Heading"" me=""Inactive"" /><Style parent=""Norma" & _
+        "l"" me=""Selected"" /><Style parent=""Normal"" me=""HighlightRow"" /><Style parent=""Nor" & _
+        "mal"" me=""EvenRow"" /><Style parent=""Normal"" me=""OddRow"" /><Style parent=""Heading""" & _
+        " me=""RecordSelector"" /><Style parent=""Caption"" me=""Group"" /></NamedStyles><vertS" & _
+        "plits>1</vertSplits><horzSplits>1</horzSplits><Layout>Modified</Layout><DefaultR" & _
+        "ecSelWidth>17</DefaultRecSelWidth></Blob>"
+        '
+        'btnElegirAcabadorPorDefecto
+        '
+        Me.btnElegirAcabadorPorDefecto.Anchor = System.Windows.Forms.AnchorStyles.Bottom
+        Me.btnElegirAcabadorPorDefecto.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.btnElegirAcabadorPorDefecto.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft
+        Me.btnElegirAcabadorPorDefecto.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.btnElegirAcabadorPorDefecto.Location = New System.Drawing.Point(472, 40)
+        Me.btnElegirAcabadorPorDefecto.Name = "btnElegirAcabadorPorDefecto"
+        Me.btnElegirAcabadorPorDefecto.Size = New System.Drawing.Size(64, 44)
+        Me.btnElegirAcabadorPorDefecto.TabIndex = 280
+        Me.btnElegirAcabadorPorDefecto.Text = "Escollir Acabador Per Defecte"
+        '
+        'dtpFECHA
+        '
+        '
+        'dtpFECHA.Calendar
+        '
+        Me.dtpFECHA.Calendar.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.dtpFECHA.DisableOnNoData = False
+        Me.dtpFECHA.EmptyAsNull = True
+        Me.dtpFECHA.FormatType = C1.Win.C1Input.FormatTypeEnum.ShortDate
+        Me.dtpFECHA.Location = New System.Drawing.Point(808, 40)
+        Me.dtpFECHA.Name = "dtpFECHA"
+        Me.dtpFECHA.Size = New System.Drawing.Size(148, 20)
+        Me.dtpFECHA.TabIndex = 279
+        Me.dtpFECHA.Tag = Nothing
+        '
+        'dtpDRECEPCION
+        '
+        '
+        'dtpDRECEPCION.Calendar
+        '
+        Me.dtpDRECEPCION.Calendar.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.dtpDRECEPCION.DisableOnNoData = False
+        Me.dtpDRECEPCION.EmptyAsNull = True
+        Me.dtpDRECEPCION.FormatType = C1.Win.C1Input.FormatTypeEnum.ShortDate
+        Me.dtpDRECEPCION.Location = New System.Drawing.Point(808, 64)
+        Me.dtpDRECEPCION.Name = "dtpDRECEPCION"
+        Me.dtpDRECEPCION.Size = New System.Drawing.Size(148, 20)
+        Me.dtpDRECEPCION.TabIndex = 278
+        Me.dtpDRECEPCION.Tag = Nothing
+        Me.dtpDRECEPCION.Visible = False
+        '
+        'txtColor
+        '
+        Me.txtColor.Anchor = System.Windows.Forms.AnchorStyles.Bottom
+        Me.txtColor.Location = New System.Drawing.Point(100, 88)
+        Me.txtColor.MaxLength = 10
+        Me.txtColor.Name = "txtColor"
+        Me.txtColor.Size = New System.Drawing.Size(140, 20)
+        Me.txtColor.TabIndex = 270
+        Me.txtColor.Tag = Nothing
+        '
+        'btnEscogerColorExistente
+        '
+        Me.btnEscogerColorExistente.Anchor = System.Windows.Forms.AnchorStyles.Bottom
+        Me.btnEscogerColorExistente.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.btnEscogerColorExistente.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft
+        Me.btnEscogerColorExistente.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.btnEscogerColorExistente.Location = New System.Drawing.Point(248, 88)
+        Me.btnEscogerColorExistente.Name = "btnEscogerColorExistente"
+        Me.btnEscogerColorExistente.Size = New System.Drawing.Size(120, 20)
+        Me.btnEscogerColorExistente.TabIndex = 269
+        Me.btnEscogerColorExistente.Text = "Escollir Color Existent"
+        '
+        'chkANULADA
+        '
+        Me.chkANULADA.BackColor = System.Drawing.Color.Transparent
+        Me.chkANULADA.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.chkANULADA.Location = New System.Drawing.Point(556, 92)
+        Me.chkANULADA.Name = "chkANULADA"
+        Me.chkANULADA.Size = New System.Drawing.Size(140, 19)
+        Me.chkANULADA.TabIndex = 268
+        Me.chkANULADA.Text = "Disposició Anulada"
+        '
+        'btnElegirAcabador
+        '
+        Me.btnElegirAcabador.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.btnElegirAcabador.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft
+        Me.btnElegirAcabador.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.btnElegirAcabador.Location = New System.Drawing.Point(160, 64)
+        Me.btnElegirAcabador.Name = "btnElegirAcabador"
+        Me.btnElegirAcabador.Size = New System.Drawing.Size(24, 20)
+        Me.btnElegirAcabador.TabIndex = 267
+        Me.btnElegirAcabador.Text = "..."
+        '
+        'lblPedido
+        '
+        Me.lblPedido.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.lblPedido.Location = New System.Drawing.Point(476, 16)
+        Me.lblPedido.Name = "lblPedido"
+        Me.lblPedido.Size = New System.Drawing.Size(76, 20)
+        Me.lblPedido.TabIndex = 266
+        Me.lblPedido.Text = "Comanda"
+        Me.lblPedido.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        '
+        'txtCOMANDA
+        '
+        Me.txtCOMANDA.Location = New System.Drawing.Point(560, 16)
+        Me.txtCOMANDA.Name = "txtCOMANDA"
+        Me.txtCOMANDA.Size = New System.Drawing.Size(148, 20)
+        Me.txtCOMANDA.TabIndex = 265
+        Me.txtCOMANDA.Tag = Nothing
+        '
+        'cboNOMCLIENT
+        '
+        Me.cboNOMCLIENT.AddItemSeparator = Microsoft.VisualBasic.ChrW(59)
+        Me.cboNOMCLIENT.Anchor = System.Windows.Forms.AnchorStyles.Bottom
+        Me.cboNOMCLIENT.AutoSelect = True
+        Me.cboNOMCLIENT.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+        Me.cboNOMCLIENT.Caption = ""
+        Me.cboNOMCLIENT.CaptionHeight = 17
+        Me.cboNOMCLIENT.CharacterCasing = System.Windows.Forms.CharacterCasing.Normal
+        Me.cboNOMCLIENT.ColumnCaptionHeight = 17
+        Me.cboNOMCLIENT.ColumnFooterHeight = 17
+        Me.cboNOMCLIENT.ContentHeight = 15
+        Me.cboNOMCLIENT.Cursor = System.Windows.Forms.Cursors.Default
+        Me.cboNOMCLIENT.DeadAreaBackColor = System.Drawing.Color.Empty
+        Me.cboNOMCLIENT.EditorBackColor = System.Drawing.SystemColors.Window
+        Me.cboNOMCLIENT.EditorFont = New System.Drawing.Font("Microsoft Sans Serif", 8.25!)
+        Me.cboNOMCLIENT.EditorForeColor = System.Drawing.SystemColors.WindowText
+        Me.cboNOMCLIENT.EditorHeight = 15
+        Me.cboNOMCLIENT.GapHeight = 2
+        Me.cboNOMCLIENT.Images.Add(CType(resources.GetObject("resource4"), System.Drawing.Image))
+        Me.cboNOMCLIENT.IntegralHeight = True
+        Me.cboNOMCLIENT.ItemHeight = 13
+        Me.cboNOMCLIENT.Location = New System.Drawing.Point(188, 40)
+        Me.cboNOMCLIENT.MatchEntryTimeout = CType(100, Long)
+        Me.cboNOMCLIENT.MaxDropDownItems = CType(8, Short)
+        Me.cboNOMCLIENT.MaxLength = 0
+        Me.cboNOMCLIENT.MouseCursor = System.Windows.Forms.Cursors.Default
+        Me.cboNOMCLIENT.Name = "cboNOMCLIENT"
+        'Me.cbo.PartialRightColumn = False
+        Me.cboNOMCLIENT.RowDivider.Color = System.Drawing.Color.DarkGray
+        Me.cboNOMCLIENT.RowDivider.Style = C1.Win.C1List.LineStyleEnum.None
+        Me.cboNOMCLIENT.RowSubDividerColor = System.Drawing.Color.DarkGray
+        Me.cboNOMCLIENT.Size = New System.Drawing.Size(280, 19)
+        Me.cboNOMCLIENT.TabIndex = 262
+        Me.cboNOMCLIENT.PropBag = "<?xml version=""1.0""?><Blob><Styles type=""C1.Win.C1List.Design.ContextWrapper""><Da" & _
+        "ta>Group{AlignVert:Center;Border:None,,0, 0, 0, 0;BackColor:ControlDark;}Style2{" & _
+        "}Style5{}Style4{}Style7{}Style6{}EvenRow{BackColor:Aqua;}Selected{ForeColor:High" & _
+        "lightText;BackColor:Highlight;}Style3{}Inactive{ForeColor:InactiveCaptionText;Ba" & _
+        "ckColor:InactiveCaption;}Footer{}Caption{AlignHorz:Center;}Normal{Font:Microsoft" & _
+        " Sans Serif, 8.25pt;BackColor:Window;}HighlightRow{ForeColor:HighlightText;BackC" & _
+        "olor:Highlight;}Style1{}OddRow{}RecordSelector{AlignImage:Center;}Heading{Wrap:T" & _
+        "rue;BackColor:Control;Border:Raised,,1, 1, 1, 1;ForeColor:ControlText;AlignVert:" & _
+        "Center;}Style8{}Style10{}Style11{}Style9{AlignHorz:Near;}</Data></Styles><Splits" & _
+        "><C1.Win.C1List.ListBoxView AllowColSelect=""False"" Name="""" CaptionHeight=""17"" Co" & _
+        "lumnCaptionHeight=""17"" ColumnFooterHeight=""17"" VerticalScrollGroup=""1"" Horizonta" & _
+        "lScrollGroup=""1""><ClientRect>0, 0, 116, 156</ClientRect><VScrollBar><Width>17</W" & _
+        "idth></VScrollBar><HScrollBar><Height>17</Height></HScrollBar><CaptionStyle pare" & _
+        "nt=""Style2"" me=""Style9"" /><EvenRowStyle parent=""EvenRow"" me=""Style7"" /><FooterSt" & _
+        "yle parent=""Footer"" me=""Style3"" /><GroupStyle parent=""Group"" me=""Style11"" /><Hea" & _
+        "dingStyle parent=""Heading"" me=""Style2"" /><HighLightRowStyle parent=""HighlightRow" & _
+        """ me=""Style6"" /><InactiveStyle parent=""Inactive"" me=""Style4"" /><OddRowStyle pare" & _
+        "nt=""OddRow"" me=""Style8"" /><RecordSelectorStyle parent=""RecordSelector"" me=""Style" & _
+        "10"" /><SelectedStyle parent=""Selected"" me=""Style5"" /><Style parent="""" me=""Normal" & _
+        """ /></C1.Win.C1List.ListBoxView></Splits><NamedStyles><Style parent="""" me=""Norma" & _
+        "l"" /><Style parent=""Normal"" me=""Heading"" /><Style parent=""Heading"" me=""Footer"" /" & _
+        "><Style parent=""Heading"" me=""Caption"" /><Style parent=""Heading"" me=""Inactive"" />" & _
+        "<Style parent=""Normal"" me=""Selected"" /><Style parent=""Normal"" me=""HighlightRow"" " & _
+        "/><Style parent=""Normal"" me=""EvenRow"" /><Style parent=""Normal"" me=""OddRow"" /><St" & _
+        "yle parent=""Heading"" me=""RecordSelector"" /><Style parent=""Caption"" me=""Group"" />" & _
+        "</NamedStyles><vertSplits>1</vertSplits><horzSplits>1</horzSplits><Layout>Modifi" & _
+        "ed</Layout><DefaultRecSelWidth>17</DefaultRecSelWidth></Blob>"
+        '
+        'cboNOMACABADOR
+        '
+        Me.cboNOMACABADOR.AddItemSeparator = Microsoft.VisualBasic.ChrW(59)
+        Me.cboNOMACABADOR.Anchor = System.Windows.Forms.AnchorStyles.Bottom
+        Me.cboNOMACABADOR.AutoSelect = True
+        Me.cboNOMACABADOR.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+        Me.cboNOMACABADOR.Caption = ""
+        Me.cboNOMACABADOR.CaptionHeight = 17
+        Me.cboNOMACABADOR.CharacterCasing = System.Windows.Forms.CharacterCasing.Normal
+        Me.cboNOMACABADOR.ColumnCaptionHeight = 17
+        Me.cboNOMACABADOR.ColumnFooterHeight = 17
+        Me.cboNOMACABADOR.ContentHeight = 15
+        Me.cboNOMACABADOR.Cursor = System.Windows.Forms.Cursors.Default
+        Me.cboNOMACABADOR.DeadAreaBackColor = System.Drawing.Color.Empty
+        Me.cboNOMACABADOR.EditorBackColor = System.Drawing.SystemColors.Window
+        Me.cboNOMACABADOR.EditorFont = New System.Drawing.Font("Microsoft Sans Serif", 8.25!)
+        Me.cboNOMACABADOR.EditorForeColor = System.Drawing.SystemColors.WindowText
+        Me.cboNOMACABADOR.EditorHeight = 15
+        Me.cboNOMACABADOR.GapHeight = 2
+        Me.cboNOMACABADOR.Images.Add(CType(resources.GetObject("resource5"), System.Drawing.Image))
+        Me.cboNOMACABADOR.IntegralHeight = True
+        Me.cboNOMACABADOR.ItemHeight = 13
+        Me.cboNOMACABADOR.Location = New System.Drawing.Point(188, 64)
+        Me.cboNOMACABADOR.MatchEntryTimeout = CType(100, Long)
+        Me.cboNOMACABADOR.MaxDropDownItems = CType(8, Short)
+        Me.cboNOMACABADOR.MaxLength = 0
+        Me.cboNOMACABADOR.MouseCursor = System.Windows.Forms.Cursors.Default
+        Me.cboNOMACABADOR.Name = "cboNOMACABADOR"
+        'Me.cbo.PartialRightColumn = False
+        Me.cboNOMACABADOR.RowDivider.Color = System.Drawing.Color.DarkGray
+        Me.cboNOMACABADOR.RowDivider.Style = C1.Win.C1List.LineStyleEnum.None
+        Me.cboNOMACABADOR.RowSubDividerColor = System.Drawing.Color.DarkGray
+        Me.cboNOMACABADOR.Size = New System.Drawing.Size(280, 19)
+        Me.cboNOMACABADOR.TabIndex = 254
+        Me.cboNOMACABADOR.PropBag = "<?xml version=""1.0""?><Blob><Styles type=""C1.Win.C1List.Design.ContextWrapper""><Da" & _
+        "ta>Group{BackColor:ControlDark;Border:None,,0, 0, 0, 0;AlignVert:Center;}Style2{" & _
+        "}Style5{}Style4{}Style7{}Style6{}EvenRow{BackColor:Aqua;}Selected{ForeColor:High" & _
+        "lightText;BackColor:Highlight;}Style3{}Inactive{ForeColor:InactiveCaptionText;Ba" & _
+        "ckColor:InactiveCaption;}Footer{}Caption{AlignHorz:Center;}Normal{Font:Microsoft" & _
+        " Sans Serif, 8.25pt;BackColor:Window;}HighlightRow{ForeColor:HighlightText;BackC" & _
+        "olor:Highlight;}Style9{AlignHorz:Near;}OddRow{}RecordSelector{AlignImage:Center;" & _
+        "}Heading{Wrap:True;AlignVert:Center;Border:Raised,,1, 1, 1, 1;ForeColor:ControlT" & _
+        "ext;BackColor:Control;}Style8{}Style10{}Style11{}Style1{}</Data></Styles><Splits" & _
+        "><C1.Win.C1List.ListBoxView AllowColSelect=""False"" Name="""" CaptionHeight=""17"" Co" & _
+        "lumnCaptionHeight=""17"" ColumnFooterHeight=""17"" VerticalScrollGroup=""1"" Horizonta" & _
+        "lScrollGroup=""1""><ClientRect>0, 0, 116, 156</ClientRect><VScrollBar><Width>17</W" & _
+        "idth></VScrollBar><HScrollBar><Height>17</Height></HScrollBar><CaptionStyle pare" & _
+        "nt=""Style2"" me=""Style9"" /><EvenRowStyle parent=""EvenRow"" me=""Style7"" /><FooterSt" & _
+        "yle parent=""Footer"" me=""Style3"" /><GroupStyle parent=""Group"" me=""Style11"" /><Hea" & _
+        "dingStyle parent=""Heading"" me=""Style2"" /><HighLightRowStyle parent=""HighlightRow" & _
+        """ me=""Style6"" /><InactiveStyle parent=""Inactive"" me=""Style4"" /><OddRowStyle pare" & _
+        "nt=""OddRow"" me=""Style8"" /><RecordSelectorStyle parent=""RecordSelector"" me=""Style" & _
+        "10"" /><SelectedStyle parent=""Selected"" me=""Style5"" /><Style parent="""" me=""Normal" & _
+        """ /></C1.Win.C1List.ListBoxView></Splits><NamedStyles><Style parent="""" me=""Norma" & _
+        "l"" /><Style parent=""Normal"" me=""Heading"" /><Style parent=""Heading"" me=""Footer"" /" & _
+        "><Style parent=""Heading"" me=""Caption"" /><Style parent=""Heading"" me=""Inactive"" />" & _
+        "<Style parent=""Normal"" me=""Selected"" /><Style parent=""Normal"" me=""HighlightRow"" " & _
+        "/><Style parent=""Normal"" me=""EvenRow"" /><Style parent=""Normal"" me=""OddRow"" /><St" & _
+        "yle parent=""Heading"" me=""RecordSelector"" /><Style parent=""Caption"" me=""Group"" />" & _
+        "</NamedStyles><vertSplits>1</vertSplits><horzSplits>1</horzSplits><Layout>Modifi" & _
+        "ed</Layout><DefaultRecSelWidth>17</DefaultRecSelWidth></Blob>"
+        '
+        'chkRECIBIDO
+        '
+        Me.chkRECIBIDO.BackColor = System.Drawing.Color.Transparent
+        Me.chkRECIBIDO.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.chkRECIBIDO.Location = New System.Drawing.Point(556, 64)
+        Me.chkRECIBIDO.Name = "chkRECIBIDO"
+        Me.chkRECIBIDO.Size = New System.Drawing.Size(140, 19)
+        Me.chkRECIBIDO.TabIndex = 5
+        Me.chkRECIBIDO.Text = "Disposició Rebuda"
+        '
+        'lblFechaRecibido
+        '
+        Me.lblFechaRecibido.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.lblFechaRecibido.Location = New System.Drawing.Point(712, 64)
+        Me.lblFechaRecibido.Name = "lblFechaRecibido"
+        Me.lblFechaRecibido.Size = New System.Drawing.Size(96, 19)
+        Me.lblFechaRecibido.TabIndex = 6
+        Me.lblFechaRecibido.Text = "Data Rebut"
+        Me.lblFechaRecibido.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        Me.lblFechaRecibido.Visible = False
+        '
+        'lblFecha
+        '
+        Me.lblFecha.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.lblFecha.Location = New System.Drawing.Point(712, 40)
+        Me.lblFecha.Name = "lblFecha"
+        Me.lblFecha.Size = New System.Drawing.Size(92, 20)
+        Me.lblFecha.TabIndex = 4
+        Me.lblFecha.Text = "Data Disposició"
+        Me.lblFecha.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        '
+        'txtCODICLIENT
+        '
+        Me.txtCODICLIENT.Location = New System.Drawing.Point(100, 16)
+        Me.txtCODICLIENT.Name = "txtCODICLIENT"
+        Me.txtCODICLIENT.Size = New System.Drawing.Size(56, 20)
+        Me.txtCODICLIENT.TabIndex = 0
+        Me.txtCODICLIENT.Tag = Nothing
+        '
+        'txtany
+        '
+        Me.txtany.Location = New System.Drawing.Point(232, 16)
+        Me.txtany.Name = "txtany"
+        Me.txtany.Size = New System.Drawing.Size(36, 20)
+        Me.txtany.TabIndex = 2
+        Me.txtany.Tag = Nothing
+        '
+        'lblDisposicion
+        '
+        Me.lblDisposicion.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.lblDisposicion.Location = New System.Drawing.Point(8, 16)
+        Me.lblDisposicion.Name = "lblDisposicion"
+        Me.lblDisposicion.Size = New System.Drawing.Size(88, 20)
+        Me.lblDisposicion.TabIndex = 0
+        Me.lblDisposicion.Text = "Disposició Nº"
+        Me.lblDisposicion.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        '
+        'txtCLIENT
+        '
+        Me.txtCLIENT.Location = New System.Drawing.Point(100, 40)
+        Me.txtCLIENT.Name = "txtCLIENT"
+        Me.txtCLIENT.Size = New System.Drawing.Size(56, 20)
+        Me.txtCLIENT.TabIndex = 3
+        Me.txtCLIENT.Tag = Nothing
+        '
+        'lblCliente
+        '
+        Me.lblCliente.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.lblCliente.Location = New System.Drawing.Point(8, 40)
+        Me.lblCliente.Name = "lblCliente"
+        Me.lblCliente.Size = New System.Drawing.Size(88, 20)
+        Me.lblCliente.TabIndex = 202
+        Me.lblCliente.Text = "Client"
+        Me.lblCliente.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        '
+        'btnElegirCliente
+        '
+        Me.btnElegirCliente.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.btnElegirCliente.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft
+        Me.btnElegirCliente.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.btnElegirCliente.Location = New System.Drawing.Point(160, 39)
+        Me.btnElegirCliente.Name = "btnElegirCliente"
+        Me.btnElegirCliente.Size = New System.Drawing.Size(24, 20)
+        Me.btnElegirCliente.TabIndex = 201
+        Me.btnElegirCliente.Text = "..."
+        '
+        'txtACABADOR
+        '
+        Me.txtACABADOR.Anchor = System.Windows.Forms.AnchorStyles.Bottom
+        Me.txtACABADOR.Location = New System.Drawing.Point(100, 64)
+        Me.txtACABADOR.Name = "txtACABADOR"
+        Me.txtACABADOR.Size = New System.Drawing.Size(56, 20)
+        Me.txtACABADOR.TabIndex = 253
+        Me.txtACABADOR.Tag = Nothing
+        '
+        'lblAcabador
+        '
+        Me.lblAcabador.Anchor = System.Windows.Forms.AnchorStyles.Bottom
+        Me.lblAcabador.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.lblAcabador.Location = New System.Drawing.Point(8, 64)
+        Me.lblAcabador.Name = "lblAcabador"
+        Me.lblAcabador.Size = New System.Drawing.Size(88, 20)
+        Me.lblAcabador.TabIndex = 256
+        Me.lblAcabador.Text = "Acabador"
+        Me.lblAcabador.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        '
+        'Label3
+        '
+        Me.Label3.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.Label3.Location = New System.Drawing.Point(8, 88)
+        Me.Label3.Name = "Label3"
+        Me.Label3.Size = New System.Drawing.Size(88, 20)
+        Me.Label3.TabIndex = 5
+        Me.Label3.Text = "Tintar a Color"
+        Me.Label3.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        '
+        'Label2
+        '
+        Me.Label2.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.Label2.Location = New System.Drawing.Point(712, 16)
+        Me.Label2.Name = "Label2"
+        Me.Label2.Size = New System.Drawing.Size(90, 20)
+        Me.Label2.TabIndex = 262
+        Me.Label2.Text = "Colorit Client"
+        Me.Label2.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        '
+        'txtcolorcliente
+        '
+        Me.txtcolorcliente.Location = New System.Drawing.Point(808, 16)
+        Me.txtcolorcliente.Name = "txtcolorcliente"
+        Me.txtcolorcliente.Size = New System.Drawing.Size(148, 20)
+        Me.txtcolorcliente.TabIndex = 261
+        Me.txtcolorcliente.Tag = Nothing
+        '
+        'frmDisposicion
+        '
+        Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
+        Me.ClientSize = New System.Drawing.Size(992, 610)
+        Me.Controls.Add(Me.tabControlDisposiciones)
+        Me.Controls.Add(Me.btnImprimir)
+        Me.Cursor = System.Windows.Forms.Cursors.Default
+        Me.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!)
+        Me.KeyPreview = True
+        Me.Name = "frmDisposicion"
+        Me.Text = "Disposicions"
+        Me.Controls.SetChildIndex(Me.cboSeleccionCentro, 0)
+        Me.Controls.SetChildIndex(Me.sbtipo, 0)
+        Me.Controls.SetChildIndex(Me.btnActualizar, 0)
+        Me.Controls.SetChildIndex(Me.btnNuevo, 0)
+        Me.Controls.SetChildIndex(Me.btnBorrar, 0)
+        Me.Controls.SetChildIndex(Me.btnTancar, 0)
+        Me.Controls.SetChildIndex(Me.btnUltimo, 0)
+        Me.Controls.SetChildIndex(Me.btnPrimero, 0)
+        Me.Controls.SetChildIndex(Me.btnAnterior, 0)
+        Me.Controls.SetChildIndex(Me.btnSiguiente, 0)
+        Me.Controls.SetChildIndex(Me.btnRecargar, 0)
+        Me.Controls.SetChildIndex(Me.btnVerLista, 0)
+        Me.Controls.SetChildIndex(Me.btnModificar, 0)
+        Me.Controls.SetChildIndex(Me.btnImprimir, 0)
+        Me.Controls.SetChildIndex(Me.tabControlDisposiciones, 0)
+        CType(Me.cboTejedor, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.cboTejido, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.tabControlDisposiciones.ResumeLayout(False)
+        Me.tabPageDisposicion.ResumeLayout(False)
+        CType(Me.dgDdispos, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.txtOBSERV, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.txtTotalPiezas, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.txtTotalKG, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.gb1.ResumeLayout(False)
+        CType(Me.cboIDDispos, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.dtpFECHA, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.dtpDRECEPCION, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.txtColor, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.txtCOMANDA, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.cboNOMCLIENT, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.cboNOMACABADOR, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.txtCODICLIENT, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.txtany, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.txtCLIENT, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.txtACABADOR, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.txtcolorcliente, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.ResumeLayout(False)
+
+    End Sub
+
+#End Region
+
+    Shared frmChildForm As frmDisposicion
+    Public Shared Function GetInstance() As frmDisposicion
+        If frmChildForm Is Nothing Then
+            frmChildForm = New frmDisposicion
+            
+        End If
+        Return frmChildForm
+    End Function
+
+#Region "VARIABLES"
+
+    Public dispoActual As clsDisposicion
+
+#End Region
+
+#Region "INICIALIZAR"
+
+    Private Sub IniciarForm(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
+        Try
+            Cursor = Cursors.WaitCursor
+            Me.arrayCombos.Controls.AddRange(New System.Windows.Forms.Control() {Me.cboNOMACABADOR, Me.cboNOMCLIENT})
+            Me.arrayGrids.Controls.AddRange(New System.Windows.Forms.Control() {Me.dgDdispos})
+            Me.arrayDateTime.Controls.AddRange(New System.Windows.Forms.Control() {Me.dtpFECHA, Me.dtpDRECEPCION})
+            Me.arrayTextBox.Controls.AddRange(New System.Windows.Forms.Control() {Me.txtany, Me.txtCODICLIENT, Me.txtACABADOR, Me.txtCLIENT, Me.txtColor, Me.txtcolorcliente, Me.txtOBSERV, Me.txtCOMANDA, Me.txtTotalKG, Me.txtTotalPiezas})
+
+            cargando = True
+            tabla = tablaDisposiciones
+            dispoActual = New clsDisposicion(ds.Tables(tabla), empresaPorDefecto, BindingContext)
+            HacerBindings()
+            InicializardgDdisposes()
+            PonerModificables(soloLectura)
+            btnUltimo_Click(Nothing, Nothing)
+            PSBTIPO(dispoActual.centro) : cargando = False
+
+            If dispoActual.RECIBIDO = False Then dtpDRECEPCION.Visible = False
+            PonerHandlersErroresParaGrids()
+            cargando = False
+
+        Catch ex As Exception
+            LOG(ex.ToString) : ccn() : cargando = False
+        End Try
+        Cursor = Cursors.Default
+    End Sub
+    Private Sub cboTejedor_SelChange(ByVal sender As Object, ByVal e As C1.Win.C1TrueDBGrid.CancelEventArgs) Handles cboTejedor.SelChange
+        Try
+            If PuedoModificar() Then
+
+                dispoActual.detalleDisposicion.TEJEDOR = cboTejedor.Columns("CODI").Value
+                'AñadirBindingCombo(cboTejedor, dispoActual.dtTejedores, "NOM", "CODI")
+            End If
+
+        Catch ex As Exception
+            LOG(ex.ToString) : CCN() : cargando = False
+        End Try
+    End Sub
+    Private Sub InicializardgDdisposes()
+        Dim i As Integer
+        Try
+            OcultarColumnasDG(dgDdispos)
+
+            With dgDdispos.Columns
+
+                i = 0
+                PPCol2("TEJEDOR", dgDdispos, "Codi Teixidor", "", True, 100, True, PresentationEnum.Normal, False, 50, i, False)
+                i = 1
+                PPCol2("NOMTEJEDOR", dgDdispos, rm.GetString("NOMTEJEDOR"), "", True, 200, False, PresentationEnum.ComboBox, False, 200, i, False, cboTejedor)
+                i = 2
+                PPCol2("NALBARAN", dgDdispos, rm.GetString("ALBARAN"), "", True, 50, _
+                            False, PresentationEnum.Normal, False, 50, i, True)
+                i = 3
+                PPCol2("TEJIDO", dgDdispos, rm.GetString("TEJIDO"), "", True, 100, _
+                            False, PresentationEnum.ComboBox, False, 100, i, True, cboTejido)
+                i = 4
+                PPCol2("COMPOS", dgDdispos, rm.GetString("COMPOSICION"), "", True, 200, _
+                            False, PresentationEnum.Normal, False, 200, i, True)
+                i = 5
+                PPCol2("NPIEZAS", dgDdispos, rm.GetString("NPIEZAS"), "", True, 50, _
+                            False, PresentationEnum.Normal, False, 50, i, True)
+                i = 6
+                PPCol2("RENDIMIENTO", dgDdispos, rm.GetString("RENDIMIENTO"), "", True, 50, _
+                            False, PresentationEnum.Normal, False, 50, i, True)
+
+                i = 7
+                PPCol2("GRAMAJE", dgDdispos, rm.GetString("GRAMAJE"), "", True, 50, _
+                             False, PresentationEnum.Normal, False, 50, i, True)
+                i = 8
+                PPCol2("ANCHO", dgDdispos, rm.GetString("ANCHO"), "", True, 100, _
+                            False, PresentationEnum.Normal, False, 100, i, True)
+                i = 9
+                PPCol2("TOTALPIEZAS", dgDdispos, rm.GetString("TOTALP"), "", True, 50, _
+                            False, PresentationEnum.Normal, False, 50, i, True)
+                i = 10
+                PPCol2("TOTALKG", dgDdispos, rm.GetString("TOTALKG"), "", True, 50, _
+                            False, PresentationEnum.Normal, False, 50, i, True)
+                i = 11
+                PPCol2("ACABADO", dgDdispos, rm.GetString("ACABADOS"), "", True, 250, _
+                            False, PresentationEnum.ComboBox, False, 250, i, True)
+                i = 12
+                PPCol2("DISPUESTO", dgDdispos, rm.GetString("DISPUESTO"), "", True, _
+                            45, False, PresentationEnum.CheckBox, False, 45, i, False, Nothing, True)
+                i = 13
+                PPCol2("SERVIDO", dgDdispos, rm.GetString("SERVIDO"), "", True, _
+                            35, False, PresentationEnum.CheckBox, False, 35, i, False, Nothing, True)
+                i = 14
+                'PPCol2("LINEA", dgDdispos, "", "", True, _
+                '            35, False, PresentationEnum.Normal, False, 35, i, False, Nothing, True)
+
+            End With
+
+
+        Catch ex As Exception
+            LOG(ex.ToString) : CCN() : cargando = False
+        End Try
+
+
+    End Sub
+    Private Sub HacerBindings()
+        Try
+            HacerBindingsTodos(dispoActual.dvForm)
+            AñadirBinding(cboIDDispos, dispoActual.dvForm, "IDDISPOS")
+            AñadirBindingCombo(cboIDDispos, dispoActual.dvIdentificadores, "CODI", "IDDISPOS")
+            OcultarMostrarColumnaCbo(cboIDDispos, "CODI", False)
+            AñadirBindingCombo(cboNOMACABADOR, dispoActual.dtAcabadores, CCTallers, CNTallers)
+            AñadirBindingCombo(cboNOMCLIENT, dispoActual.dtClients, CCClients, CNClients)
+            dgDdispos.SetDataBinding(dispoActual.detalleDisposicion.dvForm, "")
+            'AñadirBindingCombo(cboTejedor, dispoActual.dtTejedores.DefaultView, "NOM", "CODI")
+            AñadirBindingCombo(cboTejedor, dispoActual.dtTejedores, "NOM", "CODI")
+            AñadirBindingCombo(cboTejido, dispoActual.dtTejidos.DefaultView, "CODI", "CODI")
+            OcultarColumnaDropDown(cboTejido)
+            OcultarMostrarColumnaCbo(cboTejido, "CODI", True)
+
+        Catch ex As Exception
+            LOG(ex.ToString) : CCN() : cargando = False
+        End Try
+    End Sub
+
+#End Region
+
+#Region "MODIFICAR DB"
+
+    Private Sub ActualizarOrigen()
+        Try
+            If editando Then
+                If dispoActual.hayAlgunaSinDisponer Then
+                    MessageBox.Show(rm.GetString("HAYLINEASSINDISPONER"), "", MessageBoxButtons.OK)
+                Else
+                    editando = False
+                    PonerModificables(soloLectura)
+                End If
+            End If
+            If EsRegistroNuevo Then
+                dgDdispos.Visible = True
+                editando = True : PSBTIPO(dispoActual.centro)
+                PonerControlesNuevo(True)
+                dispoActual.actualizarNumeraciones()
+                EsRegistroNuevo = False
+            End If
+
+        Catch ex As Exception
+            LOG(ex.ToString) : CCN() : cargando = False
+        End Try
+    End Sub
+    Friend Overrides Sub btnActualizar_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) 'Handles btnActualizar.Click
+        Try
+            cargando = True
+            If dispoActual.TieneCambios Then
+                Select Case MessageBox.Show(rm.GetString("QUIERECONFIRMARLOSCAMBIOS"), rm.GetString("INFORMACION"), MessageBoxButtons.YesNoCancel)
+                    Case DialogResult.Cancel
+                        cargando = False
+                        Exit Sub
+                    Case DialogResult.No
+                        dispoActual.tabla.RejectChanges()
+                        dispoActual.detalleDisposicion.tabla.RejectChanges()
+                        cargando = False
+                        Exit Sub
+                End Select
+            End If
+            dispoActual.ActualizarOrigen() : ActualizarOrigen()
+            PSBTIPO(dispoActual.centro) : cargando = False
+
+        Catch ex As Exception
+            LOG(ex.ToString) : CCN() : cargando = False
+        End Try
+    End Sub
+    Friend Overrides Sub btnBorrar_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) 'Handles btnBorrar.Click
+        Try
+            If MessageBox.Show(rm.GetString("BorrarDisposicion"), rm.GetString("ConfirmacionEliminacion"), MessageBoxButtons.YesNo) = DialogResult.Yes Then
+                'Primero borramos el tejido de la tabla tejido
+                'Despues borramos todos sus "tejidos"
+                editando = True
+                dispoActual.borrar() : ActualizarOrigen()
+                editando = False
+            End If
+
+        Catch ex As Exception
+            LOG(ex.ToString) : CCN() : cargando = False
+        End Try
+
+    End Sub
+    Friend Overrides Sub btnModificar_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnModificar.Click
+        Try
+            If Not editando Then
+                cargando = True
+                editando = True
+                PonerModificables(modificable)
+                PSBTIPO(dispoActual.centro)
+                cboIDDispos.Text = dispoActual.IDDISPOS
+                cargando = False
+            End If
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+    Friend Overrides Sub btnNuevo_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) 'Handles btnNuevo.Click
+        Try
+            cargando = True
+            EsRegistroNuevo = True
+            dgDdispos.Visible = False
+
+            PonerModificables(modificable)
+            PonerControlesNuevo(False)
+            dispoActual.NuevoRegistro()
+            cboIDDispos.AutoCompletion = False
+            PSBTIPO(dispoActual.centro) : cargando = False
+
+        Catch ex As Exception
+            LOG(ex.ToString) : CCN() : cargando = False
+        End Try
+    End Sub
+
+#End Region
+
+#Region "ESPECÍFICO"
+
+    Private Sub chkAnulada_CheckStateChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles chkANULADA.CheckStateChanged
+        Try
+            If PuedoModificar() Then
+                cargando = True
+                If chkANULADA.Checked = True Then
+                    chkRecibido.Checked = False
+                    lblFechaRecibido.Visible = False
+                End If
+                cargando = False
+            End If
+        Catch ex As Exception
+            LOG(ex.ToString) : CCN() : cargando = False
+        End Try
+    End Sub
+    Private Sub chkRecibido_CheckStateChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles chkRECIBIDO.CheckStateChanged
+        Try
+            If PuedoModificar() Then
+                cargando = True
+                If chkRECIBIDO.Checked = True Then
+                    If dispoActual.detalleDisposicion.TodasRecibidas Then
+                        dtpDRECEPCION.Visible = True
+                        lblFechaRecibido.Visible = True
+                        chkANULADA.Checked = False
+                    Else
+                        MessageBox.Show(rm.GetString("DIPOSRECIBIDAS"), rm.GetString("INFO"))
+                        chkRECIBIDO.Checked = False
+                        lblFechaRecibido.Visible = False
+                    End If
+                Else
+                    dtpDRECEPCION.Visible = False
+                    lblFechaRecibido.Visible = False
+                End If
+                cargando = False
+            End If
+
+        Catch ex As Exception
+            LOG(ex.ToString) : CCN() : cargando = False
+        End Try
+
+    End Sub
+    Private Sub PonerKGEditable()
+        Try
+
+        Catch ex As Exception
+
+        End Try
+    End Sub
+    Private Sub dgDdispos_ButtonClick(ByVal sender As Object, ByVal e As C1.Win.C1TrueDBGrid.ColEventArgs) Handles dgDdispos.ButtonClick
+        Dim f As New frmElegirAcabados
+        Try
+            Select Case e.Column.DataColumn.DataField
+                Case "ACABADO"
+                    dgDdispos.EditActive = True
+                    f.client = dispoActual.ACABADOR
+                    f.tejido = dispoActual.detalleDisposicion.TEJIDO
+                    f.ShowDialog()
+                    dispoActual.detalleDisposicion.PonerAcabadoLineaActual(f.aAcabados)
+                    dgDdispos.Refresh()
+            End Select
+
+        Catch ex As Exception
+            LOG(ex.ToString) : CCN() : cargando = False
+        End Try
+
+    End Sub
+    Private Sub dgDdispos_Error(ByVal sender As System.Object, ByVal e As C1.Win.C1TrueDBGrid.ErrorEventArgs)
+
+        e.Handled = True
+
+    End Sub
+
+#Region "CAMBIO COLUMNA"
+
+    Private Sub dgDdispos_AfterColUpdate(ByVal sender As Object, ByVal e As C1.Win.C1TrueDBGrid.ColEventArgs) Handles dgDdispos.AfterColUpdate
+        Dim b As Boolean
+        Try
+
+            If PuedoModificar() Then
+                cargando = True
+                dgDdispos.UpdateData()
+                Select Case e.Column.DataColumn.DataField
+                    Case "TEJEDOR"
+                        dispoActual.detalleDisposicion.TEJEDOR = e.Column.DataColumn.Value
+                    Case "NOMTALLER"
+                        dispoActual.detalleDisposicion.TEJEDOR = e.Column.DataColumn.Value
+
+                    Case "SERVIDO"
+
+                        If dgDdispos(dgDdispos.Row, "DISPUESTO") = True Then
+                            b = dgDdispos(dgDdispos.Row, "SERVIDO")
+
+                            If b = True Then
+                                If dispoActual.detalleDisposicion.PonerQuitarServido(True) Then
+                                    dgDdispos(dgDdispos.Row, "SERVIDO") = False
+                                End If
+                            Else
+                                If dispoActual.detalleDisposicion.PonerQuitarServido(False) Then
+                                    dgDdispos(dgDdispos.Row, "SERVIDO") = True
+                                End If
+                            End If
+
+                            b = dgDdispos(dgDdispos.Row, "SERVIDO")
+
+                            If b And dgDdispos(dgDdispos.Row, "DISPUESTO") = False Then
+                                dgDdispos(dgDdispos.Row, "SERVIDO") = False
+                            End If
+
+                            If dgDdispos(dgDdispos.Row, "SERVIDO") = True Then
+                                dgDdispos.Splits(0).DisplayColumns("TOTALKG").AllowFocus = False
+                            Else
+                                dgDdispos.Splits(0).DisplayColumns("TOTALKG").AllowFocus = True
+                            End If
+                        Else
+                            dgDdispos(dgDdispos.Row, "SERVIDO") = False
+                            MessageBox.Show(rm.GetString("PRIMERODISPONER"))
+                        End If
+
+                    Case "DISPUESTO"
+                        If dgDdispos(dgDdispos.Row, "DISPUESTO") = True Then
+                            dgDdispos.Splits(0).DisplayColumns("TOTALKG").AllowFocus = False
+                            If dispoActual.detalleDisposicion.PonerQuitarDispuesta(True) Then
+
+                            Else
+                                dgDdispos(dgDdispos.Row, "DISPUESTO") = False
+                            End If
+                            dgDdispos.Splits(0).DisplayColumns("TOTALKG").AllowFocus = False
+                        Else
+                            If dispoActual.detalleDisposicion.PonerQuitarDispuesta(False) Then
+                            Else
+                            End If
+                            dgDdispos.Splits(0).DisplayColumns("TOTALKG").AllowFocus = True
+                        End If
+
+                    Case "TEJIDO"
+                        dgDdispos.EditActive = True
+                        dispoActual.detalleDisposicion.TEJIDO = cboTejido.Columns("CODI").Value
+                        dispoActual.detalleDisposicion.COMPOS = nz(dispoActual.detalleDisposicion.getcomposicion(), "")
+                        dispoActual.detalleDisposicion.ANCHO = nz(cboTejido.Columns("AMPLE").Value, "")
+                        dispoActual.detalleDisposicion.DESCRIPCIO = nz(cboTejido.Columns("DESCRI").Value, "")
+                        dispoActual.detalleDisposicion.RENDIMIENTO = nzn(cboTejido.Columns("RENDIMENT").Value, 0)
+                        dispoActual.detalleDisposicion.GRAMAJE = nz(cboTejido.Columns("GRAMA").Value, "")
+                        dispoActual.detalleDisposicion.ACABADO = nz(cboTejido.Columns("ACABAT").Value, "")
+                        dgDdispos.Refresh()
+                End Select
+                cargando = False
+            End If
+
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Sub
+    Private Sub dgDdispos_RowColChange(ByVal sender As System.Object, ByVal e As C1.Win.C1TrueDBGrid.RowColChangeEventArgs) Handles dgDdispos.RowColChange
+        Try
+            If PuedoModificar() Then
+                cargando = True
+                'If dgDdispos(dgDdispos.Row, "SERVIDO") = False And dgDdispos(dgDdispos.Row, "DISPUESTO") = False Then
+                '    dgDdispos.Splits(0).DisplayColumns("TOTALKG").AllowFocus = True
+                'Else
+                '    If Not dgDdispos.Splits(0).DisplayColumns("TOTALKG").AllowFocus = False Then
+                '        dgDdispos.Splits(0).DisplayColumns("TOTALKG").AllowFocus = False
+                '        dgDdispos.Col = e.LastCol + 1
+                '    End If
+
+                'End If
+                ''AutosizeColumnasTrueDBDropdown(cboTejedor)
+                'AutosizeColumnasTrueDBDropdown(cboTejido)
+                'AutoSizeCC(dgDdispos)
+                If dispoActual.detalleDisposicion.SERVIDO = False And dispoActual.detalleDisposicion.DISPUESTO = False Then
+                    dgDdispos.Splits(0).DisplayColumns("TOTALKG").AllowFocus = True
+                Else
+                    If Not dgDdispos.Splits(0).DisplayColumns("TOTALKG").AllowFocus = False Then
+                        dgDdispos.Splits(0).DisplayColumns("TOTALKG").AllowFocus = False
+                        dgDdispos.Col = e.LastCol + 1
+                    End If
+
+                End If
+                'AutosizeColumnasTrueDBDropdown(cboTejedor)
+                AutosizeColumnasTrueDBDropdown(cboTejido)
+                AutoSizeCC(dgDdispos)
+                cargando = False
+            End If
+        Catch ex As Exception
+            LOG(ex.ToString)
+
+        End Try
+    End Sub
+
+#End Region
+#Region "CAMBIO SELECCION"
+
+    Private Sub cboTejido_SelChange(ByVal sender As Object, ByVal e As C1.Win.C1TrueDBGrid.CancelEventArgs) Handles cboTejido.SelChange
+        Try
+
+            If PuedoModificar() Then
+                cargando = True
+                'Debug.WriteLine("QUE ASCO")
+                dispoActual.detalleDisposicion.TEJIDO = cboTejido.Columns("CODI").Value
+                dispoActual.detalleDisposicion.COMPOS = nz(dispoActual.detalleDisposicion.getcomposicion(), "")
+                dispoActual.detalleDisposicion.ANCHO = nz(cboTejido.Columns("AMPLE").Value, "")
+                dispoActual.detalleDisposicion.DESCRIPCIO = nz(cboTejido.Columns("DESCRI").Value, "")
+                dispoActual.detalleDisposicion.RENDIMIENTO = nzn(cboTejido.Columns("RENDIMENT").Value, 0)
+                dispoActual.detalleDisposicion.GRAMAJE = nz(cboTejido.Columns("GRAMA").Value, "")
+                dispoActual.detalleDisposicion.ACABADO = nz(cboTejido.Columns("ACABAT").Value, "")
+                cargando = False
+            End If
+
+        Catch ex As Exception
+            LOG(ex.ToString) : CCN() : cargando = False
+        End Try
+    End Sub
+    'Private Sub cboTejedor_SelChange(ByVal sender As Object, ByVal e As C1.Win.C1TrueDBGrid.CancelEventArgs) Handles cboTejedor.SelChange
+    '    Try
+    '        If nzn(cboTejedor.Columns("CODI").Value, 0) = 0 Or nzn(dispoActual.ACABADOR, 0) = 0 Then
+    '            MessageBox.Show(rm.GetString("ERRORELEGIRTEJEDORACABADOR"))
+    '        Else
+    '            dgDdispos(dgDdispos.Row, "TEJEDOR") = cboTejedor.Columns("CODI").Value
+    '            dispoActual.dtTejidos.DefaultView.RowFilter = "TEIXIDOR = '" & cboTejedor.Columns("CODI").Value & "' AND ACABADOR = '" & dispoActual.ACABADOR & "'"
+    '            AñadirBindingCombo(cboTejido, dispoActual.dtTejidos.DefaultView, "CODI", "CODI")
+    '            AutosizeColumnasTrueDBDropdown(cboTejido)
+    '        End If
+
+    '    Catch ex As Exception
+    '        LOG(ex.ToString) : CCN() : cargando = False
+    '    End Try
+    'End Sub
+
+#End Region
+
+#End Region
+
+#Region "IMPRESIÓN"
+
+    Private Sub VistaPreliminar_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnImprimir.Click
+        Try
+            dispoActual.ImprimirDisposicionActual()
+
+        Catch ex As Exception
+            LOG(ex.ToString) : CCN() : cargando = False
+        End Try
+
+    End Sub
+
+#End Region
+
+#Region "COMUNES"
+    Private Sub PonerModificables(Optional ByVal b As Boolean = False)
+        Try
+            PonerMod(b)
+            'If Not b Then : cboID.DataSource = Nothing
+            'Else : AñadirBindingCombo(cboID, dispoActual.dvIdentificadores, CCDisposiciones, CCDisposiciones) : End If
+
+            'cboID.LimitToList = b
+            'cboID.SuperBack = b
+            'cboID.ReadOnly = editando ''or esregistronuevo
+            ModiNuev(b)
+
+        Catch ex As Exception
+            LOG(ex.ToString) : CCN() : cargando = False
+        End Try
+    End Sub
+    Private Sub PonerControlesNuevo(ByVal b As Boolean)
+        Try
+            If Not b Then
+                btnActualizar.Text = rm.GetString("CONFIRMAR")
+            Else
+                btnActualizar.Text = rm.GetString("ACTUALIZAR")
+            End If
+            ModiNuev(b)
+            cboIDDispos.AutoCompletion = Not editando
+
+        Catch ex As Exception
+            LOG(ex.ToString) : CCN() : cargando = False
+        End Try
+    End Sub
+    Private Sub btnLlista_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnVerLista.Click
+        Try
+            Cursor = Cursors.WaitCursor
+            Dim f As frmDisposicionLista = frmDisposicionLista.GetInstance(esListado)
+            f.MdiParent = Me.MdiParent
+            AddHandler f.Closed, AddressOf CType(Me.MdiParent, frmPrincipal).childCerrado
+            AddHandler f.Load, AddressOf CType(Me.MdiParent, frmPrincipal).childAbierto : AddHandler f.Activated, AddressOf CType(Me.MdiParent, frmPrincipal).childOcultandoMostrando
+            f.Show()
+            f.BringToFront()
+            Cursor = Cursors.Default
+
+        Catch ex As Exception
+            LOG(ex.ToString) : CCN() : cargando = False
+        End Try
+
+    End Sub
+
+#End Region
+
+#Region "DESPLAZARSE"
+
+    Protected Friend Overrides Sub btnPrimero_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
+        Try
+            cargando = True
+            dispoActual.PrimeroReg() : ActualizarOrigen()
+            If chkANULADA.Checked = False Then
+                lblFechaRecibido.Visible = False
+            Else
+                lblFechaRecibido.Visible = True
+            End If
+            cboTejido.Rebind(True)
+            AutoSizeCC(dgDdispos)
+            PSBTIPO(dispoActual.centro) : cargando = False
+
+        Catch ex As Exception
+            LOG(ex.ToString) : CCN() : cargando = False
+        End Try
+    End Sub
+    Friend Overrides Sub btnUltimo_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
+        Try
+            cargando = True
+            dispoActual.UltimoReg() : ActualizarOrigen()
+            If chkANULADA.Checked = False Then
+                lblFechaRecibido.Visible = False
+            Else
+                lblFechaRecibido.Visible = True
+            End If
+            cboTejido.Rebind(True)
+            AutoSizeCC(dgDdispos)
+            PSBTIPO(dispoActual.centro) : cargando = False
+
+        Catch ex As Exception
+            LOG(ex.ToString) : CCN() : cargando = False
+        End Try
+    End Sub
+    Friend Overrides Sub btnAnterior_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
+        Try
+            cargando = True
+            dispoActual.AnteriorReg() : ActualizarOrigen()
+            If chkANULADA.Checked = False Then
+                lblFechaRecibido.Visible = False
+            Else
+                lblFechaRecibido.Visible = True
+            End If
+            cboTejido.Rebind(True)
+            AutoSizeCC(dgDdispos)
+            PSBTIPO(dispoActual.centro) : cargando = False
+
+        Catch ex As Exception
+            LOG(ex.ToString) : CCN() : cargando = False
+        End Try
+    End Sub
+    Friend Overrides Sub btnSiguiente_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
+        Try
+            cargando = True
+            dispoActual.SiguienteReg() : ActualizarOrigen()
+            If chkANULADA.Checked = False Then
+                lblFechaRecibido.Visible = False
+            Else
+                lblFechaRecibido.Visible = True
+            End If
+            cboTejido.Rebind(True)
+            AutoSizeCC(dgDdispos)
+            PSBTIPO(dispoActual.centro) : cargando = False
+
+        Catch ex As Exception
+            LOG(ex.ToString) : CCN() : cargando = False
+        End Try
+    End Sub
+
+#End Region
+
+#Region "SELECCIÓN REGISTRO"
+
+    Private Sub cboID_ItemChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cboIDDispos.RowChange
+        Try
+            If consulta() Then
+                cargando = True
+                dispoActual.CambiarAReg(nz(cboIDDispos.WillChangeToValue, ""), iraregistro)
+                'MoverActual()
+                PSBTIPO(dispoActual.centro) : cargando = False
+            End If
+
+        Catch ex As Exception
+            LOG(ex.ToString) : cargando = False : CCN()
+        End Try
+    End Sub
+
+#End Region
+
+#Region "ELECCIONES"
+
+    Private Sub btnEscogerColorExistente_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnEscogerColorExistente.Click
+        Try
+            If dispoActual.ACABADOR <> 0 Then
+                Dim f As frmListadoColoresDisp = frmListadoColoresDisp.GetInstance(esEleccion)
+                f.acabador = dispoActual.ACABADOR
+                f.ShowDialog()
+                If Not f.dr Is Nothing Then dispoActual.COLOR = f.dr("COLOR")
+            Else
+                MessageBox.Show(rm.GetString("ESCOGERACABADOR"))
+                txtACABADOR.Focus()
+            End If
+
+        Catch ex As Exception
+            LOG(ex.ToString) : CCN() : cargando = False
+        End Try
+    End Sub
+    Private Sub btnElegirCliente_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnElegirCliente.Click
+        Try
+            Cursor = Cursors.WaitCursor
+            Dim f As frmClientesLista = frmClientesLista.GetInstance(esEleccion)
+            f.ShowDialog()
+            If Not f.dr Is Nothing Then dispoActual.CLIENT = f.dr("CODI")
+            Cursor = Cursors.Default
+            f = Nothing
+            PSBTIPO(dispoActual.centro) : cargando = False
+
+        Catch ex As Exception
+            LOG(ex.ToString) : CCN() : cargando = False
+        End Try
+    End Sub
+    Private Sub btnElegirAcabador_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles btnElegirAcabador.Click
+        Try
+            'Dim f As New frmElegirTaller
+            '
+            'f.ShowDialog()
+            'dispoActual.TALLER = f.codigo
+
+        Catch ex As Exception
+            LOG(ex.ToString) : CCN() : cargando = False
+        End Try
+    End Sub
+    Private Sub txtCodigoAcabador_Validated(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles txtACABADOR.Validated
+
+        Try
+            If PuedoModificar() Then cargando = True : dispoActual.ACABADOR = nzn(txtACABADOR.Text, 0) : cargando = False
+
+        Catch ex As Exception
+            LOG(ex.ToString) : CCN() : cargando = False
+        End Try
+    End Sub
+    Private Sub txtCodigoCliente_Validated(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles txtCLIENT.Validated
+
+        Try
+            If PuedoModificar() Then cargando = True : dispoActual.CLIENT = nzn(txtCLIENT.Text, 0) : cargando = False
+
+        Catch ex As Exception
+            LOG(ex.ToString) : CCN() : cargando = False
+        End Try
+    End Sub
+    Private Sub cboNombreAcabador_ItemChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cboNOMACABADOR.SelectedValueChanged
+
+        Try
+            If PuedoModificar() Then cargando = True : dispoActual.ACABADOR = nzn(cboNOMACABADOR.WillChangeToValue, 0) : cargando = False
+
+        Catch ex As Exception
+            LOG(ex.ToString) : CCN() : cargando = False
+        End Try
+    End Sub
+    Private Sub cboNombreCliente_ItemChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cboNOMCLIENT.SelectedValueChanged
+
+        Try
+            If PuedoModificar() Then cargando = True : dispoActual.CLIENT = nzn(cboNOMCLIENT.WillChangeToValue, 0) : cargando = False
+
+        Catch ex As Exception
+            LOG(ex.ToString) : CCN() : cargando = False
+        End Try
+    End Sub
+
+#End Region
+
+    Private Sub dgDdispos_BeforeDelete(ByVal sender As Object, ByVal e As C1.Win.C1TrueDBGrid.CancelEventArgs) Handles dgDdispos.BeforeDelete
+        Try
+            If MessageBox.Show(rm.GetString("BORRARLINEA"), rm.GetString("ConfirmacionEliminacion"), MessageBoxButtons.YesNo) = DialogResult.Yes Then
+                e.Cancel = False
+            Else
+                e.Cancel = True
+            End If
+
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Sub
+    Private Sub XpButton1_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnElegirAcabadorPorDefecto.Click
+        Try
+            Dim f As New frmAcabadorPorDefecto(dispoActual.dtAcabadores)
+            f.ShowDialog()
+
+        Catch ex As Exception
+            LOG(ex.ToString)
+        End Try
+    End Sub
+
+End Class
+
+'Private Sub cboColor_SelChange(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cboColor.SelectedValueChanged
+'    Try
+'        If PuedoModificar() Then
+'            cargando = True
+'            dispoActual.detalleDisposicion.tabla.Clear()
+'            dispoActual.COLOR = cboColor.WillChangeToText
+'            dispoActual.CargarTablas()
+'            Try
+'                cboTejedor.ReBind(True)
+'                cboTejido.ReBind(True)
+'                cboTejido.DataSource = dispoActual.dtTejidos.DefaultView
+'                cboTejido.DataMember = "CODI"
+'                cboTejido.ListField = "CODI"
+'            Catch ex As Exception
+
+'            End Try
+'            AutosizeColumnasTrueDBDropdown(cboTejedor)
+'            AutosizeColumnasTrueDBDropdown(cboTejido)
+'            'AutoSizeCC(dgDdispos)
+'            cargando = False
+
+'        End If
+
+'    Catch ex As Exception
+'        LOG(ex.ToString) : ccn() : cargando = false
+'    End Try
+'End Sub
