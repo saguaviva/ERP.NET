@@ -46,267 +46,267 @@ Namespace aura2k3
 
 
         <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
-            Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmBase))
-            Me.sbtipo = New System.Windows.Forms.Label()
-            Me.btnModificar = New C1.Win.C1Input.C1Button()
-            Me.btnVerLista = New C1.Win.C1Input.C1Button()
-            Me.btnRecargar = New C1.Win.C1Input.C1Button()
-            Me.btnSiguiente = New C1.Win.C1Input.C1Button()
-            Me.btnAnterior = New C1.Win.C1Input.C1Button()
-            Me.btnPrimero = New C1.Win.C1Input.C1Button()
-            Me.btnUltimo = New C1.Win.C1Input.C1Button()
-            Me.btnTancar = New C1.Win.C1Input.C1Button()
-            Me.btnBorrar = New C1.Win.C1Input.C1Button()
-            Me.btnNuevo = New C1.Win.C1Input.C1Button()
-            Me.btnActualizar = New C1.Win.C1Input.C1Button()
-            Me.cboSeleccionCentro = New System.Windows.Forms.ComboBox()
-            CType(Me.btnModificar, System.ComponentModel.ISupportInitialize).BeginInit()
-            CType(Me.btnVerLista, System.ComponentModel.ISupportInitialize).BeginInit()
-            CType(Me.btnRecargar, System.ComponentModel.ISupportInitialize).BeginInit()
-            CType(Me.btnSiguiente, System.ComponentModel.ISupportInitialize).BeginInit()
-            CType(Me.btnAnterior, System.ComponentModel.ISupportInitialize).BeginInit()
-            CType(Me.btnPrimero, System.ComponentModel.ISupportInitialize).BeginInit()
-            CType(Me.btnUltimo, System.ComponentModel.ISupportInitialize).BeginInit()
-            CType(Me.btnTancar, System.ComponentModel.ISupportInitialize).BeginInit()
-            CType(Me.btnBorrar, System.ComponentModel.ISupportInitialize).BeginInit()
-            CType(Me.btnNuevo, System.ComponentModel.ISupportInitialize).BeginInit()
-            CType(Me.btnActualizar, System.ComponentModel.ISupportInitialize).BeginInit()
-            Me.SuspendLayout()
-            '
-            'sbtipo
-            '
-            Me.sbtipo.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-            Me.sbtipo.Font = New System.Drawing.Font("Arial", 8.25!, System.Drawing.FontStyle.Bold)
-            Me.sbtipo.ImeMode = System.Windows.Forms.ImeMode.NoControl
-            Me.sbtipo.Location = New System.Drawing.Point(0, 90)
-            Me.sbtipo.Name = "sbtipo"
-            Me.sbtipo.Size = New System.Drawing.Size(88, 16)
-            Me.sbtipo.TabIndex = 0
-            Me.sbtipo.Text = "asdfasdfasdfasdfsadfsadfasdfasdfasdfasdfasdf"
-            Me.sbtipo.Visible = False
-            '
-            'btnModificar
-            '
-            Me.btnModificar.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-            Me.btnModificar.FlatStyle = System.Windows.Forms.FlatStyle.Flat
-            Me.btnModificar.Image = CType(resources.GetObject("btnModificar.Image"), System.Drawing.Image)
-            Me.btnModificar.ImeMode = System.Windows.Forms.ImeMode.NoControl
-            Me.btnModificar.Location = New System.Drawing.Point(135, 32)
-            Me.btnModificar.Name = "btnModificar"
-            Me.btnModificar.Size = New System.Drawing.Size(100, 23)
-            Me.btnModificar.TabIndex = 6
-            Me.btnModificar.TabStop = False
-            Me.btnModificar.Text = "Modificar (F4)"
-            Me.btnModificar.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText
-            Me.btnModificar.UseVisualStyleBackColor = True
-            Me.btnModificar.Visible = False
-            '
-            'btnVerLista
-            '
-            Me.btnVerLista.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-            Me.btnVerLista.FlatStyle = System.Windows.Forms.FlatStyle.Flat
-            Me.btnVerLista.Image = CType(resources.GetObject("btnVerLista.Image"), System.Drawing.Image)
-            Me.btnVerLista.ImeMode = System.Windows.Forms.ImeMode.NoControl
-            Me.btnVerLista.Location = New System.Drawing.Point(596, 32)
-            Me.btnVerLista.Name = "btnVerLista"
-            Me.btnVerLista.Size = New System.Drawing.Size(80, 23)
-            Me.btnVerLista.TabIndex = 9
-            Me.btnVerLista.TabStop = False
-            Me.btnVerLista.Text = "Llistat"
-            Me.btnVerLista.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText
-            Me.btnVerLista.UseVisualStyleBackColor = True
-            Me.btnVerLista.Visible = False
-            '
-            'btnRecargar
-            '
-            Me.btnRecargar.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-            Me.btnRecargar.FlatStyle = System.Windows.Forms.FlatStyle.Flat
-            Me.btnRecargar.Image = CType(resources.GetObject("btnRecargar.Image"), System.Drawing.Image)
-            Me.btnRecargar.ImeMode = System.Windows.Forms.ImeMode.NoControl
-            Me.btnRecargar.Location = New System.Drawing.Point(35, 55)
-            Me.btnRecargar.Name = "btnRecargar"
-            Me.btnRecargar.Size = New System.Drawing.Size(100, 23)
-            Me.btnRecargar.TabIndex = 1
-            Me.btnRecargar.TabStop = False
-            Me.btnRecargar.Text = "Recarregar"
-            Me.btnRecargar.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText
-            Me.btnRecargar.UseVisualStyleBackColor = True
-            Me.btnRecargar.Visible = False
-            '
-            'btnSiguiente
-            '
-            Me.btnSiguiente.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-            Me.btnSiguiente.FlatStyle = System.Windows.Forms.FlatStyle.Flat
-            Me.btnSiguiente.Image = CType(resources.GetObject("btnSiguiente.Image"), System.Drawing.Image)
-            Me.btnSiguiente.ImageAlign = System.Drawing.ContentAlignment.MiddleRight
-            Me.btnSiguiente.ImeMode = System.Windows.Forms.ImeMode.NoControl
-            Me.btnSiguiente.Location = New System.Drawing.Point(317, 55)
-            Me.btnSiguiente.Name = "btnSiguiente"
-            Me.btnSiguiente.Size = New System.Drawing.Size(32, 23)
-            Me.btnSiguiente.TabIndex = 8
-            Me.btnSiguiente.TabStop = False
-            Me.btnSiguiente.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText
-            Me.btnSiguiente.UseVisualStyleBackColor = True
-            Me.btnSiguiente.Visible = False
-            '
-            'btnAnterior
-            '
-            Me.btnAnterior.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-            Me.btnAnterior.FlatStyle = System.Windows.Forms.FlatStyle.Flat
-            Me.btnAnterior.Image = CType(resources.GetObject("btnAnterior.Image"), System.Drawing.Image)
-            Me.btnAnterior.ImeMode = System.Windows.Forms.ImeMode.NoControl
-            Me.btnAnterior.Location = New System.Drawing.Point(3, 55)
-            Me.btnAnterior.Name = "btnAnterior"
-            Me.btnAnterior.Size = New System.Drawing.Size(32, 23)
-            Me.btnAnterior.TabIndex = 4
-            Me.btnAnterior.TabStop = False
-            Me.btnAnterior.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText
-            Me.btnAnterior.UseVisualStyleBackColor = True
-            Me.btnAnterior.Visible = False
-            '
-            'btnPrimero
-            '
-            Me.btnPrimero.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-            Me.btnPrimero.FlatStyle = System.Windows.Forms.FlatStyle.Flat
-            Me.btnPrimero.Image = CType(resources.GetObject("btnPrimero.Image"), System.Drawing.Image)
-            Me.btnPrimero.ImeMode = System.Windows.Forms.ImeMode.NoControl
-            Me.btnPrimero.Location = New System.Drawing.Point(3, 32)
-            Me.btnPrimero.Name = "btnPrimero"
-            Me.btnPrimero.Size = New System.Drawing.Size(32, 23)
-            Me.btnPrimero.TabIndex = 0
-            Me.btnPrimero.TabStop = False
-            Me.btnPrimero.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText
-            Me.btnPrimero.UseVisualStyleBackColor = True
-            Me.btnPrimero.Visible = False
-            '
-            'btnUltimo
-            '
-            Me.btnUltimo.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-            Me.btnUltimo.FlatStyle = System.Windows.Forms.FlatStyle.Flat
-            Me.btnUltimo.Image = CType(resources.GetObject("btnUltimo.Image"), System.Drawing.Image)
-            Me.btnUltimo.ImageAlign = System.Drawing.ContentAlignment.MiddleRight
-            Me.btnUltimo.ImeMode = System.Windows.Forms.ImeMode.NoControl
-            Me.btnUltimo.Location = New System.Drawing.Point(317, 32)
-            Me.btnUltimo.Name = "btnUltimo"
-            Me.btnUltimo.Size = New System.Drawing.Size(32, 23)
-            Me.btnUltimo.TabIndex = 3
-            Me.btnUltimo.TabStop = False
-            Me.btnUltimo.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText
-            Me.btnUltimo.UseVisualStyleBackColor = True
-            Me.btnUltimo.Visible = False
-            '
-            'btnTancar
-            '
-            Me.btnTancar.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-            Me.btnTancar.DialogResult = System.Windows.Forms.DialogResult.Cancel
-            Me.btnTancar.FlatStyle = System.Windows.Forms.FlatStyle.Flat
-            Me.btnTancar.Image = CType(resources.GetObject("btnTancar.Image"), System.Drawing.Image)
-            Me.btnTancar.ImeMode = System.Windows.Forms.ImeMode.NoControl
-            Me.btnTancar.Location = New System.Drawing.Point(596, 55)
-            Me.btnTancar.Name = "btnTancar"
-            Me.btnTancar.Size = New System.Drawing.Size(80, 23)
-            Me.btnTancar.TabIndex = 10
-            Me.btnTancar.TabStop = False
-            Me.btnTancar.Text = "Tancar"
-            Me.btnTancar.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText
-            Me.btnTancar.UseVisualStyleBackColor = True
-            Me.btnTancar.Visible = False
-            '
-            'btnBorrar
-            '
-            Me.btnBorrar.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-            Me.btnBorrar.FlatStyle = System.Windows.Forms.FlatStyle.Flat
-            Me.btnBorrar.Image = CType(resources.GetObject("btnBorrar.Image"), System.Drawing.Image)
-            Me.btnBorrar.ImeMode = System.Windows.Forms.ImeMode.NoControl
-            Me.btnBorrar.Location = New System.Drawing.Point(135, 55)
-            Me.btnBorrar.Name = "btnBorrar"
-            Me.btnBorrar.Size = New System.Drawing.Size(100, 23)
-            Me.btnBorrar.TabIndex = 7
-            Me.btnBorrar.TabStop = False
-            Me.btnBorrar.Text = "Eliminar (F5)"
-            Me.btnBorrar.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText
-            Me.btnBorrar.UseVisualStyleBackColor = True
-            Me.btnBorrar.Visible = False
-            '
-            'btnNuevo
-            '
-            Me.btnNuevo.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-            Me.btnNuevo.FlatStyle = System.Windows.Forms.FlatStyle.Flat
-            Me.btnNuevo.Image = CType(resources.GetObject("btnNuevo.Image"), System.Drawing.Image)
-            Me.btnNuevo.ImeMode = System.Windows.Forms.ImeMode.NoControl
-            Me.btnNuevo.Location = New System.Drawing.Point(235, 32)
-            Me.btnNuevo.Name = "btnNuevo"
-            Me.btnNuevo.Size = New System.Drawing.Size(82, 46)
-            Me.btnNuevo.TabIndex = 2
-            Me.btnNuevo.TabStop = False
-            Me.btnNuevo.Text = "Nou (F3)"
-            Me.btnNuevo.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText
-            Me.btnNuevo.UseVisualStyleBackColor = True
-            Me.btnNuevo.Visible = False
-            '
-            'btnActualizar
-            '
-            Me.btnActualizar.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-            Me.btnActualizar.FlatStyle = System.Windows.Forms.FlatStyle.Flat
-            Me.btnActualizar.Image = CType(resources.GetObject("btnActualizar.Image"), System.Drawing.Image)
-            Me.btnActualizar.ImeMode = System.Windows.Forms.ImeMode.NoControl
-            Me.btnActualizar.Location = New System.Drawing.Point(35, 32)
-            Me.btnActualizar.Name = "btnActualizar"
-            Me.btnActualizar.Size = New System.Drawing.Size(100, 23)
-            Me.btnActualizar.TabIndex = 5
-            Me.btnActualizar.TabStop = False
-            Me.btnActualizar.Text = "Guardar (F6)"
-            Me.btnActualizar.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText
-            Me.btnActualizar.UseVisualStyleBackColor = True
-            Me.btnActualizar.Visible = False
-            '
-            'cboSeleccionCentro
-            '
-            Me.cboSeleccionCentro.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-            Me.cboSeleccionCentro.BackColor = System.Drawing.Color.White
-            Me.cboSeleccionCentro.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-            Me.cboSeleccionCentro.ItemHeight = 13
-            Me.cboSeleccionCentro.Location = New System.Drawing.Point(520, 6)
-            Me.cboSeleccionCentro.Name = "cboSeleccionCentro"
-            Me.cboSeleccionCentro.Size = New System.Drawing.Size(156, 21)
-            Me.cboSeleccionCentro.TabIndex = 11
-            '
-            'frmBase
-            '
-            Me.AutoScaleBaseSize = New System.Drawing.Size(5, 14)
-            Me.AutoScroll = True
-            Me.CancelButton = Me.btnTancar
-            Me.ClientSize = New System.Drawing.Size(684, 110)
-            Me.Controls.Add(Me.cboSeleccionCentro)
-            Me.Controls.Add(Me.btnModificar)
-            Me.Controls.Add(Me.btnVerLista)
-            Me.Controls.Add(Me.btnRecargar)
-            Me.Controls.Add(Me.btnSiguiente)
-            Me.Controls.Add(Me.btnAnterior)
-            Me.Controls.Add(Me.btnPrimero)
-            Me.Controls.Add(Me.btnUltimo)
-            Me.Controls.Add(Me.btnTancar)
-            Me.Controls.Add(Me.btnBorrar)
-            Me.Controls.Add(Me.btnNuevo)
-            Me.Controls.Add(Me.btnActualizar)
-            Me.Controls.Add(Me.sbtipo)
-            Me.Font = New System.Drawing.Font("Tahoma", 8.25!)
-            Me.Name = "frmBase"
-            Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
-            CType(Me.btnModificar, System.ComponentModel.ISupportInitialize).EndInit()
-            CType(Me.btnVerLista, System.ComponentModel.ISupportInitialize).EndInit()
-            CType(Me.btnRecargar, System.ComponentModel.ISupportInitialize).EndInit()
-            CType(Me.btnSiguiente, System.ComponentModel.ISupportInitialize).EndInit()
-            CType(Me.btnAnterior, System.ComponentModel.ISupportInitialize).EndInit()
-            CType(Me.btnPrimero, System.ComponentModel.ISupportInitialize).EndInit()
-            CType(Me.btnUltimo, System.ComponentModel.ISupportInitialize).EndInit()
-            CType(Me.btnTancar, System.ComponentModel.ISupportInitialize).EndInit()
-            CType(Me.btnBorrar, System.ComponentModel.ISupportInitialize).EndInit()
-            CType(Me.btnNuevo, System.ComponentModel.ISupportInitialize).EndInit()
-            CType(Me.btnActualizar, System.ComponentModel.ISupportInitialize).EndInit()
-            Me.ResumeLayout(False)
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmBase))
+        Me.sbtipo = New System.Windows.Forms.Label()
+        Me.btnModificar = New C1.Win.C1Input.C1Button()
+        Me.btnVerLista = New C1.Win.C1Input.C1Button()
+        Me.btnRecargar = New C1.Win.C1Input.C1Button()
+        Me.btnSiguiente = New C1.Win.C1Input.C1Button()
+        Me.btnAnterior = New C1.Win.C1Input.C1Button()
+        Me.btnPrimero = New C1.Win.C1Input.C1Button()
+        Me.btnUltimo = New C1.Win.C1Input.C1Button()
+        Me.btnTancar = New C1.Win.C1Input.C1Button()
+        Me.btnBorrar = New C1.Win.C1Input.C1Button()
+        Me.btnNuevo = New C1.Win.C1Input.C1Button()
+        Me.btnActualizar = New C1.Win.C1Input.C1Button()
+        Me.cboSeleccionCentro = New System.Windows.Forms.ComboBox()
+        CType(Me.btnModificar,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.btnVerLista,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.btnRecargar,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.btnSiguiente,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.btnAnterior,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.btnPrimero,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.btnUltimo,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.btnTancar,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.btnBorrar,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.btnNuevo,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.btnActualizar,System.ComponentModel.ISupportInitialize).BeginInit
+        Me.SuspendLayout
+        '
+        'sbtipo
+        '
+        Me.sbtipo.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left),System.Windows.Forms.AnchorStyles)
+        Me.sbtipo.Font = New System.Drawing.Font("Arial", 8.25!, System.Drawing.FontStyle.Bold)
+        Me.sbtipo.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.sbtipo.Location = New System.Drawing.Point(0, 85)
+        Me.sbtipo.Name = "sbtipo"
+        Me.sbtipo.Size = New System.Drawing.Size(123, 20)
+        Me.sbtipo.TabIndex = 0
+        Me.sbtipo.Text = "asdfasdfasdfasdfsadfsadfasdfasdfasdfasdfasdf"
+        Me.sbtipo.Visible = false
+        '
+        'btnModificar
+        '
+        Me.btnModificar.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left),System.Windows.Forms.AnchorStyles)
+        Me.btnModificar.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.btnModificar.Image = CType(resources.GetObject("btnModificar.Image"),System.Drawing.Image)
+        Me.btnModificar.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.btnModificar.Location = New System.Drawing.Point(189, 15)
+        Me.btnModificar.Name = "btnModificar"
+        Me.btnModificar.Size = New System.Drawing.Size(140, 28)
+        Me.btnModificar.TabIndex = 6
+        Me.btnModificar.TabStop = false
+        Me.btnModificar.Text = "Modificar (F4)"
+        Me.btnModificar.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText
+        Me.btnModificar.UseVisualStyleBackColor = true
+        Me.btnModificar.Visible = false
+        '
+        'btnVerLista
+        '
+        Me.btnVerLista.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right),System.Windows.Forms.AnchorStyles)
+        Me.btnVerLista.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.btnVerLista.Image = CType(resources.GetObject("btnVerLista.Image"),System.Drawing.Image)
+        Me.btnVerLista.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.btnVerLista.Location = New System.Drawing.Point(560, 15)
+        Me.btnVerLista.Name = "btnVerLista"
+        Me.btnVerLista.Size = New System.Drawing.Size(112, 28)
+        Me.btnVerLista.TabIndex = 9
+        Me.btnVerLista.TabStop = false
+        Me.btnVerLista.Text = "Llistat"
+        Me.btnVerLista.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText
+        Me.btnVerLista.UseVisualStyleBackColor = true
+        Me.btnVerLista.Visible = false
+        '
+        'btnRecargar
+        '
+        Me.btnRecargar.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left),System.Windows.Forms.AnchorStyles)
+        Me.btnRecargar.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.btnRecargar.Image = CType(resources.GetObject("btnRecargar.Image"),System.Drawing.Image)
+        Me.btnRecargar.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.btnRecargar.Location = New System.Drawing.Point(49, 43)
+        Me.btnRecargar.Name = "btnRecargar"
+        Me.btnRecargar.Size = New System.Drawing.Size(140, 28)
+        Me.btnRecargar.TabIndex = 1
+        Me.btnRecargar.TabStop = false
+        Me.btnRecargar.Text = "Recarregar"
+        Me.btnRecargar.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText
+        Me.btnRecargar.UseVisualStyleBackColor = true
+        Me.btnRecargar.Visible = false
+        '
+        'btnSiguiente
+        '
+        Me.btnSiguiente.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left),System.Windows.Forms.AnchorStyles)
+        Me.btnSiguiente.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.btnSiguiente.Image = CType(resources.GetObject("btnSiguiente.Image"),System.Drawing.Image)
+        Me.btnSiguiente.ImageAlign = System.Drawing.ContentAlignment.MiddleRight
+        Me.btnSiguiente.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.btnSiguiente.Location = New System.Drawing.Point(444, 43)
+        Me.btnSiguiente.Name = "btnSiguiente"
+        Me.btnSiguiente.Size = New System.Drawing.Size(45, 28)
+        Me.btnSiguiente.TabIndex = 8
+        Me.btnSiguiente.TabStop = false
+        Me.btnSiguiente.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText
+        Me.btnSiguiente.UseVisualStyleBackColor = true
+        Me.btnSiguiente.Visible = false
+        '
+        'btnAnterior
+        '
+        Me.btnAnterior.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left),System.Windows.Forms.AnchorStyles)
+        Me.btnAnterior.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.btnAnterior.Image = CType(resources.GetObject("btnAnterior.Image"),System.Drawing.Image)
+        Me.btnAnterior.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.btnAnterior.Location = New System.Drawing.Point(4, 43)
+        Me.btnAnterior.Name = "btnAnterior"
+        Me.btnAnterior.Size = New System.Drawing.Size(45, 28)
+        Me.btnAnterior.TabIndex = 4
+        Me.btnAnterior.TabStop = false
+        Me.btnAnterior.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText
+        Me.btnAnterior.UseVisualStyleBackColor = true
+        Me.btnAnterior.Visible = false
+        '
+        'btnPrimero
+        '
+        Me.btnPrimero.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left),System.Windows.Forms.AnchorStyles)
+        Me.btnPrimero.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.btnPrimero.Image = CType(resources.GetObject("btnPrimero.Image"),System.Drawing.Image)
+        Me.btnPrimero.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.btnPrimero.Location = New System.Drawing.Point(4, 15)
+        Me.btnPrimero.Name = "btnPrimero"
+        Me.btnPrimero.Size = New System.Drawing.Size(45, 28)
+        Me.btnPrimero.TabIndex = 0
+        Me.btnPrimero.TabStop = false
+        Me.btnPrimero.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText
+        Me.btnPrimero.UseVisualStyleBackColor = true
+        Me.btnPrimero.Visible = false
+        '
+        'btnUltimo
+        '
+        Me.btnUltimo.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left),System.Windows.Forms.AnchorStyles)
+        Me.btnUltimo.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.btnUltimo.Image = CType(resources.GetObject("btnUltimo.Image"),System.Drawing.Image)
+        Me.btnUltimo.ImageAlign = System.Drawing.ContentAlignment.MiddleRight
+        Me.btnUltimo.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.btnUltimo.Location = New System.Drawing.Point(444, 15)
+        Me.btnUltimo.Name = "btnUltimo"
+        Me.btnUltimo.Size = New System.Drawing.Size(45, 28)
+        Me.btnUltimo.TabIndex = 3
+        Me.btnUltimo.TabStop = false
+        Me.btnUltimo.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText
+        Me.btnUltimo.UseVisualStyleBackColor = true
+        Me.btnUltimo.Visible = false
+        '
+        'btnTancar
+        '
+        Me.btnTancar.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right),System.Windows.Forms.AnchorStyles)
+        Me.btnTancar.DialogResult = System.Windows.Forms.DialogResult.Cancel
+        Me.btnTancar.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.btnTancar.Image = CType(resources.GetObject("btnTancar.Image"),System.Drawing.Image)
+        Me.btnTancar.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.btnTancar.Location = New System.Drawing.Point(560, 43)
+        Me.btnTancar.Name = "btnTancar"
+        Me.btnTancar.Size = New System.Drawing.Size(112, 28)
+        Me.btnTancar.TabIndex = 10
+        Me.btnTancar.TabStop = false
+        Me.btnTancar.Text = "Tancar"
+        Me.btnTancar.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText
+        Me.btnTancar.UseVisualStyleBackColor = true
+        Me.btnTancar.Visible = false
+        '
+        'btnBorrar
+        '
+        Me.btnBorrar.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left),System.Windows.Forms.AnchorStyles)
+        Me.btnBorrar.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.btnBorrar.Image = CType(resources.GetObject("btnBorrar.Image"),System.Drawing.Image)
+        Me.btnBorrar.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.btnBorrar.Location = New System.Drawing.Point(189, 43)
+        Me.btnBorrar.Name = "btnBorrar"
+        Me.btnBorrar.Size = New System.Drawing.Size(140, 28)
+        Me.btnBorrar.TabIndex = 7
+        Me.btnBorrar.TabStop = false
+        Me.btnBorrar.Text = "Eliminar (F5)"
+        Me.btnBorrar.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText
+        Me.btnBorrar.UseVisualStyleBackColor = true
+        Me.btnBorrar.Visible = false
+        '
+        'btnNuevo
+        '
+        Me.btnNuevo.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left),System.Windows.Forms.AnchorStyles)
+        Me.btnNuevo.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.btnNuevo.Image = CType(resources.GetObject("btnNuevo.Image"),System.Drawing.Image)
+        Me.btnNuevo.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.btnNuevo.Location = New System.Drawing.Point(329, 15)
+        Me.btnNuevo.Name = "btnNuevo"
+        Me.btnNuevo.Size = New System.Drawing.Size(115, 56)
+        Me.btnNuevo.TabIndex = 2
+        Me.btnNuevo.TabStop = false
+        Me.btnNuevo.Text = "Nou (F3)"
+        Me.btnNuevo.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText
+        Me.btnNuevo.UseVisualStyleBackColor = true
+        Me.btnNuevo.Visible = false
+        '
+        'btnActualizar
+        '
+        Me.btnActualizar.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left),System.Windows.Forms.AnchorStyles)
+        Me.btnActualizar.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.btnActualizar.Image = CType(resources.GetObject("btnActualizar.Image"),System.Drawing.Image)
+        Me.btnActualizar.ImeMode = System.Windows.Forms.ImeMode.NoControl
+        Me.btnActualizar.Location = New System.Drawing.Point(49, 15)
+        Me.btnActualizar.Name = "btnActualizar"
+        Me.btnActualizar.Size = New System.Drawing.Size(140, 28)
+        Me.btnActualizar.TabIndex = 5
+        Me.btnActualizar.TabStop = false
+        Me.btnActualizar.Text = "Guardar (F6)"
+        Me.btnActualizar.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText
+        Me.btnActualizar.UseVisualStyleBackColor = true
+        Me.btnActualizar.Visible = false
+        '
+        'cboSeleccionCentro
+        '
+        Me.cboSeleccionCentro.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right),System.Windows.Forms.AnchorStyles)
+        Me.cboSeleccionCentro.BackColor = System.Drawing.Color.White
+        Me.cboSeleccionCentro.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.cboSeleccionCentro.ItemHeight = 17
+        Me.cboSeleccionCentro.Location = New System.Drawing.Point(454, 7)
+        Me.cboSeleccionCentro.Name = "cboSeleccionCentro"
+        Me.cboSeleccionCentro.Size = New System.Drawing.Size(218, 25)
+        Me.cboSeleccionCentro.TabIndex = 11
+        '
+        'frmBase
+        '
+        Me.AutoScaleBaseSize = New System.Drawing.Size(7, 17)
+        Me.AutoScroll = true
+        Me.CancelButton = Me.btnTancar
+        Me.ClientSize = New System.Drawing.Size(684, 110)
+        Me.Controls.Add(Me.cboSeleccionCentro)
+        Me.Controls.Add(Me.btnModificar)
+        Me.Controls.Add(Me.btnVerLista)
+        Me.Controls.Add(Me.btnRecargar)
+        Me.Controls.Add(Me.btnSiguiente)
+        Me.Controls.Add(Me.btnAnterior)
+        Me.Controls.Add(Me.btnPrimero)
+        Me.Controls.Add(Me.btnUltimo)
+        Me.Controls.Add(Me.btnTancar)
+        Me.Controls.Add(Me.btnBorrar)
+        Me.Controls.Add(Me.btnNuevo)
+        Me.Controls.Add(Me.btnActualizar)
+        Me.Controls.Add(Me.sbtipo)
+        Me.Font = New System.Drawing.Font("Tahoma", 8.25!)
+        Me.Name = "frmBase"
+        Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
+        CType(Me.btnModificar,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.btnVerLista,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.btnRecargar,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.btnSiguiente,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.btnAnterior,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.btnPrimero,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.btnUltimo,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.btnTancar,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.btnBorrar,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.btnNuevo,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.btnActualizar,System.ComponentModel.ISupportInitialize).EndInit
+        Me.ResumeLayout(false)
 
-        End Sub
+End Sub
 #End Region
 
 #Region "VARIABLES"

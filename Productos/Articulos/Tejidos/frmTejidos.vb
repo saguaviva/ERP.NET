@@ -159,6 +159,10 @@ Public Class frmTejidos
         Dim Style14 As C1.Win.C1TrueDBGrid.Style = New C1.Win.C1TrueDBGrid.Style()
         Dim Style15 As C1.Win.C1TrueDBGrid.Style = New C1.Win.C1TrueDBGrid.Style()
         Dim Style16 As C1.Win.C1TrueDBGrid.Style = New C1.Win.C1TrueDBGrid.Style()
+        Dim Style17 As C1.Win.C1TrueDBGrid.Style = New C1.Win.C1TrueDBGrid.Style()
+        Dim Style18 As C1.Win.C1TrueDBGrid.Style = New C1.Win.C1TrueDBGrid.Style()
+        Dim Style19 As C1.Win.C1TrueDBGrid.Style = New C1.Win.C1TrueDBGrid.Style()
+        Dim Style20 As C1.Win.C1TrueDBGrid.Style = New C1.Win.C1TrueDBGrid.Style()
         Me.TabControl1 = New System.Windows.Forms.TabControl()
         Me.tpTejido = New System.Windows.Forms.TabPage()
         Me.C1Combo1 = New C1.Win.C1List.C1Combo()
@@ -256,161 +260,176 @@ Public Class frmTejidos
         Me.btnExportarExcel = New C1.Win.C1Input.C1Button()
         Me.btnExportarPDF = New C1.Win.C1Input.C1Button()
         Me.dgValoracion = New C1.Win.C1TrueDBGrid.C1TrueDBGrid()
-        CType(Me.btnRecargar, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.btnSiguiente, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.btnAnterior, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.btnPrimero, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.btnUltimo, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.btnModificar, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.btnTancar, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.btnBorrar, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.btnNuevo, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.btnActualizar, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.btnVerLista, System.ComponentModel.ISupportInitialize).BeginInit()
-        Me.TabControl1.SuspendLayout()
-        Me.tpTejido.SuspendLayout()
-        CType(Me.C1Combo1, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.dgCartaColores, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.lblNumeroTejidos, System.ComponentModel.ISupportInitialize).BeginInit()
-        Me.XpGroupBox1.SuspendLayout()
-        CType(Me.txtMLINEAL, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.txtNCCODE, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.txtComposicio, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.txtAMPLE, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.btnElegirMaquina, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.cboID, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.cboNOMMAQUI, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.btnElegirTejido, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.txtPREUPERMODEL, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.comboIVA, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.txtNRO, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.txtAMPLENOU, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.txtPREUM, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.txtMAQUI, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.txtDESCRI, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.txtRENDIMENT, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.txtMARGE, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.txtGRAMA, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.txtPREUK, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.txtOBSERV, System.ComponentModel.ISupportInitialize).BeginInit()
-        Me.gb2.SuspendLayout()
-        CType(Me.txtSTCRUK, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.txtSTCRUM, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.txtSTDISPK, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.txtSTDISPM, System.ComponentModel.ISupportInitialize).BeginInit()
-        Me.tpEscandalloTejido.SuspendLayout()
-        CType(Me.cboAcabados, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.dgAcabados, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.btnLimpiarAcabados, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.txtACABAT, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.cboHilos, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.cboNOMACABADOR, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.dgComposcionTejido, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.cboNOMESTAMPADOR, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.cboNOMTEIXIDOR, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.txtCRU, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.txtPACA, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.txtPESTAM, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.txtPTEIXIR, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.txtMATERIA, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.btnElegirAcabador, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.btnElegirEstampador, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.btnElegirTejidor, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.txtACABADOR, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.txtESTAMPADOR, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.txtTEIXIDOR, System.ComponentModel.ISupportInitialize).BeginInit()
-        Me.GroupBox1.SuspendLayout()
-        CType(Me.tx2CODI, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.tx2DESCRI, System.ComponentModel.ISupportInitialize).BeginInit()
-        Me.tabImpresioFitxa.SuspendLayout()
-        Me.gbImpresionEtiquetas.SuspendLayout()
-        CType(Me.ppv, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.ppv.PreviewPane, System.ComponentModel.ISupportInitialize).BeginInit()
-        Me.ppv.SuspendLayout()
-        CType(Me.btnGenerarEtiquetas, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.txtNumEtiquetas, System.ComponentModel.ISupportInitialize).BeginInit()
-        Me.gbFichaTecnica.SuspendLayout()
-        CType(Me.ppFitxa, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.ppFitxa.PreviewPane, System.ComponentModel.ISupportInitialize).BeginInit()
-        Me.ppFitxa.SuspendLayout()
-        Me.tabPageValoracion.SuspendLayout()
-        CType(Me.btnExportarExcel, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.btnExportarPDF, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.dgValoracion, System.ComponentModel.ISupportInitialize).BeginInit()
-        Me.SuspendLayout()
+        CType(Me.btnRecargar,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.btnSiguiente,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.btnAnterior,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.btnPrimero,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.btnUltimo,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.btnModificar,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.btnTancar,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.btnBorrar,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.btnNuevo,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.btnActualizar,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.btnVerLista,System.ComponentModel.ISupportInitialize).BeginInit
+        Me.TabControl1.SuspendLayout
+        Me.tpTejido.SuspendLayout
+        CType(Me.C1Combo1,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.dgCartaColores,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.lblNumeroTejidos,System.ComponentModel.ISupportInitialize).BeginInit
+        Me.XpGroupBox1.SuspendLayout
+        CType(Me.txtMLINEAL,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.txtNCCODE,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.txtComposicio,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.txtAMPLE,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.btnElegirMaquina,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.cboID,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.cboNOMMAQUI,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.btnElegirTejido,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.txtPREUPERMODEL,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.comboIVA,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.txtNRO,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.txtAMPLENOU,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.txtPREUM,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.txtMAQUI,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.txtDESCRI,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.txtRENDIMENT,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.txtMARGE,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.txtGRAMA,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.txtPREUK,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.txtOBSERV,System.ComponentModel.ISupportInitialize).BeginInit
+        Me.gb2.SuspendLayout
+        CType(Me.txtSTCRUK,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.txtSTCRUM,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.txtSTDISPK,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.txtSTDISPM,System.ComponentModel.ISupportInitialize).BeginInit
+        Me.tpEscandalloTejido.SuspendLayout
+        CType(Me.cboAcabados,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.dgAcabados,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.btnLimpiarAcabados,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.txtACABAT,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.cboHilos,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.cboNOMACABADOR,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.dgComposcionTejido,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.cboNOMESTAMPADOR,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.cboNOMTEIXIDOR,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.txtCRU,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.txtPACA,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.txtPESTAM,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.txtPTEIXIR,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.txtMATERIA,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.btnElegirAcabador,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.btnElegirEstampador,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.btnElegirTejidor,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.txtACABADOR,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.txtESTAMPADOR,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.txtTEIXIDOR,System.ComponentModel.ISupportInitialize).BeginInit
+        Me.GroupBox1.SuspendLayout
+        CType(Me.tx2CODI,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.tx2DESCRI,System.ComponentModel.ISupportInitialize).BeginInit
+        Me.tabImpresioFitxa.SuspendLayout
+        Me.gbImpresionEtiquetas.SuspendLayout
+        CType(Me.ppv,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.ppv.PreviewPane,System.ComponentModel.ISupportInitialize).BeginInit
+        Me.ppv.SuspendLayout
+        CType(Me.btnGenerarEtiquetas,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.txtNumEtiquetas,System.ComponentModel.ISupportInitialize).BeginInit
+        Me.gbFichaTecnica.SuspendLayout
+        CType(Me.ppFitxa,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.ppFitxa.PreviewPane,System.ComponentModel.ISupportInitialize).BeginInit
+        Me.ppFitxa.SuspendLayout
+        Me.tabPageValoracion.SuspendLayout
+        CType(Me.btnExportarExcel,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.btnExportarPDF,System.ComponentModel.ISupportInitialize).BeginInit
+        CType(Me.dgValoracion,System.ComponentModel.ISupportInitialize).BeginInit
+        Me.SuspendLayout
         '
         'sbtipo
         '
         Me.sbtipo.FlatStyle = System.Windows.Forms.FlatStyle.Flat
-        Me.sbtipo.Location = New System.Drawing.Point(5, 210)
+        Me.sbtipo.Location = New System.Drawing.Point(7, 97)
+        Me.sbtipo.Size = New System.Drawing.Size(123, 20)
         Me.sbtipo.Text = ""
         '
         'btnRecargar
         '
-        Me.btnRecargar.Location = New System.Drawing.Point(35, 121)
+        Me.btnRecargar.Location = New System.Drawing.Point(49, -12)
+        Me.btnRecargar.Size = New System.Drawing.Size(140, 28)
         '
         'btnSiguiente
         '
-        Me.btnSiguiente.Location = New System.Drawing.Point(317, 121)
+        Me.btnSiguiente.Location = New System.Drawing.Point(444, -12)
+        Me.btnSiguiente.Size = New System.Drawing.Size(45, 28)
         '
         'btnAnterior
         '
-        Me.btnAnterior.Location = New System.Drawing.Point(3, 121)
+        Me.btnAnterior.Location = New System.Drawing.Point(4, -12)
+        Me.btnAnterior.Size = New System.Drawing.Size(45, 28)
         '
         'btnPrimero
         '
-        Me.btnPrimero.Location = New System.Drawing.Point(3, 98)
+        Me.btnPrimero.Location = New System.Drawing.Point(4, -40)
+        Me.btnPrimero.Size = New System.Drawing.Size(45, 28)
         '
         'btnUltimo
         '
-        Me.btnUltimo.Location = New System.Drawing.Point(317, 98)
+        Me.btnUltimo.Location = New System.Drawing.Point(444, -40)
+        Me.btnUltimo.Size = New System.Drawing.Size(45, 28)
         '
         'btnModificar
         '
-        Me.btnModificar.Location = New System.Drawing.Point(135, 98)
+        Me.btnModificar.Location = New System.Drawing.Point(189, -40)
+        Me.btnModificar.Size = New System.Drawing.Size(140, 28)
         '
         'btnTancar
         '
-        Me.btnTancar.Location = New System.Drawing.Point(632, 186)
+        Me.btnTancar.Location = New System.Drawing.Point(535, 68)
+        Me.btnTancar.Size = New System.Drawing.Size(112, 28)
         '
         'btnBorrar
         '
-        Me.btnBorrar.Location = New System.Drawing.Point(135, 121)
+        Me.btnBorrar.Location = New System.Drawing.Point(189, -12)
+        Me.btnBorrar.Size = New System.Drawing.Size(140, 28)
         '
         'btnNuevo
         '
-        Me.btnNuevo.Location = New System.Drawing.Point(235, 98)
+        Me.btnNuevo.Location = New System.Drawing.Point(329, -40)
+        Me.btnNuevo.Size = New System.Drawing.Size(115, 56)
         '
         'btnActualizar
         '
-        Me.btnActualizar.Location = New System.Drawing.Point(35, 98)
+        Me.btnActualizar.Location = New System.Drawing.Point(49, -40)
+        Me.btnActualizar.Size = New System.Drawing.Size(140, 28)
         '
         'btnVerLista
         '
-        Me.btnVerLista.Location = New System.Drawing.Point(632, 166)
+        Me.btnVerLista.Location = New System.Drawing.Point(535, 43)
+        Me.btnVerLista.Size = New System.Drawing.Size(112, 29)
         '
         'cboSeleccionCentro
         '
+        Me.cboSeleccionCentro.ItemHeight = 17
+        Me.cboSeleccionCentro.Location = New System.Drawing.Point(378, 7)
+        Me.cboSeleccionCentro.Size = New System.Drawing.Size(218, 25)
         '
         'TabControl1
         '
-        Me.TabControl1.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-            Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.TabControl1.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom)  _
+            Or System.Windows.Forms.AnchorStyles.Left)  _
+            Or System.Windows.Forms.AnchorStyles.Right),System.Windows.Forms.AnchorStyles)
         Me.TabControl1.Controls.Add(Me.tpTejido)
         Me.TabControl1.Controls.Add(Me.tpEscandalloTejido)
         Me.TabControl1.Controls.Add(Me.tabImpresioFitxa)
         Me.TabControl1.Controls.Add(Me.tabPageValoracion)
         Me.TabControl1.ItemSize = New System.Drawing.Size(42, 18)
-        Me.TabControl1.Location = New System.Drawing.Point(8, 12)
+        Me.TabControl1.Location = New System.Drawing.Point(11, 15)
         Me.TabControl1.Name = "TabControl1"
         Me.TabControl1.SelectedIndex = 0
-        Me.TabControl1.Size = New System.Drawing.Size(860, 630)
+        Me.TabControl1.Size = New System.Drawing.Size(854, 614)
         Me.TabControl1.TabIndex = 0
         '
         'tpTejido
         '
-        Me.tpTejido.BackColor = System.Drawing.Color.FromArgb(CType(CType(221, Byte), Integer), CType(CType(208, Byte), Integer), CType(CType(196, Byte), Integer))
+        Me.tpTejido.BackColor = System.Drawing.Color.FromArgb(CType(CType(221,Byte),Integer), CType(CType(208,Byte),Integer), CType(CType(196,Byte),Integer))
         Me.tpTejido.Controls.Add(Me.C1Combo1)
         Me.tpTejido.Controls.Add(Me.dgCartaColores)
         Me.tpTejido.Controls.Add(Me.lblNumeroTejidos)
@@ -421,74 +440,72 @@ Public Class frmTejidos
         Me.tpTejido.ImeMode = System.Windows.Forms.ImeMode.NoControl
         Me.tpTejido.Location = New System.Drawing.Point(4, 22)
         Me.tpTejido.Name = "tpTejido"
-        Me.tpTejido.Size = New System.Drawing.Size(852, 604)
+        Me.tpTejido.Size = New System.Drawing.Size(846, 588)
         Me.tpTejido.TabIndex = 0
         Me.tpTejido.Text = "Teixit"
         '
         'C1Combo1
         '
-        Me.C1Combo1.AddItemSeparator = Global.Microsoft.VisualBasic.ChrW(59)
         Me.C1Combo1.Caption = ""
         Me.C1Combo1.CharacterCasing = System.Windows.Forms.CharacterCasing.Normal
         Me.C1Combo1.DeadAreaBackColor = System.Drawing.Color.Empty
-        Me.C1Combo1.EditorBackColor = System.Drawing.SystemColors.Window
-        Me.C1Combo1.EditorFont = New System.Drawing.Font("Microsoft Sans Serif", 8.25!)
-        Me.C1Combo1.EditorForeColor = System.Drawing.SystemColors.WindowText
-        Me.C1Combo1.Images.Add(CType(resources.GetObject("C1Combo1.Images"), System.Drawing.Image))
-        Me.C1Combo1.Location = New System.Drawing.Point(620, 324)
-        Me.C1Combo1.MatchEntryTimeout = CType(2000, Long)
-        Me.C1Combo1.MaxDropDownItems = CType(5, Short)
+        Me.C1Combo1.Images.Add(CType(resources.GetObject("C1Combo1.Images"),System.Drawing.Image))
+        Me.C1Combo1.Location = New System.Drawing.Point(868, 399)
+        Me.C1Combo1.MatchEntryTimeout = CType(2000,Long)
+        Me.C1Combo1.MaxDropDownItems = CType(5,Short)
         Me.C1Combo1.MaxLength = 32767
         Me.C1Combo1.MouseCursor = System.Windows.Forms.Cursors.Default
         Me.C1Combo1.Name = "C1Combo1"
-        Me.C1Combo1.RowDivider.Style = C1.Win.C1List.LineStyleEnum.None
         Me.C1Combo1.RowSubDividerColor = System.Drawing.Color.DarkGray
-        Me.C1Combo1.Size = New System.Drawing.Size(121, 21)
+        Me.C1Combo1.Size = New System.Drawing.Size(169, 24)
         Me.C1Combo1.TabIndex = 286
         Me.C1Combo1.Text = "C1Combo1"
-        Me.C1Combo1.Visible = False
+        Me.C1Combo1.Visible = false
         Me.C1Combo1.PropBag = resources.GetString("C1Combo1.PropBag")
         '
         'dgCartaColores
         '
-        Me.dgCartaColores.AllowAddNew = True
-        Me.dgCartaColores.AllowDelete = True
-        Me.dgCartaColores.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-            Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.dgCartaColores.AllowAddNew = true
+        Me.dgCartaColores.AllowDelete = true
+        Me.dgCartaColores.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom)  _
+            Or System.Windows.Forms.AnchorStyles.Left)  _
+            Or System.Windows.Forms.AnchorStyles.Right),System.Windows.Forms.AnchorStyles)
         Me.dgCartaColores.Caption = "COLORS PER TIPUS DE TEIXIT"
+        Me.dgCartaColores.CaptionHeight = 19
         Me.dgCartaColores.GroupByCaption = "Drag a column header here to group by that column"
-        Me.dgCartaColores.Images.Add(CType(resources.GetObject("dgCartaColores.Images"), System.Drawing.Image))
-        Me.dgCartaColores.Location = New System.Drawing.Point(4, 358)
+        Me.dgCartaColores.Images.Add(CType(resources.GetObject("dgCartaColores.Images"),System.Drawing.Image))
+        Me.dgCartaColores.Location = New System.Drawing.Point(6, 441)
         Me.dgCartaColores.Name = "dgCartaColores"
         Me.dgCartaColores.PreviewInfo.Location = New System.Drawing.Point(0, 0)
         Me.dgCartaColores.PreviewInfo.Size = New System.Drawing.Size(0, 0)
-        Me.dgCartaColores.PreviewInfo.ZoomFactor = 75.0R
-        Me.dgCartaColores.PrintInfo.PageSettings = CType(resources.GetObject("dgCartaColores.PrintInfo.PageSettings"), System.Drawing.Printing.PageSettings)
-        Me.dgCartaColores.Size = New System.Drawing.Size(844, 240)
+        Me.dgCartaColores.PreviewInfo.ZoomFactor = 75R
+        Me.dgCartaColores.PrintInfo.MeasurementDevice = C1.Win.C1TrueDBGrid.PrintInfo.MeasurementDeviceEnum.Screen
+        Me.dgCartaColores.PrintInfo.MeasurementPrinterName = Nothing
+        Me.dgCartaColores.RowHeight = 17
+        Me.dgCartaColores.Size = New System.Drawing.Size(831, 134)
         Me.dgCartaColores.TabAction = C1.Win.C1TrueDBGrid.TabActionEnum.ColumnNavigation
         Me.dgCartaColores.TabIndex = 285
         Me.dgCartaColores.Text = "C1TrueDBGrid2"
-        Me.dgCartaColores.UseCompatibleTextRendering = False
-        Me.dgCartaColores.WrapCellPointer = True
+        Me.dgCartaColores.UseCompatibleTextRendering = false
+        Me.dgCartaColores.WrapCellPointer = true
         Me.dgCartaColores.PropBag = resources.GetString("dgCartaColores.PropBag")
         '
         'lblNumeroTejidos
         '
-        Me.lblNumeroTejidos.AutoSize = True
+        Me.lblNumeroTejidos.AutoSize = true
         Me.lblNumeroTejidos.BorderStyle = System.Windows.Forms.BorderStyle.None
         Me.lblNumeroTejidos.ForeColor = System.Drawing.Color.Red
         Me.lblNumeroTejidos.ImeMode = System.Windows.Forms.ImeMode.NoControl
-        Me.lblNumeroTejidos.Location = New System.Drawing.Point(700, 4)
+        Me.lblNumeroTejidos.Location = New System.Drawing.Point(980, 5)
         Me.lblNumeroTejidos.Name = "lblNumeroTejidos"
-        Me.lblNumeroTejidos.Size = New System.Drawing.Size(0, 13)
+        Me.lblNumeroTejidos.Size = New System.Drawing.Size(0, 17)
         Me.lblNumeroTejidos.TabIndex = 284
         Me.lblNumeroTejidos.Tag = Nothing
-        Me.lblNumeroTejidos.TextDetached = True
+        Me.lblNumeroTejidos.TextDetached = true
         '
         'XpGroupBox1
         '
-        Me.XpGroupBox1.BackColor = System.Drawing.Color.FromArgb(CType(CType(221, Byte), Integer), CType(CType(208, Byte), Integer), CType(CType(196, Byte), Integer))
+        Me.XpGroupBox1.BackColor = System.Drawing.Color.FromArgb(CType(CType(221,Byte),Integer), CType(CType(208,Byte),Integer), CType(CType(196,Byte),Integer))
         Me.XpGroupBox1.Controls.Add(Me.lblMLineal)
         Me.XpGroupBox1.Controls.Add(Me.txtMLINEAL)
         Me.XpGroupBox1.Controls.Add(Me.txtNCCODE)
@@ -526,125 +543,124 @@ Public Class frmTejidos
         Me.XpGroupBox1.Controls.Add(Me.txtGRAMA)
         Me.XpGroupBox1.Controls.Add(Me.txtPREUK)
         Me.XpGroupBox1.FlatStyle = System.Windows.Forms.FlatStyle.System
-        Me.XpGroupBox1.Location = New System.Drawing.Point(4, 7)
+        Me.XpGroupBox1.Location = New System.Drawing.Point(6, 9)
         Me.XpGroupBox1.Name = "XpGroupBox1"
-        Me.XpGroupBox1.Size = New System.Drawing.Size(492, 275)
+        Me.XpGroupBox1.Size = New System.Drawing.Size(688, 338)
         Me.XpGroupBox1.TabIndex = 281
-        Me.XpGroupBox1.TabStop = False
+        Me.XpGroupBox1.TabStop = false
         '
         'lblMLineal
         '
         Me.lblMLineal.ImeMode = System.Windows.Forms.ImeMode.NoControl
-        Me.lblMLineal.Location = New System.Drawing.Point(290, 64)
+        Me.lblMLineal.Location = New System.Drawing.Point(406, 79)
         Me.lblMLineal.Name = "lblMLineal"
-        Me.lblMLineal.Size = New System.Drawing.Size(88, 15)
+        Me.lblMLineal.Size = New System.Drawing.Size(123, 18)
         Me.lblMLineal.TabIndex = 295
         Me.lblMLineal.Text = "Metre Lineal"
         Me.lblMLineal.TextAlign = System.Drawing.ContentAlignment.MiddleRight
         '
         'txtMLINEAL
         '
-        Me.txtMLINEAL.Enabled = False
-        Me.txtMLINEAL.Location = New System.Drawing.Point(384, 63)
+        Me.txtMLINEAL.Enabled = false
+        Me.txtMLINEAL.Location = New System.Drawing.Point(538, 78)
         Me.txtMLINEAL.Name = "txtMLINEAL"
-        Me.txtMLINEAL.Size = New System.Drawing.Size(92, 18)
+        Me.txtMLINEAL.Size = New System.Drawing.Size(128, 21)
         Me.txtMLINEAL.TabIndex = 294
         Me.txtMLINEAL.Tag = Nothing
         '
         'txtNCCODE
         '
-        Me.txtNCCODE.Location = New System.Drawing.Point(100, 107)
+        Me.txtNCCODE.Location = New System.Drawing.Point(140, 132)
         Me.txtNCCODE.MaxLength = 20
         Me.txtNCCODE.Name = "txtNCCODE"
-        Me.txtNCCODE.Size = New System.Drawing.Size(119, 18)
+        Me.txtNCCODE.Size = New System.Drawing.Size(167, 21)
         Me.txtNCCODE.TabIndex = 292
         Me.txtNCCODE.Tag = Nothing
         '
         'lblNCCODE
         '
         Me.lblNCCODE.ImeMode = System.Windows.Forms.ImeMode.NoControl
-        Me.lblNCCODE.Location = New System.Drawing.Point(12, 110)
+        Me.lblNCCODE.Location = New System.Drawing.Point(17, 135)
         Me.lblNCCODE.Name = "lblNCCODE"
-        Me.lblNCCODE.Size = New System.Drawing.Size(82, 15)
+        Me.lblNCCODE.Size = New System.Drawing.Size(115, 19)
         Me.lblNCCODE.TabIndex = 293
         Me.lblNCCODE.Text = "NC CODE"
         Me.lblNCCODE.TextAlign = System.Drawing.ContentAlignment.MiddleRight
         '
         'txtComposicio
         '
-        Me.txtComposicio.Location = New System.Drawing.Point(301, 107)
+        Me.txtComposicio.Location = New System.Drawing.Point(421, 132)
         Me.txtComposicio.MaxLength = 20
         Me.txtComposicio.Name = "txtComposicio"
-        Me.txtComposicio.Size = New System.Drawing.Size(175, 18)
+        Me.txtComposicio.Size = New System.Drawing.Size(245, 21)
         Me.txtComposicio.TabIndex = 290
         Me.txtComposicio.Tag = Nothing
         '
         'lblComposicio
         '
         Me.lblComposicio.ImeMode = System.Windows.Forms.ImeMode.NoControl
-        Me.lblComposicio.Location = New System.Drawing.Point(213, 110)
+        Me.lblComposicio.Location = New System.Drawing.Point(298, 135)
         Me.lblComposicio.Name = "lblComposicio"
-        Me.lblComposicio.Size = New System.Drawing.Size(82, 15)
+        Me.lblComposicio.Size = New System.Drawing.Size(115, 19)
         Me.lblComposicio.TabIndex = 291
         Me.lblComposicio.Text = "Composició"
         Me.lblComposicio.TextAlign = System.Drawing.ContentAlignment.MiddleRight
         '
         'txtAMPLE
         '
-        Me.txtAMPLE.Location = New System.Drawing.Point(100, 133)
+        Me.txtAMPLE.Location = New System.Drawing.Point(140, 164)
         Me.txtAMPLE.MaxLength = 20
         Me.txtAMPLE.Name = "txtAMPLE"
-        Me.txtAMPLE.Size = New System.Drawing.Size(236, 18)
+        Me.txtAMPLE.Size = New System.Drawing.Size(330, 21)
         Me.txtAMPLE.TabIndex = 288
         Me.txtAMPLE.Tag = Nothing
         '
         'lblAncho
         '
         Me.lblAncho.ImeMode = System.Windows.Forms.ImeMode.NoControl
-        Me.lblAncho.Location = New System.Drawing.Point(12, 136)
+        Me.lblAncho.Location = New System.Drawing.Point(17, 167)
         Me.lblAncho.Name = "lblAncho"
-        Me.lblAncho.Size = New System.Drawing.Size(84, 15)
+        Me.lblAncho.Size = New System.Drawing.Size(117, 19)
         Me.lblAncho.TabIndex = 289
         Me.lblAncho.Text = "Ample"
         Me.lblAncho.TextAlign = System.Drawing.ContentAlignment.MiddleRight
         '
         'chkTubular
         '
-        Me.chkTubular.AutoSize = True
-        Me.chkTubular.Location = New System.Drawing.Point(353, 157)
+        Me.chkTubular.AutoSize = true
+        Me.chkTubular.Location = New System.Drawing.Point(494, 193)
         Me.chkTubular.Name = "chkTubular"
-        Me.chkTubular.Size = New System.Drawing.Size(62, 17)
+        Me.chkTubular.Size = New System.Drawing.Size(79, 21)
         Me.chkTubular.TabIndex = 287
         Me.chkTubular.Text = "Tubular"
-        Me.chkTubular.UseVisualStyleBackColor = True
+        Me.chkTubular.UseVisualStyleBackColor = true
         '
         'btnElegirMaquina
         '
         Me.btnElegirMaquina.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.btnElegirMaquina.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft
         Me.btnElegirMaquina.ImeMode = System.Windows.Forms.ImeMode.NoControl
-        Me.btnElegirMaquina.Location = New System.Drawing.Point(144, 199)
+        Me.btnElegirMaquina.Location = New System.Drawing.Point(202, 245)
         Me.btnElegirMaquina.Name = "btnElegirMaquina"
-        Me.btnElegirMaquina.Size = New System.Drawing.Size(22, 20)
+        Me.btnElegirMaquina.Size = New System.Drawing.Size(30, 25)
         Me.btnElegirMaquina.TabIndex = 286
         Me.btnElegirMaquina.Text = "..."
-        Me.btnElegirMaquina.UseVisualStyleBackColor = True
-        Me.btnElegirMaquina.Visible = False
+        Me.btnElegirMaquina.UseVisualStyleBackColor = true
+        Me.btnElegirMaquina.Visible = false
         '
         'lblMAQUI
         '
         Me.lblMAQUI.ImeMode = System.Windows.Forms.ImeMode.NoControl
-        Me.lblMAQUI.Location = New System.Drawing.Point(12, 203)
+        Me.lblMAQUI.Location = New System.Drawing.Point(17, 250)
         Me.lblMAQUI.Name = "lblMAQUI"
-        Me.lblMAQUI.Size = New System.Drawing.Size(84, 16)
+        Me.lblMAQUI.Size = New System.Drawing.Size(117, 20)
         Me.lblMAQUI.TabIndex = 285
         Me.lblMAQUI.Text = "Màquina"
         Me.lblMAQUI.TextAlign = System.Drawing.ContentAlignment.MiddleRight
         '
         'cboID
         '
-        Me.cboID.AddItemSeparator = Global.Microsoft.VisualBasic.ChrW(59)
-        Me.cboID.AutoCompletion = True
+        Me.cboID.AutoCompletion = true
         Me.cboID.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
         Me.cboID.Caption = ""
         Me.cboID.CaptionHeight = 17
@@ -652,27 +668,21 @@ Public Class frmTejidos
         Me.cboID.ColumnCaptionHeight = 17
         Me.cboID.ColumnFooterHeight = 17
         Me.cboID.DeadAreaBackColor = System.Drawing.Color.Empty
-        Me.cboID.EditorBackColor = System.Drawing.SystemColors.Window
-        Me.cboID.EditorFont = New System.Drawing.Font("Microsoft Sans Serif", 8.25!)
-        Me.cboID.EditorForeColor = System.Drawing.SystemColors.WindowText
-        Me.cboID.Images.Add(CType(resources.GetObject("cboID.Images"), System.Drawing.Image))
-        Me.cboID.ItemHeight = 15
-        Me.cboID.Location = New System.Drawing.Point(100, 16)
-        Me.cboID.MatchEntryTimeout = CType(2000, Long)
-        Me.cboID.MaxDropDownItems = CType(15, Short)
+        Me.cboID.Images.Add(CType(resources.GetObject("cboID.Images"),System.Drawing.Image))
+        Me.cboID.Location = New System.Drawing.Point(140, 20)
+        Me.cboID.MatchEntryTimeout = CType(2000,Long)
+        Me.cboID.MaxDropDownItems = CType(15,Short)
         Me.cboID.MaxLength = 10
         Me.cboID.MouseCursor = System.Windows.Forms.Cursors.Default
         Me.cboID.Name = "cboID"
-        Me.cboID.RowDivider.Style = C1.Win.C1List.LineStyleEnum.None
         Me.cboID.RowSubDividerColor = System.Drawing.Color.DarkGray
-        Me.cboID.Size = New System.Drawing.Size(148, 19)
+        Me.cboID.Size = New System.Drawing.Size(207, 22)
         Me.cboID.TabIndex = 0
         Me.cboID.PropBag = resources.GetString("cboID.PropBag")
         '
         'cboNOMMAQUI
         '
-        Me.cboNOMMAQUI.AddItemSeparator = Global.Microsoft.VisualBasic.ChrW(59)
-        Me.cboNOMMAQUI.AutoSelect = True
+        Me.cboNOMMAQUI.AutoSelect = true
         Me.cboNOMMAQUI.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
         Me.cboNOMMAQUI.Caption = ""
         Me.cboNOMMAQUI.CaptionHeight = 17
@@ -681,21 +691,16 @@ Public Class frmTejidos
         Me.cboNOMMAQUI.ColumnFooterHeight = 17
         Me.cboNOMMAQUI.Cursor = System.Windows.Forms.Cursors.Default
         Me.cboNOMMAQUI.DeadAreaBackColor = System.Drawing.Color.Empty
-        Me.cboNOMMAQUI.EditorBackColor = System.Drawing.SystemColors.Window
-        Me.cboNOMMAQUI.EditorFont = New System.Drawing.Font("Microsoft Sans Serif", 8.25!)
-        Me.cboNOMMAQUI.EditorForeColor = System.Drawing.SystemColors.WindowText
-        Me.cboNOMMAQUI.Images.Add(CType(resources.GetObject("cboNOMMAQUI.Images"), System.Drawing.Image))
-        Me.cboNOMMAQUI.IntegralHeight = True
-        Me.cboNOMMAQUI.ItemHeight = 13
-        Me.cboNOMMAQUI.Location = New System.Drawing.Point(168, 199)
-        Me.cboNOMMAQUI.MatchEntryTimeout = CType(100, Long)
-        Me.cboNOMMAQUI.MaxDropDownItems = CType(8, Short)
+        Me.cboNOMMAQUI.Images.Add(CType(resources.GetObject("cboNOMMAQUI.Images"),System.Drawing.Image))
+        Me.cboNOMMAQUI.IntegralHeight = true
+        Me.cboNOMMAQUI.Location = New System.Drawing.Point(235, 245)
+        Me.cboNOMMAQUI.MatchEntryTimeout = CType(100,Long)
+        Me.cboNOMMAQUI.MaxDropDownItems = CType(8,Short)
         Me.cboNOMMAQUI.MaxLength = 0
         Me.cboNOMMAQUI.MouseCursor = System.Windows.Forms.Cursors.Default
         Me.cboNOMMAQUI.Name = "cboNOMMAQUI"
-        Me.cboNOMMAQUI.RowDivider.Style = C1.Win.C1List.LineStyleEnum.None
         Me.cboNOMMAQUI.RowSubDividerColor = System.Drawing.Color.DarkGray
-        Me.cboNOMMAQUI.Size = New System.Drawing.Size(316, 19)
+        Me.cboNOMMAQUI.Size = New System.Drawing.Size(443, 22)
         Me.cboNOMMAQUI.TabIndex = 11
         Me.cboNOMMAQUI.PropBag = resources.GetString("cboNOMMAQUI.PropBag")
         '
@@ -704,36 +709,35 @@ Public Class frmTejidos
         Me.btnElegirTejido.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.btnElegirTejido.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft
         Me.btnElegirTejido.ImeMode = System.Windows.Forms.ImeMode.NoControl
-        Me.btnElegirTejido.Location = New System.Drawing.Point(248, 16)
+        Me.btnElegirTejido.Location = New System.Drawing.Point(347, 20)
         Me.btnElegirTejido.Name = "btnElegirTejido"
-        Me.btnElegirTejido.Size = New System.Drawing.Size(32, 20)
+        Me.btnElegirTejido.Size = New System.Drawing.Size(45, 24)
         Me.btnElegirTejido.TabIndex = 281
         Me.btnElegirTejido.Text = "..."
-        Me.btnElegirTejido.UseVisualStyleBackColor = True
-        Me.btnElegirTejido.Visible = False
+        Me.btnElegirTejido.UseVisualStyleBackColor = true
+        Me.btnElegirTejido.Visible = false
         '
         'lblPrecioTejidoParaModelos
         '
         Me.lblPrecioTejidoParaModelos.ImeMode = System.Windows.Forms.ImeMode.NoControl
-        Me.lblPrecioTejidoParaModelos.Location = New System.Drawing.Point(340, 227)
+        Me.lblPrecioTejidoParaModelos.Location = New System.Drawing.Point(476, 279)
         Me.lblPrecioTejidoParaModelos.Name = "lblPrecioTejidoParaModelos"
-        Me.lblPrecioTejidoParaModelos.Size = New System.Drawing.Size(72, 16)
+        Me.lblPrecioTejidoParaModelos.Size = New System.Drawing.Size(101, 20)
         Me.lblPrecioTejidoParaModelos.TabIndex = 280
         Me.lblPrecioTejidoParaModelos.Text = "Preu Model"
         Me.lblPrecioTejidoParaModelos.TextAlign = System.Drawing.ContentAlignment.MiddleRight
         '
         'txtPREUPERMODEL
         '
-        Me.txtPREUPERMODEL.Location = New System.Drawing.Point(412, 223)
+        Me.txtPREUPERMODEL.Location = New System.Drawing.Point(577, 274)
         Me.txtPREUPERMODEL.Name = "txtPREUPERMODEL"
-        Me.txtPREUPERMODEL.Size = New System.Drawing.Size(60, 18)
+        Me.txtPREUPERMODEL.Size = New System.Drawing.Size(84, 21)
         Me.txtPREUPERMODEL.TabIndex = 14
         Me.txtPREUPERMODEL.Tag = Nothing
         '
         'comboIVA
         '
-        Me.comboIVA.AddItemSeparator = Global.Microsoft.VisualBasic.ChrW(59)
-        Me.comboIVA.AutoSelect = True
+        Me.comboIVA.AutoSelect = true
         Me.comboIVA.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
         Me.comboIVA.Caption = ""
         Me.comboIVA.CaptionHeight = 17
@@ -742,102 +746,97 @@ Public Class frmTejidos
         Me.comboIVA.ColumnFooterHeight = 17
         Me.comboIVA.Cursor = System.Windows.Forms.Cursors.Default
         Me.comboIVA.DeadAreaBackColor = System.Drawing.Color.Empty
-        Me.comboIVA.EditorBackColor = System.Drawing.SystemColors.Window
-        Me.comboIVA.EditorFont = New System.Drawing.Font("Microsoft Sans Serif", 8.25!)
-        Me.comboIVA.EditorForeColor = System.Drawing.SystemColors.WindowText
-        Me.comboIVA.Images.Add(CType(resources.GetObject("comboIVA.Images"), System.Drawing.Image))
-        Me.comboIVA.IntegralHeight = True
-        Me.comboIVA.ItemHeight = 13
-        Me.comboIVA.Location = New System.Drawing.Point(100, 247)
-        Me.comboIVA.MatchEntryTimeout = CType(100, Long)
-        Me.comboIVA.MaxDropDownItems = CType(8, Short)
+        Me.comboIVA.Images.Add(CType(resources.GetObject("comboIVA.Images"),System.Drawing.Image))
+        Me.comboIVA.IntegralHeight = true
+        Me.comboIVA.Location = New System.Drawing.Point(140, 304)
+        Me.comboIVA.MatchEntryTimeout = CType(100,Long)
+        Me.comboIVA.MaxDropDownItems = CType(8,Short)
         Me.comboIVA.MaxLength = 0
         Me.comboIVA.MouseCursor = System.Windows.Forms.Cursors.Default
         Me.comboIVA.Name = "comboIVA"
-        Me.comboIVA.RowDivider.Style = C1.Win.C1List.LineStyleEnum.None
         Me.comboIVA.RowSubDividerColor = System.Drawing.Color.DarkGray
-        Me.comboIVA.Size = New System.Drawing.Size(104, 19)
+        Me.comboIVA.Size = New System.Drawing.Size(146, 22)
         Me.comboIVA.TabIndex = 15
         Me.comboIVA.PropBag = resources.GetString("comboIVA.PropBag")
         '
         'lblNumeroHilo
         '
         Me.lblNumeroHilo.ImeMode = System.Windows.Forms.ImeMode.NoControl
-        Me.lblNumeroHilo.Location = New System.Drawing.Point(12, 89)
+        Me.lblNumeroHilo.Location = New System.Drawing.Point(17, 110)
         Me.lblNumeroHilo.Name = "lblNumeroHilo"
-        Me.lblNumeroHilo.Size = New System.Drawing.Size(84, 15)
+        Me.lblNumeroHilo.Size = New System.Drawing.Size(117, 18)
         Me.lblNumeroHilo.TabIndex = 270
         Me.lblNumeroHilo.Text = "Nro de fil"
         Me.lblNumeroHilo.TextAlign = System.Drawing.ContentAlignment.MiddleRight
         '
         'txtNRO
         '
-        Me.txtNRO.Location = New System.Drawing.Point(100, 85)
+        Me.txtNRO.Location = New System.Drawing.Point(140, 105)
         Me.txtNRO.MaxLength = 50
         Me.txtNRO.Name = "txtNRO"
-        Me.txtNRO.Size = New System.Drawing.Size(236, 18)
+        Me.txtNRO.Size = New System.Drawing.Size(330, 21)
         Me.txtNRO.TabIndex = 5
         Me.txtNRO.Tag = Nothing
         '
         'txtAMPLENOU
         '
-        Me.txtAMPLENOU.Location = New System.Drawing.Point(100, 155)
+        Me.txtAMPLENOU.Location = New System.Drawing.Point(140, 191)
         Me.txtAMPLENOU.MaxLength = 20
         Me.txtAMPLENOU.Name = "txtAMPLENOU"
-        Me.txtAMPLENOU.Size = New System.Drawing.Size(236, 18)
+        Me.txtAMPLENOU.Size = New System.Drawing.Size(330, 21)
         Me.txtAMPLENOU.TabIndex = 7
         Me.txtAMPLENOU.Tag = Nothing
         '
         'lblNombre
         '
         Me.lblNombre.ImeMode = System.Windows.Forms.ImeMode.NoControl
-        Me.lblNombre.Location = New System.Drawing.Point(12, 44)
+        Me.lblNombre.Location = New System.Drawing.Point(17, 54)
         Me.lblNombre.Name = "lblNombre"
-        Me.lblNombre.Size = New System.Drawing.Size(84, 13)
+        Me.lblNombre.Size = New System.Drawing.Size(117, 16)
         Me.lblNombre.TabIndex = 268
         Me.lblNombre.Text = "Descripció"
         Me.lblNombre.TextAlign = System.Drawing.ContentAlignment.MiddleRight
         '
         'txtPREUM
         '
-        Me.txtPREUM.Location = New System.Drawing.Point(100, 223)
+        Me.txtPREUM.Location = New System.Drawing.Point(140, 274)
         Me.txtPREUM.Name = "txtPREUM"
-        Me.txtPREUM.Size = New System.Drawing.Size(68, 18)
+        Me.txtPREUM.Size = New System.Drawing.Size(95, 21)
         Me.txtPREUM.TabIndex = 12
         Me.txtPREUM.Tag = Nothing
         '
         'txtMAQUI
         '
-        Me.txtMAQUI.Location = New System.Drawing.Point(100, 199)
+        Me.txtMAQUI.Location = New System.Drawing.Point(140, 245)
         Me.txtMAQUI.Name = "txtMAQUI"
-        Me.txtMAQUI.Size = New System.Drawing.Size(40, 18)
+        Me.txtMAQUI.Size = New System.Drawing.Size(56, 21)
         Me.txtMAQUI.TabIndex = 10
         Me.txtMAQUI.Tag = Nothing
         '
         'lblCodigoTejido
         '
         Me.lblCodigoTejido.ImeMode = System.Windows.Forms.ImeMode.NoControl
-        Me.lblCodigoTejido.Location = New System.Drawing.Point(12, 20)
+        Me.lblCodigoTejido.Location = New System.Drawing.Point(17, 25)
         Me.lblCodigoTejido.Name = "lblCodigoTejido"
-        Me.lblCodigoTejido.Size = New System.Drawing.Size(84, 16)
+        Me.lblCodigoTejido.Size = New System.Drawing.Size(117, 19)
         Me.lblCodigoTejido.TabIndex = 267
         Me.lblCodigoTejido.Text = "Codi Teixit"
         Me.lblCodigoTejido.TextAlign = System.Drawing.ContentAlignment.MiddleRight
         '
         'txtDESCRI
         '
-        Me.txtDESCRI.Location = New System.Drawing.Point(100, 40)
+        Me.txtDESCRI.Location = New System.Drawing.Point(140, 49)
         Me.txtDESCRI.Name = "txtDESCRI"
-        Me.txtDESCRI.Size = New System.Drawing.Size(376, 18)
+        Me.txtDESCRI.Size = New System.Drawing.Size(526, 21)
         Me.txtDESCRI.TabIndex = 2
         Me.txtDESCRI.Tag = Nothing
         '
         'lblAncho2
         '
         Me.lblAncho2.ImeMode = System.Windows.Forms.ImeMode.NoControl
-        Me.lblAncho2.Location = New System.Drawing.Point(12, 158)
+        Me.lblAncho2.Location = New System.Drawing.Point(17, 194)
         Me.lblAncho2.Name = "lblAncho2"
-        Me.lblAncho2.Size = New System.Drawing.Size(84, 15)
+        Me.lblAncho2.Size = New System.Drawing.Size(117, 19)
         Me.lblAncho2.TabIndex = 271
         Me.lblAncho2.Text = "Ample nou"
         Me.lblAncho2.TextAlign = System.Drawing.ContentAlignment.MiddleRight
@@ -845,9 +844,9 @@ Public Class frmTejidos
         'lblIVA
         '
         Me.lblIVA.ImeMode = System.Windows.Forms.ImeMode.NoControl
-        Me.lblIVA.Location = New System.Drawing.Point(40, 251)
+        Me.lblIVA.Location = New System.Drawing.Point(56, 309)
         Me.lblIVA.Name = "lblIVA"
-        Me.lblIVA.Size = New System.Drawing.Size(56, 14)
+        Me.lblIVA.Size = New System.Drawing.Size(78, 17)
         Me.lblIVA.TabIndex = 276
         Me.lblIVA.Text = "IVA"
         Me.lblIVA.TextAlign = System.Drawing.ContentAlignment.MiddleRight
@@ -855,27 +854,27 @@ Public Class frmTejidos
         'lblRendimiento
         '
         Me.lblRendimiento.ImeMode = System.Windows.Forms.ImeMode.NoControl
-        Me.lblRendimiento.Location = New System.Drawing.Point(12, 181)
+        Me.lblRendimiento.Location = New System.Drawing.Point(17, 223)
         Me.lblRendimiento.Name = "lblRendimiento"
-        Me.lblRendimiento.Size = New System.Drawing.Size(84, 15)
+        Me.lblRendimiento.Size = New System.Drawing.Size(117, 18)
         Me.lblRendimiento.TabIndex = 275
         Me.lblRendimiento.Text = "Rendiment"
         Me.lblRendimiento.TextAlign = System.Drawing.ContentAlignment.MiddleRight
         '
         'txtRENDIMENT
         '
-        Me.txtRENDIMENT.Location = New System.Drawing.Point(100, 177)
+        Me.txtRENDIMENT.Location = New System.Drawing.Point(140, 218)
         Me.txtRENDIMENT.Name = "txtRENDIMENT"
-        Me.txtRENDIMENT.Size = New System.Drawing.Size(68, 18)
+        Me.txtRENDIMENT.Size = New System.Drawing.Size(95, 21)
         Me.txtRENDIMENT.TabIndex = 8
         Me.txtRENDIMENT.Tag = Nothing
         '
         'lblGramaje
         '
         Me.lblGramaje.ImeMode = System.Windows.Forms.ImeMode.NoControl
-        Me.lblGramaje.Location = New System.Drawing.Point(12, 67)
+        Me.lblGramaje.Location = New System.Drawing.Point(17, 82)
         Me.lblGramaje.Name = "lblGramaje"
-        Me.lblGramaje.Size = New System.Drawing.Size(88, 15)
+        Me.lblGramaje.Size = New System.Drawing.Size(123, 19)
         Me.lblGramaje.TabIndex = 269
         Me.lblGramaje.Text = "Gramatge gr/m2"
         Me.lblGramaje.TextAlign = System.Drawing.ContentAlignment.MiddleRight
@@ -883,27 +882,27 @@ Public Class frmTejidos
         'lblPrecioMetro
         '
         Me.lblPrecioMetro.ImeMode = System.Windows.Forms.ImeMode.NoControl
-        Me.lblPrecioMetro.Location = New System.Drawing.Point(12, 228)
+        Me.lblPrecioMetro.Location = New System.Drawing.Point(17, 281)
         Me.lblPrecioMetro.Name = "lblPrecioMetro"
-        Me.lblPrecioMetro.Size = New System.Drawing.Size(84, 15)
+        Me.lblPrecioMetro.Size = New System.Drawing.Size(117, 18)
         Me.lblPrecioMetro.TabIndex = 272
         Me.lblPrecioMetro.Text = "Preu Metre"
         Me.lblPrecioMetro.TextAlign = System.Drawing.ContentAlignment.MiddleRight
         '
         'txtMARGE
         '
-        Me.txtMARGE.Location = New System.Drawing.Point(260, 177)
+        Me.txtMARGE.Location = New System.Drawing.Point(364, 218)
         Me.txtMARGE.Name = "txtMARGE"
-        Me.txtMARGE.Size = New System.Drawing.Size(76, 18)
+        Me.txtMARGE.Size = New System.Drawing.Size(106, 21)
         Me.txtMARGE.TabIndex = 9
         Me.txtMARGE.Tag = Nothing
         '
         'lblPreciokg
         '
         Me.lblPreciokg.ImeMode = System.Windows.Forms.ImeMode.NoControl
-        Me.lblPreciokg.Location = New System.Drawing.Point(172, 227)
+        Me.lblPreciokg.Location = New System.Drawing.Point(241, 279)
         Me.lblPreciokg.Name = "lblPreciokg"
-        Me.lblPreciokg.Size = New System.Drawing.Size(72, 16)
+        Me.lblPreciokg.Size = New System.Drawing.Size(101, 20)
         Me.lblPreciokg.TabIndex = 10
         Me.lblPreciokg.Text = "Preu quilo"
         Me.lblPreciokg.TextAlign = System.Drawing.ContentAlignment.MiddleRight
@@ -911,54 +910,54 @@ Public Class frmTejidos
         'lblTantoPorCientoMargen
         '
         Me.lblTantoPorCientoMargen.ImeMode = System.Windows.Forms.ImeMode.NoControl
-        Me.lblTantoPorCientoMargen.Location = New System.Drawing.Point(172, 181)
+        Me.lblTantoPorCientoMargen.Location = New System.Drawing.Point(241, 223)
         Me.lblTantoPorCientoMargen.Name = "lblTantoPorCientoMargen"
-        Me.lblTantoPorCientoMargen.Size = New System.Drawing.Size(80, 15)
+        Me.lblTantoPorCientoMargen.Size = New System.Drawing.Size(112, 18)
         Me.lblTantoPorCientoMargen.TabIndex = 273
         Me.lblTantoPorCientoMargen.Text = "% de Marge"
         Me.lblTantoPorCientoMargen.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
         '
         'txtGRAMA
         '
-        Me.txtGRAMA.Location = New System.Drawing.Point(100, 62)
+        Me.txtGRAMA.Location = New System.Drawing.Point(140, 76)
         Me.txtGRAMA.Name = "txtGRAMA"
-        Me.txtGRAMA.Size = New System.Drawing.Size(68, 18)
+        Me.txtGRAMA.Size = New System.Drawing.Size(95, 21)
         Me.txtGRAMA.TabIndex = 3
         Me.txtGRAMA.Tag = Nothing
         '
         'txtPREUK
         '
-        Me.txtPREUK.Location = New System.Drawing.Point(244, 223)
+        Me.txtPREUK.Location = New System.Drawing.Point(342, 274)
         Me.txtPREUK.Name = "txtPREUK"
-        Me.txtPREUK.Size = New System.Drawing.Size(60, 18)
+        Me.txtPREUK.Size = New System.Drawing.Size(84, 21)
         Me.txtPREUK.TabIndex = 13
         Me.txtPREUK.Tag = Nothing
         '
         'Label2
         '
         Me.Label2.ImeMode = System.Windows.Forms.ImeMode.NoControl
-        Me.Label2.Location = New System.Drawing.Point(512, 4)
+        Me.Label2.Location = New System.Drawing.Point(717, 5)
         Me.Label2.Name = "Label2"
-        Me.Label2.Size = New System.Drawing.Size(144, 17)
+        Me.Label2.Size = New System.Drawing.Size(201, 21)
         Me.Label2.TabIndex = 256
         Me.Label2.Text = "Notas"
         Me.Label2.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
         '
         'txtOBSERV
         '
-        Me.txtOBSERV.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtOBSERV.Location = New System.Drawing.Point(508, 24)
-        Me.txtOBSERV.Multiline = True
+        Me.txtOBSERV.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left)  _
+            Or System.Windows.Forms.AnchorStyles.Right),System.Windows.Forms.AnchorStyles)
+        Me.txtOBSERV.Location = New System.Drawing.Point(711, 30)
+        Me.txtOBSERV.Multiline = true
         Me.txtOBSERV.Name = "txtOBSERV"
         Me.txtOBSERV.ScrollBars = System.Windows.Forms.ScrollBars.Vertical
-        Me.txtOBSERV.Size = New System.Drawing.Size(332, 258)
+        Me.txtOBSERV.Size = New System.Drawing.Size(115, 317)
         Me.txtOBSERV.TabIndex = 0
         Me.txtOBSERV.Tag = Nothing
         '
         'gb2
         '
-        Me.gb2.BackColor = System.Drawing.Color.FromArgb(CType(CType(221, Byte), Integer), CType(CType(208, Byte), Integer), CType(CType(196, Byte), Integer))
+        Me.gb2.BackColor = System.Drawing.Color.FromArgb(CType(CType(221,Byte),Integer), CType(CType(208,Byte),Integer), CType(CType(196,Byte),Integer))
         Me.gb2.Controls.Add(Me.txtSTCRUK)
         Me.gb2.Controls.Add(Me.txtSTCRUM)
         Me.gb2.Controls.Add(Me.lblStockDisposatK)
@@ -970,36 +969,36 @@ Public Class frmTejidos
         Me.gb2.Controls.Add(Me.lblStockDisposat)
         Me.gb2.Controls.Add(Me.lblStockCru)
         Me.gb2.FlatStyle = System.Windows.Forms.FlatStyle.System
-        Me.gb2.Location = New System.Drawing.Point(4, 288)
+        Me.gb2.Location = New System.Drawing.Point(6, 354)
         Me.gb2.Name = "gb2"
-        Me.gb2.Size = New System.Drawing.Size(492, 63)
+        Me.gb2.Size = New System.Drawing.Size(688, 78)
         Me.gb2.TabIndex = 283
-        Me.gb2.TabStop = False
+        Me.gb2.TabStop = false
         '
         'txtSTCRUK
         '
         Me.txtSTCRUK.BackColor = System.Drawing.Color.LightSalmon
-        Me.txtSTCRUK.Location = New System.Drawing.Point(144, 20)
+        Me.txtSTCRUK.Location = New System.Drawing.Point(202, 25)
         Me.txtSTCRUK.Name = "txtSTCRUK"
-        Me.txtSTCRUK.Size = New System.Drawing.Size(96, 18)
+        Me.txtSTCRUK.Size = New System.Drawing.Size(134, 21)
         Me.txtSTCRUK.TabIndex = 293
         Me.txtSTCRUK.Tag = Nothing
         '
         'txtSTCRUM
         '
         Me.txtSTCRUM.BackColor = System.Drawing.Color.PaleTurquoise
-        Me.txtSTCRUM.Location = New System.Drawing.Point(144, 40)
+        Me.txtSTCRUM.Location = New System.Drawing.Point(202, 49)
         Me.txtSTCRUM.Name = "txtSTCRUM"
-        Me.txtSTCRUM.Size = New System.Drawing.Size(96, 18)
+        Me.txtSTCRUM.Size = New System.Drawing.Size(134, 21)
         Me.txtSTCRUM.TabIndex = 292
         Me.txtSTCRUM.Tag = Nothing
         '
         'lblStockDisposatK
         '
         Me.lblStockDisposatK.ImeMode = System.Windows.Forms.ImeMode.NoControl
-        Me.lblStockDisposatK.Location = New System.Drawing.Point(336, 16)
+        Me.lblStockDisposatK.Location = New System.Drawing.Point(470, 20)
         Me.lblStockDisposatK.Name = "lblStockDisposatK"
-        Me.lblStockDisposatK.Size = New System.Drawing.Size(44, 20)
+        Me.lblStockDisposatK.Size = New System.Drawing.Size(62, 24)
         Me.lblStockDisposatK.TabIndex = 291
         Me.lblStockDisposatK.Text = "KG"
         Me.lblStockDisposatK.TextAlign = System.Drawing.ContentAlignment.MiddleRight
@@ -1007,18 +1006,18 @@ Public Class frmTejidos
         'txtSTDISPK
         '
         Me.txtSTDISPK.BackColor = System.Drawing.Color.LightSalmon
-        Me.txtSTDISPK.Location = New System.Drawing.Point(384, 16)
+        Me.txtSTDISPK.Location = New System.Drawing.Point(538, 20)
         Me.txtSTDISPK.Name = "txtSTDISPK"
-        Me.txtSTDISPK.Size = New System.Drawing.Size(96, 18)
+        Me.txtSTDISPK.Size = New System.Drawing.Size(134, 21)
         Me.txtSTDISPK.TabIndex = 3
         Me.txtSTDISPK.Tag = Nothing
         '
         'lblStockCruK
         '
         Me.lblStockCruK.ImeMode = System.Windows.Forms.ImeMode.NoControl
-        Me.lblStockCruK.Location = New System.Drawing.Point(96, 20)
+        Me.lblStockCruK.Location = New System.Drawing.Point(134, 25)
         Me.lblStockCruK.Name = "lblStockCruK"
-        Me.lblStockCruK.Size = New System.Drawing.Size(40, 11)
+        Me.lblStockCruK.Size = New System.Drawing.Size(56, 13)
         Me.lblStockCruK.TabIndex = 289
         Me.lblStockCruK.Text = "KG"
         Me.lblStockCruK.TextAlign = System.Drawing.ContentAlignment.MiddleRight
@@ -1026,9 +1025,9 @@ Public Class frmTejidos
         'lblStockDisipM
         '
         Me.lblStockDisipM.ImeMode = System.Windows.Forms.ImeMode.NoControl
-        Me.lblStockDisipM.Location = New System.Drawing.Point(336, 40)
+        Me.lblStockDisipM.Location = New System.Drawing.Point(470, 49)
         Me.lblStockDisipM.Name = "lblStockDisipM"
-        Me.lblStockDisipM.Size = New System.Drawing.Size(44, 16)
+        Me.lblStockDisipM.Size = New System.Drawing.Size(62, 20)
         Me.lblStockDisipM.TabIndex = 287
         Me.lblStockDisipM.Text = "Metres"
         Me.lblStockDisipM.TextAlign = System.Drawing.ContentAlignment.MiddleRight
@@ -1036,9 +1035,9 @@ Public Class frmTejidos
         'lblStockCruM
         '
         Me.lblStockCruM.ImeMode = System.Windows.Forms.ImeMode.NoControl
-        Me.lblStockCruM.Location = New System.Drawing.Point(96, 40)
+        Me.lblStockCruM.Location = New System.Drawing.Point(134, 49)
         Me.lblStockCruM.Name = "lblStockCruM"
-        Me.lblStockCruM.Size = New System.Drawing.Size(44, 16)
+        Me.lblStockCruM.Size = New System.Drawing.Size(62, 20)
         Me.lblStockCruM.TabIndex = 286
         Me.lblStockCruM.Text = "Metres"
         Me.lblStockCruM.TextAlign = System.Drawing.ContentAlignment.MiddleRight
@@ -1046,18 +1045,18 @@ Public Class frmTejidos
         'txtSTDISPM
         '
         Me.txtSTDISPM.BackColor = System.Drawing.Color.PaleTurquoise
-        Me.txtSTDISPM.Location = New System.Drawing.Point(384, 36)
+        Me.txtSTDISPM.Location = New System.Drawing.Point(538, 44)
         Me.txtSTDISPM.Name = "txtSTDISPM"
-        Me.txtSTDISPM.Size = New System.Drawing.Size(96, 18)
+        Me.txtSTDISPM.Size = New System.Drawing.Size(134, 21)
         Me.txtSTDISPM.TabIndex = 2
         Me.txtSTDISPM.Tag = Nothing
         '
         'lblStockDisposat
         '
         Me.lblStockDisposat.ImeMode = System.Windows.Forms.ImeMode.NoControl
-        Me.lblStockDisposat.Location = New System.Drawing.Point(248, 28)
+        Me.lblStockDisposat.Location = New System.Drawing.Point(347, 34)
         Me.lblStockDisposat.Name = "lblStockDisposat"
-        Me.lblStockDisposat.Size = New System.Drawing.Size(84, 16)
+        Me.lblStockDisposat.Size = New System.Drawing.Size(118, 20)
         Me.lblStockDisposat.TabIndex = 285
         Me.lblStockDisposat.Text = "Stock Disposat"
         Me.lblStockDisposat.TextAlign = System.Drawing.ContentAlignment.MiddleRight
@@ -1065,16 +1064,16 @@ Public Class frmTejidos
         'lblStockCru
         '
         Me.lblStockCru.ImeMode = System.Windows.Forms.ImeMode.NoControl
-        Me.lblStockCru.Location = New System.Drawing.Point(8, 28)
+        Me.lblStockCru.Location = New System.Drawing.Point(11, 34)
         Me.lblStockCru.Name = "lblStockCru"
-        Me.lblStockCru.Size = New System.Drawing.Size(84, 16)
+        Me.lblStockCru.Size = New System.Drawing.Size(118, 20)
         Me.lblStockCru.TabIndex = 284
         Me.lblStockCru.Text = "Stock Cru"
         Me.lblStockCru.TextAlign = System.Drawing.ContentAlignment.MiddleRight
         '
         'tpEscandalloTejido
         '
-        Me.tpEscandalloTejido.BackColor = System.Drawing.Color.FromArgb(CType(CType(221, Byte), Integer), CType(CType(208, Byte), Integer), CType(CType(196, Byte), Integer))
+        Me.tpEscandalloTejido.BackColor = System.Drawing.Color.FromArgb(CType(CType(221,Byte),Integer), CType(CType(208,Byte),Integer), CType(CType(196,Byte),Integer))
         Me.tpEscandalloTejido.Controls.Add(Me.cboAcabados)
         Me.tpEscandalloTejido.Controls.Add(Me.dgAcabados)
         Me.tpEscandalloTejido.Controls.Add(Me.btnLimpiarAcabados)
@@ -1103,128 +1102,138 @@ Public Class frmTejidos
         Me.tpEscandalloTejido.ImeMode = System.Windows.Forms.ImeMode.NoControl
         Me.tpEscandalloTejido.Location = New System.Drawing.Point(4, 22)
         Me.tpEscandalloTejido.Name = "tpEscandalloTejido"
-        Me.tpEscandalloTejido.Size = New System.Drawing.Size(852, 604)
+        Me.tpEscandalloTejido.Size = New System.Drawing.Size(1196, 749)
         Me.tpEscandalloTejido.TabIndex = 1
         Me.tpEscandalloTejido.Text = "Escandall Teixit"
         '
         'cboAcabados
         '
-        Me.cboAcabados.AllowColMove = True
-        Me.cboAcabados.AllowColSelect = True
+        Me.cboAcabados.AllowColMove = true
+        Me.cboAcabados.AllowColSelect = true
         Me.cboAcabados.AllowRowSizing = C1.Win.C1TrueDBGrid.RowSizingEnum.AllRows
-        Me.cboAcabados.AlternatingRows = False
+        Me.cboAcabados.AlternatingRows = false
+        Me.cboAcabados.CaptionHeight = 19
         Me.cboAcabados.CaptionStyle = Style1
         Me.cboAcabados.ColumnCaptionHeight = 17
         Me.cboAcabados.ColumnFooterHeight = 17
-        Me.cboAcabados.EvenRowStyle = Style2
-        Me.cboAcabados.ExtendRightColumn = True
-        Me.cboAcabados.FetchRowStyles = False
-        Me.cboAcabados.FooterStyle = Style3
-        Me.cboAcabados.HeadingStyle = Style4
-        Me.cboAcabados.HighLightRowStyle = Style5
-        Me.cboAcabados.Images.Add(CType(resources.GetObject("cboAcabados.Images"), System.Drawing.Image))
-        Me.cboAcabados.Location = New System.Drawing.Point(76, 328)
+        Me.cboAcabados.ColumnSelectorStyle = Style2
+        Me.cboAcabados.EvenRowStyle = Style3
+        Me.cboAcabados.ExtendRightColumn = true
+        Me.cboAcabados.FetchRowStyles = false
+        Me.cboAcabados.FooterStyle = Style4
+        Me.cboAcabados.HeadingStyle = Style5
+        Me.cboAcabados.HighLightRowStyle = Style6
+        Me.cboAcabados.Images.Add(CType(resources.GetObject("cboAcabados.Images"),System.Drawing.Image))
+        Me.cboAcabados.Location = New System.Drawing.Point(106, 404)
         Me.cboAcabados.Name = "cboAcabados"
-        Me.cboAcabados.OddRowStyle = Style6
-        Me.cboAcabados.RecordSelectorStyle = Style7
+        Me.cboAcabados.OddRowStyle = Style7
+        Me.cboAcabados.RecordSelectorStyle = Style8
         Me.cboAcabados.RowDivider.Color = System.Drawing.Color.DarkGray
         Me.cboAcabados.RowDivider.Style = C1.Win.C1TrueDBGrid.LineStyleEnum.[Single]
+        Me.cboAcabados.RowHeight = 17
+        Me.cboAcabados.RowSelectorStyle = Style9
         Me.cboAcabados.RowSubDividerColor = System.Drawing.Color.DarkGray
-        Me.cboAcabados.ScrollTips = False
-        Me.cboAcabados.Size = New System.Drawing.Size(150, 156)
-        Me.cboAcabados.Style = Style8
+        Me.cboAcabados.ScrollTips = false
+        Me.cboAcabados.Size = New System.Drawing.Size(210, 192)
+        Me.cboAcabados.Style = Style10
         Me.cboAcabados.TabIndex = 287
         Me.cboAcabados.Text = "C1TrueDBDropdown1"
-        Me.cboAcabados.UseCompatibleTextRendering = False
-        Me.cboAcabados.ValueTranslate = True
-        Me.cboAcabados.Visible = False
+        Me.cboAcabados.UseCompatibleTextRendering = false
+        Me.cboAcabados.ValueTranslate = true
+        Me.cboAcabados.Visible = false
         Me.cboAcabados.PropBag = resources.GetString("cboAcabados.PropBag")
         '
         'dgAcabados
         '
-        Me.dgAcabados.AllowAddNew = True
-        Me.dgAcabados.AllowDelete = True
-        Me.dgAcabados.AllowSort = False
-        Me.dgAcabados.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.dgAcabados.AllowAddNew = true
+        Me.dgAcabados.AllowDelete = true
+        Me.dgAcabados.AllowSort = false
+        Me.dgAcabados.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left)  _
+            Or System.Windows.Forms.AnchorStyles.Right),System.Windows.Forms.AnchorStyles)
         Me.dgAcabados.Caption = "Acabats"
+        Me.dgAcabados.CaptionHeight = 19
         Me.dgAcabados.GroupByCaption = "Drag a column header here to group by that column"
-        Me.dgAcabados.Images.Add(CType(resources.GetObject("dgAcabados.Images"), System.Drawing.Image))
-        Me.dgAcabados.Location = New System.Drawing.Point(12, 300)
+        Me.dgAcabados.Images.Add(CType(resources.GetObject("dgAcabados.Images"),System.Drawing.Image))
+        Me.dgAcabados.Location = New System.Drawing.Point(17, 369)
         Me.dgAcabados.Name = "dgAcabados"
         Me.dgAcabados.PreviewInfo.Location = New System.Drawing.Point(0, 0)
         Me.dgAcabados.PreviewInfo.Size = New System.Drawing.Size(0, 0)
-        Me.dgAcabados.PreviewInfo.ZoomFactor = 75.0R
-        Me.dgAcabados.PrintInfo.PageSettings = CType(resources.GetObject("dgAcabados.PrintInfo.PageSettings"), System.Drawing.Printing.PageSettings)
-        Me.dgAcabados.Size = New System.Drawing.Size(700, 176)
+        Me.dgAcabados.PreviewInfo.ZoomFactor = 75R
+        Me.dgAcabados.PrintInfo.MeasurementDevice = C1.Win.C1TrueDBGrid.PrintInfo.MeasurementDeviceEnum.Screen
+        Me.dgAcabados.PrintInfo.MeasurementPrinterName = Nothing
+        Me.dgAcabados.RowHeight = 17
+        Me.dgAcabados.Size = New System.Drawing.Size(980, 217)
         Me.dgAcabados.TabAction = C1.Win.C1TrueDBGrid.TabActionEnum.ColumnNavigation
         Me.dgAcabados.TabIndex = 286
         Me.dgAcabados.Text = "Acabats"
-        Me.dgAcabados.UseCompatibleTextRendering = False
-        Me.dgAcabados.WrapCellPointer = True
+        Me.dgAcabados.UseCompatibleTextRendering = false
+        Me.dgAcabados.WrapCellPointer = true
         Me.dgAcabados.PropBag = resources.GetString("dgAcabados.PropBag")
         '
         'btnLimpiarAcabados
         '
-        Me.btnLimpiarAcabados.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnLimpiarAcabados.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right),System.Windows.Forms.AnchorStyles)
         Me.btnLimpiarAcabados.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.btnLimpiarAcabados.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft
         Me.btnLimpiarAcabados.ImeMode = System.Windows.Forms.ImeMode.NoControl
-        Me.btnLimpiarAcabados.Location = New System.Drawing.Point(720, 448)
+        Me.btnLimpiarAcabados.Location = New System.Drawing.Point(1008, 551)
         Me.btnLimpiarAcabados.Name = "btnLimpiarAcabados"
-        Me.btnLimpiarAcabados.Size = New System.Drawing.Size(100, 28)
+        Me.btnLimpiarAcabados.Size = New System.Drawing.Size(140, 35)
         Me.btnLimpiarAcabados.TabIndex = 269
         Me.btnLimpiarAcabados.Text = "Netejar Acabats"
-        Me.btnLimpiarAcabados.UseVisualStyleBackColor = True
+        Me.btnLimpiarAcabados.UseVisualStyleBackColor = true
         '
         'txtACABAT
         '
-        Me.txtACABAT.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-            Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.txtACABAT.Location = New System.Drawing.Point(12, 484)
-        Me.txtACABAT.Multiline = True
+        Me.txtACABAT.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom)  _
+            Or System.Windows.Forms.AnchorStyles.Left)  _
+            Or System.Windows.Forms.AnchorStyles.Right),System.Windows.Forms.AnchorStyles)
+        Me.txtACABAT.Location = New System.Drawing.Point(17, 596)
+        Me.txtACABAT.Multiline = true
         Me.txtACABAT.Name = "txtACABAT"
-        Me.txtACABAT.Size = New System.Drawing.Size(700, 40)
+        Me.txtACABAT.Size = New System.Drawing.Size(980, 49)
         Me.txtACABAT.TabIndex = 267
         Me.txtACABAT.Tag = Nothing
         '
         'cboHilos
         '
-        Me.cboHilos.AllowColMove = True
-        Me.cboHilos.AllowColSelect = True
+        Me.cboHilos.AllowColMove = true
+        Me.cboHilos.AllowColSelect = true
         Me.cboHilos.AllowRowSizing = C1.Win.C1TrueDBGrid.RowSizingEnum.AllRows
-        Me.cboHilos.AlternatingRows = False
-        Me.cboHilos.CaptionStyle = Style9
+        Me.cboHilos.AlternatingRows = false
+        Me.cboHilos.CaptionHeight = 19
+        Me.cboHilos.CaptionStyle = Style11
         Me.cboHilos.ColumnCaptionHeight = 17
         Me.cboHilos.ColumnFooterHeight = 17
-        Me.cboHilos.EvenRowStyle = Style10
-        Me.cboHilos.FetchRowStyles = False
-        Me.cboHilos.FooterStyle = Style11
-        Me.cboHilos.HeadingStyle = Style12
-        Me.cboHilos.HighLightRowStyle = Style13
-        Me.cboHilos.Images.Add(CType(resources.GetObject("cboHilos.Images"), System.Drawing.Image))
-        Me.cboHilos.Location = New System.Drawing.Point(24, 76)
+        Me.cboHilos.ColumnSelectorStyle = Style12
+        Me.cboHilos.EvenRowStyle = Style13
+        Me.cboHilos.FetchRowStyles = false
+        Me.cboHilos.FooterStyle = Style14
+        Me.cboHilos.HeadingStyle = Style15
+        Me.cboHilos.HighLightRowStyle = Style16
+        Me.cboHilos.Images.Add(CType(resources.GetObject("cboHilos.Images"),System.Drawing.Image))
+        Me.cboHilos.Location = New System.Drawing.Point(34, 94)
         Me.cboHilos.Name = "cboHilos"
-        Me.cboHilos.OddRowStyle = Style14
-        Me.cboHilos.RecordSelectorStyle = Style15
+        Me.cboHilos.OddRowStyle = Style17
+        Me.cboHilos.RecordSelectorStyle = Style18
         Me.cboHilos.RowDivider.Color = System.Drawing.Color.DarkGray
         Me.cboHilos.RowDivider.Style = C1.Win.C1TrueDBGrid.LineStyleEnum.[Single]
+        Me.cboHilos.RowHeight = 17
+        Me.cboHilos.RowSelectorStyle = Style19
         Me.cboHilos.RowSubDividerColor = System.Drawing.Color.DarkGray
-        Me.cboHilos.ScrollTips = False
-        Me.cboHilos.Size = New System.Drawing.Size(68, 156)
-        Me.cboHilos.Style = Style16
+        Me.cboHilos.ScrollTips = false
+        Me.cboHilos.Size = New System.Drawing.Size(95, 192)
+        Me.cboHilos.Style = Style20
         Me.cboHilos.TabIndex = 266
         Me.cboHilos.Text = "C1TrueDBDropdown1"
-        Me.cboHilos.UseCompatibleTextRendering = False
-        Me.cboHilos.ValueTranslate = True
-        Me.cboHilos.Visible = False
+        Me.cboHilos.UseCompatibleTextRendering = false
+        Me.cboHilos.ValueTranslate = true
+        Me.cboHilos.Visible = false
         Me.cboHilos.PropBag = resources.GetString("cboHilos.PropBag")
         '
         'cboNOMACABADOR
         '
-        Me.cboNOMACABADOR.AddItemSeparator = Global.Microsoft.VisualBasic.ChrW(59)
-        Me.cboNOMACABADOR.AutoSelect = True
+        Me.cboNOMACABADOR.AutoSelect = true
         Me.cboNOMACABADOR.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
         Me.cboNOMACABADOR.Caption = ""
         Me.cboNOMACABADOR.CaptionHeight = 17
@@ -1233,51 +1242,48 @@ Public Class frmTejidos
         Me.cboNOMACABADOR.ColumnFooterHeight = 17
         Me.cboNOMACABADOR.Cursor = System.Windows.Forms.Cursors.Default
         Me.cboNOMACABADOR.DeadAreaBackColor = System.Drawing.Color.Empty
-        Me.cboNOMACABADOR.EditorBackColor = System.Drawing.SystemColors.Window
-        Me.cboNOMACABADOR.EditorFont = New System.Drawing.Font("Microsoft Sans Serif", 8.25!)
-        Me.cboNOMACABADOR.EditorForeColor = System.Drawing.SystemColors.WindowText
-        Me.cboNOMACABADOR.Images.Add(CType(resources.GetObject("cboNOMACABADOR.Images"), System.Drawing.Image))
-        Me.cboNOMACABADOR.IntegralHeight = True
-        Me.cboNOMACABADOR.ItemHeight = 13
-        Me.cboNOMACABADOR.Location = New System.Drawing.Point(424, 276)
-        Me.cboNOMACABADOR.MatchEntryTimeout = CType(100, Long)
-        Me.cboNOMACABADOR.MaxDropDownItems = CType(8, Short)
+        Me.cboNOMACABADOR.Images.Add(CType(resources.GetObject("cboNOMACABADOR.Images"),System.Drawing.Image))
+        Me.cboNOMACABADOR.IntegralHeight = true
+        Me.cboNOMACABADOR.Location = New System.Drawing.Point(594, 340)
+        Me.cboNOMACABADOR.MatchEntryTimeout = CType(100,Long)
+        Me.cboNOMACABADOR.MaxDropDownItems = CType(8,Short)
         Me.cboNOMACABADOR.MaxLength = 0
         Me.cboNOMACABADOR.MouseCursor = System.Windows.Forms.Cursors.Default
         Me.cboNOMACABADOR.Name = "cboNOMACABADOR"
-        Me.cboNOMACABADOR.RowDivider.Style = C1.Win.C1List.LineStyleEnum.None
         Me.cboNOMACABADOR.RowSubDividerColor = System.Drawing.Color.DarkGray
-        Me.cboNOMACABADOR.Size = New System.Drawing.Size(288, 19)
+        Me.cboNOMACABADOR.Size = New System.Drawing.Size(403, 22)
         Me.cboNOMACABADOR.TabIndex = 264
         Me.cboNOMACABADOR.PropBag = resources.GetString("cboNOMACABADOR.PropBag")
         '
         'dgComposcionTejido
         '
-        Me.dgComposcionTejido.AllowAddNew = True
-        Me.dgComposcionTejido.AllowDelete = True
-        Me.dgComposcionTejido.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.dgComposcionTejido.AllowAddNew = true
+        Me.dgComposcionTejido.AllowDelete = true
+        Me.dgComposcionTejido.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left)  _
+            Or System.Windows.Forms.AnchorStyles.Right),System.Windows.Forms.AnchorStyles)
         Me.dgComposcionTejido.Caption = "COMPOSICIÓ TEIXIT"
+        Me.dgComposcionTejido.CaptionHeight = 19
         Me.dgComposcionTejido.GroupByCaption = "Drag a column header here to group by that column"
-        Me.dgComposcionTejido.Images.Add(CType(resources.GetObject("dgComposcionTejido.Images"), System.Drawing.Image))
-        Me.dgComposcionTejido.Location = New System.Drawing.Point(16, 52)
+        Me.dgComposcionTejido.Images.Add(CType(resources.GetObject("dgComposcionTejido.Images"),System.Drawing.Image))
+        Me.dgComposcionTejido.Location = New System.Drawing.Point(22, 64)
         Me.dgComposcionTejido.Name = "dgComposcionTejido"
         Me.dgComposcionTejido.PreviewInfo.Location = New System.Drawing.Point(0, 0)
         Me.dgComposcionTejido.PreviewInfo.Size = New System.Drawing.Size(0, 0)
-        Me.dgComposcionTejido.PreviewInfo.ZoomFactor = 75.0R
-        Me.dgComposcionTejido.PrintInfo.PageSettings = CType(resources.GetObject("dgComposcionTejido.PrintInfo.PageSettings"), System.Drawing.Printing.PageSettings)
-        Me.dgComposcionTejido.Size = New System.Drawing.Size(812, 144)
+        Me.dgComposcionTejido.PreviewInfo.ZoomFactor = 75R
+        Me.dgComposcionTejido.PrintInfo.MeasurementDevice = C1.Win.C1TrueDBGrid.PrintInfo.MeasurementDeviceEnum.Screen
+        Me.dgComposcionTejido.PrintInfo.MeasurementPrinterName = Nothing
+        Me.dgComposcionTejido.RowHeight = 17
+        Me.dgComposcionTejido.Size = New System.Drawing.Size(1137, 177)
         Me.dgComposcionTejido.TabAction = C1.Win.C1TrueDBGrid.TabActionEnum.ColumnNavigation
         Me.dgComposcionTejido.TabIndex = 263
         Me.dgComposcionTejido.Text = "C1TrueDBGrid1"
-        Me.dgComposcionTejido.UseCompatibleTextRendering = False
-        Me.dgComposcionTejido.WrapCellPointer = True
+        Me.dgComposcionTejido.UseCompatibleTextRendering = false
+        Me.dgComposcionTejido.WrapCellPointer = true
         Me.dgComposcionTejido.PropBag = resources.GetString("dgComposcionTejido.PropBag")
         '
         'cboNOMESTAMPADOR
         '
-        Me.cboNOMESTAMPADOR.AddItemSeparator = Global.Microsoft.VisualBasic.ChrW(59)
-        Me.cboNOMESTAMPADOR.AutoSelect = True
+        Me.cboNOMESTAMPADOR.AutoSelect = true
         Me.cboNOMESTAMPADOR.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
         Me.cboNOMESTAMPADOR.Caption = ""
         Me.cboNOMESTAMPADOR.CaptionHeight = 17
@@ -1286,28 +1292,22 @@ Public Class frmTejidos
         Me.cboNOMESTAMPADOR.ColumnFooterHeight = 17
         Me.cboNOMESTAMPADOR.Cursor = System.Windows.Forms.Cursors.Default
         Me.cboNOMESTAMPADOR.DeadAreaBackColor = System.Drawing.Color.Empty
-        Me.cboNOMESTAMPADOR.EditorBackColor = System.Drawing.SystemColors.Window
-        Me.cboNOMESTAMPADOR.EditorFont = New System.Drawing.Font("Microsoft Sans Serif", 8.25!)
-        Me.cboNOMESTAMPADOR.EditorForeColor = System.Drawing.SystemColors.WindowText
-        Me.cboNOMESTAMPADOR.Images.Add(CType(resources.GetObject("cboNOMESTAMPADOR.Images"), System.Drawing.Image))
-        Me.cboNOMESTAMPADOR.IntegralHeight = True
-        Me.cboNOMESTAMPADOR.ItemHeight = 13
-        Me.cboNOMESTAMPADOR.Location = New System.Drawing.Point(424, 252)
-        Me.cboNOMESTAMPADOR.MatchEntryTimeout = CType(100, Long)
-        Me.cboNOMESTAMPADOR.MaxDropDownItems = CType(8, Short)
+        Me.cboNOMESTAMPADOR.Images.Add(CType(resources.GetObject("cboNOMESTAMPADOR.Images"),System.Drawing.Image))
+        Me.cboNOMESTAMPADOR.IntegralHeight = true
+        Me.cboNOMESTAMPADOR.Location = New System.Drawing.Point(594, 310)
+        Me.cboNOMESTAMPADOR.MatchEntryTimeout = CType(100,Long)
+        Me.cboNOMESTAMPADOR.MaxDropDownItems = CType(8,Short)
         Me.cboNOMESTAMPADOR.MaxLength = 0
         Me.cboNOMESTAMPADOR.MouseCursor = System.Windows.Forms.Cursors.Default
         Me.cboNOMESTAMPADOR.Name = "cboNOMESTAMPADOR"
-        Me.cboNOMESTAMPADOR.RowDivider.Style = C1.Win.C1List.LineStyleEnum.None
         Me.cboNOMESTAMPADOR.RowSubDividerColor = System.Drawing.Color.DarkGray
-        Me.cboNOMESTAMPADOR.Size = New System.Drawing.Size(288, 19)
+        Me.cboNOMESTAMPADOR.Size = New System.Drawing.Size(403, 22)
         Me.cboNOMESTAMPADOR.TabIndex = 4
         Me.cboNOMESTAMPADOR.PropBag = resources.GetString("cboNOMESTAMPADOR.PropBag")
         '
         'cboNOMTEIXIDOR
         '
-        Me.cboNOMTEIXIDOR.AddItemSeparator = Global.Microsoft.VisualBasic.ChrW(59)
-        Me.cboNOMTEIXIDOR.AutoSelect = True
+        Me.cboNOMTEIXIDOR.AutoSelect = true
         Me.cboNOMTEIXIDOR.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
         Me.cboNOMTEIXIDOR.Caption = ""
         Me.cboNOMTEIXIDOR.CaptionHeight = 17
@@ -1316,71 +1316,66 @@ Public Class frmTejidos
         Me.cboNOMTEIXIDOR.ColumnFooterHeight = 17
         Me.cboNOMTEIXIDOR.Cursor = System.Windows.Forms.Cursors.Default
         Me.cboNOMTEIXIDOR.DeadAreaBackColor = System.Drawing.Color.Empty
-        Me.cboNOMTEIXIDOR.EditorBackColor = System.Drawing.SystemColors.Window
-        Me.cboNOMTEIXIDOR.EditorFont = New System.Drawing.Font("Microsoft Sans Serif", 8.25!)
-        Me.cboNOMTEIXIDOR.EditorForeColor = System.Drawing.SystemColors.WindowText
-        Me.cboNOMTEIXIDOR.Images.Add(CType(resources.GetObject("cboNOMTEIXIDOR.Images"), System.Drawing.Image))
-        Me.cboNOMTEIXIDOR.IntegralHeight = True
-        Me.cboNOMTEIXIDOR.ItemHeight = 13
-        Me.cboNOMTEIXIDOR.Location = New System.Drawing.Point(424, 228)
-        Me.cboNOMTEIXIDOR.MatchEntryTimeout = CType(100, Long)
-        Me.cboNOMTEIXIDOR.MaxDropDownItems = CType(8, Short)
+        Me.cboNOMTEIXIDOR.Images.Add(CType(resources.GetObject("cboNOMTEIXIDOR.Images"),System.Drawing.Image))
+        Me.cboNOMTEIXIDOR.IntegralHeight = true
+        Me.cboNOMTEIXIDOR.Location = New System.Drawing.Point(594, 281)
+        Me.cboNOMTEIXIDOR.MatchEntryTimeout = CType(100,Long)
+        Me.cboNOMTEIXIDOR.MaxDropDownItems = CType(8,Short)
         Me.cboNOMTEIXIDOR.MaxLength = 0
         Me.cboNOMTEIXIDOR.MouseCursor = System.Windows.Forms.Cursors.Default
         Me.cboNOMTEIXIDOR.Name = "cboNOMTEIXIDOR"
-        Me.cboNOMTEIXIDOR.RowDivider.Style = C1.Win.C1List.LineStyleEnum.None
         Me.cboNOMTEIXIDOR.RowSubDividerColor = System.Drawing.Color.DarkGray
-        Me.cboNOMTEIXIDOR.Size = New System.Drawing.Size(288, 19)
+        Me.cboNOMTEIXIDOR.Size = New System.Drawing.Size(403, 22)
         Me.cboNOMTEIXIDOR.TabIndex = 2
         Me.cboNOMTEIXIDOR.PropBag = resources.GetString("cboNOMTEIXIDOR.PropBag")
         '
         'txtCRU
         '
-        Me.txtCRU.Location = New System.Drawing.Point(720, 508)
+        Me.txtCRU.Location = New System.Drawing.Point(1008, 625)
         Me.txtCRU.Name = "txtCRU"
-        Me.txtCRU.Size = New System.Drawing.Size(112, 18)
+        Me.txtCRU.Size = New System.Drawing.Size(157, 21)
         Me.txtCRU.TabIndex = 12
         Me.txtCRU.Tag = Nothing
         '
         'txtPACA
         '
-        Me.txtPACA.Location = New System.Drawing.Point(716, 276)
+        Me.txtPACA.Location = New System.Drawing.Point(1002, 340)
         Me.txtPACA.Name = "txtPACA"
-        Me.txtPACA.Size = New System.Drawing.Size(112, 18)
+        Me.txtPACA.Size = New System.Drawing.Size(157, 21)
         Me.txtPACA.TabIndex = 10
         Me.txtPACA.Tag = Nothing
         '
         'txtPESTAM
         '
-        Me.txtPESTAM.Location = New System.Drawing.Point(716, 252)
+        Me.txtPESTAM.Location = New System.Drawing.Point(1002, 310)
         Me.txtPESTAM.Name = "txtPESTAM"
-        Me.txtPESTAM.Size = New System.Drawing.Size(112, 18)
+        Me.txtPESTAM.Size = New System.Drawing.Size(157, 21)
         Me.txtPESTAM.TabIndex = 9
         Me.txtPESTAM.Tag = Nothing
         '
         'txtPTEIXIR
         '
-        Me.txtPTEIXIR.Location = New System.Drawing.Point(716, 228)
+        Me.txtPTEIXIR.Location = New System.Drawing.Point(1002, 281)
         Me.txtPTEIXIR.Name = "txtPTEIXIR"
-        Me.txtPTEIXIR.Size = New System.Drawing.Size(112, 18)
+        Me.txtPTEIXIR.Size = New System.Drawing.Size(157, 21)
         Me.txtPTEIXIR.TabIndex = 8
         Me.txtPTEIXIR.Tag = Nothing
         '
         'lblTotalMateria
         '
         Me.lblTotalMateria.ImeMode = System.Windows.Forms.ImeMode.NoControl
-        Me.lblTotalMateria.Location = New System.Drawing.Point(612, 204)
+        Me.lblTotalMateria.Location = New System.Drawing.Point(857, 251)
         Me.lblTotalMateria.Name = "lblTotalMateria"
-        Me.lblTotalMateria.Size = New System.Drawing.Size(96, 16)
+        Me.lblTotalMateria.Size = New System.Drawing.Size(134, 20)
         Me.lblTotalMateria.TabIndex = 261
         Me.lblTotalMateria.Text = "Total Materia"
         Me.lblTotalMateria.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
         '
         'txtMATERIA
         '
-        Me.txtMATERIA.Location = New System.Drawing.Point(716, 200)
+        Me.txtMATERIA.Location = New System.Drawing.Point(1002, 246)
         Me.txtMATERIA.Name = "txtMATERIA"
-        Me.txtMATERIA.Size = New System.Drawing.Size(112, 18)
+        Me.txtMATERIA.Size = New System.Drawing.Size(157, 21)
         Me.txtMATERIA.TabIndex = 7
         Me.txtMATERIA.Tag = Nothing
         '
@@ -1389,43 +1384,43 @@ Public Class frmTejidos
         Me.btnElegirAcabador.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.btnElegirAcabador.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft
         Me.btnElegirAcabador.ImeMode = System.Windows.Forms.ImeMode.NoControl
-        Me.btnElegirAcabador.Location = New System.Drawing.Point(392, 276)
+        Me.btnElegirAcabador.Location = New System.Drawing.Point(549, 340)
         Me.btnElegirAcabador.Name = "btnElegirAcabador"
-        Me.btnElegirAcabador.Size = New System.Drawing.Size(24, 20)
+        Me.btnElegirAcabador.Size = New System.Drawing.Size(33, 24)
         Me.btnElegirAcabador.TabIndex = 8
         Me.btnElegirAcabador.Text = "..."
-        Me.btnElegirAcabador.UseVisualStyleBackColor = True
+        Me.btnElegirAcabador.UseVisualStyleBackColor = true
         '
         'btnElegirEstampador
         '
         Me.btnElegirEstampador.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.btnElegirEstampador.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft
         Me.btnElegirEstampador.ImeMode = System.Windows.Forms.ImeMode.NoControl
-        Me.btnElegirEstampador.Location = New System.Drawing.Point(392, 252)
+        Me.btnElegirEstampador.Location = New System.Drawing.Point(549, 310)
         Me.btnElegirEstampador.Name = "btnElegirEstampador"
-        Me.btnElegirEstampador.Size = New System.Drawing.Size(24, 20)
+        Me.btnElegirEstampador.Size = New System.Drawing.Size(33, 25)
         Me.btnElegirEstampador.TabIndex = 5
         Me.btnElegirEstampador.Text = "..."
-        Me.btnElegirEstampador.UseVisualStyleBackColor = True
+        Me.btnElegirEstampador.UseVisualStyleBackColor = true
         '
         'btnElegirTejidor
         '
         Me.btnElegirTejidor.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.btnElegirTejidor.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft
         Me.btnElegirTejidor.ImeMode = System.Windows.Forms.ImeMode.NoControl
-        Me.btnElegirTejidor.Location = New System.Drawing.Point(392, 228)
+        Me.btnElegirTejidor.Location = New System.Drawing.Point(549, 281)
         Me.btnElegirTejidor.Name = "btnElegirTejidor"
-        Me.btnElegirTejidor.Size = New System.Drawing.Size(24, 20)
+        Me.btnElegirTejidor.Size = New System.Drawing.Size(33, 24)
         Me.btnElegirTejidor.TabIndex = 2
         Me.btnElegirTejidor.Text = "..."
-        Me.btnElegirTejidor.UseVisualStyleBackColor = True
+        Me.btnElegirTejidor.UseVisualStyleBackColor = true
         '
         'lblAcabador
         '
         Me.lblAcabador.ImeMode = System.Windows.Forms.ImeMode.NoControl
-        Me.lblAcabador.Location = New System.Drawing.Point(236, 280)
+        Me.lblAcabador.Location = New System.Drawing.Point(330, 345)
         Me.lblAcabador.Name = "lblAcabador"
-        Me.lblAcabador.Size = New System.Drawing.Size(96, 16)
+        Me.lblAcabador.Size = New System.Drawing.Size(135, 19)
         Me.lblAcabador.TabIndex = 252
         Me.lblAcabador.Text = "Acabador"
         Me.lblAcabador.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
@@ -1433,9 +1428,9 @@ Public Class frmTejidos
         'lblEstampador
         '
         Me.lblEstampador.ImeMode = System.Windows.Forms.ImeMode.NoControl
-        Me.lblEstampador.Location = New System.Drawing.Point(236, 256)
+        Me.lblEstampador.Location = New System.Drawing.Point(330, 315)
         Me.lblEstampador.Name = "lblEstampador"
-        Me.lblEstampador.Size = New System.Drawing.Size(96, 16)
+        Me.lblEstampador.Size = New System.Drawing.Size(135, 20)
         Me.lblEstampador.TabIndex = 251
         Me.lblEstampador.Text = "Estampador"
         Me.lblEstampador.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
@@ -1443,35 +1438,35 @@ Public Class frmTejidos
         'lblTejedor
         '
         Me.lblTejedor.ImeMode = System.Windows.Forms.ImeMode.NoControl
-        Me.lblTejedor.Location = New System.Drawing.Point(236, 232)
+        Me.lblTejedor.Location = New System.Drawing.Point(330, 286)
         Me.lblTejedor.Name = "lblTejedor"
-        Me.lblTejedor.Size = New System.Drawing.Size(96, 16)
+        Me.lblTejedor.Size = New System.Drawing.Size(135, 19)
         Me.lblTejedor.TabIndex = 250
         Me.lblTejedor.Text = "Teixidor"
         Me.lblTejedor.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
         '
         'txtACABADOR
         '
-        Me.txtACABADOR.Location = New System.Drawing.Point(336, 276)
+        Me.txtACABADOR.Location = New System.Drawing.Point(470, 340)
         Me.txtACABADOR.Name = "txtACABADOR"
-        Me.txtACABADOR.Size = New System.Drawing.Size(56, 18)
+        Me.txtACABADOR.Size = New System.Drawing.Size(79, 21)
         Me.txtACABADOR.TabIndex = 5
         Me.txtACABADOR.Tag = Nothing
         '
         'txtESTAMPADOR
         '
-        Me.txtESTAMPADOR.Location = New System.Drawing.Point(336, 252)
+        Me.txtESTAMPADOR.Location = New System.Drawing.Point(470, 310)
         Me.txtESTAMPADOR.Name = "txtESTAMPADOR"
         Me.txtESTAMPADOR.NullText = """"""
-        Me.txtESTAMPADOR.Size = New System.Drawing.Size(56, 18)
+        Me.txtESTAMPADOR.Size = New System.Drawing.Size(79, 21)
         Me.txtESTAMPADOR.TabIndex = 3
         Me.txtESTAMPADOR.Tag = Nothing
         '
         'txtTEIXIDOR
         '
-        Me.txtTEIXIDOR.Location = New System.Drawing.Point(336, 228)
+        Me.txtTEIXIDOR.Location = New System.Drawing.Point(470, 281)
         Me.txtTEIXIDOR.Name = "txtTEIXIDOR"
-        Me.txtTEIXIDOR.Size = New System.Drawing.Size(56, 18)
+        Me.txtTEIXIDOR.Size = New System.Drawing.Size(79, 21)
         Me.txtTEIXIDOR.TabIndex = 1
         Me.txtTEIXIDOR.Tag = Nothing
         '
@@ -1483,242 +1478,242 @@ Public Class frmTejidos
         Me.GroupBox1.Controls.Add(Me.lblCodigoTejidoEscandallo)
         Me.GroupBox1.Controls.Add(Me.tx2DESCRI)
         Me.GroupBox1.FlatStyle = System.Windows.Forms.FlatStyle.System
-        Me.GroupBox1.Location = New System.Drawing.Point(16, 4)
+        Me.GroupBox1.Location = New System.Drawing.Point(22, 5)
         Me.GroupBox1.Name = "GroupBox1"
-        Me.GroupBox1.Size = New System.Drawing.Size(608, 41)
+        Me.GroupBox1.Size = New System.Drawing.Size(852, 50)
         Me.GroupBox1.TabIndex = 243
-        Me.GroupBox1.TabStop = False
+        Me.GroupBox1.TabStop = false
         '
         'tx2CODI
         '
-        Me.tx2CODI.Location = New System.Drawing.Point(92, 16)
+        Me.tx2CODI.Location = New System.Drawing.Point(129, 20)
         Me.tx2CODI.Name = "tx2CODI"
-        Me.tx2CODI.Size = New System.Drawing.Size(100, 18)
+        Me.tx2CODI.Size = New System.Drawing.Size(140, 21)
         Me.tx2CODI.TabIndex = 245
         Me.tx2CODI.Tag = Nothing
         '
         'Label3
         '
-        Me.Label3.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-            Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.Label3.Enabled = False
+        Me.Label3.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom)  _
+            Or System.Windows.Forms.AnchorStyles.Left)  _
+            Or System.Windows.Forms.AnchorStyles.Right),System.Windows.Forms.AnchorStyles)
+        Me.Label3.Enabled = false
         Me.Label3.ImeMode = System.Windows.Forms.ImeMode.NoControl
-        Me.Label3.Location = New System.Drawing.Point(240, 19)
+        Me.Label3.Location = New System.Drawing.Point(336, 23)
         Me.Label3.Name = "Label3"
-        Me.Label3.Size = New System.Drawing.Size(72, 16)
+        Me.Label3.Size = New System.Drawing.Size(101, 20)
         Me.Label3.TabIndex = 244
         Me.Label3.Text = "Descripció"
         Me.Label3.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
         '
         'lblCodigoTejidoEscandallo
         '
-        Me.lblCodigoTejidoEscandallo.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-            Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.lblCodigoTejidoEscandallo.Enabled = False
+        Me.lblCodigoTejidoEscandallo.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom)  _
+            Or System.Windows.Forms.AnchorStyles.Left)  _
+            Or System.Windows.Forms.AnchorStyles.Right),System.Windows.Forms.AnchorStyles)
+        Me.lblCodigoTejidoEscandallo.Enabled = false
         Me.lblCodigoTejidoEscandallo.ImeMode = System.Windows.Forms.ImeMode.NoControl
-        Me.lblCodigoTejidoEscandallo.Location = New System.Drawing.Point(16, 19)
+        Me.lblCodigoTejidoEscandallo.Location = New System.Drawing.Point(22, 23)
         Me.lblCodigoTejidoEscandallo.Name = "lblCodigoTejidoEscandallo"
-        Me.lblCodigoTejidoEscandallo.Size = New System.Drawing.Size(72, 16)
+        Me.lblCodigoTejidoEscandallo.Size = New System.Drawing.Size(101, 20)
         Me.lblCodigoTejidoEscandallo.TabIndex = 243
         Me.lblCodigoTejidoEscandallo.Text = "Codi Teixit"
         Me.lblCodigoTejidoEscandallo.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
         '
         'tx2DESCRI
         '
-        Me.tx2DESCRI.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-            Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.tx2DESCRI.Location = New System.Drawing.Point(328, 16)
+        Me.tx2DESCRI.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom)  _
+            Or System.Windows.Forms.AnchorStyles.Left)  _
+            Or System.Windows.Forms.AnchorStyles.Right),System.Windows.Forms.AnchorStyles)
+        Me.tx2DESCRI.Location = New System.Drawing.Point(459, 20)
         Me.tx2DESCRI.Name = "tx2DESCRI"
-        Me.tx2DESCRI.Size = New System.Drawing.Size(264, 18)
+        Me.tx2DESCRI.Size = New System.Drawing.Size(370, 21)
         Me.tx2DESCRI.TabIndex = 0
         Me.tx2DESCRI.Tag = Nothing
         '
         'tabImpresioFitxa
         '
-        Me.tabImpresioFitxa.BackColor = System.Drawing.Color.FromArgb(CType(CType(221, Byte), Integer), CType(CType(208, Byte), Integer), CType(CType(196, Byte), Integer))
+        Me.tabImpresioFitxa.BackColor = System.Drawing.Color.FromArgb(CType(CType(221,Byte),Integer), CType(CType(208,Byte),Integer), CType(CType(196,Byte),Integer))
         Me.tabImpresioFitxa.Controls.Add(Me.gbImpresionEtiquetas)
         Me.tabImpresioFitxa.Controls.Add(Me.gbFichaTecnica)
         Me.tabImpresioFitxa.Location = New System.Drawing.Point(4, 22)
         Me.tabImpresioFitxa.Name = "tabImpresioFitxa"
-        Me.tabImpresioFitxa.Size = New System.Drawing.Size(852, 604)
+        Me.tabImpresioFitxa.Size = New System.Drawing.Size(1196, 749)
         Me.tabImpresioFitxa.TabIndex = 2
         Me.tabImpresioFitxa.Text = "Impresió Fitxa - Etiquetes"
         '
         'gbImpresionEtiquetas
         '
-        Me.gbImpresionEtiquetas.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-            Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.gbImpresionEtiquetas.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom)  _
+            Or System.Windows.Forms.AnchorStyles.Left),System.Windows.Forms.AnchorStyles)
         Me.gbImpresionEtiquetas.Controls.Add(Me.ppv)
         Me.gbImpresionEtiquetas.Controls.Add(Me.btnGenerarEtiquetas)
         Me.gbImpresionEtiquetas.Controls.Add(Me.txtNumEtiquetas)
         Me.gbImpresionEtiquetas.Controls.Add(Me.Label1)
-        Me.gbImpresionEtiquetas.Location = New System.Drawing.Point(3, 11)
+        Me.gbImpresionEtiquetas.Location = New System.Drawing.Point(4, 14)
         Me.gbImpresionEtiquetas.Name = "gbImpresionEtiquetas"
-        Me.gbImpresionEtiquetas.Size = New System.Drawing.Size(253, 495)
+        Me.gbImpresionEtiquetas.Size = New System.Drawing.Size(354, 609)
         Me.gbImpresionEtiquetas.TabIndex = 246
-        Me.gbImpresionEtiquetas.TabStop = False
+        Me.gbImpresionEtiquetas.TabStop = false
         Me.gbImpresionEtiquetas.Text = "Impresió Etiquetes"
         '
         'ppv
         '
-        Me.ppv.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-            Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.ppv.AvailablePreviewActions = CType(((((C1.Win.C1Preview.C1PreviewActionFlags.FileOpen Or C1.Win.C1Preview.C1PreviewActionFlags.FileSave) _
-            Or C1.Win.C1Preview.C1PreviewActionFlags.PageSetup) _
-            Or C1.Win.C1Preview.C1PreviewActionFlags.Print) _
-            Or C1.Win.C1Preview.C1PreviewActionFlags.Reflow), C1.Win.C1Preview.C1PreviewActionFlags)
-        Me.ppv.Location = New System.Drawing.Point(6, 85)
+        Me.ppv.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom)  _
+            Or System.Windows.Forms.AnchorStyles.Left)  _
+            Or System.Windows.Forms.AnchorStyles.Right),System.Windows.Forms.AnchorStyles)
+        Me.ppv.AvailablePreviewActions = CType(((((C1.Win.C1Preview.C1PreviewActionFlags.FileOpen Or C1.Win.C1Preview.C1PreviewActionFlags.FileSave)  _
+            Or C1.Win.C1Preview.C1PreviewActionFlags.PageSetup)  _
+            Or C1.Win.C1Preview.C1PreviewActionFlags.Print)  _
+            Or C1.Win.C1Preview.C1PreviewActionFlags.Reflow),C1.Win.C1Preview.C1PreviewActionFlags)
+        Me.ppv.Location = New System.Drawing.Point(8, 105)
         Me.ppv.Name = "ppv"
-        Me.ppv.NavigationPanelVisible = False
+        Me.ppv.NavigationPanelVisible = false
         '
         'ppv.PreviewPane
         '
-        Me.ppv.PreviewPane.IntegrateExternalTools = True
-        Me.ppv.PreviewPane.ShowToolTips = False
+        Me.ppv.PreviewPane.IntegrateExternalTools = true
+        Me.ppv.PreviewPane.ShowToolTips = false
         Me.ppv.PreviewPane.TabIndex = 0
-        Me.ppv.Size = New System.Drawing.Size(241, 387)
-        Me.ppv.StatusBarVisible = False
+        Me.ppv.Size = New System.Drawing.Size(338, 476)
+        Me.ppv.StatusBarVisible = false
         Me.ppv.TabIndex = 248
         Me.ppv.Text = "C1PrintPreviewControl1"
         '
         '
         '
-        Me.ppv.ToolBars.File.Open.Image = CType(resources.GetObject("ppv.ToolBars.File.Open.Image"), System.Drawing.Image)
+        Me.ppv.ToolBars.File.Open.Image = CType(resources.GetObject("ppv.ToolBars.File.Open.Image"),System.Drawing.Image)
         Me.ppv.ToolBars.File.Open.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.ppv.ToolBars.File.Open.Name = "btnFileOpen"
-        Me.ppv.ToolBars.File.Open.Size = New System.Drawing.Size(32, 22)
+        Me.ppv.ToolBars.File.Open.Size = New System.Drawing.Size(39, 24)
         Me.ppv.ToolBars.File.Open.Tag = "C1PreviewActionEnum.FileOpen"
         Me.ppv.ToolBars.File.Open.ToolTipText = "Open File"
         '
         '
         '
-        Me.ppv.ToolBars.File.PageSetup.Image = CType(resources.GetObject("ppv.ToolBars.File.PageSetup.Image"), System.Drawing.Image)
+        Me.ppv.ToolBars.File.PageSetup.Image = CType(resources.GetObject("ppv.ToolBars.File.PageSetup.Image"),System.Drawing.Image)
         Me.ppv.ToolBars.File.PageSetup.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.ppv.ToolBars.File.PageSetup.Name = "btnPageSetup"
-        Me.ppv.ToolBars.File.PageSetup.Size = New System.Drawing.Size(23, 22)
+        Me.ppv.ToolBars.File.PageSetup.Size = New System.Drawing.Size(29, 24)
         Me.ppv.ToolBars.File.PageSetup.Tag = "C1PreviewActionEnum.PageSetup"
         Me.ppv.ToolBars.File.PageSetup.ToolTipText = "Page Setup"
         '
         '
         '
-        Me.ppv.ToolBars.File.Parameters.Image = CType(resources.GetObject("ppv.ToolBars.File.Parameters.Image"), System.Drawing.Image)
+        Me.ppv.ToolBars.File.Parameters.Image = CType(resources.GetObject("ppv.ToolBars.File.Parameters.Image"),System.Drawing.Image)
         Me.ppv.ToolBars.File.Parameters.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.ppv.ToolBars.File.Parameters.Name = "btnParameters"
         Me.ppv.ToolBars.File.Parameters.Size = New System.Drawing.Size(23, 22)
         Me.ppv.ToolBars.File.Parameters.Tag = "C1PreviewActionEnum.Parameters"
         Me.ppv.ToolBars.File.Parameters.ToolTipText = "Report Parameters"
-        Me.ppv.ToolBars.File.Parameters.Visible = False
+        Me.ppv.ToolBars.File.Parameters.Visible = false
         '
         '
         '
-        Me.ppv.ToolBars.File.Print.Image = CType(resources.GetObject("ppv.ToolBars.File.Print.Image"), System.Drawing.Image)
+        Me.ppv.ToolBars.File.Print.Image = CType(resources.GetObject("ppv.ToolBars.File.Print.Image"),System.Drawing.Image)
         Me.ppv.ToolBars.File.Print.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.ppv.ToolBars.File.Print.Name = "btnPrint"
-        Me.ppv.ToolBars.File.Print.Size = New System.Drawing.Size(23, 22)
+        Me.ppv.ToolBars.File.Print.Size = New System.Drawing.Size(29, 24)
         Me.ppv.ToolBars.File.Print.Tag = "C1PreviewActionEnum.Print"
         Me.ppv.ToolBars.File.Print.ToolTipText = "Print"
         '
         '
         '
-        Me.ppv.ToolBars.File.PrintLayout.Image = CType(resources.GetObject("ppv.ToolBars.File.PrintLayout.Image"), System.Drawing.Image)
+        Me.ppv.ToolBars.File.PrintLayout.Image = CType(resources.GetObject("ppv.ToolBars.File.PrintLayout.Image"),System.Drawing.Image)
         Me.ppv.ToolBars.File.PrintLayout.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.ppv.ToolBars.File.PrintLayout.Name = "btnPrintLayout"
         Me.ppv.ToolBars.File.PrintLayout.Size = New System.Drawing.Size(23, 22)
         Me.ppv.ToolBars.File.PrintLayout.Tag = "C1PreviewActionEnum.PrintLayout"
         Me.ppv.ToolBars.File.PrintLayout.ToolTipText = "Print Layout"
-        Me.ppv.ToolBars.File.PrintLayout.Visible = False
+        Me.ppv.ToolBars.File.PrintLayout.Visible = false
         '
         '
         '
-        Me.ppv.ToolBars.File.Reflow.Image = CType(resources.GetObject("ppv.ToolBars.File.Reflow.Image"), System.Drawing.Image)
+        Me.ppv.ToolBars.File.Reflow.Image = CType(resources.GetObject("ppv.ToolBars.File.Reflow.Image"),System.Drawing.Image)
         Me.ppv.ToolBars.File.Reflow.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.ppv.ToolBars.File.Reflow.Name = "btnReflow"
-        Me.ppv.ToolBars.File.Reflow.Size = New System.Drawing.Size(23, 22)
+        Me.ppv.ToolBars.File.Reflow.Size = New System.Drawing.Size(29, 24)
         Me.ppv.ToolBars.File.Reflow.Tag = "C1PreviewActionEnum.Reflow"
         Me.ppv.ToolBars.File.Reflow.ToolTipText = "Reflow"
         '
         '
         '
-        Me.ppv.ToolBars.File.Save.Image = CType(resources.GetObject("ppv.ToolBars.File.Save.Image"), System.Drawing.Image)
+        Me.ppv.ToolBars.File.Save.Image = CType(resources.GetObject("ppv.ToolBars.File.Save.Image"),System.Drawing.Image)
         Me.ppv.ToolBars.File.Save.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.ppv.ToolBars.File.Save.Name = "btnFileSave"
-        Me.ppv.ToolBars.File.Save.Size = New System.Drawing.Size(23, 22)
+        Me.ppv.ToolBars.File.Save.Size = New System.Drawing.Size(29, 24)
         Me.ppv.ToolBars.File.Save.Tag = "C1PreviewActionEnum.FileSave"
         Me.ppv.ToolBars.File.Save.ToolTipText = "Save File"
         '
         '
         '
-        Me.ppv.ToolBars.File.Stop.Image = CType(resources.GetObject("ppv.ToolBars.File.Stop.Image"), System.Drawing.Image)
+        Me.ppv.ToolBars.File.Stop.Image = CType(resources.GetObject("ppv.ToolBars.File.Stop.Image"),System.Drawing.Image)
         Me.ppv.ToolBars.File.Stop.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.ppv.ToolBars.File.Stop.Name = "btnStop"
         Me.ppv.ToolBars.File.Stop.Size = New System.Drawing.Size(23, 22)
         Me.ppv.ToolBars.File.Stop.Tag = "C1PreviewActionEnum.Stop"
         Me.ppv.ToolBars.File.Stop.ToolTipText = "Stop"
-        Me.ppv.ToolBars.File.Stop.Visible = False
+        Me.ppv.ToolBars.File.Stop.Visible = false
         '
         '
         '
-        Me.ppv.ToolBars.Navigation.GoFirst.Image = CType(resources.GetObject("ppv.ToolBars.Navigation.GoFirst.Image"), System.Drawing.Image)
+        Me.ppv.ToolBars.Navigation.GoFirst.Image = CType(resources.GetObject("ppv.ToolBars.Navigation.GoFirst.Image"),System.Drawing.Image)
         Me.ppv.ToolBars.Navigation.GoFirst.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.ppv.ToolBars.Navigation.GoFirst.Name = "btnGoFirst"
         Me.ppv.ToolBars.Navigation.GoFirst.Size = New System.Drawing.Size(23, 22)
         Me.ppv.ToolBars.Navigation.GoFirst.Tag = "C1PreviewActionEnum.GoFirst"
         Me.ppv.ToolBars.Navigation.GoFirst.ToolTipText = "Go To First Page"
-        Me.ppv.ToolBars.Navigation.GoFirst.Visible = False
+        Me.ppv.ToolBars.Navigation.GoFirst.Visible = false
         '
         '
         '
-        Me.ppv.ToolBars.Navigation.GoLast.Image = CType(resources.GetObject("ppv.ToolBars.Navigation.GoLast.Image"), System.Drawing.Image)
+        Me.ppv.ToolBars.Navigation.GoLast.Image = CType(resources.GetObject("ppv.ToolBars.Navigation.GoLast.Image"),System.Drawing.Image)
         Me.ppv.ToolBars.Navigation.GoLast.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.ppv.ToolBars.Navigation.GoLast.Name = "btnGoLast"
         Me.ppv.ToolBars.Navigation.GoLast.Size = New System.Drawing.Size(23, 20)
         Me.ppv.ToolBars.Navigation.GoLast.Tag = "C1PreviewActionEnum.GoLast"
         Me.ppv.ToolBars.Navigation.GoLast.ToolTipText = "Go To Last Page"
-        Me.ppv.ToolBars.Navigation.GoLast.Visible = False
+        Me.ppv.ToolBars.Navigation.GoLast.Visible = false
         '
         '
         '
-        Me.ppv.ToolBars.Navigation.GoNext.Image = CType(resources.GetObject("ppv.ToolBars.Navigation.GoNext.Image"), System.Drawing.Image)
+        Me.ppv.ToolBars.Navigation.GoNext.Image = CType(resources.GetObject("ppv.ToolBars.Navigation.GoNext.Image"),System.Drawing.Image)
         Me.ppv.ToolBars.Navigation.GoNext.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.ppv.ToolBars.Navigation.GoNext.Name = "btnGoNext"
         Me.ppv.ToolBars.Navigation.GoNext.Size = New System.Drawing.Size(23, 20)
         Me.ppv.ToolBars.Navigation.GoNext.Tag = "C1PreviewActionEnum.GoNext"
         Me.ppv.ToolBars.Navigation.GoNext.ToolTipText = "Go To Next Page"
-        Me.ppv.ToolBars.Navigation.GoNext.Visible = False
+        Me.ppv.ToolBars.Navigation.GoNext.Visible = false
         '
         '
         '
-        Me.ppv.ToolBars.Navigation.GoPrev.Image = CType(resources.GetObject("ppv.ToolBars.Navigation.GoPrev.Image"), System.Drawing.Image)
+        Me.ppv.ToolBars.Navigation.GoPrev.Image = CType(resources.GetObject("ppv.ToolBars.Navigation.GoPrev.Image"),System.Drawing.Image)
         Me.ppv.ToolBars.Navigation.GoPrev.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.ppv.ToolBars.Navigation.GoPrev.Name = "btnGoPrev"
         Me.ppv.ToolBars.Navigation.GoPrev.Size = New System.Drawing.Size(23, 20)
         Me.ppv.ToolBars.Navigation.GoPrev.Tag = "C1PreviewActionEnum.GoPrev"
         Me.ppv.ToolBars.Navigation.GoPrev.ToolTipText = "Go To Previous Page"
-        Me.ppv.ToolBars.Navigation.GoPrev.Visible = False
+        Me.ppv.ToolBars.Navigation.GoPrev.Visible = false
         '
         '
         '
-        Me.ppv.ToolBars.Navigation.HistoryNext.Image = CType(resources.GetObject("ppv.ToolBars.Navigation.HistoryNext.Image"), System.Drawing.Image)
+        Me.ppv.ToolBars.Navigation.HistoryNext.Image = CType(resources.GetObject("ppv.ToolBars.Navigation.HistoryNext.Image"),System.Drawing.Image)
         Me.ppv.ToolBars.Navigation.HistoryNext.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.ppv.ToolBars.Navigation.HistoryNext.Name = "btnHistoryNext"
         Me.ppv.ToolBars.Navigation.HistoryNext.Size = New System.Drawing.Size(32, 20)
         Me.ppv.ToolBars.Navigation.HistoryNext.Tag = "C1PreviewActionEnum.HistoryNext"
         Me.ppv.ToolBars.Navigation.HistoryNext.ToolTipText = "Next View"
-        Me.ppv.ToolBars.Navigation.HistoryNext.Visible = False
+        Me.ppv.ToolBars.Navigation.HistoryNext.Visible = false
         '
         '
         '
-        Me.ppv.ToolBars.Navigation.HistoryPrev.Image = CType(resources.GetObject("ppv.ToolBars.Navigation.HistoryPrev.Image"), System.Drawing.Image)
+        Me.ppv.ToolBars.Navigation.HistoryPrev.Image = CType(resources.GetObject("ppv.ToolBars.Navigation.HistoryPrev.Image"),System.Drawing.Image)
         Me.ppv.ToolBars.Navigation.HistoryPrev.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.ppv.ToolBars.Navigation.HistoryPrev.Name = "btnHistoryPrev"
         Me.ppv.ToolBars.Navigation.HistoryPrev.Size = New System.Drawing.Size(32, 20)
         Me.ppv.ToolBars.Navigation.HistoryPrev.Tag = "C1PreviewActionEnum.HistoryPrev"
         Me.ppv.ToolBars.Navigation.HistoryPrev.ToolTipText = "Previous View"
-        Me.ppv.ToolBars.Navigation.HistoryPrev.Visible = False
+        Me.ppv.ToolBars.Navigation.HistoryPrev.Visible = false
         '
         '
         '
@@ -1726,7 +1721,7 @@ Public Class frmTejidos
         Me.ppv.ToolBars.Navigation.LblOfPages.Size = New System.Drawing.Size(27, 15)
         Me.ppv.ToolBars.Navigation.LblOfPages.Tag = "C1PreviewActionEnum.GoPageCount"
         Me.ppv.ToolBars.Navigation.LblOfPages.Text = "of 0"
-        Me.ppv.ToolBars.Navigation.LblOfPages.Visible = False
+        Me.ppv.ToolBars.Navigation.LblOfPages.Visible = false
         '
         '
         '
@@ -1734,75 +1729,76 @@ Public Class frmTejidos
         Me.ppv.ToolBars.Navigation.LblPage.Size = New System.Drawing.Size(33, 15)
         Me.ppv.ToolBars.Navigation.LblPage.Tag = "C1PreviewActionEnum.GoPageLabel"
         Me.ppv.ToolBars.Navigation.LblPage.Text = "Page"
-        Me.ppv.ToolBars.Navigation.LblPage.Visible = False
+        Me.ppv.ToolBars.Navigation.LblPage.Visible = false
         '
         '
         '
-        Me.ppv.ToolBars.Navigation.NavigationPane.Image = CType(resources.GetObject("ppv.ToolBars.Navigation.NavigationPane.Image"), System.Drawing.Image)
+        Me.ppv.ToolBars.Navigation.NavigationPane.Image = CType(resources.GetObject("ppv.ToolBars.Navigation.NavigationPane.Image"),System.Drawing.Image)
         Me.ppv.ToolBars.Navigation.NavigationPane.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.ppv.ToolBars.Navigation.NavigationPane.Name = "btnNavigationPane"
         Me.ppv.ToolBars.Navigation.NavigationPane.Size = New System.Drawing.Size(23, 22)
         Me.ppv.ToolBars.Navigation.NavigationPane.Tag = "C1PreviewActionEnum.NavigationPane"
         Me.ppv.ToolBars.Navigation.NavigationPane.ToolTipText = "Navigation Pane"
-        Me.ppv.ToolBars.Navigation.NavigationPane.Visible = False
+        Me.ppv.ToolBars.Navigation.NavigationPane.Visible = false
         '
         '
         '
+        Me.ppv.ToolBars.Navigation.PageNo.Font = New System.Drawing.Font("Segoe UI", 9!)
         Me.ppv.ToolBars.Navigation.PageNo.Name = "txtPageNo"
         Me.ppv.ToolBars.Navigation.PageNo.Size = New System.Drawing.Size(34, 23)
         Me.ppv.ToolBars.Navigation.PageNo.Tag = "C1PreviewActionEnum.GoPageNumber"
         Me.ppv.ToolBars.Navigation.PageNo.Text = "1"
-        Me.ppv.ToolBars.Navigation.PageNo.Visible = False
+        Me.ppv.ToolBars.Navigation.PageNo.Visible = false
         Me.ppv.ToolBars.Navigation.ToolTipPageNo = Nothing
         '
         '
         '
-        Me.ppv.ToolBars.Page.Continuous.Image = CType(resources.GetObject("ppv.ToolBars.Page.Continuous.Image"), System.Drawing.Image)
+        Me.ppv.ToolBars.Page.Continuous.Image = CType(resources.GetObject("ppv.ToolBars.Page.Continuous.Image"),System.Drawing.Image)
         Me.ppv.ToolBars.Page.Continuous.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.ppv.ToolBars.Page.Continuous.Name = "btnPageContinuous"
         Me.ppv.ToolBars.Page.Continuous.Size = New System.Drawing.Size(23, 22)
         Me.ppv.ToolBars.Page.Continuous.Tag = "C1PreviewActionEnum.PageContinuous"
         Me.ppv.ToolBars.Page.Continuous.ToolTipText = "Continuous View"
-        Me.ppv.ToolBars.Page.Continuous.Visible = False
+        Me.ppv.ToolBars.Page.Continuous.Visible = false
         '
         '
         '
-        Me.ppv.ToolBars.Page.Facing.Image = CType(resources.GetObject("ppv.ToolBars.Page.Facing.Image"), System.Drawing.Image)
+        Me.ppv.ToolBars.Page.Facing.Image = CType(resources.GetObject("ppv.ToolBars.Page.Facing.Image"),System.Drawing.Image)
         Me.ppv.ToolBars.Page.Facing.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.ppv.ToolBars.Page.Facing.Name = "btnPageFacing"
         Me.ppv.ToolBars.Page.Facing.Size = New System.Drawing.Size(23, 22)
         Me.ppv.ToolBars.Page.Facing.Tag = "C1PreviewActionEnum.PageFacing"
         Me.ppv.ToolBars.Page.Facing.ToolTipText = "Pages Facing View"
-        Me.ppv.ToolBars.Page.Facing.Visible = False
+        Me.ppv.ToolBars.Page.Facing.Visible = false
         '
         '
         '
-        Me.ppv.ToolBars.Page.FacingContinuous.Image = CType(resources.GetObject("ppv.ToolBars.Page.FacingContinuous.Image"), System.Drawing.Image)
+        Me.ppv.ToolBars.Page.FacingContinuous.Image = CType(resources.GetObject("ppv.ToolBars.Page.FacingContinuous.Image"),System.Drawing.Image)
         Me.ppv.ToolBars.Page.FacingContinuous.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.ppv.ToolBars.Page.FacingContinuous.Name = "btnPageFacingContinuous"
         Me.ppv.ToolBars.Page.FacingContinuous.Size = New System.Drawing.Size(23, 22)
         Me.ppv.ToolBars.Page.FacingContinuous.Tag = "C1PreviewActionEnum.PageFacingContinuous"
         Me.ppv.ToolBars.Page.FacingContinuous.ToolTipText = "Pages Facing Continuous View"
-        Me.ppv.ToolBars.Page.FacingContinuous.Visible = False
+        Me.ppv.ToolBars.Page.FacingContinuous.Visible = false
         '
         '
         '
-        Me.ppv.ToolBars.Page.Single.Image = CType(resources.GetObject("ppv.ToolBars.Page.Single.Image"), System.Drawing.Image)
+        Me.ppv.ToolBars.Page.Single.Image = CType(resources.GetObject("ppv.ToolBars.Page.Single.Image"),System.Drawing.Image)
         Me.ppv.ToolBars.Page.Single.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.ppv.ToolBars.Page.Single.Name = "btnPageSingle"
         Me.ppv.ToolBars.Page.Single.Size = New System.Drawing.Size(23, 22)
         Me.ppv.ToolBars.Page.Single.Tag = "C1PreviewActionEnum.PageSingle"
         Me.ppv.ToolBars.Page.Single.ToolTipText = "Single Page View"
-        Me.ppv.ToolBars.Page.Single.Visible = False
+        Me.ppv.ToolBars.Page.Single.Visible = false
         '
         '
         '
-        Me.ppv.ToolBars.Search.CloseSearch.Image = CType(resources.GetObject("ppv.ToolBars.Search.CloseSearch.Image"), System.Drawing.Image)
+        Me.ppv.ToolBars.Search.CloseSearch.Image = CType(resources.GetObject("ppv.ToolBars.Search.CloseSearch.Image"),System.Drawing.Image)
         Me.ppv.ToolBars.Search.CloseSearch.Name = "btnCloseSearch"
         Me.ppv.ToolBars.Search.CloseSearch.Size = New System.Drawing.Size(23, 22)
         Me.ppv.ToolBars.Search.CloseSearch.Tag = "C1PreviewActionEnum.CloseSearch"
         Me.ppv.ToolBars.Search.CloseSearch.ToolTipText = "Close"
-        Me.ppv.ToolBars.Search.CloseSearch.Visible = False
+        Me.ppv.ToolBars.Search.CloseSearch.Visible = false
         '
         '
         '
@@ -1811,7 +1807,7 @@ Public Class frmTejidos
         Me.ppv.ToolBars.Search.MatchCase.Tag = "C1PreviewActionEnum.MatchCase"
         Me.ppv.ToolBars.Search.MatchCase.Text = "Match Case"
         Me.ppv.ToolBars.Search.MatchCase.ToolTipText = "Search with case sensitivity"
-        Me.ppv.ToolBars.Search.MatchCase.Visible = False
+        Me.ppv.ToolBars.Search.MatchCase.Visible = false
         '
         '
         '
@@ -1820,7 +1816,7 @@ Public Class frmTejidos
         Me.ppv.ToolBars.Search.MatchWholeWord.Tag = "C1PreviewActionEnum.MatchWholeWord"
         Me.ppv.ToolBars.Search.MatchWholeWord.Text = "Whole Word"
         Me.ppv.ToolBars.Search.MatchWholeWord.ToolTipText = "Match whole word only"
-        Me.ppv.ToolBars.Search.MatchWholeWord.Visible = False
+        Me.ppv.ToolBars.Search.MatchWholeWord.Visible = false
         '
         '
         '
@@ -1828,115 +1824,117 @@ Public Class frmTejidos
         Me.ppv.ToolBars.Search.SearchLabel.Size = New System.Drawing.Size(33, 22)
         Me.ppv.ToolBars.Search.SearchLabel.Tag = "C1PreviewActionEnum.SearchLabel"
         Me.ppv.ToolBars.Search.SearchLabel.Text = "Find:"
-        Me.ppv.ToolBars.Search.SearchLabel.Visible = False
+        Me.ppv.ToolBars.Search.SearchLabel.Visible = false
         '
         '
         '
-        Me.ppv.ToolBars.Search.SearchNext.Image = CType(resources.GetObject("ppv.ToolBars.Search.SearchNext.Image"), System.Drawing.Image)
+        Me.ppv.ToolBars.Search.SearchNext.Image = CType(resources.GetObject("ppv.ToolBars.Search.SearchNext.Image"),System.Drawing.Image)
         Me.ppv.ToolBars.Search.SearchNext.Name = "btnSearchNext"
         Me.ppv.ToolBars.Search.SearchNext.Size = New System.Drawing.Size(23, 22)
         Me.ppv.ToolBars.Search.SearchNext.Tag = "C1PreviewActionEnum.SearchNext"
         Me.ppv.ToolBars.Search.SearchNext.ToolTipText = "Search Next"
-        Me.ppv.ToolBars.Search.SearchNext.Visible = False
+        Me.ppv.ToolBars.Search.SearchNext.Visible = false
         '
         '
         '
-        Me.ppv.ToolBars.Search.SearchPrevious.Image = CType(resources.GetObject("ppv.ToolBars.Search.SearchPrevious.Image"), System.Drawing.Image)
+        Me.ppv.ToolBars.Search.SearchPrevious.Image = CType(resources.GetObject("ppv.ToolBars.Search.SearchPrevious.Image"),System.Drawing.Image)
         Me.ppv.ToolBars.Search.SearchPrevious.Name = "btnSearchPrevious"
         Me.ppv.ToolBars.Search.SearchPrevious.Size = New System.Drawing.Size(23, 22)
         Me.ppv.ToolBars.Search.SearchPrevious.Tag = "C1PreviewActionEnum.SearchPrevious"
         Me.ppv.ToolBars.Search.SearchPrevious.ToolTipText = "Search Previous"
-        Me.ppv.ToolBars.Search.SearchPrevious.Visible = False
+        Me.ppv.ToolBars.Search.SearchPrevious.Visible = false
         '
         '
         '
+        Me.ppv.ToolBars.Search.SearchText.Font = New System.Drawing.Font("Segoe UI", 9!)
         Me.ppv.ToolBars.Search.SearchText.Name = "txtSearchText"
-        Me.ppv.ToolBars.Search.SearchText.Size = New System.Drawing.Size(200, 25)
+        Me.ppv.ToolBars.Search.SearchText.Size = New System.Drawing.Size(280, 27)
         Me.ppv.ToolBars.Search.SearchText.Tag = "C1PreviewActionEnum.SearchText"
-        Me.ppv.ToolBars.Search.SearchText.Visible = False
+        Me.ppv.ToolBars.Search.SearchText.Visible = false
         '
         '
         '
-        Me.ppv.ToolBars.Text.Find.Image = CType(resources.GetObject("ppv.ToolBars.Text.Find.Image"), System.Drawing.Image)
+        Me.ppv.ToolBars.Text.Find.Image = CType(resources.GetObject("ppv.ToolBars.Text.Find.Image"),System.Drawing.Image)
         Me.ppv.ToolBars.Text.Find.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.ppv.ToolBars.Text.Find.Name = "btnFind"
         Me.ppv.ToolBars.Text.Find.Size = New System.Drawing.Size(23, 22)
         Me.ppv.ToolBars.Text.Find.Tag = "C1PreviewActionEnum.Find"
         Me.ppv.ToolBars.Text.Find.ToolTipText = "Find Text"
-        Me.ppv.ToolBars.Text.Find.Visible = False
+        Me.ppv.ToolBars.Text.Find.Visible = false
         '
         '
         '
-        Me.ppv.ToolBars.Text.Hand.Image = CType(resources.GetObject("ppv.ToolBars.Text.Hand.Image"), System.Drawing.Image)
+        Me.ppv.ToolBars.Text.Hand.Image = CType(resources.GetObject("ppv.ToolBars.Text.Hand.Image"),System.Drawing.Image)
         Me.ppv.ToolBars.Text.Hand.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.ppv.ToolBars.Text.Hand.Name = "btnHandTool"
         Me.ppv.ToolBars.Text.Hand.Size = New System.Drawing.Size(23, 22)
         Me.ppv.ToolBars.Text.Hand.Tag = "C1PreviewActionEnum.HandTool"
         Me.ppv.ToolBars.Text.Hand.ToolTipText = "Hand Tool"
-        Me.ppv.ToolBars.Text.Hand.Visible = False
+        Me.ppv.ToolBars.Text.Hand.Visible = false
         '
         '
         '
-        Me.ppv.ToolBars.Text.SelectText.Image = CType(resources.GetObject("ppv.ToolBars.Text.SelectText.Image"), System.Drawing.Image)
+        Me.ppv.ToolBars.Text.SelectText.Image = CType(resources.GetObject("ppv.ToolBars.Text.SelectText.Image"),System.Drawing.Image)
         Me.ppv.ToolBars.Text.SelectText.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.ppv.ToolBars.Text.SelectText.Name = "btnSelectTextTool"
         Me.ppv.ToolBars.Text.SelectText.Size = New System.Drawing.Size(23, 22)
         Me.ppv.ToolBars.Text.SelectText.Tag = "C1PreviewActionEnum.SelectTextTool"
         Me.ppv.ToolBars.Text.SelectText.ToolTipText = "Text Select Tool"
-        Me.ppv.ToolBars.Text.SelectText.Visible = False
+        Me.ppv.ToolBars.Text.SelectText.Visible = false
         '
         '
         '
         Me.ppv.ToolBars.Zoom.DropZoomFactor.Name = "dropZoomFactor"
         Me.ppv.ToolBars.Zoom.DropZoomFactor.Size = New System.Drawing.Size(13, 22)
         Me.ppv.ToolBars.Zoom.DropZoomFactor.Tag = "C1PreviewActionEnum.ZoomFactor"
-        Me.ppv.ToolBars.Zoom.DropZoomFactor.Visible = False
+        Me.ppv.ToolBars.Zoom.DropZoomFactor.Visible = false
         Me.ppv.ToolBars.Zoom.ToolTipZoomFactor = Nothing
         '
         '
         '
+        Me.ppv.ToolBars.Zoom.ZoomFactor.Font = New System.Drawing.Font("Segoe UI", 9!)
         Me.ppv.ToolBars.Zoom.ZoomFactor.Name = "txtZoomFactor"
-        Me.ppv.ToolBars.Zoom.ZoomFactor.Size = New System.Drawing.Size(34, 25)
+        Me.ppv.ToolBars.Zoom.ZoomFactor.Size = New System.Drawing.Size(47, 27)
         Me.ppv.ToolBars.Zoom.ZoomFactor.Tag = "C1PreviewActionEnum.ZoomFactor"
         Me.ppv.ToolBars.Zoom.ZoomFactor.Text = "100%"
-        Me.ppv.ToolBars.Zoom.ZoomFactor.Visible = False
+        Me.ppv.ToolBars.Zoom.ZoomFactor.Visible = false
         '
         '
         '
-        Me.ppv.ToolBars.Zoom.ZoomIn.Image = CType(resources.GetObject("ppv.ToolBars.Zoom.ZoomIn.Image"), System.Drawing.Image)
+        Me.ppv.ToolBars.Zoom.ZoomIn.Image = CType(resources.GetObject("ppv.ToolBars.Zoom.ZoomIn.Image"),System.Drawing.Image)
         Me.ppv.ToolBars.Zoom.ZoomIn.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.ppv.ToolBars.Zoom.ZoomIn.Name = "btnZoomIn"
         Me.ppv.ToolBars.Zoom.ZoomIn.Size = New System.Drawing.Size(23, 22)
         Me.ppv.ToolBars.Zoom.ZoomIn.Tag = "C1PreviewActionEnum.ZoomIn"
         Me.ppv.ToolBars.Zoom.ZoomIn.ToolTipText = "Zoom In"
-        Me.ppv.ToolBars.Zoom.ZoomIn.Visible = False
+        Me.ppv.ToolBars.Zoom.ZoomIn.Visible = false
         '
         '
         '
-        Me.ppv.ToolBars.Zoom.ZoomInTool.Image = CType(resources.GetObject("ppv.ToolBars.Zoom.ZoomInTool.Image"), System.Drawing.Image)
+        Me.ppv.ToolBars.Zoom.ZoomInTool.Image = CType(resources.GetObject("ppv.ToolBars.Zoom.ZoomInTool.Image"),System.Drawing.Image)
         Me.ppv.ToolBars.Zoom.ZoomInTool.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.ppv.ToolBars.Zoom.ZoomInTool.Name = "itemZoomInTool"
-        Me.ppv.ToolBars.Zoom.ZoomInTool.Size = New System.Drawing.Size(207, 22)
+        Me.ppv.ToolBars.Zoom.ZoomInTool.Size = New System.Drawing.Size(261, 26)
         Me.ppv.ToolBars.Zoom.ZoomInTool.Tag = "C1PreviewActionEnum.ZoomInTool"
         Me.ppv.ToolBars.Zoom.ZoomInTool.Text = "Herramienta para acercar"
         Me.ppv.ToolBars.Zoom.ZoomInTool.ToolTipText = "Herramienta para acercar"
         '
         '
         '
-        Me.ppv.ToolBars.Zoom.ZoomOut.Image = CType(resources.GetObject("ppv.ToolBars.Zoom.ZoomOut.Image"), System.Drawing.Image)
+        Me.ppv.ToolBars.Zoom.ZoomOut.Image = CType(resources.GetObject("ppv.ToolBars.Zoom.ZoomOut.Image"),System.Drawing.Image)
         Me.ppv.ToolBars.Zoom.ZoomOut.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.ppv.ToolBars.Zoom.ZoomOut.Name = "btnZoomOut"
         Me.ppv.ToolBars.Zoom.ZoomOut.Size = New System.Drawing.Size(23, 22)
         Me.ppv.ToolBars.Zoom.ZoomOut.Tag = "C1PreviewActionEnum.ZoomOut"
         Me.ppv.ToolBars.Zoom.ZoomOut.ToolTipText = "Zoom Out"
-        Me.ppv.ToolBars.Zoom.ZoomOut.Visible = False
+        Me.ppv.ToolBars.Zoom.ZoomOut.Visible = false
         '
         '
         '
-        Me.ppv.ToolBars.Zoom.ZoomOutTool.Image = CType(resources.GetObject("ppv.ToolBars.Zoom.ZoomOutTool.Image"), System.Drawing.Image)
+        Me.ppv.ToolBars.Zoom.ZoomOutTool.Image = CType(resources.GetObject("ppv.ToolBars.Zoom.ZoomOutTool.Image"),System.Drawing.Image)
         Me.ppv.ToolBars.Zoom.ZoomOutTool.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.ppv.ToolBars.Zoom.ZoomOutTool.Name = "itemZoomOutTool"
-        Me.ppv.ToolBars.Zoom.ZoomOutTool.Size = New System.Drawing.Size(207, 22)
+        Me.ppv.ToolBars.Zoom.ZoomOutTool.Size = New System.Drawing.Size(261, 26)
         Me.ppv.ToolBars.Zoom.ZoomOutTool.Tag = "C1PreviewActionEnum.ZoomOutTool"
         Me.ppv.ToolBars.Zoom.ZoomOutTool.Text = "Herramienta para alejar"
         Me.ppv.ToolBars.Zoom.ZoomOutTool.ToolTipText = "Herramienta para alejar"
@@ -1944,31 +1942,31 @@ Public Class frmTejidos
         '
         '
         Me.ppv.ToolBars.Zoom.ZoomTool.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ppv.ToolBars.Zoom.ZoomInTool, Me.ppv.ToolBars.Zoom.ZoomOutTool})
-        Me.ppv.ToolBars.Zoom.ZoomTool.Image = CType(resources.GetObject("ppv.ToolBars.Zoom.ZoomTool.Image"), System.Drawing.Image)
+        Me.ppv.ToolBars.Zoom.ZoomTool.Image = CType(resources.GetObject("ppv.ToolBars.Zoom.ZoomTool.Image"),System.Drawing.Image)
         Me.ppv.ToolBars.Zoom.ZoomTool.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.ppv.ToolBars.Zoom.ZoomTool.Name = "btnZoomTool"
         Me.ppv.ToolBars.Zoom.ZoomTool.Size = New System.Drawing.Size(32, 22)
         Me.ppv.ToolBars.Zoom.ZoomTool.Tag = "C1PreviewActionEnum.ZoomInTool"
         Me.ppv.ToolBars.Zoom.ZoomTool.ToolTipText = "Zoom In Tool"
-        Me.ppv.ToolBars.Zoom.ZoomTool.Visible = False
+        Me.ppv.ToolBars.Zoom.ZoomTool.Visible = false
         '
         'btnGenerarEtiquetas
         '
         Me.btnGenerarEtiquetas.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.btnGenerarEtiquetas.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft
         Me.btnGenerarEtiquetas.ImeMode = System.Windows.Forms.ImeMode.NoControl
-        Me.btnGenerarEtiquetas.Location = New System.Drawing.Point(15, 38)
+        Me.btnGenerarEtiquetas.Location = New System.Drawing.Point(21, 47)
         Me.btnGenerarEtiquetas.Name = "btnGenerarEtiquetas"
-        Me.btnGenerarEtiquetas.Size = New System.Drawing.Size(168, 41)
+        Me.btnGenerarEtiquetas.Size = New System.Drawing.Size(235, 50)
         Me.btnGenerarEtiquetas.TabIndex = 244
         Me.btnGenerarEtiquetas.Text = "Generar Etiquetes"
-        Me.btnGenerarEtiquetas.UseVisualStyleBackColor = True
+        Me.btnGenerarEtiquetas.UseVisualStyleBackColor = true
         '
         'txtNumEtiquetas
         '
-        Me.txtNumEtiquetas.Location = New System.Drawing.Point(115, 16)
+        Me.txtNumEtiquetas.Location = New System.Drawing.Point(161, 20)
         Me.txtNumEtiquetas.Name = "txtNumEtiquetas"
-        Me.txtNumEtiquetas.Size = New System.Drawing.Size(68, 18)
+        Me.txtNumEtiquetas.Size = New System.Drawing.Size(95, 21)
         Me.txtNumEtiquetas.TabIndex = 243
         Me.txtNumEtiquetas.Tag = Nothing
         Me.txtNumEtiquetas.Value = "1"
@@ -1976,321 +1974,324 @@ Public Class frmTejidos
         'Label1
         '
         Me.Label1.ImeMode = System.Windows.Forms.ImeMode.NoControl
-        Me.Label1.Location = New System.Drawing.Point(9, 15)
+        Me.Label1.Location = New System.Drawing.Point(13, 18)
         Me.Label1.Name = "Label1"
-        Me.Label1.Size = New System.Drawing.Size(100, 20)
+        Me.Label1.Size = New System.Drawing.Size(140, 25)
         Me.Label1.TabIndex = 245
         Me.Label1.Text = "Numero Etiquetes"
         Me.Label1.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
         '
         'gbFichaTecnica
         '
-        Me.gbFichaTecnica.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-            Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.gbFichaTecnica.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom)  _
+            Or System.Windows.Forms.AnchorStyles.Left)  _
+            Or System.Windows.Forms.AnchorStyles.Right),System.Windows.Forms.AnchorStyles)
         Me.gbFichaTecnica.Controls.Add(Me.ppFitxa)
-        Me.gbFichaTecnica.Location = New System.Drawing.Point(267, 11)
+        Me.gbFichaTecnica.Location = New System.Drawing.Point(374, 14)
         Me.gbFichaTecnica.Name = "gbFichaTecnica"
-        Me.gbFichaTecnica.Size = New System.Drawing.Size(582, 524)
+        Me.gbFichaTecnica.Size = New System.Drawing.Size(815, 644)
         Me.gbFichaTecnica.TabIndex = 247
-        Me.gbFichaTecnica.TabStop = False
+        Me.gbFichaTecnica.TabStop = false
         Me.gbFichaTecnica.Text = "Fitxa Tècnica"
         '
         'ppFitxa
         '
-        Me.ppFitxa.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-            Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-        Me.ppFitxa.Location = New System.Drawing.Point(6, 24)
+        Me.ppFitxa.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom)  _
+            Or System.Windows.Forms.AnchorStyles.Left)  _
+            Or System.Windows.Forms.AnchorStyles.Right),System.Windows.Forms.AnchorStyles)
+        Me.ppFitxa.Location = New System.Drawing.Point(8, 30)
         Me.ppFitxa.Name = "ppFitxa"
         '
         'ppFitxa.PreviewPane
         '
-        Me.ppFitxa.PreviewPane.IntegrateExternalTools = True
+        Me.ppFitxa.PreviewPane.IntegrateExternalTools = true
         Me.ppFitxa.PreviewPane.TabIndex = 0
-        Me.ppFitxa.Size = New System.Drawing.Size(558, 500)
+        Me.ppFitxa.Size = New System.Drawing.Size(782, 615)
         Me.ppFitxa.TabIndex = 0
         Me.ppFitxa.Text = "C1PrintPreviewControl1"
         '
         '
         '
-        Me.ppFitxa.ToolBars.File.Open.Image = CType(resources.GetObject("ppFitxa.ToolBars.File.Open.Image"), System.Drawing.Image)
+        Me.ppFitxa.ToolBars.File.Open.Image = CType(resources.GetObject("ppFitxa.ToolBars.File.Open.Image"),System.Drawing.Image)
         Me.ppFitxa.ToolBars.File.Open.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.ppFitxa.ToolBars.File.Open.Name = "btnFileOpen"
-        Me.ppFitxa.ToolBars.File.Open.Size = New System.Drawing.Size(32, 22)
+        Me.ppFitxa.ToolBars.File.Open.Size = New System.Drawing.Size(39, 24)
         Me.ppFitxa.ToolBars.File.Open.Tag = "C1PreviewActionEnum.FileOpen"
         Me.ppFitxa.ToolBars.File.Open.ToolTipText = "Open File"
         '
         '
         '
-        Me.ppFitxa.ToolBars.File.PageSetup.Image = CType(resources.GetObject("ppFitxa.ToolBars.File.PageSetup.Image"), System.Drawing.Image)
+        Me.ppFitxa.ToolBars.File.PageSetup.Image = CType(resources.GetObject("ppFitxa.ToolBars.File.PageSetup.Image"),System.Drawing.Image)
         Me.ppFitxa.ToolBars.File.PageSetup.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.ppFitxa.ToolBars.File.PageSetup.Name = "btnPageSetup"
-        Me.ppFitxa.ToolBars.File.PageSetup.Size = New System.Drawing.Size(23, 22)
+        Me.ppFitxa.ToolBars.File.PageSetup.Size = New System.Drawing.Size(29, 24)
         Me.ppFitxa.ToolBars.File.PageSetup.Tag = "C1PreviewActionEnum.PageSetup"
         Me.ppFitxa.ToolBars.File.PageSetup.ToolTipText = "Page Setup"
         '
         '
         '
-        Me.ppFitxa.ToolBars.File.Print.Image = CType(resources.GetObject("ppFitxa.ToolBars.File.Print.Image"), System.Drawing.Image)
+        Me.ppFitxa.ToolBars.File.Print.Image = CType(resources.GetObject("ppFitxa.ToolBars.File.Print.Image"),System.Drawing.Image)
         Me.ppFitxa.ToolBars.File.Print.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.ppFitxa.ToolBars.File.Print.Name = "btnPrint"
-        Me.ppFitxa.ToolBars.File.Print.Size = New System.Drawing.Size(23, 22)
+        Me.ppFitxa.ToolBars.File.Print.Size = New System.Drawing.Size(29, 24)
         Me.ppFitxa.ToolBars.File.Print.Tag = "C1PreviewActionEnum.Print"
         Me.ppFitxa.ToolBars.File.Print.ToolTipText = "Print"
         '
         '
         '
-        Me.ppFitxa.ToolBars.File.Reflow.Image = CType(resources.GetObject("ppFitxa.ToolBars.File.Reflow.Image"), System.Drawing.Image)
+        Me.ppFitxa.ToolBars.File.Reflow.Image = CType(resources.GetObject("ppFitxa.ToolBars.File.Reflow.Image"),System.Drawing.Image)
         Me.ppFitxa.ToolBars.File.Reflow.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.ppFitxa.ToolBars.File.Reflow.Name = "btnReflow"
-        Me.ppFitxa.ToolBars.File.Reflow.Size = New System.Drawing.Size(23, 22)
+        Me.ppFitxa.ToolBars.File.Reflow.Size = New System.Drawing.Size(29, 24)
         Me.ppFitxa.ToolBars.File.Reflow.Tag = "C1PreviewActionEnum.Reflow"
         Me.ppFitxa.ToolBars.File.Reflow.ToolTipText = "Reflow"
         '
         '
         '
-        Me.ppFitxa.ToolBars.File.Save.Image = CType(resources.GetObject("ppFitxa.ToolBars.File.Save.Image"), System.Drawing.Image)
+        Me.ppFitxa.ToolBars.File.Save.Image = CType(resources.GetObject("ppFitxa.ToolBars.File.Save.Image"),System.Drawing.Image)
         Me.ppFitxa.ToolBars.File.Save.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.ppFitxa.ToolBars.File.Save.Name = "btnFileSave"
-        Me.ppFitxa.ToolBars.File.Save.Size = New System.Drawing.Size(23, 22)
+        Me.ppFitxa.ToolBars.File.Save.Size = New System.Drawing.Size(29, 24)
         Me.ppFitxa.ToolBars.File.Save.Tag = "C1PreviewActionEnum.FileSave"
         Me.ppFitxa.ToolBars.File.Save.ToolTipText = "Save File"
         '
         '
         '
-        Me.ppFitxa.ToolBars.Navigation.GoFirst.Image = CType(resources.GetObject("ppFitxa.ToolBars.Navigation.GoFirst.Image"), System.Drawing.Image)
+        Me.ppFitxa.ToolBars.Navigation.GoFirst.Image = CType(resources.GetObject("ppFitxa.ToolBars.Navigation.GoFirst.Image"),System.Drawing.Image)
         Me.ppFitxa.ToolBars.Navigation.GoFirst.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.ppFitxa.ToolBars.Navigation.GoFirst.Name = "btnGoFirst"
-        Me.ppFitxa.ToolBars.Navigation.GoFirst.Size = New System.Drawing.Size(23, 22)
+        Me.ppFitxa.ToolBars.Navigation.GoFirst.Size = New System.Drawing.Size(29, 24)
         Me.ppFitxa.ToolBars.Navigation.GoFirst.Tag = "C1PreviewActionEnum.GoFirst"
         Me.ppFitxa.ToolBars.Navigation.GoFirst.ToolTipText = "Go To First Page"
         '
         '
         '
-        Me.ppFitxa.ToolBars.Navigation.GoLast.Image = CType(resources.GetObject("ppFitxa.ToolBars.Navigation.GoLast.Image"), System.Drawing.Image)
+        Me.ppFitxa.ToolBars.Navigation.GoLast.Image = CType(resources.GetObject("ppFitxa.ToolBars.Navigation.GoLast.Image"),System.Drawing.Image)
         Me.ppFitxa.ToolBars.Navigation.GoLast.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.ppFitxa.ToolBars.Navigation.GoLast.Name = "btnGoLast"
-        Me.ppFitxa.ToolBars.Navigation.GoLast.Size = New System.Drawing.Size(23, 20)
+        Me.ppFitxa.ToolBars.Navigation.GoLast.Size = New System.Drawing.Size(29, 24)
         Me.ppFitxa.ToolBars.Navigation.GoLast.Tag = "C1PreviewActionEnum.GoLast"
         Me.ppFitxa.ToolBars.Navigation.GoLast.ToolTipText = "Go To Last Page"
         '
         '
         '
-        Me.ppFitxa.ToolBars.Navigation.GoNext.Image = CType(resources.GetObject("ppFitxa.ToolBars.Navigation.GoNext.Image"), System.Drawing.Image)
+        Me.ppFitxa.ToolBars.Navigation.GoNext.Image = CType(resources.GetObject("ppFitxa.ToolBars.Navigation.GoNext.Image"),System.Drawing.Image)
         Me.ppFitxa.ToolBars.Navigation.GoNext.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.ppFitxa.ToolBars.Navigation.GoNext.Name = "btnGoNext"
-        Me.ppFitxa.ToolBars.Navigation.GoNext.Size = New System.Drawing.Size(23, 20)
+        Me.ppFitxa.ToolBars.Navigation.GoNext.Size = New System.Drawing.Size(29, 24)
         Me.ppFitxa.ToolBars.Navigation.GoNext.Tag = "C1PreviewActionEnum.GoNext"
         Me.ppFitxa.ToolBars.Navigation.GoNext.ToolTipText = "Go To Next Page"
         '
         '
         '
-        Me.ppFitxa.ToolBars.Navigation.GoPrev.Image = CType(resources.GetObject("ppFitxa.ToolBars.Navigation.GoPrev.Image"), System.Drawing.Image)
+        Me.ppFitxa.ToolBars.Navigation.GoPrev.Image = CType(resources.GetObject("ppFitxa.ToolBars.Navigation.GoPrev.Image"),System.Drawing.Image)
         Me.ppFitxa.ToolBars.Navigation.GoPrev.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.ppFitxa.ToolBars.Navigation.GoPrev.Name = "btnGoPrev"
-        Me.ppFitxa.ToolBars.Navigation.GoPrev.Size = New System.Drawing.Size(23, 20)
+        Me.ppFitxa.ToolBars.Navigation.GoPrev.Size = New System.Drawing.Size(29, 24)
         Me.ppFitxa.ToolBars.Navigation.GoPrev.Tag = "C1PreviewActionEnum.GoPrev"
         Me.ppFitxa.ToolBars.Navigation.GoPrev.ToolTipText = "Go To Previous Page"
         '
         '
         '
-        Me.ppFitxa.ToolBars.Navigation.HistoryNext.Image = CType(resources.GetObject("ppFitxa.ToolBars.Navigation.HistoryNext.Image"), System.Drawing.Image)
+        Me.ppFitxa.ToolBars.Navigation.HistoryNext.Image = CType(resources.GetObject("ppFitxa.ToolBars.Navigation.HistoryNext.Image"),System.Drawing.Image)
         Me.ppFitxa.ToolBars.Navigation.HistoryNext.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.ppFitxa.ToolBars.Navigation.HistoryNext.Name = "btnHistoryNext"
-        Me.ppFitxa.ToolBars.Navigation.HistoryNext.Size = New System.Drawing.Size(32, 20)
+        Me.ppFitxa.ToolBars.Navigation.HistoryNext.Size = New System.Drawing.Size(39, 24)
         Me.ppFitxa.ToolBars.Navigation.HistoryNext.Tag = "C1PreviewActionEnum.HistoryNext"
         Me.ppFitxa.ToolBars.Navigation.HistoryNext.ToolTipText = "Next View"
         '
         '
         '
-        Me.ppFitxa.ToolBars.Navigation.HistoryPrev.Image = CType(resources.GetObject("ppFitxa.ToolBars.Navigation.HistoryPrev.Image"), System.Drawing.Image)
+        Me.ppFitxa.ToolBars.Navigation.HistoryPrev.Image = CType(resources.GetObject("ppFitxa.ToolBars.Navigation.HistoryPrev.Image"),System.Drawing.Image)
         Me.ppFitxa.ToolBars.Navigation.HistoryPrev.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.ppFitxa.ToolBars.Navigation.HistoryPrev.Name = "btnHistoryPrev"
-        Me.ppFitxa.ToolBars.Navigation.HistoryPrev.Size = New System.Drawing.Size(32, 20)
+        Me.ppFitxa.ToolBars.Navigation.HistoryPrev.Size = New System.Drawing.Size(39, 24)
         Me.ppFitxa.ToolBars.Navigation.HistoryPrev.Tag = "C1PreviewActionEnum.HistoryPrev"
         Me.ppFitxa.ToolBars.Navigation.HistoryPrev.ToolTipText = "Previous View"
         '
         '
         '
         Me.ppFitxa.ToolBars.Navigation.LblOfPages.Name = "lblOfPages"
-        Me.ppFitxa.ToolBars.Navigation.LblOfPages.Size = New System.Drawing.Size(27, 15)
+        Me.ppFitxa.ToolBars.Navigation.LblOfPages.Size = New System.Drawing.Size(35, 24)
         Me.ppFitxa.ToolBars.Navigation.LblOfPages.Tag = "C1PreviewActionEnum.GoPageCount"
         Me.ppFitxa.ToolBars.Navigation.LblOfPages.Text = "of 0"
         '
         '
         '
         Me.ppFitxa.ToolBars.Navigation.LblPage.Name = "lblPage"
-        Me.ppFitxa.ToolBars.Navigation.LblPage.Size = New System.Drawing.Size(33, 15)
+        Me.ppFitxa.ToolBars.Navigation.LblPage.Size = New System.Drawing.Size(41, 24)
         Me.ppFitxa.ToolBars.Navigation.LblPage.Tag = "C1PreviewActionEnum.GoPageLabel"
         Me.ppFitxa.ToolBars.Navigation.LblPage.Text = "Page"
         Me.ppFitxa.ToolBars.Navigation.ToolTipPageNo = Nothing
         '
         '
         '
-        Me.ppFitxa.ToolBars.Page.Continuous.Image = CType(resources.GetObject("ppFitxa.ToolBars.Page.Continuous.Image"), System.Drawing.Image)
+        Me.ppFitxa.ToolBars.Page.Continuous.Image = CType(resources.GetObject("ppFitxa.ToolBars.Page.Continuous.Image"),System.Drawing.Image)
         Me.ppFitxa.ToolBars.Page.Continuous.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.ppFitxa.ToolBars.Page.Continuous.Name = "btnPageContinuous"
-        Me.ppFitxa.ToolBars.Page.Continuous.Size = New System.Drawing.Size(23, 22)
+        Me.ppFitxa.ToolBars.Page.Continuous.Size = New System.Drawing.Size(29, 24)
         Me.ppFitxa.ToolBars.Page.Continuous.Tag = "C1PreviewActionEnum.PageContinuous"
         Me.ppFitxa.ToolBars.Page.Continuous.ToolTipText = "Continuous View"
         '
         '
         '
-        Me.ppFitxa.ToolBars.Page.Facing.Image = CType(resources.GetObject("ppFitxa.ToolBars.Page.Facing.Image"), System.Drawing.Image)
+        Me.ppFitxa.ToolBars.Page.Facing.Image = CType(resources.GetObject("ppFitxa.ToolBars.Page.Facing.Image"),System.Drawing.Image)
         Me.ppFitxa.ToolBars.Page.Facing.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.ppFitxa.ToolBars.Page.Facing.Name = "btnPageFacing"
-        Me.ppFitxa.ToolBars.Page.Facing.Size = New System.Drawing.Size(23, 22)
+        Me.ppFitxa.ToolBars.Page.Facing.Size = New System.Drawing.Size(29, 24)
         Me.ppFitxa.ToolBars.Page.Facing.Tag = "C1PreviewActionEnum.PageFacing"
         Me.ppFitxa.ToolBars.Page.Facing.ToolTipText = "Pages Facing View"
         '
         '
         '
-        Me.ppFitxa.ToolBars.Page.FacingContinuous.Image = CType(resources.GetObject("ppFitxa.ToolBars.Page.FacingContinuous.Image"), System.Drawing.Image)
+        Me.ppFitxa.ToolBars.Page.FacingContinuous.Image = CType(resources.GetObject("ppFitxa.ToolBars.Page.FacingContinuous.Image"),System.Drawing.Image)
         Me.ppFitxa.ToolBars.Page.FacingContinuous.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.ppFitxa.ToolBars.Page.FacingContinuous.Name = "btnPageFacingContinuous"
-        Me.ppFitxa.ToolBars.Page.FacingContinuous.Size = New System.Drawing.Size(23, 22)
+        Me.ppFitxa.ToolBars.Page.FacingContinuous.Size = New System.Drawing.Size(29, 24)
         Me.ppFitxa.ToolBars.Page.FacingContinuous.Tag = "C1PreviewActionEnum.PageFacingContinuous"
         Me.ppFitxa.ToolBars.Page.FacingContinuous.ToolTipText = "Pages Facing Continuous View"
         '
         '
         '
-        Me.ppFitxa.ToolBars.Page.Single.Image = CType(resources.GetObject("ppFitxa.ToolBars.Page.Single.Image"), System.Drawing.Image)
+        Me.ppFitxa.ToolBars.Page.Single.Image = CType(resources.GetObject("ppFitxa.ToolBars.Page.Single.Image"),System.Drawing.Image)
         Me.ppFitxa.ToolBars.Page.Single.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.ppFitxa.ToolBars.Page.Single.Name = "btnPageSingle"
-        Me.ppFitxa.ToolBars.Page.Single.Size = New System.Drawing.Size(23, 22)
+        Me.ppFitxa.ToolBars.Page.Single.Size = New System.Drawing.Size(29, 24)
         Me.ppFitxa.ToolBars.Page.Single.Tag = "C1PreviewActionEnum.PageSingle"
         Me.ppFitxa.ToolBars.Page.Single.ToolTipText = "Single Page View"
         '
         '
         '
-        Me.ppFitxa.ToolBars.Text.Find.Image = CType(resources.GetObject("ppFitxa.ToolBars.Text.Find.Image"), System.Drawing.Image)
+        Me.ppFitxa.ToolBars.Text.Find.Image = CType(resources.GetObject("ppFitxa.ToolBars.Text.Find.Image"),System.Drawing.Image)
         Me.ppFitxa.ToolBars.Text.Find.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.ppFitxa.ToolBars.Text.Find.Name = "btnFind"
-        Me.ppFitxa.ToolBars.Text.Find.Size = New System.Drawing.Size(23, 20)
+        Me.ppFitxa.ToolBars.Text.Find.Size = New System.Drawing.Size(29, 24)
         Me.ppFitxa.ToolBars.Text.Find.Tag = "C1PreviewActionEnum.Find"
         Me.ppFitxa.ToolBars.Text.Find.ToolTipText = "Find Text"
         '
         '
         '
-        Me.ppFitxa.ToolBars.Text.Hand.Image = CType(resources.GetObject("ppFitxa.ToolBars.Text.Hand.Image"), System.Drawing.Image)
+        Me.ppFitxa.ToolBars.Text.Hand.Image = CType(resources.GetObject("ppFitxa.ToolBars.Text.Hand.Image"),System.Drawing.Image)
         Me.ppFitxa.ToolBars.Text.Hand.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.ppFitxa.ToolBars.Text.Hand.Name = "btnHandTool"
-        Me.ppFitxa.ToolBars.Text.Hand.Size = New System.Drawing.Size(23, 22)
+        Me.ppFitxa.ToolBars.Text.Hand.Size = New System.Drawing.Size(29, 24)
         Me.ppFitxa.ToolBars.Text.Hand.Tag = "C1PreviewActionEnum.HandTool"
         Me.ppFitxa.ToolBars.Text.Hand.ToolTipText = "Hand Tool"
         '
         '
         '
-        Me.ppFitxa.ToolBars.Text.SelectText.Image = CType(resources.GetObject("ppFitxa.ToolBars.Text.SelectText.Image"), System.Drawing.Image)
+        Me.ppFitxa.ToolBars.Text.SelectText.Image = CType(resources.GetObject("ppFitxa.ToolBars.Text.SelectText.Image"),System.Drawing.Image)
         Me.ppFitxa.ToolBars.Text.SelectText.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.ppFitxa.ToolBars.Text.SelectText.Name = "btnSelectTextTool"
-        Me.ppFitxa.ToolBars.Text.SelectText.Size = New System.Drawing.Size(23, 20)
+        Me.ppFitxa.ToolBars.Text.SelectText.Size = New System.Drawing.Size(29, 24)
         Me.ppFitxa.ToolBars.Text.SelectText.Tag = "C1PreviewActionEnum.SelectTextTool"
         Me.ppFitxa.ToolBars.Text.SelectText.ToolTipText = "Text Select Tool"
         Me.ppFitxa.ToolBars.Zoom.ToolTipZoomFactor = Nothing
         '
         '
         '
-        Me.ppFitxa.ToolBars.Zoom.ZoomIn.Image = CType(resources.GetObject("ppFitxa.ToolBars.Zoom.ZoomIn.Image"), System.Drawing.Image)
+        Me.ppFitxa.ToolBars.Zoom.ZoomIn.Image = CType(resources.GetObject("ppFitxa.ToolBars.Zoom.ZoomIn.Image"),System.Drawing.Image)
         Me.ppFitxa.ToolBars.Zoom.ZoomIn.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.ppFitxa.ToolBars.Zoom.ZoomIn.Name = "btnZoomIn"
-        Me.ppFitxa.ToolBars.Zoom.ZoomIn.Size = New System.Drawing.Size(23, 22)
+        Me.ppFitxa.ToolBars.Zoom.ZoomIn.Size = New System.Drawing.Size(29, 24)
         Me.ppFitxa.ToolBars.Zoom.ZoomIn.Tag = "C1PreviewActionEnum.ZoomIn"
         Me.ppFitxa.ToolBars.Zoom.ZoomIn.ToolTipText = "Zoom In"
         '
         '
         '
-        Me.ppFitxa.ToolBars.Zoom.ZoomOut.Image = CType(resources.GetObject("ppFitxa.ToolBars.Zoom.ZoomOut.Image"), System.Drawing.Image)
+        Me.ppFitxa.ToolBars.Zoom.ZoomOut.Image = CType(resources.GetObject("ppFitxa.ToolBars.Zoom.ZoomOut.Image"),System.Drawing.Image)
         Me.ppFitxa.ToolBars.Zoom.ZoomOut.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.ppFitxa.ToolBars.Zoom.ZoomOut.Name = "btnZoomOut"
-        Me.ppFitxa.ToolBars.Zoom.ZoomOut.Size = New System.Drawing.Size(23, 22)
+        Me.ppFitxa.ToolBars.Zoom.ZoomOut.Size = New System.Drawing.Size(29, 24)
         Me.ppFitxa.ToolBars.Zoom.ZoomOut.Tag = "C1PreviewActionEnum.ZoomOut"
         Me.ppFitxa.ToolBars.Zoom.ZoomOut.ToolTipText = "Zoom Out"
         '
         '
         '
         Me.ppFitxa.ToolBars.Zoom.ZoomTool.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ppFitxa.ToolBars.Zoom.ZoomInTool, Me.ppFitxa.ToolBars.Zoom.ZoomOutTool})
-        Me.ppFitxa.ToolBars.Zoom.ZoomTool.Image = CType(resources.GetObject("ppFitxa.ToolBars.Zoom.ZoomTool.Image"), System.Drawing.Image)
+        Me.ppFitxa.ToolBars.Zoom.ZoomTool.Image = CType(resources.GetObject("ppFitxa.ToolBars.Zoom.ZoomTool.Image"),System.Drawing.Image)
         Me.ppFitxa.ToolBars.Zoom.ZoomTool.ImageTransparentColor = System.Drawing.Color.Magenta
         Me.ppFitxa.ToolBars.Zoom.ZoomTool.Name = "btnZoomTool"
-        Me.ppFitxa.ToolBars.Zoom.ZoomTool.Size = New System.Drawing.Size(32, 22)
+        Me.ppFitxa.ToolBars.Zoom.ZoomTool.Size = New System.Drawing.Size(39, 24)
         Me.ppFitxa.ToolBars.Zoom.ZoomTool.Tag = "C1PreviewActionEnum.ZoomInTool"
         Me.ppFitxa.ToolBars.Zoom.ZoomTool.ToolTipText = "Zoom In Tool"
         '
         'tabPageValoracion
         '
-        Me.tabPageValoracion.BackColor = System.Drawing.Color.FromArgb(CType(CType(221, Byte), Integer), CType(CType(208, Byte), Integer), CType(CType(196, Byte), Integer))
+        Me.tabPageValoracion.BackColor = System.Drawing.Color.FromArgb(CType(CType(221,Byte),Integer), CType(CType(208,Byte),Integer), CType(CType(196,Byte),Integer))
         Me.tabPageValoracion.Controls.Add(Me.btnExportarExcel)
         Me.tabPageValoracion.Controls.Add(Me.btnExportarPDF)
         Me.tabPageValoracion.Controls.Add(Me.dgValoracion)
         Me.tabPageValoracion.Location = New System.Drawing.Point(4, 22)
         Me.tabPageValoracion.Name = "tabPageValoracion"
-        Me.tabPageValoracion.Size = New System.Drawing.Size(852, 604)
+        Me.tabPageValoracion.Size = New System.Drawing.Size(1196, 749)
         Me.tabPageValoracion.TabIndex = 3
         Me.tabPageValoracion.Text = "Valoració Stock"
         '
         'btnExportarExcel
         '
-        Me.btnExportarExcel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnExportarExcel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right),System.Windows.Forms.AnchorStyles)
         Me.btnExportarExcel.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.btnExportarExcel.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft
         Me.btnExportarExcel.ImeMode = System.Windows.Forms.ImeMode.NoControl
-        Me.btnExportarExcel.Location = New System.Drawing.Point(620, 486)
+        Me.btnExportarExcel.Location = New System.Drawing.Point(868, 598)
         Me.btnExportarExcel.Name = "btnExportarExcel"
-        Me.btnExportarExcel.Size = New System.Drawing.Size(100, 28)
+        Me.btnExportarExcel.Size = New System.Drawing.Size(140, 35)
         Me.btnExportarExcel.TabIndex = 271
         Me.btnExportarExcel.Text = "Exportar a Excel"
-        Me.btnExportarExcel.UseVisualStyleBackColor = True
+        Me.btnExportarExcel.UseVisualStyleBackColor = true
         '
         'btnExportarPDF
         '
-        Me.btnExportarPDF.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnExportarPDF.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right),System.Windows.Forms.AnchorStyles)
         Me.btnExportarPDF.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.btnExportarPDF.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft
         Me.btnExportarPDF.ImeMode = System.Windows.Forms.ImeMode.NoControl
-        Me.btnExportarPDF.Location = New System.Drawing.Point(740, 486)
+        Me.btnExportarPDF.Location = New System.Drawing.Point(1036, 598)
         Me.btnExportarPDF.Name = "btnExportarPDF"
-        Me.btnExportarPDF.Size = New System.Drawing.Size(100, 28)
+        Me.btnExportarPDF.Size = New System.Drawing.Size(140, 35)
         Me.btnExportarPDF.TabIndex = 270
         Me.btnExportarPDF.Text = "Exportar a PDF"
-        Me.btnExportarPDF.UseVisualStyleBackColor = True
+        Me.btnExportarPDF.UseVisualStyleBackColor = true
         '
         'dgValoracion
         '
-        Me.dgValoracion.AllowUpdate = False
-        Me.dgValoracion.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-            Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.dgValoracion.AllowUpdate = false
+        Me.dgValoracion.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom)  _
+            Or System.Windows.Forms.AnchorStyles.Left)  _
+            Or System.Windows.Forms.AnchorStyles.Right),System.Windows.Forms.AnchorStyles)
         Me.dgValoracion.Caption = "Llistat Valorat"
-        Me.dgValoracion.ExtendRightColumn = True
-        Me.dgValoracion.FilterBar = True
+        Me.dgValoracion.CaptionHeight = 19
+        Me.dgValoracion.ExtendRightColumn = true
+        Me.dgValoracion.FilterBar = true
         Me.dgValoracion.GroupByCaption = "Desplaça aquí una capçalera de columna per agrupar per aquesta columna"
-        Me.dgValoracion.Images.Add(CType(resources.GetObject("dgValoracion.Images"), System.Drawing.Image))
-        Me.dgValoracion.Location = New System.Drawing.Point(16, 16)
+        Me.dgValoracion.Images.Add(CType(resources.GetObject("dgValoracion.Images"),System.Drawing.Image))
+        Me.dgValoracion.Location = New System.Drawing.Point(22, 20)
         Me.dgValoracion.Name = "dgValoracion"
         Me.dgValoracion.PreviewInfo.Location = New System.Drawing.Point(0, 0)
         Me.dgValoracion.PreviewInfo.Size = New System.Drawing.Size(0, 0)
-        Me.dgValoracion.PreviewInfo.ZoomFactor = 75.0R
-        Me.dgValoracion.PrintInfo.PageSettings = CType(resources.GetObject("dgValoracion.PrintInfo.PageSettings"), System.Drawing.Printing.PageSettings)
+        Me.dgValoracion.PreviewInfo.ZoomFactor = 75R
+        Me.dgValoracion.PrintInfo.MeasurementDevice = C1.Win.C1TrueDBGrid.PrintInfo.MeasurementDeviceEnum.Screen
+        Me.dgValoracion.PrintInfo.MeasurementPrinterName = Nothing
         Me.dgValoracion.RowDivider.Color = System.Drawing.Color.Black
         Me.dgValoracion.RowDivider.Style = C1.Win.C1TrueDBGrid.LineStyleEnum.[Single]
-        Me.dgValoracion.Size = New System.Drawing.Size(824, 464)
-        Me.dgValoracion.SpringMode = True
+        Me.dgValoracion.RowHeight = 17
+        Me.dgValoracion.Size = New System.Drawing.Size(1154, 571)
+        Me.dgValoracion.SpringMode = true
         Me.dgValoracion.TabIndex = 0
-        Me.dgValoracion.UseCompatibleTextRendering = False
-        Me.dgValoracion.WrapCellPointer = True
+        Me.dgValoracion.UseCompatibleTextRendering = false
+        Me.dgValoracion.WrapCellPointer = true
         Me.dgValoracion.PropBag = resources.GetString("dgValoracion.PropBag")
         '
         'frmTejidos
         '
-        Me.AutoScaleBaseSize = New System.Drawing.Size(5, 13)
-        Me.BackColor = System.Drawing.Color.FromArgb(CType(CType(221, Byte), Integer), CType(CType(208, Byte), Integer), CType(CType(196, Byte), Integer))
+        Me.AutoScaleBaseSize = New System.Drawing.Size(7, 16)
+        Me.BackColor = System.Drawing.Color.FromArgb(CType(CType(221,Byte),Integer), CType(CType(208,Byte),Integer), CType(CType(196,Byte),Integer))
         Me.ClientSize = New System.Drawing.Size(876, 696)
         Me.Controls.Add(Me.TabControl1)
         Me.Cursor = System.Windows.Forms.Cursors.Default
         Me.Font = New System.Drawing.Font("Microsoft Sans Serif", 8.25!)
-        Me.KeyPreview = True
+        Me.KeyPreview = true
         Me.Name = "frmTejidos"
         Me.Text = "Teixits"
         Me.Controls.SetChildIndex(Me.cboSeleccionCentro, 0)
@@ -2307,95 +2308,95 @@ Public Class frmTejidos
         Me.Controls.SetChildIndex(Me.btnVerLista, 0)
         Me.Controls.SetChildIndex(Me.btnModificar, 0)
         Me.Controls.SetChildIndex(Me.TabControl1, 0)
-        CType(Me.btnRecargar, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.btnSiguiente, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.btnAnterior, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.btnPrimero, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.btnUltimo, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.btnModificar, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.btnTancar, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.btnBorrar, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.btnNuevo, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.btnActualizar, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.btnVerLista, System.ComponentModel.ISupportInitialize).EndInit()
-        Me.TabControl1.ResumeLayout(False)
-        Me.tpTejido.ResumeLayout(False)
-        Me.tpTejido.PerformLayout()
-        CType(Me.C1Combo1, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.dgCartaColores, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.lblNumeroTejidos, System.ComponentModel.ISupportInitialize).EndInit()
-        Me.XpGroupBox1.ResumeLayout(False)
-        Me.XpGroupBox1.PerformLayout()
-        CType(Me.txtMLINEAL, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.txtNCCODE, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.txtComposicio, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.txtAMPLE, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.btnElegirMaquina, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.cboID, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.cboNOMMAQUI, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.btnElegirTejido, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.txtPREUPERMODEL, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.comboIVA, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.txtNRO, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.txtAMPLENOU, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.txtPREUM, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.txtMAQUI, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.txtDESCRI, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.txtRENDIMENT, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.txtMARGE, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.txtGRAMA, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.txtPREUK, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.txtOBSERV, System.ComponentModel.ISupportInitialize).EndInit()
-        Me.gb2.ResumeLayout(False)
-        CType(Me.txtSTCRUK, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.txtSTCRUM, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.txtSTDISPK, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.txtSTDISPM, System.ComponentModel.ISupportInitialize).EndInit()
-        Me.tpEscandalloTejido.ResumeLayout(False)
-        Me.tpEscandalloTejido.PerformLayout()
-        CType(Me.cboAcabados, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.dgAcabados, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.btnLimpiarAcabados, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.txtACABAT, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.cboHilos, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.cboNOMACABADOR, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.dgComposcionTejido, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.cboNOMESTAMPADOR, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.cboNOMTEIXIDOR, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.txtCRU, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.txtPACA, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.txtPESTAM, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.txtPTEIXIR, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.txtMATERIA, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.btnElegirAcabador, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.btnElegirEstampador, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.btnElegirTejidor, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.txtACABADOR, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.txtESTAMPADOR, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.txtTEIXIDOR, System.ComponentModel.ISupportInitialize).EndInit()
-        Me.GroupBox1.ResumeLayout(False)
-        CType(Me.tx2CODI, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.tx2DESCRI, System.ComponentModel.ISupportInitialize).EndInit()
-        Me.tabImpresioFitxa.ResumeLayout(False)
-        Me.gbImpresionEtiquetas.ResumeLayout(False)
-        CType(Me.ppv.PreviewPane, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.ppv, System.ComponentModel.ISupportInitialize).EndInit()
-        Me.ppv.ResumeLayout(False)
-        Me.ppv.PerformLayout()
-        CType(Me.btnGenerarEtiquetas, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.txtNumEtiquetas, System.ComponentModel.ISupportInitialize).EndInit()
-        Me.gbFichaTecnica.ResumeLayout(False)
-        CType(Me.ppFitxa.PreviewPane, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.ppFitxa, System.ComponentModel.ISupportInitialize).EndInit()
-        Me.ppFitxa.ResumeLayout(False)
-        Me.ppFitxa.PerformLayout()
-        Me.tabPageValoracion.ResumeLayout(False)
-        CType(Me.btnExportarExcel, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.btnExportarPDF, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.dgValoracion, System.ComponentModel.ISupportInitialize).EndInit()
-        Me.ResumeLayout(False)
+        CType(Me.btnRecargar,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.btnSiguiente,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.btnAnterior,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.btnPrimero,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.btnUltimo,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.btnModificar,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.btnTancar,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.btnBorrar,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.btnNuevo,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.btnActualizar,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.btnVerLista,System.ComponentModel.ISupportInitialize).EndInit
+        Me.TabControl1.ResumeLayout(false)
+        Me.tpTejido.ResumeLayout(false)
+        Me.tpTejido.PerformLayout
+        CType(Me.C1Combo1,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.dgCartaColores,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.lblNumeroTejidos,System.ComponentModel.ISupportInitialize).EndInit
+        Me.XpGroupBox1.ResumeLayout(false)
+        Me.XpGroupBox1.PerformLayout
+        CType(Me.txtMLINEAL,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.txtNCCODE,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.txtComposicio,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.txtAMPLE,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.btnElegirMaquina,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.cboID,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.cboNOMMAQUI,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.btnElegirTejido,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.txtPREUPERMODEL,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.comboIVA,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.txtNRO,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.txtAMPLENOU,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.txtPREUM,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.txtMAQUI,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.txtDESCRI,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.txtRENDIMENT,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.txtMARGE,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.txtGRAMA,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.txtPREUK,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.txtOBSERV,System.ComponentModel.ISupportInitialize).EndInit
+        Me.gb2.ResumeLayout(false)
+        CType(Me.txtSTCRUK,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.txtSTCRUM,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.txtSTDISPK,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.txtSTDISPM,System.ComponentModel.ISupportInitialize).EndInit
+        Me.tpEscandalloTejido.ResumeLayout(false)
+        Me.tpEscandalloTejido.PerformLayout
+        CType(Me.cboAcabados,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.dgAcabados,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.btnLimpiarAcabados,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.txtACABAT,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.cboHilos,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.cboNOMACABADOR,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.dgComposcionTejido,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.cboNOMESTAMPADOR,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.cboNOMTEIXIDOR,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.txtCRU,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.txtPACA,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.txtPESTAM,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.txtPTEIXIR,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.txtMATERIA,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.btnElegirAcabador,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.btnElegirEstampador,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.btnElegirTejidor,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.txtACABADOR,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.txtESTAMPADOR,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.txtTEIXIDOR,System.ComponentModel.ISupportInitialize).EndInit
+        Me.GroupBox1.ResumeLayout(false)
+        CType(Me.tx2CODI,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.tx2DESCRI,System.ComponentModel.ISupportInitialize).EndInit
+        Me.tabImpresioFitxa.ResumeLayout(false)
+        Me.gbImpresionEtiquetas.ResumeLayout(false)
+        CType(Me.ppv.PreviewPane,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.ppv,System.ComponentModel.ISupportInitialize).EndInit
+        Me.ppv.ResumeLayout(false)
+        Me.ppv.PerformLayout
+        CType(Me.btnGenerarEtiquetas,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.txtNumEtiquetas,System.ComponentModel.ISupportInitialize).EndInit
+        Me.gbFichaTecnica.ResumeLayout(false)
+        CType(Me.ppFitxa.PreviewPane,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.ppFitxa,System.ComponentModel.ISupportInitialize).EndInit
+        Me.ppFitxa.ResumeLayout(false)
+        Me.ppFitxa.PerformLayout
+        Me.tabPageValoracion.ResumeLayout(false)
+        CType(Me.btnExportarExcel,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.btnExportarPDF,System.ComponentModel.ISupportInitialize).EndInit
+        CType(Me.dgValoracion,System.ComponentModel.ISupportInitialize).EndInit
+        Me.ResumeLayout(false)
 
-    End Sub
+End Sub
 
 #End Region
 
