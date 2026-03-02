@@ -5,6 +5,8 @@ Imports MySql.Data.MySqlClient : Imports clsFuncionesLOG : Imports clsFuncionesC
 Public Class clsAcabadosTejidos
     Inherits clsADO
 
+    Private Shared ReadOnly s_AcabadosCache As New Dictionary(Of Integer, DataTable)
+
 #Region "CAMPOS"
 
     Private mACABAT As String
@@ -115,6 +117,7 @@ Public Class clsAcabadosTejidos
     Friend m_Tejido As clsTejido
     Private dtProve As New DataTable
     Friend dvTodosLosAcabados As New DataView
+    Private mUltimoProveCache As Integer = Integer.MinValue
 
 #End Region
 
@@ -122,22 +125,10 @@ Public Class clsAcabadosTejidos
                 ByVal centro As String, ByRef bindingcontext As BindingContext, ByVal tejid As clsTejido)
 
         MyBase.New(tabla, centro, bindingcontext, "ESDETALLE")
-        Dim sqlSel As String
         Try
             m_Tejido = tejid
 
-            sqlSinWhere = "SELECT acabatsteixits.*, " &
-                                      " filiales.DESCRI AS NOMCENTRO, " &
-                                      " dacabats.PREUM, dacabats.PREUK " &
-                                      " FROM acabatsteixits " &
-                                      " INNER JOIN filiales ON (filiales.CODI = acabatsteixits.CENTRO) " &
-                                      " INNER JOIN dacabats ON (dacabats.CODI = acabatsteixits.ACABAT AND dacabats.PROVE = acabatsteixits.PROVE) "
-            sqlSel = sqlSinWhere & _
-                        " WHERE acabatsteixits.CENTRO = """ & m_Tejido.centro & """ AND  acabatsteixits.TEIXIT = """ & m_Tejido.CODI & """ AND  " & _
-                                      " ACABATSTEIXITS.PROVE = " & m_Tejido.ACABADOR & " ORDER BY dacabats.CODI "
-
-            '" LIMIT 1"
-            cmdSel.CommandText = sqlSel
+            cmdSel.CommandText = BuildSelectSql()
             dvForm.Sort = "ORDEN"
             da.SelectCommand = cmdSel
             da.Fill(tabla)
@@ -170,23 +161,11 @@ Public Class clsAcabadosTejidos
         End Try
     End Sub
     Friend Sub CambioDetalle(ByVal centro As String, ByVal tejid As clsTejido)
-        Dim sqlSel As String
         Try
             m_Tejido = tejid
             Me.centro = centro
-            '        cmdSelectAcabados.CommandText = "SELECT acabatsteixits.*, dacabats.PREUM, dacabats.PREUK FROM acabatsteixits LEFT JOIN dacabats ON (dacabats.PROVE = " & tejidoActual.ACABADOR & " AND dacabats.CODI = acabatsteixits.ACABAT)"
 
-            sqlSinWhere = "SELECT acabatsteixits.*, " &
-                                      " filiales.DESCRI AS NOMCENTRO, " &
-                                      " dacabats.PREUM, dacabats.PREUK " &
-                                      " FROM acabatsteixits " &
-                                      " INNER JOIN filiales ON (filiales.CODI = acabatsteixits.CENTRO) " &
-                                      " INNER JOIN dacabats ON (dacabats.CODI = acabatsteixits.ACABAT AND dacabats.PROVE = acabatsteixits.PROVE) "
-            sqlSel = sqlSinWhere & _
-                        " WHERE acabatsteixits.CENTRO = """ & m_Tejido.centro & """ AND  acabatsteixits.TEIXIT = """ & m_Tejido.CODI & """ AND  " & _
-                                      " ACABATSTEIXITS.PROVE = " & m_Tejido.ACABADOR & " ORDER BY dacabats.CODI "
-            cmdSel.CommandText = sqlSel
-            dvForm.Sort = "ACABAT"
+            cmdSel.CommandText = BuildSelectSql()
 
             da.SelectCommand = cmdSel
             tabla.Clear()
@@ -217,6 +196,7 @@ Public Class clsAcabadosTejidos
     End Sub
     Public Overrides Sub ActualizarOrigen(Optional ByVal nocerrar As Boolean = False, Optional ByVal hackDetalle As Boolean = False)
         Try
+            If tabla.GetChanges Is Nothing Then Exit Sub
             ActualizarDetalle()
             MyBase.ActualizarOrigen(True, True)
 
@@ -259,12 +239,27 @@ Public Class clsAcabadosTejidos
             LOG(ex.ToString) : cargando = False : CCN()
         End Try
     End Sub
-    Friend Sub AñadirAcabado(ByVal acabado As String)
-        Dim dr As DataRow
+            Dim row As DataRow = tabla.Rows.Find(key)
+            If Not row Is Nothing Then row.Delete()
+        Dim proveActual As Integer = m_Tejido.ACABADOR
+        Dim cmdSel As New MySqlCommand("SELECT CODI, PREUM, PREUK FROM dacabats WHERE PROVE = @PROVE", cnn)
         Try
-            dr = tabla.NewRow
-            dr("ACABAT") = acabado
-            dr.Item("PROVE") = m_Tejido.ACABADOR
+            If mUltimoProveCache = proveActual AndAlso Not dvTodosLosAcabados Is Nothing AndAlso dvTodosLosAcabados.Count > 0 Then Exit Sub
+
+            If s_AcabadosCache.ContainsKey(proveActual) Then
+                dvTodosLosAcabados = s_AcabadosCache(proveActual).DefaultView
+                dvTodosLosAcabados.Sort = "CODI"
+                mUltimoProveCache = proveActual
+                Exit Sub
+            End If
+
+            cmdSel.Parameters.AddWithValue("@PROVE", proveActual)
+            Dim dtAcabados As New DataTable("dacabats")
+            daSelAcabados.Fill(dtAcabados)
+            s_AcabadosCache(proveActual) = dtAcabados
+
+            dvTodosLosAcabados = dtAcabados.DefaultView
+            mUltimoProveCache = proveActual
             dr.Item("TEIXIT") = m_Tejido.CODI
             dr.Item("CENTRO") = m_Tejido.centro
             Try
@@ -354,6 +349,20 @@ Public Class clsAcabadosTejidos
 #End Region
 
 #Region "OVERRIDES"
+
+    Private Function BuildSelectSql() As String
+        sqlSinWhere = "SELECT acabatsteixits.*, " &
+                                  " filiales.DESCRI AS NOMCENTRO, " &
+                                  " dacabats.PREUM, dacabats.PREUK " &
+                                  " FROM acabatsteixits " &
+                                  " INNER JOIN filiales ON (filiales.CODI = acabatsteixits.CENTRO) " &
+                                  " INNER JOIN dacabats ON (dacabats.CODI = acabatsteixits.ACABAT AND dacabats.PROVE = acabatsteixits.PROVE) "
+
+        Return sqlSinWhere & _
+                    " WHERE acabatsteixits.CENTRO = """ & m_Tejido.centro & """ AND  acabatsteixits.TEIXIT = """ & m_Tejido.CODI & """ AND  " & _
+                                  " ACABATSTEIXITS.PROVE = " & m_Tejido.ACABADOR & " ORDER BY dacabats.CODI "
+    End Function
+
 
     Friend Overrides Function TieneCambios() As Boolean
         Try
