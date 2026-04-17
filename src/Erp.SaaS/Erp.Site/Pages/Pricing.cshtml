@@ -1,0 +1,38 @@
+@page
+@model Erp.Site.Pages.PricingModel
+@{
+    ViewData["Title"] = "Pricing";
+}
+
+<section class="section-block">
+    <div class="section-heading">
+        <div>
+            <p class="kicker">Pricing</p>
+            <h1>Planes por usuarios, alta asistida y módulos preparados para más adelante.</h1>
+        </div>
+        <a asp-page="/Demo" class="button-primary">Hablar con ventas</a>
+    </div>
+
+    <div class="pricing-grid">
+        @foreach (var plan in Model.Plans)
+        {
+            <article class="price-card">
+                <span class="pill">@plan.MaxUsers usuarios</span>
+                <h2>@plan.Name</h2>
+                <strong>@plan.MonthlyPrice.ToString("0.##") €/mes</strong>
+                <p>@plan.Description</p>
+                <a asp-page="/Demo" class="text-link">Solicitar propuesta</a>
+            </article>
+        }
+    </div>
+</section>
+
+<section class="section-block soft-block">
+    <h2>Incluido en v1</h2>
+    <ul class="flat-list">
+        <li>Multiempresa por tenant con selección de company activa.</li>
+        <li>Usuarios y roles básicos de plataforma y tenant.</li>
+        <li>CRM / Clientes como primer módulo web.</li>
+        <li>Alta comercial asistida, sin checkout online.</li>
+    </ul>
+</section>

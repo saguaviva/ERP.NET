@@ -1,0 +1,333 @@
+@page "/plataforma"
+@attribute [Authorize(Roles = "PlatformAdmin")]
+@inject ITenantAdminService TenantAdminService
+@inject ILeadCaptureService LeadCaptureService
+
+<PageTitle>Plataforma</PageTitle>
+
+<div class="page-header">
+    <div>
+        <p class="eyebrow">Platform Admin</p>
+        <h1>Tenants, companies y usuarios</h1>
+        <p class="lead">Backoffice inicial para alta manual, pricing asistido y gobierno multiempresa.</p>
+    </div>
+</div>
+
+@if (!string.IsNullOrWhiteSpace(statusMessage))
+{
+    <div class="alert @(isError ? "danger" : "success")">@statusMessage</div>
+}
+
+<div class="admin-grid">
+    <section class="panel">
+        <h2>Nuevo tenant</h2>
+        <EditForm Model="tenantForm" OnValidSubmit="CreateTenantAsync">
+            <div class="stack">
+                <label class="field">
+                    <span>Nombre</span>
+                    <InputText class="text-input" @bind-Value="tenantForm.Name" />
+                </label>
+                <label class="field">
+                    <span>Slug</span>
+                    <InputText class="text-input" @bind-Value="tenantForm.Slug" />
+                </label>
+                <button class="primary-button" type="submit">Crear tenant</button>
+            </div>
+        </EditForm>
+    </section>
+
+    <section class="panel">
+        <h2>Nueva company</h2>
+        <EditForm Model="companyForm" OnValidSubmit="CreateCompanyAsync">
+            <div class="stack">
+                <label class="field">
+                    <span>Tenant</span>
+                    <InputSelect class="text-input" @bind-Value="companyForm.TenantId">
+                        <option value="">Selecciona tenant</option>
+                        @foreach (var tenant in tenants)
+                        {
+                            <option value="@tenant.Id">@tenant.Name</option>
+                        }
+                    </InputSelect>
+                </label>
+                <label class="field">
+                    <span>Nombre</span>
+                    <InputText class="text-input" @bind-Value="companyForm.Name" />
+                </label>
+                <label class="field">
+                    <span>Slug</span>
+                    <InputText class="text-input" @bind-Value="companyForm.Slug" />
+                </label>
+                <label class="field">
+                    <span>Centro legacy</span>
+                    <InputText class="text-input" @bind-Value="companyForm.LegacyCenterCode" />
+                </label>
+                <button class="primary-button" type="submit">Crear company</button>
+            </div>
+        </EditForm>
+    </section>
+
+    <section class="panel">
+        <h2>Nuevo usuario</h2>
+        <EditForm Model="userForm" OnValidSubmit="CreateUserAsync">
+            <div class="stack">
+                <label class="field">
+                    <span>Tenant</span>
+                    <InputSelect class="text-input" @bind-Value="userForm.TenantId" @onchange="OnUserTenantChanged">
+                        <option value="">Selecciona tenant</option>
+                        @foreach (var tenant in tenants)
+                        {
+                            <option value="@tenant.Id">@tenant.Name</option>
+                        }
+                    </InputSelect>
+                </label>
+                <label class="field">
+                    <span>Nombre</span>
+                    <InputText class="text-input" @bind-Value="userForm.DisplayName" />
+                </label>
+                <label class="field">
+                    <span>Email</span>
+                    <InputText class="text-input" @bind-Value="userForm.Email" />
+                </label>
+                <label class="field">
+                    <span>Contraseña</span>
+                    <InputText class="text-input" @bind-Value="userForm.Password" />
+                </label>
+                <div class="field">
+                    <span>Companies</span>
+                    <div class="checkbox-list">
+                        @foreach (var company in GetCompaniesForUserTenant())
+                        {
+                            <label class="checkbox-field compact">
+                                <input type="checkbox" checked="@userForm.SelectedCompanyIds.Contains(company.Id)" @onchange="args => ToggleCompany(company.Id, args.Value)" />
+                                <span>@company.Name (@company.LegacyCenterCode)</span>
+                            </label>
+                        }
+                    </div>
+                </div>
+                <div class="field">
+                    <span>Roles</span>
+                    <div class="checkbox-list">
+                        @foreach (var role in PlatformRoles.All.Where(role => role != PlatformRoles.PlatformAdmin))
+                        {
+                            <label class="checkbox-field compact">
+                                <input type="checkbox" checked="@userForm.SelectedRoles.Contains(role)" @onchange="args => ToggleRole(role, args.Value)" />
+                                <span>@role</span>
+                            </label>
+                        }
+                    </div>
+                </div>
+                <button class="primary-button" type="submit">Crear usuario</button>
+            </div>
+        </EditForm>
+    </section>
+
+    <section class="panel">
+        <h2>Leads recientes</h2>
+        <div class="list-block">
+            @if (recentLeads.Count == 0)
+            {
+                <p class="muted">Todavía no hay leads registrados.</p>
+            }
+            else
+            {
+                @foreach (var lead in recentLeads)
+                {
+                    <article class="list-item">
+                        <strong>@lead.CompanyName</strong>
+                        <span>@lead.ContactName · @lead.Email</span>
+                        <span>@lead.RequestedUsers usuarios · @lead.Status</span>
+                    </article>
+                }
+            }
+        </div>
+    </section>
+</div>
+
+<div class="admin-grid">
+    <section class="panel">
+        <h2>Tenants</h2>
+        <div class="list-block">
+            @foreach (var tenant in tenants)
+            {
+                <article class="list-item">
+                    <strong>@tenant.Name</strong>
+                    <span>@tenant.Slug</span>
+                </article>
+            }
+        </div>
+    </section>
+
+    <section class="panel">
+        <h2>Companies</h2>
+        <div class="list-block">
+            @foreach (var company in companies)
+            {
+                <article class="list-item">
+                    <strong>@company.Name</strong>
+                    <span>@company.LegacyCenterCode · @company.Slug</span>
+                </article>
+            }
+        </div>
+    </section>
+
+    <section class="panel">
+        <h2>Usuarios</h2>
+        <div class="list-block">
+            @foreach (var user in users)
+            {
+                <article class="list-item">
+                    <strong>@user.DisplayName</strong>
+                    <span>@user.Email</span>
+                    <span>@string.Join(", ", user.Roles)</span>
+                </article>
+            }
+        </div>
+    </section>
+</div>
+
+@code {
+    private IReadOnlyCollection<TenantSummaryDto> tenants = [];
+    private IReadOnlyCollection<CompanySummaryDto> companies = [];
+    private IReadOnlyCollection<UserSummaryDto> users = [];
+    private IReadOnlyCollection<LeadSummaryDto> recentLeads = [];
+    private TenantFormModel tenantForm = new();
+    private CompanyFormModel companyForm = new();
+    private UserFormModel userForm = new();
+    private string statusMessage = string.Empty;
+    private bool isError;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await ReloadAsync();
+    }
+
+    private async Task ReloadAsync()
+    {
+        tenants = await TenantAdminService.GetTenantsAsync();
+        companies = await TenantAdminService.GetCompaniesAsync();
+        users = await TenantAdminService.GetUsersAsync();
+        recentLeads = await LeadCaptureService.GetRecentAsync();
+    }
+
+    private async Task CreateTenantAsync()
+    {
+        await RunAsync(async () =>
+        {
+            await TenantAdminService.CreateTenantAsync(new CreateTenantCommand
+            {
+                Name = tenantForm.Name,
+                Slug = tenantForm.Slug
+            });
+            tenantForm = new TenantFormModel();
+            await ReloadAsync();
+        }, "Tenant creado correctamente.");
+    }
+
+    private async Task CreateCompanyAsync()
+    {
+        await RunAsync(async () =>
+        {
+            await TenantAdminService.CreateCompanyAsync(new CreateCompanyCommand
+            {
+                TenantId = companyForm.TenantId,
+                Name = companyForm.Name,
+                Slug = companyForm.Slug,
+                LegacyCenterCode = companyForm.LegacyCenterCode
+            });
+            companyForm = new CompanyFormModel();
+            await ReloadAsync();
+        }, "Company creada correctamente.");
+    }
+
+    private async Task CreateUserAsync()
+    {
+        await RunAsync(async () =>
+        {
+            await TenantAdminService.CreateUserAsync(new CreateUserCommand
+            {
+                TenantId = userForm.TenantId,
+                Email = userForm.Email,
+                DisplayName = userForm.DisplayName,
+                Password = userForm.Password,
+                CompanyIds = userForm.SelectedCompanyIds.ToArray(),
+                Roles = userForm.SelectedRoles.ToArray()
+            });
+            userForm = new UserFormModel();
+            await ReloadAsync();
+        }, "Usuario creado correctamente.");
+    }
+
+    private Task OnUserTenantChanged(ChangeEventArgs _)
+    {
+        userForm.SelectedCompanyIds.Clear();
+        return Task.CompletedTask;
+    }
+
+    private IEnumerable<CompanySummaryDto> GetCompaniesForUserTenant() =>
+        companies.Where(company => company.TenantId == userForm.TenantId);
+
+    private void ToggleCompany(Guid companyId, object? value)
+    {
+        if (value as bool? == true)
+        {
+            userForm.SelectedCompanyIds.Add(companyId);
+        }
+        else
+        {
+            userForm.SelectedCompanyIds.Remove(companyId);
+        }
+    }
+
+    private void ToggleRole(string role, object? value)
+    {
+        if (value as bool? == true)
+        {
+            userForm.SelectedRoles.Add(role);
+        }
+        else
+        {
+            userForm.SelectedRoles.Remove(role);
+        }
+    }
+
+    private async Task RunAsync(Func<Task> action, string successMessage)
+    {
+        try
+        {
+            statusMessage = string.Empty;
+            isError = false;
+            await action();
+            statusMessage = successMessage;
+        }
+        catch (Exception exception)
+        {
+            isError = true;
+            statusMessage = exception.Message;
+        }
+    }
+
+    private sealed class TenantFormModel
+    {
+        public string Name { get; set; } = string.Empty;
+        public string Slug { get; set; } = string.Empty;
+    }
+
+    private sealed class CompanyFormModel
+    {
+        public Guid TenantId { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public string Slug { get; set; } = string.Empty;
+        public string LegacyCenterCode { get; set; } = string.Empty;
+    }
+
+    private sealed class UserFormModel
+    {
+        public Guid TenantId { get; set; }
+        public string DisplayName { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
+        public string Password { get; set; } = string.Empty;
+        public HashSet<Guid> SelectedCompanyIds { get; } = [];
+        public HashSet<string> SelectedRoles { get; } = [];
+    }
+}

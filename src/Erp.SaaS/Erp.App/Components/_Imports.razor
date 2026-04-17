@@ -1,11 +1,23 @@
-﻿@using System.Net.Http
+@using System.Net.Http
 @using System.Net.Http.Json
+@using System.Security.Claims
+@using Erp.Application.Auth
+@using Erp.Application.Clients
+@using Erp.Application.Companies
+@using Erp.Application.Leads
+@using Erp.Application.Pricing
+@using Erp.Application.Tenants
+@using Erp.Domain.Common
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.AspNetCore.Components.Forms
 @using Microsoft.AspNetCore.Components.Routing
 @using Microsoft.AspNetCore.Components.Web
-@using static Microsoft.AspNetCore.Components.Web.RenderMode
 @using Microsoft.AspNetCore.Components.Web.Virtualization
 @using Microsoft.JSInterop
+@using static Microsoft.AspNetCore.Components.Web.RenderMode
 @using Erp.App
+@using Erp.App.Components.Auth
 @using Erp.App.Components
 @using Erp.App.Components.Layout
+@using Erp.App.Security

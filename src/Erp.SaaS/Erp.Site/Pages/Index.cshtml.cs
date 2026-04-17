@@ -1,12 +1,21 @@
-using Microsoft.AspNetCore.Mvc;
+using Erp.Application.Pricing;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace Erp.Site.Pages;
 
-public class IndexModel : PageModel
+public sealed class IndexModel : PageModel
 {
-    public void OnGet()
-    {
+    private readonly IPlanCatalogService _planCatalogService;
 
+    public IndexModel(IPlanCatalogService planCatalogService)
+    {
+        _planCatalogService = planCatalogService;
+    }
+
+    public IReadOnlyCollection<PlanCardDto> Plans { get; private set; } = [];
+
+    public async Task OnGetAsync()
+    {
+        Plans = await _planCatalogService.GetPublicPlansAsync();
     }
 }

@@ -1,30 +1,104 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="">Erp.App</a>
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject ICompanyAccessService CompanyAccessService
+@inject NavigationManager NavigationManager
+
+<div class="brand-block">
+    <a class="brand-link" href="/">
+        <span class="brand-kicker">ERP SaaS</span>
+        <strong>CoreFlow</strong>
+    </a>
+</div>
+
+@if (isAuthenticated)
+{
+    <div class="sidebar-panel">
+        <div class="sidebar-label">Usuario</div>
+        <div class="sidebar-user">@displayName</div>
+        <div class="sidebar-muted">@email</div>
     </div>
-</div>
 
-<input type="checkbox" title="Navigation menu" class="navbar-toggler" />
-
-<div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
-    <nav class="nav flex-column">
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
-            </NavLink>
+    @if (allowedCompanies.Count > 0)
+    {
+        <div class="sidebar-panel">
+            <div class="sidebar-label">Empresa activa</div>
+            <form method="post" action="/account/switch-company">
+                <AntiforgeryToken />
+                <input type="hidden" name="returnUrl" value="@CurrentPath" />
+                <select class="sidebar-select" name="companyId">
+                    @foreach (var company in allowedCompanies)
+                    {
+                        <option selected="@(company.CompanyId == activeCompanyId)" value="@company.CompanyId">@company.Name (@company.LegacyCenterCode)</option>
+                    }
+                </select>
+                <button class="sidebar-button" type="submit">Cambiar empresa</button>
+            </form>
         </div>
+    }
 
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="counter">
-                <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Counter
-            </NavLink>
-        </div>
-
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="weather">
-                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Weather
-            </NavLink>
-        </div>
+    <nav class="sidebar-nav">
+        <NavLink class="sidebar-link" href="/" Match="NavLinkMatch.All">Dashboard</NavLink>
+        <NavLink class="sidebar-link" href="/crm/clientes">CRM / Clientes</NavLink>
+        @if (isPlatformAdmin)
+        {
+            <NavLink class="sidebar-link" href="/plataforma">Plataforma</NavLink>
+        }
     </nav>
-</div>
 
+    <form method="post" action="/account/logout">
+        <AntiforgeryToken />
+        <button class="sidebar-logout" type="submit">Cerrar sesión</button>
+    </form>
+}
+else
+{
+    <nav class="sidebar-nav">
+        <NavLink class="sidebar-link" href="/login">Acceder</NavLink>
+    </nav>
+}
+
+@code {
+    private bool isAuthenticated;
+    private bool isPlatformAdmin;
+    private string displayName = string.Empty;
+    private string email = string.Empty;
+    private Guid? activeCompanyId;
+    private IReadOnlyCollection<AllowedCompanyDto> allowedCompanies = [];
+
+    private string CurrentPath
+    {
+        get
+        {
+            var relativePath = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
+            return string.IsNullOrWhiteSpace(relativePath) ? "/" : $"/{relativePath}";
+        }
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        isAuthenticated = user.Identity?.IsAuthenticated ?? false;
+        if (!isAuthenticated)
+        {
+            allowedCompanies = [];
+            return;
+        }
+
+        displayName = user.Identity?.Name ?? string.Empty;
+        email = user.FindFirstValue(ClaimTypes.Email) ?? string.Empty;
+        activeCompanyId = user.GetActiveCompanyId();
+        isPlatformAdmin = user.IsPlatformAdmin();
+
+        var userId = user.GetUserId();
+        var tenantId = user.GetTenantId();
+        if (userId.HasValue && tenantId.HasValue)
+        {
+            allowedCompanies = await CompanyAccessService.GetAllowedCompaniesAsync(userId.Value, tenantId.Value);
+        }
+        else
+        {
+            allowedCompanies = [];
+        }
+    }
+}

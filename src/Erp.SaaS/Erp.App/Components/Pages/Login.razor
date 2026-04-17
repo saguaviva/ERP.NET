@@ -1,0 +1,49 @@
+@page "/login"
+@attribute [AllowAnonymous]
+
+<PageTitle>Acceso</PageTitle>
+
+<div class="auth-shell">
+    <section class="auth-panel">
+        <p class="eyebrow">ERP SaaS</p>
+        <h1>Acceso seguro</h1>
+        <p class="lead">Tenant, roles y empresa activa preparados para la migración desde el ERP actual.</p>
+
+        @if (Error == "1")
+        {
+            <div class="alert danger">Email o contraseña incorrectos.</div>
+        }
+
+        <form class="auth-form" method="post" action="/account/login">
+            <AntiforgeryToken />
+            <input type="hidden" name="returnUrl" value="@ResolvedReturnUrl" />
+
+            <label class="field">
+                <span>Email</span>
+                <input class="text-input" name="email" type="email" autocomplete="username" placeholder="admin@empresa.com" required />
+            </label>
+
+            <label class="field">
+                <span>Contraseña</span>
+                <input class="text-input" name="password" type="password" autocomplete="current-password" placeholder="Tu contraseña" required />
+            </label>
+
+            <label class="checkbox-field">
+                <input name="rememberMe" type="checkbox" value="true" />
+                <span>Recordar sesión</span>
+            </label>
+
+            <button class="primary-button" type="submit">Entrar</button>
+        </form>
+    </section>
+</div>
+
+@code {
+    [SupplyParameterFromQuery]
+    public string? Error { get; set; }
+
+    [SupplyParameterFromQuery]
+    public string? ReturnUrl { get; set; }
+
+    private string ResolvedReturnUrl => string.IsNullOrWhiteSpace(ReturnUrl) ? "/" : ReturnUrl;
+}

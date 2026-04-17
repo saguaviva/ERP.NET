@@ -1,0 +1,52 @@
+@page
+@model Erp.Site.Pages.DemoModel
+@{
+    ViewData["Title"] = "Solicitar demo";
+}
+
+<section class="section-block">
+    <div class="section-heading">
+        <div>
+            <p class="kicker">Lead + alta asistida</p>
+            <h1>Cuéntanos tu grupo empresarial y te montamos la propuesta inicial.</h1>
+        </div>
+    </div>
+
+    @if (Model.Submitted)
+    {
+        <div class="notice success">Hemos recibido la solicitud. El siguiente paso será revisar el caso y proponerte un arranque.</div>
+    }
+
+    @if (!string.IsNullOrWhiteSpace(Model.ErrorMessage))
+    {
+        <div class="notice danger">@Model.ErrorMessage</div>
+    }
+
+    <form method="post" class="lead-form">
+        <label>
+            <span>Nombre de contacto</span>
+            <input asp-for="Lead.ContactName" />
+        </label>
+        <label>
+            <span>Empresa o grupo</span>
+            <input asp-for="Lead.CompanyName" />
+        </label>
+        <label>
+            <span>Email</span>
+            <input asp-for="Lead.Email" type="email" />
+        </label>
+        <label>
+            <span>Teléfono</span>
+            <input asp-for="Lead.Phone" />
+        </label>
+        <label>
+            <span>Número estimado de usuarios</span>
+            <input asp-for="Lead.RequestedUsers" type="number" min="1" />
+        </label>
+        <label class="full">
+            <span>Contexto y necesidades</span>
+            <textarea asp-for="Lead.Message"></textarea>
+        </label>
+        <button type="submit" class="button-primary">Solicitar demo</button>
+    </form>
+</section>

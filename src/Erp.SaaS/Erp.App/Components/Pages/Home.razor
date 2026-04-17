@@ -1,7 +1,69 @@
-﻿@page "/"
+@page "/"
+@attribute [Authorize]
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject ICompanyAccessService CompanyAccessService
 
-<PageTitle>Home</PageTitle>
+<PageTitle>Dashboard</PageTitle>
 
-<h1>Hello, world!</h1>
+<div class="page-header">
+    <div>
+        <p class="eyebrow">Aplicación privada</p>
+        <h1>Panel de trabajo</h1>
+        <p class="lead">La base SaaS ya separa tenant, empresa activa y usuarios con roles.</p>
+    </div>
+</div>
 
-Welcome to your new app.
+<div class="card-grid">
+    <section class="info-card accent-card">
+        <h2>@displayName</h2>
+        <p>@email</p>
+        <p class="muted">Rol principal: @(roles.FirstOrDefault() ?? "Sin rol")</p>
+    </section>
+    <section class="info-card">
+        <h2>Tenant</h2>
+        <p>@(tenantId?.ToString() ?? "Sin tenant asignado")</p>
+    </section>
+    <section class="info-card">
+        <h2>Empresa activa</h2>
+        <p>@(activeCompany?.Name ?? "Selecciona una empresa para trabajar")</p>
+    </section>
+</div>
+
+<section class="panel">
+    <h2>Accesos rápidos</h2>
+    <div class="quick-links">
+        <a class="action-link" href="/crm/clientes">Abrir CRM / Clientes</a>
+        @if (isPlatformAdmin)
+        {
+            <a class="action-link" href="/plataforma">Administrar tenants y usuarios</a>
+        }
+    </div>
+</section>
+
+@code {
+    private string displayName = string.Empty;
+    private string email = string.Empty;
+    private Guid? tenantId;
+    private IReadOnlyCollection<string> roles = [];
+    private AllowedCompanyDto? activeCompany;
+    private bool isPlatformAdmin;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        displayName = user.Identity?.Name ?? string.Empty;
+        email = user.FindFirstValue(ClaimTypes.Email) ?? string.Empty;
+        tenantId = user.GetTenantId();
+        roles = user.FindAll(ClaimTypes.Role).Select(claim => claim.Value).ToArray();
+        isPlatformAdmin = user.IsPlatformAdmin();
+
+        var userId = user.GetUserId();
+        if (userId.HasValue && tenantId.HasValue)
+        {
+            var companies = await CompanyAccessService.GetAllowedCompaniesAsync(userId.Value, tenantId.Value);
+            activeCompany = companies.FirstOrDefault(company => company.CompanyId == user.GetActiveCompanyId());
+        }
+    }
+}

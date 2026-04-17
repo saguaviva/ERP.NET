@@ -1,0 +1,185 @@
+@page "/crm/clientes/nuevo"
+@page "/crm/clientes/editar/{Code:int}"
+@attribute [Authorize(Roles = "TenantAdmin")]
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IClienteQueries ClienteQueries
+@inject IClienteService ClienteService
+@inject NavigationManager NavigationManager
+
+<PageTitle>@(Code.HasValue ? "Editar cliente" : "Nuevo cliente")</PageTitle>
+
+<div class="page-header">
+    <div>
+        <p class="eyebrow">CRM</p>
+        <h1>@(Code.HasValue ? $"Editar cliente {Code}" : "Nuevo cliente")</h1>
+        <p class="lead">Alta y edición sobre la tabla legacy `clients`, filtrada por la empresa activa.</p>
+    </div>
+</div>
+
+@if (!tenantId.HasValue || !companyId.HasValue)
+{
+    <div class="empty-state">
+        <p>No hay empresa activa seleccionada.</p>
+    </div>
+}
+else
+{
+    @if (!string.IsNullOrWhiteSpace(statusMessage))
+    {
+        <div class="alert @(isError ? "danger" : "success")">@statusMessage</div>
+    }
+
+    <EditForm Model="model" OnValidSubmit="SaveAsync">
+        <div class="form-grid">
+            <label class="field">
+                <span>Nombre</span>
+                <InputText class="text-input" @bind-Value="model.Name" />
+            </label>
+            <label class="field">
+                <span>NIF</span>
+                <InputText class="text-input" @bind-Value="model.TaxId" />
+            </label>
+            <label class="field">
+                <span>Contacto</span>
+                <InputText class="text-input" @bind-Value="model.ContactName" />
+            </label>
+            <label class="field">
+                <span>Teléfono</span>
+                <InputText class="text-input" @bind-Value="model.Phone" />
+            </label>
+            <label class="field wide">
+                <span>Dirección</span>
+                <InputText class="text-input" @bind-Value="model.Address" />
+            </label>
+            <label class="field">
+                <span>Código postal</span>
+                <InputText class="text-input" @bind-Value="model.PostalCode" />
+            </label>
+            <label class="field">
+                <span>Ciudad</span>
+                <InputText class="text-input" @bind-Value="model.City" />
+            </label>
+            <label class="field">
+                <span>Provincia</span>
+                <InputText class="text-input" @bind-Value="model.Province" />
+            </label>
+            <label class="field">
+                <span>País</span>
+                <InputText class="text-input" @bind-Value="model.Country" />
+            </label>
+            <label class="field">
+                <span>Email principal</span>
+                <InputText class="text-input" @bind-Value="model.PrimaryEmail" />
+            </label>
+            <label class="field">
+                <span>Email secundario</span>
+                <InputText class="text-input" @bind-Value="model.SecondaryEmail" />
+            </label>
+            <label class="field">
+                <span>Fax</span>
+                <InputText class="text-input" @bind-Value="model.Fax" />
+            </label>
+            <label class="field wide">
+                <span>Web</span>
+                <InputText class="text-input" @bind-Value="model.Website" />
+            </label>
+            <label class="field wide">
+                <span>Notas</span>
+                <InputTextArea class="text-area" @bind-Value="model.Notes" />
+            </label>
+            <label class="checkbox-field">
+                <InputCheckbox @bind-Value="model.IsBlocked" />
+                <span>Cliente bloqueado</span>
+            </label>
+        </div>
+
+        <div class="form-actions">
+            <button class="primary-button" type="submit">Guardar</button>
+            <a class="secondary-button link-button" href="/crm/clientes">Volver al listado</a>
+        </div>
+    </EditForm>
+}
+
+@code {
+    [Parameter]
+    public int? Code { get; set; }
+
+    private Guid? tenantId;
+    private Guid? companyId;
+    private SaveClienteCommand model = new();
+    private string statusMessage = string.Empty;
+    private bool isError;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        tenantId = user.GetTenantId();
+        companyId = user.GetActiveCompanyId();
+
+        if (tenantId.HasValue)
+        {
+            model.TenantId = tenantId.Value;
+        }
+
+        if (companyId.HasValue)
+        {
+            model.CompanyId = companyId.Value;
+        }
+
+        if (Code.HasValue && tenantId.HasValue && companyId.HasValue)
+        {
+            var existing = await ClienteQueries.GetByCodeAsync(tenantId.Value, companyId.Value, Code.Value);
+            if (existing is not null)
+            {
+                model = new SaveClienteCommand
+                {
+                    TenantId = tenantId.Value,
+                    CompanyId = companyId.Value,
+                    Code = existing.Code,
+                    Name = existing.Name,
+                    TaxId = existing.TaxId,
+                    Address = existing.Address,
+                    PostalCode = existing.PostalCode,
+                    City = existing.City,
+                    Province = existing.Province,
+                    Country = existing.Country,
+                    ContactName = existing.ContactName,
+                    Phone = existing.Phone,
+                    Fax = existing.Fax,
+                    PrimaryEmail = existing.PrimaryEmail,
+                    SecondaryEmail = existing.SecondaryEmail,
+                    Website = existing.Website,
+                    Notes = existing.Notes,
+                    IsBlocked = existing.IsBlocked
+                };
+            }
+        }
+    }
+
+    private async Task SaveAsync()
+    {
+        statusMessage = string.Empty;
+        isError = false;
+
+        if (!tenantId.HasValue || !companyId.HasValue)
+        {
+            statusMessage = "No hay empresa activa seleccionada.";
+            isError = true;
+            return;
+        }
+
+        try
+        {
+            model.TenantId = tenantId.Value;
+            model.CompanyId = companyId.Value;
+            var code = await ClienteService.SaveAsync(model);
+            NavigationManager.NavigateTo($"/crm/clientes/editar/{code}", forceLoad: true);
+        }
+        catch (Exception exception)
+        {
+            statusMessage = exception.Message;
+            isError = true;
+        }
+    }
+}

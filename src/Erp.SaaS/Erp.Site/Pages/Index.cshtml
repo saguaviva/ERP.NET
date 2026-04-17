@@ -1,10 +1,85 @@
-﻿@page
-@model IndexModel
+@page
+@model Erp.Site.Pages.IndexModel
 @{
-    ViewData["Title"] = "Home page";
+    ViewData["Title"] = "Inicio";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<section class="hero">
+    <div class="hero-copy">
+        <p class="kicker">ERP SaaS para grupos empresariales</p>
+        <h1>Tenant por grupo, empresa activa por usuario y una migración web pensada para crecer.</h1>
+        <p class="intro">
+            CoreFlow nace para convertir el ERP actual en una plataforma web moderna: multiempresa real, roles propios,
+            CRM inicial y una base preparada para evolucionar hacia SaaS comercial.
+        </p>
+        <div class="hero-actions">
+            <a asp-page="/Demo" class="button-primary">Solicitar demo</a>
+            <a asp-page="/Product" class="button-secondary">Ver producto</a>
+        </div>
+    </div>
+
+    <div class="hero-panel">
+        <div class="metric-card">
+            <span>Jerarquía SaaS</span>
+            <strong>Tenant -> Company -> User</strong>
+        </div>
+        <div class="metric-card">
+            <span>Primer módulo</span>
+            <strong>CRM / Clientes</strong>
+        </div>
+        <div class="metric-card">
+            <span>Despliegue objetivo</span>
+            <strong>Azure App Service Linux</strong>
+        </div>
+    </div>
+</section>
+
+<section class="section-grid">
+    <article class="feature-card">
+        <h2>Multiempresa real</h2>
+        <p>Un usuario puede entrar en varias companies del mismo tenant y cambiar de empresa activa sin perder contexto.</p>
+    </article>
+    <article class="feature-card">
+        <h2>Roles simples y ampliables</h2>
+        <p>PlatformAdmin, TenantAdmin y TenantReader como arranque limpio para gobernanza, lectura y edición.</p>
+    </article>
+    <article class="feature-card">
+        <h2>Sin dependencia fuerte de terceros</h2>
+        <p>ASP.NET Core, Blazor, SQL explícito y una política de dependencias mínimas para mantener control del producto.</p>
+    </article>
+</section>
+
+<section class="section-block">
+    <div class="section-heading">
+        <div>
+            <p class="kicker">Pricing inicial</p>
+            <h2>Planes por número de usuarios</h2>
+        </div>
+        <a asp-page="/Pricing" class="text-link">Ver todos los planes</a>
+    </div>
+
+    <div class="pricing-grid">
+        @foreach (var plan in Model.Plans.Take(3))
+        {
+            <article class="price-card">
+                <span class="pill">@plan.MaxUsers usuarios</span>
+                <h3>@plan.Name</h3>
+                <strong>@plan.MonthlyPrice.ToString("0.##") €/mes</strong>
+                <p>@plan.Description</p>
+            </article>
+        }
+    </div>
+</section>
+
+<section class="section-block soft-block">
+    <div class="section-heading">
+        <div>
+            <p class="kicker">Origen sectorial</p>
+            <h2>Textil hoy, más genérico mañana</h2>
+        </div>
+    </div>
+    <p>
+        La primera migración conserva el conocimiento operativo adquirido en fabricación y distribución textil,
+        pero con una arquitectura lo bastante limpia para abrirse a otros verticales con el tiempo.
+    </p>
+</section>

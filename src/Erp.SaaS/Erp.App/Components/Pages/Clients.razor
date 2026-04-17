@@ -1,0 +1,124 @@
+@page "/crm/clientes"
+@attribute [Authorize(Roles = "TenantAdmin,TenantReader")]
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IClienteQueries ClienteQueries
+
+<PageTitle>CRM / Clientes</PageTitle>
+
+<div class="page-header">
+    <div>
+        <p class="eyebrow">CRM</p>
+        <h1>Clientes</h1>
+        <p class="lead">Consulta y filtra los clientes del centro legacy asociado a la empresa activa.</p>
+    </div>
+    @if (canEdit)
+    {
+        <a class="primary-button link-button" href="/crm/clientes/nuevo">Nuevo cliente</a>
+    }
+</div>
+
+@if (!tenantId.HasValue || !companyId.HasValue)
+{
+    <div class="empty-state">
+        <p>Selecciona una empresa activa para trabajar con el CRM.</p>
+    </div>
+}
+else
+{
+    <section class="panel">
+        <div class="filter-row">
+            <input class="text-input" @bind="filter.Search" placeholder="Buscar por nombre, NIF, ciudad, email o teléfono" />
+            <label class="checkbox-field compact">
+                <input type="checkbox" @bind="filter.IncludeBlocked" />
+                <span>Incluir bloqueados</span>
+            </label>
+            <button class="secondary-button" @onclick="LoadAsync">Buscar</button>
+        </div>
+    </section>
+
+    @if (!string.IsNullOrWhiteSpace(errorMessage))
+    {
+        <div class="alert danger">@errorMessage</div>
+    }
+
+    <section class="panel">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Código</th>
+                    <th>Nombre</th>
+                    <th>NIF</th>
+                    <th>Ciudad</th>
+                    <th>Email</th>
+                    <th>Teléfono</th>
+                    <th>Estado</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (items.Count == 0)
+                {
+                    <tr>
+                        <td colspan="8" class="table-empty">No hay clientes para mostrar.</td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var item in items)
+                    {
+                        <tr>
+                            <td>@item.Code</td>
+                            <td>@item.Name</td>
+                            <td>@item.TaxId</td>
+                            <td>@item.City</td>
+                            <td>@item.Email</td>
+                            <td>@item.Phone</td>
+                            <td>@(item.IsBlocked ? "Bloqueado" : "Activo")</td>
+                            <td><a class="inline-link" href="/crm/clientes/editar/@item.Code">Abrir</a></td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </section>
+}
+
+@code {
+    private Guid? tenantId;
+    private Guid? companyId;
+    private bool canEdit;
+    private ClienteFilter filter = new() { Limit = 100 };
+    private IReadOnlyCollection<ClienteListItemDto> items = [];
+    private string errorMessage = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        tenantId = user.GetTenantId();
+        companyId = user.GetActiveCompanyId();
+        canEdit = user.IsInRole(PlatformRoles.TenantAdmin);
+
+        await LoadAsync();
+    }
+
+    private async Task LoadAsync()
+    {
+        errorMessage = string.Empty;
+        if (!tenantId.HasValue || !companyId.HasValue)
+        {
+            items = [];
+            return;
+        }
+
+        try
+        {
+            items = await ClienteQueries.SearchAsync(tenantId.Value, companyId.Value, filter);
+        }
+        catch (Exception exception)
+        {
+            errorMessage = exception.Message;
+            items = [];
+        }
+    }
+}
