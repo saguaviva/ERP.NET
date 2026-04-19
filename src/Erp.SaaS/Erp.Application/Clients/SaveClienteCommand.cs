@@ -20,4 +20,6 @@ public sealed class SaveClienteCommand
     public string Website { get; set; } = string.Empty;
     public string Notes { get; set; } = string.Empty;
     public bool IsBlocked { get; set; }
+    public List<ClienteSecondaryAddressDto> SecondaryAddresses { get; set; } = [];
+    public List<ClienteContactDto> Contacts { get; set; } = [];
 }

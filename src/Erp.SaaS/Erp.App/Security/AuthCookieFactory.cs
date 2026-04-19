@@ -13,7 +13,8 @@ public static class AuthCookieFactory
             new(ClaimTypes.NameIdentifier, session.UserId.ToString()),
             new(ClaimTypes.Name, session.DisplayName),
             new(ClaimTypes.Email, session.Email),
-            new(AppClaimTypes.IsPlatformAdmin, session.IsPlatformAdmin.ToString())
+            new(AppClaimTypes.IsPlatformAdmin, session.IsPlatformAdmin.ToString()),
+            new(AppClaimTypes.RequirePasswordChange, session.RequirePasswordChange.ToString())
         };
 
         if (session.TenantId.HasValue)

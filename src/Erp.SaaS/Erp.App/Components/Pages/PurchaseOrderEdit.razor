@@ -1,0 +1,676 @@
+@page "/compras/pedidos/nuevo"
+@page "/compras/pedidos/editar/{OrderNumber:int}"
+@attribute [Authorize(Roles = "TenantAdmin,TenantReader")]
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IAuditLogService AuditLogService
+@inject ILegacySyncService LegacySyncService
+@inject IProveedorQueries ProveedorQueries
+@inject IPurchaseOrderQueries PurchaseOrderQueries
+@inject IPurchaseOrderService PurchaseOrderService
+@inject NavigationManager NavigationManager
+
+<PageTitle>@(OrderNumber.HasValue ? $"Pedido {OrderNumber}" : "Nuevo pedido de compra")</PageTitle>
+
+<div class="page-header">
+    <div>
+        <p class="eyebrow">Compras</p>
+        <h1>@(OrderNumber.HasValue ? $"Pedido {OrderNumber}" : "Nuevo pedido a proveedor")</h1>
+        <p class="lead">@(isLegacySyncActive
+            ? "Consulta sobre la réplica SaaS local de pedidos de compra, en solo lectura mientras el módulo siga sincronizado desde legacy."
+            : "Cabecera, líneas, recepción parcial o total y auditoría sobre el nuevo módulo web de compras.")</p>
+    </div>
+    <div class="quick-links">
+        <a class="secondary-button link-button" href="/compras/pedidos">Volver al listado</a>
+    </div>
+</div>
+
+@if (!tenantId.HasValue || !companyId.HasValue)
+{
+    <div class="empty-state">
+        <p>No hay empresa activa seleccionada.</p>
+    </div>
+}
+else if (!canEdit && !OrderNumber.HasValue && !isLegacySyncActive)
+{
+    <div class="empty-state">
+        <p>No tienes permisos para crear pedidos de compra.</p>
+    </div>
+}
+else if (isLegacySyncActive && !OrderNumber.HasValue)
+{
+    <div class="empty-state">
+        <p>Compras / Pedidos está en convivencia con legacy para esta empresa. Mientras la sync mande, no se pueden crear pedidos web nuevos.</p>
+    </div>
+}
+else
+{
+    @if (!string.IsNullOrWhiteSpace(statusMessage))
+    {
+        <div class="alert @(isError ? "danger" : "success")">@statusMessage</div>
+    }
+
+    @if (isLegacySyncActive)
+    {
+        <div class="alert">
+            Compras / Pedidos está en convivencia con legacy para esta empresa.
+            Esta ficha queda en solo lectura mientras la sincronización mande.
+            @if (!string.IsNullOrWhiteSpace(syncStatusLabel))
+            {
+                <span>@syncStatusLabel</span>
+            }
+        </div>
+    }
+
+    <EditForm Model="model" OnValidSubmit="SaveAsync">
+        <fieldset disabled="@isLegacySyncActive">
+        <div class="form-grid">
+            <label class="field">
+                <span>Proveedor</span>
+                <InputSelect class="text-input" @bind-Value="model.SupplierCode" disabled="@(!canEdit)">
+                    <option value="0">Selecciona proveedor</option>
+                    @foreach (var supplier in suppliers)
+                    {
+                        <option value="@supplier.Code">@supplier.Name (@supplier.Code)</option>
+                    }
+                </InputSelect>
+                @if (SelectedSupplier is not null)
+                {
+                    <span class="field-hint">@SelectedSupplier.TaxId · @SelectedSupplier.ContactName</span>
+                }
+            </label>
+            <label class="field">
+                <span>Fecha documento</span>
+                <InputDate class="text-input" @bind-Value="model.DocumentDate" disabled="@(!canEdit)" />
+            </label>
+            <label class="field">
+                <span>Fecha prevista</span>
+                <InputDate class="text-input" @bind-Value="model.ExpectedDate" disabled="@(!canEdit)" />
+            </label>
+            <label class="field">
+                <span>Estado</span>
+                <InputSelect class="text-input" @bind-Value="model.Status" disabled="@(!canEdit || HasAnyReceipt)">
+                    @foreach (var status in PurchaseOrderStatuses.All)
+                    {
+                        <option value="@status">@FormatStatus(status)</option>
+                    }
+                </InputSelect>
+                @if (HasAnyReceipt)
+                {
+                    <span class="field-hint">El estado pasa a depender de las cantidades recibidas.</span>
+                }
+            </label>
+            <label class="field wide">
+                <span>Notas</span>
+                <InputTextArea class="text-area" @bind-Value="model.Notes" disabled="@(!canEdit)" />
+            </label>
+        </div>
+
+        <section class="panel">
+            <div class="page-header">
+                <div>
+                    <h2>Líneas</h2>
+                    <p class="muted">Añade conceptos, cantidades, precios y fechas previstas por línea.</p>
+                </div>
+                @if (canEdit)
+                {
+                    <button class="secondary-button" type="button" @onclick="AddLine">Añadir línea</button>
+                }
+            </div>
+
+            <div class="stack">
+                @for (var index = 0; index < model.Lines.Count; index++)
+                {
+                    var line = model.Lines[index];
+                    <section class="panel line-editor">
+                        <div class="panel-header">
+                            <strong>Línea @line.LineNumber</strong>
+                            @if (canEdit && model.Lines.Count > 1)
+                            {
+                                <button class="secondary-button" type="button" @onclick="() => RemoveLine(index)">Quitar</button>
+                            }
+                        </div>
+                        <div class="form-grid">
+                            <label class="field">
+                                <span>Artículo</span>
+                                <InputText class="text-input" @bind-Value="line.ItemCode" disabled="@(!canEdit)" />
+                            </label>
+                            <label class="field wide">
+                                <span>Descripción</span>
+                                <InputText class="text-input" @bind-Value="line.Description" disabled="@(!canEdit)" />
+                            </label>
+                            <label class="field">
+                                <span>Cantidad</span>
+                                <InputNumber class="text-input" @bind-Value="line.Quantity" disabled="@(!canEdit)" />
+                            </label>
+                            <label class="field">
+                                <span>Unidad</span>
+                                <InputText class="text-input" @bind-Value="line.UnitOfMeasure" disabled="@(!canEdit)" />
+                            </label>
+                            <label class="field">
+                                <span>Precio unitario</span>
+                                <InputNumber class="text-input" @bind-Value="line.UnitPrice" disabled="@(!canEdit)" />
+                            </label>
+                            <label class="field">
+                                <span>Prevista</span>
+                                <InputDate class="text-input" @bind-Value="line.ExpectedDate" disabled="@(!canEdit)" />
+                            </label>
+                            <label class="field wide">
+                                <span>Notas línea</span>
+                                <InputTextArea class="text-area" @bind-Value="line.Notes" disabled="@(!canEdit)" />
+                            </label>
+                        </div>
+                        <div class="stack">
+                            <div class="muted">Total línea: @LineTotal(line).ToString("0.00") €</div>
+                            <div class="muted">Recibido: @line.ReceivedQuantity.ToString("0.###") · Pendiente: @line.PendingQuantity.ToString("0.###")</div>
+                        </div>
+                    </section>
+                }
+            </div>
+        </section>
+
+        <section class="panel">
+            <h2>Resumen</h2>
+            <div class="card-grid purchase-summary-grid purchase-metrics-grid">
+                <article class="info-card">
+                    <h2>@model.Lines.Count</h2>
+                    <p class="muted">líneas</p>
+                </article>
+                <article class="info-card">
+                    <h2>@TotalQuantity.ToString("0.###")</h2>
+                    <p class="muted">cantidad total</p>
+                </article>
+                <article class="info-card">
+                    <h2>@TotalReceivedQuantity.ToString("0.###")</h2>
+                    <p class="muted">recibido</p>
+                </article>
+                <article class="info-card">
+                    <h2>@TotalPendingQuantity.ToString("0.###")</h2>
+                    <p class="muted">pendiente</p>
+                </article>
+                <article class="info-card accent-card">
+                    <h2>@TotalAmount.ToString("0.00") €</h2>
+                    <p class="muted">importe total</p>
+                </article>
+            </div>
+        </section>
+
+        @if (canEdit)
+        {
+            <div class="quick-links" style="margin-top: 1rem;">
+                <button class="primary-button" type="submit">Guardar pedido</button>
+            </div>
+        }
+        </fieldset>
+    </EditForm>
+
+    @if (OrderNumber.HasValue)
+    {
+        @if (canEdit && !isLegacySyncActive && model.Lines.Any(line => line.PendingQuantity > 0) && !string.Equals(model.Status, PurchaseOrderStatuses.Cancelled, StringComparison.OrdinalIgnoreCase))
+        {
+            <section class="panel" style="margin-top: 1rem;">
+                <h2>Recepción de mercancía</h2>
+                <p class="muted">Marca solo las cantidades que entran ahora. El estado del pedido se actualizará automáticamente.</p>
+
+                <div class="stack">
+                    <div class="form-grid">
+                        <label class="field">
+                            <span>Fecha de recepción</span>
+                            <InputDate class="text-input" @bind-Value="receiptForm.ReceiptDate" />
+                        </label>
+                        <label class="field">
+                            <span>Almacén</span>
+                            <InputText class="text-input" @bind-Value="receiptForm.Warehouse" />
+                        </label>
+                        <label class="field">
+                            <span>Transportista</span>
+                            <InputText class="text-input" @bind-Value="receiptForm.Carrier" />
+                        </label>
+                        <label class="field">
+                            <span>Referencia proveedor</span>
+                            <InputText class="text-input" @bind-Value="receiptForm.SupplierReference" />
+                        </label>
+                        <label class="field">
+                            <span>Matrícula</span>
+                            <InputText class="text-input" @bind-Value="receiptForm.VehiclePlate" />
+                        </label>
+                        <label class="field">
+                            <span>Bultos</span>
+                            <InputNumber class="text-input" @bind-Value="receiptForm.PackageCount" />
+                        </label>
+                        <label class="field">
+                            <span>Peso bruto (kg)</span>
+                            <InputNumber class="text-input" @bind-Value="receiptForm.GrossWeightKg" />
+                        </label>
+                        <label class="field wide">
+                            <span>Notas de recepción</span>
+                            <InputTextArea class="text-area" @bind-Value="receiptForm.Notes" />
+                        </label>
+                    </div>
+                </div>
+
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Línea</th>
+                            <th>Descripción</th>
+                            <th>Pedida</th>
+                            <th>Recibida</th>
+                            <th>Pendiente</th>
+                            <th>Recibir ahora</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var line in model.Lines)
+                        {
+                            <tr>
+                                <td>@line.LineNumber</td>
+                                <td>@line.Description</td>
+                                <td>@line.Quantity.ToString("0.###")</td>
+                                <td>@line.ReceivedQuantity.ToString("0.###")</td>
+                                <td>@line.PendingQuantity.ToString("0.###")</td>
+                                <td>
+                                    <InputNumber class="text-input receipt-qty-input" @bind-Value="line.ReceiveNowQuantity" />
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+
+                <div class="quick-links" style="margin-top: 1rem;">
+                    <button class="primary-button" type="button" @onclick="RegisterReceiptAsync">Registrar recepción</button>
+                </div>
+            </section>
+        }
+
+        <section class="panel" style="margin-top: 1rem;">
+            <h2>Recepciones registradas</h2>
+            <div class="list-block">
+                @if (receipts.Count == 0)
+                {
+                    <p class="muted">Todavía no hay recepciones registradas para este pedido.</p>
+                }
+                else
+                {
+                    @foreach (var receipt in receipts)
+                    {
+                        <article class="list-item">
+                            <strong>@receipt.ReceiptDate.ToString("dd/MM/yyyy") · @receipt.TotalReceivedQuantity.ToString("0.###") uds</strong>
+                            @if (!string.IsNullOrWhiteSpace(receipt.Notes))
+                            {
+                                <span>@receipt.Notes</span>
+                            }
+                            <span>@string.Join(" · ", receipt.Lines.Select(line => $"L{line.LineNumber}: +{line.ReceivedQuantity:0.###}"))</span>
+                        </article>
+                    }
+                }
+            </div>
+        </section>
+
+        <section class="panel" style="margin-top: 1rem;">
+            <h2>Historial reciente del pedido</h2>
+            <div class="list-block">
+                @if (recentAuditLogs.Count == 0)
+                {
+                    <p class="muted">Todavía no hay eventos auditados para este pedido.</p>
+                }
+                else
+                {
+                    @foreach (var entry in recentAuditLogs)
+                    {
+                        <article class="list-item">
+                            <strong>@entry.Action</strong>
+                            @if (!string.IsNullOrWhiteSpace(entry.Details))
+                            {
+                                <span>@entry.Details</span>
+                            }
+                            <span>@entry.CreatedUtc.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss")</span>
+                        </article>
+                    }
+                }
+            </div>
+        </section>
+    }
+}
+
+@code {
+    [Parameter]
+    public int? OrderNumber { get; set; }
+
+    private Guid? tenantId;
+    private Guid? companyId;
+    private bool canEdit;
+    private PurchaseOrderFormModel model = PurchaseOrderFormModel.CreateDefault();
+    private IReadOnlyCollection<ProveedorListItemDto> suppliers = [];
+    private IReadOnlyCollection<PurchaseOrderReceiptDto> receipts = [];
+    private IReadOnlyCollection<AuditLogEntryDto> recentAuditLogs = [];
+    private string statusMessage = string.Empty;
+    private bool isError;
+    private bool isLegacySyncActive;
+    private string syncStatusLabel = string.Empty;
+    private ReceiptFormModel receiptForm = new();
+
+    private ProveedorListItemDto? SelectedSupplier =>
+        suppliers.FirstOrDefault(supplier => supplier.Code == model.SupplierCode);
+
+    private decimal TotalAmount => model.Lines.Sum(LineTotal);
+    private decimal TotalQuantity => model.Lines.Sum(line => line.Quantity);
+    private decimal TotalReceivedQuantity => model.Lines.Sum(line => line.ReceivedQuantity);
+    private decimal TotalPendingQuantity => model.Lines.Sum(line => line.PendingQuantity);
+    private bool HasAnyReceipt => model.Lines.Any(line => line.ReceivedQuantity > 0);
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        tenantId = user.GetTenantId();
+        companyId = user.GetActiveCompanyId();
+        canEdit = user.IsPlatformAdmin() || user.IsInRole(PlatformRoles.TenantAdmin);
+        await LoadSyncStatusAsync();
+        canEdit = canEdit && !isLegacySyncActive;
+
+        if (!tenantId.HasValue || !companyId.HasValue)
+        {
+            return;
+        }
+
+        suppliers = (await ProveedorQueries.SearchAsync(tenantId.Value, companyId.Value, new ProveedorFilter
+        {
+            Page = 1,
+            PageSize = 200,
+            SortColumn = nameof(ProveedorListItemDto.Name)
+        })).Items;
+
+        if (OrderNumber.HasValue)
+        {
+            await ReloadOrderAsync();
+            await LoadAuditAsync();
+        }
+        else
+        {
+            model = PurchaseOrderFormModel.CreateDefault();
+            receipts = [];
+            recentAuditLogs = [];
+        }
+    }
+
+    private async Task LoadSyncStatusAsync()
+    {
+        isLegacySyncActive = false;
+        syncStatusLabel = string.Empty;
+
+        if (!tenantId.HasValue || !companyId.HasValue)
+        {
+            return;
+        }
+
+        var status = (await LegacySyncService.GetModuleStatusesAsync(tenantId.Value))
+            .FirstOrDefault(item =>
+                item.CompanyId == companyId.Value &&
+                string.Equals(item.ModuleKey, LegacySyncModuleKeys.PurchaseOrders, StringComparison.OrdinalIgnoreCase));
+
+        if (status is null || !status.HasSuccessfulSync)
+        {
+            return;
+        }
+
+        isLegacySyncActive = true;
+        syncStatusLabel = status.LastCompletedUtc.HasValue
+            ? $"Última sync: {status.LastCompletedUtc.Value.ToLocalTime():dd/MM/yyyy HH:mm:ss} · Ins: {status.LastInserted} · Act: {status.LastUpdated} · Omi: {status.LastSkipped} · Err: {status.LastErrors}"
+            : $"Estado: {status.LastStatus}";
+    }
+
+    private async Task SaveAsync()
+    {
+        if (!tenantId.HasValue || !companyId.HasValue || !canEdit)
+        {
+            return;
+        }
+
+        try
+        {
+            statusMessage = string.Empty;
+            isError = false;
+
+            var orderNumber = await PurchaseOrderService.SaveAsync(new SavePurchaseOrderCommand
+            {
+                TenantId = tenantId.Value,
+                CompanyId = companyId.Value,
+                OrderNumber = OrderNumber,
+                SupplierCode = model.SupplierCode,
+                DocumentDate = model.DocumentDate,
+                ExpectedDate = model.ExpectedDate,
+                Status = model.Status,
+                Notes = model.Notes,
+                Lines = model.Lines.Select(line => new PurchaseOrderLineInputDto
+                {
+                    LineNumber = line.LineNumber,
+                    ItemCode = line.ItemCode,
+                    Description = line.Description,
+                    Quantity = line.Quantity,
+                    UnitOfMeasure = line.UnitOfMeasure,
+                    UnitPrice = line.UnitPrice,
+                    ExpectedDate = line.ExpectedDate,
+                    Notes = line.Notes
+                }).ToList()
+            });
+
+            statusMessage = OrderNumber.HasValue
+                ? "Pedido actualizado correctamente."
+                : "Pedido creado correctamente.";
+
+            if (!OrderNumber.HasValue)
+            {
+                NavigationManager.NavigateTo($"/compras/pedidos/editar/{orderNumber}", forceLoad: false);
+                return;
+            }
+
+            await ReloadOrderAsync();
+            await LoadAuditAsync();
+        }
+        catch (Exception exception)
+        {
+            statusMessage = exception.Message;
+            isError = true;
+        }
+    }
+
+    private async Task RegisterReceiptAsync()
+    {
+        if (!tenantId.HasValue || !companyId.HasValue || !OrderNumber.HasValue || !canEdit)
+        {
+            return;
+        }
+
+        try
+        {
+            statusMessage = string.Empty;
+            isError = false;
+
+            await PurchaseOrderService.ReceiveAsync(new RegisterPurchaseOrderReceiptCommand
+            {
+                TenantId = tenantId.Value,
+                CompanyId = companyId.Value,
+                OrderNumber = OrderNumber.Value,
+                ReceiptDate = receiptForm.ReceiptDate,
+                Warehouse = receiptForm.Warehouse,
+                Carrier = receiptForm.Carrier,
+                SupplierReference = receiptForm.SupplierReference,
+                VehiclePlate = receiptForm.VehiclePlate,
+                PackageCount = receiptForm.PackageCount,
+                GrossWeightKg = receiptForm.GrossWeightKg,
+                Notes = receiptForm.Notes,
+                Lines = model.Lines
+                    .Where(line => line.ReceiveNowQuantity > 0)
+                    .Select(line => new RegisterPurchaseOrderReceiptLineDto
+                    {
+                        LineNumber = line.LineNumber,
+                        ReceivedQuantity = line.ReceiveNowQuantity
+                    })
+                    .ToList()
+            });
+
+            receiptForm = new ReceiptFormModel();
+            statusMessage = "Recepción registrada correctamente.";
+            await ReloadOrderAsync();
+            await LoadAuditAsync();
+        }
+        catch (Exception exception)
+        {
+            statusMessage = exception.Message;
+            isError = true;
+        }
+    }
+
+    private void AddLine()
+    {
+        model.Lines.Add(new PurchaseOrderLineFormModel
+        {
+            LineNumber = GetNextLineNumber(),
+            Quantity = 1
+        });
+    }
+
+    private void RemoveLine(int index)
+    {
+        if (index < 0 || index >= model.Lines.Count)
+        {
+            return;
+        }
+
+        model.Lines.RemoveAt(index);
+        if (model.Lines.Count == 0)
+        {
+            AddLine();
+        }
+    }
+
+    private async Task ReloadOrderAsync()
+    {
+        if (!tenantId.HasValue || !companyId.HasValue || !OrderNumber.HasValue)
+        {
+            return;
+        }
+
+        var detail = await PurchaseOrderQueries.GetByOrderNumberAsync(tenantId.Value, companyId.Value, OrderNumber.Value);
+        if (detail is null)
+        {
+            statusMessage = "No se ha encontrado el pedido solicitado.";
+            isError = true;
+            model = PurchaseOrderFormModel.CreateDefault();
+            receipts = [];
+            return;
+        }
+
+        model = PurchaseOrderFormModel.FromDetail(detail);
+        receipts = await PurchaseOrderQueries.GetReceiptsAsync(tenantId.Value, companyId.Value, OrderNumber.Value);
+    }
+
+    private async Task LoadAuditAsync()
+    {
+        if (!tenantId.HasValue || !OrderNumber.HasValue)
+        {
+            recentAuditLogs = [];
+            return;
+        }
+
+        recentAuditLogs = await AuditLogService.GetRecentAsync(
+            limit: 15,
+            tenantId: tenantId.Value,
+            entityName: "PedidoCompra",
+            entityId: OrderNumber.Value.ToString());
+    }
+
+    private int GetNextLineNumber() => model.Lines.Count == 0 ? 1 : model.Lines.Max(line => line.LineNumber) + 1;
+
+    private static decimal LineTotal(PurchaseOrderLineFormModel line) =>
+        decimal.Round(line.Quantity * line.UnitPrice, 2, MidpointRounding.AwayFromZero);
+
+    private static string FormatStatus(string status) => status switch
+    {
+        PurchaseOrderStatuses.Draft => "Borrador",
+        PurchaseOrderStatuses.Sent => "Enviado",
+        PurchaseOrderStatuses.PartiallyReceived => "Recibido parcial",
+        PurchaseOrderStatuses.Received => "Recibido total",
+        PurchaseOrderStatuses.Cancelled => "Cancelado",
+        _ => status
+    };
+
+    private sealed class PurchaseOrderFormModel
+    {
+        public int SupplierCode { get; set; }
+        public DateTime DocumentDate { get; set; } = DateTime.Today;
+        public DateTime? ExpectedDate { get; set; }
+        public string Status { get; set; } = PurchaseOrderStatuses.Draft;
+        public string Notes { get; set; } = string.Empty;
+        public List<PurchaseOrderLineFormModel> Lines { get; } = [];
+
+        public static PurchaseOrderFormModel CreateDefault()
+        {
+            var model = new PurchaseOrderFormModel();
+            model.Lines.Add(new PurchaseOrderLineFormModel { LineNumber = 1, Quantity = 1 });
+            return model;
+        }
+
+        public static PurchaseOrderFormModel FromDetail(PurchaseOrderDetailDto detail)
+        {
+            var model = new PurchaseOrderFormModel
+            {
+                SupplierCode = detail.SupplierCode,
+                DocumentDate = detail.DocumentDate,
+                ExpectedDate = detail.ExpectedDate,
+                Status = detail.Status,
+                Notes = detail.Notes
+            };
+
+            foreach (var line in detail.Lines)
+            {
+                model.Lines.Add(new PurchaseOrderLineFormModel
+                {
+                    LineNumber = line.LineNumber,
+                    ItemCode = line.ItemCode,
+                    Description = line.Description,
+                    Quantity = line.Quantity,
+                    ReceivedQuantity = line.ReceivedQuantity,
+                    UnitOfMeasure = line.UnitOfMeasure,
+                    UnitPrice = line.UnitPrice,
+                    ExpectedDate = line.ExpectedDate,
+                    Notes = line.Notes
+                });
+            }
+
+            if (model.Lines.Count == 0)
+            {
+                model.Lines.Add(new PurchaseOrderLineFormModel { LineNumber = 1, Quantity = 1 });
+            }
+
+            return model;
+        }
+    }
+
+    private sealed class PurchaseOrderLineFormModel
+    {
+        public int LineNumber { get; set; }
+        public string ItemCode { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
+        public decimal Quantity { get; set; }
+        public decimal ReceivedQuantity { get; set; }
+        public string UnitOfMeasure { get; set; } = string.Empty;
+        public decimal UnitPrice { get; set; }
+        public DateTime? ExpectedDate { get; set; }
+        public string Notes { get; set; } = string.Empty;
+        public decimal ReceiveNowQuantity { get; set; }
+        public decimal PendingQuantity => Math.Max(0m, Quantity - ReceivedQuantity);
+    }
+
+    private sealed class ReceiptFormModel
+    {
+        public DateTime ReceiptDate { get; set; } = DateTime.Today;
+        public string Warehouse { get; set; } = string.Empty;
+        public string Carrier { get; set; } = string.Empty;
+        public string SupplierReference { get; set; } = string.Empty;
+        public string VehiclePlate { get; set; } = string.Empty;
+        public int? PackageCount { get; set; }
+        public decimal? GrossWeightKg { get; set; }
+        public string Notes { get; set; } = string.Empty;
+    }
+}

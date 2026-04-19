@@ -1,0 +1,302 @@
+@page "/ventas/pre-facturacion/borradores/{DraftNumber:int}"
+@attribute [Authorize(Roles = "TenantAdmin,TenantReader")]
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject ISalesOrderQueries SalesOrderQueries
+@inject ISalesOrderService SalesOrderService
+@inject NavigationManager NavigationManager
+
+<PageTitle>Pre-factura @DraftNumber</PageTitle>
+
+<div class="page-header">
+    <div>
+        <p class="eyebrow">Ventas</p>
+        <h1>@(draft?.DisplayNumber ?? $"Pre-factura {DraftNumber}")</h1>
+        <p class="lead">Borrador de factura agrupado desde uno o varios albaranes del mismo cliente.</p>
+    </div>
+    <div class="quick-links">
+        <a class="secondary-button link-button" href="/ventas/pre-facturacion">Volver a pre-facturación</a>
+        @if (draft?.InvoiceNumber is int invoiceNumber)
+        {
+            <a class="secondary-button link-button" href="/ventas/facturas/@invoiceNumber">Abrir factura</a>
+        }
+        @if (canEdit && draft is not null && string.Equals(draft.Status, SalesInvoiceDraftStatuses.Draft, StringComparison.OrdinalIgnoreCase))
+        {
+            <button class="primary-button" type="button" @onclick="IssueInvoiceAsync" disabled="@isIssuing">@(isIssuing ? "Emitiendo..." : "Emitir factura")</button>
+        }
+    </div>
+</div>
+
+@if (!tenantId.HasValue || !companyId.HasValue)
+{
+    <div class="empty-state">
+        <p>No hay empresa activa seleccionada.</p>
+    </div>
+}
+else if (!string.IsNullOrWhiteSpace(errorMessage))
+{
+    <div class="alert danger">@errorMessage</div>
+}
+else if (!string.IsNullOrWhiteSpace(statusMessage))
+{
+    <div class="alert @(isError ? "danger" : "success")">@statusMessage</div>
+}
+else if (draft is null)
+{
+    <div class="empty-state">
+        <p>No se ha encontrado el borrador solicitado.</p>
+    </div>
+}
+else
+{
+    <section class="panel receipt-document">
+        <div class="receipt-document-header">
+            <div>
+                <p class="eyebrow">Pre-facturación</p>
+                <h2>@draft.DisplayNumber</h2>
+                <p class="muted">@FormatDraftStatus(draft.Status) · @draft.ShipmentCount albaranes</p>
+            </div>
+            <div class="receipt-document-meta">
+                <strong>Fecha borrador</strong>
+                <span>@draft.IssueDate.ToString("dd/MM/yyyy")</span>
+            </div>
+        </div>
+
+        <div class="comparison-grid">
+            <section class="info-card">
+                <h2>Empresa emisora</h2>
+                <p><strong>@draft.CompanyName</strong></p>
+                <p class="muted">@draft.TenantName</p>
+                <p class="muted">Centro legacy @draft.CompanyLegacyCenterCode</p>
+            </section>
+            <section class="info-card">
+                <h2>Cliente</h2>
+                <p><strong>@draft.ClientName</strong></p>
+                @if (!string.IsNullOrWhiteSpace(draft.ClientTaxId))
+                {
+                    <p class="muted">NIF @draft.ClientTaxId</p>
+                }
+                @if (!string.IsNullOrWhiteSpace(ClientLocation))
+                {
+                    <p class="muted">@ClientLocation</p>
+                }
+            </section>
+        </div>
+
+        <div class="receipt-detail-grid">
+            <section class="info-card">
+                <h2>Cabecera de facturación</h2>
+                <div class="receipt-kv-grid">
+                    <div>
+                        <span class="muted">Estado</span>
+                        <strong>@FormatDraftStatus(draft.Status)</strong>
+                    </div>
+                    <div>
+                        <span class="muted">Factura emitida</span>
+                        <strong>@(draft.IssuedInvoiceDisplayNumber ?? "Todavía no emitida")</strong>
+                    </div>
+                    <div>
+                        <span class="muted">Vencimiento</span>
+                        <strong>@(draft.DueDate?.ToString("dd/MM/yyyy") ?? "Sin dato")</strong>
+                    </div>
+                    <div>
+                        <span class="muted">Cliente</span>
+                        <strong>@draft.ClientCode</strong>
+                    </div>
+                </div>
+            </section>
+            <section class="info-card">
+                <h2>Resumen</h2>
+                <div class="receipt-kv-grid">
+                    <div>
+                        <span class="muted">Albaranes</span>
+                        <strong>@draft.ShipmentCount</strong>
+                    </div>
+                    <div>
+                        <span class="muted">Cantidad total</span>
+                        <strong>@draft.TotalQuantity.ToString("0.###")</strong>
+                    </div>
+                    <div>
+                        <span class="muted">Importe total</span>
+                        <strong>@draft.TotalAmount.ToString("0.00") €</strong>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </section>
+
+    <section class="panel" style="margin-top: 1rem;">
+        <h2>Albaranes incluidos</h2>
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Albarán</th>
+                    <th>Pedido</th>
+                    <th>Fecha</th>
+                    <th>Almacén</th>
+                    <th>Cantidad</th>
+                    <th>Importe</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var shipment in draft.Shipments)
+                {
+                    <tr>
+                        <td>@shipment.DisplayNumber</td>
+                        <td>@shipment.OrderNumber</td>
+                        <td>@shipment.ShipmentDate.ToString("dd/MM/yyyy")</td>
+                        <td>@DisplayValue(shipment.Warehouse)</td>
+                        <td>@shipment.TotalShippedQuantity.ToString("0.###")</td>
+                        <td>@shipment.EstimatedAmount.ToString("0.00") €</td>
+                        <td><a class="inline-link" href="/ventas/albaranes/@shipment.ShipmentNumber">Abrir albarán</a></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </section>
+
+    <section class="panel" style="margin-top: 1rem;">
+        <h2>Líneas del borrador</h2>
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Línea</th>
+                    <th>Artículo</th>
+                    <th>Descripción</th>
+                    <th>Cantidad</th>
+                    <th>Unidad</th>
+                    <th>Precio</th>
+                    <th>Total</th>
+                    <th>Origen</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var line in draft.Lines)
+                {
+                    <tr>
+                        <td>@line.LineNumber</td>
+                        <td>@DisplayValue(line.ItemCode)</td>
+                        <td>@line.Description</td>
+                        <td>@line.Quantity.ToString("0.###")</td>
+                        <td>@DisplayValue(line.UnitOfMeasure)</td>
+                        <td>@line.UnitPrice.ToString("0.0000")</td>
+                        <td>@line.LineTotal.ToString("0.00") €</td>
+                        <td>@DisplayValue(line.SourceSummary)</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </section>
+
+    @if (!string.IsNullOrWhiteSpace(draft.Notes))
+    {
+        <section class="panel" style="margin-top: 1rem;">
+            <h2>Notas</h2>
+            <p>@draft.Notes</p>
+        </section>
+    }
+}
+
+@code {
+    [Parameter]
+    public int DraftNumber { get; set; }
+
+    private Guid? tenantId;
+    private Guid? companyId;
+    private SalesInvoiceDraftDto? draft;
+    private string errorMessage = string.Empty;
+    private string statusMessage = string.Empty;
+    private bool isError;
+    private bool canEdit;
+    private bool isIssuing;
+
+    private string ClientLocation
+    {
+        get
+        {
+            if (draft is null)
+            {
+                return string.Empty;
+            }
+
+            var parts = new[]
+            {
+                draft.ClientAddress,
+                $"{draft.ClientPostalCode} {draft.ClientCity}".Trim(),
+                draft.ClientProvince,
+                draft.ClientCountry
+            }.Where(part => !string.IsNullOrWhiteSpace(part));
+
+            return string.Join(" · ", parts);
+        }
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        tenantId = user.GetTenantId();
+        companyId = user.GetActiveCompanyId();
+        canEdit = user.IsPlatformAdmin() || user.IsInRole(PlatformRoles.TenantAdmin);
+
+        if (!tenantId.HasValue || !companyId.HasValue)
+        {
+            return;
+        }
+
+        try
+        {
+            errorMessage = string.Empty;
+            statusMessage = string.Empty;
+            isError = false;
+            draft = await SalesOrderQueries.GetInvoiceDraftByNumberAsync(tenantId.Value, companyId.Value, DraftNumber);
+        }
+        catch (Exception exception)
+        {
+            errorMessage = exception.Message;
+            draft = null;
+        }
+    }
+
+    private async Task IssueInvoiceAsync()
+    {
+        if (!tenantId.HasValue || !companyId.HasValue || draft is null)
+        {
+            return;
+        }
+
+        try
+        {
+            isIssuing = true;
+            errorMessage = string.Empty;
+            statusMessage = string.Empty;
+            isError = false;
+
+            var invoiceNumber = await SalesOrderService.IssueInvoiceDraftAsync(new IssueSalesInvoiceDraftCommand
+            {
+                TenantId = tenantId.Value,
+                CompanyId = companyId.Value,
+                DraftNumber = DraftNumber
+            });
+
+            NavigationManager.NavigateTo($"/ventas/facturas/{invoiceNumber}");
+        }
+        catch (Exception exception)
+        {
+            statusMessage = exception.Message;
+            isError = true;
+        }
+        finally
+        {
+            isIssuing = false;
+        }
+    }
+
+    private static string DisplayValue(string value) => string.IsNullOrWhiteSpace(value) ? "Sin dato" : value;
+    private static string FormatDraftStatus(string status) => status switch
+    {
+        SalesInvoiceDraftStatuses.Draft => "Borrador",
+        SalesInvoiceDraftStatuses.Issued => "Emitido",
+        _ => status
+    };
+}

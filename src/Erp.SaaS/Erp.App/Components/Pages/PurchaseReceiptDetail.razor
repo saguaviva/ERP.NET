@@ -1,0 +1,320 @@
+@page "/compras/recepciones/{ReceiptNumber:int}"
+@attribute [Authorize(Roles = "TenantAdmin,TenantReader")]
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject ILegacySyncService LegacySyncService
+@inject IPurchaseOrderQueries PurchaseOrderQueries
+@inject IStockQueries StockQueries
+
+<PageTitle>Albarán de compra @ReceiptNumber</PageTitle>
+
+<div class="page-header">
+    <div>
+        <p class="eyebrow">Compras</p>
+        <h1>@(receipt?.DisplayNumber ?? $"Entrada {ReceiptNumber}")</h1>
+        <p class="lead">@(isLegacySyncActive
+            ? "Documento replicado desde TEX.NET en la SaaS local, en solo lectura mientras el módulo siga sincronizado desde legacy."
+            : "Albarán de compra generado desde la recepción del pedido.")</p>
+    </div>
+    <div class="quick-links no-print">
+        <a class="secondary-button link-button" href="/compras/recepciones">Volver a recepciones</a>
+        @if (receipt is not null)
+        {
+            @if (receipt.OrderNumber > 0)
+            {
+                <a class="secondary-button link-button" href="/compras/pedidos/editar/@receipt.OrderNumber">Abrir pedido</a>
+            }
+            <a class="secondary-button link-button" href="/compras/recepciones/@receipt.ReceiptNumber/pdf" target="_blank">Versión PDF</a>
+        }
+        <button class="secondary-button" type="button" onclick="window.print()">Imprimir</button>
+    </div>
+</div>
+
+@if (!tenantId.HasValue || !companyId.HasValue)
+{
+    <div class="empty-state">
+        <p>No hay empresa activa seleccionada.</p>
+    </div>
+}
+else if (!string.IsNullOrWhiteSpace(errorMessage))
+{
+    <div class="alert danger">@errorMessage</div>
+}
+else if (receipt is null)
+{
+    <div class="empty-state">
+        <p>No se ha encontrado la recepción solicitada.</p>
+    </div>
+}
+else
+{
+    @if (isLegacySyncActive && !string.IsNullOrWhiteSpace(syncStatusLabel))
+    {
+        <div class="alert">
+            Compras / Recepciones está en convivencia con legacy para esta empresa.
+            @syncStatusLabel
+        </div>
+    }
+
+    <section class="panel receipt-document">
+        <div class="receipt-document-header">
+            <div>
+                <p class="eyebrow">Albarán de compra</p>
+                <h2>@receipt.DisplayNumber</h2>
+                <p class="muted">Pedido origen @receipt.OrderNumber</p>
+            </div>
+            <div class="receipt-document-meta">
+                <strong>Fecha</strong>
+                <span>@receipt.ReceiptDate.ToString("dd/MM/yyyy")</span>
+            </div>
+        </div>
+
+        <div class="comparison-grid">
+            <section class="info-card">
+                <h2>Empresa receptora</h2>
+                <p><strong>@receipt.CompanyName</strong></p>
+                <p class="muted">@receipt.TenantName</p>
+                <p class="muted">Centro legacy @receipt.CompanyLegacyCenterCode</p>
+            </section>
+            <section class="info-card">
+                <h2>Proveedor</h2>
+                <p><strong>@receipt.SupplierName</strong></p>
+                @if (!string.IsNullOrWhiteSpace(receipt.SupplierTaxId))
+                {
+                    <p class="muted">NIF @receipt.SupplierTaxId</p>
+                }
+                @if (!string.IsNullOrWhiteSpace(SupplierLocation))
+                {
+                    <p class="muted">@SupplierLocation</p>
+                }
+            </section>
+        </div>
+
+        <div class="receipt-detail-grid">
+            <section class="info-card">
+                <h2>Cabecera logística</h2>
+                <div class="receipt-kv-grid">
+                    <div>
+                        <span class="muted">Almacén</span>
+                        <strong>@DisplayValue(receipt.Warehouse)</strong>
+                    </div>
+                    <div>
+                        <span class="muted">Transportista</span>
+                        <strong>@DisplayValue(receipt.Carrier)</strong>
+                    </div>
+                    <div>
+                        <span class="muted">Referencia proveedor</span>
+                        <strong>@DisplayValue(receipt.SupplierReference)</strong>
+                    </div>
+                    <div>
+                        <span class="muted">Matrícula</span>
+                        <strong>@DisplayValue(receipt.VehiclePlate)</strong>
+                    </div>
+                </div>
+            </section>
+            <section class="info-card">
+                <h2>Datos de expedición</h2>
+                <div class="receipt-kv-grid">
+                    <div>
+                        <span class="muted">Bultos</span>
+                <strong>@(receipt.PackageCount?.ToString() ?? "Sin dato")</strong>
+                    </div>
+                    <div>
+                        <span class="muted">Peso bruto</span>
+                        <strong>@(receipt.GrossWeightKg.HasValue ? $"{receipt.GrossWeightKg.Value:0.###} kg" : "Sin dato")</strong>
+                    </div>
+                    <div>
+                        <span class="muted">Fecha de entrada</span>
+                        <strong>@receipt.ReceiptDate.ToString("dd/MM/yyyy")</strong>
+                    </div>
+                    <div>
+                        <span class="muted">Pedido origen</span>
+                        <strong>@(receipt.OrderNumber > 0 ? receipt.OrderNumber.ToString() : "Sin pedido enlazado")</strong>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </section>
+
+    <div class="card-grid purchase-summary-grid">
+        <section class="info-card">
+            <h2>@receipt.DisplayNumber</h2>
+            <p>albarán</p>
+        </section>
+        <section class="info-card">
+            <h2>Pedido @receipt.OrderNumber</h2>
+            <p>@receipt.SupplierName</p>
+        </section>
+        <section class="info-card">
+            <h2>@receipt.ReceiptDate.ToString("dd/MM/yyyy")</h2>
+            <p class="muted">fecha de entrada</p>
+        </section>
+        <section class="info-card accent-card">
+            <h2>@receipt.TotalReceivedQuantity.ToString("0.###")</h2>
+            <p class="muted">cantidad recepcionada</p>
+        </section>
+    </div>
+
+    <section class="panel">
+        <h2>Detalle de líneas</h2>
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Línea</th>
+                    <th>Descripción</th>
+                    <th>Cantidad</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var line in receipt.Lines)
+                {
+                    <tr>
+                        <td>@line.LineNumber</td>
+                        <td>@line.Description</td>
+                        <td>@line.ReceivedQuantity.ToString("0.###")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </section>
+
+    @if (!string.IsNullOrWhiteSpace(receipt.Notes))
+    {
+        <section class="panel">
+            <h2>Notas</h2>
+            <p>@receipt.Notes</p>
+        </section>
+    }
+
+    <section class="panel">
+        <div class="page-header">
+            <div>
+                <h2>Movimientos de almacén generados</h2>
+                <p class="muted">Cada línea recepcionada deja ya rastro de entrada en stock.</p>
+            </div>
+            <div class="quick-links no-print">
+                <a class="secondary-button link-button" href="/almacen/movimientos">Abrir almacén</a>
+            </div>
+        </div>
+
+        @if (stockMovements.Count == 0)
+        {
+            <p class="muted">Esta recepción todavía no tiene movimientos asociados.</p>
+        }
+        else
+        {
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Almacén</th>
+                        <th>Artículo</th>
+                        <th>Descripción</th>
+                        <th>Cantidad</th>
+                        <th>Proveedor</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var movement in stockMovements)
+                    {
+                        <tr>
+                            <td>@DisplayValue(movement.Warehouse)</td>
+                            <td>@DisplayValue(movement.ItemCode)</td>
+                            <td>@movement.ItemDescription</td>
+                            <td>@movement.Quantity.ToString("0.###") @movement.UnitOfMeasure</td>
+                            <td>@DisplayValue(movement.SupplierName)</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </section>
+}
+
+@code {
+    [Parameter]
+    public int ReceiptNumber { get; set; }
+
+    private Guid? tenantId;
+    private Guid? companyId;
+    private PurchaseOrderReceiptDto? receipt;
+    private IReadOnlyCollection<StockMovementListItemDto> stockMovements = [];
+    private string errorMessage = string.Empty;
+    private bool isLegacySyncActive;
+    private string syncStatusLabel = string.Empty;
+    private string SupplierLocation
+    {
+        get
+        {
+            if (receipt is null)
+            {
+                return string.Empty;
+            }
+
+            var parts = new[]
+            {
+                receipt.SupplierAddress,
+                $"{receipt.SupplierPostalCode} {receipt.SupplierCity}".Trim(),
+                receipt.SupplierProvince,
+                receipt.SupplierCountry
+            }.Where(part => !string.IsNullOrWhiteSpace(part));
+
+            return string.Join(" · ", parts);
+        }
+    }
+
+    private static string DisplayValue(string value) => string.IsNullOrWhiteSpace(value) ? "Sin dato" : value;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        tenantId = user.GetTenantId();
+        companyId = user.GetActiveCompanyId();
+        await LoadSyncStatusAsync();
+
+        if (!tenantId.HasValue || !companyId.HasValue)
+        {
+            return;
+        }
+
+        try
+        {
+            errorMessage = string.Empty;
+            receipt = await PurchaseOrderQueries.GetReceiptByNumberAsync(tenantId.Value, companyId.Value, ReceiptNumber);
+            stockMovements = receipt is null
+                ? []
+                : await StockQueries.GetByPurchaseReceiptAsync(tenantId.Value, companyId.Value, ReceiptNumber);
+        }
+        catch (Exception exception)
+        {
+            errorMessage = exception.Message;
+            receipt = null;
+            stockMovements = [];
+        }
+    }
+
+    private async Task LoadSyncStatusAsync()
+    {
+        isLegacySyncActive = false;
+        syncStatusLabel = string.Empty;
+
+        if (!tenantId.HasValue || !companyId.HasValue)
+        {
+            return;
+        }
+
+        var status = (await LegacySyncService.GetModuleStatusesAsync(tenantId.Value))
+            .FirstOrDefault(item =>
+                item.CompanyId == companyId.Value &&
+                string.Equals(item.ModuleKey, LegacySyncModuleKeys.PurchaseReceipts, StringComparison.OrdinalIgnoreCase));
+
+        if (status is null || !status.HasSuccessfulSync)
+        {
+            return;
+        }
+
+        isLegacySyncActive = true;
+        syncStatusLabel = status.LastCompletedUtc.HasValue
+            ? $"Última sync: {status.LastCompletedUtc.Value.ToLocalTime():dd/MM/yyyy HH:mm:ss} · Ins: {status.LastInserted} · Act: {status.LastUpdated} · Omi: {status.LastSkipped} · Err: {status.LastErrors}"
+            : $"Estado: {status.LastStatus}";
+    }
+}

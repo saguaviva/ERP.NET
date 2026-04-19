@@ -1,0 +1,751 @@
+@page "/crm/clientes/duplicados"
+@attribute [Authorize(Roles = "TenantAdmin,TenantReader")]
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IClienteQueries ClienteQueries
+@inject IClienteService ClienteService
+@inject ILegacySyncService LegacySyncService
+
+<PageTitle>Bandeja de duplicados</PageTitle>
+
+<div class="page-header">
+    <div>
+        <p class="eyebrow">CRM</p>
+        <h1>Bandeja de duplicados</h1>
+        <p class="lead">Revisión en bloque de coincidencias detectadas por NIF, email, nombre o teléfono.</p>
+    </div>
+    <div class="quick-links">
+        <a class="secondary-button link-button" href="/crm/clientes">Volver a clientes</a>
+    </div>
+</div>
+
+@if (!tenantId.HasValue || !companyId.HasValue)
+{
+    <div class="empty-state">
+        <p>No hay empresa activa seleccionada.</p>
+    </div>
+}
+else
+{
+    @if (!string.IsNullOrWhiteSpace(statusMessage))
+    {
+        <div class="alert @(isError ? "danger" : "success")">@statusMessage</div>
+    }
+
+    @if (isLegacySyncActive)
+    {
+        <div class="alert">
+            CRM / Clientes está en convivencia con legacy para esta empresa.
+            La bandeja de duplicados queda en solo lectura mientras la sincronización mande.
+            @if (!string.IsNullOrWhiteSpace(syncStatusLabel))
+            {
+                <span>@syncStatusLabel</span>
+            }
+        </div>
+    }
+
+    <section class="card-grid">
+        <article class="info-card">
+            <p class="eyebrow">Pendientes</p>
+            <h2>@pairs.Count(IsOpen)</h2>
+            <p class="muted">Parejas sin revisar todavía.</p>
+        </article>
+        <article class="info-card">
+            <p class="eyebrow">Conflictos duros</p>
+            <h2>@pairs.Count(pair => pair.IsHardConflict)</h2>
+            <p class="muted">Coincidencias por NIF o email.</p>
+        </article>
+        <article class="info-card">
+            <p class="eyebrow">Falsos positivos</p>
+            <h2>@pairs.Count(IsFalsePositive)</h2>
+            <p class="muted">Parejas descartadas manualmente.</p>
+        </article>
+        <article class="info-card">
+            <p class="eyebrow">Principal propuesto</p>
+            <h2>@pairs.Count(HasPreferredPrincipal)</h2>
+            <p class="muted">Parejas con candidato de consolidación.</p>
+        </article>
+    </section>
+
+    <section class="panel">
+        <div class="filter-row">
+            <button class="@(inboxFilter == InboxFilterMode.Open ? "primary-button" : "secondary-button")" @onclick="() => SetInboxFilter(InboxFilterMode.Open)">Abiertos (@pairs.Count(IsOpen))</button>
+            <button class="@(inboxFilter == InboxFilterMode.Reviewed ? "primary-button" : "secondary-button")" @onclick="() => SetInboxFilter(InboxFilterMode.Reviewed)">Revisados (@pairs.Count(IsReviewed))</button>
+            <button class="@(inboxFilter == InboxFilterMode.FalsePositive ? "primary-button" : "secondary-button")" @onclick="() => SetInboxFilter(InboxFilterMode.FalsePositive)">Falsos positivos (@pairs.Count(IsFalsePositive))</button>
+            <button class="@(inboxFilter == InboxFilterMode.All ? "primary-button" : "secondary-button")" @onclick="() => SetInboxFilter(InboxFilterMode.All)">Todos (@pairs.Count)</button>
+        </div>
+        <div class="filter-row" style="margin-top: 0.85rem;">
+            <input class="text-input" @bind="SearchText" @bind:event="oninput" placeholder="Buscar por código, nombre, NIF, email, teléfono o revisor" />
+            <button class="@(conflictFilter == ConflictFilterMode.All ? "primary-button" : "secondary-button")" @onclick="() => SetConflictFilter(ConflictFilterMode.All)">Todos</button>
+            <button class="@(conflictFilter == ConflictFilterMode.Hard ? "primary-button" : "secondary-button")" @onclick="() => SetConflictFilter(ConflictFilterMode.Hard)">Solo duros</button>
+            <button class="@(conflictFilter == ConflictFilterMode.Soft ? "primary-button" : "secondary-button")" @onclick="() => SetConflictFilter(ConflictFilterMode.Soft)">Solo revisión manual</button>
+            <button class="secondary-button" @onclick="LoadAsync">Recargar</button>
+        </div>
+    </section>
+
+    <section class="panel">
+        <div class="list-block">
+            @if (filteredPairs.Count == 0)
+            {
+                <p class="muted">No hay duplicados para el filtro seleccionado.</p>
+            }
+            else
+            {
+                @foreach (var pair in filteredPairs)
+                {
+                    <article class="list-item">
+                        <div class="filter-row">
+                            <strong>
+                                @pair.LeftCode · @pair.LeftName
+                                <span> ↔ </span>
+                                @pair.RightCode · @pair.RightName
+                            </strong>
+                            <div class="filter-row">
+                                <span class="status-pill @(pair.IsHardConflict ? "danger" : "warning")">
+                                    @(pair.IsHardConflict ? "Conflicto duro" : "Revisión manual")
+                                </span>
+                                <span class="status-pill @GetReviewStatusCss(pair)">
+                                    @GetReviewStatusLabel(pair)
+                                </span>
+                            </div>
+                        </div>
+                        <span>@string.Join(", ", pair.MatchReasons)</span>
+                        <span>@FormatPairSharedData(pair)</span>
+                        <span>@FormatPairReview(pair)</span>
+                        <span>@FormatPreferredPrincipal(pair)</span>
+                        <div class="quick-links">
+                            @if (canEdit)
+                            {
+                                <a class="inline-link" href="/crm/clientes/editar/@pair.LeftCode">Abrir @pair.LeftCode</a>
+                                <a class="inline-link" href="/crm/clientes/editar/@pair.RightCode">Abrir @pair.RightCode</a>
+                            }
+                            else
+                            {
+                                <span class="muted">Solo lectura</span>
+                            }
+                            <button class="secondary-button" type="button" @onclick="() => ToggleComparisonAsync(pair)">
+                                @(IsComparisonExpanded(pair) ? "Ocultar comparativa" : "Comparar lado a lado")
+                            </button>
+                        </div>
+                        @if (canEdit)
+                        {
+                            <div class="quick-links">
+                                <button class="secondary-button" type="button" @onclick="() => SetReviewAsync(pair, ClienteDuplicateReviewStatus.Reviewed)">Marcar revisado</button>
+                                <button class="secondary-button" type="button" @onclick="() => SetReviewAsync(pair, ClienteDuplicateReviewStatus.FalsePositive)">Falso positivo</button>
+                                @if (!string.IsNullOrWhiteSpace(pair.ReviewStatus))
+                                {
+                                    <button class="secondary-button" type="button" @onclick="() => ClearReviewAsync(pair)">Quitar marca</button>
+                                }
+                            </div>
+                        }
+
+                        @if (IsComparisonExpanded(pair))
+                        {
+                            var comparison = GetComparison(pair);
+
+                            <section class="panel comparison-panel">
+                                @if (comparison is null || comparison.IsLoading)
+                                {
+                                    <p class="muted">Cargando comparativa...</p>
+                                }
+                                else if (!string.IsNullOrWhiteSpace(comparison.ErrorMessage))
+                                {
+                                    <div class="alert danger">@comparison.ErrorMessage</div>
+                                }
+                                else if (comparison.Left is null || comparison.Right is null)
+                                {
+                                    <p class="muted">No se ha podido cargar uno de los dos clientes.</p>
+                                }
+                                else
+                                {
+                                    <div class="comparison-grid">
+                                        <article class="info-card">
+                                            <p class="eyebrow">Cliente @comparison.Left.Code</p>
+                                            <h2>@comparison.Left.Name</h2>
+                                            @if (IsPreferredPrincipal(pair, comparison.Left.Code))
+                                            {
+                                                <span class="status-pill success">Principal propuesto</span>
+                                            }
+                                            @if (canEdit)
+                                            {
+                                                <div class="quick-links">
+                                                    <button class="secondary-button" type="button" @onclick="() => SetPreferredPrincipalAsync(pair, comparison.Left.Code!.Value)">Proponer como principal</button>
+                                                </div>
+                                            }
+                                            <div class="stack comparison-fields">
+                                                @RenderField("NIF", comparison.Left.TaxId, comparison.Right.TaxId)
+                                                @RenderField("Contacto", comparison.Left.ContactName, comparison.Right.ContactName)
+                                                @RenderField("Teléfono", comparison.Left.Phone, comparison.Right.Phone)
+                                                @RenderField("Fax", comparison.Left.Fax, comparison.Right.Fax)
+                                                @RenderField("Email principal", comparison.Left.PrimaryEmail, comparison.Right.PrimaryEmail)
+                                                @RenderField("Email secundario", comparison.Left.SecondaryEmail, comparison.Right.SecondaryEmail)
+                                                @RenderField("Dirección", comparison.Left.Address, comparison.Right.Address)
+                                                @RenderField("Código postal", comparison.Left.PostalCode, comparison.Right.PostalCode)
+                                                @RenderField("Ciudad", comparison.Left.City, comparison.Right.City)
+                                                @RenderField("Provincia", comparison.Left.Province, comparison.Right.Province)
+                                                @RenderField("País", comparison.Left.Country, comparison.Right.Country)
+                                                @RenderField("Web", comparison.Left.Website, comparison.Right.Website)
+                                                @RenderField("Notas", comparison.Left.Notes, comparison.Right.Notes, true)
+                                                @RenderField("Estado", comparison.Left.IsBlocked ? "Bloqueado" : "Activo", comparison.Right.IsBlocked ? "Bloqueado" : "Activo")
+                                            </div>
+                                        </article>
+
+                                        <article class="info-card">
+                                            <p class="eyebrow">Cliente @comparison.Right.Code</p>
+                                            <h2>@comparison.Right.Name</h2>
+                                            @if (IsPreferredPrincipal(pair, comparison.Right.Code))
+                                            {
+                                                <span class="status-pill success">Principal propuesto</span>
+                                            }
+                                            @if (canEdit)
+                                            {
+                                                <div class="quick-links">
+                                                    <button class="secondary-button" type="button" @onclick="() => SetPreferredPrincipalAsync(pair, comparison.Right.Code!.Value)">Proponer como principal</button>
+                                                    @if (HasPreferredPrincipal(pair))
+                                                    {
+                                                        <button class="secondary-button" type="button" @onclick="() => ClearPreferredPrincipalAsync(pair)">Quitar propuesta</button>
+                                                    }
+                                                </div>
+                                            }
+                                            <div class="stack comparison-fields">
+                                                @RenderField("NIF", comparison.Right.TaxId, comparison.Left.TaxId)
+                                                @RenderField("Contacto", comparison.Right.ContactName, comparison.Left.ContactName)
+                                                @RenderField("Teléfono", comparison.Right.Phone, comparison.Left.Phone)
+                                                @RenderField("Fax", comparison.Right.Fax, comparison.Left.Fax)
+                                                @RenderField("Email principal", comparison.Right.PrimaryEmail, comparison.Left.PrimaryEmail)
+                                                @RenderField("Email secundario", comparison.Right.SecondaryEmail, comparison.Left.SecondaryEmail)
+                                                @RenderField("Dirección", comparison.Right.Address, comparison.Left.Address)
+                                                @RenderField("Código postal", comparison.Right.PostalCode, comparison.Left.PostalCode)
+                                                @RenderField("Ciudad", comparison.Right.City, comparison.Left.City)
+                                                @RenderField("Provincia", comparison.Right.Province, comparison.Left.Province)
+                                                @RenderField("País", comparison.Right.Country, comparison.Left.Country)
+                                                @RenderField("Web", comparison.Right.Website, comparison.Left.Website)
+                                                @RenderField("Notas", comparison.Right.Notes, comparison.Left.Notes, true)
+                                                @RenderField("Estado", comparison.Right.IsBlocked ? "Bloqueado" : "Activo", comparison.Left.IsBlocked ? "Bloqueado" : "Activo")
+                                            </div>
+                                        </article>
+                                    </div>
+                                }
+                            </section>
+                        }
+                    </article>
+                }
+            }
+        </div>
+    </section>
+}
+
+@code {
+    private Guid? tenantId;
+    private Guid? companyId;
+    private bool canEdit;
+    private IReadOnlyCollection<ClienteDuplicatePairDto> pairs = [];
+    private IReadOnlyCollection<ClienteDuplicatePairDto> filteredPairs = [];
+    private InboxFilterMode inboxFilter = InboxFilterMode.Open;
+    private ConflictFilterMode conflictFilter = ConflictFilterMode.All;
+    private string searchText = string.Empty;
+    private string statusMessage = string.Empty;
+    private bool isError;
+    private bool isLegacySyncActive;
+    private string syncStatusLabel = string.Empty;
+    private string? expandedPairKey;
+    private readonly Dictionary<string, ComparisonState> comparisons = [];
+
+    private string SearchText
+    {
+        get => searchText;
+        set
+        {
+            searchText = value;
+            ApplyInboxFilter();
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        tenantId = user.GetTenantId();
+        companyId = user.GetActiveCompanyId();
+        canEdit = user.IsInRole(PlatformRoles.TenantAdmin);
+
+        await LoadSyncStatusAsync();
+        canEdit = canEdit && !isLegacySyncActive;
+
+        await LoadAsync();
+    }
+
+    private async Task LoadSyncStatusAsync()
+    {
+        isLegacySyncActive = false;
+        syncStatusLabel = string.Empty;
+
+        if (!tenantId.HasValue || !companyId.HasValue)
+        {
+            return;
+        }
+
+        var status = (await LegacySyncService.GetModuleStatusesAsync(tenantId.Value))
+            .FirstOrDefault(item =>
+                item.CompanyId == companyId.Value &&
+                string.Equals(item.ModuleKey, LegacySyncModuleKeys.CrmClients, StringComparison.OrdinalIgnoreCase));
+
+        if (status is null || !status.HasSuccessfulSync)
+        {
+            return;
+        }
+
+        isLegacySyncActive = true;
+        syncStatusLabel = status.LastCompletedUtc.HasValue
+            ? $"Última sync: {status.LastCompletedUtc.Value.ToLocalTime():dd/MM/yyyy HH:mm:ss} · Ins: {status.LastInserted} · Act: {status.LastUpdated} · Omi: {status.LastSkipped} · Err: {status.LastErrors}"
+            : $"Estado: {status.LastStatus}";
+    }
+
+    private async Task LoadAsync()
+    {
+        statusMessage = string.Empty;
+        if (!tenantId.HasValue || !companyId.HasValue)
+        {
+            pairs = [];
+            filteredPairs = [];
+            return;
+        }
+
+        try
+        {
+            pairs = await ClienteQueries.GetDuplicateInboxAsync(tenantId.Value, companyId.Value);
+            PruneComparisons();
+            ApplyInboxFilter();
+        }
+        catch (Exception exception)
+        {
+            statusMessage = exception.Message;
+            isError = true;
+            pairs = [];
+            filteredPairs = [];
+            comparisons.Clear();
+            expandedPairKey = null;
+        }
+    }
+
+    private void SetInboxFilter(InboxFilterMode mode)
+    {
+        inboxFilter = mode;
+        ApplyInboxFilter();
+    }
+
+    private void SetConflictFilter(ConflictFilterMode mode)
+    {
+        conflictFilter = mode;
+        ApplyInboxFilter();
+    }
+
+    private void ApplyInboxFilter()
+    {
+        IEnumerable<ClienteDuplicatePairDto> query = inboxFilter switch
+        {
+            InboxFilterMode.Reviewed => pairs.Where(IsReviewed).ToArray(),
+            InboxFilterMode.FalsePositive => pairs.Where(IsFalsePositive).ToArray(),
+            InboxFilterMode.All => pairs,
+            _ => pairs.Where(IsOpen).ToArray()
+        };
+
+        query = conflictFilter switch
+        {
+            ConflictFilterMode.Hard => query.Where(pair => pair.IsHardConflict),
+            ConflictFilterMode.Soft => query.Where(pair => !pair.IsHardConflict),
+            _ => query
+        };
+
+        var term = searchText.Trim();
+        if (!string.IsNullOrWhiteSpace(term))
+        {
+            query = query.Where(pair => MatchesSearch(pair, term));
+        }
+
+        filteredPairs = query.ToArray();
+    }
+
+    private async Task SetReviewAsync(ClienteDuplicatePairDto pair, string status)
+    {
+        if (!tenantId.HasValue || !companyId.HasValue)
+        {
+            return;
+        }
+
+        statusMessage = string.Empty;
+        isError = false;
+
+        try
+        {
+            await ClienteService.SetDuplicateReviewAsync(new SetClienteDuplicateReviewCommand
+            {
+                TenantId = tenantId.Value,
+                CompanyId = companyId.Value,
+                ClientCode = pair.LeftCode,
+                DuplicateClientCode = pair.RightCode,
+                Status = status
+            });
+
+            await LoadAsync();
+            statusMessage = status == ClienteDuplicateReviewStatus.FalsePositive
+                ? "Pareja marcada como falso positivo."
+                : "Pareja marcada como revisada.";
+        }
+        catch (Exception exception)
+        {
+            statusMessage = exception.Message;
+            isError = true;
+        }
+    }
+
+    private async Task ClearReviewAsync(ClienteDuplicatePairDto pair)
+    {
+        if (!tenantId.HasValue || !companyId.HasValue)
+        {
+            return;
+        }
+
+        statusMessage = string.Empty;
+        isError = false;
+
+        try
+        {
+            await ClienteService.SetDuplicateReviewAsync(new SetClienteDuplicateReviewCommand
+            {
+                TenantId = tenantId.Value,
+                CompanyId = companyId.Value,
+                ClientCode = pair.LeftCode,
+                DuplicateClientCode = pair.RightCode,
+                Status = null
+            });
+
+            await LoadAsync();
+            statusMessage = "Marca eliminada.";
+        }
+        catch (Exception exception)
+        {
+            statusMessage = exception.Message;
+            isError = true;
+        }
+    }
+
+    private static bool IsOpen(ClienteDuplicatePairDto pair) =>
+        string.IsNullOrWhiteSpace(pair.ReviewStatus);
+
+    private static bool IsReviewed(ClienteDuplicatePairDto pair) =>
+        string.Equals(pair.ReviewStatus, ClienteDuplicateReviewStatus.Reviewed, StringComparison.OrdinalIgnoreCase);
+
+    private static bool IsFalsePositive(ClienteDuplicatePairDto pair) =>
+        string.Equals(pair.ReviewStatus, ClienteDuplicateReviewStatus.FalsePositive, StringComparison.OrdinalIgnoreCase);
+
+    private static bool HasPreferredPrincipal(ClienteDuplicatePairDto pair) =>
+        pair.PreferredClientCode.HasValue;
+
+    private static bool IsPreferredPrincipal(ClienteDuplicatePairDto pair, int? clientCode) =>
+        clientCode.HasValue && pair.PreferredClientCode == clientCode.Value;
+
+    private static string FormatPairSharedData(ClienteDuplicatePairDto pair)
+    {
+        var parts = new List<string>();
+
+        if (!string.IsNullOrWhiteSpace(pair.SharedTaxId))
+        {
+            parts.Add($"NIF={pair.SharedTaxId}");
+        }
+
+        if (!string.IsNullOrWhiteSpace(pair.SharedEmail))
+        {
+            parts.Add($"Email={pair.SharedEmail}");
+        }
+
+        if (!string.IsNullOrWhiteSpace(pair.SharedPhone))
+        {
+            parts.Add($"Tel={pair.SharedPhone}");
+        }
+
+        return parts.Count == 0 ? "Sin dato compartido principal" : string.Join(" · ", parts);
+    }
+
+    private static string FormatPairReview(ClienteDuplicatePairDto pair)
+    {
+        if (string.IsNullOrWhiteSpace(pair.ReviewStatus))
+        {
+            return pair.IsHardConflict ? "Pendiente · conflicto duro" : "Pendiente · revisión manual";
+        }
+
+        var status = IsFalsePositive(pair) ? "Falso positivo" : "Revisado";
+        if (pair.ReviewUpdatedUtc.HasValue && !string.IsNullOrWhiteSpace(pair.ReviewUpdatedBy))
+        {
+            return $"{status} por {pair.ReviewUpdatedBy} · {pair.ReviewUpdatedUtc.Value.ToLocalTime():dd/MM/yyyy HH:mm:ss}";
+        }
+
+        if (pair.ReviewUpdatedUtc.HasValue)
+        {
+            return $"{status} · {pair.ReviewUpdatedUtc.Value.ToLocalTime():dd/MM/yyyy HH:mm:ss}";
+        }
+
+        return status;
+    }
+
+    private static string FormatPreferredPrincipal(ClienteDuplicatePairDto pair)
+    {
+        if (!pair.PreferredClientCode.HasValue)
+        {
+            return "Sin principal propuesto todavía.";
+        }
+
+        var preferredName = pair.PreferredClientCode.Value == pair.LeftCode ? pair.LeftName : pair.RightName;
+        var label = $"Principal propuesto: {pair.PreferredClientCode.Value} · {preferredName}";
+
+        if (pair.PreferredUpdatedUtc.HasValue && !string.IsNullOrWhiteSpace(pair.PreferredUpdatedBy))
+        {
+            return $"{label} · por {pair.PreferredUpdatedBy} · {pair.PreferredUpdatedUtc.Value.ToLocalTime():dd/MM/yyyy HH:mm:ss}";
+        }
+
+        if (pair.PreferredUpdatedUtc.HasValue)
+        {
+            return $"{label} · {pair.PreferredUpdatedUtc.Value.ToLocalTime():dd/MM/yyyy HH:mm:ss}";
+        }
+
+        return label;
+    }
+
+    private static string GetReviewStatusCss(ClienteDuplicatePairDto pair)
+    {
+        if (IsFalsePositive(pair))
+        {
+            return "success";
+        }
+
+        if (IsReviewed(pair))
+        {
+            return "warning";
+        }
+
+        return pair.IsHardConflict ? "danger" : "warning";
+    }
+
+    private static string GetReviewStatusLabel(ClienteDuplicatePairDto pair)
+    {
+        if (IsFalsePositive(pair))
+        {
+            return "Falso positivo";
+        }
+
+        if (IsReviewed(pair))
+        {
+            return "Revisado";
+        }
+
+        return "Pendiente";
+    }
+
+    private async Task ToggleComparisonAsync(ClienteDuplicatePairDto pair)
+    {
+        var key = GetPairKey(pair);
+        if (expandedPairKey == key)
+        {
+            expandedPairKey = null;
+            return;
+        }
+
+        expandedPairKey = key;
+
+        if (comparisons.ContainsKey(key))
+        {
+            return;
+        }
+
+        comparisons[key] = new ComparisonState { IsLoading = true };
+        StateHasChanged();
+
+        try
+        {
+            if (!tenantId.HasValue || !companyId.HasValue)
+            {
+                comparisons[key] = new ComparisonState
+                {
+                    ErrorMessage = "No hay empresa activa seleccionada."
+                };
+                return;
+            }
+
+            var leftTask = ClienteQueries.GetByCodeAsync(tenantId.Value, companyId.Value, pair.LeftCode);
+            var rightTask = ClienteQueries.GetByCodeAsync(tenantId.Value, companyId.Value, pair.RightCode);
+            await Task.WhenAll(leftTask, rightTask);
+
+            comparisons[key] = new ComparisonState
+            {
+                Left = leftTask.Result,
+                Right = rightTask.Result
+            };
+        }
+        catch (Exception exception)
+        {
+            comparisons[key] = new ComparisonState
+            {
+                ErrorMessage = exception.Message
+            };
+        }
+    }
+
+    private async Task SetPreferredPrincipalAsync(ClienteDuplicatePairDto pair, int preferredClientCode)
+    {
+        if (!tenantId.HasValue || !companyId.HasValue)
+        {
+            return;
+        }
+
+        statusMessage = string.Empty;
+        isError = false;
+
+        try
+        {
+            await ClienteService.SetPreferredPrincipalAsync(new SetClientePreferredPrincipalCommand
+            {
+                TenantId = tenantId.Value,
+                CompanyId = companyId.Value,
+                ClientCode = pair.LeftCode,
+                DuplicateClientCode = pair.RightCode,
+                PreferredClientCode = preferredClientCode
+            });
+
+            await LoadAsync();
+            statusMessage = $"Cliente {preferredClientCode} marcado como principal propuesto.";
+        }
+        catch (Exception exception)
+        {
+            statusMessage = exception.Message;
+            isError = true;
+        }
+    }
+
+    private async Task ClearPreferredPrincipalAsync(ClienteDuplicatePairDto pair)
+    {
+        if (!tenantId.HasValue || !companyId.HasValue)
+        {
+            return;
+        }
+
+        statusMessage = string.Empty;
+        isError = false;
+
+        try
+        {
+            await ClienteService.SetPreferredPrincipalAsync(new SetClientePreferredPrincipalCommand
+            {
+                TenantId = tenantId.Value,
+                CompanyId = companyId.Value,
+                ClientCode = pair.LeftCode,
+                DuplicateClientCode = pair.RightCode,
+                PreferredClientCode = null
+            });
+
+            await LoadAsync();
+            statusMessage = "Propuesta de principal eliminada.";
+        }
+        catch (Exception exception)
+        {
+            statusMessage = exception.Message;
+            isError = true;
+        }
+    }
+
+    private bool IsComparisonExpanded(ClienteDuplicatePairDto pair) =>
+        string.Equals(expandedPairKey, GetPairKey(pair), StringComparison.Ordinal);
+
+    private ComparisonState? GetComparison(ClienteDuplicatePairDto pair)
+    {
+        comparisons.TryGetValue(GetPairKey(pair), out var state);
+        return state;
+    }
+
+    private void PruneComparisons()
+    {
+        var validKeys = pairs.Select(GetPairKey).ToHashSet(StringComparer.Ordinal);
+        foreach (var key in comparisons.Keys.ToArray())
+        {
+            if (!validKeys.Contains(key))
+            {
+                comparisons.Remove(key);
+            }
+        }
+
+        if (expandedPairKey is not null && !validKeys.Contains(expandedPairKey))
+        {
+            expandedPairKey = null;
+        }
+    }
+
+    private static string GetPairKey(ClienteDuplicatePairDto pair) =>
+        $"{pair.LeftCode}:{pair.RightCode}";
+
+    private RenderFragment RenderField(string label, string value, string otherValue, bool multiline = false) => builder =>
+    {
+        var normalizedValue = DisplayValue(value);
+        var cssClass = AreEquivalent(value, otherValue) ? "comparison-field" : "comparison-field comparison-field-different";
+
+        builder.OpenElement(0, "div");
+        builder.AddAttribute(1, "class", cssClass);
+
+        builder.OpenElement(2, "span");
+        builder.AddAttribute(3, "class", "eyebrow");
+        builder.AddContent(4, label);
+        builder.CloseElement();
+
+        builder.OpenElement(5, multiline ? "pre" : "div");
+        builder.AddAttribute(6, "class", multiline ? "comparison-value comparison-value-multiline" : "comparison-value");
+        builder.AddContent(7, normalizedValue);
+        builder.CloseElement();
+
+        builder.CloseElement();
+    };
+
+    private static string DisplayValue(string? value) =>
+        string.IsNullOrWhiteSpace(value) ? "Sin dato" : value.Trim();
+
+    private static bool AreEquivalent(string? left, string? right) =>
+        string.Equals(NormalizeValue(left), NormalizeValue(right), StringComparison.OrdinalIgnoreCase);
+
+    private static string NormalizeValue(string? value) =>
+        string.IsNullOrWhiteSpace(value) ? string.Empty : value.Trim();
+
+    private static bool MatchesSearch(ClienteDuplicatePairDto pair, string term)
+    {
+        return Contains(pair.LeftCode.ToString(), term) ||
+               Contains(pair.RightCode.ToString(), term) ||
+               Contains(pair.LeftName, term) ||
+               Contains(pair.RightName, term) ||
+               Contains(pair.SharedTaxId, term) ||
+               Contains(pair.SharedEmail, term) ||
+               Contains(pair.SharedPhone, term) ||
+               Contains(pair.ReviewUpdatedBy, term) ||
+               pair.MatchReasons.Any(reason => Contains(reason, term));
+    }
+
+    private static bool Contains(string value, string term) =>
+        value.Contains(term, StringComparison.OrdinalIgnoreCase);
+
+    private enum InboxFilterMode
+    {
+        Open,
+        Reviewed,
+        FalsePositive,
+        All
+    }
+
+    private enum ConflictFilterMode
+    {
+        All,
+        Hard,
+        Soft
+    }
+
+    private sealed class ComparisonState
+    {
+        public bool IsLoading { get; init; }
+        public ClienteDetailDto? Left { get; init; }
+        public ClienteDetailDto? Right { get; init; }
+        public string ErrorMessage { get; init; } = string.Empty;
+    }
+}

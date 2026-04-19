@@ -1,0 +1,82 @@
+@page "/preview-access"
+@attribute [AllowAnonymous]
+@inject IOptions<PreviewAccessOptions> PreviewAccessOptions
+@inject NavigationManager NavigationManager
+
+<PageTitle>Acceso de pruebas</PageTitle>
+
+<div class="auth-shell">
+    <section class="auth-panel">
+        <p class="eyebrow">Preproduccion</p>
+        <h1>Acceso privado de pruebas</h1>
+        <p class="lead">Esta demo esta protegida antes del login principal. Solo las personas invitadas pueden continuar.</p>
+
+        @if (Error == "email")
+        {
+            <div class="alert danger">El email no esta en la lista de acceso de pruebas.</div>
+        }
+        else if (Error == "password")
+        {
+            <div class="alert danger">La clave de acceso de pruebas no es correcta.</div>
+        }
+        else if (Error == "config")
+        {
+            <div class="alert danger">La puerta de pruebas esta activada pero no tiene ninguna regla configurada.</div>
+        }
+
+        <form class="auth-form" method="post" action="/preview-access/unlock">
+            <AntiforgeryToken />
+            <input type="hidden" name="returnUrl" value="@ResolvedReturnUrl" />
+
+            @if (RequiresEmail)
+            {
+                <label class="field">
+                    <span>Email invitado</span>
+                    <input class="text-input" name="email" type="email" autocomplete="email" placeholder="tester@empresa.com" required />
+                </label>
+            }
+
+            @if (RequiresPassword)
+            {
+                <label class="field">
+                    <span>Clave de acceso</span>
+                    <input class="text-input" name="password" type="password" autocomplete="current-password" placeholder="Clave compartida de pruebas" required />
+                </label>
+            }
+
+            <button class="primary-button" type="submit">Continuar a la demo</button>
+        </form>
+
+        <div class="stack preview-help">
+            <div class="info-card">
+                <h2>Como funciona</h2>
+                <p class="muted">Primero validas el acceso de pruebas. Despues entraras al login normal del ERP con tu usuario y contraseña.</p>
+                @if (RequiresEmail)
+                {
+                    <p class="muted">Si no tienes invitación todavía, puedes pedirla desde la landing pública en <strong>/DemoAccess</strong>.</p>
+                }
+            </div>
+        </div>
+    </section>
+</div>
+
+@code {
+    [SupplyParameterFromQuery]
+    public string? Error { get; set; }
+
+    [SupplyParameterFromQuery]
+    public string? ReturnUrl { get; set; }
+
+    private PreviewAccessOptions Options => PreviewAccessOptions.Value;
+    private bool RequiresEmail => Options.RequiresEmail;
+    private bool RequiresPassword => Options.RequiresPassword;
+    private string ResolvedReturnUrl => string.IsNullOrWhiteSpace(ReturnUrl) ? "/" : ReturnUrl;
+
+    protected override void OnInitialized()
+    {
+        if (!Options.Enabled)
+        {
+            NavigationManager.NavigateTo("/login", forceLoad: true);
+        }
+    }
+}

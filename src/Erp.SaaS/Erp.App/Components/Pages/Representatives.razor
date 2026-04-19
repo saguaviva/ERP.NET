@@ -1,0 +1,287 @@
+@page "/crm/representantes"
+@attribute [Authorize(Roles = "TenantAdmin,TenantReader")]
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IRepresentativeQueries RepresentativeQueries
+@inject ILegacySyncService LegacySyncService
+
+<PageTitle>CRM / Representantes</PageTitle>
+
+<div class="page-header">
+    <div>
+        <p class="eyebrow">CRM</p>
+        <h1>Representantes</h1>
+        <p class="lead">@(isLegacySyncActive
+            ? "Consulta y filtra los representantes de la SaaS local. La importación manual desde legacy refresca solo registros de origen legacy."
+            : "Consulta y filtra los representantes del centro legacy asociado a la empresa activa.")</p>
+    </div>
+    <div class="quick-links">
+        @if (canEdit)
+        {
+            <a class="primary-button link-button" href="/crm/representantes/nuevo">Nuevo representante</a>
+        }
+    </div>
+</div>
+
+@if (!tenantId.HasValue || !companyId.HasValue)
+{
+    <div class="empty-state">
+        <p>Selecciona una empresa activa para trabajar con representantes.</p>
+    </div>
+}
+else
+{
+    <section class="panel">
+        <div class="filter-row">
+            <input class="text-input" @bind="filter.Search" placeholder="Buscar por nombre, NIF, ciudad, email o teléfono" />
+            <button class="secondary-button" @onclick="SearchAsync" disabled="@isLoading">@(isLoading ? "Cargando..." : "Buscar")</button>
+        </div>
+        <div class="filter-row results-toolbar" style="margin-top: 0.85rem;">
+            <span class="results-summary">
+                @(totalCount == 0
+                    ? "Sin resultados"
+                    : $"Mostrando {PageStart}-{PageEnd} de {totalCount} representantes")
+            </span>
+            <label class="field compact-field">
+                <span>Tamaño de página</span>
+                <select class="sidebar-select compact-select" value="@filter.PageSize" @onchange="OnPageSizeChanged" disabled="@isLoading">
+                    <option value="25">25</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                </select>
+            </label>
+        </div>
+    </section>
+
+    @if (!string.IsNullOrWhiteSpace(errorMessage))
+    {
+        <div class="alert danger">@errorMessage</div>
+    }
+
+    @if (isLegacySyncActive)
+    {
+        <div class="alert">
+            CRM / Representantes está en convivencia con legacy para esta empresa.
+            La web guarda cambios solo en la SaaS local y la sync manual refresca únicamente registros de origen legacy.
+            @if (!string.IsNullOrWhiteSpace(syncStatusLabel))
+            {
+                <span>@syncStatusLabel</span>
+            }
+        </div>
+    }
+
+    <section class="panel @(isLoading ? "loading-panel" : string.Empty)" aria-busy="@isLoading">
+        @if (isLoading)
+        {
+            <div class="loading-banner">
+                <span class="loading-indicator" aria-hidden="true"></span>
+                <span>Cargando representantes...</span>
+            </div>
+        }
+
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <SortableHeader Label="Código" IsActive="@(sortColumn == nameof(RepresentativeListItemDto.Code))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(RepresentativeListItemDto.Code), true))" />
+                    <SortableHeader Label="Nombre" IsActive="@(sortColumn == nameof(RepresentativeListItemDto.Name))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(RepresentativeListItemDto.Name)))" />
+                    <SortableHeader Label="Comisión" IsActive="@(sortColumn == nameof(RepresentativeListItemDto.CommissionPercent))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(RepresentativeListItemDto.CommissionPercent), true))" />
+                    <SortableHeader Label="NIF" IsActive="@(sortColumn == nameof(RepresentativeListItemDto.TaxId))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(RepresentativeListItemDto.TaxId)))" />
+                    <SortableHeader Label="Ciudad" IsActive="@(sortColumn == nameof(RepresentativeListItemDto.City))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(RepresentativeListItemDto.City)))" />
+                    <SortableHeader Label="Email" IsActive="@(sortColumn == nameof(RepresentativeListItemDto.Email))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(RepresentativeListItemDto.Email)))" />
+                    <SortableHeader Label="Teléfono" IsActive="@(sortColumn == nameof(RepresentativeListItemDto.Phone))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(RepresentativeListItemDto.Phone)))" />
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (isLoading)
+                {
+                    @for (var index = 0; index < 5; index++)
+                    {
+                        <tr class="table-skeleton-row">
+                            <td><span class="skeleton-line short"></span></td>
+                            <td><span class="skeleton-line"></span></td>
+                            <td><span class="skeleton-line short"></span></td>
+                            <td><span class="skeleton-line short"></span></td>
+                            <td><span class="skeleton-line short"></span></td>
+                            <td><span class="skeleton-line"></span></td>
+                            <td><span class="skeleton-line short"></span></td>
+                            <td><span class="skeleton-line short"></span></td>
+                        </tr>
+                    }
+                }
+                else if (items.Count == 0)
+                {
+                    <tr>
+                        <td colspan="8" class="table-empty">No hay representantes para mostrar.</td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var item in items)
+                    {
+                        <tr>
+                            <td>@item.Code</td>
+                            <td>@item.Name</td>
+                            <td>@($"{item.CommissionPercent:0.##}%")</td>
+                            <td>@item.TaxId</td>
+                            <td>@item.City</td>
+                            <td>@item.Email</td>
+                            <td>@item.Phone</td>
+                            <td>
+                                <a class="inline-link" href="/crm/representantes/editar/@item.Code">@(canEdit ? "Abrir" : "Ver")</a>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+
+        <div class="pagination-bar">
+            <span class="muted">Página @filter.Page de @TotalPages</span>
+            <div class="pagination-actions">
+                <button class="secondary-button" @onclick="() => ChangePageAsync(1)" disabled="@(!CanGoPrevious || isLoading)">Primera</button>
+                <button class="secondary-button" @onclick="() => ChangePageAsync(filter.Page - 1)" disabled="@(!CanGoPrevious || isLoading)">Anterior</button>
+                <button class="secondary-button" @onclick="() => ChangePageAsync(filter.Page + 1)" disabled="@(!CanGoNext || isLoading)">Siguiente</button>
+                <button class="secondary-button" @onclick="() => ChangePageAsync(TotalPages)" disabled="@(!CanGoNext || isLoading)">Última</button>
+            </div>
+        </div>
+    </section>
+}
+
+@code {
+    private Guid? tenantId;
+    private Guid? companyId;
+    private bool canEdit;
+    private bool isLoading;
+    private RepresentativeFilter filter = new() { Page = 1, PageSize = 25, SortColumn = nameof(RepresentativeListItemDto.Code), SortDescending = true };
+    private IReadOnlyCollection<RepresentativeListItemDto> items = [];
+    private string errorMessage = string.Empty;
+    private string sortColumn = nameof(RepresentativeListItemDto.Code);
+    private bool sortDescending = true;
+    private bool isLegacySyncActive;
+    private string syncStatusLabel = string.Empty;
+    private int totalCount;
+    private int TotalPages => Math.Max(1, (int)Math.Ceiling(totalCount / (double)filter.PageSize));
+    private bool CanGoPrevious => filter.Page > 1;
+    private bool CanGoNext => filter.Page < TotalPages;
+    private int PageStart => totalCount == 0 ? 0 : ((filter.Page - 1) * filter.PageSize) + 1;
+    private int PageEnd => totalCount == 0 ? 0 : Math.Min(filter.Page * filter.PageSize, totalCount);
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        tenantId = user.GetTenantId();
+        companyId = user.GetActiveCompanyId();
+
+        await LoadSyncStatusAsync();
+
+        canEdit = user.IsPlatformAdmin() || user.IsInRole(PlatformRoles.TenantAdmin);
+        await LoadAsync();
+    }
+
+    private async Task LoadSyncStatusAsync()
+    {
+        isLegacySyncActive = false;
+        syncStatusLabel = string.Empty;
+
+        if (!tenantId.HasValue || !companyId.HasValue)
+        {
+            return;
+        }
+
+        var status = (await LegacySyncService.GetModuleStatusesAsync(tenantId.Value))
+            .FirstOrDefault(item =>
+                item.CompanyId == companyId.Value &&
+                string.Equals(item.ModuleKey, LegacySyncModuleKeys.CrmRepresentatives, StringComparison.OrdinalIgnoreCase));
+
+        if (status is null || !status.HasSuccessfulSync)
+        {
+            return;
+        }
+
+        isLegacySyncActive = true;
+        syncStatusLabel = status.LastCompletedUtc.HasValue
+            ? $"Última sync: {status.LastCompletedUtc.Value.ToLocalTime():dd/MM/yyyy HH:mm:ss} · Ins: {status.LastInserted} · Act: {status.LastUpdated} · Omi: {status.LastSkipped} · Err: {status.LastErrors}"
+            : $"Estado: {status.LastStatus}";
+    }
+
+    private async Task LoadAsync()
+    {
+        errorMessage = string.Empty;
+        if (!tenantId.HasValue || !companyId.HasValue)
+        {
+            items = [];
+            totalCount = 0;
+            return;
+        }
+
+        isLoading = true;
+        await InvokeAsync(StateHasChanged);
+
+        try
+        {
+            filter.SortColumn = sortColumn;
+            filter.SortDescending = sortDescending;
+
+            var result = await RepresentativeQueries.SearchAsync(tenantId.Value, companyId.Value, filter);
+            items = result.Items;
+            totalCount = result.TotalCount;
+        }
+        catch (Exception exception)
+        {
+            errorMessage = exception.Message;
+            items = [];
+            totalCount = 0;
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private Task SearchAsync()
+    {
+        filter.Page = 1;
+        return LoadAsync();
+    }
+
+    private async Task SetSortAsync(string column, bool defaultDescending = false)
+    {
+        if (string.Equals(sortColumn, column, StringComparison.Ordinal))
+        {
+            sortDescending = !sortDescending;
+        }
+        else
+        {
+            sortColumn = column;
+            sortDescending = defaultDescending;
+        }
+
+        filter.Page = 1;
+        await LoadAsync();
+    }
+
+    private async Task ChangePageAsync(int page)
+    {
+        var nextPage = Math.Clamp(page, 1, TotalPages);
+        if (nextPage == filter.Page)
+        {
+            return;
+        }
+
+        filter.Page = nextPage;
+        await LoadAsync();
+    }
+
+    private async Task OnPageSizeChanged(ChangeEventArgs args)
+    {
+        if (!int.TryParse(args.Value?.ToString(), out var pageSize))
+        {
+            return;
+        }
+
+        filter.PageSize = pageSize;
+        filter.Page = 1;
+        await LoadAsync();
+    }
+}

@@ -1,0 +1,268 @@
+@page "/onboarding"
+@attribute [AllowAnonymous]
+@inject ITenantAdminService TenantAdminService
+@inject NavigationManager NavigationManager
+
+<PageTitle>Configuracion inicial</PageTitle>
+
+<div class="page-header">
+    <div>
+        <p class="eyebrow">Primer arranque</p>
+        <h1>Configuracion inicial de la plataforma</h1>
+        <p class="lead">Crea el tenant, sus companies iniciales y el administrador principal sin depender del bootstrap.</p>
+    </div>
+</div>
+
+@if (!string.IsNullOrWhiteSpace(statusMessage))
+{
+    <div class="alert @(isError ? "danger" : "success")">@statusMessage</div>
+}
+
+@if (!setupStatus.IsDatabaseConfigured)
+{
+    <section class="panel">
+        <h2>Base de datos no configurada</h2>
+        <p class="muted">Antes del onboarding debes configurar la conexion MySQL de la aplicacion.</p>
+    </section>
+}
+else if (!setupStatus.CanRunInitialSetup)
+{
+    <section class="panel">
+        <h2>Instalacion ya inicializada</h2>
+        <p class="muted">Esta instalacion ya tiene tenant, companies o usuarios creados. Continúa desde el acceso normal o desde plataforma.</p>
+        <div class="quick-links">
+            <a class="primary-button link-button" href="/login">Ir al login</a>
+        </div>
+    </section>
+}
+else
+{
+    <section class="panel">
+        <EditForm Model="form" OnValidSubmit="SubmitAsync">
+            <div class="admin-grid">
+                <section class="panel">
+                    <h2>Tenant inicial</h2>
+                    <div class="stack">
+                        <label class="field">
+                            <span>Nombre del tenant</span>
+                            <InputText class="text-input" @bind-Value="form.TenantName" />
+                        </label>
+                        <label class="field">
+                            <span>Slug del tenant</span>
+                            <InputText class="text-input" @bind-Value="form.TenantSlug" />
+                        </label>
+                    </div>
+                </section>
+
+                <section class="panel">
+                    <div class="panel-header">
+                        <div>
+                            <h2>Companies iniciales</h2>
+                            <p class="muted">Puedes arrancar el tenant con varias companies, por ejemplo `Coespunt (C)` y `Completex (M)`.</p>
+                        </div>
+                        <button class="secondary-button" type="button" @onclick="AddCompany">Añadir company</button>
+                    </div>
+
+                    <div class="stack">
+                        @for (var index = 0; index < form.Companies.Count; index++)
+                        {
+                            var company = form.Companies[index];
+                            <section class="panel">
+                                <div class="panel-header">
+                                    <h3>Company @(index + 1)</h3>
+                                    @if (form.Companies.Count > 1)
+                                    {
+                                        <button class="secondary-button" type="button" @onclick="() => RemoveCompany(index)">Quitar</button>
+                                    }
+                                </div>
+                                <div class="stack">
+                                    <label class="field">
+                                        <span>Nombre de la company</span>
+                                        <InputText class="text-input" @bind-Value="company.Name" />
+                                    </label>
+                                    <label class="field">
+                                        <span>Slug de la company</span>
+                                        <InputText class="text-input" @bind-Value="company.Slug" />
+                                    </label>
+                                    <label class="field">
+                                        <span>Centro legacy</span>
+                                        @if (GetLegacyCentersForCompany(company).Any())
+                                        {
+                                            <InputSelect class="text-input" @bind-Value="company.LegacyCenterCode">
+                                                <option value="">Selecciona centro legacy</option>
+                                                @foreach (var center in GetLegacyCentersForCompany(company))
+                                                {
+                                                    <option value="@center.Code">@FormatLegacyCenter(center)</option>
+                                                }
+                                            </InputSelect>
+                                        }
+                                        else
+                                        {
+                                            <InputText class="text-input" @bind-Value="company.LegacyCenterCode" />
+                                        }
+                                    </label>
+                                </div>
+                            </section>
+                        }
+                    </div>
+                </section>
+
+                <section class="panel">
+                    <h2>Administrador inicial</h2>
+                    <div class="stack">
+                        <label class="field">
+                            <span>Nombre</span>
+                            <InputText class="text-input" @bind-Value="form.AdminDisplayName" />
+                        </label>
+                        <label class="field">
+                            <span>Email</span>
+                            <InputText class="text-input" @bind-Value="form.AdminEmail" />
+                        </label>
+                        <label class="field">
+                            <span>Contrasena</span>
+                            <InputText class="text-input" type="password" @bind-Value="form.AdminPassword" />
+                        </label>
+                        <p class="muted">Este usuario quedará como `PlatformAdmin` y `TenantAdmin` del tenant inicial.</p>
+                    </div>
+                </section>
+            </div>
+
+            <div class="form-actions">
+                <button class="primary-button" type="submit">Crear instalacion inicial</button>
+                <a class="secondary-button link-button" href="/login">Volver al login</a>
+            </div>
+        </EditForm>
+    </section>
+}
+
+@code {
+    private PlatformSetupStatusDto setupStatus = new();
+    private IReadOnlyCollection<LegacyCenterOptionDto> legacyCenters = [];
+    private InitializePlatformFormModel form = new();
+    private string statusMessage = string.Empty;
+    private bool isError;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadAsync();
+    }
+
+    private async Task LoadAsync()
+    {
+        setupStatus = await TenantAdminService.GetSetupStatusAsync();
+        legacyCenters = setupStatus.CanRunInitialSetup
+            ? await TenantAdminService.GetLegacyCentersAsync()
+            : [];
+
+        if (form.Companies.Count == 0)
+        {
+            form.Companies.Add(new InitializeCompanyFormModel());
+        }
+
+        foreach (var company in form.Companies)
+        {
+            if (string.IsNullOrWhiteSpace(company.LegacyCenterCode))
+            {
+                company.LegacyCenterCode = GetLegacyCentersForCompany(company)
+                    .Select(center => center.Code)
+                    .FirstOrDefault() ?? string.Empty;
+            }
+        }
+    }
+
+    private async Task SubmitAsync()
+    {
+        try
+        {
+            statusMessage = string.Empty;
+            isError = false;
+
+            await TenantAdminService.InitializePlatformAsync(new InitializePlatformCommand
+            {
+                TenantName = form.TenantName,
+                TenantSlug = form.TenantSlug,
+                InitialCompanies = form.Companies
+                    .Select(company => new InitialCompanyInput
+                    {
+                        Name = company.Name,
+                        Slug = company.Slug,
+                        LegacyCenterCode = company.LegacyCenterCode
+                    })
+                    .ToArray(),
+                AdminDisplayName = form.AdminDisplayName,
+                AdminEmail = form.AdminEmail,
+                AdminPassword = form.AdminPassword
+            });
+
+            NavigationManager.NavigateTo("/login?setup=1", forceLoad: true);
+        }
+        catch (Exception exception)
+        {
+            isError = true;
+            statusMessage = exception.Message;
+            await LoadAsync();
+        }
+    }
+
+    private IReadOnlyCollection<LegacyCenterOptionDto> GetLegacyCentersForCompany(InitializeCompanyFormModel company)
+    {
+        var selectedCodes = form.Companies
+            .Where(otherCompany => !ReferenceEquals(otherCompany, company))
+            .Select(otherCompany => otherCompany.LegacyCenterCode)
+            .Where(code => !string.IsNullOrWhiteSpace(code))
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+        return legacyCenters
+            .Where(center => !center.IsAssigned || string.Equals(center.Code, company.LegacyCenterCode, StringComparison.OrdinalIgnoreCase))
+            .Where(center => !selectedCodes.Contains(center.Code))
+            .ToArray();
+    }
+
+    private void AddCompany()
+    {
+        var company = new InitializeCompanyFormModel
+        {
+            LegacyCenterCode = legacyCenters
+                .Where(center => !center.IsAssigned)
+                .Select(center => center.Code)
+                .FirstOrDefault(code => form.Companies.All(existingCompany => !string.Equals(existingCompany.LegacyCenterCode, code, StringComparison.OrdinalIgnoreCase)))
+                ?? string.Empty
+        };
+
+        form.Companies.Add(company);
+    }
+
+    private void RemoveCompany(int index)
+    {
+        if (index < 0 || index >= form.Companies.Count)
+        {
+            return;
+        }
+
+        form.Companies.RemoveAt(index);
+        if (form.Companies.Count == 0)
+        {
+            AddCompany();
+        }
+    }
+
+    private static string FormatLegacyCenter(LegacyCenterOptionDto center) =>
+        string.IsNullOrWhiteSpace(center.Description) ? center.Code : $"{center.Description} ({center.Code})";
+
+    private sealed class InitializePlatformFormModel
+    {
+        public string TenantName { get; set; } = string.Empty;
+        public string TenantSlug { get; set; } = string.Empty;
+        public List<InitializeCompanyFormModel> Companies { get; } = [new()];
+        public string AdminDisplayName { get; set; } = string.Empty;
+        public string AdminEmail { get; set; } = string.Empty;
+        public string AdminPassword { get; set; } = string.Empty;
+    }
+
+    private sealed class InitializeCompanyFormModel
+    {
+        public string Name { get; set; } = string.Empty;
+        public string Slug { get; set; } = string.Empty;
+        public string LegacyCenterCode { get; set; } = string.Empty;
+    }
+}

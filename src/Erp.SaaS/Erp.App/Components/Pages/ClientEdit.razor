@@ -2,8 +2,10 @@
 @page "/crm/clientes/editar/{Code:int}"
 @attribute [Authorize(Roles = "TenantAdmin")]
 @inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IAuditLogService AuditLogService
 @inject IClienteQueries ClienteQueries
 @inject IClienteService ClienteService
+@inject ILegacySyncService LegacySyncService
 @inject NavigationManager NavigationManager
 
 <PageTitle>@(Code.HasValue ? "Editar cliente" : "Nuevo cliente")</PageTitle>
@@ -12,7 +14,9 @@
     <div>
         <p class="eyebrow">CRM</p>
         <h1>@(Code.HasValue ? $"Editar cliente {Code}" : "Nuevo cliente")</h1>
-        <p class="lead">Alta y edición sobre la tabla legacy `clients`, filtrada por la empresa activa.</p>
+        <p class="lead">@(isLegacySyncActive
+            ? "Consulta sobre la réplica SaaS local de clients, en solo lectura mientras el módulo siga sincronizado desde legacy."
+            : "Alta y edición sobre la tabla clients replicada en la SaaS local, filtrada por la empresa activa.")</p>
     </div>
 </div>
 
@@ -29,7 +33,59 @@ else
         <div class="alert @(isError ? "danger" : "success")">@statusMessage</div>
     }
 
+    @if (isLegacySyncActive)
+    {
+        <div class="alert">
+            CRM / Clientes está en convivencia con legacy para esta empresa.
+            Esta ficha queda en solo lectura mientras la sincronización mande.
+            @if (!string.IsNullOrWhiteSpace(syncStatusLabel))
+            {
+                <span>@syncStatusLabel</span>
+            }
+        </div>
+    }
+
+    @if (duplicates.Count > 0)
+    {
+        <section class="panel" style="margin-bottom: 1rem;">
+            <h2>Posibles duplicados</h2>
+            <div class="list-block">
+                @foreach (var duplicate in duplicates)
+                {
+                    <article class="list-item">
+                        <strong>
+                            Cliente @duplicate.Code · @duplicate.Name
+                            @if (duplicate.IsHardConflict)
+                            {
+                                <span> · conflicto duro</span>
+                            }
+                        </strong>
+                        <span>@string.Join(", ", duplicate.MatchReasons)</span>
+                        <span>@duplicate.TaxId · @duplicate.City · @FirstNonEmpty(duplicate.PrimaryEmail, duplicate.SecondaryEmail, duplicate.Phone)</span>
+                        @if (!string.IsNullOrWhiteSpace(duplicate.ReviewStatus))
+                        {
+                            <span>@FormatDuplicateReview(duplicate)</span>
+                        }
+                        @if (Code.HasValue && !isLegacySyncActive)
+                        {
+                            <div class="quick-links">
+                                <button class="secondary-button" type="button" @onclick="() => SetDuplicateReviewAsync(duplicate, ClienteDuplicateReviewStatus.Reviewed)">Marcar revisado</button>
+                                <button class="secondary-button" type="button" @onclick="() => SetDuplicateReviewAsync(duplicate, ClienteDuplicateReviewStatus.FalsePositive)">Falso positivo</button>
+                                @if (!string.IsNullOrWhiteSpace(duplicate.ReviewStatus))
+                                {
+                                    <button class="secondary-button" type="button" @onclick="() => ClearDuplicateReviewAsync(duplicate)">Quitar marca</button>
+                                }
+                            </div>
+                        }
+                        <a class="inline-link" href="/crm/clientes/editar/@duplicate.Code">Abrir cliente</a>
+                    </article>
+                }
+            </div>
+        </section>
+    }
+
     <EditForm Model="model" OnValidSubmit="SaveAsync">
+        <fieldset disabled="@isLegacySyncActive">
         <div class="form-grid">
             <label class="field">
                 <span>Nombre</span>
@@ -93,11 +149,177 @@ else
             </label>
         </div>
 
+        <section class="panel" style="margin-bottom: 1rem;">
+            <div class="page-header" style="margin-bottom: 1rem;">
+                <div>
+                    <h2>Direcciones secundarias</h2>
+                    <p class="lead">Direcciones de envio y contactos adicionales del cliente.</p>
+                </div>
+                <div class="quick-links">
+                    <button class="secondary-button" type="button" @onclick="AddSecondaryAddress">Anadir direccion</button>
+                </div>
+            </div>
+
+            @if (model.SecondaryAddresses.Count == 0)
+            {
+                <p class="muted">Todavia no hay direcciones secundarias para este cliente.</p>
+            }
+            else
+            {
+                @for (var index = 0; index < model.SecondaryAddresses.Count; index++)
+                {
+                    var address = model.SecondaryAddresses[index];
+
+                    <article class="panel comparison-panel" style="margin-bottom: 1rem;">
+                        <div class="page-header" style="margin-bottom: 1rem;">
+                            <div>
+                                <p class="eyebrow">Direccion secundaria @(index + 1)</p>
+                                <h2>@GetSecondaryAddressTitle(address, index)</h2>
+                            </div>
+                            <div class="quick-links">
+                                <button class="secondary-button" type="button" @onclick="() => RemoveSecondaryAddress(index)">Quitar</button>
+                            </div>
+                        </div>
+
+                        <div class="form-grid">
+                            <label class="field">
+                                <span>Nombre / consignatario</span>
+                                <InputText class="text-input" @bind-Value="address.Name" />
+                            </label>
+                            <label class="field">
+                                <span>Contacto</span>
+                                <InputText class="text-input" @bind-Value="address.ContactName" />
+                            </label>
+                            <label class="field wide">
+                                <span>Direccion</span>
+                                <InputText class="text-input" @bind-Value="address.Address" />
+                            </label>
+                            <label class="field">
+                                <span>Codigo postal</span>
+                                <InputText class="text-input" @bind-Value="address.PostalCode" />
+                            </label>
+                            <label class="field">
+                                <span>Ciudad</span>
+                                <InputText class="text-input" @bind-Value="address.City" />
+                            </label>
+                            <label class="field">
+                                <span>Provincia</span>
+                                <InputText class="text-input" @bind-Value="address.Province" />
+                            </label>
+                            <label class="field">
+                                <span>Pais</span>
+                                <InputText class="text-input" @bind-Value="address.Country" />
+                            </label>
+                            <label class="field">
+                                <span>Telefono</span>
+                                <InputText class="text-input" @bind-Value="address.Phone" />
+                            </label>
+                            <label class="field">
+                                <span>Fax</span>
+                                <InputText class="text-input" @bind-Value="address.Fax" />
+                            </label>
+                        </div>
+                    </article>
+                }
+            }
+        </section>
+
+        <section class="panel" style="margin-bottom: 1rem;">
+            <div class="page-header" style="margin-bottom: 1rem;">
+                <div>
+                    <h2>Contactos del cliente</h2>
+                    <p class="lead">Agenda comercial y operativa asociada a este cliente.</p>
+                </div>
+                <div class="quick-links">
+                    <button class="secondary-button" type="button" @onclick="AddContact">Anadir contacto</button>
+                </div>
+            </div>
+
+            @if (model.Contacts.Count == 0)
+            {
+                <p class="muted">Todavia no hay contactos adicionales para este cliente.</p>
+            }
+            else
+            {
+                @for (var index = 0; index < model.Contacts.Count; index++)
+                {
+                    var contact = model.Contacts[index];
+
+                    <article class="panel comparison-panel" style="margin-bottom: 1rem;">
+                        <div class="page-header" style="margin-bottom: 1rem;">
+                            <div>
+                                <p class="eyebrow">Contacto @(index + 1)</p>
+                                <h2>@GetContactTitle(contact, index)</h2>
+                            </div>
+                            <div class="quick-links">
+                                <button class="secondary-button" type="button" @onclick="() => RemoveContact(index)">Quitar</button>
+                            </div>
+                        </div>
+
+                        <div class="form-grid">
+                            <label class="field">
+                                <span>Nombre</span>
+                                <InputText class="text-input" @bind-Value="contact.Name" />
+                            </label>
+                            <label class="field">
+                                <span>Cargo</span>
+                                <InputText class="text-input" @bind-Value="contact.Role" />
+                            </label>
+                            <label class="field">
+                                <span>Email</span>
+                                <InputText class="text-input" @bind-Value="contact.Email" />
+                            </label>
+                            <label class="field">
+                                <span>Telefono</span>
+                                <InputText class="text-input" @bind-Value="contact.Phone" />
+                            </label>
+                            <label class="field wide">
+                                <span>Notas</span>
+                                <InputTextArea class="text-area" @bind-Value="contact.Notes" />
+                            </label>
+                            <label class="checkbox-field">
+                                <InputCheckbox Value="contact.IsPrimary"
+                                               ValueChanged="value => SetPrimaryContact(index, value)"
+                                               ValueExpression="() => contact.IsPrimary" />
+                                <span>Contacto principal</span>
+                            </label>
+                        </div>
+                    </article>
+                }
+            }
+        </section>
+
         <div class="form-actions">
-            <button class="primary-button" type="submit">Guardar</button>
+            @if (!isLegacySyncActive)
+            {
+                <button class="primary-button" type="submit">Guardar</button>
+                <button class="secondary-button" type="button" @onclick="CheckDuplicatesAsync">Comprobar duplicados</button>
+            }
             <a class="secondary-button link-button" href="/crm/clientes">Volver al listado</a>
         </div>
+        </fieldset>
     </EditForm>
+
+    @if (auditLogs.Count > 0)
+    {
+        <section class="panel" style="margin-top: 1rem;">
+            <h2>Historial reciente del cliente</h2>
+            <div class="list-block">
+                @foreach (var entry in auditLogs)
+                {
+                    <article class="list-item">
+                        <strong>@entry.Action</strong>
+                        <span>@FormatAuditActor(entry)</span>
+                        @if (!string.IsNullOrWhiteSpace(entry.Details))
+                        {
+                            <span>@entry.Details</span>
+                        }
+                        <span>@entry.CreatedUtc.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss")</span>
+                    </article>
+                }
+            </div>
+        </section>
+    }
 }
 
 @code {
@@ -107,8 +329,12 @@ else
     private Guid? tenantId;
     private Guid? companyId;
     private SaveClienteCommand model = new();
+    private IReadOnlyCollection<AuditLogEntryDto> auditLogs = [];
+    private IReadOnlyCollection<ClienteDuplicateDto> duplicates = [];
     private string statusMessage = string.Empty;
     private bool isError;
+    private bool isLegacySyncActive;
+    private string syncStatusLabel = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
@@ -126,6 +352,8 @@ else
         {
             model.CompanyId = companyId.Value;
         }
+
+        await LoadSyncStatusAsync();
 
         if (Code.HasValue && tenantId.HasValue && companyId.HasValue)
         {
@@ -151,8 +379,38 @@ else
                     SecondaryEmail = existing.SecondaryEmail,
                     Website = existing.Website,
                     Notes = existing.Notes,
-                    IsBlocked = existing.IsBlocked
+                    IsBlocked = existing.IsBlocked,
+                    SecondaryAddresses = existing.SecondaryAddresses
+                        .Select(address => new ClienteSecondaryAddressDto
+                        {
+                            OriginalAddress = address.OriginalAddress,
+                            Name = address.Name,
+                            ContactName = address.ContactName,
+                            Address = address.Address,
+                            PostalCode = address.PostalCode,
+                            City = address.City,
+                            Province = address.Province,
+                            Country = address.Country,
+                            Phone = address.Phone,
+                            Fax = address.Fax
+                        })
+                        .ToList(),
+                    Contacts = existing.Contacts
+                        .Select(contact => new ClienteContactDto
+                        {
+                            Id = contact.Id,
+                            Name = contact.Name,
+                            Role = contact.Role,
+                            Email = contact.Email,
+                            Phone = contact.Phone,
+                            Notes = contact.Notes,
+                            IsPrimary = contact.IsPrimary
+                        })
+                        .ToList()
                 };
+
+                await LoadAuditAsync(existing.Code);
+                await LoadDuplicatesAsync();
             }
         }
     }
@@ -161,6 +419,13 @@ else
     {
         statusMessage = string.Empty;
         isError = false;
+
+        if (isLegacySyncActive)
+        {
+            statusMessage = "CRM / Clientes está en convivencia con legacy para esta empresa. La ficha queda en solo lectura.";
+            isError = true;
+            return;
+        }
 
         if (!tenantId.HasValue || !companyId.HasValue)
         {
@@ -173,7 +438,10 @@ else
         {
             model.TenantId = tenantId.Value;
             model.CompanyId = companyId.Value;
+            await LoadDuplicatesAsync();
             var code = await ClienteService.SaveAsync(model);
+            Code = code;
+            await LoadAuditAsync(code);
             NavigationManager.NavigateTo($"/crm/clientes/editar/{code}", forceLoad: true);
         }
         catch (Exception exception)
@@ -181,5 +449,267 @@ else
             statusMessage = exception.Message;
             isError = true;
         }
+    }
+
+    private async Task LoadSyncStatusAsync()
+    {
+        isLegacySyncActive = false;
+        syncStatusLabel = string.Empty;
+
+        if (!tenantId.HasValue || !companyId.HasValue)
+        {
+            return;
+        }
+
+        var status = (await LegacySyncService.GetModuleStatusesAsync(tenantId.Value))
+            .FirstOrDefault(item =>
+                item.CompanyId == companyId.Value &&
+                string.Equals(item.ModuleKey, LegacySyncModuleKeys.CrmClients, StringComparison.OrdinalIgnoreCase));
+
+        if (status is null || !status.HasSuccessfulSync)
+        {
+            return;
+        }
+
+        isLegacySyncActive = true;
+        syncStatusLabel = status.LastCompletedUtc.HasValue
+            ? $"Última sync: {status.LastCompletedUtc.Value.ToLocalTime():dd/MM/yyyy HH:mm:ss} · Ins: {status.LastInserted} · Act: {status.LastUpdated} · Omi: {status.LastSkipped} · Err: {status.LastErrors}"
+            : $"Estado: {status.LastStatus}";
+    }
+
+    private async Task CheckDuplicatesAsync()
+    {
+        statusMessage = string.Empty;
+        isError = false;
+
+        try
+        {
+            await LoadDuplicatesAsync();
+            statusMessage = duplicates.Count == 0
+                ? "No se han encontrado duplicados relevantes."
+                : "Se han encontrado posibles duplicados. Revísalos antes de guardar.";
+        }
+        catch (Exception exception)
+        {
+            statusMessage = exception.Message;
+            isError = true;
+        }
+    }
+
+    private async Task SetDuplicateReviewAsync(ClienteDuplicateDto duplicate, string status)
+    {
+        if (!tenantId.HasValue || !companyId.HasValue || !Code.HasValue)
+        {
+            return;
+        }
+
+        statusMessage = string.Empty;
+        isError = false;
+
+        try
+        {
+            await ClienteService.SetDuplicateReviewAsync(new SetClienteDuplicateReviewCommand
+            {
+                TenantId = tenantId.Value,
+                CompanyId = companyId.Value,
+                ClientCode = Code.Value,
+                DuplicateClientCode = duplicate.Code,
+                Status = status
+            });
+
+            await LoadDuplicatesAsync();
+            statusMessage = status == ClienteDuplicateReviewStatus.FalsePositive
+                ? "Duplicado marcado como falso positivo."
+                : "Duplicado marcado como revisado.";
+        }
+        catch (Exception exception)
+        {
+            statusMessage = exception.Message;
+            isError = true;
+        }
+    }
+
+    private async Task ClearDuplicateReviewAsync(ClienteDuplicateDto duplicate)
+    {
+        if (!tenantId.HasValue || !companyId.HasValue || !Code.HasValue)
+        {
+            return;
+        }
+
+        statusMessage = string.Empty;
+        isError = false;
+
+        try
+        {
+            await ClienteService.SetDuplicateReviewAsync(new SetClienteDuplicateReviewCommand
+            {
+                TenantId = tenantId.Value,
+                CompanyId = companyId.Value,
+                ClientCode = Code.Value,
+                DuplicateClientCode = duplicate.Code,
+                Status = null
+            });
+
+            await LoadDuplicatesAsync();
+            statusMessage = "Marca de revisión eliminada.";
+        }
+        catch (Exception exception)
+        {
+            statusMessage = exception.Message;
+            isError = true;
+        }
+    }
+
+    private async Task LoadAuditAsync(int? code)
+    {
+        if (!tenantId.HasValue || !companyId.HasValue || !code.HasValue)
+        {
+            auditLogs = [];
+            return;
+        }
+
+        auditLogs = await AuditLogService.GetRecentAsync(
+            limit: 10,
+            tenantId: tenantId.Value,
+            companyId: companyId.Value,
+            entityName: "Cliente",
+            entityId: code.Value.ToString());
+    }
+
+    private async Task LoadDuplicatesAsync()
+    {
+        if (!tenantId.HasValue || !companyId.HasValue)
+        {
+            duplicates = [];
+            return;
+        }
+
+        model.TenantId = tenantId.Value;
+        model.CompanyId = companyId.Value;
+        duplicates = await ClienteQueries.FindDuplicatesAsync(tenantId.Value, companyId.Value, model);
+    }
+
+    private static string FormatAuditActor(AuditLogEntryDto entry)
+    {
+        if (!string.IsNullOrWhiteSpace(entry.ActorDisplayName) && !string.IsNullOrWhiteSpace(entry.ActorEmail))
+        {
+            return $"{entry.ActorDisplayName} · {entry.ActorEmail}";
+        }
+
+        if (!string.IsNullOrWhiteSpace(entry.ActorDisplayName))
+        {
+            return entry.ActorDisplayName;
+        }
+
+        if (!string.IsNullOrWhiteSpace(entry.ActorEmail))
+        {
+            return entry.ActorEmail;
+        }
+
+        return "Actor no disponible";
+    }
+
+    private static string FirstNonEmpty(params string[] values) =>
+        values.FirstOrDefault(value => !string.IsNullOrWhiteSpace(value)) ?? string.Empty;
+
+    private void AddSecondaryAddress()
+    {
+        model.SecondaryAddresses.Add(new ClienteSecondaryAddressDto());
+    }
+
+    private void RemoveSecondaryAddress(int index)
+    {
+        if (index < 0 || index >= model.SecondaryAddresses.Count)
+        {
+            return;
+        }
+
+        model.SecondaryAddresses.RemoveAt(index);
+    }
+
+    private static string GetSecondaryAddressTitle(ClienteSecondaryAddressDto address, int index)
+    {
+        if (!string.IsNullOrWhiteSpace(address.Name))
+        {
+            return address.Name;
+        }
+
+        if (!string.IsNullOrWhiteSpace(address.Address))
+        {
+            return address.Address;
+        }
+
+        return $"Direccion {index + 1}";
+    }
+
+    private void AddContact()
+    {
+        model.Contacts.Add(new ClienteContactDto
+        {
+            IsPrimary = model.Contacts.Count == 0
+        });
+    }
+
+    private void RemoveContact(int index)
+    {
+        if (index < 0 || index >= model.Contacts.Count)
+        {
+            return;
+        }
+
+        model.Contacts.RemoveAt(index);
+    }
+
+    private static string GetContactTitle(ClienteContactDto contact, int index)
+    {
+        if (!string.IsNullOrWhiteSpace(contact.Name))
+        {
+            return contact.Name;
+        }
+
+        if (!string.IsNullOrWhiteSpace(contact.Email))
+        {
+            return contact.Email;
+        }
+
+        return $"Contacto {index + 1}";
+    }
+
+    private void SetPrimaryContact(int index, bool isPrimary)
+    {
+        if (index < 0 || index >= model.Contacts.Count)
+        {
+            return;
+        }
+
+        if (!isPrimary)
+        {
+            model.Contacts[index].IsPrimary = false;
+            return;
+        }
+
+        for (var contactIndex = 0; contactIndex < model.Contacts.Count; contactIndex++)
+        {
+            model.Contacts[contactIndex].IsPrimary = contactIndex == index;
+        }
+    }
+
+    private static string FormatDuplicateReview(ClienteDuplicateDto duplicate)
+    {
+        var status = string.Equals(duplicate.ReviewStatus, ClienteDuplicateReviewStatus.FalsePositive, StringComparison.OrdinalIgnoreCase)
+            ? "Falso positivo"
+            : "Revisado";
+
+        if (duplicate.ReviewUpdatedUtc.HasValue && !string.IsNullOrWhiteSpace(duplicate.ReviewUpdatedBy))
+        {
+            return $"{status} por {duplicate.ReviewUpdatedBy} · {duplicate.ReviewUpdatedUtc.Value.ToLocalTime():dd/MM/yyyy HH:mm:ss}";
+        }
+
+        if (duplicate.ReviewUpdatedUtc.HasValue)
+        {
+            return $"{status} · {duplicate.ReviewUpdatedUtc.Value.ToLocalTime():dd/MM/yyyy HH:mm:ss}";
+        }
+
+        return status;
     }
 }

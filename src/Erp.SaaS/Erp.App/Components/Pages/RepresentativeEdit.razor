@@ -1,0 +1,347 @@
+@page "/crm/representantes/nuevo"
+@page "/crm/representantes/editar/{Code:int}"
+@attribute [Authorize(Roles = "TenantAdmin,TenantReader")]
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IAuditLogService AuditLogService
+@inject ILegacySyncService LegacySyncService
+@inject IRepresentativeQueries RepresentativeQueries
+@inject IRepresentativeService RepresentativeService
+@inject NavigationManager NavigationManager
+
+<PageTitle>@(Code.HasValue ? "Editar representante" : "Nuevo representante")</PageTitle>
+
+<div class="page-header">
+    <div>
+        <p class="eyebrow">CRM</p>
+        <h1>@(Code.HasValue ? $"Editar representante {Code}" : "Nuevo representante")</h1>
+        <p class="lead">@(isLegacySyncActive
+            ? "Edición sobre la SaaS local. La importación manual desde legacy refresca solo registros marcados como legacy."
+            : "Alta y edición sobre la tabla repres replicada en la SaaS local, filtrada por la empresa activa.")</p>
+    </div>
+    <div class="quick-links">
+        <a class="secondary-button link-button" href="/crm/representantes">Volver al listado</a>
+    </div>
+</div>
+
+@if (!tenantId.HasValue || !companyId.HasValue)
+{
+    <div class="empty-state">
+        <p>No hay empresa activa seleccionada.</p>
+    </div>
+}
+else
+{
+    @if (!string.IsNullOrWhiteSpace(statusMessage))
+    {
+        <div class="alert @(isError ? "danger" : "success")">@statusMessage</div>
+    }
+
+    @if (isLegacySyncActive)
+    {
+        <div class="alert">
+            CRM / Representantes está en convivencia con legacy para esta empresa.
+            Esta ficha guarda cambios solo en la SaaS local y la sync manual refresca únicamente registros de origen legacy.
+            @if (!string.IsNullOrWhiteSpace(syncStatusLabel))
+            {
+                <span>@syncStatusLabel</span>
+            }
+        </div>
+    }
+
+    @if (!canEdit && !Code.HasValue)
+    {
+        <div class="alert">
+            No tienes permisos de edición para crear representantes nuevos en esta empresa.
+        </div>
+    }
+
+    <EditForm Model="model" OnValidSubmit="SaveAsync">
+        <fieldset disabled="@isReadOnly">
+            <div class="form-grid">
+                <label class="field">
+                    <span>Nombre</span>
+                    <InputText class="text-input" @bind-Value="model.Name" />
+                </label>
+                <label class="field">
+                    <span>NIF</span>
+                    <InputText class="text-input" @bind-Value="model.TaxId" />
+                </label>
+                <label class="field">
+                    <span>Comisión (%)</span>
+                    <InputNumber class="text-input" @bind-Value="model.CommissionPercent" />
+                </label>
+                <label class="field">
+                    <span>Teléfono</span>
+                    <InputText class="text-input" @bind-Value="model.Phone" />
+                </label>
+                <label class="field">
+                    <span>Teléfono 2</span>
+                    <InputText class="text-input" @bind-Value="model.SecondaryPhone" />
+                </label>
+                <label class="field">
+                    <span>Fax</span>
+                    <InputText class="text-input" @bind-Value="model.Fax" />
+                </label>
+                <label class="field">
+                    <span>Email principal</span>
+                    <InputText class="text-input" @bind-Value="model.PrimaryEmail" />
+                </label>
+                <label class="field">
+                    <span>Email secundario</span>
+                    <InputText class="text-input" @bind-Value="model.SecondaryEmail" />
+                </label>
+                <label class="field wide">
+                    <span>Dirección</span>
+                    <InputText class="text-input" @bind-Value="model.Address" />
+                </label>
+                <label class="field">
+                    <span>Código postal</span>
+                    <InputText class="text-input" @bind-Value="model.PostalCode" />
+                </label>
+                <label class="field">
+                    <span>Ciudad</span>
+                    <InputText class="text-input" @bind-Value="model.City" />
+                </label>
+                <label class="field">
+                    <span>Provincia</span>
+                    <InputText class="text-input" @bind-Value="model.Province" />
+                </label>
+                <label class="field">
+                    <span>País</span>
+                    <InputText class="text-input" @bind-Value="model.Country" />
+                </label>
+                <label class="field wide">
+                    <span>Web</span>
+                    <InputText class="text-input" @bind-Value="model.Website" />
+                </label>
+                <label class="field wide">
+                    <span>Notas</span>
+                    <InputTextArea class="text-area" @bind-Value="model.Notes" />
+                </label>
+            </div>
+
+            <div class="quick-links" style="margin-top: 1rem;">
+                @if (canEdit)
+                {
+                    <button class="primary-button" type="submit">Guardar representante</button>
+                }
+                @if (canEdit && Code.HasValue)
+                {
+                    <button class="secondary-button danger-button" type="button" @onclick="DeleteAsync">Eliminar representante</button>
+                }
+                @if (Code.HasValue)
+                {
+                    <button class="secondary-button" type="button" @onclick="LoadAuditAsync">Recargar historial</button>
+                }
+            </div>
+        </fieldset>
+    </EditForm>
+
+    @if (Code.HasValue)
+    {
+        <section class="panel" style="margin-top: 1rem;">
+            <h2>Historial reciente del representante</h2>
+            <div class="list-block">
+                @if (recentAuditLogs.Count == 0)
+                {
+                    <p class="muted">Todavía no hay eventos auditados para este representante.</p>
+                }
+                else
+                {
+                    @foreach (var entry in recentAuditLogs)
+                    {
+                        <article class="list-item">
+                            <strong>@entry.Action</strong>
+                            @if (!string.IsNullOrWhiteSpace(entry.Details))
+                            {
+                                <span>@entry.Details</span>
+                            }
+                            <span>@entry.CreatedUtc.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss")</span>
+                        </article>
+                    }
+                }
+            </div>
+        </section>
+    }
+}
+
+@code {
+    [Parameter]
+    public int? Code { get; set; }
+
+    private Guid? tenantId;
+    private Guid? companyId;
+    private bool canEdit;
+    private bool isReadOnly;
+    private RepresentativeDetailDto model = new();
+    private string statusMessage = string.Empty;
+    private bool isError;
+    private bool isLegacySyncActive;
+    private string syncStatusLabel = string.Empty;
+    private IReadOnlyCollection<AuditLogEntryDto> recentAuditLogs = [];
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        tenantId = user.GetTenantId();
+        companyId = user.GetActiveCompanyId();
+        canEdit = user.IsPlatformAdmin() || user.IsInRole(PlatformRoles.TenantAdmin);
+
+        if (!tenantId.HasValue || !companyId.HasValue)
+        {
+            return;
+        }
+
+        await LoadSyncStatusAsync();
+        isReadOnly = !canEdit;
+
+        if (Code.HasValue)
+        {
+            var detail = await RepresentativeQueries.GetByCodeAsync(tenantId.Value, companyId.Value, Code.Value);
+            if (detail is null)
+            {
+                statusMessage = "No se ha encontrado el representante solicitado.";
+                isError = true;
+                model = new RepresentativeDetailDto();
+                recentAuditLogs = [];
+                return;
+            }
+
+            model = detail;
+            await LoadAuditAsync();
+        }
+        else
+        {
+            model = new RepresentativeDetailDto();
+            recentAuditLogs = [];
+        }
+    }
+
+    private async Task SaveAsync()
+    {
+        if (!tenantId.HasValue || !companyId.HasValue)
+        {
+            return;
+        }
+
+        if (isReadOnly)
+        {
+            statusMessage = "No tienes permisos de edición en este tenant.";
+            isError = true;
+            return;
+        }
+
+        try
+        {
+            statusMessage = string.Empty;
+            isError = false;
+
+            var code = await RepresentativeService.SaveAsync(new SaveRepresentativeCommand
+            {
+                TenantId = tenantId.Value,
+                CompanyId = companyId.Value,
+                Code = Code,
+                Name = model.Name,
+                TaxId = model.TaxId,
+                Address = model.Address,
+                PostalCode = model.PostalCode,
+                City = model.City,
+                Province = model.Province,
+                Country = model.Country,
+                Phone = model.Phone,
+                SecondaryPhone = model.SecondaryPhone,
+                Fax = model.Fax,
+                PrimaryEmail = model.PrimaryEmail,
+                SecondaryEmail = model.SecondaryEmail,
+                Website = model.Website,
+                CommissionPercent = model.CommissionPercent,
+                Notes = model.Notes
+            });
+
+            statusMessage = Code.HasValue
+                ? "Representante actualizado correctamente."
+                : "Representante creado correctamente.";
+
+            if (!Code.HasValue)
+            {
+                NavigationManager.NavigateTo($"/crm/representantes/editar/{code}", forceLoad: false);
+                return;
+            }
+
+            await LoadAuditAsync();
+        }
+        catch (Exception exception)
+        {
+            statusMessage = exception.Message;
+            isError = true;
+        }
+    }
+
+    private async Task LoadSyncStatusAsync()
+    {
+        isLegacySyncActive = false;
+        syncStatusLabel = string.Empty;
+
+        if (!tenantId.HasValue || !companyId.HasValue)
+        {
+            return;
+        }
+
+        var status = (await LegacySyncService.GetModuleStatusesAsync(tenantId.Value))
+            .FirstOrDefault(item =>
+                item.CompanyId == companyId.Value &&
+                string.Equals(item.ModuleKey, LegacySyncModuleKeys.CrmRepresentatives, StringComparison.OrdinalIgnoreCase));
+
+        if (status is null || !status.HasSuccessfulSync)
+        {
+            return;
+        }
+
+        isLegacySyncActive = true;
+        syncStatusLabel = status.LastCompletedUtc.HasValue
+            ? $"Última sync: {status.LastCompletedUtc.Value.ToLocalTime():dd/MM/yyyy HH:mm:ss} · Ins: {status.LastInserted} · Act: {status.LastUpdated} · Omi: {status.LastSkipped} · Err: {status.LastErrors}"
+            : $"Estado: {status.LastStatus}";
+    }
+
+    private async Task LoadAuditAsync()
+    {
+        if (!tenantId.HasValue || !Code.HasValue)
+        {
+            recentAuditLogs = [];
+            return;
+        }
+
+        recentAuditLogs = await AuditLogService.GetRecentAsync(
+            limit: 15,
+            tenantId: tenantId.Value,
+            entityName: "Representante",
+            entityId: Code.Value.ToString());
+    }
+
+    private async Task DeleteAsync()
+    {
+        if (!tenantId.HasValue || !companyId.HasValue || !Code.HasValue)
+        {
+            return;
+        }
+
+        if (!canEdit)
+        {
+            statusMessage = "No tienes permisos de edición en este tenant.";
+            isError = true;
+            return;
+        }
+
+        try
+        {
+            await RepresentativeService.DeleteAsync(tenantId.Value, companyId.Value, Code.Value);
+            NavigationManager.NavigateTo("/crm/representantes", forceLoad: false);
+        }
+        catch (Exception exception)
+        {
+            statusMessage = exception.Message;
+            isError = true;
+        }
+    }
+}

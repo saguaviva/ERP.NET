@@ -1,7 +1,10 @@
 @page "/plataforma"
 @attribute [Authorize(Roles = "PlatformAdmin")]
+@inject AuthenticationStateProvider AuthenticationStateProvider
 @inject ITenantAdminService TenantAdminService
 @inject ILeadCaptureService LeadCaptureService
+@inject IDemoAccessService DemoAccessService
+@inject IAuditLogService AuditLogService
 
 <PageTitle>Plataforma</PageTitle>
 
@@ -31,6 +34,53 @@
                     <span>Slug</span>
                     <InputText class="text-input" @bind-Value="tenantForm.Slug" />
                 </label>
+                <div class="field">
+                    <span>Companies iniciales</span>
+                    <div class="stack">
+                        @for (var index = 0; index < tenantForm.InitialCompanies.Count; index++)
+                        {
+                            var company = tenantForm.InitialCompanies[index];
+                            <section class="panel">
+                                <div class="panel-header">
+                                    <strong>Company @(index + 1)</strong>
+                                    @if (tenantForm.InitialCompanies.Count > 1)
+                                    {
+                                        <button class="secondary-button" type="button" @onclick="() => RemoveTenantInitialCompany(index)">Quitar</button>
+                                    }
+                                </div>
+                                <div class="stack">
+                                    <label class="field">
+                                        <span>Nombre</span>
+                                        <InputText class="text-input" @bind-Value="company.Name" />
+                                    </label>
+                                    <label class="field">
+                                        <span>Slug</span>
+                                        <InputText class="text-input" @bind-Value="company.Slug" />
+                                    </label>
+                                    <label class="field">
+                                        <span>Centro legacy</span>
+                                        @if (GetLegacyCentersForTenantInitialCompany(company).Any())
+                                        {
+                                            <InputSelect class="text-input" @bind-Value="company.LegacyCenterCode">
+                                                <option value="">Selecciona centro legacy</option>
+                                                @foreach (var center in GetLegacyCentersForTenantInitialCompany(company))
+                                                {
+                                                    <option value="@center.Code">@FormatLegacyCenter(center)</option>
+                                                }
+                                            </InputSelect>
+                                        }
+                                        else
+                                        {
+                                            <InputText class="text-input" @bind-Value="company.LegacyCenterCode" />
+                                        }
+                                    </label>
+                                </div>
+                            </section>
+                        }
+                    </div>
+                    <button class="secondary-button" type="button" @onclick="AddTenantInitialCompany">Añadir company inicial</button>
+                    <p class="muted">Opcional, pero muy útil para arrancar un grupo empresarial con varios centros de una vez.</p>
+                </div>
                 <button class="primary-button" type="submit">Crear tenant</button>
             </div>
         </EditForm>
@@ -42,7 +92,7 @@
             <div class="stack">
                 <label class="field">
                     <span>Tenant</span>
-                    <InputSelect class="text-input" @bind-Value="companyForm.TenantId">
+                    <InputSelect class="text-input" @bind-Value="companyForm.TenantId" @onchange="OnCompanyTenantChanged">
                         <option value="">Selecciona tenant</option>
                         @foreach (var tenant in tenants)
                         {
@@ -60,8 +110,22 @@
                 </label>
                 <label class="field">
                     <span>Centro legacy</span>
-                    <InputText class="text-input" @bind-Value="companyForm.LegacyCenterCode" />
+                    @if (GetAvailableLegacyCentersForSelectedTenant().Any())
+                    {
+                        <InputSelect class="text-input" @bind-Value="companyForm.LegacyCenterCode">
+                            <option value="">Selecciona centro legacy</option>
+                            @foreach (var center in GetAvailableLegacyCentersForSelectedTenant())
+                            {
+                                <option value="@center.Code">@FormatLegacyCenter(center)</option>
+                            }
+                        </InputSelect>
+                    }
+                    else
+                    {
+                        <InputText class="text-input" @bind-Value="companyForm.LegacyCenterCode" />
+                    }
                 </label>
+                <p class="muted">Cada company del mismo tenant debe usar un centro legacy distinto. Si no aparecen centros, puedes escribir el codi manualmente.</p>
                 <button class="primary-button" type="submit">Crear company</button>
             </div>
         </EditForm>
@@ -146,6 +210,93 @@
 
 <div class="admin-grid">
     <section class="panel">
+        <h2>Solicitudes de acceso demo</h2>
+        <div class="list-block">
+            @if (recentDemoAccessRequests.Count == 0)
+            {
+                <p class="muted">Todavía no hay solicitudes de acceso a demo.</p>
+            }
+            else
+            {
+                @foreach (var request in recentDemoAccessRequests)
+                {
+                    <article class="list-item">
+                        <strong>@request.CompanyName</strong>
+                        <span>@request.ContactName · @request.Email</span>
+                        <span>@request.RequestedUsers usuarios · Estado @request.Status</span>
+                        @if (request.RequestedTesterEmails.Length > 0)
+                        {
+                            <span>Testers pedidos: @string.Join(", ", request.RequestedTesterEmails)</span>
+                        }
+                        @if (!string.IsNullOrWhiteSpace(request.Message))
+                        {
+                            <span>@request.Message</span>
+                        }
+                        <div class="quick-links">
+                            <button class="secondary-button" type="button" @onclick="() => CreateInvitesFromRequestAsync(request)">Invitar emails solicitados</button>
+                        </div>
+                    </article>
+                }
+            }
+        </div>
+    </section>
+
+    <section class="panel">
+        <h2>Invitaciones demo</h2>
+        <EditForm Model="demoInviteForm" OnValidSubmit="CreateManualPreviewInviteAsync">
+            <div class="stack">
+                <label class="field">
+                    <span>Email</span>
+                    <InputText class="text-input" @bind-Value="demoInviteForm.Email" />
+                </label>
+                <label class="field">
+                    <span>Nombre</span>
+                    <InputText class="text-input" @bind-Value="demoInviteForm.DisplayName" />
+                </label>
+                <label class="field">
+                    <span>Empresa o grupo</span>
+                    <InputText class="text-input" @bind-Value="demoInviteForm.CompanyName" />
+                </label>
+                <label class="field">
+                    <span>Notas</span>
+                    <InputTextArea class="text-area" @bind-Value="demoInviteForm.Notes" />
+                </label>
+                <button class="primary-button" type="submit">Crear invitación</button>
+            </div>
+        </EditForm>
+
+        <div class="list-block">
+            @if (previewInvites.Count == 0)
+            {
+                <p class="muted">Todavía no hay invitaciones creadas.</p>
+            }
+            else
+            {
+                @foreach (var invite in previewInvites)
+                {
+                    <article class="list-item">
+                        <strong>@invite.Email</strong>
+                        <span>@(string.IsNullOrWhiteSpace(invite.DisplayName) ? "Sin nombre" : invite.DisplayName)</span>
+                        <span>@(string.IsNullOrWhiteSpace(invite.CompanyName) ? "Sin empresa" : invite.CompanyName)</span>
+                        <span class="status-pill @(invite.IsActive ? "success" : "warning")">@(invite.IsActive ? "Activa" : "Pausada")</span>
+                        @if (!string.IsNullOrWhiteSpace(invite.Notes))
+                        {
+                            <span>@invite.Notes</span>
+                        }
+                        <div class="quick-links">
+                            <button class="secondary-button" type="button" @onclick="() => TogglePreviewInviteActiveAsync(invite)">
+                                @(invite.IsActive ? "Desactivar" : "Reactivar")
+                            </button>
+                        </div>
+                    </article>
+                }
+            }
+        </div>
+    </section>
+</div>
+
+<div class="admin-grid">
+    <section class="panel">
         <h2>Tenants</h2>
         <div class="list-block">
             @foreach (var tenant in tenants)
@@ -165,8 +316,63 @@
             {
                 <article class="list-item">
                     <strong>@company.Name</strong>
-                    <span>@company.LegacyCenterCode · @company.Slug</span>
+                    <span>@GetTenantName(company.TenantId) · @company.LegacyCenterCode · @company.Slug</span>
+                    <span>@(company.IsActive ? "Activa" : "Inactiva")</span>
+                    <div class="quick-links">
+                        @if (editingCompanyId == company.Id)
+                        {
+                            <button class="secondary-button" type="button" @onclick="() => SaveCompanyLegacyCenterAsync(company)" disabled="@RequiresCompanyChangeConfirmation(company)">
+                                Guardar centro
+                            </button>
+                            <button class="secondary-button" type="button" @onclick="CancelCompanyEdit">Cancelar</button>
+                        }
+                        else
+                        {
+                            <button class="secondary-button" type="button" @onclick="() => BeginCompanyEditAsync(company)">Cambiar centro</button>
+                        }
+                    </div>
                 </article>
+
+                @if (editingCompanyId == company.Id)
+                {
+                    <article class="list-item">
+                        <strong>Centro legacy para @company.Name</strong>
+                        <label class="field">
+                            <span>Centro legacy</span>
+                            @if (GetLegacyCentersForCompanyEdit(company).Any())
+                            {
+                                <InputSelect class="text-input" @bind-Value="editingCompanyLegacyCenterCode">
+                                    <option value="">Selecciona centro legacy</option>
+                                    @foreach (var center in GetLegacyCentersForCompanyEdit(company))
+                                    {
+                                        <option value="@center.Code">@FormatLegacyCenter(center)</option>
+                                    }
+                                </InputSelect>
+                            }
+                            else
+                            {
+                                <InputText class="text-input" @bind-Value="editingCompanyLegacyCenterCode" />
+                            }
+                        </label>
+                        <p class="muted">El cambio afecta al centro legacy que usará esta company en los módulos migrados.</p>
+                        @if (editingCompanyImpact is not null && editingCompanyImpact.HasUsage)
+                        {
+                            <div class="alert danger">
+                                <strong>Impacto detectado</strong>
+                                <span>Usuarios asignados: @editingCompanyImpact.AssignedUsersCount</span>
+                                <span>Clientes en centro actual: @editingCompanyImpact.ClientCount</span>
+                                <span>Proveedores en centro actual: @editingCompanyImpact.SupplierCount</span>
+                                <span>Compras en centro actual: @editingCompanyImpact.PurchaseDocumentCount</span>
+                                <span>Ventas en centro actual: @editingCompanyImpact.SalesDocumentCount</span>
+                                <span>Eventos auditados: @editingCompanyImpact.AuditEventCount</span>
+                            </div>
+                            <label class="checkbox-field">
+                                <input type="checkbox" @bind="confirmCompanyLegacyCenterChange" />
+                                <span>Confirmo que quiero cambiar el centro legacy de esta company aunque ya tenga uso real.</span>
+                            </label>
+                        }
+                    </article>
+                }
             }
         </div>
     </section>
@@ -179,26 +385,144 @@
                 <article class="list-item">
                     <strong>@user.DisplayName</strong>
                     <span>@user.Email</span>
+                    <span>@(user.IsActive ? "Activo" : "Inactivo")</span>
+                    <span>@GetTenantName(user.TenantId)</span>
+                    <span>@FormatUserCompanies(user)</span>
                     <span>@string.Join(", ", user.Roles)</span>
+                    <div class="quick-links">
+                        @if (user.TenantId.HasValue)
+                        {
+                            @if (editingUserId == user.Id)
+                            {
+                                <button class="secondary-button" type="button" @onclick="() => SaveUserAccessAsync(user)">Guardar permisos</button>
+                                <button class="secondary-button" type="button" @onclick="CancelUserEdit">Cancelar</button>
+                            }
+                            else
+                            {
+                                <button class="secondary-button" type="button" @onclick="() => BeginUserEdit(user)">Editar accesos</button>
+                            }
+                        }
+
+                        @if (passwordEditorUserId == user.Id)
+                        {
+                            <button class="secondary-button" type="button" @onclick="() => SaveUserPasswordAsync(user)">Guardar contraseña</button>
+                            <button class="secondary-button" type="button" @onclick="CancelPasswordEdit">Cancelar contraseña</button>
+                        }
+                        else
+                        {
+                            <button class="secondary-button" type="button" @onclick="() => BeginPasswordEdit(user)">Cambiar contraseña</button>
+                        }
+
+                        <button class="secondary-button" type="button" @onclick="() => ToggleUserActiveAsync(user)">
+                            @(user.IsActive ? "Desactivar" : "Activar")
+                        </button>
+                    </div>
                 </article>
+
+                @if (editingUserId == user.Id && user.TenantId.HasValue)
+                {
+                    <article class="list-item">
+                        <strong>Editar accesos de @user.DisplayName</strong>
+                        <div class="field">
+                            <span>Companies</span>
+                            <div class="checkbox-list">
+                                @foreach (var company in GetCompaniesForTenant(user.TenantId.Value))
+                                {
+                                    <label class="checkbox-field compact">
+                                        <input type="checkbox" checked="@editingCompanyIds.Contains(company.Id)" @onchange="args => ToggleEditingCompany(company.Id, args.Value)" />
+                                        <span>@company.Name (@company.LegacyCenterCode)</span>
+                                    </label>
+                                }
+                            </div>
+                        </div>
+                        <div class="field">
+                            <span>Roles</span>
+                            <div class="checkbox-list">
+                                @foreach (var role in PlatformRoles.All.Where(role => role != PlatformRoles.PlatformAdmin))
+                                {
+                                    <label class="checkbox-field compact">
+                                        <input type="checkbox" checked="@editingRoles.Contains(role)" @onchange="args => ToggleEditingRole(role, args.Value)" />
+                                        <span>@role</span>
+                                    </label>
+                                }
+                            </div>
+                        </div>
+                    </article>
+                }
+
+                @if (passwordEditorUserId == user.Id)
+                {
+                    <article class="list-item">
+                        <strong>Nueva contraseña para @user.DisplayName</strong>
+                        <label class="field">
+                            <span>Contraseña nueva</span>
+                            <InputText class="text-input" type="password" @bind-Value="passwordEditorValue" />
+                        </label>
+                        <p class="muted">Usa al menos 8 caracteres. El cambio se guarda al pulsar “Guardar contraseña”.</p>
+                    </article>
+                }
             }
         </div>
     </section>
 </div>
 
+<section class="panel">
+    <h2>Actividad reciente</h2>
+    <div class="list-block">
+        @if (recentAuditLogs.Count == 0)
+        {
+            <p class="muted">Todavía no hay eventos auditados.</p>
+        }
+        else
+        {
+            @foreach (var entry in recentAuditLogs)
+            {
+                <article class="list-item">
+                    <strong>@entry.Action · @entry.EntityName</strong>
+                    <span>@FormatAuditActor(entry)</span>
+                    <span>@FormatAuditScope(entry)</span>
+                    @if (!string.IsNullOrWhiteSpace(entry.Details))
+                    {
+                        <span>@entry.Details</span>
+                    }
+                    <span>@entry.CreatedUtc.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss")</span>
+                </article>
+            }
+        }
+    </div>
+</section>
+
 @code {
+    private Guid? currentUserId;
     private IReadOnlyCollection<TenantSummaryDto> tenants = [];
     private IReadOnlyCollection<CompanySummaryDto> companies = [];
+    private IReadOnlyCollection<LegacyCenterOptionDto> legacyCenters = [];
+    private IReadOnlyCollection<LegacyCenterOptionDto> platformLegacyCenters = [];
     private IReadOnlyCollection<UserSummaryDto> users = [];
     private IReadOnlyCollection<LeadSummaryDto> recentLeads = [];
-    private TenantFormModel tenantForm = new();
+    private IReadOnlyCollection<DemoAccessRequestSummaryDto> recentDemoAccessRequests = [];
+    private IReadOnlyCollection<PreviewInviteSummaryDto> previewInvites = [];
+    private IReadOnlyCollection<AuditLogEntryDto> recentAuditLogs = [];
+    private TenantFormModel tenantForm = CreateTenantFormModel();
     private CompanyFormModel companyForm = new();
     private UserFormModel userForm = new();
+    private DemoInviteFormModel demoInviteForm = new();
     private string statusMessage = string.Empty;
     private bool isError;
+    private Guid? editingCompanyId;
+    private string editingCompanyLegacyCenterCode = string.Empty;
+    private CompanyLegacyCenterImpactDto? editingCompanyImpact;
+    private bool confirmCompanyLegacyCenterChange;
+    private Guid? editingUserId;
+    private HashSet<Guid> editingCompanyIds = [];
+    private HashSet<string> editingRoles = [];
+    private Guid? passwordEditorUserId;
+    private string passwordEditorValue = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        currentUserId = authState.User.GetUserId();
         await ReloadAsync();
     }
 
@@ -206,21 +530,37 @@
     {
         tenants = await TenantAdminService.GetTenantsAsync();
         companies = await TenantAdminService.GetCompaniesAsync();
+        platformLegacyCenters = await TenantAdminService.GetLegacyCentersAsync();
+        legacyCenters = await TenantAdminService.GetLegacyCentersAsync(companyForm.TenantId == Guid.Empty ? null : companyForm.TenantId);
         users = await TenantAdminService.GetUsersAsync();
         recentLeads = await LeadCaptureService.GetRecentAsync();
+        recentDemoAccessRequests = await DemoAccessService.GetRecentRequestsAsync();
+        previewInvites = await DemoAccessService.GetRecentInvitesAsync();
+        recentAuditLogs = await AuditLogService.GetRecentAsync();
     }
 
     private async Task CreateTenantAsync()
     {
         await RunAsync(async () =>
         {
-            await TenantAdminService.CreateTenantAsync(new CreateTenantCommand
+            var tenant = await TenantAdminService.CreateTenantAsync(new CreateTenantCommand
             {
                 Name = tenantForm.Name,
-                Slug = tenantForm.Slug
+                Slug = tenantForm.Slug,
+                InitialCompanies = tenantForm.InitialCompanies
+                    .Select(company => new InitialCompanyInput
+                    {
+                        Name = company.Name,
+                        Slug = company.Slug,
+                        LegacyCenterCode = company.LegacyCenterCode
+                    })
+                    .ToArray()
             });
-            tenantForm = new TenantFormModel();
+            tenantForm = CreateTenantFormModel();
+            companyForm = new CompanyFormModel { TenantId = tenant.Id };
+            userForm = new UserFormModel { TenantId = tenant.Id };
             await ReloadAsync();
+            await LoadLegacyCentersAsync(tenant.Id, selectFirstAvailable: true);
         }, "Tenant creado correctamente.");
     }
 
@@ -228,6 +568,8 @@
     {
         await RunAsync(async () =>
         {
+            var tenantId = companyForm.TenantId;
+
             await TenantAdminService.CreateCompanyAsync(new CreateCompanyCommand
             {
                 TenantId = companyForm.TenantId,
@@ -235,8 +577,10 @@
                 Slug = companyForm.Slug,
                 LegacyCenterCode = companyForm.LegacyCenterCode
             });
-            companyForm = new CompanyFormModel();
+            companyForm = new CompanyFormModel { TenantId = tenantId };
+            userForm.TenantId = tenantId;
             await ReloadAsync();
+            await LoadLegacyCentersAsync(tenantId, selectFirstAvailable: true);
         }, "Company creada correctamente.");
     }
 
@@ -264,8 +608,115 @@
         return Task.CompletedTask;
     }
 
+    private async Task OnCompanyTenantChanged(ChangeEventArgs _)
+    {
+        await LoadLegacyCentersAsync(companyForm.TenantId, selectFirstAvailable: true);
+    }
+
     private IEnumerable<CompanySummaryDto> GetCompaniesForUserTenant() =>
         companies.Where(company => company.TenantId == userForm.TenantId);
+
+    private IEnumerable<CompanySummaryDto> GetCompaniesForTenant(Guid tenantId) =>
+        companies.Where(company => company.TenantId == tenantId);
+
+    private IEnumerable<LegacyCenterOptionDto> GetAvailableLegacyCentersForSelectedTenant() =>
+        legacyCenters.Where(center => !center.IsAssigned);
+
+    private IReadOnlyCollection<LegacyCenterOptionDto> GetLegacyCentersForTenantInitialCompany(TenantInitialCompanyFormModel company)
+    {
+        var selectedCodes = tenantForm.InitialCompanies
+            .Where(otherCompany => !ReferenceEquals(otherCompany, company))
+            .Select(otherCompany => otherCompany.LegacyCenterCode)
+            .Where(code => !string.IsNullOrWhiteSpace(code))
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+        return platformLegacyCenters
+            .Where(center => !selectedCodes.Contains(center.Code))
+            .Where(center => string.IsNullOrWhiteSpace(company.LegacyCenterCode) || string.Equals(center.Code, company.LegacyCenterCode, StringComparison.OrdinalIgnoreCase) || !selectedCodes.Contains(center.Code))
+            .ToArray();
+    }
+
+    private IReadOnlyCollection<LegacyCenterOptionDto> GetLegacyCentersForCompanyEdit(CompanySummaryDto company)
+    {
+        var assignedCodes = companies
+            .Where(candidate => candidate.TenantId == company.TenantId && candidate.Id != company.Id)
+            .Select(candidate => candidate.LegacyCenterCode)
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+        return platformLegacyCenters
+            .Where(center => !assignedCodes.Contains(center.Code) || string.Equals(center.Code, company.LegacyCenterCode, StringComparison.OrdinalIgnoreCase))
+            .ToArray();
+    }
+
+    private static string FormatLegacyCenter(LegacyCenterOptionDto center) =>
+        string.IsNullOrWhiteSpace(center.Description) ? center.Code : $"{center.Description} ({center.Code})";
+
+    private string GetTenantName(Guid? tenantId)
+    {
+        if (!tenantId.HasValue)
+        {
+            return "Plataforma";
+        }
+
+        return tenants.FirstOrDefault(tenant => tenant.Id == tenantId.Value)?.Name ?? "Tenant desconocido";
+    }
+
+    private string FormatUserCompanies(UserSummaryDto user)
+    {
+        if (!user.TenantId.HasValue)
+        {
+            return "Sin company";
+        }
+
+        var names = companies
+            .Where(company => company.TenantId == user.TenantId.Value && user.CompanyIds.Contains(company.Id))
+            .Select(company => $"{company.Name} ({company.LegacyCenterCode})")
+            .ToArray();
+
+        return names.Length == 0 ? "Sin companies asignadas" : string.Join(", ", names);
+    }
+
+    private static string FormatAuditActor(AuditLogEntryDto entry)
+    {
+        if (!string.IsNullOrWhiteSpace(entry.ActorDisplayName) && !string.IsNullOrWhiteSpace(entry.ActorEmail))
+        {
+            return $"{entry.ActorDisplayName} · {entry.ActorEmail}";
+        }
+
+        if (!string.IsNullOrWhiteSpace(entry.ActorDisplayName))
+        {
+            return entry.ActorDisplayName;
+        }
+
+        if (!string.IsNullOrWhiteSpace(entry.ActorEmail))
+        {
+            return entry.ActorEmail;
+        }
+
+        return "Actor no disponible";
+    }
+
+    private static string FormatAuditScope(AuditLogEntryDto entry)
+    {
+        var scopeParts = new List<string>();
+
+        if (!string.IsNullOrWhiteSpace(entry.TenantName))
+        {
+            scopeParts.Add(entry.TenantName);
+        }
+
+        if (!string.IsNullOrWhiteSpace(entry.CompanyName))
+        {
+            scopeParts.Add(entry.CompanyName);
+        }
+
+        if (!string.IsNullOrWhiteSpace(entry.EntityId))
+        {
+            scopeParts.Add($"Id={entry.EntityId}");
+        }
+
+        return scopeParts.Count == 0 ? "Sin alcance" : string.Join(" · ", scopeParts);
+    }
 
     private void ToggleCompany(Guid companyId, object? value)
     {
@@ -291,6 +742,223 @@
         }
     }
 
+    private void BeginUserEdit(UserSummaryDto user)
+    {
+        editingUserId = user.Id;
+        editingCompanyIds = [.. user.CompanyIds];
+        editingRoles = [.. user.Roles.Where(role => role != PlatformRoles.PlatformAdmin)];
+    }
+
+    private void CancelUserEdit()
+    {
+        editingUserId = null;
+        editingCompanyIds.Clear();
+        editingRoles.Clear();
+    }
+
+    private async Task SaveUserAccessAsync(UserSummaryDto user)
+    {
+        if (!user.TenantId.HasValue)
+        {
+            return;
+        }
+
+        await RunAsync(async () =>
+        {
+            await TenantAdminService.AssignUserCompaniesAsync(new AssignUserCompaniesCommand
+            {
+                UserId = user.Id,
+                TenantId = user.TenantId.Value,
+                CompanyIds = editingCompanyIds.ToArray()
+            });
+
+            await TenantAdminService.AssignUserRolesAsync(new AssignUserRolesCommand
+            {
+                UserId = user.Id,
+                TenantId = user.TenantId.Value,
+                Roles = editingRoles.ToArray()
+            });
+
+            CancelUserEdit();
+            await ReloadAsync();
+        }, "Accesos del usuario actualizados correctamente.");
+    }
+
+    private void ToggleEditingCompany(Guid companyId, object? value)
+    {
+        if (value as bool? == true)
+        {
+            editingCompanyIds.Add(companyId);
+        }
+        else
+        {
+            editingCompanyIds.Remove(companyId);
+        }
+    }
+
+    private void ToggleEditingRole(string role, object? value)
+    {
+        if (value as bool? == true)
+        {
+            editingRoles.Add(role);
+        }
+        else
+        {
+            editingRoles.Remove(role);
+        }
+    }
+
+    private void BeginPasswordEdit(UserSummaryDto user)
+    {
+        passwordEditorUserId = user.Id;
+        passwordEditorValue = string.Empty;
+    }
+
+    private void CancelPasswordEdit()
+    {
+        passwordEditorUserId = null;
+        passwordEditorValue = string.Empty;
+    }
+
+    private async Task SaveUserPasswordAsync(UserSummaryDto user)
+    {
+        await RunAsync(async () =>
+        {
+            await TenantAdminService.ResetUserPasswordAsync(new ResetUserPasswordCommand
+            {
+                UserId = user.Id,
+                NewPassword = passwordEditorValue
+            });
+
+            CancelPasswordEdit();
+        }, "Contraseña actualizada correctamente.");
+    }
+
+    private async Task ToggleUserActiveAsync(UserSummaryDto user)
+    {
+        await RunAsync(async () =>
+        {
+            await TenantAdminService.SetUserActiveAsync(new SetUserActiveCommand
+            {
+                UserId = user.Id,
+                IsActive = !user.IsActive
+            });
+
+            if (passwordEditorUserId == user.Id)
+            {
+                CancelPasswordEdit();
+            }
+
+            if (editingUserId == user.Id)
+            {
+                CancelUserEdit();
+            }
+
+            await ReloadAsync();
+        }, user.IsActive ? "Usuario desactivado correctamente." : "Usuario activado correctamente.");
+    }
+
+    private async Task CreateManualPreviewInviteAsync()
+    {
+        await RunAsync(async () =>
+        {
+            await DemoAccessService.CreateInviteAsync(new CreatePreviewInviteCommand
+            {
+                Email = demoInviteForm.Email,
+                DisplayName = demoInviteForm.DisplayName,
+                CompanyName = demoInviteForm.CompanyName,
+                Notes = demoInviteForm.Notes,
+                CreatedByUserId = currentUserId
+            });
+
+            demoInviteForm = new DemoInviteFormModel();
+            await ReloadAsync();
+        }, "Invitación de demo creada correctamente.");
+    }
+
+    private async Task CreateInvitesFromRequestAsync(DemoAccessRequestSummaryDto request)
+    {
+        await RunAsync(async () =>
+        {
+            await DemoAccessService.CreateInvitesFromRequestAsync(new CreatePreviewInvitesFromRequestCommand
+            {
+                RequestId = request.Id,
+                CreatedByUserId = currentUserId
+            });
+
+            await ReloadAsync();
+        }, "Acceso de demo concedido a los emails solicitados.");
+    }
+
+    private async Task TogglePreviewInviteActiveAsync(PreviewInviteSummaryDto invite)
+    {
+        await RunAsync(async () =>
+        {
+            await DemoAccessService.SetInviteActiveAsync(new SetPreviewInviteActiveCommand
+            {
+                InviteId = invite.Id,
+                IsActive = !invite.IsActive,
+                UpdatedByUserId = currentUserId
+            });
+
+            await ReloadAsync();
+        }, invite.IsActive ? "Invitación de demo desactivada." : "Invitación de demo reactivada.");
+    }
+
+    private async Task LoadLegacyCentersAsync(Guid tenantId, bool selectFirstAvailable)
+    {
+        companyForm.LegacyCenterCode = string.Empty;
+        legacyCenters = await TenantAdminService.GetLegacyCentersAsync(tenantId == Guid.Empty ? null : tenantId);
+
+        if (selectFirstAvailable)
+        {
+            companyForm.LegacyCenterCode = GetAvailableLegacyCentersForSelectedTenant()
+                .Select(center => center.Code)
+                .FirstOrDefault() ?? string.Empty;
+        }
+    }
+
+    private async Task BeginCompanyEditAsync(CompanySummaryDto company)
+    {
+        editingCompanyId = company.Id;
+        editingCompanyLegacyCenterCode = company.LegacyCenterCode;
+        confirmCompanyLegacyCenterChange = false;
+        editingCompanyImpact = await TenantAdminService.GetCompanyLegacyCenterImpactAsync(company.Id, company.TenantId);
+    }
+
+    private void CancelCompanyEdit()
+    {
+        editingCompanyId = null;
+        editingCompanyLegacyCenterCode = string.Empty;
+        editingCompanyImpact = null;
+        confirmCompanyLegacyCenterChange = false;
+    }
+
+    private async Task SaveCompanyLegacyCenterAsync(CompanySummaryDto company)
+    {
+        await RunAsync(async () =>
+        {
+            await TenantAdminService.UpdateCompanyLegacyCenterAsync(new UpdateCompanyLegacyCenterCommand
+            {
+                CompanyId = company.Id,
+                TenantId = company.TenantId,
+                LegacyCenterCode = editingCompanyLegacyCenterCode,
+                ForceChange = confirmCompanyLegacyCenterChange
+            });
+
+            CancelCompanyEdit();
+            await ReloadAsync();
+        }, "Centro legacy actualizado correctamente.");
+    }
+
+    private bool RequiresCompanyChangeConfirmation(CompanySummaryDto company)
+    {
+        return editingCompanyImpact is not null &&
+               editingCompanyImpact.HasUsage &&
+               !string.Equals(editingCompanyLegacyCenterCode, company.LegacyCenterCode, StringComparison.OrdinalIgnoreCase) &&
+               !confirmCompanyLegacyCenterChange;
+    }
+
     private async Task RunAsync(Func<Task> action, string successMessage)
     {
         try
@@ -307,10 +975,52 @@
         }
     }
 
+    private void AddTenantInitialCompany()
+    {
+        var company = new TenantInitialCompanyFormModel
+        {
+            LegacyCenterCode = platformLegacyCenters
+                .Select(center => center.Code)
+                .FirstOrDefault(code => tenantForm.InitialCompanies.All(existingCompany => !string.Equals(existingCompany.LegacyCenterCode, code, StringComparison.OrdinalIgnoreCase)))
+                ?? string.Empty
+        };
+
+        tenantForm.InitialCompanies.Add(company);
+    }
+
+    private void RemoveTenantInitialCompany(int index)
+    {
+        if (index < 0 || index >= tenantForm.InitialCompanies.Count)
+        {
+            return;
+        }
+
+        tenantForm.InitialCompanies.RemoveAt(index);
+        if (tenantForm.InitialCompanies.Count == 0)
+        {
+            tenantForm.InitialCompanies.Add(new TenantInitialCompanyFormModel());
+        }
+    }
+
+    private static TenantFormModel CreateTenantFormModel()
+    {
+        var model = new TenantFormModel();
+        model.InitialCompanies.Add(new TenantInitialCompanyFormModel());
+        return model;
+    }
+
     private sealed class TenantFormModel
     {
         public string Name { get; set; } = string.Empty;
         public string Slug { get; set; } = string.Empty;
+        public List<TenantInitialCompanyFormModel> InitialCompanies { get; } = [];
+    }
+
+    private sealed class TenantInitialCompanyFormModel
+    {
+        public string Name { get; set; } = string.Empty;
+        public string Slug { get; set; } = string.Empty;
+        public string LegacyCenterCode { get; set; } = string.Empty;
     }
 
     private sealed class CompanyFormModel
@@ -329,5 +1039,13 @@
         public string Password { get; set; } = string.Empty;
         public HashSet<Guid> SelectedCompanyIds { get; } = [];
         public HashSet<string> SelectedRoles { get; } = [];
+    }
+
+    private sealed class DemoInviteFormModel
+    {
+        public string Email { get; set; } = string.Empty;
+        public string DisplayName { get; set; } = string.Empty;
+        public string CompanyName { get; set; } = string.Empty;
+        public string Notes { get; set; } = string.Empty;
     }
 }

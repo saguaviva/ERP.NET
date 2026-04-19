@@ -1,0 +1,319 @@
+@page "/ventas/facturas"
+@attribute [Authorize(Roles = "TenantAdmin,TenantReader")]
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject ISalesOrderQueries SalesOrderQueries
+@inject ILegacySyncService LegacySyncService
+
+<PageTitle>Ventas / Facturas</PageTitle>
+
+<div class="page-header">
+    <div>
+        <p class="eyebrow">Ventas</p>
+        <h1>Facturas de cliente</h1>
+        <p class="lead">Facturas emitidas desde la pre-facturación, con trazabilidad completa hacia borradores y albaranes.</p>
+    </div>
+    <div class="quick-links">
+        <a class="secondary-button link-button" href="/ventas/pre-facturacion">Volver a pre-facturación</a>
+    </div>
+</div>
+
+@if (!tenantId.HasValue || !companyId.HasValue)
+{
+    <div class="empty-state">
+        <p>Selecciona una empresa activa para revisar las facturas de venta.</p>
+    </div>
+}
+else
+{
+    @if (syncStatus?.HasSuccessfulSync == true)
+    {
+        <div class="alert warning">
+            Ventas / Facturas está en convivencia con legacy para esta empresa. La web muestra la réplica SaaS local y queda en solo lectura mientras la sincronización mande.
+            @if (syncStatus.LastCompletedUtc.HasValue)
+            {
+                <span>Última sync: @syncStatus.LastCompletedUtc.Value.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss") · Ins: @syncStatus.LastInserted · Act: @syncStatus.LastUpdated · Omi: @syncStatus.LastSkipped · Err: @syncStatus.LastErrors</span>
+            }
+        </div>
+    }
+
+    <section class="panel">
+        <div class="filter-row">
+            <input class="text-input" @bind="filter.Search" placeholder="Buscar por factura, borrador, cliente o notas" disabled="@isLoading" />
+            <button class="secondary-button" @onclick="SearchAsync" disabled="@isLoading">@(isLoading ? "Cargando..." : "Buscar")</button>
+        </div>
+        <div class="filter-row results-toolbar" style="margin-top: 0.85rem;">
+            <span class="results-summary">
+                @(totalCount == 0
+                    ? "Sin resultados"
+                    : $"Mostrando {PageStart}-{PageEnd} de {totalCount} facturas")
+            </span>
+            <label class="field compact-field">
+                <span>Tamaño de página</span>
+                <select class="sidebar-select compact-select" value="@filter.PageSize" @onchange="OnPageSizeChanged" disabled="@isLoading">
+                    <option value="25">25</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                </select>
+            </label>
+        </div>
+    </section>
+
+    @if (!string.IsNullOrWhiteSpace(errorMessage))
+    {
+        <div class="alert danger">@errorMessage</div>
+    }
+
+    <section class="panel @(isLoading ? "loading-panel" : string.Empty)">
+        @if (isLoading)
+        {
+            <div class="loading-banner">
+                <span class="loading-indicator" aria-hidden="true"></span>
+                <span>Cargando facturas de cliente...</span>
+            </div>
+        }
+
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <SortableHeader Label="Factura" IsActive="@(sortColumn == nameof(SalesInvoiceListItemDto.InvoiceNumber))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(SalesInvoiceListItemDto.InvoiceNumber), true))" />
+                    <SortableHeader Label="Cliente" IsActive="@(sortColumn == nameof(SalesInvoiceListItemDto.ClientName))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(SalesInvoiceListItemDto.ClientName)))" />
+                    <SortableHeader Label="Fecha" IsActive="@(sortColumn == nameof(SalesInvoiceListItemDto.IssueDate))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(SalesInvoiceListItemDto.IssueDate), true))" />
+                    <SortableHeader Label="Vencimiento" IsActive="@(sortColumn == nameof(SalesInvoiceListItemDto.DueDate))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(SalesInvoiceListItemDto.DueDate), true))" />
+                    <SortableHeader Label="Estado" IsActive="@(sortColumn == nameof(SalesInvoiceListItemDto.Status))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(SalesInvoiceListItemDto.Status)))" />
+                    <SortableHeader Label="Cobro" IsActive="@(sortColumn == nameof(SalesInvoiceListItemDto.PaymentStatus))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(SalesInvoiceListItemDto.PaymentStatus)))" />
+                    <SortableHeader Label="Pendiente" IsActive="@(sortColumn == nameof(SalesInvoiceListItemDto.OutstandingAmount))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(SalesInvoiceListItemDto.OutstandingAmount), true))" />
+                    <SortableHeader Label="Contabilidad" IsActive="@(sortColumn == nameof(SalesInvoiceListItemDto.AccountingStatus))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(SalesInvoiceListItemDto.AccountingStatus)))" />
+                    <SortableHeader Label="Albaranes" IsActive="@(sortColumn == nameof(SalesInvoiceListItemDto.ShipmentCount))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(SalesInvoiceListItemDto.ShipmentCount), true))" />
+                    <SortableHeader Label="Total" IsActive="@(sortColumn == nameof(SalesInvoiceListItemDto.TotalAmount))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(SalesInvoiceListItemDto.TotalAmount), true))" />
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (isLoading)
+                {
+                    @for (var index = 0; index < 5; index++)
+                    {
+                        <tr class="table-skeleton-row">
+                            <td><span class="skeleton-line short"></span></td>
+                            <td><span class="skeleton-line"></span></td>
+                            <td><span class="skeleton-line short"></span></td>
+                            <td><span class="skeleton-line short"></span></td>
+                            <td><span class="skeleton-line short"></span></td>
+                            <td><span class="skeleton-line short"></span></td>
+                            <td><span class="skeleton-line short"></span></td>
+                            <td><span class="skeleton-line short"></span></td>
+                            <td><span class="skeleton-line short"></span></td>
+                            <td><span class="skeleton-line short"></span></td>
+                            <td><span class="skeleton-line short"></span></td>
+                        </tr>
+                    }
+                }
+                else if (items.Count == 0)
+                {
+                    <tr>
+                        <td colspan="11" class="table-empty">Todavía no hay facturas emitidas.</td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var item in items)
+                    {
+                        <tr>
+                            <td>
+                                <div>@item.DisplayNumber</div>
+                                <div class="table-subtitle">
+                                    @(string.Equals(item.Origin, SalesOrderOrigins.Legacy, StringComparison.OrdinalIgnoreCase)
+                                        ? "Legacy"
+                                        : $"Borrador {item.DraftNumber}")
+                                </div>
+                            </td>
+                            <td>@item.ClientName</td>
+                            <td>@item.IssueDate.ToString("dd/MM/yyyy")</td>
+                            <td>@(item.DueDate?.ToString("dd/MM/yyyy") ?? "-")</td>
+                            <td><span class="status-pill @GetInvoiceStatusClass(item.Status)">@FormatInvoiceStatus(item.Status)</span></td>
+                            <td><span class="status-pill @GetPaymentStatusClass(item.PaymentStatus, item.IsOverdue)">@FormatPaymentStatus(item.PaymentStatus, item.IsOverdue)</span></td>
+                            <td>@item.OutstandingAmount.ToString("0.00") €</td>
+                            <td><span class="status-pill @GetAccountingStatusClass(item.AccountingStatus)">@FormatAccountingStatus(item.AccountingStatus)</span></td>
+                            <td>@item.ShipmentCount</td>
+                            <td>@item.TotalAmount.ToString("0.00") €</td>
+                            <td>
+                                <div class="table-actions">
+                                    <a class="inline-link" href="/ventas/facturas/@item.InvoiceNumber">Abrir</a>
+                                    <a class="inline-link" href="/ventas/facturas/@item.InvoiceNumber/pdf" target="_blank">PDF</a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+
+        <div class="pagination-bar">
+            <span class="muted">Página @filter.Page de @TotalPages</span>
+            <div class="pagination-actions">
+                <button class="secondary-button" @onclick="() => ChangePageAsync(1)" disabled="@(!CanGoPrevious || isLoading)">Primera</button>
+                <button class="secondary-button" @onclick="() => ChangePageAsync(filter.Page - 1)" disabled="@(!CanGoPrevious || isLoading)">Anterior</button>
+                <button class="secondary-button" @onclick="() => ChangePageAsync(filter.Page + 1)" disabled="@(!CanGoNext || isLoading)">Siguiente</button>
+                <button class="secondary-button" @onclick="() => ChangePageAsync(TotalPages)" disabled="@(!CanGoNext || isLoading)">Última</button>
+            </div>
+        </div>
+    </section>
+}
+
+@code {
+    private Guid? tenantId;
+    private Guid? companyId;
+    private bool isLoading;
+    private SalesPreInvoiceFilter filter = new() { Page = 1, PageSize = 25, SortColumn = nameof(SalesInvoiceListItemDto.InvoiceNumber), SortDescending = true };
+    private IReadOnlyCollection<SalesInvoiceListItemDto> items = [];
+    private string errorMessage = string.Empty;
+    private LegacySyncModuleStatusDto? syncStatus;
+    private string sortColumn = nameof(SalesInvoiceListItemDto.InvoiceNumber);
+    private bool sortDescending = true;
+    private int totalCount;
+    private int TotalPages => Math.Max(1, (int)Math.Ceiling(totalCount / (double)filter.PageSize));
+    private bool CanGoPrevious => filter.Page > 1;
+    private bool CanGoNext => filter.Page < TotalPages;
+    private int PageStart => totalCount == 0 ? 0 : ((filter.Page - 1) * filter.PageSize) + 1;
+    private int PageEnd => totalCount == 0 ? 0 : Math.Min(filter.Page * filter.PageSize, totalCount);
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        tenantId = user.GetTenantId();
+        companyId = user.GetActiveCompanyId();
+        if (tenantId.HasValue && companyId.HasValue)
+        {
+            syncStatus = (await LegacySyncService.GetModuleStatusesAsync(tenantId.Value))
+                .FirstOrDefault(status =>
+                    status.CompanyId == companyId.Value &&
+                    string.Equals(status.ModuleKey, LegacySyncModuleKeys.SalesInvoices, StringComparison.OrdinalIgnoreCase));
+        }
+        await LoadAsync();
+    }
+
+    private async Task LoadAsync()
+    {
+        errorMessage = string.Empty;
+        if (!tenantId.HasValue || !companyId.HasValue)
+        {
+            items = [];
+            totalCount = 0;
+            return;
+        }
+
+        isLoading = true;
+        await InvokeAsync(StateHasChanged);
+
+        try
+        {
+            filter.SortColumn = sortColumn;
+            filter.SortDescending = sortDescending;
+            var result = await SalesOrderQueries.SearchInvoicesAsync(tenantId.Value, companyId.Value, filter);
+            items = result.Items;
+            totalCount = result.TotalCount;
+        }
+        catch (Exception exception)
+        {
+            errorMessage = exception.Message;
+            items = [];
+            totalCount = 0;
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private async Task SearchAsync()
+    {
+        filter.Page = 1;
+        await LoadAsync();
+    }
+
+    private async Task SetSortAsync(string column, bool defaultDescending = false)
+    {
+        if (string.Equals(sortColumn, column, StringComparison.Ordinal))
+        {
+            sortDescending = !sortDescending;
+        }
+        else
+        {
+            sortColumn = column;
+            sortDescending = defaultDescending;
+        }
+
+        filter.Page = 1;
+        await LoadAsync();
+    }
+
+    private async Task ChangePageAsync(int page)
+    {
+        var newPage = Math.Max(1, Math.Min(page, TotalPages));
+        if (newPage == filter.Page)
+        {
+            return;
+        }
+
+        filter.Page = newPage;
+        await LoadAsync();
+    }
+
+    private async Task OnPageSizeChanged(ChangeEventArgs args)
+    {
+        if (!int.TryParse(args.Value?.ToString(), out var pageSize))
+        {
+            return;
+        }
+
+        filter.PageSize = pageSize;
+        filter.Page = 1;
+        await LoadAsync();
+    }
+
+    private static string FormatInvoiceStatus(string status) => status switch
+    {
+        SalesInvoiceStatuses.Issued => "Emitida",
+        SalesInvoiceStatuses.Cancelled => "Anulada",
+        _ => status
+    };
+
+    private static string GetInvoiceStatusClass(string status) => status switch
+    {
+        SalesInvoiceStatuses.Cancelled => "danger",
+        _ => "success"
+    };
+
+    private static string FormatPaymentStatus(string status, bool isOverdue) => status switch
+    {
+        SalesInvoicePaymentStatuses.Pending when isOverdue => "Pendiente vencida",
+        SalesInvoicePaymentStatuses.Pending => "Pendiente",
+        SalesInvoicePaymentStatuses.PartiallyPaid when isOverdue => "Parcial vencida",
+        SalesInvoicePaymentStatuses.PartiallyPaid => "Cobro parcial",
+        SalesInvoicePaymentStatuses.Paid => "Cobrada",
+        _ => status
+    };
+
+    private static string GetPaymentStatusClass(string status, bool isOverdue) => status switch
+    {
+        SalesInvoicePaymentStatuses.Paid => "success",
+        _ when isOverdue => "danger",
+        _ => "warning"
+    };
+
+    private static string FormatAccountingStatus(string status) => status switch
+    {
+        SalesInvoiceAccountingStatuses.Pending => "Pendiente",
+        SalesInvoiceAccountingStatuses.Ready => "Preparada",
+        SalesInvoiceAccountingStatuses.Exported => "Exportada",
+        _ => status
+    };
+
+    private static string GetAccountingStatusClass(string status) => status switch
+    {
+        SalesInvoiceAccountingStatuses.Exported => "success",
+        SalesInvoiceAccountingStatuses.Ready => "warning",
+        _ => "warning"
+    };
+}

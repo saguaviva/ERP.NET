@@ -1,0 +1,465 @@
+@page "/crm/proveedores/nuevo"
+@page "/crm/proveedores/editar/{Code:int}"
+@attribute [Authorize(Roles = "TenantAdmin")]
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IAuditLogService AuditLogService
+@inject ILegacySyncService LegacySyncService
+@inject IProveedorQueries ProveedorQueries
+@inject IProveedorService ProveedorService
+@inject NavigationManager NavigationManager
+
+<PageTitle>@(Code.HasValue ? "Editar proveedor" : "Nuevo proveedor")</PageTitle>
+
+<div class="page-header">
+    <div>
+        <p class="eyebrow">Compras</p>
+        <h1>@(Code.HasValue ? $"Editar proveedor {Code}" : "Nuevo proveedor")</h1>
+        <p class="lead">@(isLegacySyncActive
+            ? "Consulta sobre la réplica SaaS local de prove, en solo lectura mientras el módulo siga sincronizado desde legacy."
+            : "Alta y edición sobre la tabla prove replicada en la SaaS local, filtrada por la empresa activa.")</p>
+    </div>
+    <div class="quick-links">
+        <a class="secondary-button link-button" href="/crm/proveedores">Volver al listado</a>
+    </div>
+</div>
+
+@if (!tenantId.HasValue || !companyId.HasValue)
+{
+    <div class="empty-state">
+        <p>No hay empresa activa seleccionada.</p>
+    </div>
+}
+else
+{
+    @if (!string.IsNullOrWhiteSpace(statusMessage))
+    {
+        <div class="alert @(isError ? "danger" : "success")">@statusMessage</div>
+    }
+
+    @if (isLegacySyncActive)
+    {
+        <div class="alert">
+            Compras / Proveedores está en convivencia con legacy para esta empresa.
+            Esta ficha queda en solo lectura mientras la sincronización mande.
+            @if (!string.IsNullOrWhiteSpace(syncStatusLabel))
+            {
+                <span>@syncStatusLabel</span>
+            }
+        </div>
+    }
+
+    <EditForm Model="model" OnValidSubmit="SaveAsync">
+        <fieldset disabled="@isLegacySyncActive">
+        <div class="form-grid">
+            <label class="field">
+                <span>Nombre</span>
+                <InputText class="text-input" @bind-Value="model.Name" />
+            </label>
+            <label class="field">
+                <span>NIF</span>
+                <InputText class="text-input" @bind-Value="model.TaxId" />
+            </label>
+            <label class="field">
+                <span>Contacto</span>
+                <InputText class="text-input" @bind-Value="model.ContactName" />
+            </label>
+            <label class="field">
+                <span>Teléfono</span>
+                <InputText class="text-input" @bind-Value="model.Phone" />
+            </label>
+            <label class="field">
+                <span>Teléfono 2</span>
+                <InputText class="text-input" @bind-Value="model.SecondaryPhone" />
+            </label>
+            <label class="field">
+                <span>Fax</span>
+                <InputText class="text-input" @bind-Value="model.Fax" />
+            </label>
+            <label class="field checkbox-field">
+                <span>Estado</span>
+                <label class="checkbox-row">
+                    <InputCheckbox @bind-Value="model.IsBlocked" />
+                    <span>Proveedor bloqueado</span>
+                </label>
+            </label>
+            <label class="field">
+                <span>Email principal</span>
+                <InputText class="text-input" @bind-Value="model.PrimaryEmail" />
+            </label>
+            <label class="field">
+                <span>Email secundario</span>
+                <InputText class="text-input" @bind-Value="model.SecondaryEmail" />
+            </label>
+            <label class="field">
+                <span>Forma de pago</span>
+                <InputSelect class="text-input" @bind-Value="model.PaymentMethodCode">
+                    <option value="">Selecciona una forma</option>
+                    @foreach (var option in paymentMethods)
+                    {
+                        <option value="@option.Code">@option.Name (@option.Code)</option>
+                    }
+                </InputSelect>
+                @if (SelectedPaymentMethod is not null)
+                {
+                    <span class="field-hint">@(FormatPaymentMethodSummary(SelectedPaymentMethod))</span>
+                }
+            </label>
+            <label class="field">
+                <span>Banco</span>
+                <InputSelect class="text-input" @bind-Value="model.BankCode">
+                    <option value="">Selecciona un banco</option>
+                    @foreach (var option in banks)
+                    {
+                        <option value="@option.Code">@option.Name (@option.Code)</option>
+                    }
+                </InputSelect>
+            </label>
+            <label class="field">
+                <span>Entidad</span>
+                <InputText class="text-input" @bind-Value="model.BankEntityCode" />
+            </label>
+            <label class="field">
+                <span>Oficina</span>
+                <InputText class="text-input" @bind-Value="model.BankOfficeCode" />
+            </label>
+            <label class="field">
+                <span>Dígito control</span>
+                <InputText class="text-input" @bind-Value="model.BankControlDigit" />
+            </label>
+            <label class="field">
+                <span>Cuenta</span>
+                <InputText class="text-input" @bind-Value="model.BankAccountNumber" />
+            </label>
+            <label class="field">
+                <span>Día pago 1</span>
+                <InputNumber class="text-input" @bind-Value="model.PaymentDay1" />
+            </label>
+            <label class="field">
+                <span>Día pago 2</span>
+                <InputNumber class="text-input" @bind-Value="model.PaymentDay2" />
+            </label>
+            <label class="field">
+                <span>Día pago 3</span>
+                <InputNumber class="text-input" @bind-Value="model.PaymentDay3" />
+            </label>
+            <label class="field">
+                <span>IVA</span>
+                <InputSelect class="text-input" @bind-Value="model.TaxCode">
+                    <option value="">Selecciona un IVA</option>
+                    @foreach (var option in vatRates)
+                    {
+                        <option value="@option.Code">@option.Name (@option.Code)</option>
+                    }
+                </InputSelect>
+                @if (SelectedVatRate is not null)
+                {
+                    <span class="field-hint">IVA @FormatPercent(SelectedVatRate.TaxPercent) · RE @FormatPercent(SelectedVatRate.SurchargePercent)</span>
+                }
+            </label>
+            <label class="field">
+                <span>Subcuenta</span>
+                <InputText class="text-input" @bind-Value="model.SubAccount" />
+            </label>
+            <label class="field checkbox-field">
+                <span>Contabilidad</span>
+                <label class="checkbox-row">
+                    <InputCheckbox @bind-Value="model.TransferToAccounting" />
+                    <span>Marcar para traspaso contable</span>
+                </label>
+            </label>
+            <label class="field">
+                <span>IBAN</span>
+                <InputText class="text-input" @bind-Value="model.Iban" />
+            </label>
+            <label class="field">
+                <span>SWIFT</span>
+                <InputText class="text-input" @bind-Value="model.Swift" />
+            </label>
+            <label class="field">
+                <span>Incoterm</span>
+                <InputSelect class="text-input" @bind-Value="model.IncotermCode">
+                    <option value="">Selecciona un incoterm</option>
+                    @foreach (var option in incoterms)
+                    {
+                        <option value="@option.Code">@option.Name (@option.Code)</option>
+                    }
+                </InputSelect>
+            </label>
+            <label class="field wide">
+                <span>Dirección</span>
+                <InputText class="text-input" @bind-Value="model.Address" />
+            </label>
+            <label class="field">
+                <span>Código postal</span>
+                <InputText class="text-input" @bind-Value="model.PostalCode" />
+            </label>
+            <label class="field">
+                <span>Ciudad</span>
+                <InputText class="text-input" @bind-Value="model.City" />
+            </label>
+            <label class="field">
+                <span>Provincia</span>
+                <InputText class="text-input" @bind-Value="model.Province" />
+            </label>
+            <label class="field">
+                <span>País</span>
+                <InputText class="text-input" @bind-Value="model.Country" />
+            </label>
+            <label class="field wide">
+                <span>Web</span>
+                <InputText class="text-input" @bind-Value="model.Website" />
+            </label>
+            <label class="field wide">
+                <span>Notas</span>
+                <InputTextArea class="text-area" @bind-Value="model.Notes" />
+            </label>
+        </div>
+
+        <div class="quick-links" style="margin-top: 1rem;">
+            @if (!isLegacySyncActive)
+            {
+                <button class="primary-button" type="submit">Guardar proveedor</button>
+            }
+            @if (Code.HasValue)
+            {
+                <button class="secondary-button" type="button" @onclick="LoadAuditAsync">Recargar historial</button>
+            }
+        </div>
+        </fieldset>
+    </EditForm>
+
+    @if (Code.HasValue)
+    {
+        <section class="panel" style="margin-top: 1rem;">
+            <h2>Historial reciente del proveedor</h2>
+            <div class="list-block">
+                @if (recentAuditLogs.Count == 0)
+                {
+                    <p class="muted">Todavía no hay eventos auditados para este proveedor.</p>
+                }
+                else
+                {
+                    @foreach (var entry in recentAuditLogs)
+                    {
+                        <article class="list-item">
+                            <strong>@entry.Action</strong>
+                            @if (!string.IsNullOrWhiteSpace(entry.Details))
+                            {
+                                <span>@entry.Details</span>
+                            }
+                            <span>@entry.CreatedUtc.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss")</span>
+                        </article>
+                    }
+                }
+            </div>
+        </section>
+    }
+}
+
+@code {
+    [Parameter]
+    public int? Code { get; set; }
+
+    private Guid? tenantId;
+    private Guid? companyId;
+    private ProveedorDetailDto model = new();
+    private string statusMessage = string.Empty;
+    private bool isError;
+    private bool isLegacySyncActive;
+    private string syncStatusLabel = string.Empty;
+    private IReadOnlyCollection<AuditLogEntryDto> recentAuditLogs = [];
+    private IReadOnlyCollection<ProveedorCatalogOptionDto> paymentMethods = [];
+    private IReadOnlyCollection<ProveedorCatalogOptionDto> banks = [];
+    private IReadOnlyCollection<ProveedorCatalogOptionDto> vatRates = [];
+    private IReadOnlyCollection<ProveedorCatalogOptionDto> incoterms = [];
+
+    private ProveedorCatalogOptionDto? SelectedPaymentMethod =>
+        paymentMethods.FirstOrDefault(option => string.Equals(option.Code, model.PaymentMethodCode, StringComparison.OrdinalIgnoreCase));
+
+    private ProveedorCatalogOptionDto? SelectedVatRate =>
+        vatRates.FirstOrDefault(option => string.Equals(option.Code, model.TaxCode, StringComparison.OrdinalIgnoreCase));
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        tenantId = user.GetTenantId();
+        companyId = user.GetActiveCompanyId();
+
+        if (!tenantId.HasValue || !companyId.HasValue)
+        {
+            return;
+        }
+
+        await LoadSyncStatusAsync();
+        paymentMethods = await ProveedorQueries.GetPaymentMethodsAsync();
+        banks = await ProveedorQueries.GetBanksAsync();
+        vatRates = await ProveedorQueries.GetVatRatesAsync(tenantId.Value, companyId.Value);
+        incoterms = await ProveedorQueries.GetIncotermsAsync();
+
+        if (Code.HasValue)
+        {
+            var detail = await ProveedorQueries.GetByCodeAsync(tenantId.Value, companyId.Value, Code.Value);
+            if (detail is null)
+            {
+                statusMessage = "No se ha encontrado el proveedor solicitado.";
+                isError = true;
+                model = new ProveedorDetailDto();
+                recentAuditLogs = [];
+                return;
+            }
+
+            model = detail;
+            await LoadAuditAsync();
+        }
+        else
+        {
+            model = new ProveedorDetailDto();
+            recentAuditLogs = [];
+        }
+    }
+
+    private async Task SaveAsync()
+    {
+        if (!tenantId.HasValue || !companyId.HasValue)
+        {
+            return;
+        }
+
+        if (isLegacySyncActive)
+        {
+            statusMessage = "Compras / Proveedores está en convivencia con legacy para esta empresa. La ficha queda en solo lectura.";
+            isError = true;
+            return;
+        }
+
+        try
+        {
+            statusMessage = string.Empty;
+            isError = false;
+
+            var code = await ProveedorService.SaveAsync(new SaveProveedorCommand
+            {
+                TenantId = tenantId.Value,
+                CompanyId = companyId.Value,
+                Code = Code,
+                Name = model.Name,
+                TaxId = model.TaxId,
+                Address = model.Address,
+                PostalCode = model.PostalCode,
+                City = model.City,
+                Province = model.Province,
+                Country = model.Country,
+                ContactName = model.ContactName,
+                Phone = model.Phone,
+                SecondaryPhone = model.SecondaryPhone,
+                Fax = model.Fax,
+                IsBlocked = model.IsBlocked,
+                PrimaryEmail = model.PrimaryEmail,
+                SecondaryEmail = model.SecondaryEmail,
+                PaymentMethodCode = model.PaymentMethodCode,
+                BankCode = model.BankCode,
+                BankEntityCode = model.BankEntityCode,
+                BankOfficeCode = model.BankOfficeCode,
+                BankControlDigit = model.BankControlDigit,
+                BankAccountNumber = model.BankAccountNumber,
+                PaymentDay1 = model.PaymentDay1,
+                PaymentDay2 = model.PaymentDay2,
+                PaymentDay3 = model.PaymentDay3,
+                TaxCode = model.TaxCode,
+                SubAccount = model.SubAccount,
+                TransferToAccounting = model.TransferToAccounting,
+                Iban = model.Iban,
+                Swift = model.Swift,
+                IncotermCode = model.IncotermCode,
+                Website = model.Website,
+                Notes = model.Notes
+            });
+
+            statusMessage = Code.HasValue
+                ? "Proveedor actualizado correctamente."
+                : "Proveedor creado correctamente.";
+
+            if (!Code.HasValue)
+            {
+                NavigationManager.NavigateTo($"/crm/proveedores/editar/{code}", forceLoad: false);
+                return;
+            }
+
+            await LoadAuditAsync();
+        }
+        catch (Exception exception)
+        {
+            statusMessage = exception.Message;
+            isError = true;
+        }
+    }
+
+    private async Task LoadSyncStatusAsync()
+    {
+        isLegacySyncActive = false;
+        syncStatusLabel = string.Empty;
+
+        if (!tenantId.HasValue || !companyId.HasValue)
+        {
+            return;
+        }
+
+        var status = (await LegacySyncService.GetModuleStatusesAsync(tenantId.Value))
+            .FirstOrDefault(item =>
+                item.CompanyId == companyId.Value &&
+                string.Equals(item.ModuleKey, LegacySyncModuleKeys.CrmSuppliers, StringComparison.OrdinalIgnoreCase));
+
+        if (status is null || !status.HasSuccessfulSync)
+        {
+            return;
+        }
+
+        isLegacySyncActive = true;
+        syncStatusLabel = status.LastCompletedUtc.HasValue
+            ? $"Última sync: {status.LastCompletedUtc.Value.ToLocalTime():dd/MM/yyyy HH:mm:ss} · Ins: {status.LastInserted} · Act: {status.LastUpdated} · Omi: {status.LastSkipped} · Err: {status.LastErrors}"
+            : $"Estado: {status.LastStatus}";
+    }
+
+    private async Task LoadAuditAsync()
+    {
+        if (!tenantId.HasValue || !Code.HasValue)
+        {
+            recentAuditLogs = [];
+            return;
+        }
+
+        recentAuditLogs = await AuditLogService.GetRecentAsync(
+            limit: 15,
+            tenantId: tenantId.Value,
+            entityName: "Proveedor",
+            entityId: Code.Value.ToString());
+    }
+
+    private static string FormatPaymentMethodSummary(ProveedorCatalogOptionDto option)
+    {
+        var fragments = new List<string>();
+
+        if (option.NumberOfPayments.HasValue)
+        {
+            fragments.Add($"{option.NumberOfPayments.Value} pagos");
+        }
+
+        if (option.PaymentDays.HasValue)
+        {
+            fragments.Add($"{option.PaymentDays.Value} días");
+        }
+
+        if (option.FirstPaymentDays.HasValue)
+        {
+            fragments.Add($"1er vencimiento {option.FirstPaymentDays.Value} días");
+        }
+
+        return fragments.Count == 0 ? "Sin detalle legacy adicional." : string.Join(" · ", fragments);
+    }
+
+    private static string FormatPercent(decimal? value)
+    {
+        return value.HasValue ? $"{value.Value:0.##}%" : "-";
+    }
+}

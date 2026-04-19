@@ -1,0 +1,228 @@
+@page "/ventas/albaranes/{ShipmentNumber:int}/pdf"
+@layout EmptyLayout
+@attribute [Authorize(Roles = "TenantAdmin,TenantReader")]
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject ISalesOrderQueries SalesOrderQueries
+
+<PageTitle>PDF albarán venta @ShipmentNumber</PageTitle>
+
+<div class="document-shell">
+    <div class="document-toolbar no-print">
+        <a class="secondary-button link-button" href="/ventas/albaranes/@ShipmentNumber">Volver al albarán</a>
+        <button class="primary-button" type="button" onclick="window.print()">Guardar como PDF / Imprimir</button>
+    </div>
+
+    @if (!tenantId.HasValue || !companyId.HasValue)
+    {
+        <div class="empty-state document-state">
+            <p>No hay empresa activa seleccionada.</p>
+        </div>
+    }
+    else if (!string.IsNullOrWhiteSpace(errorMessage))
+    {
+        <div class="alert danger document-state">@errorMessage</div>
+    }
+    else if (shipment is null)
+    {
+        <div class="empty-state document-state">
+            <p>No se ha encontrado el albarán solicitado.</p>
+        </div>
+    }
+    else
+    {
+        <section class="document-page">
+            <header class="document-header">
+                <div>
+                    <p class="eyebrow">Albarán de cliente</p>
+                    <h1>@shipment.DisplayNumber</h1>
+                    <p class="muted">Pedido origen @shipment.OrderNumber</p>
+                </div>
+                <div class="document-header-meta">
+                    <div>
+                        <span class="muted">Fecha</span>
+                        <strong>@shipment.ShipmentDate.ToString("dd/MM/yyyy")</strong>
+                    </div>
+                    <div>
+                        <span class="muted">Centro</span>
+                        <strong>@shipment.CompanyLegacyCenterCode</strong>
+                    </div>
+                </div>
+            </header>
+
+            <section class="document-section">
+                <div class="document-grid-two">
+                    <section class="document-box">
+                        <h2>Empresa expedidora</h2>
+                        <p><strong>@shipment.CompanyName</strong></p>
+                        <p class="muted">@shipment.TenantName</p>
+                        <p class="muted">Centro legacy @shipment.CompanyLegacyCenterCode</p>
+                    </section>
+                    <section class="document-box">
+                        <h2>Cliente</h2>
+                        <p><strong>@shipment.ClientName</strong></p>
+                        @if (!string.IsNullOrWhiteSpace(shipment.ClientTaxId))
+                        {
+                            <p class="muted">NIF @shipment.ClientTaxId</p>
+                        }
+                        @if (!string.IsNullOrWhiteSpace(ClientLocation))
+                        {
+                            <p class="muted">@ClientLocation</p>
+                        }
+                    </section>
+                </div>
+            </section>
+
+            <section class="document-section">
+                <div class="document-grid-two">
+                    <section class="document-box">
+                        <h2>Cabecera logística</h2>
+                        <div class="document-kv-grid">
+                            <div>
+                                <span class="muted">Almacén</span>
+                                <strong>@DisplayValue(shipment.Warehouse)</strong>
+                            </div>
+                            <div>
+                                <span class="muted">Fecha salida</span>
+                                <strong>@shipment.ShipmentDate.ToString("dd/MM/yyyy")</strong>
+                            </div>
+                            <div>
+                                <span class="muted">Pedido origen</span>
+                                <strong>@shipment.OrderNumber</strong>
+                            </div>
+                        </div>
+                    </section>
+                    <section class="document-box">
+                        <h2>Preparado para facturación</h2>
+                        <div class="document-kv-grid">
+                            <div>
+                                <span class="muted">Estado</span>
+                                <strong>@FormatInvoiceStatus(shipment.InvoiceStatus)</strong>
+                            </div>
+                            <div>
+                                <span class="muted">Referencia factura</span>
+                                <strong>@(shipment.InvoiceDisplayNumber ?? DisplayValue(shipment.InvoiceReference))</strong>
+                            </div>
+                            <div>
+                                <span class="muted">Listo desde</span>
+                                <strong>@(shipment.InvoiceReadyUtc?.ToLocalTime().ToString("dd/MM/yyyy HH:mm") ?? "Sin dato")</strong>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </section>
+
+            <section class="document-section">
+                <h2>Detalle de líneas</h2>
+                <table class="data-table document-table">
+                    <thead>
+                        <tr>
+                            <th>Línea</th>
+                            <th>Descripción</th>
+                            <th>Cantidad</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var line in shipment.Lines)
+                        {
+                            <tr>
+                                <td>@line.LineNumber</td>
+                                <td>@line.Description</td>
+                                <td>@line.ShippedQuantity.ToString("0.###")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </section>
+
+            <section class="document-section">
+                <div class="document-grid-two">
+                    <section class="document-box">
+                        <h2>Resumen</h2>
+                        <div class="document-kv-grid">
+                            <div>
+                                <span class="muted">Albarán</span>
+                                <strong>@shipment.DisplayNumber</strong>
+                            </div>
+                            <div>
+                                <span class="muted">Fecha</span>
+                                <strong>@shipment.ShipmentDate.ToString("dd/MM/yyyy")</strong>
+                            </div>
+                            <div>
+                                <span class="muted">Total expedido</span>
+                                <strong>@shipment.TotalShippedQuantity.ToString("0.###")</strong>
+                            </div>
+                        </div>
+                    </section>
+                    <section class="document-box">
+                        <h2>Notas</h2>
+                        <p>@(string.IsNullOrWhiteSpace(shipment.Notes) ? "Sin observaciones." : shipment.Notes)</p>
+                    </section>
+                </div>
+            </section>
+        </section>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public int ShipmentNumber { get; set; }
+
+    private Guid? tenantId;
+    private Guid? companyId;
+    private SalesOrderShipmentDto? shipment;
+    private string errorMessage = string.Empty;
+
+    private string ClientLocation
+    {
+        get
+        {
+            if (shipment is null)
+            {
+                return string.Empty;
+            }
+
+            var parts = new[]
+            {
+                shipment.ClientAddress,
+                $"{shipment.ClientPostalCode} {shipment.ClientCity}".Trim(),
+                shipment.ClientProvince,
+                shipment.ClientCountry
+            }.Where(part => !string.IsNullOrWhiteSpace(part));
+
+            return string.Join(" · ", parts);
+        }
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        tenantId = user.GetTenantId();
+        companyId = user.GetActiveCompanyId();
+
+        if (!tenantId.HasValue || !companyId.HasValue)
+        {
+            return;
+        }
+
+        try
+        {
+            errorMessage = string.Empty;
+            shipment = await SalesOrderQueries.GetShipmentByNumberAsync(tenantId.Value, companyId.Value, ShipmentNumber);
+        }
+        catch (Exception exception)
+        {
+            errorMessage = exception.Message;
+            shipment = null;
+        }
+    }
+
+    private static string DisplayValue(string value) => string.IsNullOrWhiteSpace(value) ? "Sin dato" : value;
+    private static string FormatInvoiceStatus(string status) => status switch
+    {
+        "Pending" => "Pendiente de facturar",
+        "Drafted" => "En borrador de factura",
+        "Invoiced" => "Facturado",
+        _ => status
+    };
+}

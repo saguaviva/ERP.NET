@@ -6,9 +6,9 @@ namespace Erp.Infrastructure.MySql.Database;
 
 public sealed class MySqlConnectionFactory
 {
-    private readonly IOptions<ErpDatabaseOptions> _options;
+    private readonly IOptions<SaasDatabaseOptions> _options;
 
-    public MySqlConnectionFactory(IOptions<ErpDatabaseOptions> options)
+    public MySqlConnectionFactory(IOptions<SaasDatabaseOptions> options)
     {
         _options = options;
     }
@@ -20,7 +20,7 @@ public sealed class MySqlConnectionFactory
         var settings = _options.Value;
         if (!settings.IsConfigured)
         {
-            throw new InvalidOperationException("ErpDatabase is not configured.");
+            throw new InvalidOperationException("SaasDatabase is not configured.");
         }
 
         var connection = new MySqlConnection(settings.BuildConnectionString());

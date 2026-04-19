@@ -1,5 +1,7 @@
 @page "/login"
 @attribute [AllowAnonymous]
+@inject ITenantAdminService TenantAdminService
+@inject NavigationManager NavigationManager
 
 <PageTitle>Acceso</PageTitle>
 
@@ -12,6 +14,11 @@
         @if (Error == "1")
         {
             <div class="alert danger">Email o contraseña incorrectos.</div>
+        }
+
+        @if (Setup == "1")
+        {
+            <div class="alert success">La instalacion inicial se ha creado correctamente. Ya puedes entrar con el administrador que acabas de definir.</div>
         }
 
         <form class="auth-form" method="post" action="/account/login">
@@ -45,5 +52,17 @@
     [SupplyParameterFromQuery]
     public string? ReturnUrl { get; set; }
 
+    [SupplyParameterFromQuery]
+    public string? Setup { get; set; }
+
     private string ResolvedReturnUrl => string.IsNullOrWhiteSpace(ReturnUrl) ? "/" : ReturnUrl;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var setupStatus = await TenantAdminService.GetSetupStatusAsync();
+        if (setupStatus.CanRunInitialSetup)
+        {
+            NavigationManager.NavigateTo("/onboarding", forceLoad: true);
+        }
+    }
 }

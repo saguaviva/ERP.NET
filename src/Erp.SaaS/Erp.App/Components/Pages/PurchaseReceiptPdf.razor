@@ -1,0 +1,229 @@
+@page "/compras/recepciones/{ReceiptNumber:int}/pdf"
+@layout EmptyLayout
+@attribute [Authorize(Roles = "TenantAdmin,TenantReader")]
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IPurchaseOrderQueries PurchaseOrderQueries
+
+<PageTitle>PDF albarán @ReceiptNumber</PageTitle>
+
+<div class="document-shell">
+    <div class="document-toolbar no-print">
+        <a class="secondary-button link-button" href="/compras/recepciones/@ReceiptNumber">Volver al albarán</a>
+        <button class="primary-button" type="button" onclick="window.print()">Guardar como PDF / Imprimir</button>
+    </div>
+
+    @if (!tenantId.HasValue || !companyId.HasValue)
+    {
+        <div class="empty-state document-state">
+            <p>No hay empresa activa seleccionada.</p>
+        </div>
+    }
+    else if (!string.IsNullOrWhiteSpace(errorMessage))
+    {
+        <div class="alert danger document-state">@errorMessage</div>
+    }
+    else if (receipt is null)
+    {
+        <div class="empty-state document-state">
+            <p>No se ha encontrado la recepción solicitada.</p>
+        </div>
+    }
+    else
+    {
+        <section class="document-page">
+            <header class="document-header">
+                <div>
+                    <p class="eyebrow">Albarán de compra</p>
+                    <h1>@receipt.DisplayNumber</h1>
+                    <p class="muted">Pedido origen @receipt.OrderNumber</p>
+                </div>
+                <div class="document-header-meta">
+                    <div>
+                        <span class="muted">Fecha</span>
+                        <strong>@receipt.ReceiptDate.ToString("dd/MM/yyyy")</strong>
+                    </div>
+                    <div>
+                        <span class="muted">Centro</span>
+                        <strong>@receipt.CompanyLegacyCenterCode</strong>
+                    </div>
+                </div>
+            </header>
+
+            <section class="document-section">
+                <div class="document-grid-two">
+                    <section class="document-box">
+                        <h2>Empresa receptora</h2>
+                        <p><strong>@receipt.CompanyName</strong></p>
+                        <p class="muted">@receipt.TenantName</p>
+                        <p class="muted">Centro legacy @receipt.CompanyLegacyCenterCode</p>
+                    </section>
+                    <section class="document-box">
+                        <h2>Proveedor</h2>
+                        <p><strong>@receipt.SupplierName</strong></p>
+                        @if (!string.IsNullOrWhiteSpace(receipt.SupplierTaxId))
+                        {
+                            <p class="muted">NIF @receipt.SupplierTaxId</p>
+                        }
+                        @if (!string.IsNullOrWhiteSpace(SupplierLocation))
+                        {
+                            <p class="muted">@SupplierLocation</p>
+                        }
+                    </section>
+                </div>
+            </section>
+
+            <section class="document-section">
+                <div class="document-grid-two">
+                    <section class="document-box">
+                        <h2>Cabecera logística</h2>
+                        <div class="document-kv-grid">
+                            <div>
+                                <span class="muted">Almacén</span>
+                                <strong>@DisplayValue(receipt.Warehouse)</strong>
+                            </div>
+                            <div>
+                                <span class="muted">Transportista</span>
+                                <strong>@DisplayValue(receipt.Carrier)</strong>
+                            </div>
+                            <div>
+                                <span class="muted">Referencia proveedor</span>
+                                <strong>@DisplayValue(receipt.SupplierReference)</strong>
+                            </div>
+                            <div>
+                                <span class="muted">Matrícula</span>
+                                <strong>@DisplayValue(receipt.VehiclePlate)</strong>
+                            </div>
+                        </div>
+                    </section>
+                    <section class="document-box">
+                        <h2>Datos de expedición</h2>
+                        <div class="document-kv-grid">
+                            <div>
+                                <span class="muted">Bultos</span>
+                                <strong>@(receipt.PackageCount?.ToString() ?? "Sin dato")</strong>
+                            </div>
+                            <div>
+                                <span class="muted">Peso bruto</span>
+                                <strong>@(receipt.GrossWeightKg.HasValue ? $"{receipt.GrossWeightKg.Value:0.###} kg" : "Sin dato")</strong>
+                            </div>
+                            <div>
+                                <span class="muted">Proveedor</span>
+                                <strong>@receipt.SupplierCode</strong>
+                            </div>
+                            <div>
+                                <span class="muted">Pedido origen</span>
+                                <strong>@receipt.OrderNumber</strong>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </section>
+
+            <section class="document-section">
+                <h2>Detalle de líneas</h2>
+                <table class="data-table document-table">
+                    <thead>
+                        <tr>
+                            <th>Línea</th>
+                            <th>Descripción</th>
+                            <th>Cantidad</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var line in receipt.Lines)
+                        {
+                            <tr>
+                                <td>@line.LineNumber</td>
+                                <td>@line.Description</td>
+                                <td>@line.ReceivedQuantity.ToString("0.###")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </section>
+
+            <section class="document-section">
+                <div class="document-grid-two">
+                    <section class="document-box">
+                        <h2>Resumen</h2>
+                        <div class="document-kv-grid">
+                            <div>
+                                <span class="muted">Albarán</span>
+                                <strong>@receipt.DisplayNumber</strong>
+                            </div>
+                            <div>
+                                <span class="muted">Fecha</span>
+                                <strong>@receipt.ReceiptDate.ToString("dd/MM/yyyy")</strong>
+                            </div>
+                            <div>
+                                <span class="muted">Total recepcionado</span>
+                                <strong>@receipt.TotalReceivedQuantity.ToString("0.###")</strong>
+                            </div>
+                        </div>
+                    </section>
+                    <section class="document-box">
+                        <h2>Notas</h2>
+                        <p>@(string.IsNullOrWhiteSpace(receipt.Notes) ? "Sin observaciones." : receipt.Notes)</p>
+                    </section>
+                </div>
+            </section>
+        </section>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public int ReceiptNumber { get; set; }
+
+    private Guid? tenantId;
+    private Guid? companyId;
+    private PurchaseOrderReceiptDto? receipt;
+    private string errorMessage = string.Empty;
+
+    private string SupplierLocation
+    {
+        get
+        {
+            if (receipt is null)
+            {
+                return string.Empty;
+            }
+
+            var parts = new[]
+            {
+                receipt.SupplierAddress,
+                $"{receipt.SupplierPostalCode} {receipt.SupplierCity}".Trim(),
+                receipt.SupplierProvince,
+                receipt.SupplierCountry
+            }.Where(part => !string.IsNullOrWhiteSpace(part));
+
+            return string.Join(" · ", parts);
+        }
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        tenantId = user.GetTenantId();
+        companyId = user.GetActiveCompanyId();
+
+        if (!tenantId.HasValue || !companyId.HasValue)
+        {
+            return;
+        }
+
+        try
+        {
+            errorMessage = string.Empty;
+            receipt = await PurchaseOrderQueries.GetReceiptByNumberAsync(tenantId.Value, companyId.Value, ReceiptNumber);
+        }
+        catch (Exception exception)
+        {
+            errorMessage = exception.Message;
+            receipt = null;
+        }
+    }
+
+    private static string DisplayValue(string value) => string.IsNullOrWhiteSpace(value) ? "Sin dato" : value;
+}

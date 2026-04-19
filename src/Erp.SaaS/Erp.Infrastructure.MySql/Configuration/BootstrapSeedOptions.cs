@@ -6,7 +6,7 @@ public sealed class BootstrapSeedOptions
 
     public string PlatformAdminEmail { get; set; } = "admin@erp.local";
     public string PlatformAdminDisplayName { get; set; } = "Platform Admin";
-    public string PlatformAdminPassword { get; set; } = "ChangeMe123!";
+    public string PlatformAdminPassword { get; set; } = string.Empty;
     public string InitialTenantName { get; set; } = "Grupo demo";
     public string InitialTenantSlug { get; set; } = "grupo-demo";
     public string InitialCompanyName { get; set; } = "Empresa demo";

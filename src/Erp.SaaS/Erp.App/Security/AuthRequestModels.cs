@@ -17,3 +17,17 @@ public sealed class SwitchCompanyForm
     public Guid CompanyId { get; set; }
     public string? ReturnUrl { get; set; }
 }
+
+public sealed class ChangePasswordForm
+{
+    public string NewPassword { get; set; } = string.Empty;
+    public string ConfirmPassword { get; set; } = string.Empty;
+    public string? ReturnUrl { get; set; }
+}
+
+public sealed class PreviewAccessForm
+{
+    public string Email { get; set; } = string.Empty;
+    public string Password { get; set; } = string.Empty;
+    public string? ReturnUrl { get; set; }
+}

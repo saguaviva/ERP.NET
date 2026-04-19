@@ -1,0 +1,1748 @@
+@page "/administracion"
+@attribute [Authorize(Roles = "TenantAdmin,PlatformAdmin")]
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject ITenantAdminService TenantAdminService
+@inject IAuditLogService AuditLogService
+@inject ILegacySyncService LegacySyncService
+
+<PageTitle>Administración del tenant</PageTitle>
+
+<div class="page-header">
+    <div>
+        <p class="eyebrow">Tenant Admin</p>
+        <h1>Administración del tenant</h1>
+        <p class="lead">Gestiona companies, usuarios y permisos dentro del tenant activo, sin salir del alcance asignado.</p>
+    </div>
+    <div class="quick-links">
+        @if (isPlatformAdmin)
+        {
+            <a class="secondary-button link-button" href="/plataforma">Volver a plataforma</a>
+        }
+    </div>
+</div>
+
+@if (!string.IsNullOrWhiteSpace(statusMessage))
+{
+    <div class="alert @(isError ? "danger" : "success")">@statusMessage</div>
+}
+
+@if (!currentTenantId.HasValue)
+{
+    <div class="empty-state">
+        <p>Tu sesión no tiene un tenant activo. Vuelve a iniciar sesión o selecciona una empresa válida.</p>
+    </div>
+}
+else if (currentTenant is null)
+{
+    <div class="empty-state">
+        <p>No se ha podido cargar el tenant activo.</p>
+    </div>
+}
+else
+{
+    <section class="card-grid">
+        <article class="info-card">
+            <p class="eyebrow">Tenant activo</p>
+            <h2>@currentTenant.Name</h2>
+            <p class="muted">@currentTenant.Slug</p>
+        </article>
+        <article class="info-card">
+            <p class="eyebrow">Companies</p>
+            <h2>@companies.Count</h2>
+            <p class="muted">Empresas operativas dentro del tenant.</p>
+        </article>
+        <article class="info-card">
+            <p class="eyebrow">Usuarios</p>
+            <h2>@users.Count</h2>
+            <p class="muted">Usuarios con acceso al tenant actual.</p>
+        </article>
+        <article class="info-card">
+            <p class="eyebrow">Actividad</p>
+            <h2>@recentAuditLogs.Count</h2>
+            <p class="muted">Eventos recientes del tenant.</p>
+        </article>
+    </section>
+
+    <section class="panel" style="margin-top: 1rem;">
+        <h2>Comportamiento de módulos</h2>
+        <div class="admin-grid">
+            <article class="info-card">
+                <p class="eyebrow">CRM / Clientes</p>
+                <h2>Ámbito de datos</h2>
+                <p class="muted">Decide si el CRM usa una base lógica por company o una base compartida para todo el tenant.</p>
+                <label class="field">
+                    <span>Modo</span>
+                    <InputSelect class="text-input" @bind-Value="crmClientsDataScope">
+                        <option value="@TenantModuleDataScopes.Company">Por empresa activa</option>
+                        <option value="@TenantModuleDataScopes.TenantShared">Compartido en todo el tenant</option>
+                    </InputSelect>
+                </label>
+                <p class="muted">
+                    En modo compartido, el listado y la numeración de clientes pasan a ser tenant-wide.
+                    La persistencia física sigue usando el centro legacy de la empresa activa al crear nuevos registros.
+                </p>
+                <button class="primary-button" type="button" @onclick="SaveCrmClientsScopeAsync">Guardar configuración</button>
+            </article>
+            <article class="info-card">
+                <p class="eyebrow">Ventas / Pedidos</p>
+                <h2>Sync legacy</h2>
+                <p class="muted">Mientras este módulo esté en convivencia, la fuente de verdad sigue siendo TEX.NET y la web consume una réplica controlada.</p>
+                <label class="field">
+                    <span>Company</span>
+                    <InputSelect class="text-input" @bind-Value="selectedSalesOrdersSyncCompanyId">
+                        <option value="">Todas las companies del tenant</option>
+                        @foreach (var company in companies)
+                        {
+                            <option value="@company.Id.ToString()">@company.Name (@company.LegacyCenterCode)</option>
+                        }
+                    </InputSelect>
+                </label>
+                <button class="primary-button" type="button" @onclick="RunSalesOrdersSyncAsync" disabled="@isRunningSalesOrdersSync">
+                    @(isRunningSalesOrdersSync ? "Sincronizando pedidos..." : "Sincronizar ventas / pedidos")
+                </button>
+                <div class="list-block" style="margin-top: 1rem;">
+                    @foreach (var status in salesOrdersSyncStatuses)
+                    {
+                        <article class="list-item">
+                            <strong>@status.CompanyName (@status.CompanyLegacyCenterCode)</strong>
+                            <span>@(string.IsNullOrWhiteSpace(status.LastStatus) ? "Sin sincronizar" : status.LastStatus)</span>
+                            <span>@(status.LastCompletedUtc?.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss") ?? "Nunca")</span>
+                            <span>Ins: @status.LastInserted · Act: @status.LastUpdated · Omi: @status.LastSkipped · Err: @status.LastErrors</span>
+                        </article>
+                    }
+                </div>
+            </article>
+            <article class="info-card">
+                <p class="eyebrow">CRM / Clientes</p>
+                <h2>Sync legacy</h2>
+                <p class="muted">Replica clients y adres desde TEX.NET hacia la SaaS local. Mientras esta sync mande, el CRM web queda en solo lectura para esa company.</p>
+                <label class="field">
+                    <span>Company</span>
+                    <InputSelect class="text-input" @bind-Value="selectedCrmClientsSyncCompanyId">
+                        <option value="">Todas las companies del tenant</option>
+                        @foreach (var company in companies)
+                        {
+                            <option value="@company.Id.ToString()">@company.Name (@company.LegacyCenterCode)</option>
+                        }
+                    </InputSelect>
+                </label>
+                <button class="primary-button" type="button" @onclick="RunCrmClientsSyncAsync" disabled="@isRunningCrmClientsSync">
+                    @(isRunningCrmClientsSync ? "Sincronizando clientes..." : "Sincronizar CRM / clientes")
+                </button>
+                <div class="list-block" style="margin-top: 1rem;">
+                    @foreach (var status in crmClientsSyncStatuses)
+                    {
+                        <article class="list-item">
+                            <strong>@status.CompanyName (@status.CompanyLegacyCenterCode)</strong>
+                            <span>@(string.IsNullOrWhiteSpace(status.LastStatus) ? "Sin sincronizar" : status.LastStatus)</span>
+                            <span>@(status.LastCompletedUtc?.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss") ?? "Nunca")</span>
+                            <span>Ins: @status.LastInserted · Act: @status.LastUpdated · Omi: @status.LastSkipped · Err: @status.LastErrors</span>
+                        </article>
+                    }
+                </div>
+            </article>
+            <article class="info-card">
+                <p class="eyebrow">CRM / Representantes</p>
+                <h2>Sync legacy</h2>
+                <p class="muted">Replica representantes desde TEX.NET hacia la SaaS local. Mientras esta sync mande, la ficha web queda en solo lectura para esa company.</p>
+                <label class="field">
+                    <span>Company</span>
+                    <InputSelect class="text-input" @bind-Value="selectedCrmRepresentativesSyncCompanyId">
+                        <option value="">Todas las companies del tenant</option>
+                        @foreach (var company in companies)
+                        {
+                            <option value="@company.Id.ToString()">@company.Name (@company.LegacyCenterCode)</option>
+                        }
+                    </InputSelect>
+                </label>
+                <button class="primary-button" type="button" @onclick="RunCrmRepresentativesSyncAsync" disabled="@isRunningCrmRepresentativesSync">
+                    @(isRunningCrmRepresentativesSync ? "Sincronizando representantes..." : "Sincronizar CRM / representantes")
+                </button>
+                <div class="list-block" style="margin-top: 1rem;">
+                    @foreach (var status in crmRepresentativesSyncStatuses)
+                    {
+                        <article class="list-item">
+                            <strong>@status.CompanyName (@status.CompanyLegacyCenterCode)</strong>
+                            <span>@(string.IsNullOrWhiteSpace(status.LastStatus) ? "Sin sincronizar" : status.LastStatus)</span>
+                            <span>@(status.LastCompletedUtc?.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss") ?? "Nunca")</span>
+                            <span>Ins: @status.LastInserted · Act: @status.LastUpdated · Omi: @status.LastSkipped · Err: @status.LastErrors</span>
+                        </article>
+                    }
+                </div>
+            </article>
+            <article class="info-card">
+                <p class="eyebrow">CRM / Transportistas</p>
+                <h2>Sync legacy</h2>
+                <p class="muted">Replica transportistas desde TEX.NET hacia la SaaS local. Mientras esta sync mande, la ficha web queda en solo lectura para esa company.</p>
+                <label class="field">
+                    <span>Company</span>
+                    <InputSelect class="text-input" @bind-Value="selectedCrmCarriersSyncCompanyId">
+                        <option value="">Todas las companies del tenant</option>
+                        @foreach (var company in companies)
+                        {
+                            <option value="@company.Id.ToString()">@company.Name (@company.LegacyCenterCode)</option>
+                        }
+                    </InputSelect>
+                </label>
+                <button class="primary-button" type="button" @onclick="RunCrmCarriersSyncAsync" disabled="@isRunningCrmCarriersSync">
+                    @(isRunningCrmCarriersSync ? "Sincronizando transportistas..." : "Sincronizar CRM / transportistas")
+                </button>
+                <div class="list-block" style="margin-top: 1rem;">
+                    @foreach (var status in crmCarriersSyncStatuses)
+                    {
+                        <article class="list-item">
+                            <strong>@status.CompanyName (@status.CompanyLegacyCenterCode)</strong>
+                            <span>@(string.IsNullOrWhiteSpace(status.LastStatus) ? "Sin sincronizar" : status.LastStatus)</span>
+                            <span>@(status.LastCompletedUtc?.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss") ?? "Nunca")</span>
+                            <span>Ins: @status.LastInserted · Act: @status.LastUpdated · Omi: @status.LastSkipped · Err: @status.LastErrors</span>
+                        </article>
+                    }
+                </div>
+            </article>
+            <article class="info-card">
+                <p class="eyebrow">CRM / Talleres</p>
+                <h2>Sync legacy</h2>
+                <p class="muted">Replica talleres desde TEX.NET hacia la SaaS local. Mientras esta sync mande, la ficha web queda en solo lectura para esa company.</p>
+                <label class="field">
+                    <span>Company</span>
+                    <InputSelect class="text-input" @bind-Value="selectedCrmWorkshopsSyncCompanyId">
+                        <option value="">Todas las companies del tenant</option>
+                        @foreach (var company in companies)
+                        {
+                            <option value="@company.Id.ToString()">@company.Name (@company.LegacyCenterCode)</option>
+                        }
+                    </InputSelect>
+                </label>
+                <button class="primary-button" type="button" @onclick="RunCrmWorkshopsSyncAsync" disabled="@isRunningCrmWorkshopsSync">
+                    @(isRunningCrmWorkshopsSync ? "Sincronizando talleres..." : "Sincronizar CRM / talleres")
+                </button>
+                <div class="list-block" style="margin-top: 1rem;">
+                    @foreach (var status in crmWorkshopsSyncStatuses)
+                    {
+                        <article class="list-item">
+                            <strong>@status.CompanyName (@status.CompanyLegacyCenterCode)</strong>
+                            <span>@(string.IsNullOrWhiteSpace(status.LastStatus) ? "Sin sincronizar" : status.LastStatus)</span>
+                            <span>@(status.LastCompletedUtc?.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss") ?? "Nunca")</span>
+                            <span>Ins: @status.LastInserted · Act: @status.LastUpdated · Omi: @status.LastSkipped · Err: @status.LastErrors</span>
+                        </article>
+                    }
+                </div>
+            </article>
+            <article class="info-card">
+                <p class="eyebrow">ARTÍCULOS / Fornituras</p>
+                <h2>Sync legacy</h2>
+                <p class="muted">Replica fornituras desde TEX.NET hacia la SaaS local. Mientras esta sync mande, la ficha web queda en solo lectura para esa company.</p>
+                <label class="field">
+                    <span>Company</span>
+                    <InputSelect class="text-input" @bind-Value="selectedArticleForniturasSyncCompanyId">
+                        <option value="">Todas las companies del tenant</option>
+                        @foreach (var company in companies)
+                        {
+                            <option value="@company.Id.ToString()">@company.Name (@company.LegacyCenterCode)</option>
+                        }
+                    </InputSelect>
+                </label>
+                <button class="primary-button" type="button" @onclick="RunArticleForniturasSyncAsync" disabled="@isRunningArticleForniturasSync">
+                    @(isRunningArticleForniturasSync ? "Sincronizando fornituras..." : "Sincronizar artículos / fornituras")
+                </button>
+                <div class="list-block" style="margin-top: 1rem;">
+                    @foreach (var status in articleForniturasSyncStatuses)
+                    {
+                        <article class="list-item">
+                            <strong>@status.CompanyName (@status.CompanyLegacyCenterCode)</strong>
+                            <span>@(string.IsNullOrWhiteSpace(status.LastStatus) ? "Sin sincronizar" : status.LastStatus)</span>
+                            <span>@(status.LastCompletedUtc?.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss") ?? "Nunca")</span>
+                            <span>Ins: @status.LastInserted · Act: @status.LastUpdated · Omi: @status.LastSkipped · Err: @status.LastErrors</span>
+                        </article>
+                    }
+                </div>
+            </article>
+            <article class="info-card">
+                <p class="eyebrow">Compras / Proveedores</p>
+                <h2>Sync legacy</h2>
+                <p class="muted">Replica proveedores desde TEX.NET hacia la SaaS local. Mientras esta sync mande, la ficha web queda en solo lectura para esa company.</p>
+                <label class="field">
+                    <span>Company</span>
+                    <InputSelect class="text-input" @bind-Value="selectedCrmSuppliersSyncCompanyId">
+                        <option value="">Todas las companies del tenant</option>
+                        @foreach (var company in companies)
+                        {
+                            <option value="@company.Id.ToString()">@company.Name (@company.LegacyCenterCode)</option>
+                        }
+                    </InputSelect>
+                </label>
+                <button class="primary-button" type="button" @onclick="RunCrmSuppliersSyncAsync" disabled="@isRunningCrmSuppliersSync">
+                    @(isRunningCrmSuppliersSync ? "Sincronizando proveedores..." : "Sincronizar compras / proveedores")
+                </button>
+                <div class="list-block" style="margin-top: 1rem;">
+                    @foreach (var status in crmSuppliersSyncStatuses)
+                    {
+                        <article class="list-item">
+                            <strong>@status.CompanyName (@status.CompanyLegacyCenterCode)</strong>
+                            <span>@(string.IsNullOrWhiteSpace(status.LastStatus) ? "Sin sincronizar" : status.LastStatus)</span>
+                            <span>@(status.LastCompletedUtc?.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss") ?? "Nunca")</span>
+                            <span>Ins: @status.LastInserted · Act: @status.LastUpdated · Omi: @status.LastSkipped · Err: @status.LastErrors</span>
+                        </article>
+                    }
+                </div>
+            </article>
+            <article class="info-card">
+                <p class="eyebrow">Compras / Pedidos</p>
+                <h2>Sync legacy</h2>
+                <p class="muted">Replica pedidos de compra desde TEX.NET hacia la SaaS local. Mientras esta sync mande, el módulo web de compras queda en solo lectura para esa company.</p>
+                <label class="field">
+                    <span>Company</span>
+                    <InputSelect class="text-input" @bind-Value="selectedPurchaseOrdersSyncCompanyId">
+                        <option value="">Todas las companies del tenant</option>
+                        @foreach (var company in companies)
+                        {
+                            <option value="@company.Id.ToString()">@company.Name (@company.LegacyCenterCode)</option>
+                        }
+                    </InputSelect>
+                </label>
+                <button class="primary-button" type="button" @onclick="RunPurchaseOrdersSyncAsync" disabled="@isRunningPurchaseOrdersSync">
+                    @(isRunningPurchaseOrdersSync ? "Sincronizando pedidos de compra..." : "Sincronizar compras / pedidos")
+                </button>
+                <div class="list-block" style="margin-top: 1rem;">
+                    @foreach (var status in purchaseOrdersSyncStatuses)
+                    {
+                        <article class="list-item">
+                            <strong>@status.CompanyName (@status.CompanyLegacyCenterCode)</strong>
+                            <span>@(string.IsNullOrWhiteSpace(status.LastStatus) ? "Sin sincronizar" : status.LastStatus)</span>
+                            <span>@(status.LastCompletedUtc?.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss") ?? "Nunca")</span>
+                            <span>Ins: @status.LastInserted · Act: @status.LastUpdated · Omi: @status.LastSkipped · Err: @status.LastErrors</span>
+                        </article>
+                    }
+                </div>
+            </article>
+            <article class="info-card">
+                <p class="eyebrow">Compras / Recepciones</p>
+                <h2>Sync legacy</h2>
+                <p class="muted">Replica albaranes de compra desde TEX.NET hacia la SaaS local. Mientras esta sync mande, las recepciones web quedan en solo lectura para esa company.</p>
+                <label class="field">
+                    <span>Company</span>
+                    <InputSelect class="text-input" @bind-Value="selectedPurchaseReceiptsSyncCompanyId">
+                        <option value="">Todas las companies del tenant</option>
+                        @foreach (var company in companies)
+                        {
+                            <option value="@company.Id.ToString()">@company.Name (@company.LegacyCenterCode)</option>
+                        }
+                    </InputSelect>
+                </label>
+                <button class="primary-button" type="button" @onclick="RunPurchaseReceiptsSyncAsync" disabled="@isRunningPurchaseReceiptsSync">
+                    @(isRunningPurchaseReceiptsSync ? "Sincronizando recepciones..." : "Sincronizar compras / recepciones")
+                </button>
+                <div class="list-block" style="margin-top: 1rem;">
+                    @foreach (var status in purchaseReceiptsSyncStatuses)
+                    {
+                        <article class="list-item">
+                            <strong>@status.CompanyName (@status.CompanyLegacyCenterCode)</strong>
+                            <span>@(string.IsNullOrWhiteSpace(status.LastStatus) ? "Sin sincronizar" : status.LastStatus)</span>
+                            <span>@(status.LastCompletedUtc?.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss") ?? "Nunca")</span>
+                            <span>Ins: @status.LastInserted · Act: @status.LastUpdated · Omi: @status.LastSkipped · Err: @status.LastErrors</span>
+                        </article>
+                    }
+                </div>
+            </article>
+            <article class="info-card">
+                <p class="eyebrow">Almacén / Stock</p>
+                <h2>Sync legacy</h2>
+                <p class="muted">Replica artículos y saldo actual desde TEX.NET hacia la SaaS local. Mientras esta sync mande, el stock web pasa a leer la réplica y los ajustes manuales quedan en solo lectura para esa company.</p>
+                <label class="field">
+                    <span>Company</span>
+                    <InputSelect class="text-input" @bind-Value="selectedStockItemsSyncCompanyId">
+                        <option value="">Todas las companies del tenant</option>
+                        @foreach (var company in companies)
+                        {
+                            <option value="@company.Id.ToString()">@company.Name (@company.LegacyCenterCode)</option>
+                        }
+                    </InputSelect>
+                </label>
+                <button class="primary-button" type="button" @onclick="RunStockItemsSyncAsync" disabled="@isRunningStockItemsSync">
+                    @(isRunningStockItemsSync ? "Sincronizando stock..." : "Sincronizar stock / artículos")
+                </button>
+                <div class="list-block" style="margin-top: 1rem;">
+                    @foreach (var status in stockItemsSyncStatuses)
+                    {
+                        <article class="list-item">
+                            <strong>@status.CompanyName (@status.CompanyLegacyCenterCode)</strong>
+                            <span>@(string.IsNullOrWhiteSpace(status.LastStatus) ? "Sin sincronizar" : status.LastStatus)</span>
+                            <span>@(status.LastCompletedUtc?.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss") ?? "Nunca")</span>
+                            <span>Ins: @status.LastInserted · Act: @status.LastUpdated · Omi: @status.LastSkipped · Err: @status.LastErrors</span>
+                        </article>
+                    }
+                </div>
+            </article>
+            <article class="info-card">
+                <p class="eyebrow">Ventas / Albaranes</p>
+                <h2>Sync legacy</h2>
+                <p class="muted">Replica albaranes desde TEX.NET hacia la SaaS local. Mientras esta sync mande, la expedición web y la pre-facturación quedan en solo lectura para esa company.</p>
+                <label class="field">
+                    <span>Company</span>
+                    <InputSelect class="text-input" @bind-Value="selectedSalesShipmentsSyncCompanyId">
+                        <option value="">Todas las companies del tenant</option>
+                        @foreach (var company in companies)
+                        {
+                            <option value="@company.Id.ToString()">@company.Name (@company.LegacyCenterCode)</option>
+                        }
+                    </InputSelect>
+                </label>
+                <button class="primary-button" type="button" @onclick="RunSalesShipmentsSyncAsync" disabled="@isRunningSalesShipmentsSync">
+                    @(isRunningSalesShipmentsSync ? "Sincronizando albaranes..." : "Sincronizar ventas / albaranes")
+                </button>
+                <div class="list-block" style="margin-top: 1rem;">
+                    @foreach (var status in salesShipmentsSyncStatuses)
+                    {
+                        <article class="list-item">
+                            <strong>@status.CompanyName (@status.CompanyLegacyCenterCode)</strong>
+                            <span>@(string.IsNullOrWhiteSpace(status.LastStatus) ? "Sin sincronizar" : status.LastStatus)</span>
+                            <span>@(status.LastCompletedUtc?.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss") ?? "Nunca")</span>
+                            <span>Ins: @status.LastInserted · Act: @status.LastUpdated · Omi: @status.LastSkipped · Err: @status.LastErrors</span>
+                        </article>
+                    }
+                </div>
+            </article>
+            <article class="info-card">
+                <p class="eyebrow">Ventas / Facturas</p>
+                <h2>Sync legacy</h2>
+                <p class="muted">Replica facturas desde TEX.NET hacia la SaaS local. Mientras esta sync mande, las facturas web quedan en solo lectura y pendientes del origen legacy.</p>
+                <label class="field">
+                    <span>Company</span>
+                    <InputSelect class="text-input" @bind-Value="selectedSalesInvoicesSyncCompanyId">
+                        <option value="">Todas las companies del tenant</option>
+                        @foreach (var company in companies)
+                        {
+                            <option value="@company.Id.ToString()">@company.Name (@company.LegacyCenterCode)</option>
+                        }
+                    </InputSelect>
+                </label>
+                <button class="primary-button" type="button" @onclick="RunSalesInvoicesSyncAsync" disabled="@isRunningSalesInvoicesSync">
+                    @(isRunningSalesInvoicesSync ? "Sincronizando facturas..." : "Sincronizar ventas / facturas")
+                </button>
+                <div class="list-block" style="margin-top: 1rem;">
+                    @foreach (var status in salesInvoicesSyncStatuses)
+                    {
+                        <article class="list-item">
+                            <strong>@status.CompanyName (@status.CompanyLegacyCenterCode)</strong>
+                            <span>@(string.IsNullOrWhiteSpace(status.LastStatus) ? "Sin sincronizar" : status.LastStatus)</span>
+                            <span>@(status.LastCompletedUtc?.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss") ?? "Nunca")</span>
+                            <span>Ins: @status.LastInserted · Act: @status.LastUpdated · Omi: @status.LastSkipped · Err: @status.LastErrors</span>
+                        </article>
+                    }
+                </div>
+            </article>
+        </div>
+    </section>
+
+    <div class="admin-grid">
+        <section class="panel">
+            <h2>Nueva company</h2>
+            <EditForm Model="companyForm" OnValidSubmit="CreateCompanyAsync">
+                <div class="stack">
+                    <label class="field">
+                        <span>Nombre</span>
+                        <InputText class="text-input" @bind-Value="companyForm.Name" />
+                    </label>
+                    <label class="field">
+                        <span>Slug</span>
+                        <InputText class="text-input" @bind-Value="companyForm.Slug" />
+                    </label>
+                    <label class="field">
+                        <span>Centro legacy</span>
+                        @if (GetAvailableLegacyCenters().Any())
+                        {
+                            <InputSelect class="text-input" @bind-Value="companyForm.LegacyCenterCode">
+                                <option value="">Selecciona centro legacy</option>
+                                @foreach (var center in GetAvailableLegacyCenters())
+                                {
+                                    <option value="@center.Code">@FormatLegacyCenter(center)</option>
+                                }
+                            </InputSelect>
+                        }
+                        else
+                        {
+                            <InputText class="text-input" @bind-Value="companyForm.LegacyCenterCode" />
+                        }
+                    </label>
+                    <p class="muted">Cada company del tenant debe usar un centro legacy distinto.</p>
+                    <button class="primary-button" type="submit">Crear company</button>
+                </div>
+            </EditForm>
+        </section>
+
+        <section class="panel">
+            <h2>Nuevo usuario</h2>
+            <EditForm Model="userForm" OnValidSubmit="CreateUserAsync">
+                <div class="stack">
+                    <label class="field">
+                        <span>Nombre</span>
+                        <InputText class="text-input" @bind-Value="userForm.DisplayName" />
+                    </label>
+                    <label class="field">
+                        <span>Email</span>
+                        <InputText class="text-input" @bind-Value="userForm.Email" />
+                    </label>
+                    <label class="field">
+                        <span>Contraseña</span>
+                        <InputText class="text-input" @bind-Value="userForm.Password" />
+                    </label>
+                    <div class="field">
+                        <span>Companies</span>
+                        <div class="checkbox-list">
+                            @foreach (var company in companies)
+                            {
+                                <label class="checkbox-field compact">
+                                    <input type="checkbox" checked="@userForm.SelectedCompanyIds.Contains(company.Id)" @onchange="args => ToggleCompany(company.Id, args.Value)" />
+                                    <span>@company.Name (@company.LegacyCenterCode)</span>
+                                </label>
+                            }
+                        </div>
+                    </div>
+                    <div class="field">
+                        <span>Roles</span>
+                        <div class="checkbox-list">
+                            @foreach (var role in TenantRoles)
+                            {
+                                <label class="checkbox-field compact">
+                                    <input type="checkbox" checked="@userForm.SelectedRoles.Contains(role)" @onchange="args => ToggleRole(role, args.Value)" />
+                                    <span>@role</span>
+                                </label>
+                            }
+                        </div>
+                    </div>
+                    <button class="primary-button" type="submit">Crear usuario</button>
+                </div>
+            </EditForm>
+        </section>
+
+        <section class="panel">
+            <h2>Companies del tenant</h2>
+            <div class="list-block">
+                @if (companies.Count == 0)
+                {
+                    <p class="muted">Todavía no hay companies dadas de alta.</p>
+                }
+                else
+                {
+                    @foreach (var company in companies)
+                    {
+                        <article class="list-item">
+                            <strong>@company.Name</strong>
+                            <span>@company.LegacyCenterCode · @company.Slug</span>
+                            <span>@(company.IsActive ? "Activa" : "Inactiva")</span>
+                            <div class="quick-links">
+                                @if (editingCompanyId == company.Id)
+                                {
+                                    <button class="secondary-button" type="button" @onclick="() => SaveCompanyLegacyCenterAsync(company)" disabled="@RequiresCompanyChangeConfirmation(company)">
+                                        Guardar centro
+                                    </button>
+                                    <button class="secondary-button" type="button" @onclick="CancelCompanyEdit">Cancelar</button>
+                                }
+                                else
+                                {
+                                    <button class="secondary-button" type="button" @onclick="() => BeginCompanyEditAsync(company)">Cambiar centro</button>
+                                }
+                            </div>
+                        </article>
+
+                        @if (editingCompanyId == company.Id)
+                        {
+                            <article class="list-item">
+                                <strong>Centro legacy para @company.Name</strong>
+                                <label class="field">
+                                    <span>Centro legacy</span>
+                                    @if (GetLegacyCentersForCompanyEdit(company).Any())
+                                    {
+                                        <InputSelect class="text-input" @bind-Value="editingCompanyLegacyCenterCode">
+                                            <option value="">Selecciona centro legacy</option>
+                                            @foreach (var center in GetLegacyCentersForCompanyEdit(company))
+                                            {
+                                                <option value="@center.Code">@FormatLegacyCenter(center)</option>
+                                            }
+                                        </InputSelect>
+                                    }
+                                    else
+                                    {
+                                        <InputText class="text-input" @bind-Value="editingCompanyLegacyCenterCode" />
+                                    }
+                                </label>
+                                @if (editingCompanyImpact is not null && editingCompanyImpact.HasUsage)
+                                {
+                                    <div class="alert danger">
+                                        <strong>Impacto detectado</strong>
+                                        <span>Usuarios asignados: @editingCompanyImpact.AssignedUsersCount</span>
+                                        <span>Clientes en centro actual: @editingCompanyImpact.ClientCount</span>
+                                        <span>Proveedores en centro actual: @editingCompanyImpact.SupplierCount</span>
+                                        <span>Compras en centro actual: @editingCompanyImpact.PurchaseDocumentCount</span>
+                                        <span>Ventas en centro actual: @editingCompanyImpact.SalesDocumentCount</span>
+                                        <span>Eventos auditados: @editingCompanyImpact.AuditEventCount</span>
+                                    </div>
+                                    <label class="checkbox-field">
+                                        <input type="checkbox" @bind="confirmCompanyLegacyCenterChange" />
+                                        <span>Confirmo que quiero cambiar el centro legacy de esta company aunque ya tenga uso real.</span>
+                                    </label>
+                                }
+                            </article>
+                        }
+                    }
+                }
+            </div>
+        </section>
+    </div>
+
+    <div class="admin-grid">
+        <section class="panel">
+            <h2>Usuarios del tenant</h2>
+            <div class="list-block">
+                @if (users.Count == 0)
+                {
+                    <p class="muted">Todavía no hay usuarios en este tenant.</p>
+                }
+                else
+                {
+                    @foreach (var user in users)
+                    {
+                        <article class="list-item">
+                            <strong>@user.DisplayName</strong>
+                            <span>@user.Email</span>
+                            <span>@(user.IsActive ? "Activo" : "Inactivo")</span>
+                            <span>@FormatUserCompanies(user)</span>
+                            <span>@string.Join(", ", user.Roles)</span>
+                            <div class="quick-links">
+                                @if (editingUserId == user.Id)
+                                {
+                                    <button class="secondary-button" type="button" @onclick="() => SaveUserAccessAsync(user)">Guardar permisos</button>
+                                    <button class="secondary-button" type="button" @onclick="CancelUserEdit">Cancelar</button>
+                                }
+                                else
+                                {
+                                    <button class="secondary-button" type="button" @onclick="() => BeginUserEdit(user)">Editar accesos</button>
+                                }
+
+                                @if (passwordEditorUserId == user.Id)
+                                {
+                                    <button class="secondary-button" type="button" @onclick="() => SaveUserPasswordAsync(user)">Guardar contraseña</button>
+                                    <button class="secondary-button" type="button" @onclick="CancelPasswordEdit">Cancelar contraseña</button>
+                                }
+                                else
+                                {
+                                    <button class="secondary-button" type="button" @onclick="() => BeginPasswordEdit(user)">Cambiar contraseña</button>
+                                }
+
+                                @if (CanToggleUserActive(user))
+                                {
+                                    <button class="secondary-button" type="button" @onclick="() => ToggleUserActiveAsync(user)">
+                                        @(user.IsActive ? "Desactivar" : "Activar")
+                                    </button>
+                                }
+                                else
+                                {
+                                    <span class="muted">@GetUserActiveToggleBlockedReason(user)</span>
+                                }
+                            </div>
+                        </article>
+
+                        @if (editingUserId == user.Id)
+                        {
+                            <article class="list-item">
+                                <strong>Editar accesos de @user.DisplayName</strong>
+                                <div class="field">
+                                    <span>Companies</span>
+                                    <div class="checkbox-list">
+                                        @foreach (var company in companies)
+                                        {
+                                            <label class="checkbox-field compact">
+                                                <input type="checkbox"
+                                                       checked="@editingCompanyIds.Contains(company.Id)"
+                                                       disabled="@IsEditingCompanyLocked(user, company.Id)"
+                                                       @onchange="args => ToggleEditingCompany(company.Id, args.Value)" />
+                                                <span>@company.Name (@company.LegacyCenterCode)</span>
+                                            </label>
+                                        }
+                                    </div>
+                                    @if (IsSelf(user) && !isPlatformAdmin)
+                                    {
+                                        <p class="muted">Debes conservar al menos una company y no puedes quitarte la company activa.</p>
+                                    }
+                                </div>
+                                <div class="field">
+                                    <span>Roles</span>
+                                    <div class="checkbox-list">
+                                        @foreach (var role in TenantRoles)
+                                        {
+                                            <label class="checkbox-field compact">
+                                                <input type="checkbox"
+                                                       checked="@editingRoles.Contains(role)"
+                                                       disabled="@IsEditingRoleLocked(user, role)"
+                                                       @onchange="args => ToggleEditingRole(role, args.Value)" />
+                                                <span>@role</span>
+                                            </label>
+                                        }
+                                    </div>
+                                    @if (IsSelf(user) && !isPlatformAdmin)
+                                    {
+                                        <p class="muted">No puedes quitarte el rol TenantAdmin desde esta pantalla.</p>
+                                    }
+                                    else if (IsLastActiveTenantAdmin(user))
+                                    {
+                                        <p class="muted">El tenant debe conservar al menos un TenantAdmin activo.</p>
+                                    }
+                                </div>
+                            </article>
+                        }
+
+                        @if (passwordEditorUserId == user.Id)
+                        {
+                            <article class="list-item">
+                                <strong>Nueva contraseña para @user.DisplayName</strong>
+                                <label class="field">
+                                    <span>Contraseña nueva</span>
+                                    <InputText class="text-input" type="password" @bind-Value="passwordEditorValue" />
+                                </label>
+                                <p class="muted">Usa al menos 8 caracteres. El cambio se guarda al pulsar “Guardar contraseña”.</p>
+                            </article>
+                        }
+                    }
+                }
+            </div>
+        </section>
+
+        <section class="panel">
+            <h2>Actividad reciente</h2>
+            <div class="list-block">
+                @if (recentAuditLogs.Count == 0)
+                {
+                    <p class="muted">Todavía no hay eventos auditados en este tenant.</p>
+                }
+                else
+                {
+                    @foreach (var entry in recentAuditLogs)
+                    {
+                        <article class="list-item">
+                            <strong>@entry.Action · @entry.EntityName</strong>
+                            <span>@FormatAuditActor(entry)</span>
+                            <span>@FormatAuditScope(entry)</span>
+                            @if (!string.IsNullOrWhiteSpace(entry.Details))
+                            {
+                                <span>@entry.Details</span>
+                            }
+                            <span>@entry.CreatedUtc.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss")</span>
+                        </article>
+                    }
+                }
+            </div>
+        </section>
+
+        <section class="panel">
+            <h2>Sincronizaciones legacy recientes</h2>
+            <div class="list-block">
+                @if (recentSyncJobs.Count == 0)
+                {
+                    <p class="muted">Todavía no hay jobs de sincronización registrados para este tenant.</p>
+                }
+                else
+                {
+                    @foreach (var job in recentSyncJobs)
+                    {
+                        <article class="list-item">
+                            <strong>@job.ModuleDisplayName · @job.CompanyName (@job.CompanyLegacyCenterCode)</strong>
+                            <span>@job.Status</span>
+                            <span>Ins: @job.RecordsInserted · Act: @job.RecordsUpdated · Omi: @job.RecordsSkipped · Err: @job.ErrorsCount</span>
+                            @if (!string.IsNullOrWhiteSpace(job.CheckpointAfter))
+                            {
+                                <span>Checkpoint: @job.CheckpointAfter</span>
+                            }
+                            @if (!string.IsNullOrWhiteSpace(job.Summary))
+                            {
+                                <span>@job.Summary</span>
+                            }
+                            <span>@job.StartedUtc.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss")</span>
+                        </article>
+                    }
+                }
+            </div>
+        </section>
+    </div>
+}
+
+@code {
+    private static readonly string[] TenantRoles = [PlatformRoles.TenantAdmin, PlatformRoles.TenantReader];
+
+    private Guid? currentTenantId;
+    private Guid? currentUserId;
+    private Guid? activeCompanyId;
+    private bool isPlatformAdmin;
+    private TenantSummaryDto? currentTenant;
+    private IReadOnlyCollection<TenantSummaryDto> tenants = [];
+    private IReadOnlyCollection<CompanySummaryDto> companies = [];
+    private IReadOnlyCollection<LegacyCenterOptionDto> legacyCenters = [];
+    private IReadOnlyCollection<TenantModuleSettingDto> moduleSettings = [];
+    private IReadOnlyCollection<UserSummaryDto> users = [];
+    private IReadOnlyCollection<AuditLogEntryDto> recentAuditLogs = [];
+    private IReadOnlyCollection<LegacySyncModuleStatusDto> syncStatuses = [];
+    private IReadOnlyCollection<LegacySyncJobSummaryDto> recentSyncJobs = [];
+    private CompanyFormModel companyForm = new();
+    private UserFormModel userForm = new();
+    private string statusMessage = string.Empty;
+    private bool isError;
+    private string crmClientsDataScope = TenantModuleDataScopes.Company;
+    private bool isRunningCrmClientsSync;
+    private string selectedCrmClientsSyncCompanyId = string.Empty;
+    private bool isRunningCrmRepresentativesSync;
+    private string selectedCrmRepresentativesSyncCompanyId = string.Empty;
+    private bool isRunningCrmCarriersSync;
+    private string selectedCrmCarriersSyncCompanyId = string.Empty;
+    private bool isRunningCrmWorkshopsSync;
+    private string selectedCrmWorkshopsSyncCompanyId = string.Empty;
+    private bool isRunningArticleForniturasSync;
+    private string selectedArticleForniturasSyncCompanyId = string.Empty;
+    private bool isRunningCrmSuppliersSync;
+    private string selectedCrmSuppliersSyncCompanyId = string.Empty;
+    private bool isRunningPurchaseOrdersSync;
+    private string selectedPurchaseOrdersSyncCompanyId = string.Empty;
+    private bool isRunningPurchaseReceiptsSync;
+    private string selectedPurchaseReceiptsSyncCompanyId = string.Empty;
+    private bool isRunningStockItemsSync;
+    private string selectedStockItemsSyncCompanyId = string.Empty;
+    private bool isRunningSalesOrdersSync;
+    private string selectedSalesOrdersSyncCompanyId = string.Empty;
+    private bool isRunningSalesShipmentsSync;
+    private string selectedSalesShipmentsSyncCompanyId = string.Empty;
+    private bool isRunningSalesInvoicesSync;
+    private string selectedSalesInvoicesSyncCompanyId = string.Empty;
+    private Guid? editingCompanyId;
+    private string editingCompanyLegacyCenterCode = string.Empty;
+    private CompanyLegacyCenterImpactDto? editingCompanyImpact;
+    private bool confirmCompanyLegacyCenterChange;
+    private Guid? editingUserId;
+    private HashSet<Guid> editingCompanyIds = [];
+    private HashSet<string> editingRoles = [];
+    private Guid? passwordEditorUserId;
+    private string passwordEditorValue = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        currentUserId = user.GetUserId();
+        currentTenantId = user.GetTenantId();
+        activeCompanyId = user.GetActiveCompanyId();
+        isPlatformAdmin = user.IsPlatformAdmin();
+
+        await ReloadAsync();
+    }
+
+    private async Task ReloadAsync()
+    {
+        if (!currentTenantId.HasValue)
+        {
+            tenants = [];
+            companies = [];
+            legacyCenters = [];
+            users = [];
+            recentAuditLogs = [];
+            currentTenant = null;
+            return;
+        }
+
+        tenants = await TenantAdminService.GetTenantsAsync();
+        currentTenant = tenants.FirstOrDefault(tenant => tenant.Id == currentTenantId.Value)
+            ?? tenants.FirstOrDefault();
+
+        if (currentTenant is null)
+        {
+            companies = [];
+            legacyCenters = [];
+            users = [];
+            recentAuditLogs = [];
+            return;
+        }
+
+        companies = await TenantAdminService.GetCompaniesAsync(currentTenant.Id);
+        legacyCenters = await TenantAdminService.GetLegacyCentersAsync(currentTenant.Id);
+        moduleSettings = await TenantAdminService.GetModuleSettingsAsync(currentTenant.Id);
+        users = await TenantAdminService.GetUsersAsync(currentTenant.Id);
+        recentAuditLogs = await AuditLogService.GetRecentAsync(limit: 30, tenantId: currentTenant.Id);
+        syncStatuses = await LegacySyncService.GetModuleStatusesAsync(currentTenant.Id);
+        recentSyncJobs = await LegacySyncService.GetRecentJobsAsync(currentTenant.Id, limit: 20);
+        crmClientsDataScope = moduleSettings
+            .FirstOrDefault(item => string.Equals(item.ModuleKey, TenantModuleKeys.CrmClients, StringComparison.OrdinalIgnoreCase))
+            ?.DataScope ?? TenantModuleDataScopes.Company;
+        SelectFirstAvailableLegacyCenter();
+    }
+
+    private IReadOnlyCollection<LegacySyncModuleStatusDto> salesOrdersSyncStatuses =>
+        syncStatuses
+            .Where(status => string.Equals(status.ModuleKey, LegacySyncModuleKeys.SalesOrders, StringComparison.OrdinalIgnoreCase))
+            .OrderBy(status => status.CompanyName, StringComparer.CurrentCultureIgnoreCase)
+            .ToArray();
+
+    private IReadOnlyCollection<LegacySyncModuleStatusDto> crmClientsSyncStatuses =>
+        syncStatuses
+            .Where(status => string.Equals(status.ModuleKey, LegacySyncModuleKeys.CrmClients, StringComparison.OrdinalIgnoreCase))
+            .OrderBy(status => status.CompanyName, StringComparer.CurrentCultureIgnoreCase)
+            .ToArray();
+
+    private IReadOnlyCollection<LegacySyncModuleStatusDto> crmRepresentativesSyncStatuses =>
+        syncStatuses
+            .Where(status => string.Equals(status.ModuleKey, LegacySyncModuleKeys.CrmRepresentatives, StringComparison.OrdinalIgnoreCase))
+            .OrderBy(status => status.CompanyName, StringComparer.CurrentCultureIgnoreCase)
+            .ToArray();
+
+    private IReadOnlyCollection<LegacySyncModuleStatusDto> crmCarriersSyncStatuses =>
+        syncStatuses
+            .Where(status => string.Equals(status.ModuleKey, LegacySyncModuleKeys.CrmCarriers, StringComparison.OrdinalIgnoreCase))
+            .OrderBy(status => status.CompanyName, StringComparer.CurrentCultureIgnoreCase)
+            .ToArray();
+
+    private IReadOnlyCollection<LegacySyncModuleStatusDto> crmWorkshopsSyncStatuses =>
+        syncStatuses
+            .Where(status => string.Equals(status.ModuleKey, LegacySyncModuleKeys.CrmWorkshops, StringComparison.OrdinalIgnoreCase))
+            .OrderBy(status => status.CompanyName, StringComparer.CurrentCultureIgnoreCase)
+            .ToArray();
+
+    private IReadOnlyCollection<LegacySyncModuleStatusDto> articleForniturasSyncStatuses =>
+        syncStatuses
+            .Where(status => string.Equals(status.ModuleKey, LegacySyncModuleKeys.ArticleFornituras, StringComparison.OrdinalIgnoreCase))
+            .OrderBy(status => status.CompanyName, StringComparer.CurrentCultureIgnoreCase)
+            .ToArray();
+
+    private IReadOnlyCollection<LegacySyncModuleStatusDto> crmSuppliersSyncStatuses =>
+        syncStatuses
+            .Where(status => string.Equals(status.ModuleKey, LegacySyncModuleKeys.CrmSuppliers, StringComparison.OrdinalIgnoreCase))
+            .OrderBy(status => status.CompanyName, StringComparer.CurrentCultureIgnoreCase)
+            .ToArray();
+
+    private IReadOnlyCollection<LegacySyncModuleStatusDto> purchaseOrdersSyncStatuses =>
+        syncStatuses
+            .Where(status => string.Equals(status.ModuleKey, LegacySyncModuleKeys.PurchaseOrders, StringComparison.OrdinalIgnoreCase))
+            .OrderBy(status => status.CompanyName, StringComparer.CurrentCultureIgnoreCase)
+            .ToArray();
+
+    private IReadOnlyCollection<LegacySyncModuleStatusDto> purchaseReceiptsSyncStatuses =>
+        syncStatuses
+            .Where(status => string.Equals(status.ModuleKey, LegacySyncModuleKeys.PurchaseReceipts, StringComparison.OrdinalIgnoreCase))
+            .OrderBy(status => status.CompanyName, StringComparer.CurrentCultureIgnoreCase)
+            .ToArray();
+
+    private IReadOnlyCollection<LegacySyncModuleStatusDto> stockItemsSyncStatuses =>
+        syncStatuses
+            .Where(status => string.Equals(status.ModuleKey, LegacySyncModuleKeys.StockItems, StringComparison.OrdinalIgnoreCase))
+            .OrderBy(status => status.CompanyName, StringComparer.CurrentCultureIgnoreCase)
+            .ToArray();
+
+    private IReadOnlyCollection<LegacySyncModuleStatusDto> salesShipmentsSyncStatuses =>
+        syncStatuses
+            .Where(status => string.Equals(status.ModuleKey, LegacySyncModuleKeys.SalesShipments, StringComparison.OrdinalIgnoreCase))
+            .OrderBy(status => status.CompanyName, StringComparer.CurrentCultureIgnoreCase)
+            .ToArray();
+
+    private IReadOnlyCollection<LegacySyncModuleStatusDto> salesInvoicesSyncStatuses =>
+        syncStatuses
+            .Where(status => string.Equals(status.ModuleKey, LegacySyncModuleKeys.SalesInvoices, StringComparison.OrdinalIgnoreCase))
+            .OrderBy(status => status.CompanyName, StringComparer.CurrentCultureIgnoreCase)
+            .ToArray();
+
+    private async Task SaveCrmClientsScopeAsync()
+    {
+        if (!currentTenantId.HasValue)
+        {
+            return;
+        }
+
+        await RunAsync(async () =>
+        {
+            await TenantAdminService.SetModuleDataScopeAsync(new SetTenantModuleDataScopeCommand
+            {
+                TenantId = currentTenantId.Value,
+                ModuleKey = TenantModuleKeys.CrmClients,
+                DataScope = crmClientsDataScope
+            });
+
+            await ReloadAsync();
+        }, "Configuración de CRM / Clientes actualizada correctamente.");
+    }
+
+    private async Task CreateCompanyAsync()
+    {
+        if (!currentTenantId.HasValue)
+        {
+            return;
+        }
+
+        await RunAsync(async () =>
+        {
+            await TenantAdminService.CreateCompanyAsync(new CreateCompanyCommand
+            {
+                TenantId = currentTenantId.Value,
+                Name = companyForm.Name,
+                Slug = companyForm.Slug,
+                LegacyCenterCode = companyForm.LegacyCenterCode
+            });
+
+            companyForm = new CompanyFormModel();
+            await ReloadAsync();
+        }, "Company creada correctamente.");
+    }
+
+    private async Task CreateUserAsync()
+    {
+        if (!currentTenantId.HasValue)
+        {
+            return;
+        }
+
+        await RunAsync(async () =>
+        {
+            await TenantAdminService.CreateUserAsync(new CreateUserCommand
+            {
+                TenantId = currentTenantId.Value,
+                Email = userForm.Email,
+                DisplayName = userForm.DisplayName,
+                Password = userForm.Password,
+                CompanyIds = userForm.SelectedCompanyIds.ToArray(),
+                Roles = userForm.SelectedRoles.ToArray()
+            });
+
+            userForm = new UserFormModel();
+            await ReloadAsync();
+        }, "Usuario creado correctamente.");
+    }
+
+    private IEnumerable<LegacyCenterOptionDto> GetAvailableLegacyCenters() =>
+        legacyCenters.Where(center => !center.IsAssigned);
+
+    private IReadOnlyCollection<LegacyCenterOptionDto> GetLegacyCentersForCompanyEdit(CompanySummaryDto company)
+    {
+        var assignedCodes = companies
+            .Where(candidate => candidate.Id != company.Id)
+            .Select(candidate => candidate.LegacyCenterCode)
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+        return legacyCenters
+            .Where(center => !assignedCodes.Contains(center.Code) || string.Equals(center.Code, company.LegacyCenterCode, StringComparison.OrdinalIgnoreCase))
+            .ToArray();
+    }
+
+    private static string FormatLegacyCenter(LegacyCenterOptionDto center) =>
+        string.IsNullOrWhiteSpace(center.Description) ? center.Code : $"{center.Description} ({center.Code})";
+
+    private string FormatUserCompanies(UserSummaryDto user)
+    {
+        var names = companies
+            .Where(company => user.CompanyIds.Contains(company.Id))
+            .Select(company => $"{company.Name} ({company.LegacyCenterCode})")
+            .ToArray();
+
+        return names.Length == 0 ? "Sin companies asignadas" : string.Join(", ", names);
+    }
+
+    private static string FormatAuditActor(AuditLogEntryDto entry)
+    {
+        if (!string.IsNullOrWhiteSpace(entry.ActorDisplayName) && !string.IsNullOrWhiteSpace(entry.ActorEmail))
+        {
+            return $"{entry.ActorDisplayName} · {entry.ActorEmail}";
+        }
+
+        if (!string.IsNullOrWhiteSpace(entry.ActorDisplayName))
+        {
+            return entry.ActorDisplayName;
+        }
+
+        if (!string.IsNullOrWhiteSpace(entry.ActorEmail))
+        {
+            return entry.ActorEmail;
+        }
+
+        return "Actor no disponible";
+    }
+
+    private static string FormatAuditScope(AuditLogEntryDto entry)
+    {
+        var scopeParts = new List<string>();
+
+        if (!string.IsNullOrWhiteSpace(entry.CompanyName))
+        {
+            scopeParts.Add(entry.CompanyName);
+        }
+
+        if (!string.IsNullOrWhiteSpace(entry.EntityId))
+        {
+            scopeParts.Add($"Id={entry.EntityId}");
+        }
+
+        return scopeParts.Count == 0 ? "Sin alcance" : string.Join(" · ", scopeParts);
+    }
+
+    private void ToggleCompany(Guid companyId, object? value)
+    {
+        if (value as bool? == true)
+        {
+            userForm.SelectedCompanyIds.Add(companyId);
+        }
+        else
+        {
+            userForm.SelectedCompanyIds.Remove(companyId);
+        }
+    }
+
+    private void ToggleRole(string role, object? value)
+    {
+        if (value as bool? == true)
+        {
+            userForm.SelectedRoles.Add(role);
+        }
+        else
+        {
+            userForm.SelectedRoles.Remove(role);
+        }
+    }
+
+    private void BeginUserEdit(UserSummaryDto user)
+    {
+        editingUserId = user.Id;
+        editingCompanyIds = [.. user.CompanyIds];
+        editingRoles = [.. user.Roles.Where(role => role != PlatformRoles.PlatformAdmin)];
+    }
+
+    private void CancelUserEdit()
+    {
+        editingUserId = null;
+        editingCompanyIds.Clear();
+        editingRoles.Clear();
+    }
+
+    private async Task SaveUserAccessAsync(UserSummaryDto user)
+    {
+        if (!currentTenantId.HasValue)
+        {
+            return;
+        }
+
+        await RunAsync(async () =>
+        {
+            await TenantAdminService.AssignUserCompaniesAsync(new AssignUserCompaniesCommand
+            {
+                UserId = user.Id,
+                TenantId = currentTenantId.Value,
+                CompanyIds = editingCompanyIds.ToArray()
+            });
+
+            await TenantAdminService.AssignUserRolesAsync(new AssignUserRolesCommand
+            {
+                UserId = user.Id,
+                TenantId = currentTenantId.Value,
+                Roles = editingRoles.ToArray()
+            });
+
+            CancelUserEdit();
+            await ReloadAsync();
+        }, "Accesos del usuario actualizados correctamente.");
+    }
+
+    private void ToggleEditingCompany(Guid companyId, object? value)
+    {
+        if (value as bool? == true)
+        {
+            editingCompanyIds.Add(companyId);
+        }
+        else
+        {
+            editingCompanyIds.Remove(companyId);
+        }
+    }
+
+    private void ToggleEditingRole(string role, object? value)
+    {
+        if (value as bool? == true)
+        {
+            editingRoles.Add(role);
+        }
+        else
+        {
+            editingRoles.Remove(role);
+        }
+    }
+
+    private void BeginPasswordEdit(UserSummaryDto user)
+    {
+        passwordEditorUserId = user.Id;
+        passwordEditorValue = string.Empty;
+    }
+
+    private void CancelPasswordEdit()
+    {
+        passwordEditorUserId = null;
+        passwordEditorValue = string.Empty;
+    }
+
+    private async Task SaveUserPasswordAsync(UserSummaryDto user)
+    {
+        await RunAsync(async () =>
+        {
+            await TenantAdminService.ResetUserPasswordAsync(new ResetUserPasswordCommand
+            {
+                UserId = user.Id,
+                NewPassword = passwordEditorValue
+            });
+
+            CancelPasswordEdit();
+        }, "Contraseña actualizada correctamente.");
+    }
+
+    private async Task ToggleUserActiveAsync(UserSummaryDto user)
+    {
+        await RunAsync(async () =>
+        {
+            await TenantAdminService.SetUserActiveAsync(new SetUserActiveCommand
+            {
+                UserId = user.Id,
+                IsActive = !user.IsActive
+            });
+
+            if (passwordEditorUserId == user.Id)
+            {
+                CancelPasswordEdit();
+            }
+
+            if (editingUserId == user.Id)
+            {
+                CancelUserEdit();
+            }
+
+            await ReloadAsync();
+        }, user.IsActive ? "Usuario desactivado correctamente." : "Usuario activado correctamente.");
+    }
+
+    private bool IsSelf(UserSummaryDto user) =>
+        currentUserId.HasValue && user.Id == currentUserId.Value;
+
+    private bool CanToggleUserActive(UserSummaryDto user) =>
+        isPlatformAdmin || (!IsSelf(user) && !IsLastActiveTenantAdmin(user));
+
+    private string GetUserActiveToggleBlockedReason(UserSummaryDto user)
+    {
+        if (IsSelf(user) && !isPlatformAdmin)
+        {
+            return "No puedes desactivarte a ti mismo";
+        }
+
+        if (IsLastActiveTenantAdmin(user))
+        {
+            return "Último TenantAdmin activo del tenant";
+        }
+
+        return "Acción no disponible";
+    }
+
+    private bool IsEditingRoleLocked(UserSummaryDto user, string role) =>
+        !isPlatformAdmin &&
+        string.Equals(role, PlatformRoles.TenantAdmin, StringComparison.OrdinalIgnoreCase) &&
+        (IsSelf(user) || IsLastActiveTenantAdmin(user));
+
+    private bool IsEditingCompanyLocked(UserSummaryDto user, Guid companyId) =>
+        !isPlatformAdmin &&
+        IsSelf(user) &&
+        activeCompanyId.HasValue &&
+        activeCompanyId.Value == companyId;
+
+    private bool IsLastActiveTenantAdmin(UserSummaryDto user) =>
+        user.IsActive &&
+        user.Roles.Contains(PlatformRoles.TenantAdmin, StringComparer.OrdinalIgnoreCase) &&
+        users.Count(candidate =>
+            candidate.IsActive &&
+            candidate.Roles.Contains(PlatformRoles.TenantAdmin, StringComparer.OrdinalIgnoreCase)) <= 1;
+
+    private void SelectFirstAvailableLegacyCenter()
+    {
+        companyForm.LegacyCenterCode = GetAvailableLegacyCenters()
+            .Select(center => center.Code)
+            .FirstOrDefault() ?? string.Empty;
+    }
+
+    private async Task BeginCompanyEditAsync(CompanySummaryDto company)
+    {
+        editingCompanyId = company.Id;
+        editingCompanyLegacyCenterCode = company.LegacyCenterCode;
+        confirmCompanyLegacyCenterChange = false;
+        editingCompanyImpact = await TenantAdminService.GetCompanyLegacyCenterImpactAsync(company.Id, company.TenantId);
+    }
+
+    private void CancelCompanyEdit()
+    {
+        editingCompanyId = null;
+        editingCompanyLegacyCenterCode = string.Empty;
+        editingCompanyImpact = null;
+        confirmCompanyLegacyCenterChange = false;
+    }
+
+    private async Task SaveCompanyLegacyCenterAsync(CompanySummaryDto company)
+    {
+        if (!currentTenantId.HasValue)
+        {
+            return;
+        }
+
+        await RunAsync(async () =>
+        {
+            await TenantAdminService.UpdateCompanyLegacyCenterAsync(new UpdateCompanyLegacyCenterCommand
+            {
+                CompanyId = company.Id,
+                TenantId = currentTenantId.Value,
+                LegacyCenterCode = editingCompanyLegacyCenterCode,
+                ForceChange = confirmCompanyLegacyCenterChange
+            });
+
+            CancelCompanyEdit();
+            await ReloadAsync();
+        }, "Centro legacy actualizado correctamente.");
+    }
+
+    private async Task RunSalesOrdersSyncAsync()
+    {
+        if (!currentTenantId.HasValue)
+        {
+            return;
+        }
+
+        isRunningSalesOrdersSync = true;
+        try
+        {
+            statusMessage = string.Empty;
+            isError = false;
+
+            var result = await LegacySyncService.RunAsync(new RunLegacySyncCommand
+            {
+                TenantId = currentTenantId.Value,
+                CompanyId = Guid.TryParse(selectedSalesOrdersSyncCompanyId, out var companyIdValue) ? companyIdValue : null,
+                ModuleKey = LegacySyncModuleKeys.SalesOrders
+            });
+
+            statusMessage = $"Sincronización completada. Companies={result.CompaniesProcessed}, Insertados={result.RecordsInserted}, Actualizados={result.RecordsUpdated}, Omitidos={result.RecordsSkipped}, Errores={result.ErrorsCount}.";
+            await ReloadAsync();
+        }
+        catch (Exception exception)
+        {
+            isError = true;
+            statusMessage = exception.Message;
+        }
+        finally
+        {
+            isRunningSalesOrdersSync = false;
+        }
+    }
+
+    private async Task RunCrmClientsSyncAsync()
+    {
+        if (!currentTenantId.HasValue)
+        {
+            return;
+        }
+
+        isRunningCrmClientsSync = true;
+        try
+        {
+            statusMessage = string.Empty;
+            isError = false;
+
+            var result = await LegacySyncService.RunAsync(new RunLegacySyncCommand
+            {
+                TenantId = currentTenantId.Value,
+                CompanyId = Guid.TryParse(selectedCrmClientsSyncCompanyId, out var companyIdValue) ? companyIdValue : null,
+                ModuleKey = LegacySyncModuleKeys.CrmClients
+            });
+
+            statusMessage = $"Sincronización completada. Companies={result.CompaniesProcessed}, Insertados={result.RecordsInserted}, Actualizados={result.RecordsUpdated}, Omitidos={result.RecordsSkipped}, Errores={result.ErrorsCount}.";
+            await ReloadAsync();
+        }
+        catch (Exception exception)
+        {
+            isError = true;
+            statusMessage = exception.Message;
+        }
+        finally
+        {
+            isRunningCrmClientsSync = false;
+        }
+    }
+
+    private async Task RunCrmSuppliersSyncAsync()
+    {
+        if (!currentTenantId.HasValue)
+        {
+            return;
+        }
+
+        isRunningCrmSuppliersSync = true;
+        try
+        {
+            statusMessage = string.Empty;
+            isError = false;
+
+            var result = await LegacySyncService.RunAsync(new RunLegacySyncCommand
+            {
+                TenantId = currentTenantId.Value,
+                CompanyId = Guid.TryParse(selectedCrmSuppliersSyncCompanyId, out var companyIdValue) ? companyIdValue : null,
+                ModuleKey = LegacySyncModuleKeys.CrmSuppliers
+            });
+
+            statusMessage = $"Sincronización completada. Companies={result.CompaniesProcessed}, Insertados={result.RecordsInserted}, Actualizados={result.RecordsUpdated}, Omitidos={result.RecordsSkipped}, Errores={result.ErrorsCount}.";
+            await ReloadAsync();
+        }
+        catch (Exception exception)
+        {
+            isError = true;
+            statusMessage = exception.Message;
+        }
+        finally
+        {
+            isRunningCrmSuppliersSync = false;
+        }
+    }
+
+    private async Task RunCrmCarriersSyncAsync()
+    {
+        if (!currentTenantId.HasValue)
+        {
+            return;
+        }
+
+        isRunningCrmCarriersSync = true;
+        try
+        {
+            statusMessage = string.Empty;
+            isError = false;
+
+            var result = await LegacySyncService.RunAsync(new RunLegacySyncCommand
+            {
+                TenantId = currentTenantId.Value,
+                CompanyId = Guid.TryParse(selectedCrmCarriersSyncCompanyId, out var companyIdValue) ? companyIdValue : null,
+                ModuleKey = LegacySyncModuleKeys.CrmCarriers
+            });
+
+            statusMessage = $"Sincronización completada. Companies={result.CompaniesProcessed}, Insertados={result.RecordsInserted}, Actualizados={result.RecordsUpdated}, Omitidos={result.RecordsSkipped}, Errores={result.ErrorsCount}.";
+            await ReloadAsync();
+        }
+        catch (Exception exception)
+        {
+            isError = true;
+            statusMessage = exception.Message;
+        }
+        finally
+        {
+            isRunningCrmCarriersSync = false;
+        }
+    }
+
+    private async Task RunCrmWorkshopsSyncAsync()
+    {
+        if (!currentTenantId.HasValue)
+        {
+            return;
+        }
+
+        isRunningCrmWorkshopsSync = true;
+        try
+        {
+            statusMessage = string.Empty;
+            isError = false;
+
+            var result = await LegacySyncService.RunAsync(new RunLegacySyncCommand
+            {
+                TenantId = currentTenantId.Value,
+                CompanyId = Guid.TryParse(selectedCrmWorkshopsSyncCompanyId, out var companyIdValue) ? companyIdValue : null,
+                ModuleKey = LegacySyncModuleKeys.CrmWorkshops
+            });
+
+            statusMessage = $"Sincronización completada. Companies={result.CompaniesProcessed}, Insertados={result.RecordsInserted}, Actualizados={result.RecordsUpdated}, Omitidos={result.RecordsSkipped}, Errores={result.ErrorsCount}.";
+            await ReloadAsync();
+        }
+        catch (Exception exception)
+        {
+            isError = true;
+            statusMessage = exception.Message;
+        }
+        finally
+        {
+            isRunningCrmWorkshopsSync = false;
+        }
+    }
+
+    private async Task RunArticleForniturasSyncAsync()
+    {
+        if (!currentTenantId.HasValue)
+        {
+            return;
+        }
+
+        isRunningArticleForniturasSync = true;
+        try
+        {
+            statusMessage = string.Empty;
+            isError = false;
+
+            var result = await LegacySyncService.RunAsync(new RunLegacySyncCommand
+            {
+                TenantId = currentTenantId.Value,
+                CompanyId = Guid.TryParse(selectedArticleForniturasSyncCompanyId, out var companyIdValue) ? companyIdValue : null,
+                ModuleKey = LegacySyncModuleKeys.ArticleFornituras
+            });
+
+            statusMessage = $"Sincronización completada. Companies={result.CompaniesProcessed}, Insertados={result.RecordsInserted}, Actualizados={result.RecordsUpdated}, Omitidos={result.RecordsSkipped}, Errores={result.ErrorsCount}.";
+            await ReloadAsync();
+        }
+        catch (Exception exception)
+        {
+            isError = true;
+            statusMessage = exception.Message;
+        }
+        finally
+        {
+            isRunningArticleForniturasSync = false;
+        }
+    }
+
+    private async Task RunCrmRepresentativesSyncAsync()
+    {
+        if (!currentTenantId.HasValue)
+        {
+            return;
+        }
+
+        isRunningCrmRepresentativesSync = true;
+        try
+        {
+            statusMessage = string.Empty;
+            isError = false;
+
+            var result = await LegacySyncService.RunAsync(new RunLegacySyncCommand
+            {
+                TenantId = currentTenantId.Value,
+                CompanyId = Guid.TryParse(selectedCrmRepresentativesSyncCompanyId, out var companyIdValue) ? companyIdValue : null,
+                ModuleKey = LegacySyncModuleKeys.CrmRepresentatives
+            });
+
+            statusMessage = $"Sincronización completada. Companies={result.CompaniesProcessed}, Insertados={result.RecordsInserted}, Actualizados={result.RecordsUpdated}, Omitidos={result.RecordsSkipped}, Errores={result.ErrorsCount}.";
+            await ReloadAsync();
+        }
+        catch (Exception exception)
+        {
+            isError = true;
+            statusMessage = exception.Message;
+        }
+        finally
+        {
+            isRunningCrmRepresentativesSync = false;
+        }
+    }
+
+    private async Task RunPurchaseOrdersSyncAsync()
+    {
+        if (!currentTenantId.HasValue)
+        {
+            return;
+        }
+
+        isRunningPurchaseOrdersSync = true;
+        try
+        {
+            statusMessage = string.Empty;
+            isError = false;
+
+            var result = await LegacySyncService.RunAsync(new RunLegacySyncCommand
+            {
+                TenantId = currentTenantId.Value,
+                CompanyId = Guid.TryParse(selectedPurchaseOrdersSyncCompanyId, out var companyIdValue) ? companyIdValue : null,
+                ModuleKey = LegacySyncModuleKeys.PurchaseOrders
+            });
+
+            statusMessage = $"Sincronización completada. Companies={result.CompaniesProcessed}, Insertados={result.RecordsInserted}, Actualizados={result.RecordsUpdated}, Omitidos={result.RecordsSkipped}, Errores={result.ErrorsCount}.";
+            await ReloadAsync();
+        }
+        catch (Exception exception)
+        {
+            isError = true;
+            statusMessage = exception.Message;
+        }
+        finally
+        {
+            isRunningPurchaseOrdersSync = false;
+        }
+    }
+
+    private async Task RunPurchaseReceiptsSyncAsync()
+    {
+        if (!currentTenantId.HasValue)
+        {
+            return;
+        }
+
+        isRunningPurchaseReceiptsSync = true;
+        try
+        {
+            statusMessage = string.Empty;
+            isError = false;
+
+            var result = await LegacySyncService.RunAsync(new RunLegacySyncCommand
+            {
+                TenantId = currentTenantId.Value,
+                CompanyId = Guid.TryParse(selectedPurchaseReceiptsSyncCompanyId, out var companyIdValue) ? companyIdValue : null,
+                ModuleKey = LegacySyncModuleKeys.PurchaseReceipts
+            });
+
+            statusMessage = $"Sincronización completada. Companies={result.CompaniesProcessed}, Insertados={result.RecordsInserted}, Actualizados={result.RecordsUpdated}, Omitidos={result.RecordsSkipped}, Errores={result.ErrorsCount}.";
+            await ReloadAsync();
+        }
+        catch (Exception exception)
+        {
+            isError = true;
+            statusMessage = exception.Message;
+        }
+        finally
+        {
+            isRunningPurchaseReceiptsSync = false;
+        }
+    }
+
+    private async Task RunStockItemsSyncAsync()
+    {
+        if (!currentTenantId.HasValue)
+        {
+            return;
+        }
+
+        isRunningStockItemsSync = true;
+        try
+        {
+            statusMessage = string.Empty;
+            isError = false;
+
+            var result = await LegacySyncService.RunAsync(new RunLegacySyncCommand
+            {
+                TenantId = currentTenantId.Value,
+                CompanyId = Guid.TryParse(selectedStockItemsSyncCompanyId, out var companyIdValue) ? companyIdValue : null,
+                ModuleKey = LegacySyncModuleKeys.StockItems
+            });
+
+            statusMessage = $"Sincronización completada. Companies={result.CompaniesProcessed}, Insertados={result.RecordsInserted}, Actualizados={result.RecordsUpdated}, Omitidos={result.RecordsSkipped}, Errores={result.ErrorsCount}.";
+            await ReloadAsync();
+        }
+        catch (Exception exception)
+        {
+            isError = true;
+            statusMessage = exception.Message;
+        }
+        finally
+        {
+            isRunningStockItemsSync = false;
+        }
+    }
+
+    private async Task RunSalesShipmentsSyncAsync()
+    {
+        if (!currentTenantId.HasValue)
+        {
+            return;
+        }
+
+        isRunningSalesShipmentsSync = true;
+        try
+        {
+            statusMessage = string.Empty;
+            isError = false;
+
+            var result = await LegacySyncService.RunAsync(new RunLegacySyncCommand
+            {
+                TenantId = currentTenantId.Value,
+                CompanyId = Guid.TryParse(selectedSalesShipmentsSyncCompanyId, out var companyIdValue) ? companyIdValue : null,
+                ModuleKey = LegacySyncModuleKeys.SalesShipments
+            });
+
+            statusMessage = $"Sincronización completada. Companies={result.CompaniesProcessed}, Insertados={result.RecordsInserted}, Actualizados={result.RecordsUpdated}, Omitidos={result.RecordsSkipped}, Errores={result.ErrorsCount}.";
+            await ReloadAsync();
+        }
+        catch (Exception exception)
+        {
+            isError = true;
+            statusMessage = exception.Message;
+        }
+        finally
+        {
+            isRunningSalesShipmentsSync = false;
+        }
+    }
+
+    private async Task RunSalesInvoicesSyncAsync()
+    {
+        if (!currentTenantId.HasValue)
+        {
+            return;
+        }
+
+        isRunningSalesInvoicesSync = true;
+        try
+        {
+            statusMessage = string.Empty;
+            isError = false;
+
+            var result = await LegacySyncService.RunAsync(new RunLegacySyncCommand
+            {
+                TenantId = currentTenantId.Value,
+                CompanyId = Guid.TryParse(selectedSalesInvoicesSyncCompanyId, out var companyIdValue) ? companyIdValue : null,
+                ModuleKey = LegacySyncModuleKeys.SalesInvoices
+            });
+
+            statusMessage = $"Sincronización completada. Companies={result.CompaniesProcessed}, Insertados={result.RecordsInserted}, Actualizados={result.RecordsUpdated}, Omitidos={result.RecordsSkipped}, Errores={result.ErrorsCount}.";
+            await ReloadAsync();
+        }
+        catch (Exception exception)
+        {
+            isError = true;
+            statusMessage = exception.Message;
+        }
+        finally
+        {
+            isRunningSalesInvoicesSync = false;
+        }
+    }
+
+    private bool RequiresCompanyChangeConfirmation(CompanySummaryDto company)
+    {
+        return editingCompanyImpact is not null &&
+               editingCompanyImpact.HasUsage &&
+               !string.Equals(editingCompanyLegacyCenterCode, company.LegacyCenterCode, StringComparison.OrdinalIgnoreCase) &&
+               !confirmCompanyLegacyCenterChange;
+    }
+
+    private async Task RunAsync(Func<Task> action, string successMessage)
+    {
+        try
+        {
+            statusMessage = string.Empty;
+            isError = false;
+            await action();
+            statusMessage = successMessage;
+        }
+        catch (Exception exception)
+        {
+            isError = true;
+            statusMessage = exception.Message;
+        }
+    }
+
+    private sealed class CompanyFormModel
+    {
+        public string Name { get; set; } = string.Empty;
+        public string Slug { get; set; } = string.Empty;
+        public string LegacyCenterCode { get; set; } = string.Empty;
+    }
+
+    private sealed class UserFormModel
+    {
+        public string DisplayName { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
+        public string Password { get; set; } = string.Empty;
+        public HashSet<Guid> SelectedCompanyIds { get; } = [];
+        public HashSet<string> SelectedRoles { get; } = [];
+    }
+}

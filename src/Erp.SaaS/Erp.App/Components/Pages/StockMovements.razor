@@ -1,0 +1,289 @@
+@page "/almacen/movimientos"
+@attribute [Authorize(Roles = "TenantAdmin,TenantReader")]
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IStockQueries StockQueries
+
+<PageTitle>Almacén / Movimientos</PageTitle>
+
+<div class="page-header">
+    <div>
+        <p class="eyebrow">Almacén</p>
+        <h1>Movimientos</h1>
+        <p class="lead">Entradas de stock generadas desde recepciones y futuros movimientos de almacén.</p>
+    </div>
+    <div class="quick-links">
+        <a class="secondary-button link-button" href="/almacen/stock-actual">Ver stock actual</a>
+        @if (!legacySyncInfo.IsActive)
+        {
+            <a class="secondary-button link-button" href="/almacen/ajustes">Nuevo ajuste</a>
+        }
+    </div>
+</div>
+
+@if (!tenantId.HasValue || !companyId.HasValue)
+{
+    <div class="empty-state">
+        <p>Selecciona una empresa activa para revisar movimientos de almacén.</p>
+    </div>
+}
+else
+{
+    <section class="panel">
+        <div class="filter-row">
+            <input class="text-input" @bind="filter.Search" placeholder="Buscar por artículo, proveedor, referencia, matrícula o documento" disabled="@isLoading" />
+            <input class="text-input" @bind="filter.Warehouse" placeholder="Almacén" disabled="@isLoading" />
+            <button class="secondary-button" @onclick="SearchAsync" disabled="@isLoading">@(isLoading ? "Cargando..." : "Buscar")</button>
+        </div>
+        <div class="filter-row results-toolbar" style="margin-top: 0.85rem;">
+            <span class="results-summary">
+                @(totalCount == 0
+                    ? "Sin resultados"
+                    : $"Mostrando {PageStart}-{PageEnd} de {totalCount} movimientos")
+            </span>
+            <label class="field compact-field">
+                <span>Tamaño de página</span>
+                <select class="sidebar-select compact-select" value="@filter.PageSize" @onchange="OnPageSizeChanged" disabled="@isLoading">
+                    <option value="25">25</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                </select>
+            </label>
+        </div>
+    </section>
+
+    @if (legacySyncInfo.IsActive)
+    {
+        <section class="panel" style="margin-top: 1rem;">
+            <p class="eyebrow">Sync legacy</p>
+            <p class="muted">
+                El saldo actual manda desde TEX.NET y se replica en la SaaS local.
+                Esta pantalla sigue mostrando solo los movimientos web registrados en local; no es el histórico completo del legacy.
+                Última sync: @(legacySyncInfo.LastCompletedUtc?.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss") ?? "Sin fecha")
+                · Ins: @legacySyncInfo.LastInserted · Act: @legacySyncInfo.LastUpdated · Omi: @legacySyncInfo.LastSkipped · Err: @legacySyncInfo.LastErrors
+            </p>
+        </section>
+    }
+
+    @if (!string.IsNullOrWhiteSpace(errorMessage))
+    {
+        <div class="alert danger">@errorMessage</div>
+    }
+
+    <div class="card-grid purchase-summary-grid">
+        <section class="info-card">
+            <h2>@totalCount</h2>
+            <p class="muted">movimientos</p>
+        </section>
+        <section class="info-card">
+            <h2>@items.Select(item => item.Warehouse).Where(value => !string.IsNullOrWhiteSpace(value)).Distinct(StringComparer.OrdinalIgnoreCase).Count()</h2>
+            <p class="muted">almacenes en página</p>
+        </section>
+        <section class="info-card accent-card">
+            <h2>@items.Sum(item => item.Quantity).ToString("0.###")</h2>
+            <p class="muted">cantidad movida en página</p>
+        </section>
+    </div>
+
+    <section class="panel @(isLoading ? "loading-panel" : string.Empty)">
+        @if (isLoading)
+        {
+            <div class="loading-banner">
+                <span class="loading-indicator" aria-hidden="true"></span>
+                <span>Cargando movimientos de almacén...</span>
+            </div>
+        }
+
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <SortableHeader Label="Fecha" IsActive="@(sortColumn == nameof(StockMovementListItemDto.MovementDate))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(StockMovementListItemDto.MovementDate), true))" />
+                    <SortableHeader Label="Tipo" IsActive="@(sortColumn == nameof(StockMovementListItemDto.MovementType))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(StockMovementListItemDto.MovementType)))" />
+                    <SortableHeader Label="Almacén" IsActive="@(sortColumn == nameof(StockMovementListItemDto.Warehouse))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(StockMovementListItemDto.Warehouse)))" />
+                    <SortableHeader Label="Artículo" IsActive="@(sortColumn == nameof(StockMovementListItemDto.ItemCode))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(StockMovementListItemDto.ItemCode)))" />
+                    <SortableHeader Label="Descripción" IsActive="@(sortColumn == nameof(StockMovementListItemDto.ItemDescription))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(StockMovementListItemDto.ItemDescription)))" />
+                    <SortableHeader Label="Cantidad" IsActive="@(sortColumn == nameof(StockMovementListItemDto.Quantity))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(StockMovementListItemDto.Quantity), true))" />
+                    <SortableHeader Label="Proveedor" IsActive="@(sortColumn == nameof(StockMovementListItemDto.SupplierName))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(StockMovementListItemDto.SupplierName)))" />
+                    <SortableHeader Label="Documento" IsActive="@(sortColumn == nameof(StockMovementListItemDto.SourceDocumentDisplay))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(StockMovementListItemDto.SourceDocumentDisplay)))" />
+                </tr>
+            </thead>
+            <tbody>
+                @if (isLoading)
+                {
+                    @for (var index = 0; index < 5; index++)
+                    {
+                        <tr class="table-skeleton-row">
+                            <td><span class="skeleton-line short"></span></td>
+                            <td><span class="skeleton-line short"></span></td>
+                            <td><span class="skeleton-line short"></span></td>
+                            <td><span class="skeleton-line short"></span></td>
+                            <td><span class="skeleton-line"></span></td>
+                            <td><span class="skeleton-line short"></span></td>
+                            <td><span class="skeleton-line"></span></td>
+                            <td><span class="skeleton-line short"></span></td>
+                        </tr>
+                    }
+                }
+                else if (items.Count == 0)
+                {
+                    <tr>
+                        <td colspan="8" class="table-empty">Todavía no hay movimientos de almacén para mostrar.</td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var item in items)
+                    {
+                        <tr>
+                            <td>@item.MovementDate.ToString("dd/MM/yyyy")</td>
+                            <td>@FormatMovementType(item.MovementType)</td>
+                            <td>@DisplayValue(item.Warehouse)</td>
+                            <td>@DisplayValue(item.ItemCode)</td>
+                            <td>@item.ItemDescription</td>
+                            <td>@item.Quantity.ToString("0.###") @item.UnitOfMeasure</td>
+                            <td>@DisplayValue(item.SupplierName)</td>
+                            <td>
+                                @if (string.Equals(item.SourceDocumentType, "PurchaseReceipt", StringComparison.OrdinalIgnoreCase) && item.SourceDocumentNumber.HasValue)
+                                {
+                                    <a class="inline-link" href="/compras/recepciones/@item.SourceDocumentNumber.Value">@item.SourceDocumentDisplay</a>
+                                }
+                                else
+                                {
+                                    @item.SourceDocumentDisplay
+                                }
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+
+        <div class="pagination-bar">
+            <span class="muted">Página @filter.Page de @TotalPages</span>
+            <div class="pagination-actions">
+                <button class="secondary-button" @onclick="() => ChangePageAsync(1)" disabled="@(!CanGoPrevious || isLoading)">Primera</button>
+                <button class="secondary-button" @onclick="() => ChangePageAsync(filter.Page - 1)" disabled="@(!CanGoPrevious || isLoading)">Anterior</button>
+                <button class="secondary-button" @onclick="() => ChangePageAsync(filter.Page + 1)" disabled="@(!CanGoNext || isLoading)">Siguiente</button>
+                <button class="secondary-button" @onclick="() => ChangePageAsync(TotalPages)" disabled="@(!CanGoNext || isLoading)">Última</button>
+            </div>
+        </div>
+    </section>
+}
+
+@code {
+    private Guid? tenantId;
+    private Guid? companyId;
+    private bool isLoading;
+    private StockMovementFilter filter = new() { Page = 1, PageSize = 25, SortColumn = nameof(StockMovementListItemDto.MovementDate), SortDescending = true };
+    private IReadOnlyCollection<StockMovementListItemDto> items = [];
+    private StockLegacySyncInfoDto legacySyncInfo = new();
+    private string errorMessage = string.Empty;
+    private string sortColumn = nameof(StockMovementListItemDto.MovementDate);
+    private bool sortDescending = true;
+    private int totalCount;
+    private int TotalPages => Math.Max(1, (int)Math.Ceiling(totalCount / (double)filter.PageSize));
+    private bool CanGoPrevious => filter.Page > 1;
+    private bool CanGoNext => filter.Page < TotalPages;
+    private int PageStart => totalCount == 0 ? 0 : ((filter.Page - 1) * filter.PageSize) + 1;
+    private int PageEnd => totalCount == 0 ? 0 : Math.Min(filter.Page * filter.PageSize, totalCount);
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        tenantId = user.GetTenantId();
+        companyId = user.GetActiveCompanyId();
+        await LoadAsync();
+    }
+
+    private async Task LoadAsync()
+    {
+        errorMessage = string.Empty;
+        if (!tenantId.HasValue || !companyId.HasValue)
+        {
+            items = [];
+            totalCount = 0;
+            return;
+        }
+
+        isLoading = true;
+        await InvokeAsync(StateHasChanged);
+
+        try
+        {
+            legacySyncInfo = await StockQueries.GetLegacySyncInfoAsync(tenantId.Value, companyId.Value);
+            filter.SortColumn = sortColumn;
+            filter.SortDescending = sortDescending;
+            var result = await StockQueries.SearchMovementsAsync(tenantId.Value, companyId.Value, filter);
+            items = result.Items;
+            totalCount = result.TotalCount;
+        }
+        catch (Exception exception)
+        {
+            errorMessage = exception.Message;
+            items = [];
+            legacySyncInfo = new StockLegacySyncInfoDto();
+            totalCount = 0;
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private async Task SearchAsync()
+    {
+        filter.Page = 1;
+        await LoadAsync();
+    }
+
+    private async Task SetSortAsync(string column, bool defaultDescending = false)
+    {
+        if (string.Equals(sortColumn, column, StringComparison.Ordinal))
+        {
+            sortDescending = !sortDescending;
+        }
+        else
+        {
+            sortColumn = column;
+            sortDescending = defaultDescending;
+        }
+
+        filter.Page = 1;
+        await LoadAsync();
+    }
+
+    private async Task ChangePageAsync(int page)
+    {
+        var newPage = Math.Max(1, Math.Min(page, TotalPages));
+        if (newPage == filter.Page)
+        {
+            return;
+        }
+
+        filter.Page = newPage;
+        await LoadAsync();
+    }
+
+    private async Task OnPageSizeChanged(ChangeEventArgs args)
+    {
+        if (!int.TryParse(args.Value?.ToString(), out var pageSize))
+        {
+            return;
+        }
+
+        filter.PageSize = pageSize;
+        filter.Page = 1;
+        await LoadAsync();
+    }
+
+    private static string FormatMovementType(string movementType) => movementType switch
+    {
+        StockMovementTypes.InboundPurchaseReceipt => "Entrada compra",
+        StockMovementTypes.InboundManualAdjustment => "Ajuste entrada",
+        StockMovementTypes.OutboundManualAdjustment => "Ajuste salida",
+        StockMovementTypes.OutboundSalesShipment => "Salida venta",
+        _ => movementType
+    };
+
+    private static string DisplayValue(string value) => string.IsNullOrWhiteSpace(value) ? "Sin dato" : value;
+}

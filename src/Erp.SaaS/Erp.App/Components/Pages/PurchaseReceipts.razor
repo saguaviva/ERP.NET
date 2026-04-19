@@ -1,0 +1,276 @@
+@page "/compras/recepciones"
+@attribute [Authorize(Roles = "TenantAdmin,TenantReader")]
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject ILegacySyncService LegacySyncService
+@inject IPurchaseOrderQueries PurchaseOrderQueries
+
+<PageTitle>Compras / Recepciones</PageTitle>
+
+<div class="page-header">
+    <div>
+        <p class="eyebrow">Compras</p>
+        <h1>Recepciones</h1>
+        <p class="lead">@(isLegacySyncActive
+            ? "Consulta y filtra las recepciones replicadas en la SaaS local, en solo lectura mientras el módulo siga sincronizado desde legacy."
+            : "Listado de entradas de mercancía registradas para la empresa activa.")</p>
+    </div>
+</div>
+
+@if (!tenantId.HasValue || !companyId.HasValue)
+{
+    <div class="empty-state">
+        <p>Selecciona una empresa activa para revisar recepciones.</p>
+    </div>
+}
+else
+{
+    <section class="panel">
+        <div class="filter-row">
+            <input class="text-input" @bind="filter.Search" placeholder="Buscar por entrada, pedido, proveedor o notas" disabled="@isLoading" />
+            <button class="secondary-button" @onclick="SearchAsync" disabled="@isLoading">@(isLoading ? "Cargando..." : "Buscar")</button>
+        </div>
+        <div class="filter-row results-toolbar" style="margin-top: 0.85rem;">
+            <span class="results-summary">
+                @(totalCount == 0
+                    ? "Sin resultados"
+                    : $"Mostrando {PageStart}-{PageEnd} de {totalCount} recepciones")
+            </span>
+            <label class="field compact-field">
+                <span>Tamaño de página</span>
+                <select class="sidebar-select compact-select" value="@filter.PageSize" @onchange="OnPageSizeChanged" disabled="@isLoading">
+                    <option value="25">25</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                </select>
+            </label>
+        </div>
+    </section>
+
+    @if (!string.IsNullOrWhiteSpace(errorMessage))
+    {
+        <div class="alert danger">@errorMessage</div>
+    }
+
+    @if (isLegacySyncActive)
+    {
+        <div class="alert">
+            Compras / Recepciones está en convivencia con legacy para esta empresa.
+            La web muestra la réplica SaaS local y queda en solo lectura mientras la sincronización mande.
+            @if (!string.IsNullOrWhiteSpace(syncStatusLabel))
+            {
+                <span>@syncStatusLabel</span>
+            }
+        </div>
+    }
+
+    <section class="panel @(isLoading ? "loading-panel" : string.Empty)">
+        @if (isLoading)
+        {
+            <div class="loading-banner">
+                <span class="loading-indicator" aria-hidden="true"></span>
+                <span>Cargando recepciones...</span>
+            </div>
+        }
+
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <SortableHeader Label="Entrada" IsActive="@(sortColumn == nameof(PurchaseReceiptListItemDto.ReceiptNumber))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(PurchaseReceiptListItemDto.ReceiptNumber), true))" />
+                    <SortableHeader Label="Pedido" IsActive="@(sortColumn == nameof(PurchaseReceiptListItemDto.OrderNumber))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(PurchaseReceiptListItemDto.OrderNumber), true))" />
+                    <SortableHeader Label="Proveedor" IsActive="@(sortColumn == nameof(PurchaseReceiptListItemDto.SupplierName))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(PurchaseReceiptListItemDto.SupplierName)))" />
+                    <SortableHeader Label="Fecha" IsActive="@(sortColumn == nameof(PurchaseReceiptListItemDto.ReceiptDate))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(PurchaseReceiptListItemDto.ReceiptDate), true))" />
+                    <SortableHeader Label="Líneas" IsActive="@(sortColumn == nameof(PurchaseReceiptListItemDto.LineCount))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(PurchaseReceiptListItemDto.LineCount), true))" />
+                    <SortableHeader Label="Cantidad" IsActive="@(sortColumn == nameof(PurchaseReceiptListItemDto.TotalReceivedQuantity))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(PurchaseReceiptListItemDto.TotalReceivedQuantity), true))" />
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (isLoading)
+                {
+                    @for (var index = 0; index < 5; index++)
+                    {
+                        <tr class="table-skeleton-row">
+                            <td><span class="skeleton-line short"></span></td>
+                            <td><span class="skeleton-line short"></span></td>
+                            <td><span class="skeleton-line"></span></td>
+                            <td><span class="skeleton-line short"></span></td>
+                            <td><span class="skeleton-line short"></span></td>
+                            <td><span class="skeleton-line short"></span></td>
+                            <td><span class="skeleton-line short"></span></td>
+                        </tr>
+                    }
+                }
+                else if (items.Count == 0)
+                {
+                    <tr>
+                        <td colspan="7" class="table-empty">No hay recepciones para mostrar.</td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var item in items)
+                    {
+                        <tr>
+                            <td>@item.DisplayNumber</td>
+                            <td>@item.OrderNumber</td>
+                            <td>@item.SupplierName</td>
+                            <td>@item.ReceiptDate.ToString("dd/MM/yyyy")</td>
+                            <td>@item.LineCount</td>
+                            <td>@item.TotalReceivedQuantity.ToString("0.###")</td>
+                            <td>
+                                <div class="table-actions">
+                                    <a class="inline-link" href="/compras/recepciones/@item.ReceiptNumber">Ver documento</a>
+                                    <a class="inline-link" href="/compras/recepciones/@item.ReceiptNumber/pdf" target="_blank">PDF</a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+
+        <div class="pagination-bar">
+            <span class="muted">Página @filter.Page de @TotalPages</span>
+            <div class="pagination-actions">
+                <button class="secondary-button" @onclick="() => ChangePageAsync(1)" disabled="@(!CanGoPrevious || isLoading)">Primera</button>
+                <button class="secondary-button" @onclick="() => ChangePageAsync(filter.Page - 1)" disabled="@(!CanGoPrevious || isLoading)">Anterior</button>
+                <button class="secondary-button" @onclick="() => ChangePageAsync(filter.Page + 1)" disabled="@(!CanGoNext || isLoading)">Siguiente</button>
+                <button class="secondary-button" @onclick="() => ChangePageAsync(TotalPages)" disabled="@(!CanGoNext || isLoading)">Última</button>
+            </div>
+        </div>
+    </section>
+}
+
+@code {
+    private Guid? tenantId;
+    private Guid? companyId;
+    private bool isLoading;
+    private PurchaseReceiptFilter filter = new() { Page = 1, PageSize = 25, SortColumn = nameof(PurchaseReceiptListItemDto.ReceiptNumber), SortDescending = true };
+    private IReadOnlyCollection<PurchaseReceiptListItemDto> items = [];
+    private string errorMessage = string.Empty;
+    private string sortColumn = nameof(PurchaseReceiptListItemDto.ReceiptNumber);
+    private bool sortDescending = true;
+    private bool isLegacySyncActive;
+    private string syncStatusLabel = string.Empty;
+    private int totalCount;
+    private int TotalPages => Math.Max(1, (int)Math.Ceiling(totalCount / (double)filter.PageSize));
+    private bool CanGoPrevious => filter.Page > 1;
+    private bool CanGoNext => filter.Page < TotalPages;
+    private int PageStart => totalCount == 0 ? 0 : ((filter.Page - 1) * filter.PageSize) + 1;
+    private int PageEnd => totalCount == 0 ? 0 : Math.Min(filter.Page * filter.PageSize, totalCount);
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        tenantId = user.GetTenantId();
+        companyId = user.GetActiveCompanyId();
+        await LoadSyncStatusAsync();
+        await LoadAsync();
+    }
+
+    private async Task LoadSyncStatusAsync()
+    {
+        isLegacySyncActive = false;
+        syncStatusLabel = string.Empty;
+
+        if (!tenantId.HasValue || !companyId.HasValue)
+        {
+            return;
+        }
+
+        var status = (await LegacySyncService.GetModuleStatusesAsync(tenantId.Value))
+            .FirstOrDefault(item =>
+                item.CompanyId == companyId.Value &&
+                string.Equals(item.ModuleKey, LegacySyncModuleKeys.PurchaseReceipts, StringComparison.OrdinalIgnoreCase));
+
+        if (status is null || !status.HasSuccessfulSync)
+        {
+            return;
+        }
+
+        isLegacySyncActive = true;
+        syncStatusLabel = status.LastCompletedUtc.HasValue
+            ? $"Última sync: {status.LastCompletedUtc.Value.ToLocalTime():dd/MM/yyyy HH:mm:ss} · Ins: {status.LastInserted} · Act: {status.LastUpdated} · Omi: {status.LastSkipped} · Err: {status.LastErrors}"
+            : $"Estado: {status.LastStatus}";
+    }
+
+    private async Task LoadAsync()
+    {
+        errorMessage = string.Empty;
+        if (!tenantId.HasValue || !companyId.HasValue)
+        {
+            items = [];
+            totalCount = 0;
+            return;
+        }
+
+        isLoading = true;
+        await InvokeAsync(StateHasChanged);
+
+        try
+        {
+            filter.SortColumn = sortColumn;
+            filter.SortDescending = sortDescending;
+            var result = await PurchaseOrderQueries.SearchReceiptsAsync(tenantId.Value, companyId.Value, filter);
+            items = result.Items;
+            totalCount = result.TotalCount;
+        }
+        catch (Exception exception)
+        {
+            errorMessage = exception.Message;
+            items = [];
+            totalCount = 0;
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private async Task SearchAsync()
+    {
+        filter.Page = 1;
+        await LoadAsync();
+    }
+
+    private async Task SetSortAsync(string column, bool defaultDescending = false)
+    {
+        if (string.Equals(sortColumn, column, StringComparison.Ordinal))
+        {
+            sortDescending = !sortDescending;
+        }
+        else
+        {
+            sortColumn = column;
+            sortDescending = defaultDescending;
+        }
+
+        filter.Page = 1;
+        await LoadAsync();
+    }
+
+    private async Task ChangePageAsync(int page)
+    {
+        var newPage = Math.Max(1, Math.Min(page, TotalPages));
+        if (newPage == filter.Page)
+        {
+            return;
+        }
+
+        filter.Page = newPage;
+        await LoadAsync();
+    }
+
+    private async Task OnPageSizeChanged(ChangeEventArgs args)
+    {
+        if (!int.TryParse(args.Value?.ToString(), out var pageSize))
+        {
+            return;
+        }
+
+        filter.PageSize = pageSize;
+        filter.Page = 1;
+        await LoadAsync();
+    }
+}

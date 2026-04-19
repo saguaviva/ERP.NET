@@ -9,6 +9,7 @@ public sealed class AuthenticatedSession
     public string DisplayName { get; init; } = string.Empty;
     public Guid? TenantId { get; init; }
     public bool IsPlatformAdmin { get; init; }
+    public bool RequirePasswordChange { get; init; }
     public IReadOnlyCollection<string> Roles { get; init; } = [];
     public IReadOnlyCollection<AllowedCompanyDto> AllowedCompanies { get; init; } = [];
 }

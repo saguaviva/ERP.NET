@@ -1,0 +1,17 @@
+<th class="@HeaderClass">
+    <button type="button" class="sort-header-button" @onclick="OnSort">
+        <span>@Label</span>
+        <span class="sort-header-icons" aria-hidden="true">
+            <span class="sort-arrow up @(IsActive && !Descending ? "active" : string.Empty)">▲</span>
+            <span class="sort-arrow down @(IsActive && Descending ? "active" : string.Empty)">▼</span>
+        </span>
+    </button>
+</th>
+
+@code {
+    [Parameter, EditorRequired] public string Label { get; set; } = string.Empty;
+    [Parameter] public bool IsActive { get; set; }
+    [Parameter] public bool Descending { get; set; }
+    [Parameter] public EventCallback OnSort { get; set; }
+    [Parameter] public string HeaderClass { get; set; } = string.Empty;
+}

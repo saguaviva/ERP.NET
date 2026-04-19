@@ -17,7 +17,14 @@
         <div class="sidebar-muted">@email</div>
     </div>
 
-    @if (allowedCompanies.Count > 0)
+    @if (requiresPasswordChange)
+    {
+        <div class="sidebar-panel">
+            <div class="sidebar-label">Seguridad</div>
+            <div class="sidebar-muted">Debes cambiar la contraseña temporal antes de usar el resto de la aplicación.</div>
+        </div>
+    }
+    else if (allowedCompanies.Count > 0)
     {
         <div class="sidebar-panel">
             <div class="sidebar-label">Empresa activa</div>
@@ -35,14 +42,36 @@
         </div>
     }
 
-    <nav class="sidebar-nav">
-        <NavLink class="sidebar-link" href="/" Match="NavLinkMatch.All">Dashboard</NavLink>
-        <NavLink class="sidebar-link" href="/crm/clientes">CRM / Clientes</NavLink>
-        @if (isPlatformAdmin)
-        {
-            <NavLink class="sidebar-link" href="/plataforma">Plataforma</NavLink>
-        }
-    </nav>
+    @if (!requiresPasswordChange)
+    {
+        <nav class="sidebar-nav">
+            <NavLink class="sidebar-link" href="/" Match="NavLinkMatch.All">Dashboard</NavLink>
+            <NavLink class="sidebar-link" href="/crm/clientes">CRM / Clientes</NavLink>
+            <NavLink class="sidebar-link" href="/crm/clientes/duplicados">CRM / Duplicados</NavLink>
+            <NavLink class="sidebar-link" href="/crm/representantes">CRM / Representantes</NavLink>
+            <NavLink class="sidebar-link" href="/crm/transportistas">CRM / Transportistas</NavLink>
+            <NavLink class="sidebar-link" href="/crm/talleres">CRM / Talleres</NavLink>
+            <NavLink class="sidebar-link" href="/articulos/fornituras">Artículos / Fornituras</NavLink>
+            <NavLink class="sidebar-link" href="/ventas/pedidos">Ventas / Pedidos</NavLink>
+            <NavLink class="sidebar-link" href="/ventas/albaranes">Ventas / Albaranes</NavLink>
+            <NavLink class="sidebar-link" href="/ventas/pre-facturacion">Ventas / Pre-facturación</NavLink>
+            <NavLink class="sidebar-link" href="/ventas/facturas">Ventas / Facturas</NavLink>
+            <NavLink class="sidebar-link" href="/crm/proveedores">Compras / Proveedores</NavLink>
+            <NavLink class="sidebar-link" href="/compras/pedidos">Compras / Pedidos</NavLink>
+            <NavLink class="sidebar-link" href="/compras/recepciones">Compras / Recepciones</NavLink>
+            <NavLink class="sidebar-link" href="/almacen/stock-actual">Almacén / Stock</NavLink>
+            <NavLink class="sidebar-link" href="/almacen/movimientos">Almacén / Movimientos</NavLink>
+            <NavLink class="sidebar-link" href="/almacen/ajustes">Almacén / Ajustes</NavLink>
+            @if (canManageTenant)
+            {
+                <NavLink class="sidebar-link" href="/administracion">Administración</NavLink>
+            }
+            @if (isPlatformAdmin)
+            {
+                <NavLink class="sidebar-link" href="/plataforma">Plataforma</NavLink>
+            }
+        </nav>
+    }
 
     <form method="post" action="/account/logout">
         <AntiforgeryToken />
@@ -59,6 +88,8 @@ else
 @code {
     private bool isAuthenticated;
     private bool isPlatformAdmin;
+    private bool canManageTenant;
+    private bool requiresPasswordChange;
     private string displayName = string.Empty;
     private string email = string.Empty;
     private Guid? activeCompanyId;
@@ -89,6 +120,14 @@ else
         email = user.FindFirstValue(ClaimTypes.Email) ?? string.Empty;
         activeCompanyId = user.GetActiveCompanyId();
         isPlatformAdmin = user.IsPlatformAdmin();
+        canManageTenant = isPlatformAdmin || user.IsInRole(PlatformRoles.TenantAdmin);
+        requiresPasswordChange = user.RequiresPasswordChange();
+
+        if (requiresPasswordChange)
+        {
+            allowedCompanies = [];
+            return;
+        }
 
         var userId = user.GetUserId();
         var tenantId = user.GetTenantId();

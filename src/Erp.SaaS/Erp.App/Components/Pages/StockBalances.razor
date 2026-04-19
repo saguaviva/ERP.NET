@@ -1,0 +1,280 @@
+@page "/almacen/stock-actual"
+@attribute [Authorize(Roles = "TenantAdmin,TenantReader")]
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IStockQueries StockQueries
+
+<PageTitle>Almacén / Stock actual</PageTitle>
+
+<div class="page-header">
+    <div>
+        <p class="eyebrow">Almacén</p>
+        <h1>Stock actual</h1>
+        <p class="lead">Saldo calculado por artículo y almacén a partir de los movimientos registrados o de la réplica legacy activa.</p>
+    </div>
+    <div class="quick-links">
+        @if (!legacySyncInfo.IsActive)
+        {
+            <a class="secondary-button link-button" href="/almacen/ajustes">Nuevo ajuste</a>
+        }
+        <a class="secondary-button link-button" href="/almacen/movimientos">Ver movimientos</a>
+    </div>
+</div>
+
+@if (!tenantId.HasValue || !companyId.HasValue)
+{
+    <div class="empty-state">
+        <p>Selecciona una empresa activa para revisar stock.</p>
+    </div>
+}
+else
+{
+    <section class="panel">
+        <div class="filter-row">
+            <input class="text-input" @bind="filter.Search" placeholder="Buscar por artículo, descripción o almacén" disabled="@isLoading" />
+            <input class="text-input" @bind="filter.Warehouse" placeholder="Almacén" disabled="@isLoading" />
+            <button class="secondary-button" @onclick="SearchAsync" disabled="@isLoading">@(isLoading ? "Cargando..." : "Buscar")</button>
+        </div>
+        <div class="filter-row results-toolbar" style="margin-top: 0.85rem;">
+            <span class="results-summary">
+                @(totalCount == 0
+                    ? "Sin resultados"
+                    : $"Mostrando {PageStart}-{PageEnd} de {totalCount} posiciones de stock")
+            </span>
+            <label class="field compact-field">
+                <span>Tamaño de página</span>
+                <select class="sidebar-select compact-select" value="@filter.PageSize" @onchange="OnPageSizeChanged" disabled="@isLoading">
+                    <option value="25">25</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                </select>
+            </label>
+        </div>
+    </section>
+
+    @if (legacySyncInfo.IsActive)
+    {
+        <section class="panel" style="margin-top: 1rem;">
+            <p class="eyebrow">Sync legacy</p>
+            <p class="muted">
+                El stock actual se está leyendo desde la réplica SaaS local sincronizada con TEX.NET.
+                Mientras esta sync mande, los ajustes manuales quedan bloqueados.
+                Última sync: @(legacySyncInfo.LastCompletedUtc?.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss") ?? "Sin fecha")
+                · Ins: @legacySyncInfo.LastInserted · Act: @legacySyncInfo.LastUpdated · Omi: @legacySyncInfo.LastSkipped · Err: @legacySyncInfo.LastErrors
+            </p>
+            <p class="muted">En algunos artículos legacy el campo “Almacén” representa una agrupación técnica del origen, no un almacén físico.</p>
+        </section>
+    }
+
+    @if (!string.IsNullOrWhiteSpace(errorMessage))
+    {
+        <div class="alert danger">@errorMessage</div>
+    }
+
+    <div class="card-grid purchase-summary-grid">
+        <section class="info-card">
+            <h2>@totalCount</h2>
+            <p class="muted">posiciones con stock</p>
+        </section>
+        <section class="info-card">
+            <h2>@items.Select(item => item.Warehouse).Where(value => !string.IsNullOrWhiteSpace(value)).Distinct(StringComparer.OrdinalIgnoreCase).Count()</h2>
+            <p class="muted">almacenes en página</p>
+        </section>
+        <section class="info-card accent-card">
+            <h2>@items.Sum(item => item.CurrentStock).ToString("0.###")</h2>
+            <p class="muted">unidades netas en página</p>
+        </section>
+    </div>
+
+    <section class="panel @(isLoading ? "loading-panel" : string.Empty)">
+        @if (isLoading)
+        {
+            <div class="loading-banner">
+                <span class="loading-indicator" aria-hidden="true"></span>
+                <span>Cargando stock actual...</span>
+            </div>
+        }
+
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <SortableHeader Label="Almacén" IsActive="@(sortColumn == nameof(StockBalanceListItemDto.Warehouse))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(StockBalanceListItemDto.Warehouse)))" />
+                    <SortableHeader Label="Artículo" IsActive="@(sortColumn == nameof(StockBalanceListItemDto.ItemCode))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(StockBalanceListItemDto.ItemCode)))" />
+                    <SortableHeader Label="Descripción" IsActive="@(sortColumn == nameof(StockBalanceListItemDto.ItemDescription))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(StockBalanceListItemDto.ItemDescription)))" />
+                    <SortableHeader Label="Stock" IsActive="@(sortColumn == nameof(StockBalanceListItemDto.CurrentStock))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(StockBalanceListItemDto.CurrentStock), true))" />
+                    <SortableHeader Label="Movimientos" IsActive="@(sortColumn == nameof(StockBalanceListItemDto.MovementCount))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(StockBalanceListItemDto.MovementCount), true))" />
+                    <SortableHeader Label="Último movimiento" IsActive="@(sortColumn == nameof(StockBalanceListItemDto.LastMovementDate))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(StockBalanceListItemDto.LastMovementDate), true))" />
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (isLoading)
+                {
+                    @for (var index = 0; index < 5; index++)
+                    {
+                        <tr class="table-skeleton-row">
+                            <td><span class="skeleton-line short"></span></td>
+                            <td><span class="skeleton-line short"></span></td>
+                            <td><span class="skeleton-line"></span></td>
+                            <td><span class="skeleton-line short"></span></td>
+                            <td><span class="skeleton-line short"></span></td>
+                            <td><span class="skeleton-line short"></span></td>
+                            <td><span class="skeleton-line short"></span></td>
+                        </tr>
+                    }
+                }
+                else if (items.Count == 0)
+                {
+                    <tr>
+                        <td colspan="7" class="table-empty">Todavía no hay stock calculado para mostrar.</td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var item in items)
+                    {
+                        <tr>
+                            <td>@DisplayValue(item.Warehouse)</td>
+                            <td>@DisplayValue(item.ItemCode)</td>
+                            <td>@item.ItemDescription</td>
+                            <td><strong>@item.CurrentStock.ToString("0.###") @item.UnitOfMeasure</strong></td>
+                            <td>@item.MovementCount</td>
+                            <td>@(item.LastMovementDate?.ToString("dd/MM/yyyy") ?? "Sin dato")</td>
+                            <td>
+                                <a class="inline-link" href="@BuildAdjustmentUrl(item)">Ajustar</a>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+
+        <div class="pagination-bar">
+            <span class="muted">Página @filter.Page de @TotalPages</span>
+            <div class="pagination-actions">
+                <button class="secondary-button" @onclick="() => ChangePageAsync(1)" disabled="@(!CanGoPrevious || isLoading)">Primera</button>
+                <button class="secondary-button" @onclick="() => ChangePageAsync(filter.Page - 1)" disabled="@(!CanGoPrevious || isLoading)">Anterior</button>
+                <button class="secondary-button" @onclick="() => ChangePageAsync(filter.Page + 1)" disabled="@(!CanGoNext || isLoading)">Siguiente</button>
+                <button class="secondary-button" @onclick="() => ChangePageAsync(TotalPages)" disabled="@(!CanGoNext || isLoading)">Última</button>
+            </div>
+        </div>
+    </section>
+}
+
+@code {
+    private Guid? tenantId;
+    private Guid? companyId;
+    private bool isLoading;
+    private StockBalanceFilter filter = new() { Page = 1, PageSize = 25, SortColumn = nameof(StockBalanceListItemDto.Warehouse), SortDescending = false };
+    private IReadOnlyCollection<StockBalanceListItemDto> items = [];
+    private StockLegacySyncInfoDto legacySyncInfo = new();
+    private string errorMessage = string.Empty;
+    private string sortColumn = nameof(StockBalanceListItemDto.Warehouse);
+    private bool sortDescending;
+    private int totalCount;
+    private int TotalPages => Math.Max(1, (int)Math.Ceiling(totalCount / (double)filter.PageSize));
+    private bool CanGoPrevious => filter.Page > 1;
+    private bool CanGoNext => filter.Page < TotalPages;
+    private int PageStart => totalCount == 0 ? 0 : ((filter.Page - 1) * filter.PageSize) + 1;
+    private int PageEnd => totalCount == 0 ? 0 : Math.Min(filter.Page * filter.PageSize, totalCount);
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        tenantId = user.GetTenantId();
+        companyId = user.GetActiveCompanyId();
+        await LoadAsync();
+    }
+
+    private async Task LoadAsync()
+    {
+        errorMessage = string.Empty;
+        if (!tenantId.HasValue || !companyId.HasValue)
+        {
+            items = [];
+            totalCount = 0;
+            return;
+        }
+
+        isLoading = true;
+        await InvokeAsync(StateHasChanged);
+
+        try
+        {
+            legacySyncInfo = await StockQueries.GetLegacySyncInfoAsync(tenantId.Value, companyId.Value);
+            filter.SortColumn = sortColumn;
+            filter.SortDescending = sortDescending;
+            var result = await StockQueries.SearchBalancesAsync(tenantId.Value, companyId.Value, filter);
+            items = result.Items;
+            totalCount = result.TotalCount;
+        }
+        catch (Exception exception)
+        {
+            errorMessage = exception.Message;
+            items = [];
+            legacySyncInfo = new StockLegacySyncInfoDto();
+            totalCount = 0;
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private async Task SearchAsync()
+    {
+        filter.Page = 1;
+        await LoadAsync();
+    }
+
+    private async Task SetSortAsync(string column, bool defaultDescending = false)
+    {
+        if (string.Equals(sortColumn, column, StringComparison.Ordinal))
+        {
+            sortDescending = !sortDescending;
+        }
+        else
+        {
+            sortColumn = column;
+            sortDescending = defaultDescending;
+        }
+
+        filter.Page = 1;
+        await LoadAsync();
+    }
+
+    private async Task ChangePageAsync(int page)
+    {
+        var newPage = Math.Max(1, Math.Min(page, TotalPages));
+        if (newPage == filter.Page)
+        {
+            return;
+        }
+
+        filter.Page = newPage;
+        await LoadAsync();
+    }
+
+    private async Task OnPageSizeChanged(ChangeEventArgs args)
+    {
+        if (!int.TryParse(args.Value?.ToString(), out var pageSize))
+        {
+            return;
+        }
+
+        filter.PageSize = pageSize;
+        filter.Page = 1;
+        await LoadAsync();
+    }
+
+    private static string DisplayValue(string value) => string.IsNullOrWhiteSpace(value) ? "Sin dato" : value;
+
+    private static string BuildAdjustmentUrl(StockBalanceListItemDto item)
+    {
+        var warehouse = Uri.EscapeDataString(item.Warehouse ?? string.Empty);
+        var itemCode = Uri.EscapeDataString(item.ItemCode ?? string.Empty);
+        var description = Uri.EscapeDataString(item.ItemDescription ?? string.Empty);
+        var unit = Uri.EscapeDataString(item.UnitOfMeasure ?? string.Empty);
+        return $"/almacen/ajustes?warehouse={warehouse}&itemCode={itemCode}&description={description}&unit={unit}&currentStock={item.CurrentStock}";
+    }
+}

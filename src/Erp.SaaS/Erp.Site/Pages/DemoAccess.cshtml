@@ -1,0 +1,75 @@
+@page
+@model Erp.Site.Pages.DemoAccessModel
+@{
+    ViewData["Title"] = "Acceso de pruebas";
+}
+
+<section class="section-block">
+    <div class="section-heading">
+        <div>
+            <p class="kicker">Acceso de pruebas</p>
+            <h1>Solicita acceso privado a la demo web para tu equipo.</h1>
+            <p class="intro compact-intro">
+                Déjanos el grupo, las personas que queréis invitar y el tamaño aproximado del piloto.
+                Te prepararemos el acceso y luego cada tester entrará por la puerta privada de la demo.
+            </p>
+        </div>
+    </div>
+
+    @if (Model.Submitted)
+    {
+        <div class="notice success">Solicitud recibida. Revisaremos los emails indicados y os prepararemos el acceso de pruebas.</div>
+    }
+
+    @if (!string.IsNullOrWhiteSpace(Model.ErrorMessage))
+    {
+        <div class="notice danger">@Model.ErrorMessage</div>
+    }
+
+    <form method="post" class="lead-form">
+        <label>
+            <span>Nombre de contacto</span>
+            <input asp-for="Form.ContactName" />
+        </label>
+        <label>
+            <span>Empresa o grupo</span>
+            <input asp-for="Form.CompanyName" />
+        </label>
+        <label>
+            <span>Email principal</span>
+            <input asp-for="Form.Email" type="email" />
+        </label>
+        <label>
+            <span>Teléfono</span>
+            <input asp-for="Form.Phone" />
+        </label>
+        <label>
+            <span>Número estimado de usuarios</span>
+            <input asp-for="Form.RequestedUsers" type="number" min="1" />
+        </label>
+        <label>
+            <span>Emails de testers</span>
+            <textarea asp-for="Form.TesterEmails" placeholder="uno@empresa.com&#10;dos@empresa.com"></textarea>
+        </label>
+        <label class="full">
+            <span>Qué queréis validar</span>
+            <textarea asp-for="Form.Message" placeholder="Procesos, companies implicadas, módulos que queréis revisar, fechas objetivo..."></textarea>
+        </label>
+        <button type="submit" class="button-primary">Solicitar acceso a demo</button>
+    </form>
+</section>
+
+<section class="section-grid">
+    <article class="feature-card">
+        <h2>Acceso previo</h2>
+        <p>Antes del login del ERP, la demo puede pedir email aprobado y clave compartida para mantener el entorno cerrado.</p>
+    </article>
+    <article class="feature-card">
+        <h2>Piloto multiempresa</h2>
+        <p>Podemos invitar testers que trabajen con una o varias companies del mismo tenant para validar escenarios reales.</p>
+    </article>
+    <article class="feature-card">
+        <h2>Alta asistida</h2>
+        <p>El acceso se activa desde el backoffice de plataforma, sin editar listas manuales en despliegue cada vez.</p>
+    </article>
+</section>

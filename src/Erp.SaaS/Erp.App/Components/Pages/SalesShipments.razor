@@ -1,0 +1,285 @@
+@page "/ventas/albaranes"
+@attribute [Authorize(Roles = "TenantAdmin,TenantReader")]
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject ISalesOrderQueries SalesOrderQueries
+@inject ILegacySyncService LegacySyncService
+
+<PageTitle>Ventas / Albaranes</PageTitle>
+
+<div class="page-header">
+        <div>
+            <p class="eyebrow">Ventas</p>
+            <h1>Albaranes de cliente</h1>
+            <p class="lead">Salidas documentales generadas desde pedidos de cliente y listas para el siguiente paso a facturación.</p>
+        </div>
+        <div class="quick-links">
+            <a class="secondary-button link-button" href="/ventas/pre-facturacion">Abrir pre-facturación</a>
+        </div>
+    </div>
+
+@if (!tenantId.HasValue || !companyId.HasValue)
+{
+    <div class="empty-state">
+        <p>Selecciona una empresa activa para revisar albaranes de venta.</p>
+    </div>
+}
+else
+{
+    @if (syncStatus?.HasSuccessfulSync == true)
+    {
+        <div class="alert warning">
+            Ventas / Albaranes está en convivencia con legacy para esta empresa. La web muestra la réplica SaaS local y queda en solo lectura mientras la sincronización mande.
+            @if (syncStatus.LastCompletedUtc.HasValue)
+            {
+                <span>Última sync: @syncStatus.LastCompletedUtc.Value.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss") · Ins: @syncStatus.LastInserted · Act: @syncStatus.LastUpdated · Omi: @syncStatus.LastSkipped · Err: @syncStatus.LastErrors</span>
+            }
+        </div>
+    }
+
+    <section class="panel">
+        <div class="filter-row">
+            <input class="text-input" @bind="filter.Search" placeholder="Buscar por albarán, pedido, cliente, almacén o notas" disabled="@isLoading" />
+            <button class="secondary-button" @onclick="SearchAsync" disabled="@isLoading">@(isLoading ? "Cargando..." : "Buscar")</button>
+        </div>
+        <div class="filter-row results-toolbar" style="margin-top: 0.85rem;">
+            <span class="results-summary">
+                @(totalCount == 0
+                    ? "Sin resultados"
+                    : $"Mostrando {PageStart}-{PageEnd} de {totalCount} albaranes")
+            </span>
+            <label class="field compact-field">
+                <span>Tamaño de página</span>
+                <select class="sidebar-select compact-select" value="@filter.PageSize" @onchange="OnPageSizeChanged" disabled="@isLoading">
+                    <option value="25">25</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                </select>
+            </label>
+        </div>
+    </section>
+
+    @if (!string.IsNullOrWhiteSpace(errorMessage))
+    {
+        <div class="alert danger">@errorMessage</div>
+    }
+
+    <section class="panel @(isLoading ? "loading-panel" : string.Empty)">
+        @if (isLoading)
+        {
+            <div class="loading-banner">
+                <span class="loading-indicator" aria-hidden="true"></span>
+                <span>Cargando albaranes de cliente...</span>
+            </div>
+        }
+
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <SortableHeader Label="Albarán" IsActive="@(sortColumn == nameof(SalesOrderShipmentDto.ShipmentNumber))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(SalesOrderShipmentDto.ShipmentNumber), true))" />
+                    <SortableHeader Label="Pedido" IsActive="@(sortColumn == nameof(SalesOrderShipmentDto.OrderNumber))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(SalesOrderShipmentDto.OrderNumber), true))" />
+                    <SortableHeader Label="Cliente" IsActive="@(sortColumn == nameof(SalesOrderShipmentDto.ClientName))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(SalesOrderShipmentDto.ClientName)))" />
+                    <SortableHeader Label="Fecha" IsActive="@(sortColumn == nameof(SalesOrderShipmentDto.ShipmentDate))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(SalesOrderShipmentDto.ShipmentDate), true))" />
+                    <SortableHeader Label="Almacén" IsActive="@(sortColumn == nameof(SalesOrderShipmentDto.Warehouse))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(SalesOrderShipmentDto.Warehouse)))" />
+                    <SortableHeader Label="Cantidad" IsActive="@(sortColumn == nameof(SalesOrderShipmentDto.TotalShippedQuantity))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(SalesOrderShipmentDto.TotalShippedQuantity), true))" />
+                    <SortableHeader Label="Facturación" IsActive="@(sortColumn == nameof(SalesOrderShipmentDto.InvoiceStatus))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(SalesOrderShipmentDto.InvoiceStatus)))" />
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (isLoading)
+                {
+                    @for (var index = 0; index < 5; index++)
+                    {
+                        <tr class="table-skeleton-row">
+                            <td><span class="skeleton-line short"></span></td>
+                            <td><span class="skeleton-line short"></span></td>
+                            <td><span class="skeleton-line"></span></td>
+                            <td><span class="skeleton-line short"></span></td>
+                            <td><span class="skeleton-line short"></span></td>
+                            <td><span class="skeleton-line short"></span></td>
+                            <td><span class="skeleton-line short"></span></td>
+                            <td><span class="skeleton-line short"></span></td>
+                        </tr>
+                    }
+                }
+                else if (items.Count == 0)
+                {
+                    <tr>
+                        <td colspan="8" class="table-empty">No hay albaranes para mostrar.</td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var item in items)
+                    {
+                        <tr>
+                            <td>@item.DisplayNumber</td>
+                            <td>@item.OrderNumber</td>
+                            <td>@item.ClientName</td>
+                            <td>@item.ShipmentDate.ToString("dd/MM/yyyy")</td>
+                            <td>@DisplayValue(item.Warehouse)</td>
+                            <td>@item.TotalShippedQuantity.ToString("0.###")</td>
+                            <td>
+                                <span class="status-pill @GetInvoiceStatusClass(item.InvoiceStatus)">@FormatInvoiceStatus(item.InvoiceStatus)</span>
+                                @if (!string.IsNullOrWhiteSpace(item.InvoiceDisplayNumber))
+                                {
+                                    <div class="table-subtitle">@item.InvoiceDisplayNumber</div>
+                                }
+                            </td>
+                            <td>
+                                <div class="table-actions">
+                                    <a class="inline-link" href="/ventas/albaranes/@item.ShipmentNumber">Ver documento</a>
+                                    <a class="inline-link" href="/ventas/albaranes/@item.ShipmentNumber/pdf" target="_blank">PDF</a>
+                                    @if (item.InvoiceNumber is int invoiceNumber)
+                                    {
+                                        <a class="inline-link" href="/ventas/facturas/@invoiceNumber">Factura</a>
+                                    }
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+
+        <div class="pagination-bar">
+            <span class="muted">Página @filter.Page de @TotalPages</span>
+            <div class="pagination-actions">
+                <button class="secondary-button" @onclick="() => ChangePageAsync(1)" disabled="@(!CanGoPrevious || isLoading)">Primera</button>
+                <button class="secondary-button" @onclick="() => ChangePageAsync(filter.Page - 1)" disabled="@(!CanGoPrevious || isLoading)">Anterior</button>
+                <button class="secondary-button" @onclick="() => ChangePageAsync(filter.Page + 1)" disabled="@(!CanGoNext || isLoading)">Siguiente</button>
+                <button class="secondary-button" @onclick="() => ChangePageAsync(TotalPages)" disabled="@(!CanGoNext || isLoading)">Última</button>
+            </div>
+        </div>
+    </section>
+}
+
+@code {
+    private Guid? tenantId;
+    private Guid? companyId;
+    private bool isLoading;
+    private SalesOrderFilter filter = new() { Page = 1, PageSize = 25, SortColumn = nameof(SalesOrderShipmentDto.ShipmentNumber), SortDescending = true };
+    private IReadOnlyCollection<SalesOrderShipmentDto> items = [];
+    private string errorMessage = string.Empty;
+    private LegacySyncModuleStatusDto? syncStatus;
+    private string sortColumn = nameof(SalesOrderShipmentDto.ShipmentNumber);
+    private bool sortDescending = true;
+    private int totalCount;
+    private int TotalPages => Math.Max(1, (int)Math.Ceiling(totalCount / (double)filter.PageSize));
+    private bool CanGoPrevious => filter.Page > 1;
+    private bool CanGoNext => filter.Page < TotalPages;
+    private int PageStart => totalCount == 0 ? 0 : ((filter.Page - 1) * filter.PageSize) + 1;
+    private int PageEnd => totalCount == 0 ? 0 : Math.Min(filter.Page * filter.PageSize, totalCount);
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        tenantId = user.GetTenantId();
+        companyId = user.GetActiveCompanyId();
+        if (tenantId.HasValue && companyId.HasValue)
+        {
+            syncStatus = (await LegacySyncService.GetModuleStatusesAsync(tenantId.Value))
+                .FirstOrDefault(status =>
+                    status.CompanyId == companyId.Value &&
+                    string.Equals(status.ModuleKey, LegacySyncModuleKeys.SalesShipments, StringComparison.OrdinalIgnoreCase));
+        }
+        await LoadAsync();
+    }
+
+    private async Task LoadAsync()
+    {
+        errorMessage = string.Empty;
+        if (!tenantId.HasValue || !companyId.HasValue)
+        {
+            items = [];
+            totalCount = 0;
+            return;
+        }
+
+        isLoading = true;
+        await InvokeAsync(StateHasChanged);
+
+        try
+        {
+            filter.SortColumn = sortColumn;
+            filter.SortDescending = sortDescending;
+            var result = await SalesOrderQueries.SearchShipmentsAsync(tenantId.Value, companyId.Value, filter);
+            items = result.Items;
+            totalCount = result.TotalCount;
+        }
+        catch (Exception exception)
+        {
+            errorMessage = exception.Message;
+            items = [];
+            totalCount = 0;
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private async Task SearchAsync()
+    {
+        filter.Page = 1;
+        await LoadAsync();
+    }
+
+    private async Task SetSortAsync(string column, bool defaultDescending = false)
+    {
+        if (string.Equals(sortColumn, column, StringComparison.Ordinal))
+        {
+            sortDescending = !sortDescending;
+        }
+        else
+        {
+            sortColumn = column;
+            sortDescending = defaultDescending;
+        }
+
+        filter.Page = 1;
+        await LoadAsync();
+    }
+
+    private async Task ChangePageAsync(int page)
+    {
+        var newPage = Math.Max(1, Math.Min(page, TotalPages));
+        if (newPage == filter.Page)
+        {
+            return;
+        }
+
+        filter.Page = newPage;
+        await LoadAsync();
+    }
+
+    private async Task OnPageSizeChanged(ChangeEventArgs args)
+    {
+        if (!int.TryParse(args.Value?.ToString(), out var pageSize))
+        {
+            return;
+        }
+
+        filter.PageSize = pageSize;
+        filter.Page = 1;
+        await LoadAsync();
+    }
+
+    private static string DisplayValue(string value) => string.IsNullOrWhiteSpace(value) ? "Sin dato" : value;
+    private static string FormatInvoiceStatus(string status) => status switch
+    {
+        "Pending" => "Pendiente",
+        "Drafted" => "En borrador",
+        "Invoiced" => "Facturado",
+        _ => status
+    };
+
+    private static string GetInvoiceStatusClass(string status) => status switch
+    {
+        "Pending" => "warning",
+        "Drafted" => "warning",
+        "Invoiced" => "success",
+        _ => "success"
+    };
+}

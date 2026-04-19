@@ -1,0 +1,602 @@
+@page "/ventas/pre-facturacion"
+@attribute [Authorize(Roles = "TenantAdmin,TenantReader")]
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject ISalesOrderQueries SalesOrderQueries
+@inject ISalesOrderService SalesOrderService
+@inject ILegacySyncService LegacySyncService
+@inject NavigationManager NavigationManager
+
+<PageTitle>Ventas / Pre-facturación</PageTitle>
+
+<div class="page-header">
+    <div>
+        <p class="eyebrow">Ventas</p>
+        <h1>Pre-facturación</h1>
+        <p class="lead">Bandeja de albaranes pendientes y generación de borradores de factura agrupados por cliente.</p>
+    </div>
+</div>
+
+@if (!tenantId.HasValue || !companyId.HasValue)
+{
+    <div class="empty-state">
+        <p>Selecciona una empresa activa para preparar borradores de factura.</p>
+    </div>
+}
+else
+{
+    @if (shipmentsSyncStatus?.HasSuccessfulSync == true)
+    {
+        <div class="alert warning">
+            Ventas / Albaranes está en convivencia con legacy para esta empresa. La pre-facturación web queda en solo lectura mientras la sincronización mande.
+            @if (shipmentsSyncStatus.LastCompletedUtc.HasValue)
+            {
+                <span>Última sync: @shipmentsSyncStatus.LastCompletedUtc.Value.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss") · Ins: @shipmentsSyncStatus.LastInserted · Act: @shipmentsSyncStatus.LastUpdated · Omi: @shipmentsSyncStatus.LastSkipped · Err: @shipmentsSyncStatus.LastErrors</span>
+            }
+        </div>
+    }
+
+    @if (!string.IsNullOrWhiteSpace(statusMessage))
+    {
+        <div class="alert @(isError ? "danger" : "success")">@statusMessage</div>
+    }
+
+    <section class="panel">
+        <div class="filter-row">
+            <input class="text-input" @bind="searchText" placeholder="Buscar por albarán, pedido, cliente o notas" disabled="@isLoading" />
+            <button class="secondary-button" @onclick="SearchAsync" disabled="@isLoading">@(isLoading ? "Cargando..." : "Buscar")</button>
+        </div>
+    </section>
+
+    <div class="card-grid purchase-summary-grid purchase-metrics-grid">
+        <article class="info-card accent-card">
+            <h2>@pendingTotalCount</h2>
+            <p class="muted">albaranes pendientes</p>
+        </article>
+        <article class="info-card">
+            <h2>@pendingShipments.Sum(item => item.EstimatedAmount).ToString("0.00") €</h2>
+            <p class="muted">importe pendiente en página</p>
+        </article>
+        <article class="info-card">
+            <h2>@draftTotalCount</h2>
+            <p class="muted">borradores creados</p>
+        </article>
+        <article class="info-card">
+            <h2>@invoiceDrafts.Sum(item => item.TotalAmount).ToString("0.00") €</h2>
+            <p class="muted">importe en borrador en página</p>
+        </article>
+    </div>
+
+    @if (canEdit)
+    {
+        <section class="panel" style="margin-top: 1rem;">
+            <h2>Crear borrador</h2>
+            <p class="muted">Selecciona uno o varios albaranes pendientes del mismo cliente para agruparlos en un primer borrador de factura.</p>
+
+            <div class="form-grid">
+                <label class="field">
+                    <span>Fecha borrador</span>
+                    <InputDate class="text-input" @bind-Value="draftForm.IssueDate" />
+                </label>
+                <label class="field">
+                    <span>Vencimiento</span>
+                    <InputDate class="text-input" @bind-Value="draftForm.DueDate" />
+                </label>
+                <label class="field wide">
+                    <span>Notas</span>
+                    <InputTextArea class="text-area" @bind-Value="draftForm.Notes" />
+                </label>
+            </div>
+
+            <div class="quick-links">
+                <span class="muted">Seleccionados: @selectedShipmentIds.Count @(selectedClientName is null ? string.Empty : $"· Cliente {selectedClientName}")</span>
+                <button class="primary-button" type="button" disabled="@(selectedShipmentIds.Count == 0)" @onclick="CreateDraftAsync">Crear borrador</button>
+                <button class="secondary-button" type="button" disabled="@(selectedShipmentIds.Count == 0)" @onclick="ClearSelection">Limpiar selección</button>
+            </div>
+        </section>
+    }
+
+    <section class="panel @(isLoading ? "loading-panel" : string.Empty)" style="margin-top: 1rem;">
+        <div class="filter-row results-toolbar">
+            <span class="results-summary">
+                @(pendingTotalCount == 0
+                    ? "Sin albaranes pendientes"
+                    : $"Mostrando {PendingPageStart}-{PendingPageEnd} de {pendingTotalCount} albaranes pendientes")
+            </span>
+            <label class="field compact-field">
+                <span>Tamaño de página</span>
+                <select class="sidebar-select compact-select" value="@pendingFilter.PageSize" @onchange="OnPendingPageSizeChanged" disabled="@isLoading">
+                    <option value="25">25</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                </select>
+            </label>
+        </div>
+
+        @if (isLoading)
+        {
+            <div class="loading-banner">
+                <span class="loading-indicator" aria-hidden="true"></span>
+                <span>Cargando albaranes pendientes...</span>
+            </div>
+        }
+
+        <h2>Albaranes pendientes</h2>
+        <table class="data-table">
+            <thead>
+                <tr>
+                    @if (canEdit)
+                    {
+                        <th></th>
+                    }
+                    <SortableHeader Label="Albarán" IsActive="@(pendingSortColumn == nameof(PendingSalesShipmentDto.ShipmentNumber))" Descending="@pendingSortDescending" OnSort="@(() => SetPendingSortAsync(nameof(PendingSalesShipmentDto.ShipmentNumber), true))" />
+                    <SortableHeader Label="Pedido" IsActive="@(pendingSortColumn == nameof(PendingSalesShipmentDto.OrderNumber))" Descending="@pendingSortDescending" OnSort="@(() => SetPendingSortAsync(nameof(PendingSalesShipmentDto.OrderNumber), true))" />
+                    <SortableHeader Label="Cliente" IsActive="@(pendingSortColumn == nameof(PendingSalesShipmentDto.ClientName))" Descending="@pendingSortDescending" OnSort="@(() => SetPendingSortAsync(nameof(PendingSalesShipmentDto.ClientName)))" />
+                    <SortableHeader Label="Fecha" IsActive="@(pendingSortColumn == nameof(PendingSalesShipmentDto.ShipmentDate))" Descending="@pendingSortDescending" OnSort="@(() => SetPendingSortAsync(nameof(PendingSalesShipmentDto.ShipmentDate), true))" />
+                    <SortableHeader Label="Almacén" IsActive="@(pendingSortColumn == nameof(PendingSalesShipmentDto.Warehouse))" Descending="@pendingSortDescending" OnSort="@(() => SetPendingSortAsync(nameof(PendingSalesShipmentDto.Warehouse)))" />
+                    <SortableHeader Label="Cantidad" IsActive="@(pendingSortColumn == nameof(PendingSalesShipmentDto.TotalShippedQuantity))" Descending="@pendingSortDescending" OnSort="@(() => SetPendingSortAsync(nameof(PendingSalesShipmentDto.TotalShippedQuantity), true))" />
+                    <SortableHeader Label="Importe" IsActive="@(pendingSortColumn == nameof(PendingSalesShipmentDto.EstimatedAmount))" Descending="@pendingSortDescending" OnSort="@(() => SetPendingSortAsync(nameof(PendingSalesShipmentDto.EstimatedAmount), true))" />
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (isLoading)
+                {
+                    @for (var index = 0; index < 5; index++)
+                    {
+                        <tr class="table-skeleton-row">
+                            @if (canEdit)
+                            {
+                                <td><span class="skeleton-line short"></span></td>
+                            }
+                            <td><span class="skeleton-line short"></span></td>
+                            <td><span class="skeleton-line short"></span></td>
+                            <td><span class="skeleton-line"></span></td>
+                            <td><span class="skeleton-line short"></span></td>
+                            <td><span class="skeleton-line short"></span></td>
+                            <td><span class="skeleton-line short"></span></td>
+                            <td><span class="skeleton-line short"></span></td>
+                            <td><span class="skeleton-line short"></span></td>
+                        </tr>
+                    }
+                }
+                else if (pendingShipments.Count == 0)
+                {
+                    <tr>
+                        <td colspan="@(canEdit ? 9 : 8)" class="table-empty">No hay albaranes pendientes de facturar.</td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var item in pendingShipments)
+                    {
+                        <tr>
+                            @if (canEdit)
+                            {
+                                <td>
+                                    <input type="checkbox"
+                                           checked="@selectedShipmentIds.Contains(item.ShipmentId)"
+                                           disabled="@IsSelectionBlocked(item)"
+                                           @onchange="args => ToggleSelection(item, args.Value)" />
+                                </td>
+                            }
+                            <td>@item.DisplayNumber</td>
+                            <td>@item.OrderNumber</td>
+                            <td>@item.ClientName</td>
+                            <td>@item.ShipmentDate.ToString("dd/MM/yyyy")</td>
+                            <td>@DisplayValue(item.Warehouse)</td>
+                            <td>@item.TotalShippedQuantity.ToString("0.###")</td>
+                            <td>@item.EstimatedAmount.ToString("0.00") €</td>
+                            <td><a class="inline-link" href="/ventas/albaranes/@item.ShipmentNumber">Abrir</a></td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+
+        <div class="pagination-bar">
+            <span class="muted">Página @pendingFilter.Page de @PendingTotalPages</span>
+            <div class="pagination-actions">
+                <button class="secondary-button" @onclick="() => ChangePendingPageAsync(1)" disabled="@(!CanGoPendingPrevious || isLoading)">Primera</button>
+                <button class="secondary-button" @onclick="() => ChangePendingPageAsync(pendingFilter.Page - 1)" disabled="@(!CanGoPendingPrevious || isLoading)">Anterior</button>
+                <button class="secondary-button" @onclick="() => ChangePendingPageAsync(pendingFilter.Page + 1)" disabled="@(!CanGoPendingNext || isLoading)">Siguiente</button>
+                <button class="secondary-button" @onclick="() => ChangePendingPageAsync(PendingTotalPages)" disabled="@(!CanGoPendingNext || isLoading)">Última</button>
+            </div>
+        </div>
+    </section>
+
+    <section class="panel @(isLoading ? "loading-panel" : string.Empty)" style="margin-top: 1rem;">
+        <div class="filter-row results-toolbar">
+            <span class="results-summary">
+                @(draftTotalCount == 0
+                    ? "Sin borradores"
+                    : $"Mostrando {DraftPageStart}-{DraftPageEnd} de {draftTotalCount} borradores")
+            </span>
+            <label class="field compact-field">
+                <span>Tamaño de página</span>
+                <select class="sidebar-select compact-select" value="@draftFilter.PageSize" @onchange="OnDraftPageSizeChanged" disabled="@isLoading">
+                    <option value="25">25</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                </select>
+            </label>
+        </div>
+
+        <h2>Borradores recientes</h2>
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <SortableHeader Label="Borrador" IsActive="@(draftSortColumn == nameof(SalesInvoiceDraftListItemDto.DraftNumber))" Descending="@draftSortDescending" OnSort="@(() => SetDraftSortAsync(nameof(SalesInvoiceDraftListItemDto.DraftNumber), true))" />
+                    <SortableHeader Label="Cliente" IsActive="@(draftSortColumn == nameof(SalesInvoiceDraftListItemDto.ClientName))" Descending="@draftSortDescending" OnSort="@(() => SetDraftSortAsync(nameof(SalesInvoiceDraftListItemDto.ClientName)))" />
+                    <SortableHeader Label="Fecha" IsActive="@(draftSortColumn == nameof(SalesInvoiceDraftListItemDto.IssueDate))" Descending="@draftSortDescending" OnSort="@(() => SetDraftSortAsync(nameof(SalesInvoiceDraftListItemDto.IssueDate), true))" />
+                    <SortableHeader Label="Vencimiento" IsActive="@(draftSortColumn == nameof(SalesInvoiceDraftListItemDto.DueDate))" Descending="@draftSortDescending" OnSort="@(() => SetDraftSortAsync(nameof(SalesInvoiceDraftListItemDto.DueDate), true))" />
+                    <SortableHeader Label="Estado" IsActive="@(draftSortColumn == nameof(SalesInvoiceDraftListItemDto.Status))" Descending="@draftSortDescending" OnSort="@(() => SetDraftSortAsync(nameof(SalesInvoiceDraftListItemDto.Status)))" />
+                    <SortableHeader Label="Albaranes" IsActive="@(draftSortColumn == nameof(SalesInvoiceDraftListItemDto.ShipmentCount))" Descending="@draftSortDescending" OnSort="@(() => SetDraftSortAsync(nameof(SalesInvoiceDraftListItemDto.ShipmentCount), true))" />
+                    <SortableHeader Label="Total" IsActive="@(draftSortColumn == nameof(SalesInvoiceDraftListItemDto.TotalAmount))" Descending="@draftSortDescending" OnSort="@(() => SetDraftSortAsync(nameof(SalesInvoiceDraftListItemDto.TotalAmount), true))" />
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (isLoading)
+                {
+                    @for (var index = 0; index < 5; index++)
+                    {
+                        <tr class="table-skeleton-row">
+                            <td><span class="skeleton-line short"></span></td>
+                            <td><span class="skeleton-line"></span></td>
+                            <td><span class="skeleton-line short"></span></td>
+                            <td><span class="skeleton-line short"></span></td>
+                            <td><span class="skeleton-line short"></span></td>
+                            <td><span class="skeleton-line short"></span></td>
+                            <td><span class="skeleton-line short"></span></td>
+                            <td><span class="skeleton-line short"></span></td>
+                        </tr>
+                    }
+                }
+                else if (invoiceDrafts.Count == 0)
+                {
+                    <tr>
+                        <td colspan="8" class="table-empty">Todavía no hay borradores de factura.</td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var item in invoiceDrafts)
+                    {
+                        <tr>
+                            <td>@item.DisplayNumber</td>
+                            <td>@item.ClientName</td>
+                            <td>@item.IssueDate.ToString("dd/MM/yyyy")</td>
+                            <td>@(item.DueDate?.ToString("dd/MM/yyyy") ?? "-")</td>
+                            <td><span class="status-pill @GetDraftStatusClass(item.Status)">@FormatDraftStatus(item.Status)</span></td>
+                            <td>@item.ShipmentCount</td>
+                            <td>@item.TotalAmount.ToString("0.00") €</td>
+                            <td>
+                                <div class="table-actions">
+                                    <a class="inline-link" href="/ventas/pre-facturacion/borradores/@item.DraftNumber">Ver borrador</a>
+                                    @if (item.InvoiceNumber is int invoiceNumber)
+                                    {
+                                        <a class="inline-link" href="/ventas/facturas/@invoiceNumber">Abrir factura</a>
+                                    }
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+
+        <div class="pagination-bar">
+            <span class="muted">Página @draftFilter.Page de @DraftTotalPages</span>
+            <div class="pagination-actions">
+                <button class="secondary-button" @onclick="() => ChangeDraftPageAsync(1)" disabled="@(!CanGoDraftPrevious || isLoading)">Primera</button>
+                <button class="secondary-button" @onclick="() => ChangeDraftPageAsync(draftFilter.Page - 1)" disabled="@(!CanGoDraftPrevious || isLoading)">Anterior</button>
+                <button class="secondary-button" @onclick="() => ChangeDraftPageAsync(draftFilter.Page + 1)" disabled="@(!CanGoDraftNext || isLoading)">Siguiente</button>
+                <button class="secondary-button" @onclick="() => ChangeDraftPageAsync(DraftTotalPages)" disabled="@(!CanGoDraftNext || isLoading)">Última</button>
+            </div>
+        </div>
+    </section>
+}
+
+@code {
+    private Guid? tenantId;
+    private Guid? companyId;
+    private bool canEdit;
+    private bool isLoading;
+    private string searchText = string.Empty;
+    private SalesPreInvoiceFilter pendingFilter = new() { Page = 1, PageSize = 25, SortColumn = nameof(PendingSalesShipmentDto.ShipmentNumber), SortDescending = true };
+    private SalesPreInvoiceFilter draftFilter = new() { Page = 1, PageSize = 25, SortColumn = nameof(SalesInvoiceDraftListItemDto.DraftNumber), SortDescending = true };
+    private IReadOnlyCollection<PendingSalesShipmentDto> pendingShipments = [];
+    private IReadOnlyCollection<SalesInvoiceDraftListItemDto> invoiceDrafts = [];
+    private HashSet<Guid> selectedShipmentIds = [];
+    private int? selectedClientCode;
+    private string? selectedClientName;
+    private string statusMessage = string.Empty;
+    private bool isError;
+    private DraftFormModel draftForm = new();
+    private string pendingSortColumn = nameof(PendingSalesShipmentDto.ShipmentNumber);
+    private bool pendingSortDescending = true;
+    private string draftSortColumn = nameof(SalesInvoiceDraftListItemDto.DraftNumber);
+    private bool draftSortDescending = true;
+    private int pendingTotalCount;
+    private int draftTotalCount;
+    private LegacySyncModuleStatusDto? shipmentsSyncStatus;
+
+    private int PendingTotalPages => Math.Max(1, (int)Math.Ceiling(pendingTotalCount / (double)pendingFilter.PageSize));
+    private bool CanGoPendingPrevious => pendingFilter.Page > 1;
+    private bool CanGoPendingNext => pendingFilter.Page < PendingTotalPages;
+    private int PendingPageStart => pendingTotalCount == 0 ? 0 : ((pendingFilter.Page - 1) * pendingFilter.PageSize) + 1;
+    private int PendingPageEnd => pendingTotalCount == 0 ? 0 : Math.Min(pendingFilter.Page * pendingFilter.PageSize, pendingTotalCount);
+    private int DraftTotalPages => Math.Max(1, (int)Math.Ceiling(draftTotalCount / (double)draftFilter.PageSize));
+    private bool CanGoDraftPrevious => draftFilter.Page > 1;
+    private bool CanGoDraftNext => draftFilter.Page < DraftTotalPages;
+    private int DraftPageStart => draftTotalCount == 0 ? 0 : ((draftFilter.Page - 1) * draftFilter.PageSize) + 1;
+    private int DraftPageEnd => draftTotalCount == 0 ? 0 : Math.Min(draftFilter.Page * draftFilter.PageSize, draftTotalCount);
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        tenantId = user.GetTenantId();
+        companyId = user.GetActiveCompanyId();
+        canEdit = user.IsPlatformAdmin() || user.IsInRole(PlatformRoles.TenantAdmin);
+        if (tenantId.HasValue && companyId.HasValue)
+        {
+            shipmentsSyncStatus = (await LegacySyncService.GetModuleStatusesAsync(tenantId.Value))
+                .FirstOrDefault(status =>
+                    status.CompanyId == companyId.Value &&
+                    string.Equals(status.ModuleKey, LegacySyncModuleKeys.SalesShipments, StringComparison.OrdinalIgnoreCase));
+            if (shipmentsSyncStatus?.HasSuccessfulSync == true)
+            {
+                canEdit = false;
+            }
+        }
+        await LoadAsync();
+    }
+
+    private async Task LoadAsync()
+    {
+        statusMessage = string.Empty;
+        isError = false;
+
+        if (!tenantId.HasValue || !companyId.HasValue)
+        {
+            pendingShipments = [];
+            invoiceDrafts = [];
+            pendingTotalCount = 0;
+            draftTotalCount = 0;
+            return;
+        }
+
+        isLoading = true;
+        await InvokeAsync(StateHasChanged);
+
+        try
+        {
+            pendingFilter.Search = searchText;
+            pendingFilter.SortColumn = pendingSortColumn;
+            pendingFilter.SortDescending = pendingSortDescending;
+            draftFilter.Search = searchText;
+            draftFilter.SortColumn = draftSortColumn;
+            draftFilter.SortDescending = draftSortDescending;
+
+            var pendingTask = SalesOrderQueries.SearchPendingShipmentsAsync(tenantId.Value, companyId.Value, pendingFilter);
+            var draftTask = SalesOrderQueries.SearchInvoiceDraftsAsync(tenantId.Value, companyId.Value, draftFilter);
+            await Task.WhenAll(pendingTask, draftTask);
+
+            var pendingResult = await pendingTask;
+            var draftResult = await draftTask;
+
+            pendingShipments = pendingResult.Items;
+            pendingTotalCount = pendingResult.TotalCount;
+            invoiceDrafts = draftResult.Items;
+            draftTotalCount = draftResult.TotalCount;
+            SyncSelection();
+        }
+        catch (Exception exception)
+        {
+            statusMessage = exception.Message;
+            isError = true;
+            pendingShipments = [];
+            invoiceDrafts = [];
+            pendingTotalCount = 0;
+            draftTotalCount = 0;
+            ClearSelection();
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private async Task SearchAsync()
+    {
+        pendingFilter.Page = 1;
+        draftFilter.Page = 1;
+        ClearSelection();
+        await LoadAsync();
+    }
+
+    private async Task CreateDraftAsync()
+    {
+        if (!tenantId.HasValue || !companyId.HasValue || !canEdit || selectedShipmentIds.Count == 0)
+        {
+            return;
+        }
+
+        try
+        {
+            statusMessage = string.Empty;
+            isError = false;
+
+            var draftNumber = await SalesOrderService.CreateInvoiceDraftAsync(new CreateSalesInvoiceDraftCommand
+            {
+                TenantId = tenantId.Value,
+                CompanyId = companyId.Value,
+                IssueDate = draftForm.IssueDate,
+                DueDate = draftForm.DueDate,
+                Notes = draftForm.Notes,
+                ShipmentIds = selectedShipmentIds.ToList()
+            });
+
+            ClearSelection();
+            draftForm = new DraftFormModel();
+            await LoadAsync();
+            NavigationManager.NavigateTo($"/ventas/pre-facturacion/borradores/{draftNumber}");
+        }
+        catch (Exception exception)
+        {
+            statusMessage = exception.Message;
+            isError = true;
+        }
+    }
+
+    private void ToggleSelection(PendingSalesShipmentDto shipment, object? rawValue)
+    {
+        if (!bool.TryParse(Convert.ToString(rawValue), out var isChecked))
+        {
+            isChecked = false;
+        }
+
+        if (isChecked)
+        {
+            selectedShipmentIds.Add(shipment.ShipmentId);
+        }
+        else
+        {
+            selectedShipmentIds.Remove(shipment.ShipmentId);
+        }
+
+        SyncSelection();
+    }
+
+    private bool IsSelectionBlocked(PendingSalesShipmentDto shipment) =>
+        selectedClientCode.HasValue &&
+        selectedClientCode.Value != shipment.ClientCode &&
+        !selectedShipmentIds.Contains(shipment.ShipmentId);
+
+    private void SyncSelection()
+    {
+        selectedShipmentIds = pendingShipments
+            .Where(item => selectedShipmentIds.Contains(item.ShipmentId))
+            .Select(item => item.ShipmentId)
+            .ToHashSet();
+
+        var selectedShipments = pendingShipments
+            .Where(item => selectedShipmentIds.Contains(item.ShipmentId))
+            .ToArray();
+
+        selectedClientCode = selectedShipments.FirstOrDefault()?.ClientCode;
+        selectedClientName = selectedShipments.FirstOrDefault()?.ClientName;
+    }
+
+    private void ClearSelection()
+    {
+        selectedShipmentIds.Clear();
+        selectedClientCode = null;
+        selectedClientName = null;
+    }
+
+    private async Task SetPendingSortAsync(string column, bool defaultDescending = false)
+    {
+        if (string.Equals(pendingSortColumn, column, StringComparison.Ordinal))
+        {
+            pendingSortDescending = !pendingSortDescending;
+        }
+        else
+        {
+            pendingSortColumn = column;
+            pendingSortDescending = defaultDescending;
+        }
+
+        pendingFilter.Page = 1;
+        ClearSelection();
+        await LoadAsync();
+    }
+
+    private async Task SetDraftSortAsync(string column, bool defaultDescending = false)
+    {
+        if (string.Equals(draftSortColumn, column, StringComparison.Ordinal))
+        {
+            draftSortDescending = !draftSortDescending;
+        }
+        else
+        {
+            draftSortColumn = column;
+            draftSortDescending = defaultDescending;
+        }
+
+        draftFilter.Page = 1;
+        await LoadAsync();
+    }
+
+    private async Task ChangePendingPageAsync(int page)
+    {
+        var newPage = Math.Max(1, Math.Min(page, PendingTotalPages));
+        if (newPage == pendingFilter.Page)
+        {
+            return;
+        }
+
+        pendingFilter.Page = newPage;
+        ClearSelection();
+        await LoadAsync();
+    }
+
+    private async Task ChangeDraftPageAsync(int page)
+    {
+        var newPage = Math.Max(1, Math.Min(page, DraftTotalPages));
+        if (newPage == draftFilter.Page)
+        {
+            return;
+        }
+
+        draftFilter.Page = newPage;
+        await LoadAsync();
+    }
+
+    private async Task OnPendingPageSizeChanged(ChangeEventArgs args)
+    {
+        if (!int.TryParse(args.Value?.ToString(), out var pageSize))
+        {
+            return;
+        }
+
+        pendingFilter.PageSize = pageSize;
+        pendingFilter.Page = 1;
+        ClearSelection();
+        await LoadAsync();
+    }
+
+    private async Task OnDraftPageSizeChanged(ChangeEventArgs args)
+    {
+        if (!int.TryParse(args.Value?.ToString(), out var pageSize))
+        {
+            return;
+        }
+
+        draftFilter.PageSize = pageSize;
+        draftFilter.Page = 1;
+        await LoadAsync();
+    }
+
+    private static string DisplayValue(string value) => string.IsNullOrWhiteSpace(value) ? "Sin dato" : value;
+    private static string FormatDraftStatus(string status) => status switch
+    {
+        SalesInvoiceDraftStatuses.Draft => "Borrador",
+        SalesInvoiceDraftStatuses.Issued => "Emitido",
+        _ => status
+    };
+
+    private static string GetDraftStatusClass(string status) => status switch
+    {
+        SalesInvoiceDraftStatuses.Issued => "success",
+        _ => "warning"
+    };
+
+    private sealed class DraftFormModel
+    {
+        public DateTime IssueDate { get; set; } = DateTime.Today;
+        public DateTime? DueDate { get; set; }
+        public string Notes { get; set; } = string.Empty;
+    }
+}

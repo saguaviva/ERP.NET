@@ -22,6 +22,9 @@ public static class ClaimsPrincipalExtensions
         return Guid.TryParse(value, out var result) ? result : null;
     }
 
+    public static bool RequiresPasswordChange(this ClaimsPrincipal user) =>
+        string.Equals(user.FindFirstValue(AppClaimTypes.RequirePasswordChange), bool.TrueString, StringComparison.OrdinalIgnoreCase);
+
     public static bool IsPlatformAdmin(this ClaimsPrincipal user) =>
         string.Equals(user.FindFirstValue(AppClaimTypes.IsPlatformAdmin), bool.TrueString, StringComparison.OrdinalIgnoreCase);
 }

@@ -1,0 +1,641 @@
+@page "/ventas/pedidos/nuevo"
+@page "/ventas/pedidos/editar/{OrderNumber:int}"
+@attribute [Authorize(Roles = "TenantAdmin,TenantReader")]
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IAuditLogService AuditLogService
+@inject IClienteQueries ClienteQueries
+@inject ILegacySyncService LegacySyncService
+@inject ISalesOrderQueries SalesOrderQueries
+@inject ISalesOrderService SalesOrderService
+@inject NavigationManager NavigationManager
+
+<PageTitle>@(OrderNumber.HasValue ? $"Pedido venta {OrderNumber}" : "Nuevo pedido de cliente")</PageTitle>
+
+<div class="page-header">
+    <div>
+        <p class="eyebrow">Ventas</p>
+        <h1>@(OrderNumber.HasValue ? $"Pedido {OrderNumber}" : "Nuevo pedido de cliente")</h1>
+        <p class="lead">Cabecera, líneas y expedición parcial o total con salida de stock desde almacén.</p>
+    </div>
+    <div class="quick-links">
+        <a class="secondary-button link-button" href="/ventas/pedidos">Volver al listado</a>
+        <a class="secondary-button link-button" href="/ventas/pre-facturacion">Abrir pre-facturación</a>
+    </div>
+</div>
+
+@if (!tenantId.HasValue || !companyId.HasValue)
+{
+    <div class="empty-state">
+        <p>No hay empresa activa seleccionada.</p>
+    </div>
+}
+else if (!canEdit && !OrderNumber.HasValue)
+{
+    <div class="empty-state">
+        <p>No tienes permisos para crear pedidos de cliente.</p>
+    </div>
+}
+else if (isLegacySyncActive && !OrderNumber.HasValue)
+{
+    <div class="empty-state">
+        <p>Ventas / Pedidos está en convivencia con legacy para esta empresa. Los nuevos pedidos deben seguir creándose en TEX.NET mientras dure esta fase.</p>
+    </div>
+}
+else
+{
+    @if (!string.IsNullOrWhiteSpace(statusMessage))
+    {
+        <div class="alert @(isError ? "danger" : "success")">@statusMessage</div>
+    }
+
+    @if (isLegacySyncActive)
+    {
+        <div class="alert warning">
+            Este módulo está sincronizado desde legacy para la empresa activa. La edición y expedición quedan bloqueadas en la web mientras siga la convivencia.
+            @if (lastSyncUtc.HasValue)
+            {
+                <span> Última sync: @lastSyncUtc.Value.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss").</span>
+            }
+        </div>
+    }
+
+    <EditForm Model="model" OnValidSubmit="SaveAsync">
+        <div class="form-grid">
+            <label class="field">
+                <span>Cliente</span>
+                <InputSelect class="text-input" @bind-Value="model.ClientCode" disabled="@(!canModify)">
+                    <option value="0">Selecciona cliente</option>
+                    @foreach (var client in clients)
+                    {
+                        <option value="@client.Code">@client.Name (@client.Code)</option>
+                    }
+                </InputSelect>
+                @if (SelectedClient is not null)
+                {
+                    <span class="field-hint">@SelectedClient.TaxId · @SelectedClient.City</span>
+                }
+            </label>
+            <label class="field">
+                <span>Fecha documento</span>
+                <InputDate class="text-input" @bind-Value="model.DocumentDate" disabled="@(!canModify)" />
+            </label>
+            <label class="field">
+                <span>Fecha solicitada</span>
+                <InputDate class="text-input" @bind-Value="model.RequestedDate" disabled="@(!canModify)" />
+            </label>
+            <label class="field">
+                <span>Estado</span>
+                <InputSelect class="text-input" @bind-Value="model.Status" disabled="@(!canModify || HasAnyShipment)">
+                    @foreach (var status in SalesOrderStatuses.All)
+                    {
+                        <option value="@status">@FormatStatus(status)</option>
+                    }
+                </InputSelect>
+                @if (HasAnyShipment)
+                {
+                    <span class="field-hint">El estado pasa a depender de las cantidades expedidas.</span>
+                }
+            </label>
+            <label class="field wide">
+                <span>Notas</span>
+                <InputTextArea class="text-area" @bind-Value="model.Notes" disabled="@(!canModify)" />
+            </label>
+        </div>
+
+        <section class="panel">
+            <div class="page-header">
+                <div>
+                    <h2>Líneas</h2>
+                    <p class="muted">Añade artículos, cantidades, precios y fechas pedidas por línea.</p>
+                </div>
+                @if (canModify)
+                {
+                    <button class="secondary-button" type="button" @onclick="AddLine">Añadir línea</button>
+                }
+            </div>
+
+            <div class="stack">
+                @for (var index = 0; index < model.Lines.Count; index++)
+                {
+                    var line = model.Lines[index];
+                    <section class="panel line-editor">
+                        <div class="panel-header">
+                            <strong>Línea @line.LineNumber</strong>
+                            @if (canModify && model.Lines.Count > 1)
+                            {
+                                <button class="secondary-button" type="button" @onclick="() => RemoveLine(index)">Quitar</button>
+                            }
+                        </div>
+                        <div class="form-grid">
+                            <label class="field">
+                                <span>Artículo</span>
+                                <InputText class="text-input" @bind-Value="line.ItemCode" disabled="@(!canModify)" />
+                            </label>
+                            <label class="field wide">
+                                <span>Descripción</span>
+                                <InputText class="text-input" @bind-Value="line.Description" disabled="@(!canModify)" />
+                            </label>
+                            <label class="field">
+                                <span>Cantidad</span>
+                                <InputNumber class="text-input" @bind-Value="line.Quantity" disabled="@(!canModify)" />
+                            </label>
+                            <label class="field">
+                                <span>Unidad</span>
+                                <InputText class="text-input" @bind-Value="line.UnitOfMeasure" disabled="@(!canModify)" />
+                            </label>
+                            <label class="field">
+                                <span>Precio unitario</span>
+                                <InputNumber class="text-input" @bind-Value="line.UnitPrice" disabled="@(!canModify)" />
+                            </label>
+                            <label class="field">
+                                <span>Pedida</span>
+                                <InputDate class="text-input" @bind-Value="line.RequestedDate" disabled="@(!canModify)" />
+                            </label>
+                            <label class="field wide">
+                                <span>Notas línea</span>
+                                <InputTextArea class="text-area" @bind-Value="line.Notes" disabled="@(!canModify)" />
+                            </label>
+                        </div>
+                        <div class="stack">
+                            <div class="muted">Total línea: @LineTotal(line).ToString("0.00") €</div>
+                            <div class="muted">Expedido: @line.ShippedQuantity.ToString("0.###") · Pendiente: @line.PendingQuantity.ToString("0.###")</div>
+                        </div>
+                    </section>
+                }
+            </div>
+        </section>
+
+        <section class="panel">
+            <h2>Resumen</h2>
+            <div class="card-grid purchase-summary-grid purchase-metrics-grid">
+                <article class="info-card">
+                    <h2>@model.Lines.Count</h2>
+                    <p class="muted">líneas</p>
+                </article>
+                <article class="info-card">
+                    <h2>@TotalQuantity.ToString("0.###")</h2>
+                    <p class="muted">cantidad total</p>
+                </article>
+                <article class="info-card">
+                    <h2>@TotalShippedQuantity.ToString("0.###")</h2>
+                    <p class="muted">expedido</p>
+                </article>
+                <article class="info-card">
+                    <h2>@TotalPendingQuantity.ToString("0.###")</h2>
+                    <p class="muted">pendiente</p>
+                </article>
+                <article class="info-card accent-card">
+                    <h2>@TotalAmount.ToString("0.00") €</h2>
+                    <p class="muted">importe total</p>
+                </article>
+            </div>
+        </section>
+
+        @if (canModify)
+        {
+            <div class="quick-links" style="margin-top: 1rem;">
+                <button class="primary-button" type="submit">Guardar pedido</button>
+            </div>
+        }
+    </EditForm>
+
+    @if (OrderNumber.HasValue)
+    {
+        @if (canModify && model.Lines.Any(line => line.PendingQuantity > 0) && !string.Equals(model.Status, SalesOrderStatuses.Cancelled, StringComparison.OrdinalIgnoreCase))
+        {
+            <section class="panel" style="margin-top: 1rem;">
+                <h2>Salida de mercancía</h2>
+                <p class="muted">Marca solo las cantidades que salen ahora. La salida generará movimientos de stock reales.</p>
+
+                <div class="form-grid">
+                    <label class="field">
+                        <span>Fecha de salida</span>
+                        <InputDate class="text-input" @bind-Value="shipmentForm.ShipmentDate" />
+                    </label>
+                    <label class="field">
+                        <span>Almacén</span>
+                        <InputText class="text-input" @bind-Value="shipmentForm.Warehouse" />
+                    </label>
+                    <label class="field wide">
+                        <span>Notas de salida</span>
+                        <InputTextArea class="text-area" @bind-Value="shipmentForm.Notes" />
+                    </label>
+                </div>
+
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Línea</th>
+                            <th>Descripción</th>
+                            <th>Pedida</th>
+                            <th>Expedida</th>
+                            <th>Pendiente</th>
+                            <th>Salir ahora</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var line in model.Lines)
+                        {
+                            <tr>
+                                <td>@line.LineNumber</td>
+                                <td>@line.Description</td>
+                                <td>@line.Quantity.ToString("0.###")</td>
+                                <td>@line.ShippedQuantity.ToString("0.###")</td>
+                                <td>@line.PendingQuantity.ToString("0.###")</td>
+                                <td>
+                                    <InputNumber class="text-input receipt-qty-input" @bind-Value="line.ShipNowQuantity" />
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+
+                <div class="quick-links" style="margin-top: 1rem;">
+                    <button class="primary-button" type="button" @onclick="RegisterShipmentAsync">Registrar salida</button>
+                </div>
+            </section>
+        }
+
+        <section class="panel" style="margin-top: 1rem;">
+            <h2>Salidas registradas</h2>
+            <div class="list-block">
+                @if (shipments.Count == 0)
+                {
+                    <p class="muted">Todavía no hay salidas registradas para este pedido.</p>
+                }
+                else
+                {
+                    @foreach (var shipment in shipments)
+                    {
+                        <article class="list-item">
+                            <strong>@shipment.DisplayNumber · @shipment.ShipmentDate.ToString("dd/MM/yyyy") · @shipment.TotalShippedQuantity.ToString("0.###") uds</strong>
+                            <span>Almacén: @DisplayValue(shipment.Warehouse)</span>
+                            <span>Facturación: @FormatInvoiceStatus(shipment.InvoiceStatus)</span>
+                            @if (!string.IsNullOrWhiteSpace(shipment.Notes))
+                            {
+                                <span>@shipment.Notes</span>
+                            }
+                            <span>@string.Join(" · ", shipment.Lines.Select(line => $"L{line.LineNumber}: -{line.ShippedQuantity:0.###}"))</span>
+                            <span><a class="inline-link" href="/ventas/albaranes/@shipment.ShipmentNumber">Abrir albarán</a> · <a class="inline-link" href="/ventas/albaranes/@shipment.ShipmentNumber/pdf" target="_blank">PDF</a></span>
+                        </article>
+                    }
+                }
+            </div>
+        </section>
+
+        <section class="panel" style="margin-top: 1rem;">
+            <h2>Historial reciente del pedido</h2>
+            <div class="list-block">
+                @if (recentAuditLogs.Count == 0)
+                {
+                    <p class="muted">Todavía no hay eventos auditados para este pedido.</p>
+                }
+                else
+                {
+                    @foreach (var entry in recentAuditLogs)
+                    {
+                        <article class="list-item">
+                            <strong>@entry.Action</strong>
+                            @if (!string.IsNullOrWhiteSpace(entry.Details))
+                            {
+                                <span>@entry.Details</span>
+                            }
+                            <span>@entry.CreatedUtc.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss")</span>
+                        </article>
+                    }
+                }
+            </div>
+        </section>
+    }
+}
+
+@code {
+    [Parameter]
+    public int? OrderNumber { get; set; }
+
+    private Guid? tenantId;
+    private Guid? companyId;
+    private bool canEdit;
+    private bool isLegacySyncActive;
+    private bool isLegacyOriginOrder;
+    private DateTime? lastSyncUtc;
+    private SalesOrderFormModel model = SalesOrderFormModel.CreateDefault();
+    private IReadOnlyCollection<ClienteListItemDto> clients = [];
+    private IReadOnlyCollection<SalesOrderShipmentDto> shipments = [];
+    private IReadOnlyCollection<AuditLogEntryDto> recentAuditLogs = [];
+    private string statusMessage = string.Empty;
+    private bool isError;
+    private ShipmentFormModel shipmentForm = new();
+
+    private ClienteListItemDto? SelectedClient =>
+        clients.FirstOrDefault(client => client.Code == model.ClientCode);
+
+    private decimal TotalAmount => model.Lines.Sum(LineTotal);
+    private decimal TotalQuantity => model.Lines.Sum(line => line.Quantity);
+    private decimal TotalShippedQuantity => model.Lines.Sum(line => line.ShippedQuantity);
+    private decimal TotalPendingQuantity => model.Lines.Sum(line => line.PendingQuantity);
+    private bool HasAnyShipment => model.Lines.Any(line => line.ShippedQuantity > 0);
+    private bool canModify => canEdit && !isLegacySyncActive && !isLegacyOriginOrder;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        tenantId = user.GetTenantId();
+        companyId = user.GetActiveCompanyId();
+        canEdit = user.IsPlatformAdmin() || user.IsInRole(PlatformRoles.TenantAdmin);
+        isLegacyOriginOrder = false;
+
+        if (tenantId.HasValue)
+        {
+            var syncStatuses = await LegacySyncService.GetModuleStatusesAsync(tenantId.Value);
+            var currentSyncStatus = syncStatuses.FirstOrDefault(status =>
+                companyId.HasValue &&
+                status.CompanyId == companyId.Value &&
+                string.Equals(status.ModuleKey, LegacySyncModuleKeys.SalesOrders, StringComparison.OrdinalIgnoreCase));
+            isLegacySyncActive = currentSyncStatus?.HasSuccessfulSync == true;
+            lastSyncUtc = currentSyncStatus?.LastCompletedUtc;
+        }
+
+        if (!tenantId.HasValue || !companyId.HasValue)
+        {
+            return;
+        }
+
+        clients = (await ClienteQueries.SearchAsync(tenantId.Value, companyId.Value, new ClienteFilter
+        {
+            IncludeBlocked = false,
+            Page = 1,
+            PageSize = 200,
+            SortColumn = nameof(ClienteListItemDto.Name)
+        })).Items;
+
+        if (OrderNumber.HasValue)
+        {
+            await ReloadOrderAsync();
+            await LoadAuditAsync();
+        }
+        else
+        {
+            model = SalesOrderFormModel.CreateDefault();
+            shipments = [];
+            recentAuditLogs = [];
+        }
+    }
+
+    private async Task SaveAsync()
+    {
+        if (!tenantId.HasValue || !companyId.HasValue || !canEdit)
+        {
+            return;
+        }
+
+        try
+        {
+            statusMessage = string.Empty;
+            isError = false;
+
+            var orderNumber = await SalesOrderService.SaveAsync(new SaveSalesOrderCommand
+            {
+                TenantId = tenantId.Value,
+                CompanyId = companyId.Value,
+                OrderNumber = OrderNumber,
+                ClientCode = model.ClientCode,
+                DocumentDate = model.DocumentDate,
+                RequestedDate = model.RequestedDate,
+                Status = model.Status,
+                Notes = model.Notes,
+                Lines = model.Lines.Select(line => new SalesOrderLineInputDto
+                {
+                    LineNumber = line.LineNumber,
+                    ItemCode = line.ItemCode,
+                    Description = line.Description,
+                    Quantity = line.Quantity,
+                    UnitOfMeasure = line.UnitOfMeasure,
+                    UnitPrice = line.UnitPrice,
+                    RequestedDate = line.RequestedDate,
+                    Notes = line.Notes
+                }).ToList()
+            });
+
+            statusMessage = OrderNumber.HasValue
+                ? "Pedido actualizado correctamente."
+                : "Pedido creado correctamente.";
+
+            if (!OrderNumber.HasValue)
+            {
+                NavigationManager.NavigateTo($"/ventas/pedidos/editar/{orderNumber}", forceLoad: false);
+                return;
+            }
+
+            await ReloadOrderAsync();
+            await LoadAuditAsync();
+        }
+        catch (Exception exception)
+        {
+            statusMessage = exception.Message;
+            isError = true;
+        }
+    }
+
+    private async Task RegisterShipmentAsync()
+    {
+        if (!tenantId.HasValue || !companyId.HasValue || !OrderNumber.HasValue || !canEdit)
+        {
+            return;
+        }
+
+        try
+        {
+            statusMessage = string.Empty;
+            isError = false;
+
+            await SalesOrderService.ShipAsync(new RegisterSalesOrderShipmentCommand
+            {
+                TenantId = tenantId.Value,
+                CompanyId = companyId.Value,
+                OrderNumber = OrderNumber.Value,
+                ShipmentDate = shipmentForm.ShipmentDate,
+                Warehouse = shipmentForm.Warehouse,
+                Notes = shipmentForm.Notes,
+                Lines = model.Lines
+                    .Where(line => line.ShipNowQuantity > 0)
+                    .Select(line => new RegisterSalesOrderShipmentLineDto
+                    {
+                        LineNumber = line.LineNumber,
+                        ShippedQuantity = line.ShipNowQuantity
+                    })
+                    .ToList()
+            });
+
+            shipmentForm = new ShipmentFormModel();
+            statusMessage = "Salida registrada correctamente.";
+            await ReloadOrderAsync();
+            await LoadAuditAsync();
+        }
+        catch (Exception exception)
+        {
+            statusMessage = exception.Message;
+            isError = true;
+        }
+    }
+
+    private void AddLine()
+    {
+        model.Lines.Add(new SalesOrderLineFormModel
+        {
+            LineNumber = GetNextLineNumber(),
+            Quantity = 1
+        });
+    }
+
+    private void RemoveLine(int index)
+    {
+        if (index < 0 || index >= model.Lines.Count)
+        {
+            return;
+        }
+
+        model.Lines.RemoveAt(index);
+        if (model.Lines.Count == 0)
+        {
+            AddLine();
+        }
+    }
+
+    private async Task ReloadOrderAsync()
+    {
+        if (!tenantId.HasValue || !companyId.HasValue || !OrderNumber.HasValue)
+        {
+            return;
+        }
+
+        var detail = await SalesOrderQueries.GetByOrderNumberAsync(tenantId.Value, companyId.Value, OrderNumber.Value);
+        if (detail is null)
+        {
+            statusMessage = "No se ha encontrado el pedido solicitado.";
+            isError = true;
+            model = SalesOrderFormModel.CreateDefault();
+            shipments = [];
+            return;
+        }
+
+        model = SalesOrderFormModel.FromDetail(detail);
+        isLegacyOriginOrder = string.Equals(detail.Origin, SalesOrderOrigins.Legacy, StringComparison.OrdinalIgnoreCase);
+        shipments = await SalesOrderQueries.GetShipmentsAsync(tenantId.Value, companyId.Value, OrderNumber.Value);
+    }
+
+    private async Task LoadAuditAsync()
+    {
+        if (!tenantId.HasValue || !OrderNumber.HasValue)
+        {
+            recentAuditLogs = [];
+            return;
+        }
+
+        recentAuditLogs = await AuditLogService.GetRecentAsync(
+            limit: 15,
+            tenantId: tenantId.Value,
+            entityName: "PedidoVenta",
+            entityId: OrderNumber.Value.ToString());
+    }
+
+    private int GetNextLineNumber() => model.Lines.Count == 0 ? 1 : model.Lines.Max(line => line.LineNumber) + 1;
+
+    private static decimal LineTotal(SalesOrderLineFormModel line) =>
+        decimal.Round(line.Quantity * line.UnitPrice, 2, MidpointRounding.AwayFromZero);
+
+    private static string FormatStatus(string status) => status switch
+    {
+        SalesOrderStatuses.Draft => "Borrador",
+        SalesOrderStatuses.Confirmed => "Confirmado",
+        SalesOrderStatuses.PartiallyShipped => "Expedido parcial",
+        SalesOrderStatuses.Shipped => "Expedido total",
+        SalesOrderStatuses.Cancelled => "Cancelado",
+        _ => status
+    };
+
+    private static string FormatInvoiceStatus(string status) => status switch
+    {
+        "Pending" => "Pendiente de facturar",
+        "Drafted" => "En borrador de factura",
+        "Invoiced" => "Facturado",
+        _ => status
+    };
+
+    private static string DisplayValue(string value) => string.IsNullOrWhiteSpace(value) ? "Sin dato" : value;
+
+    private sealed class SalesOrderFormModel
+    {
+        public int ClientCode { get; set; }
+        public DateTime DocumentDate { get; set; } = DateTime.Today;
+        public DateTime? RequestedDate { get; set; }
+        public string Status { get; set; } = SalesOrderStatuses.Draft;
+        public string Notes { get; set; } = string.Empty;
+        public List<SalesOrderLineFormModel> Lines { get; } = [];
+
+        public static SalesOrderFormModel CreateDefault()
+        {
+            var model = new SalesOrderFormModel();
+            model.Lines.Add(new SalesOrderLineFormModel { LineNumber = 1, Quantity = 1 });
+            return model;
+        }
+
+        public static SalesOrderFormModel FromDetail(SalesOrderDetailDto detail)
+        {
+            var model = new SalesOrderFormModel
+            {
+                ClientCode = detail.ClientCode,
+                DocumentDate = detail.DocumentDate,
+                RequestedDate = detail.RequestedDate,
+                Status = detail.Status,
+                Notes = detail.Notes
+            };
+
+            foreach (var line in detail.Lines)
+            {
+                model.Lines.Add(new SalesOrderLineFormModel
+                {
+                    LineNumber = line.LineNumber,
+                    ItemCode = line.ItemCode,
+                    Description = line.Description,
+                    Quantity = line.Quantity,
+                    ShippedQuantity = line.ShippedQuantity,
+                    UnitOfMeasure = line.UnitOfMeasure,
+                    UnitPrice = line.UnitPrice,
+                    RequestedDate = line.RequestedDate,
+                    Notes = line.Notes
+                });
+            }
+
+            if (model.Lines.Count == 0)
+            {
+                model.Lines.Add(new SalesOrderLineFormModel { LineNumber = 1, Quantity = 1 });
+            }
+
+            return model;
+        }
+    }
+
+    private sealed class SalesOrderLineFormModel
+    {
+        public int LineNumber { get; set; }
+        public string ItemCode { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
+        public decimal Quantity { get; set; }
+        public decimal ShippedQuantity { get; set; }
+        public string UnitOfMeasure { get; set; } = string.Empty;
+        public decimal UnitPrice { get; set; }
+        public DateTime? RequestedDate { get; set; }
+        public string Notes { get; set; } = string.Empty;
+        public decimal ShipNowQuantity { get; set; }
+        public decimal PendingQuantity => Math.Max(0m, Quantity - ShippedQuantity);
+    }
+
+    private sealed class ShipmentFormModel
+    {
+        public DateTime ShipmentDate { get; set; } = DateTime.Today;
+        public string Warehouse { get; set; } = string.Empty;
+        public string Notes { get; set; } = string.Empty;
+    }
+}

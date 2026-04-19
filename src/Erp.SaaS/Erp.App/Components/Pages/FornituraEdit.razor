@@ -1,0 +1,433 @@
+@page "/articulos/fornituras/nueva"
+@page "/articulos/fornituras/editar/{Code}"
+@attribute [Authorize(Roles = "TenantAdmin,TenantReader")]
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IAuditLogService AuditLogService
+@inject ILegacySyncService LegacySyncService
+@inject IFornituraQueries FornituraQueries
+@inject IFornituraService FornituraService
+@inject NavigationManager NavigationManager
+
+<PageTitle>@(!string.IsNullOrWhiteSpace(Code) ? $"Editar fornitura {Code}" : "Nueva fornitura")</PageTitle>
+
+<div class="page-header">
+    <div>
+        <p class="eyebrow">ARTÍCULOS</p>
+        <h1>@(!string.IsNullOrWhiteSpace(Code) ? $"Editar fornitura {Code}" : "Nueva fornitura")</h1>
+        <p class="lead">@(isLegacySyncActive
+            ? "Edición sobre la SaaS local. La importación manual desde legacy refresca solo registros marcados como legacy."
+            : "Alta y edición sobre la tabla forni replicada en la SaaS local, filtrada por la empresa activa.")</p>
+    </div>
+    <div class="quick-links">
+        <a class="secondary-button link-button" href="/articulos/fornituras">Volver al listado</a>
+    </div>
+</div>
+
+@if (!tenantId.HasValue || !companyId.HasValue)
+{
+    <div class="empty-state">
+        <p>No hay empresa activa seleccionada.</p>
+    </div>
+}
+else
+{
+    @if (!string.IsNullOrWhiteSpace(statusMessage))
+    {
+        <div class="alert @(isError ? "danger" : "success")">@statusMessage</div>
+    }
+
+    @if (isLegacySyncActive)
+    {
+        <div class="alert">
+            Artículos / Fornituras está en convivencia con legacy para esta empresa.
+            Esta ficha guarda cambios solo en la SaaS local y la sync manual refresca únicamente registros de origen legacy.
+            @if (!string.IsNullOrWhiteSpace(syncStatusLabel))
+            {
+                <span>@syncStatusLabel</span>
+            }
+        </div>
+    }
+
+    @if (!canEdit && string.IsNullOrWhiteSpace(Code))
+    {
+        <div class="alert">
+            No tienes permisos de edición para crear fornituras nuevas en esta empresa.
+        </div>
+    }
+
+    <EditForm Model="model" OnValidSubmit="SaveAsync">
+        <fieldset disabled="@isReadOnly">
+            <div class="form-grid">
+                <label class="field">
+                    <span>Código</span>
+                    <InputText class="text-input" @bind-Value="model.Code" disabled="@(!string.IsNullOrWhiteSpace(Code))" />
+                </label>
+                <label class="field wide">
+                    <span>Descripción</span>
+                    <InputText class="text-input" @bind-Value="model.Description" />
+                </label>
+                <label class="field">
+                    <span>Precio</span>
+                    <InputNumber class="text-input" @bind-Value="model.UnitPrice" />
+                </label>
+                <label class="field">
+                    <span>Proveedor</span>
+                    <InputNumber class="text-input" @bind-Value="model.SupplierCode" />
+                </label>
+                <label class="field">
+                    <span>Referencia proveedor</span>
+                    <InputText class="text-input" @bind-Value="model.SupplierReference" />
+                </label>
+                <label class="field">
+                    <span>Cliente</span>
+                    <InputNumber class="text-input" @bind-Value="model.ClientCode" />
+                </label>
+                <label class="field">
+                    <span>Modelo</span>
+                    <InputText class="text-input" @bind-Value="model.Model" />
+                </label>
+                <label class="field">
+                    <span>Serie</span>
+                    <InputText class="text-input" @bind-Value="model.Series" />
+                </label>
+                <label class="field">
+                    <span>Temporada</span>
+                    <InputText class="text-input" @bind-Value="model.Season" />
+                </label>
+            </div>
+
+            <section class="panel detail-panel" style="margin-top: 1rem;">
+                <div class="detail-panel-header">
+                    <div>
+                        <h2>Detalle de la fornitura</h2>
+                        <p class="muted">Código proveedor, color, medida, precio y stock actual por variante.</p>
+                    </div>
+                    @if (!isReadOnly)
+                    {
+                        <button class="secondary-button" type="button" @onclick="AddVariant">Añadir línea</button>
+                    }
+                </div>
+
+                <div class="table-scroll">
+                    <table class="data-table detail-table fornitura-variants-table">
+                        <thead>
+                            <tr>
+                                <th>Código proveedor</th>
+                                <th>Color</th>
+                                <th>Medida</th>
+                                <th>Precio</th>
+                                <th>Stock actual</th>
+                                <th>Stock mínimo</th>
+                                <th>Coste</th>
+                                @if (!isReadOnly)
+                                {
+                                    <th></th>
+                                }
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (model.Variants.Count == 0)
+                            {
+                                <tr>
+                                    <td colspan="@(isReadOnly ? 7 : 8)" class="muted">No hay detalle cargado para esta fornitura.</td>
+                                </tr>
+                            }
+                            else
+                            {
+                                @foreach (var variant in model.Variants.OrderBy(item => item.LineNumber))
+                                {
+                                    <tr @key="variant.LineNumber">
+                                        <td>
+                                            <InputText class="text-input table-input" @bind-Value="variant.SupplierItemCode" />
+                                        </td>
+                                        <td>
+                                            <InputText class="text-input table-input" @bind-Value="variant.Color" />
+                                        </td>
+                                        <td>
+                                            <InputText class="text-input table-input" @bind-Value="variant.Measure" />
+                                        </td>
+                                        <td>
+                                            <InputNumber class="text-input table-input" @bind-Value="variant.UnitPrice" />
+                                        </td>
+                                        <td>
+                                            <InputNumber class="text-input table-input" @bind-Value="variant.CurrentStock" />
+                                        </td>
+                                        <td>
+                                            <InputNumber class="text-input table-input" @bind-Value="variant.MinimumStock" />
+                                        </td>
+                                        <td>
+                                            <InputNumber class="text-input table-input" @bind-Value="variant.CostPrice" />
+                                        </td>
+                                        @if (!isReadOnly)
+                                        {
+                                            <td>
+                                                <button class="danger-link" type="button" @onclick="() => RemoveVariant(variant.LineNumber)">Quitar</button>
+                                            </td>
+                                        }
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <div class="quick-links" style="margin-top: 1rem;">
+                @if (canEdit)
+                {
+                    <button class="primary-button" type="submit">Guardar fornitura</button>
+                }
+                @if (canEdit && !string.IsNullOrWhiteSpace(Code))
+                {
+                    <button class="secondary-button danger-button" type="button" @onclick="DeleteAsync">Eliminar fornitura</button>
+                }
+                @if (!string.IsNullOrWhiteSpace(Code))
+                {
+                    <button class="secondary-button" type="button" @onclick="LoadAuditAsync">Recargar historial</button>
+                }
+            </div>
+        </fieldset>
+    </EditForm>
+
+    @if (!string.IsNullOrWhiteSpace(Code))
+    {
+        <section class="panel" style="margin-top: 1rem;">
+            <h2>Historial reciente de la fornitura</h2>
+            <div class="list-block">
+                @if (recentAuditLogs.Count == 0)
+                {
+                    <p class="muted">Todavía no hay eventos auditados para esta fornitura.</p>
+                }
+                else
+                {
+                    @foreach (var entry in recentAuditLogs)
+                    {
+                        <article class="list-item">
+                            <strong>@entry.Action</strong>
+                            @if (!string.IsNullOrWhiteSpace(entry.Details))
+                            {
+                                <span>@entry.Details</span>
+                            }
+                            <span>@entry.CreatedUtc.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss")</span>
+                        </article>
+                    }
+                }
+            </div>
+        </section>
+    }
+}
+
+@code {
+    [Parameter]
+    public string? Code { get; set; }
+
+    private Guid? tenantId;
+    private Guid? companyId;
+    private bool canEdit;
+    private bool isReadOnly;
+    private FornituraDetailDto model = new();
+    private string statusMessage = string.Empty;
+    private bool isError;
+    private bool isLegacySyncActive;
+    private string syncStatusLabel = string.Empty;
+    private IReadOnlyCollection<AuditLogEntryDto> recentAuditLogs = [];
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        tenantId = user.GetTenantId();
+        companyId = user.GetActiveCompanyId();
+        canEdit = user.IsPlatformAdmin() || user.IsInRole(PlatformRoles.TenantAdmin);
+
+        if (!tenantId.HasValue || !companyId.HasValue)
+        {
+            return;
+        }
+
+        await LoadSyncStatusAsync();
+        isReadOnly = !canEdit;
+
+        if (!string.IsNullOrWhiteSpace(Code))
+        {
+            var detail = await FornituraQueries.GetByCodeAsync(tenantId.Value, companyId.Value, Uri.UnescapeDataString(Code));
+            if (detail is null)
+            {
+                statusMessage = "No se ha encontrado la fornitura solicitada.";
+                isError = true;
+                model = new FornituraDetailDto();
+                recentAuditLogs = [];
+                return;
+            }
+
+            model = detail;
+            await LoadAuditAsync();
+        }
+        else
+        {
+            model = new FornituraDetailDto();
+            recentAuditLogs = [];
+        }
+    }
+
+    private async Task SaveAsync()
+    {
+        if (!tenantId.HasValue || !companyId.HasValue)
+        {
+            return;
+        }
+
+        if (isReadOnly)
+        {
+            statusMessage = "No tienes permisos de edición en este tenant.";
+            isError = true;
+            return;
+        }
+
+        try
+        {
+            statusMessage = string.Empty;
+            isError = false;
+
+            var savedCode = await FornituraService.SaveAsync(new SaveFornituraCommand
+            {
+                TenantId = tenantId.Value,
+                CompanyId = companyId.Value,
+                Code = string.IsNullOrWhiteSpace(Code) ? model.Code : Uri.UnescapeDataString(Code),
+                Description = model.Description,
+                UnitPrice = model.UnitPrice,
+                SupplierCode = model.SupplierCode,
+                SupplierReference = model.SupplierReference,
+                ClientCode = model.ClientCode,
+                Model = model.Model,
+                Series = model.Series,
+                Season = model.Season,
+                Variants = model.Variants
+                    .OrderBy(item => item.LineNumber)
+                    .Select(item => new SaveFornituraVariantInput
+                    {
+                        LineNumber = item.LineNumber,
+                        SupplierCode = item.SupplierCode,
+                        SupplierItemCode = item.SupplierItemCode,
+                        Color = item.Color,
+                        Measure = item.Measure,
+                        UnitPrice = item.UnitPrice,
+                        CurrentStock = item.CurrentStock,
+                        MinimumStock = item.MinimumStock,
+                        CostPrice = item.CostPrice
+                    })
+                    .ToList()
+            });
+
+            statusMessage = !string.IsNullOrWhiteSpace(Code)
+                ? "Fornitura actualizada correctamente."
+                : "Fornitura creada correctamente.";
+
+            if (string.IsNullOrWhiteSpace(Code))
+            {
+                NavigationManager.NavigateTo($"/articulos/fornituras/editar/{Uri.EscapeDataString(savedCode)}", forceLoad: false);
+                return;
+            }
+
+            await LoadAuditAsync();
+        }
+        catch (Exception exception)
+        {
+            statusMessage = exception.Message;
+            isError = true;
+        }
+    }
+
+    private async Task LoadSyncStatusAsync()
+    {
+        isLegacySyncActive = false;
+        syncStatusLabel = string.Empty;
+        if (!tenantId.HasValue || !companyId.HasValue)
+        {
+            return;
+        }
+
+        var status = (await LegacySyncService.GetModuleStatusesAsync(tenantId.Value))
+            .FirstOrDefault(item =>
+                item.CompanyId == companyId.Value &&
+                string.Equals(item.ModuleKey, LegacySyncModuleKeys.ArticleFornituras, StringComparison.OrdinalIgnoreCase));
+
+        if (status is null || !status.HasSuccessfulSync)
+        {
+            return;
+        }
+
+        isLegacySyncActive = true;
+        syncStatusLabel = status.LastCompletedUtc.HasValue
+            ? $"Última sync: {status.LastCompletedUtc.Value.ToLocalTime():dd/MM/yyyy HH:mm:ss} · Ins: {status.LastInserted} · Act: {status.LastUpdated} · Omi: {status.LastSkipped} · Err: {status.LastErrors}"
+            : $"Estado: {status.LastStatus}";
+    }
+
+    private async Task LoadAuditAsync()
+    {
+        if (!tenantId.HasValue || string.IsNullOrWhiteSpace(Code))
+        {
+            recentAuditLogs = [];
+            return;
+        }
+
+        recentAuditLogs = await AuditLogService.GetRecentAsync(
+            limit: 15,
+            tenantId: tenantId.Value,
+            entityName: "Fornitura",
+            entityId: Uri.UnescapeDataString(Code));
+    }
+
+    private void AddVariant()
+    {
+        var nextLineNumber = model.Variants.Count == 0
+            ? 1
+            : model.Variants.Max(item => item.LineNumber) + 1;
+
+        model.Variants.Add(new FornituraVariantDto
+        {
+            LineNumber = nextLineNumber
+        });
+    }
+
+    private void RemoveVariant(int lineNumber)
+    {
+        var variant = model.Variants.FirstOrDefault(item => item.LineNumber == lineNumber);
+        if (variant is null)
+        {
+            return;
+        }
+
+        model.Variants.Remove(variant);
+        for (var index = 0; index < model.Variants.Count; index++)
+        {
+            model.Variants[index].LineNumber = index + 1;
+        }
+    }
+
+    private async Task DeleteAsync()
+    {
+        if (!tenantId.HasValue || !companyId.HasValue || string.IsNullOrWhiteSpace(Code))
+        {
+            return;
+        }
+
+        if (!canEdit)
+        {
+            statusMessage = "No tienes permisos de edición en este tenant.";
+            isError = true;
+            return;
+        }
+
+        try
+        {
+            await FornituraService.DeleteAsync(tenantId.Value, companyId.Value, Uri.UnescapeDataString(Code));
+            NavigationManager.NavigateTo("/articulos/fornituras", forceLoad: false);
+        }
+        catch (Exception exception)
+        {
+            statusMessage = exception.Message;
+            isError = true;
+        }
+    }
+}

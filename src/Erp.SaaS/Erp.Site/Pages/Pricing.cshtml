@@ -10,7 +10,7 @@
             <p class="kicker">Pricing</p>
             <h1>Planes por usuarios, alta asistida y módulos preparados para más adelante.</h1>
         </div>
-        <a asp-page="/Demo" class="button-primary">Hablar con ventas</a>
+        <a asp-page="/DemoAccess" class="button-primary">Solicitar acceso de pruebas</a>
     </div>
 
     <div class="pricing-grid">
@@ -21,7 +21,7 @@
                 <h2>@plan.Name</h2>
                 <strong>@plan.MonthlyPrice.ToString("0.##") €/mes</strong>
                 <p>@plan.Description</p>
-                <a asp-page="/Demo" class="text-link">Solicitar propuesta</a>
+                <a asp-page="/DemoAccess" class="text-link">Pedir acceso para piloto</a>
             </article>
         }
     </div>
