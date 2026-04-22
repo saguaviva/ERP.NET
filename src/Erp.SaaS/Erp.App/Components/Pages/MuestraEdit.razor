@@ -1,0 +1,1906 @@
+@page "/articulos/muestras/nueva"
+@page "/articulos/muestras/editar/{Code}"
+@page "/articulos/complementos/nueva"
+@page "/articulos/complementos/editar/{Code}"
+@attribute [Authorize(Roles = "TenantAdmin,TenantReader")]
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IAuditLogService AuditLogService
+@inject IBaseCatalogQueries BaseCatalogQueries
+@inject ILegacySyncService LegacySyncService
+@inject IMuestraQueries MuestraQueries
+@inject IParteAcabadoQueries ParteAcabadoQueries
+@inject IMuestraService MuestraService
+@inject NavigationManager NavigationManager
+
+<PageTitle>@PageTitleText</PageTitle>
+
+<div class="page-header">
+    <div>
+        <p class="eyebrow">ARTÍCULOS</p>
+        <h1>@PageTitleText</h1>
+        <p class="lead">@(isLegacySyncActive
+            ? "Edición sobre la SaaS local. La importación manual desde legacy refresca solo registros marcados como legacy."
+            : "Alta y edición sobre la tabla mostres replicada en la SaaS local, filtrada por la empresa activa.")</p>
+    </div>
+    <div class="quick-links">
+        <a class="secondary-button link-button" href="@BuildListUrl()">Volver al listado</a>
+        @if (!string.IsNullOrWhiteSpace(model.Code))
+        {
+            <a class="secondary-button link-button" href="@BuildCreateParteFromSampleUrl()">Crear parte acabado</a>
+        }
+        @if (model.MachineCode > 0)
+        {
+            <a class="secondary-button link-button" href="@BuildAcabadosByMachineUrl(model.MachineCode)">Abrir acabados</a>
+        }
+        @if (!string.IsNullOrWhiteSpace(Code))
+        {
+            <a class="secondary-button link-button" href="@BuildSheetPrintUrl()">Imprimir ficha</a>
+        }
+    </div>
+</div>
+
+@if (!tenantId.HasValue || !companyId.HasValue)
+{
+    <div class="empty-state">
+        <p>No hay empresa activa seleccionada.</p>
+    </div>
+}
+else
+{
+    @if (!string.IsNullOrWhiteSpace(statusMessage))
+    {
+        <div class="alert @(isError ? "danger" : "success")">@statusMessage</div>
+    }
+
+    @if (isLegacySyncActive)
+    {
+        <div class="alert">
+            Artículos / @ModulePluralTitle está en convivencia con legacy para esta empresa.
+            Esta ficha guarda cambios solo en la SaaS local y la sync manual refresca únicamente registros de origen legacy.
+            @if (IsComplementMode)
+            {
+                <span> Este módulo comparte la misma base y la misma sync que Muestras.</span>
+            }
+            @if (!string.IsNullOrWhiteSpace(syncStatusLabel))
+            {
+                <span>@syncStatusLabel</span>
+            }
+        </div>
+    }
+
+    @if (!canEdit && string.IsNullOrWhiteSpace(Code))
+    {
+        <div class="alert">
+            No tienes permisos de edición para crear @modulePluralLower nuevas en esta empresa.
+        </div>
+    }
+
+    @if (IsComplementMode && canEdit && string.IsNullOrWhiteSpace(Code))
+    {
+        <section class="panel" style="margin-bottom: 1rem;">
+            <div class="detail-panel-header">
+                <div>
+                    <h2>Duplicar desde otro complemento</h2>
+                    <p class="muted">Carga un complemento existente como base y conserva el cliente y el código que estés preparando en esta ficha.</p>
+                </div>
+            </div>
+            <div class="filter-row">
+                <input class="text-input" @bind="duplicateSearch" placeholder="Buscar por código, cliente, referencia o descripción" />
+                <button class="secondary-button" type="button" @onclick="SearchDuplicateCandidatesAsync" disabled="@isSearchingDuplicates">@(isSearchingDuplicates ? "Buscando..." : "Buscar base")</button>
+            </div>
+            @if (duplicateCandidates.Count > 0)
+            {
+                <div class="list-block" style="margin-top: 1rem;">
+                    @foreach (var candidate in duplicateCandidates)
+                    {
+                        <article class="list-item">
+                            <strong>@candidate.Code · @candidate.Description</strong>
+                            <span>@(!string.IsNullOrWhiteSpace(candidate.ClientName) ? candidate.ClientName : $"Cliente {candidate.ClientCode}")</span>
+                            <span>@candidate.Reference</span>
+                            <button class="secondary-button" type="button" @onclick="() => ApplyDuplicateBaseAsync(candidate.Code, candidate.ClientCode)">Usar base</button>
+                        </article>
+                    }
+                </div>
+            }
+        </section>
+    }
+
+    <section class="summary-card-grid">
+        <article class="summary-card">
+            <span class="summary-card-label">Origen</span>
+            <strong>@DisplayOrigin</strong>
+            <span class="summary-card-meta">@($"{model.CompanyCenterCode} · {LineCount} líneas")</span>
+        </article>
+        <article class="summary-card">
+            <span class="summary-card-label">Carta</span>
+            <strong>@DistinctColorCount colores</strong>
+            <span class="summary-card-meta">@($"{DistinctSizeCount} tallas · {DistinctClientCount} clientes")</span>
+        </article>
+        <article class="summary-card">
+            <span class="summary-card-label">Venta media</span>
+            <strong>@AverageSalePrice.ToString("0.00##")</strong>
+            <span class="summary-card-meta">@($"Coste {AverageCostPrice.ToString("0.00##")} · margen {AverageMarginPercent.ToString("0.0#")}%")</span>
+        </article>
+        <article class="summary-card">
+            <span class="summary-card-label">Estado ficha</span>
+            <strong>@FichaStatusLabel</strong>
+            <span class="summary-card-meta">@FichaStatusHelp</span>
+        </article>
+    </section>
+
+    <div class="record-tabs" style="margin-top: 1rem;">
+        <button class="record-tab @(activeTab == MuestraTab.Ficha ? "active" : null)" type="button" @onclick="@(() => activeTab = MuestraTab.Ficha)">@ModuleSingularTitle</button>
+        <button class="record-tab @(activeTab == MuestraTab.Carta ? "active" : null)" type="button" @onclick="@(() => activeTab = MuestraTab.Carta)">Carta colores · tallas</button>
+        <button class="record-tab @(activeTab == MuestraTab.Desglose ? "active" : null)" type="button" @onclick="@(() => activeTab = MuestraTab.Desglose)">Desglose color · máquina</button>
+        <button class="record-tab @(activeTab == MuestraTab.Ordenes ? "active" : null)" type="button" @onclick="@(() => activeTab = MuestraTab.Ordenes)">Ordres fabricació</button>
+        <button class="record-tab @(activeTab == MuestraTab.Impresion ? "active" : null)" type="button" @onclick="@(() => activeTab = MuestraTab.Impresion)">Impressió fitxa · etiquetes</button>
+    </div>
+
+    <EditForm Model="model" OnValidSubmit="SaveAsync">
+        <fieldset disabled="@isReadOnly">
+            @if (activeTab == MuestraTab.Ficha)
+            {
+                <div class="legacy-record-grid" style="margin-top: 1rem;">
+                    <section class="panel detail-panel">
+                        <div class="detail-panel-header">
+                            <div>
+                                <h2>Ficha comercial</h2>
+                                <p class="muted">Cabecera principal del @moduleSingularLower, cliente, máquina y datos económicos.</p>
+                            </div>
+                            @if (!string.IsNullOrWhiteSpace(model.Code))
+                            {
+                                <span class="stock-state-badge ok">@model.Code</span>
+                            }
+                        </div>
+
+                        <div class="form-grid">
+                            <label class="field">
+                                <span>Código</span>
+                                <InputText class="text-input" @bind-Value="model.Code" disabled="@(!string.IsNullOrWhiteSpace(Code))" />
+                            </label>
+                            <label class="field wide">
+                                <span>Descripción</span>
+                                <InputText class="text-input" @bind-Value="model.Description" />
+                            </label>
+                            <label class="field">
+                                <span>Cliente</span>
+                                <InputNumber class="text-input" @bind-Value="model.ClientCode" />
+                            </label>
+                            <label class="field wide">
+                                <span>Nombre cliente</span>
+                                <InputText class="text-input" @bind-Value="model.ClientName" />
+                            </label>
+                            <label class="field">
+                                <span>Referencia</span>
+                                <InputText class="text-input" @bind-Value="model.Reference" />
+                            </label>
+                            <label class="field">
+                                <span>Temporada</span>
+                                <InputText class="text-input" @bind-Value="model.Season" />
+                            </label>
+                            <label class="field">
+                                <span>Máquina</span>
+                                @if (machineOptions.Count == 0)
+                                {
+                                    <InputNumber class="text-input" @bind-Value="model.MachineCode" />
+                                }
+                                else
+                                {
+                                    <select class="text-input" value="@model.MachineCode" @onchange="OnHeaderMachineChanged">
+                                        <option value="0">Selecciona máquina</option>
+                                        @foreach (var machine in machineOptions)
+                                        {
+                                            <option value="@ParseMachineCode(machine.Code)">@FormatMachineOption(machine)</option>
+                                        }
+                                    </select>
+                                }
+                            </label>
+                            <label class="field wide">
+                                <span>Nombre máquina</span>
+                                @if (machineOptions.Count == 0)
+                                {
+                                    <InputText class="text-input" @bind-Value="model.MachineName" />
+                                }
+                                else
+                                {
+                                    <input class="text-input" value="@model.MachineName" disabled />
+                                }
+                            </label>
+                            <label class="field">
+                                <span>% margen</span>
+                                <InputNumber class="text-input" @bind-Value="model.MarginPercent" />
+                            </label>
+                            <label class="field">
+                                <span>IVA</span>
+                                <InputText class="text-input" @bind-Value="model.VatCode" />
+                            </label>
+                            <label class="field">
+                                <span>Precio unidad</span>
+                                <InputNumber class="text-input" @bind-Value="model.UnitPrice" />
+                            </label>
+                            <label class="field wide">
+                                <span>Composición</span>
+                                <InputText class="text-input" @bind-Value="model.Composition" />
+                            </label>
+                        </div>
+
+                        <div class="muestra-kpi-strip">
+                            <span class="metric-chip">Colores: <strong>@DistinctColorCount</strong></span>
+                            <span class="metric-chip">Tallas: <strong>@DistinctSizeCount</strong></span>
+                            <span class="metric-chip">Venta total: <strong>@TotalSalePrice.ToString("0.00##")</strong></span>
+                            <span class="metric-chip">Coste total: <strong>@TotalCostPrice.ToString("0.00##")</strong></span>
+                        </div>
+                    </section>
+
+                    <section class="panel detail-panel">
+                        <div class="detail-panel-header">
+                            <div>
+                                <h2>Notas y resumen</h2>
+                                <p class="muted">Contexto operativo del @moduleSingularLower y lectura rápida de la carta.</p>
+                            </div>
+                        </div>
+
+                        <label class="field field-full">
+                            <span>Notas</span>
+                            <InputTextArea class="text-input textarea-input muestra-notes-input" @bind-Value="model.Notes" />
+                        </label>
+
+                        <div class="muestra-overview-list">
+                            <article>
+                                <strong>Cliente principal</strong>
+                                <span>@DisplayClient</span>
+                            </article>
+                            <article>
+                                <strong>Máquina</strong>
+                                <span>@DisplayMachine</span>
+                            </article>
+                            <article>
+                                <strong>Colores destacados</strong>
+                                <span>@TopColorsLabel</span>
+                            </article>
+                            <article>
+                                <strong>Tallas destacadas</strong>
+                                <span>@TopSizesLabel</span>
+                            </article>
+                            <article>
+                                <strong>Composición</strong>
+                                <span>@CompositionLabel</span>
+                            </article>
+                        </div>
+                    </section>
+                </div>
+            }
+
+            @if (activeTab == MuestraTab.Carta)
+            {
+                <section class="panel detail-panel" style="margin-top: 1rem;">
+                    <div class="detail-panel-header">
+                        <div>
+                            <h2>Carta de colores y tallas</h2>
+                            <p class="muted">Detalle por color, talla y cliente con coste, venta y NC code.</p>
+                        </div>
+                        @if (!isReadOnly)
+                        {
+                            <div class="quick-links">
+                                <button class="secondary-button" type="button" @onclick="DuplicateSelectedClientAcrossLinesAsync">Copiar cliente cabecera</button>
+                                <button class="secondary-button" type="button" @onclick="AddLine">Añadir línea</button>
+                            </div>
+                        }
+                    </div>
+
+                    <div class="muestra-kpi-strip">
+                        <span class="metric-chip">Líneas: <strong>@LineCount</strong></span>
+                        <span class="metric-chip">Colores únicos: <strong>@DistinctColorCount</strong></span>
+                        <span class="metric-chip">Tallas únicas: <strong>@DistinctSizeCount</strong></span>
+                        <span class="metric-chip">Venta media línea: <strong>@AverageSalePrice.ToString("0.00##")</strong></span>
+                    </div>
+
+                    <div class="table-scroll">
+                        <table class="data-table detail-table">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Talla</th>
+                                    <th>Talla H</th>
+                                    <th>Talla L</th>
+                                    <th>Descripción</th>
+                                    <th>Color</th>
+                                    <th>Coste</th>
+                                    <th>Venta</th>
+                                    <th>Margen</th>
+                                    <th>Cliente</th>
+                                    <th>Nombre cliente</th>
+                                    <th>NC code</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (model.Lines.Count == 0)
+                                {
+                                    <tr>
+                                        <td colspan="13" class="muted">No hay detalle cargado para este @moduleSingularLower.</td>
+                                    </tr>
+                                }
+                                else
+                                {
+                                    @foreach (var line in model.Lines.OrderBy(item => item.LineNumber))
+                                    {
+                                        <tr @key="line.LineNumber" class="@GetSampleLineRowClass(line)">
+                                            <td><span class="line-number-badge">#@line.LineNumber</span></td>
+                                            <td><InputText class="text-input table-input" @bind-Value="line.SizeCode" /></td>
+                                            <td><InputText class="text-input table-input" @bind-Value="line.SizeHigh" /></td>
+                                            <td><InputText class="text-input table-input" @bind-Value="line.SizeLow" /></td>
+                                            <td><InputText class="text-input table-input" @bind-Value="line.Description" /></td>
+                                            <td><InputText class="text-input table-input" @bind-Value="line.Color" /></td>
+                                            <td><InputNumber class="text-input table-input" @bind-Value="line.CostPrice" /></td>
+                                            <td><InputNumber class="text-input table-input" @bind-Value="line.SalePrice" /></td>
+                                            <td>
+                                                <span class="stock-state-badge @GetLineMarginBadgeClass(line)">@GetLineMarginLabel(line)</span>
+                                            </td>
+                                            <td><InputNumber class="text-input table-input" @bind-Value="line.ClientCode" /></td>
+                                            <td><InputText class="text-input table-input" @bind-Value="line.ClientName" /></td>
+                                            <td><InputText class="text-input table-input" @bind-Value="line.NcCode" /></td>
+                                            <td>
+                                                <button class="secondary-button inline-action-button" type="button" @onclick="() => SelectBreakdownLine(line.LineNumber)">Desglose</button>
+                                                @if (!string.IsNullOrWhiteSpace(model.Code))
+                                                {
+                                                    <a class="inline-link" href="@BuildCreateParteFromSampleUrl(line.LineNumber)">Parte</a>
+                                                }
+                                                @if (!isReadOnly)
+                                                {
+                                                    <button class="danger-link" type="button" @onclick="() => RemoveLine(line.LineNumber)">Quitar</button>
+                                                }
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            }
+
+            @if (activeTab == MuestraTab.Desglose)
+            {
+                <div class="legacy-record-grid" style="margin-top: 1rem;">
+                    <section class="panel detail-panel">
+                        <div class="detail-panel-header">
+                            <div>
+                                <h2>Selección de color · talla</h2>
+                                <p class="muted">Cada línea de carta puede tener su propia ficha técnica de máquina e hilos.</p>
+                            </div>
+                        </div>
+
+                        @if (model.Lines.Count == 0)
+                        {
+                            <p class="muted">Añade primero alguna línea a la carta de colores para poder trabajar el desglose.</p>
+                        }
+                        else
+                        {
+                            <div class="muestra-breakdown-selector">
+                                @foreach (var line in model.Lines.OrderBy(item => item.LineNumber))
+                                {
+                                    <button class="muestra-breakdown-choice @(selectedBreakdownLineNumber == line.LineNumber ? "active" : null)"
+                                            type="button"
+                                            @onclick="@(() => SelectBreakdownLine(line.LineNumber))">
+                                        <strong>@BuildLineTitle(line)</strong>
+                                        <span>@(string.IsNullOrWhiteSpace(line.Color) ? "Sin color" : line.Color)</span>
+                                        <span>@BuildSizeLabel(line)</span>
+                                        <span class="stock-state-badge @(HasBreakdownData(line) ? "ok" : "review")">@GetBreakdownStatusLabel(line)</span>
+                                    </button>
+                                }
+                            </div>
+                        }
+                    </section>
+
+                    <section class="panel detail-panel">
+                        <div class="detail-panel-header">
+                            <div>
+                                <h2>Desglose técnico</h2>
+                                <p class="muted">Cabecera de máquina y detalle de hilos/proveedores para la línea seleccionada.</p>
+                            </div>
+                            @if (SelectedBreakdownLine is not null)
+                            {
+                                <div class="quick-links">
+                                    @if (!isReadOnly)
+                                    {
+                                        <button class="secondary-button" type="button" @onclick="CopySampleMachineIntoBreakdown">Usar máquina cabecera</button>
+                                        <button class="secondary-button" type="button" @onclick="AddBreakdownMaterialLine">Añadir hilo</button>
+                                    }
+                                    @if (SelectedBreakdown is not null && SelectedBreakdown.MachineCode > 0)
+                                    {
+                                        <a class="secondary-button link-button" href="@BuildAcabadosByMachineUrl(SelectedBreakdown.MachineCode, SelectedBreakdown.OperationCode)">Acabados máquina</a>
+                                    }
+                                    @if (!string.IsNullOrWhiteSpace(model.Code))
+                                    {
+                                        <a class="secondary-button link-button" href="@BuildCreateParteFromSampleUrl(SelectedBreakdownLine.LineNumber)">Crear parte</a>
+                                    }
+                                    @if (!string.IsNullOrWhiteSpace(Code))
+                                    {
+                                        <a class="secondary-button link-button" href="@BuildBreakdownPrintUrl(SelectedBreakdownLine.LineNumber)">Imprimir desglose</a>
+                                    }
+                                </div>
+                            }
+                        </div>
+
+                        @if (SelectedBreakdownLine is null || SelectedBreakdown is null)
+                        {
+                            <p class="muted">Selecciona una línea de carta para abrir su desglose técnico.</p>
+                        }
+                        else
+                        {
+                            <div class="muestra-kpi-strip">
+                                <span class="metric-chip">Línea: <strong>@SelectedBreakdownLine.LineNumber</strong></span>
+                                <span class="metric-chip">Materiales: <strong>@SelectedBreakdown.Lines.Count</strong></span>
+                                <span class="metric-chip">Coste hilos: <strong>@BreakdownMaterialTotal.ToString("0.00##")</strong></span>
+                                <span class="metric-chip">Coste máquina: <strong>@BreakdownMachineImport.ToString("0.00##")</strong></span>
+                                <span class="metric-chip">Coste total: <strong>@BreakdownTotalCost.ToString("0.00##")</strong></span>
+                                <span class="metric-chip">Operación: <strong>@DisplaySelectedBreakdownOperation</strong></span>
+                            </div>
+
+                            <div class="form-grid" style="margin-top: 1rem;">
+                                <label class="field">
+                                    <span>Cliente</span>
+                                    <InputNumber class="text-input" @bind-Value="SelectedBreakdown.ClientCode" />
+                                </label>
+                                <label class="field wide">
+                                    <span>Nombre cliente</span>
+                                    <InputText class="text-input" @bind-Value="SelectedBreakdown.ClientName" />
+                                </label>
+                                <label class="field">
+                                    <span>Color muestra</span>
+                                    <input class="text-input" value="@DisplayBreakdownColor(SelectedBreakdownLine)" disabled />
+                                </label>
+                                <label class="field">
+                                    <span>Talla</span>
+                                    <input class="text-input" value="@BuildSizeLabel(SelectedBreakdownLine)" disabled />
+                                </label>
+                                <label class="field">
+                                    <span>Fecha</span>
+                                    <InputDate class="text-input" @bind-Value="SelectedBreakdown.WorkDate" />
+                                </label>
+                                <label class="field">
+                                    <span>Máquina</span>
+                                    @if (machineOptions.Count == 0)
+                                    {
+                                        <InputNumber class="text-input" @bind-Value="SelectedBreakdown.MachineCode" />
+                                    }
+                                    else
+                                    {
+                                        <select class="text-input" value="@SelectedBreakdown.MachineCode" @onchange="OnBreakdownMachineChanged">
+                                            <option value="0">Selecciona máquina</option>
+                                            @foreach (var machine in machineOptions)
+                                            {
+                                                <option value="@ParseMachineCode(machine.Code)">@FormatMachineOption(machine)</option>
+                                            }
+                                        </select>
+                                    }
+                                </label>
+                                <label class="field wide">
+                                    <span>Nombre máquina</span>
+                                    @if (machineOptions.Count == 0)
+                                    {
+                                        <InputText class="text-input" @bind-Value="SelectedBreakdown.MachineName" />
+                                    }
+                                    else
+                                    {
+                                        <input class="text-input" value="@SelectedBreakdown.MachineName" disabled />
+                                    }
+                                </label>
+                                <label class="field">
+                                    <span>Operación</span>
+                                    @if (operationOptions.Count == 0)
+                                    {
+                                        <InputNumber class="text-input" @bind-Value="SelectedBreakdown.OperationCode" />
+                                    }
+                                    else
+                                    {
+                                        <select class="text-input" value="@SelectedBreakdown.OperationCode" @onchange="OnBreakdownOperationChanged">
+                                            <option value="0">Selecciona operación</option>
+                                            @foreach (var operation in operationOptions)
+                                            {
+                                                <option value="@ParseOperationCode(operation.Code)">@FormatOperationOption(operation)</option>
+                                            }
+                                        </select>
+                                    }
+                                </label>
+                                <label class="field wide">
+                                    <span>Nombre operación</span>
+                                    @if (operationOptions.Count == 0)
+                                    {
+                                        <InputText class="text-input" @bind-Value="SelectedBreakdown.OperationName" />
+                                    }
+                                    else
+                                    {
+                                        <input class="text-input" value="@SelectedBreakdown.OperationName" disabled />
+                                    }
+                                </label>
+                                <label class="field">
+                                    <span>Agujas</span>
+                                    <InputNumber class="text-input" @bind-Value="SelectedBreakdown.Needles" />
+                                </label>
+                                <label class="field">
+                                    <span>Velocidad</span>
+                                    <InputNumber class="text-input" @bind-Value="SelectedBreakdown.Speed" />
+                                </label>
+                                <label class="field">
+                                    <span>Disco</span>
+                                    <InputText class="text-input" @bind-Value="SelectedBreakdown.Disk" />
+                                </label>
+                                <label class="field">
+                                    <span>Tiempo (min)</span>
+                                    <InputNumber class="text-input" @bind-Value="SelectedBreakdown.TimeMinutes" />
+                                </label>
+                                <label class="field">
+                                    <span>Precio máquina</span>
+                                    <InputNumber class="text-input" @bind-Value="SelectedBreakdown.MachineRate" />
+                                </label>
+                                <label class="field">
+                                    <span>Importe máquina</span>
+                                    <input class="text-input" value="@BreakdownMachineImport.ToString("0.00##")" disabled />
+                                </label>
+                                <label class="field wide">
+                                    <span>Cortes</span>
+                                    <InputText class="text-input" @bind-Value="SelectedBreakdown.Cuts" />
+                                </label>
+                                <label class="field field-full">
+                                    <span>Notas técnicas</span>
+                                    <InputTextArea class="text-input textarea-input" @bind-Value="SelectedBreakdown.Notes" />
+                                </label>
+                            </div>
+
+                            <div class="table-scroll" style="margin-top: 1rem;">
+                                <table class="data-table detail-table">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Hilo</th>
+                                            <th>Prove.</th>
+                                            <th>Nombre proveedor</th>
+                                            <th>Color</th>
+                                            <th>GH</th>
+                                            <th>Cabos</th>
+                                            <th>Passades</th>
+                                            <th>Grad.</th>
+                                            <th>Consum</th>
+                                            <th>Precio</th>
+                                            <th>Importe</th>
+                                            @if (!isReadOnly)
+                                            {
+                                                <th></th>
+                                            }
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @if (SelectedBreakdown.Lines.Count == 0)
+                                        {
+                                            <tr>
+                                                <td colspan="@(isReadOnly ? 12 : 13)" class="muted">Todavía no hay materiales cargados para este desglose.</td>
+                                            </tr>
+                                        }
+                                        else
+                                        {
+                                            @foreach (var line in SelectedBreakdown.Lines.OrderBy(item => item.LineNumber))
+                                            {
+                                                <tr @key="line.LineNumber">
+                                                    <td><span class="line-number-badge">#@line.LineNumber</span></td>
+                                                    <td><InputText class="text-input table-input" @bind-Value="line.YarnCode" /></td>
+                                                    <td><InputNumber class="text-input table-input" @bind-Value="line.ProviderCode" /></td>
+                                                    <td><InputText class="text-input table-input" @bind-Value="line.ProviderName" /></td>
+                                                    <td><InputText class="text-input table-input" @bind-Value="line.MaterialColor" /></td>
+                                                    <td><InputNumber class="text-input table-input" @bind-Value="line.YarnMetric" /></td>
+                                                    <td><InputNumber class="text-input table-input" @bind-Value="line.Ends" /></td>
+                                                    <td><InputNumber class="text-input table-input" @bind-Value="line.Passes" /></td>
+                                                    <td><InputNumber class="text-input table-input" @bind-Value="line.Graduation" /></td>
+                                                    <td><InputNumber class="text-input table-input" @bind-Value="line.Consumption" /></td>
+                                                    <td><InputNumber class="text-input table-input" @bind-Value="line.Price" /></td>
+                                                    <td><input class="text-input table-input" value="@CalculateBreakdownLineImport(line).ToString("0.00##")" disabled /></td>
+                                                    @if (!isReadOnly)
+                                                    {
+                                                        <td>
+                                                            <button class="danger-link" type="button" @onclick="() => RemoveBreakdownMaterialLine(line.LineNumber)">Quitar</button>
+                                                        </td>
+                                                    }
+                                                </tr>
+                                            }
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        }
+                    </section>
+                </div>
+            }
+
+            @if (activeTab == MuestraTab.Impresion)
+            {
+                <section class="legacy-record-grid" style="margin-top: 1rem;">
+                    <article class="panel print-preview-card">
+                        <p class="eyebrow">@PrintSheetEyebrow</p>
+                        <h3>@DisplayCodeAndDescription</h3>
+                        <div class="print-preview-sheet">
+                            <div class="print-preview-sheet-header">
+                                <strong>@DisplayClient</strong>
+                                <span>@DisplayMachine</span>
+                                <span>@($"Ref. {DisplayReference} · Temp. {DisplaySeason}")</span>
+                            </div>
+                            <div class="print-preview-kpis">
+                                <span>@($"{LineCount} línies")</span>
+                                <span>@($"{DistinctColorCount} colors")</span>
+                                <span>@($"{DistinctSizeCount} talles")</span>
+                            </div>
+                            <ul class="print-preview-list">
+                                @foreach (var line in model.Lines.OrderBy(item => item.LineNumber).Take(4))
+                                {
+                                    <li>@($"{BuildLineTitle(line)} · {line.Color} · venda {line.SalePrice:0.00##}")</li>
+                                }
+                                @if (model.Lines.Count > 4)
+                                {
+                                    <li>+@(model.Lines.Count - 4) líneas más</li>
+                                }
+                            </ul>
+                        </div>
+                        @if (!string.IsNullOrWhiteSpace(Code))
+                        {
+                            <a class="secondary-button link-button" href="@BuildSheetPrintUrl()">Abrir ficha</a>
+                        }
+                    </article>
+
+                    <article class="panel print-preview-card">
+                        <p class="eyebrow">Etiquetas @moduleSingularLower</p>
+                        <h3>Selecció per color i talla</h3>
+                        <div class="print-preview-sheet">
+                            <div class="print-preview-sheet-header">
+                                <strong>@DisplayCodeAndDescription</strong>
+                                <span>@DisplayCompositionPreview</span>
+                            </div>
+                            <ul class="print-preview-list">
+                                @foreach (var line in model.Lines.OrderBy(item => item.LineNumber).Take(6))
+                                {
+                                    <li>@($"{line.Color} · {BuildSizeLabel(line)} · NC {DisplayNcCode(line)}")</li>
+                                }
+                            </ul>
+                        </div>
+                        @if (!string.IsNullOrWhiteSpace(Code))
+                        {
+                            <a class="secondary-button link-button" href="@BuildLabelsPrintUrl()">Abrir etiquetas</a>
+                        }
+                    </article>
+
+                    <article class="panel print-preview-card">
+                        <p class="eyebrow">Desglose color · máquina</p>
+                        <h3>@DisplaySelectedBreakdownTitle</h3>
+                        <div class="print-preview-sheet">
+                            <div class="print-preview-sheet-header">
+                                <strong>@DisplaySelectedBreakdownMachine</strong>
+                                <span>@DisplaySelectedBreakdownDate</span>
+                                <span>@($"{SelectedBreakdown?.Lines.Count ?? 0} materiales · coste {BreakdownTotalCost.ToString("0.00##")}")</span>
+                            </div>
+                            <ul class="print-preview-list">
+                                @if (SelectedBreakdown?.Lines.Count > 0)
+                                {
+                                    @foreach (var line in SelectedBreakdown.Lines.OrderBy(item => item.LineNumber).Take(5))
+                                    {
+                                        <li>@($"{line.YarnCode} · {line.MaterialColor} · consum {line.Consumption:0.00##} · imp. {CalculateBreakdownLineImport(line):0.00##}")</li>
+                                    }
+                                    @if (SelectedBreakdown.Lines.Count > 5)
+                                    {
+                                        <li>+@(SelectedBreakdown.Lines.Count - 5) líneas más</li>
+                                    }
+                                }
+                                else
+                                {
+                                    <li>Sin desglose técnico cargado para la línea seleccionada.</li>
+                                }
+                            </ul>
+                        </div>
+                        @if (!string.IsNullOrWhiteSpace(Code) && SelectedBreakdownLine is not null)
+                        {
+                            <a class="secondary-button link-button" href="@BuildBreakdownPrintUrl(SelectedBreakdownLine.LineNumber)">Abrir desglose</a>
+                        }
+                    </article>
+                </section>
+            }
+
+            @if (activeTab == MuestraTab.Ordenes)
+            {
+                <section class="panel detail-panel" style="margin-top: 1rem;">
+                    <div class="detail-panel-header">
+                        <div>
+                            <h2>Órdenes de fabricación relacionadas</h2>
+                            <p class="muted">Seguimiento del circuito histórico de producción enlazado a esta @ModuleSingularTitle.ToLowerInvariant().</p>
+                        </div>
+                        <div class="quick-links">
+                            @if (!string.IsNullOrWhiteSpace(model.Code))
+                            {
+                                <a class="secondary-button link-button" href="@BuildCreateParteFromSampleUrl()">Crear orden</a>
+                                <a class="secondary-button link-button" href="@BuildLinkedFinishOrdersUrl()">Abrir en acabados</a>
+                            }
+                        </div>
+                    </div>
+
+                    @if (string.IsNullOrWhiteSpace(model.Code))
+                    {
+                        <p class="muted">Guarda primero la ficha para poder generar y seguir órdenes de fabricación.</p>
+                    }
+                    else
+                    {
+                        <div class="summary-card-grid">
+                            <article class="summary-card">
+                                <span class="summary-card-label">Órdenes</span>
+                                <strong>@linkedFinishOrders.Count</strong>
+                                <span class="summary-card-meta">Total enlazadas a esta ficha</span>
+                            </article>
+                            <article class="summary-card">
+                                <span class="summary-card-label">Pendientes</span>
+                                <strong>@GetLinkedOrderStatusCount(ParteAcabadoStatuses.Pending)</strong>
+                                <span class="summary-card-meta">Aún no iniciadas</span>
+                            </article>
+                            <article class="summary-card">
+                                <span class="summary-card-label">En proceso</span>
+                                <strong>@GetLinkedOrderStatusCount(ParteAcabadoStatuses.InProgress)</strong>
+                                <span class="summary-card-meta">Trabajo vivo en planta</span>
+                            </article>
+                            <article class="summary-card">
+                                <span class="summary-card-label">Terminadas</span>
+                                <strong>@GetLinkedOrderStatusCount(ParteAcabadoStatuses.Finished)</strong>
+                                <span class="summary-card-meta">Ya cerradas</span>
+                            </article>
+                        </div>
+
+                        @if (isLoadingLinkedFinishOrders)
+                        {
+                            <p class="muted">Cargando órdenes relacionadas...</p>
+                        }
+                        else if (linkedFinishOrders.Count == 0)
+                        {
+                            <p class="muted">Todavía no hay órdenes de fabricación ligadas a esta ficha.</p>
+                        }
+                        else
+                        {
+                            <div class="table-scroll" style="margin-top: 1rem;">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Número</th>
+                                            <th>Fecha</th>
+                                            <th>Estado</th>
+                                            <th>Máquina</th>
+                                            <th>Operación</th>
+                                            <th>Tejido</th>
+                                            <th>Color</th>
+                                            <th>Piezas</th>
+                                            <th>Kg</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var item in linkedFinishOrders)
+                                        {
+                                            <tr>
+                                                <td>@item.OrderNumber</td>
+                                                <td>@(item.Date?.ToString("dd/MM/yyyy") ?? "-")</td>
+                                                <td><span class="stock-state-badge @GetLinkedOrderStatusBadgeClass(item.Status)">@GetStatusLabel(item.Status)</span></td>
+                                                <td>@GetDisplayText(item.MachineName, item.MachineCode)</td>
+                                                <td>@GetDisplayText(item.OperationName, item.OperationCode)</td>
+                                                <td>@GetLinkedOrderFabricLabel(item)</td>
+                                                <td>@(string.IsNullOrWhiteSpace(item.PrimaryColor) ? "-" : item.PrimaryColor)</td>
+                                                <td>@item.TotalPieces.ToString("0.##")</td>
+                                                <td>@item.TotalKilograms.ToString("0.##")</td>
+                                                <td>
+                                                    <div class="inline-action-list">
+                                                        <a class="inline-link" href="@BuildFinishOrderUrl(item.OrderNumber)">Abrir</a>
+                                                        <a class="inline-link" href="@BuildFinishOrderPrintUrl(item.OrderNumber)" target="_blank" rel="noopener noreferrer">Imprimir</a>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        }
+                    }
+                </section>
+            }
+
+            <div class="quick-links" style="margin-top: 1rem;">
+                @if (canEdit)
+                {
+                    <button class="primary-button" type="submit">Guardar @moduleSingularLower</button>
+                }
+                @if (canEdit && !string.IsNullOrWhiteSpace(Code))
+                {
+                    <button class="secondary-button danger-button" type="button" @onclick="DeleteAsync">Eliminar @moduleSingularLower</button>
+                }
+                @if (!string.IsNullOrWhiteSpace(Code))
+                {
+                    <button class="secondary-button" type="button" @onclick="LoadAuditAsync">Recargar historial</button>
+                }
+            </div>
+        </fieldset>
+    </EditForm>
+
+    @if (!string.IsNullOrWhiteSpace(Code))
+    {
+        <section class="panel" style="margin-top: 1rem;">
+            <h2>Historial reciente del @moduleSingularLower</h2>
+            <div class="list-block">
+                @if (recentAuditLogs.Count == 0)
+                {
+                    <p class="muted">Todavía no hay eventos auditados para este @moduleSingularLower.</p>
+                }
+                else
+                {
+                    @foreach (var entry in recentAuditLogs)
+                    {
+                        <article class="list-item">
+                            <strong>@entry.Action</strong>
+                            @if (!string.IsNullOrWhiteSpace(entry.Details))
+                            {
+                                <span>@entry.Details</span>
+                            }
+                            <span>@entry.CreatedUtc.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss")</span>
+                        </article>
+                    }
+                }
+            </div>
+        </section>
+    }
+}
+
+@code {
+    [Parameter]
+    public string? Code { get; set; }
+
+    private Guid? tenantId;
+    private Guid? companyId;
+    private bool canEdit;
+    private bool isReadOnly;
+    private bool IsComplementMode => NavigationManager.Uri.Contains("/articulos/complementos", StringComparison.OrdinalIgnoreCase);
+    private string ModulePluralTitle => IsComplementMode ? "Complementos" : "Muestras";
+    private string ModuleSingularTitle => IsComplementMode ? "Complemento" : "Muestra";
+    private string modulePluralLower => IsComplementMode ? "complementos" : "muestras";
+    private string moduleSingularLower => IsComplementMode ? "complemento" : "muestra";
+    private MuestraDetailDto model = new();
+    private string duplicateSearch = string.Empty;
+    private bool isSearchingDuplicates;
+    private IReadOnlyCollection<MuestraListItemDto> duplicateCandidates = [];
+    private IReadOnlyCollection<BaseCatalogListItemDto> machineOptions = [];
+    private IReadOnlyCollection<BaseCatalogListItemDto> operationOptions = [];
+    private string? duplicateQueryAppliedKey;
+    private string statusMessage = string.Empty;
+    private bool isError;
+    private bool isLegacySyncActive;
+    private string syncStatusLabel = string.Empty;
+    private IReadOnlyCollection<AuditLogEntryDto> recentAuditLogs = [];
+    private IReadOnlyCollection<ParteAcabadoListItemDto> linkedFinishOrders = [];
+    private bool isLoadingLinkedFinishOrders;
+    private MuestraTab activeTab = MuestraTab.Ficha;
+    private int selectedBreakdownLineNumber;
+
+    private int LineCount => model.Lines.Count;
+    private int DistinctColorCount => model.Lines.Select(line => NormalizeToken(line.Color)).Where(value => !string.IsNullOrWhiteSpace(value)).Distinct(StringComparer.OrdinalIgnoreCase).Count();
+    private int DistinctSizeCount => model.Lines.Select(BuildSizeLabel).Where(value => !string.IsNullOrWhiteSpace(value)).Distinct(StringComparer.OrdinalIgnoreCase).Count();
+    private int DistinctClientCount => model.Lines.Select(line => line.ClientCode).Where(code => code > 0).Distinct().Count();
+    private decimal TotalCostPrice => model.Lines.Sum(line => line.CostPrice);
+    private decimal TotalSalePrice => model.Lines.Sum(line => line.SalePrice);
+    private decimal AverageCostPrice => model.Lines.Count == 0 ? 0m : model.Lines.Average(line => line.CostPrice);
+    private decimal AverageSalePrice => model.Lines.Count == 0 ? 0m : model.Lines.Average(line => line.SalePrice);
+    private decimal AverageMarginPercent => model.Lines.Count == 0
+        ? model.MarginPercent
+        : model.Lines
+            .Where(line => line.SalePrice > 0)
+            .Select(CalculateLineMarginPercent)
+            .DefaultIfEmpty(model.MarginPercent)
+            .Average();
+    private string DisplayOrigin => string.IsNullOrWhiteSpace(model.Origin) ? "local" : model.Origin;
+    private string DisplayClient => !string.IsNullOrWhiteSpace(model.ClientName) ? model.ClientName : (model.ClientCode > 0 ? $"Cliente {model.ClientCode}" : "Sin cliente");
+    private string DisplayMachine => !string.IsNullOrWhiteSpace(model.MachineName) ? model.MachineName : (model.MachineCode > 0 ? $"Máquina {model.MachineCode}" : "Sin máquina");
+    private string DisplayReference => string.IsNullOrWhiteSpace(model.Reference) ? "Sin referencia" : model.Reference;
+    private string DisplaySeason => string.IsNullOrWhiteSpace(model.Season) ? "Sin temporada" : model.Season;
+    private string PageTitleText => !string.IsNullOrWhiteSpace(Code)
+        ? $"Editar {moduleSingularLower} {Code}"
+        : $"Nueva {moduleSingularLower}";
+    private string PrintSheetEyebrow => IsComplementMode ? "Fitxa complement" : "Fitxa mostra";
+    private string DisplayCodeAndDescription => string.IsNullOrWhiteSpace(model.Code)
+        ? $"Nuevo {moduleSingularLower}"
+        : $"{model.Code} · {model.Description}";
+    private string DisplayCompositionPreview => string.IsNullOrWhiteSpace(model.Composition) ? "Composición pendiente" : model.Composition;
+    private string TopColorsLabel => BuildTopList(
+        model.Lines.Select(line => NormalizeToken(line.Color)).Where(value => !string.IsNullOrWhiteSpace(value)),
+        "Sin colores");
+    private string TopSizesLabel => BuildTopList(
+        model.Lines.Select(BuildSizeLabel).Where(value => !string.IsNullOrWhiteSpace(value)),
+        "Sin tallas");
+    private string CompositionLabel => string.IsNullOrWhiteSpace(model.Composition) ? "Pendiente de completar" : model.Composition;
+    private string FichaStatusLabel => model.Lines.Count == 0
+        ? "Pendiente"
+        : string.IsNullOrWhiteSpace(model.Description) || string.IsNullOrWhiteSpace(model.ClientName)
+            ? "Incompleta"
+            : "Operativa";
+    private string FichaStatusHelp => model.Lines.Count == 0
+        ? "Falta cargar la carta de colores"
+        : string.IsNullOrWhiteSpace(model.Description) || string.IsNullOrWhiteSpace(model.ClientName)
+            ? "Revisa cabecera y cliente"
+            : "Lista para impresión y trabajo";
+    private MuestraLineDto? SelectedBreakdownLine => model.Lines.OrderBy(item => item.LineNumber).FirstOrDefault(item => item.LineNumber == selectedBreakdownLineNumber);
+    private MuestraBreakdownDto? SelectedBreakdown => SelectedBreakdownLine?.Breakdown;
+    private decimal BreakdownMaterialTotal => SelectedBreakdown?.Lines.Sum(CalculateBreakdownLineImport) ?? 0m;
+    private decimal BreakdownMachineImport => SelectedBreakdown is null ? 0m : Math.Round(SelectedBreakdown.TimeMinutes * SelectedBreakdown.MachineRate, 2);
+    private decimal BreakdownTotalCost => BreakdownMaterialTotal + BreakdownMachineImport;
+    private string DisplaySelectedBreakdownTitle => SelectedBreakdownLine is null
+        ? "Sin línea seleccionada"
+        : $"{BuildLineTitle(SelectedBreakdownLine)} · {DisplayBreakdownColor(SelectedBreakdownLine)}";
+    private string DisplaySelectedBreakdownMachine => SelectedBreakdown is null
+        ? "Sin máquina"
+        : !string.IsNullOrWhiteSpace(SelectedBreakdown.MachineName) ? SelectedBreakdown.MachineName : (SelectedBreakdown.MachineCode > 0 ? $"Máquina {SelectedBreakdown.MachineCode}" : "Sin máquina");
+    private string DisplaySelectedBreakdownOperation => SelectedBreakdown is null
+        ? "Sin operación"
+        : !string.IsNullOrWhiteSpace(SelectedBreakdown.OperationName) ? SelectedBreakdown.OperationName : (SelectedBreakdown.OperationCode > 0 ? $"Operación {SelectedBreakdown.OperationCode}" : "Sin operación");
+    private string DisplaySelectedBreakdownDate => SelectedBreakdown?.WorkDate?.ToString("dd/MM/yyyy") ?? "Sin fecha";
+    private string CurrentSourceSampleKind => IsComplementMode ? ParteAcabadoSourceKinds.Complement : ParteAcabadoSourceKinds.Sample;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        tenantId = user.GetTenantId();
+        companyId = user.GetActiveCompanyId();
+        canEdit = user.IsPlatformAdmin() || user.IsInRole(PlatformRoles.TenantAdmin);
+        isReadOnly = !canEdit;
+
+        if (!tenantId.HasValue || !companyId.HasValue)
+        {
+            return;
+        }
+
+        await LoadMachineOptionsAsync();
+        await LoadOperationOptionsAsync();
+        await LoadSyncStatusAsync();
+        if (!string.IsNullOrWhiteSpace(Code))
+        {
+            var detail = await MuestraQueries.GetByCodeAsync(tenantId.Value, companyId.Value, Uri.UnescapeDataString(Code));
+            if (detail is null)
+            {
+                statusMessage = $"No se ha encontrado el {moduleSingularLower} solicitado.";
+                isError = true;
+                model = new MuestraDetailDto();
+                recentAuditLogs = [];
+                linkedFinishOrders = [];
+                return;
+            }
+
+            model = detail;
+            EnsureBreakdownState();
+            await LoadAuditAsync();
+            await LoadLinkedFinishOrdersAsync();
+        }
+        else
+        {
+            model = new MuestraDetailDto();
+            EnsureBreakdownState();
+            recentAuditLogs = [];
+            linkedFinishOrders = [];
+        }
+
+        await TryApplyDuplicateFromQueryAsync();
+    }
+
+    private async Task LoadSyncStatusAsync()
+    {
+        isLegacySyncActive = false;
+        syncStatusLabel = string.Empty;
+        if (!tenantId.HasValue || !companyId.HasValue)
+        {
+            return;
+        }
+
+        var status = (await LegacySyncService.GetModuleStatusesAsync(tenantId.Value))
+            .FirstOrDefault(item =>
+                item.CompanyId == companyId.Value &&
+                string.Equals(item.ModuleKey, LegacySyncModuleKeys.ArticleMuestras, StringComparison.OrdinalIgnoreCase));
+
+        if (status is null || !status.HasSuccessfulSync)
+        {
+            return;
+        }
+
+        isLegacySyncActive = true;
+        syncStatusLabel = status.LastCompletedUtc.HasValue
+            ? $"Última sync: {status.LastCompletedUtc.Value.ToLocalTime():dd/MM/yyyy HH:mm:ss} · Ins: {status.LastInserted} · Act: {status.LastUpdated} · Omi: {status.LastSkipped} · Err: {status.LastErrors}"
+            : $"Estado: {status.LastStatus}";
+    }
+
+    private async Task LoadMachineOptionsAsync()
+    {
+        if (!tenantId.HasValue || !companyId.HasValue)
+        {
+            machineOptions = [];
+            return;
+        }
+
+        var result = await BaseCatalogQueries.SearchAsync(tenantId.Value, companyId.Value, BaseCatalogKeys.Machines, new BaseCatalogFilter
+        {
+            Page = 1,
+            PageSize = 200
+        });
+
+        machineOptions = result.Items
+            .Where(item => int.TryParse(item.Code, out _))
+            .OrderBy(item => ParseMachineCode(item.Code))
+            .ToArray();
+    }
+
+    private async Task LoadOperationOptionsAsync()
+    {
+        if (!tenantId.HasValue || !companyId.HasValue)
+        {
+            operationOptions = [];
+            return;
+        }
+
+        var result = await BaseCatalogQueries.SearchAsync(tenantId.Value, companyId.Value, BaseCatalogKeys.Operations, new BaseCatalogFilter
+        {
+            Page = 1,
+            PageSize = 200
+        });
+
+        operationOptions = result.Items
+            .Where(item => int.TryParse(item.Code, out _))
+            .OrderBy(item => ParseOperationCode(item.Code))
+            .ToArray();
+    }
+
+    private Task OnHeaderMachineChanged(ChangeEventArgs args)
+    {
+        var machineCode = ParseMachineCode(args.Value?.ToString() ?? string.Empty);
+        model.MachineCode = machineCode;
+        model.MachineName = ResolveMachineName(machineCode);
+        return Task.CompletedTask;
+    }
+
+    private Task OnBreakdownMachineChanged(ChangeEventArgs args)
+    {
+        if (SelectedBreakdown is null)
+        {
+            return Task.CompletedTask;
+        }
+
+        var machineCode = ParseMachineCode(args.Value?.ToString() ?? string.Empty);
+        SelectedBreakdown.MachineCode = machineCode;
+        SelectedBreakdown.MachineName = ResolveMachineName(machineCode);
+        return Task.CompletedTask;
+    }
+
+    private Task OnBreakdownOperationChanged(ChangeEventArgs args)
+    {
+        if (SelectedBreakdown is null)
+        {
+            return Task.CompletedTask;
+        }
+
+        var operationCode = ParseOperationCode(args.Value?.ToString() ?? string.Empty);
+        SelectedBreakdown.OperationCode = operationCode;
+        SelectedBreakdown.OperationName = ResolveOperationName(operationCode);
+        return Task.CompletedTask;
+    }
+
+    private async Task SearchDuplicateCandidatesAsync()
+    {
+        duplicateCandidates = [];
+        if (!tenantId.HasValue || !companyId.HasValue)
+        {
+            return;
+        }
+
+        isSearchingDuplicates = true;
+        try
+        {
+            var result = await MuestraQueries.SearchAsync(tenantId.Value, companyId.Value, new MuestraFilter
+            {
+                Search = duplicateSearch,
+                Page = 1,
+                PageSize = 12,
+                SortColumn = nameof(MuestraListItemDto.Code)
+            });
+
+            duplicateCandidates = result.Items
+                .Where(item => !string.IsNullOrWhiteSpace(item.Code))
+                .OrderBy(item => item.Code, StringComparer.OrdinalIgnoreCase)
+                .ThenBy(item => item.ClientCode)
+                .ToArray();
+        }
+        finally
+        {
+            isSearchingDuplicates = false;
+        }
+    }
+
+    private async Task TryApplyDuplicateFromQueryAsync()
+    {
+        if (!IsComplementMode || !string.IsNullOrWhiteSpace(Code) || !tenantId.HasValue || !companyId.HasValue)
+        {
+            return;
+        }
+
+        var uri = new Uri(NavigationManager.Uri);
+        var query = Microsoft.AspNetCore.WebUtilities.QueryHelpers.ParseQuery(uri.Query);
+        if (!query.TryGetValue("duplicateCode", out var duplicateCodeValues))
+        {
+            return;
+        }
+
+        var duplicateCode = duplicateCodeValues.FirstOrDefault()?.Trim();
+        var duplicateClient = query.TryGetValue("duplicateClient", out var duplicateClientValues)
+            && int.TryParse(duplicateClientValues.FirstOrDefault(), out var parsedClient)
+                ? parsedClient
+                : 0;
+
+        if (string.IsNullOrWhiteSpace(duplicateCode) || duplicateClient <= 0)
+        {
+            return;
+        }
+
+        var key = $"{duplicateCode}|{duplicateClient}";
+        if (string.Equals(duplicateQueryAppliedKey, key, StringComparison.Ordinal))
+        {
+            return;
+        }
+
+        duplicateQueryAppliedKey = key;
+        await ApplyDuplicateBaseAsync(duplicateCode, duplicateClient);
+    }
+
+    private async Task ApplyDuplicateBaseAsync(string sourceCode, int sourceClientCode)
+    {
+        if (!tenantId.HasValue || !companyId.HasValue)
+        {
+            return;
+        }
+
+        var source = await MuestraQueries.GetByIdentityAsync(tenantId.Value, companyId.Value, sourceCode, sourceClientCode);
+        if (source is null)
+        {
+            statusMessage = "No se ha encontrado el complemento base seleccionado.";
+            isError = true;
+            return;
+        }
+
+        var targetCode = model.Code;
+        var targetClientCode = model.ClientCode;
+        var targetClientName = model.ClientName;
+        var targetCenter = model.CompanyCenterCode;
+
+        model = CloneMuestraForDuplication(source, targetCode, targetClientCode, targetClientName, targetCenter);
+        EnsureBreakdownState();
+        statusMessage = $"Base cargada desde el complemento {source.Code} del cliente {source.ClientCode}.";
+        isError = false;
+    }
+
+    private async Task SaveAsync()
+    {
+        if (!tenantId.HasValue || !companyId.HasValue)
+        {
+            return;
+        }
+
+        if (isReadOnly)
+        {
+            statusMessage = "No tienes permisos de edición en este tenant.";
+            isError = true;
+            return;
+        }
+
+        try
+        {
+            statusMessage = string.Empty;
+            isError = false;
+
+            var savedCode = await MuestraService.SaveAsync(new SaveMuestraCommand
+            {
+                TenantId = tenantId.Value,
+                CompanyId = companyId.Value,
+                Code = string.IsNullOrWhiteSpace(Code) ? model.Code : Uri.UnescapeDataString(Code),
+                Description = model.Description,
+                ClientCode = model.ClientCode,
+                ClientName = model.ClientName,
+                Reference = model.Reference,
+                Season = model.Season,
+                MachineCode = model.MachineCode,
+                MachineName = model.MachineName,
+                MarginPercent = model.MarginPercent,
+                VatCode = model.VatCode,
+                Notes = model.Notes,
+                Composition = model.Composition,
+                UnitPrice = model.UnitPrice,
+                Lines = model.Lines
+                    .OrderBy(item => item.LineNumber)
+                    .Select(item => new SaveMuestraLineInput
+                    {
+                        LineNumber = item.LineNumber,
+                        SizeCode = item.SizeCode,
+                        SizeHigh = item.SizeHigh,
+                        SizeLow = item.SizeLow,
+                        Description = item.Description,
+                        CostPrice = item.CostPrice,
+                        SalePrice = item.SalePrice,
+                        Color = item.Color,
+                        ClientCode = item.ClientCode,
+                        ClientName = item.ClientName,
+                        NcCode = item.NcCode
+                    })
+                    .ToList(),
+                Breakdowns = model.Lines
+                    .OrderBy(item => item.LineNumber)
+                    .Select(item => item.Breakdown ?? CreateBreakdownForLine(item))
+                    .Select(item => new SaveMuestraBreakdownInput
+                    {
+                        SampleLineNumber = item.SampleLineNumber,
+                        WorkDate = item.WorkDate,
+                        ClientCode = item.ClientCode,
+                        ClientName = item.ClientName,
+                        MachineCode = item.MachineCode,
+                        MachineName = item.MachineName,
+                        OperationCode = item.OperationCode,
+                        OperationName = item.OperationName,
+                        Needles = item.Needles,
+                        Speed = item.Speed,
+                        Disk = item.Disk,
+                        TimeMinutes = item.TimeMinutes,
+                        MachineRate = item.MachineRate,
+                        Cuts = item.Cuts,
+                        Notes = item.Notes,
+                        Lines = item.Lines
+                            .OrderBy(line => line.LineNumber)
+                            .Select(line => new SaveMuestraBreakdownLineInput
+                            {
+                                LineNumber = line.LineNumber,
+                                YarnCode = line.YarnCode,
+                                ProviderCode = line.ProviderCode,
+                                ProviderName = line.ProviderName,
+                                MaterialColor = line.MaterialColor,
+                                YarnMetric = line.YarnMetric,
+                                Ends = line.Ends,
+                                Passes = line.Passes,
+                                Graduation = line.Graduation,
+                                Consumption = line.Consumption,
+                                Price = line.Price
+                            })
+                            .ToList()
+                    })
+                    .ToList()
+            });
+
+            statusMessage = !string.IsNullOrWhiteSpace(Code)
+                ? $"{ModuleSingularTitle} actualizado correctamente."
+                : $"{ModuleSingularTitle} creado correctamente.";
+
+            if (string.IsNullOrWhiteSpace(Code))
+            {
+                NavigationManager.NavigateTo(BuildEditUrl(savedCode), forceLoad: false);
+                return;
+            }
+
+            await LoadAuditAsync();
+        }
+        catch (Exception exception)
+        {
+            statusMessage = exception.Message;
+            isError = true;
+        }
+    }
+
+    private async Task LoadAuditAsync()
+    {
+        if (!tenantId.HasValue || string.IsNullOrWhiteSpace(Code))
+        {
+            recentAuditLogs = [];
+            return;
+        }
+
+        recentAuditLogs = await AuditLogService.GetRecentAsync(
+            limit: 15,
+            tenantId: tenantId.Value,
+            entityName: ModuleSingularTitle,
+            entityId: Uri.UnescapeDataString(Code));
+    }
+
+    private async Task LoadLinkedFinishOrdersAsync()
+    {
+        linkedFinishOrders = [];
+        if (!tenantId.HasValue || !companyId.HasValue || string.IsNullOrWhiteSpace(model.Code))
+        {
+            return;
+        }
+
+        isLoadingLinkedFinishOrders = true;
+        try
+        {
+            var result = await ParteAcabadoQueries.SearchAsync(tenantId.Value, companyId.Value, new ParteAcabadoFilter
+            {
+                SourceSampleKind = CurrentSourceSampleKind,
+                SourceSampleCode = model.Code,
+                Page = 1,
+                PageSize = 50,
+                SortColumn = nameof(ParteAcabadoListItemDto.Date),
+                SortDescending = true
+            });
+
+            linkedFinishOrders = result.Items
+                .OrderByDescending(item => item.Date ?? DateTime.MinValue)
+                .ThenByDescending(item => item.OrderNumber)
+                .ToArray();
+        }
+        finally
+        {
+            isLoadingLinkedFinishOrders = false;
+        }
+    }
+
+    private void AddLine()
+    {
+        var nextLineNumber = model.Lines.Count == 0
+            ? 1
+            : model.Lines.Max(item => item.LineNumber) + 1;
+
+        model.Lines.Add(new MuestraLineDto
+        {
+            LineNumber = nextLineNumber,
+            ClientCode = model.ClientCode,
+            ClientName = model.ClientName,
+            Breakdown = new MuestraBreakdownDto
+            {
+                SampleLineNumber = nextLineNumber,
+                ClientCode = model.ClientCode,
+                ClientName = model.ClientName,
+                MachineCode = model.MachineCode,
+                MachineName = model.MachineName
+            }
+        });
+        selectedBreakdownLineNumber = nextLineNumber;
+    }
+
+    private Task DuplicateSelectedClientAcrossLinesAsync()
+    {
+        foreach (var line in model.Lines)
+        {
+            line.ClientCode = model.ClientCode;
+            line.ClientName = model.ClientName;
+        }
+
+        return Task.CompletedTask;
+    }
+
+    private void RemoveLine(int lineNumber)
+    {
+        var line = model.Lines.FirstOrDefault(item => item.LineNumber == lineNumber);
+        if (line is null)
+        {
+            return;
+        }
+
+        model.Lines.Remove(line);
+        for (var index = 0; index < model.Lines.Count; index++)
+        {
+            model.Lines[index].LineNumber = index + 1;
+            if (model.Lines[index].Breakdown is not null)
+            {
+                model.Lines[index].Breakdown.SampleLineNumber = model.Lines[index].LineNumber;
+            }
+        }
+
+        EnsureBreakdownState();
+    }
+
+    private async Task DeleteAsync()
+    {
+        if (!tenantId.HasValue || !companyId.HasValue || string.IsNullOrWhiteSpace(Code))
+        {
+            return;
+        }
+
+        if (!canEdit)
+        {
+            statusMessage = "No tienes permisos de edición en este tenant.";
+            isError = true;
+            return;
+        }
+
+        try
+        {
+            await MuestraService.DeleteAsync(tenantId.Value, companyId.Value, Uri.UnescapeDataString(Code));
+            NavigationManager.NavigateTo(BuildListUrl(), forceLoad: false);
+        }
+        catch (Exception exception)
+        {
+            statusMessage = exception.Message;
+            isError = true;
+        }
+    }
+
+    private string BuildListUrl() => IsComplementMode ? "/articulos/complementos" : "/articulos/muestras";
+
+    private string BuildEditUrl(string code)
+    {
+        var basePath = IsComplementMode ? "/articulos/complementos/editar/" : "/articulos/muestras/editar/";
+        return $"{basePath}{Uri.EscapeDataString(code)}";
+    }
+
+    private string BuildSheetPrintUrl()
+    {
+        var basePath = IsComplementMode ? "/articulos/complementos/impresion/ficha/" : "/articulos/muestras/impresion/ficha/";
+        return $"{basePath}{Uri.EscapeDataString(model.Code)}";
+    }
+
+    private string BuildLabelsPrintUrl()
+    {
+        var basePath = IsComplementMode ? "/articulos/complementos/impresion/etiquetas/" : "/articulos/muestras/impresion/etiquetas/";
+        return $"{basePath}{Uri.EscapeDataString(model.Code)}";
+    }
+
+    private string BuildBreakdownPrintUrl(int lineNumber)
+    {
+        var basePath = IsComplementMode ? "/articulos/complementos/impresion/desglose/" : "/articulos/muestras/impresion/desglose/";
+        return $"{basePath}{Uri.EscapeDataString(model.Code)}/{lineNumber}";
+    }
+
+    private static string BuildAcabadosByMachineUrl(int machineCode, int? operationCode = null)
+    {
+        if (machineCode <= 0)
+        {
+            return "/produccion/acabados?live=true";
+        }
+
+        var uri = $"/produccion/acabados?machine={machineCode}&live=true";
+        var selectedOperationCode = operationCode.GetValueOrDefault();
+        return selectedOperationCode > 0
+            ? $"{uri}&operation={selectedOperationCode}"
+            : uri;
+    }
+
+    private string BuildCreateParteFromSampleUrl(int? lineNumber = null)
+    {
+        var parameters = new Dictionary<string, string?>
+        {
+            ["sampleCode"] = model.Code,
+            ["sampleKind"] = CurrentSourceSampleKind
+        };
+
+        if (lineNumber.HasValue && lineNumber.Value > 0)
+        {
+            parameters["sampleLine"] = lineNumber.Value.ToString();
+        }
+
+        var query = string.Join("&",
+            parameters
+                .Where(item => !string.IsNullOrWhiteSpace(item.Value))
+                .Select(item => $"{Uri.EscapeDataString(item.Key)}={Uri.EscapeDataString(item.Value!)}"));
+
+        return string.IsNullOrWhiteSpace(query)
+            ? "/produccion/acabados/nueva"
+            : $"/produccion/acabados/nueva?{query}";
+    }
+
+    private string BuildLinkedFinishOrdersUrl()
+    {
+        if (string.IsNullOrWhiteSpace(model.Code))
+        {
+            return "/produccion/acabados?live=true";
+        }
+
+        return $"/produccion/acabados?sourceKind={Uri.EscapeDataString(CurrentSourceSampleKind)}&sourceCode={Uri.EscapeDataString(model.Code)}&live=true";
+    }
+
+    private static string BuildFinishOrderUrl(int orderNumber) => $"/produccion/acabados/editar/{orderNumber}";
+
+    private static string BuildFinishOrderPrintUrl(int orderNumber) => $"/produccion/acabados/{orderNumber}/imprimir";
+
+    private static MuestraDetailDto CloneMuestraForDuplication(
+        MuestraDetailDto source,
+        string? targetCode,
+        int targetClientCode,
+        string? targetClientName,
+        string? targetCenter)
+    {
+        var clone = new MuestraDetailDto
+        {
+            Code = targetCode ?? string.Empty,
+            CompanyCenterCode = string.IsNullOrWhiteSpace(targetCenter) ? source.CompanyCenterCode : targetCenter,
+            Description = source.Description,
+            ClientCode = targetClientCode,
+            ClientName = targetClientName ?? string.Empty,
+            Reference = source.Reference,
+            Season = source.Season,
+            MachineCode = source.MachineCode,
+            MachineName = source.MachineName,
+            MarginPercent = source.MarginPercent,
+            VatCode = source.VatCode,
+            Notes = source.Notes,
+            Composition = source.Composition,
+            UnitPrice = source.UnitPrice,
+            Origin = "local"
+        };
+
+        clone.Lines = source.Lines
+            .OrderBy(item => item.LineNumber)
+            .Select(line => new MuestraLineDto
+            {
+                LineNumber = line.LineNumber,
+                SizeCode = line.SizeCode,
+                SizeHigh = line.SizeHigh,
+                SizeLow = line.SizeLow,
+                Description = line.Description,
+                CostPrice = line.CostPrice,
+                SalePrice = line.SalePrice,
+                Color = line.Color,
+                ClientCode = targetClientCode,
+                ClientName = targetClientName ?? string.Empty,
+                NcCode = line.NcCode,
+                Breakdown = CloneBreakdown(line.Breakdown, line.LineNumber, targetClientCode, targetClientName)
+            })
+            .ToList();
+
+        clone.Breakdowns = clone.Lines
+            .Where(line => line.Breakdown is not null)
+            .Select(line => line.Breakdown!)
+            .OrderBy(item => item.SampleLineNumber)
+            .ToList();
+
+        return clone;
+    }
+
+    private static MuestraBreakdownDto CloneBreakdown(
+        MuestraBreakdownDto? source,
+        int sampleLineNumber,
+        int targetClientCode,
+        string? targetClientName)
+    {
+        if (source is null)
+        {
+            return new MuestraBreakdownDto
+            {
+                SampleLineNumber = sampleLineNumber,
+                ClientCode = targetClientCode,
+                ClientName = targetClientName ?? string.Empty
+            };
+        }
+
+        return new MuestraBreakdownDto
+        {
+            SampleLineNumber = sampleLineNumber,
+            WorkDate = source.WorkDate,
+            ClientCode = targetClientCode,
+            ClientName = targetClientName ?? string.Empty,
+            MachineCode = source.MachineCode,
+            MachineName = source.MachineName,
+            OperationCode = source.OperationCode,
+            OperationName = source.OperationName,
+            Needles = source.Needles,
+            Speed = source.Speed,
+            Disk = source.Disk,
+            TimeMinutes = source.TimeMinutes,
+            MachineRate = source.MachineRate,
+            Cuts = source.Cuts,
+            Notes = source.Notes,
+            Lines = source.Lines
+                .OrderBy(item => item.LineNumber)
+                .Select(line => new MuestraBreakdownLineDto
+                {
+                    LineNumber = line.LineNumber,
+                    YarnCode = line.YarnCode,
+                    ProviderCode = line.ProviderCode,
+                    ProviderName = line.ProviderName,
+                    MaterialColor = line.MaterialColor,
+                    YarnMetric = line.YarnMetric,
+                    Ends = line.Ends,
+                    Passes = line.Passes,
+                    Graduation = line.Graduation,
+                    Consumption = line.Consumption,
+                    Price = line.Price
+                })
+                .ToList()
+        };
+    }
+
+    private static string BuildLineTitle(MuestraLineDto line)
+    {
+        if (!string.IsNullOrWhiteSpace(line.Description))
+        {
+            return line.Description;
+        }
+
+        var size = BuildSizeLabel(line);
+        return string.IsNullOrWhiteSpace(size) ? $"Línea {line.LineNumber}" : size;
+    }
+
+    private static string BuildSizeLabel(MuestraLineDto line)
+    {
+        var parts = new[]
+        {
+            NormalizeToken(line.SizeCode),
+            NormalizeToken(line.SizeHigh),
+            NormalizeToken(line.SizeLow)
+        }.Where(value => !string.IsNullOrWhiteSpace(value)).ToArray();
+
+        return parts.Length == 0 ? string.Empty : string.Join(" · ", parts);
+    }
+
+    private static string BuildTopList(IEnumerable<string> items, string emptyFallback)
+    {
+        var topItems = items
+            .GroupBy(value => value, StringComparer.OrdinalIgnoreCase)
+            .OrderByDescending(group => group.Count())
+            .ThenBy(group => group.Key)
+            .Take(3)
+            .Select(group => group.Key)
+            .ToList();
+
+        return topItems.Count == 0 ? emptyFallback : string.Join(", ", topItems);
+    }
+
+    private static string NormalizeToken(string? value) => value?.Trim() ?? string.Empty;
+
+    private static decimal CalculateLineMarginPercent(MuestraLineDto line)
+    {
+        if (line.SalePrice <= 0)
+        {
+            return 0m;
+        }
+
+        var margin = (line.SalePrice - line.CostPrice) / line.SalePrice * 100m;
+        return Math.Round(margin, 2);
+    }
+
+    private static string GetLineMarginLabel(MuestraLineDto line)
+    {
+        if (line.SalePrice <= 0)
+        {
+            return "Sin venta";
+        }
+
+        return $"{CalculateLineMarginPercent(line):0.0#}%";
+    }
+
+    private static string GetLineMarginBadgeClass(MuestraLineDto line)
+    {
+        if (line.SalePrice <= 0)
+        {
+            return "review";
+        }
+
+        return CalculateLineMarginPercent(line) switch
+        {
+            < 0 => "blocked",
+            < 15 => "review",
+            _ => "ok"
+        };
+    }
+
+    private static string GetSampleLineRowClass(MuestraLineDto line)
+    {
+        if (line.SalePrice <= 0)
+        {
+            return "sample-line-row review";
+        }
+
+        return CalculateLineMarginPercent(line) < 15 ? "sample-line-row review" : "sample-line-row";
+    }
+
+    private static string DisplayNcCode(MuestraLineDto line) =>
+        string.IsNullOrWhiteSpace(line.NcCode) ? "-" : line.NcCode;
+
+    private void EnsureBreakdownState()
+    {
+        foreach (var line in model.Lines)
+        {
+            line.Breakdown ??= CreateBreakdownForLine(line);
+            line.Breakdown.SampleLineNumber = line.LineNumber;
+            if (line.Breakdown.ClientCode <= 0)
+            {
+                line.Breakdown.ClientCode = line.ClientCode > 0 ? line.ClientCode : model.ClientCode;
+            }
+
+            if (string.IsNullOrWhiteSpace(line.Breakdown.ClientName))
+            {
+                line.Breakdown.ClientName = !string.IsNullOrWhiteSpace(line.ClientName) ? line.ClientName : model.ClientName;
+            }
+
+            if (line.Breakdown.MachineCode <= 0)
+            {
+                line.Breakdown.MachineCode = model.MachineCode;
+            }
+
+            if (string.IsNullOrWhiteSpace(line.Breakdown.MachineName))
+            {
+                line.Breakdown.MachineName = model.MachineName;
+            }
+
+            if (line.Breakdown.OperationCode > 0 && string.IsNullOrWhiteSpace(line.Breakdown.OperationName))
+            {
+                line.Breakdown.OperationName = ResolveOperationName(line.Breakdown.OperationCode);
+            }
+        }
+
+        if (selectedBreakdownLineNumber <= 0 || model.Lines.All(item => item.LineNumber != selectedBreakdownLineNumber))
+        {
+            selectedBreakdownLineNumber = model.Lines.OrderBy(item => item.LineNumber).Select(item => item.LineNumber).FirstOrDefault();
+        }
+    }
+
+    private void SelectBreakdownLine(int lineNumber)
+    {
+        selectedBreakdownLineNumber = lineNumber;
+        activeTab = MuestraTab.Desglose;
+    }
+
+    private void AddBreakdownMaterialLine()
+    {
+        if (SelectedBreakdown is null)
+        {
+            return;
+        }
+
+        var nextLineNumber = SelectedBreakdown.Lines.Count == 0
+            ? 1
+            : SelectedBreakdown.Lines.Max(item => item.LineNumber) + 1;
+
+        SelectedBreakdown.Lines.Add(new MuestraBreakdownLineDto
+        {
+            LineNumber = nextLineNumber
+        });
+    }
+
+    private void RemoveBreakdownMaterialLine(int lineNumber)
+    {
+        if (SelectedBreakdown is null)
+        {
+            return;
+        }
+
+        var line = SelectedBreakdown.Lines.FirstOrDefault(item => item.LineNumber == lineNumber);
+        if (line is null)
+        {
+            return;
+        }
+
+        SelectedBreakdown.Lines.Remove(line);
+        for (var index = 0; index < SelectedBreakdown.Lines.Count; index++)
+        {
+            SelectedBreakdown.Lines[index].LineNumber = index + 1;
+        }
+    }
+
+    private void CopySampleMachineIntoBreakdown()
+    {
+        if (SelectedBreakdown is null || SelectedBreakdownLine is null)
+        {
+            return;
+        }
+
+        SelectedBreakdown.ClientCode = SelectedBreakdownLine.ClientCode > 0 ? SelectedBreakdownLine.ClientCode : model.ClientCode;
+        SelectedBreakdown.ClientName = !string.IsNullOrWhiteSpace(SelectedBreakdownLine.ClientName) ? SelectedBreakdownLine.ClientName : model.ClientName;
+        SelectedBreakdown.MachineCode = model.MachineCode;
+        SelectedBreakdown.MachineName = model.MachineName;
+        SelectedBreakdown.WorkDate ??= DateTime.Today;
+    }
+
+    private MuestraBreakdownDto CreateBreakdownForLine(MuestraLineDto line) =>
+        new()
+        {
+            SampleLineNumber = line.LineNumber,
+            ClientCode = line.ClientCode > 0 ? line.ClientCode : model.ClientCode,
+            ClientName = !string.IsNullOrWhiteSpace(line.ClientName) ? line.ClientName : model.ClientName,
+            MachineCode = model.MachineCode,
+            MachineName = model.MachineName
+        };
+
+    private static decimal CalculateBreakdownLineImport(MuestraBreakdownLineDto line) =>
+        Math.Round(line.Consumption * line.Price, 2);
+
+    private string ResolveMachineName(int machineCode)
+    {
+        if (machineCode <= 0)
+        {
+            return string.Empty;
+        }
+
+        return machineOptions.FirstOrDefault(item => ParseMachineCode(item.Code) == machineCode)?.Name ?? string.Empty;
+    }
+
+    private string ResolveOperationName(int operationCode)
+    {
+        if (operationCode <= 0)
+        {
+            return string.Empty;
+        }
+
+        return operationOptions.FirstOrDefault(item => ParseOperationCode(item.Code) == operationCode)?.Name ?? string.Empty;
+    }
+
+    private static string DisplayBreakdownColor(MuestraLineDto line) =>
+        string.IsNullOrWhiteSpace(line.Color) ? "Sin color" : line.Color;
+
+    private static bool HasBreakdownData(MuestraLineDto line)
+    {
+        var breakdown = line.Breakdown;
+        if (breakdown is null)
+        {
+            return false;
+        }
+
+        return breakdown.MachineCode > 0 ||
+               !string.IsNullOrWhiteSpace(breakdown.MachineName) ||
+               breakdown.OperationCode > 0 ||
+               !string.IsNullOrWhiteSpace(breakdown.OperationName) ||
+               breakdown.WorkDate.HasValue ||
+               breakdown.Needles > 0 ||
+               breakdown.Speed > 0 ||
+               !string.IsNullOrWhiteSpace(breakdown.Disk) ||
+               breakdown.TimeMinutes > 0 ||
+               breakdown.MachineRate > 0 ||
+               !string.IsNullOrWhiteSpace(breakdown.Cuts) ||
+               !string.IsNullOrWhiteSpace(breakdown.Notes) ||
+               breakdown.Lines.Count > 0;
+    }
+
+    private static string GetBreakdownStatusLabel(MuestraLineDto line) =>
+        HasBreakdownData(line) ? $"{line.Breakdown.Lines.Count} mats." : "Pendiente";
+
+    private enum MuestraTab
+    {
+        Ficha,
+        Carta,
+        Desglose,
+        Ordenes,
+        Impresion
+    }
+
+    private static int ParseMachineCode(string code) =>
+        int.TryParse(code, out var parsedValue) ? parsedValue : 0;
+
+    private static string FormatMachineOption(BaseCatalogListItemDto item) =>
+        string.IsNullOrWhiteSpace(item.Name) ? item.Code : $"{item.Code} · {item.Name}";
+
+    private static int ParseOperationCode(string code) =>
+        int.TryParse(code, out var parsedValue) ? parsedValue : 0;
+
+    private static string FormatOperationOption(BaseCatalogListItemDto item) =>
+        string.IsNullOrWhiteSpace(item.Name) ? item.Code : $"{item.Code} · {item.Name}";
+
+    private static string GetStatusLabel(string status) => status switch
+    {
+        ParteAcabadoStatuses.Pending => "Pendiente",
+        ParteAcabadoStatuses.InProgress => "En proceso",
+        ParteAcabadoStatuses.Finished => "Terminado",
+        ParteAcabadoStatuses.Cancelled => "Anulado",
+        _ => status
+    };
+
+    private static string GetDisplayText(string name, int code)
+    {
+        if (!string.IsNullOrWhiteSpace(name))
+        {
+            return name;
+        }
+
+        return code > 0 ? code.ToString() : "-";
+    }
+
+    private int GetLinkedOrderStatusCount(string status) =>
+        linkedFinishOrders.Count(item => string.Equals(item.Status, status, StringComparison.OrdinalIgnoreCase));
+
+    private static string GetLinkedOrderStatusBadgeClass(string status) => status switch
+    {
+        ParteAcabadoStatuses.Finished => "ok",
+        ParteAcabadoStatuses.InProgress => "review",
+        ParteAcabadoStatuses.Cancelled => "blocked",
+        _ => "review"
+    };
+
+    private static string GetLinkedOrderFabricLabel(ParteAcabadoListItemDto item) =>
+        !string.IsNullOrWhiteSpace(item.PrimaryFabricDescription)
+            ? item.PrimaryFabricDescription
+            : !string.IsNullOrWhiteSpace(item.PrimaryFabricCode)
+                ? item.PrimaryFabricCode
+                : "-";
+}

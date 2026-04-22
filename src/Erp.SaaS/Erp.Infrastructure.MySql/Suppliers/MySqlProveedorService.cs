@@ -3,7 +3,6 @@ using System.Globalization;
 using Erp.Application.Auditing;
 using Erp.Application.Companies;
 using Erp.Application.Contexts;
-using Erp.Application.LegacySync;
 using Erp.Application.Suppliers;
 using Erp.Domain.Common;
 using Erp.Infrastructure.MySql.Database;
@@ -66,6 +65,7 @@ public sealed class MySqlProveedorService : IProveedorQueries, IProveedorService
                 SELECT COUNT(*)
                 FROM prove
                 WHERE CENTRO = @centerCode
+                  AND COALESCE(is_deleted, 0) = 0
                   AND (
                         @search = ''
                         OR NOM LIKE @likeSearch
@@ -96,6 +96,7 @@ public sealed class MySqlProveedorService : IProveedorQueries, IProveedorService
                 SELECT CODI, CENTRO, NOM, NIF, CONTACTE, POB, EMAIL1, TEL
                 FROM prove
                 WHERE CENTRO = @centerCode
+                  AND COALESCE(is_deleted, 0) = 0
                   AND (
                         @search = ''
                         OR NOM LIKE @likeSearch
@@ -329,6 +330,7 @@ public sealed class MySqlProveedorService : IProveedorQueries, IProveedorService
             {INCOTERM_JOIN}
             WHERE p.CODI = @code
               AND p.CENTRO = @centerCode
+              AND COALESCE(p.is_deleted, 0) = 0
             LIMIT 1;
             """
             .Replace("{BLOQUEADO_SELECT}", capabilities.HasBlockedColumn ? "p.BLOQUEADO," : "CAST(0 AS SIGNED) AS BLOQUEADO,")
@@ -417,7 +419,6 @@ public sealed class MySqlProveedorService : IProveedorQueries, IProveedorService
         }
 
         await using var connection = await _connectionFactory.OpenConnectionAsync(cancellationToken);
-        await EnsureSuppliersWriteAllowedAsync(connection, command.TenantId, command.CompanyId, cancellationToken);
         var capabilities = await GetSupplierCapabilitiesAsync(connection, cancellationToken);
         var code = command.Code ?? await GetNextCodeAsync(connection, centerCode, cancellationToken);
 
@@ -456,6 +457,9 @@ public sealed class MySqlProveedorService : IProveedorQueries, IProveedorService
                     {IBAN_ASSIGNMENT}
                     {SWIFT_ASSIGNMENT}
                     {INCOTERM_ASSIGNMENT}
+                    origin = 'local',
+                    is_deleted = 0,
+                    synced_utc = NULL,
                     WEB = @website,
                     NOTES = @notes
                 WHERE CODI = @code
@@ -480,13 +484,13 @@ public sealed class MySqlProveedorService : IProveedorQueries, IProveedorService
             {
                 "CODI", "CENTRO", "NOM", "NIF", "DOM", "CP", "POB", "PROV", "PAIS", "CONTACTE",
                 "TEL", "TEL2", "FAX", "EMAIL1", "EMAIL2", "FORMA", "BANC", "COFI", "OFI", "DC", "CTA",
-                "DIA1", "DIA2", "DIA3", "IVA", "SUBCTA", "TRASPAS", "WEB", "NOTES"
+                "DIA1", "DIA2", "DIA3", "IVA", "SUBCTA", "TRASPAS", "WEB", "NOTES", "origin", "is_deleted", "synced_utc"
             };
             var insertValues = new List<string>
             {
                 "@code", "@centerCode", "@name", "@taxId", "@address", "@postalCode", "@city", "@province", "@country", "@contactName",
                 "@phone", "@secondaryPhone", "@fax", "@primaryEmail", "@secondaryEmail", "@paymentMethodCode", "@bankCode", "@bankEntityCode", "@bankOfficeCode", "@bankControlDigit", "@bankAccountNumber",
-                "@paymentDay1", "@paymentDay2", "@paymentDay3", "@taxCode", "@subAccount", "@transferToAccounting", "@website", "@notes"
+                "@paymentDay1", "@paymentDay2", "@paymentDay3", "@taxCode", "@subAccount", "@transferToAccounting", "@website", "@notes", "'local'", "0", "NULL"
             };
 
             if (capabilities.HasBlockedColumn)
@@ -528,6 +532,45 @@ public sealed class MySqlProveedorService : IProveedorQueries, IProveedorService
 
         await WriteAuditAsync(command, code, centerCode, previous, current, cancellationToken);
         return code;
+    }
+
+    public async Task DeleteAsync(Guid tenantId, Guid companyId, int code, CancellationToken cancellationToken = default)
+    {
+        if (!_connectionFactory.IsConfigured)
+        {
+            return;
+        }
+
+        await EnsureCompanyAccessAsync(tenantId, companyId, cancellationToken);
+        EnsureTenantWriteAccess();
+
+        var previous = await GetByCodeAsync(tenantId, companyId, code, cancellationToken)
+            ?? throw new InvalidOperationException("No se ha encontrado el proveedor que intentas eliminar.");
+
+        await using var connection = await _connectionFactory.OpenConnectionAsync(cancellationToken);
+        await using var command = connection.CreateCommand();
+        command.CommandText =
+            """
+            UPDATE prove
+            SET is_deleted = 1,
+                origin = 'local',
+                synced_utc = NULL
+            WHERE CODI = @code
+              AND CENTRO = @centerCode;
+            """;
+        command.Parameters.AddWithValue("@code", code);
+        command.Parameters.AddWithValue("@centerCode", previous.CompanyCenterCode);
+        await command.ExecuteNonQueryAsync(cancellationToken);
+
+        await _auditLogService.WriteAsync(new WriteAuditLogCommand
+        {
+            TenantId = tenantId,
+            CompanyId = companyId,
+            Action = "ProveedorDeleted",
+            EntityName = "Proveedor",
+            EntityId = code.ToString(),
+            Details = $"Codigo={code}; Nombre={previous.Name}; Centro={previous.CompanyCenterCode}"
+        }, cancellationToken);
     }
 
     private static void FillSaveParameters(MySqlCommand command, string centerCode, int code, SaveProveedorCommand source)
@@ -692,40 +735,6 @@ public sealed class MySqlProveedorService : IProveedorQueries, IProveedorService
         }
 
         throw new InvalidOperationException("No tienes permisos de escritura en este tenant.");
-    }
-
-    private static async Task<bool> IsLegacySyncActiveForCompanyAsync(
-        MySqlConnection connection,
-        Guid tenantId,
-        Guid companyId,
-        CancellationToken cancellationToken)
-    {
-        await using var command = connection.CreateCommand();
-        command.CommandText =
-            """
-            SELECT COUNT(*)
-            FROM legacy_sync_checkpoints
-            WHERE tenant_id = @tenantId
-              AND company_id = @companyId
-              AND module_key = @moduleKey
-              AND last_status IN ('Completed', 'CompletedWithErrors');
-            """;
-        command.Parameters.AddWithValue("@tenantId", tenantId.ToString());
-        command.Parameters.AddWithValue("@companyId", companyId.ToString());
-        command.Parameters.AddWithValue("@moduleKey", LegacySyncModuleKeys.CrmSuppliers);
-        return Convert.ToInt32(await command.ExecuteScalarAsync(cancellationToken)) > 0;
-    }
-
-    private static async Task EnsureSuppliersWriteAllowedAsync(
-        MySqlConnection connection,
-        Guid tenantId,
-        Guid companyId,
-        CancellationToken cancellationToken)
-    {
-        if (await IsLegacySyncActiveForCompanyAsync(connection, tenantId, companyId, cancellationToken))
-        {
-            throw new InvalidOperationException("Compras / Proveedores está en convivencia con legacy para esta empresa. Mientras el módulo esté sincronizado, la web queda en solo lectura.");
-        }
     }
 
     private async Task EnsureCompanyAccessAsync(Guid tenantId, Guid companyId, CancellationToken cancellationToken)

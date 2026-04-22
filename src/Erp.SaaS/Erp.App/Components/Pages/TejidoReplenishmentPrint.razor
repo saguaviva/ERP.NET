@@ -1,0 +1,213 @@
+@page "/articulos/tejidos/{Code}/reposicion"
+@layout EmptyLayout
+@attribute [Authorize(Roles = "TenantAdmin,TenantReader")]
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject ITejidoQueries TejidoQueries
+
+<PageTitle>Reposición tejido @Code</PageTitle>
+
+<div class="document-shell">
+    <div class="document-toolbar no-print">
+        <a class="secondary-button link-button" href="/articulos/tejidos/editar/@Uri.EscapeDataString(Code)">Volver al tejido</a>
+        <button class="primary-button" type="button" onclick="window.print()">Guardar como PDF / Imprimir</button>
+    </div>
+
+    @if (!tenantId.HasValue || !companyId.HasValue)
+    {
+        <div class="empty-state document-state">
+            <p>No hay empresa activa seleccionada.</p>
+        </div>
+    }
+    else if (!string.IsNullOrWhiteSpace(errorMessage))
+    {
+        <div class="alert danger document-state">@errorMessage</div>
+    }
+    else if (tejido is null)
+    {
+        <div class="empty-state document-state">
+            <p>No se ha encontrado el tejido solicitado.</p>
+        </div>
+    }
+    else
+    {
+        <section class="document-page">
+            <header class="document-header">
+                <div>
+                    <p class="eyebrow">Reposició agrupada</p>
+                    <h1>@tejido.Code</h1>
+                    <p class="muted">@tejido.Description</p>
+                </div>
+                <div class="document-header-meta">
+                    <div>
+                        <span class="muted">Centro</span>
+                        <strong>@tejido.CompanyCenterCode</strong>
+                    </div>
+                    <div>
+                        <span class="muted">Colores</span>
+                        <strong>@rows.Count</strong>
+                    </div>
+                </div>
+            </header>
+
+            <section class="document-section">
+                <div class="document-grid-two">
+                    <section class="document-box">
+                        <h2>Resumen</h2>
+                        <div class="document-kv-grid">
+                            <div><span class="muted">Metros a reponer</span><strong>@TotalMeters.ToString("0.###") m</strong></div>
+                            <div><span class="muted">Valor estimado</span><strong>@TotalValue.ToString("0.00") €</strong></div>
+                            <div><span class="muted">Colores sin stock</span><strong>@rows.Count(item => item.CurrentStock <= 0m)</strong></div>
+                            <div><span class="muted">Colores bajo mínimo</span><strong>@rows.Count(item => item.CurrentStock > 0m && item.CurrentStock < item.MinimumStock)</strong></div>
+                        </div>
+                    </section>
+                    <section class="document-box">
+                        <h2>Base de cálculo</h2>
+                        <p>Se propone reponer únicamente los colores cuya cobertura está por debajo del mínimo configurado.</p>
+                        <p>Reposición sugerida = <strong>mínimo - stock actual</strong>.</p>
+                        <p>Valor estimado = <strong>metros a reponer x €/mts.</strong>.</p>
+                    </section>
+                </div>
+            </section>
+
+            <section class="document-section">
+                <h2>Detalle de reposición</h2>
+                <table class="data-table document-table">
+                    <thead>
+                        <tr>
+                            <th>Color</th>
+                            <th>Estado</th>
+                            <th>Actual</th>
+                            <th>Mínimo</th>
+                            <th>Falta</th>
+                            <th>€/Mts.</th>
+                            <th>Valor rep.</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (rows.Count == 0)
+                        {
+                            <tr>
+                                <td colspan="7" class="table-empty">No hay colores con necesidad de reposición.</td>
+                            </tr>
+                        }
+                        else
+                        {
+                            @foreach (var row in rows)
+                            {
+                                <tr>
+                                    <td>@DisplayValue(row.Color)</td>
+                                    <td>@GetStatus(row)</td>
+                                    <td>@row.CurrentStock.ToString("0.###")</td>
+                                    <td>@row.MinimumStock.ToString("0.###")</td>
+                                    <td>@GetMissingMeters(row).ToString("0.###")</td>
+                                    <td>@row.MetersPrice.ToString("0.0000")</td>
+                                    <td>@GetEstimatedValue(row).ToString("0.00") €</td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </section>
+        </section>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public string Code { get; set; } = string.Empty;
+
+    [SupplyParameterFromQuery(Name = "lines")]
+    public string? Lines { get; set; }
+
+    private Guid? tenantId;
+    private Guid? companyId;
+    private TejidoDetailDto? tejido;
+    private string errorMessage = string.Empty;
+    private IReadOnlyList<TejidoColorDetailDto> rows = [];
+    private decimal TotalMeters => rows.Sum(GetMissingMeters);
+    private decimal TotalValue => rows.Sum(GetEstimatedValue);
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        tenantId = user.GetTenantId();
+        companyId = user.GetActiveCompanyId();
+
+        if (!tenantId.HasValue || !companyId.HasValue)
+        {
+            return;
+        }
+
+        try
+        {
+            errorMessage = string.Empty;
+            tejido = await TejidoQueries.GetByCodeAsync(tenantId.Value, companyId.Value, Uri.UnescapeDataString(Code));
+            rows = BuildRows();
+        }
+        catch (Exception exception)
+        {
+            errorMessage = exception.Message;
+            rows = [];
+        }
+    }
+
+    private IReadOnlyList<TejidoColorDetailDto> BuildRows()
+    {
+        if (tejido is null)
+        {
+            return [];
+        }
+
+        var requestedLines = ParseLineNumbers(Lines);
+
+        return tejido.Colors
+            .Where(item => GetMissingMeters(item) > 0m)
+            .Where(item => requestedLines.Count == 0 || requestedLines.Contains(item.LineNumber))
+            .OrderByDescending(GetMissingMeters)
+            .ThenBy(item => item.Color)
+            .ToList();
+    }
+
+    private static HashSet<int> ParseLineNumbers(string? lines)
+    {
+        var result = new HashSet<int>();
+        if (string.IsNullOrWhiteSpace(lines))
+        {
+            return result;
+        }
+
+        foreach (var token in lines.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+        {
+            if (int.TryParse(token, out var lineNumber))
+            {
+                result.Add(lineNumber);
+            }
+        }
+
+        return result;
+    }
+
+    private static decimal GetMissingMeters(TejidoColorDetailDto item) =>
+        Math.Round(Math.Max(item.MinimumStock - item.CurrentStock, 0m), 3, MidpointRounding.AwayFromZero);
+
+    private static decimal GetEstimatedValue(TejidoColorDetailDto item) =>
+        Math.Round(GetMissingMeters(item) * Math.Max(item.MetersPrice, 0m), 2, MidpointRounding.AwayFromZero);
+
+    private static string GetStatus(TejidoColorDetailDto item)
+    {
+        if (item.CurrentStock <= 0m)
+        {
+            return "Sin stock";
+        }
+
+        if (item.CurrentStock < item.MinimumStock)
+        {
+            return "Bajo mínimo";
+        }
+
+        return "En rango";
+    }
+
+    private static string DisplayValue(string value) => string.IsNullOrWhiteSpace(value) ? "-" : value;
+}

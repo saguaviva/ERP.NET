@@ -1,0 +1,983 @@
+@page "/compras/facturas/nueva"
+@page "/compras/facturas/editar/{InvoiceNumber:int}"
+@attribute [Authorize(Roles = "TenantAdmin,TenantReader")]
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IPurchaseInvoiceQueries PurchaseInvoiceQueries
+@inject IPurchaseInvoiceService PurchaseInvoiceService
+@inject IPurchaseOrderQueries PurchaseOrderQueries
+@inject IProveedorQueries ProveedorQueries
+@inject NavigationManager NavigationManager
+
+<PageTitle>@(InvoiceNumber.HasValue ? $"Factura proveedor {InvoiceNumber}" : "Nueva factura de proveedor")</PageTitle>
+
+<div class="page-header">
+    <div>
+        <p class="eyebrow">Compras</p>
+        <h1>@(InvoiceNumber.HasValue ? $"Factura {InvoiceNumber}" : "Nueva factura de proveedor")</h1>
+        <p class="lead">Factura local de proveedor con trazabilidad hacia recepciones y pedidos de compra.</p>
+    </div>
+    <div class="quick-links">
+        <a class="secondary-button link-button" href="/compras/facturas">Volver al listado</a>
+        @if (InvoiceNumber.HasValue)
+        {
+            <a class="secondary-button link-button" href="/compras/facturas/@InvoiceNumber.Value/pdf" target="_blank">Versión PDF</a>
+        }
+    </div>
+</div>
+
+@if (!tenantId.HasValue || !companyId.HasValue)
+{
+    <div class="empty-state">
+        <p>No hay empresa activa seleccionada.</p>
+    </div>
+}
+else if (!canEdit && !InvoiceNumber.HasValue)
+{
+    <div class="empty-state">
+        <p>No tienes permisos para crear facturas de proveedor.</p>
+    </div>
+}
+else
+{
+    @if (!string.IsNullOrWhiteSpace(statusMessage))
+    {
+        <div class="alert @(isError ? "danger" : "success")">@statusMessage</div>
+    }
+
+    <EditForm Model="model" OnValidSubmit="SaveAsync">
+        <div class="form-grid">
+            <label class="field">
+                <span>Proveedor</span>
+                <InputSelect class="text-input" @bind-Value="model.SupplierCode" disabled="@(!canEdit || InvoiceNumber.HasValue && hasReceiptLinks)">
+                    <option value="0">Selecciona proveedor</option>
+                    @foreach (var supplier in suppliers)
+                    {
+                        <option value="@supplier.Code">@supplier.Name (@supplier.Code)</option>
+                    }
+                </InputSelect>
+                @if (SelectedSupplier is not null)
+                {
+                    <span class="field-hint">@SelectedSupplier.TaxId · @SelectedSupplier.City</span>
+                }
+            </label>
+            <label class="field">
+                <span>Fecha documento</span>
+                <InputDate class="text-input" @bind-Value="model.DocumentDate" disabled="@(!canEdit)" />
+            </label>
+            <label class="field">
+                <span>Vencimiento</span>
+                <InputDate class="text-input" @bind-Value="model.DueDate" disabled="@(!canEdit)" />
+            </label>
+            <label class="field">
+                <span>Estado</span>
+                <InputSelect class="text-input" @bind-Value="model.Status" disabled="@(!canEdit)">
+                    @foreach (var status in PurchaseInvoiceStatuses.All)
+                    {
+                        <option value="@status">@FormatStatus(status)</option>
+                    }
+                </InputSelect>
+            </label>
+            <label class="field wide">
+                <span>Número factura proveedor</span>
+                <InputText class="text-input" @bind-Value="model.SupplierDocumentNumber" disabled="@(!canEdit)" />
+            </label>
+            <label class="field wide">
+                <span>Notas</span>
+                <InputTextArea class="text-area" @bind-Value="model.Notes" disabled="@(!canEdit)" />
+            </label>
+        </div>
+
+        <section class="panel">
+            <div class="page-header">
+                <div>
+                    <h2>Recepciones enlazadas</h2>
+                    <p class="muted">La factura puede nacer desde una recepción y conserva aquí la trazabilidad documental.</p>
+                </div>
+            </div>
+
+            @if (model.Receipts.Count == 0)
+            {
+                <p class="muted">No hay recepciones enlazadas. Puedes crear la factura manualmente o partir desde una recepción.</p>
+            }
+            else
+            {
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Entrada</th>
+                            <th>Pedido</th>
+                            <th>Fecha</th>
+                            <th>Cantidad</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var receipt in model.Receipts)
+                        {
+                            <tr>
+                                <td>@receipt.DisplayNumber</td>
+                                <td>@receipt.OrderNumber</td>
+                                <td>@receipt.ReceiptDate.ToString("dd/MM/yyyy")</td>
+                                <td>@receipt.TotalReceivedQuantity.ToString("0.###")</td>
+                                <td>
+                                    <a class="inline-link" href="/compras/recepciones/@receipt.ReceiptNumber">Abrir recepción</a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+        </section>
+
+        <section class="panel">
+            <div class="page-header">
+                <div>
+                    <h2>Conciliación pedido · recepción · factura</h2>
+                    <p class="muted">Comparativa rápida entre lo pedido, lo recibido y lo que estás facturando, con diferencias de cantidad y precio.</p>
+                </div>
+            </div>
+
+            @if (reconciliationRows.Count > 0)
+            {
+                <div class="alert @(ReconciliationHasDifferences ? "danger" : "success")">
+                    <strong>@ReconciliationHeadline</strong>
+                    <span>
+                        @if (ReconciliationHasDifferences)
+                        {
+                            @($"{DifferenceLineCount} líneas con diferencias · Qty {TotalQuantityDifference:0.###} · Precio {TotalPriceDifference:0.0000} · Base {TotalBaseDifference:0.00} €")
+                        }
+                        else
+                        {
+                            @("La factura cuadra con lo recibido y el precio esperado en las líneas conciliables.")
+                        }
+                    </span>
+                </div>
+            }
+
+            <div class="card-grid purchase-summary-grid purchase-metrics-grid">
+                <article class="info-card">
+                    <h2>@reconciliationRows.Sum(row => row.ReceivedQuantity).ToString("0.###")</h2>
+                    <p class="muted">qty recibida</p>
+                </article>
+                <article class="info-card">
+                    <h2>@reconciliationRows.Sum(row => row.InvoicedQuantity).ToString("0.###")</h2>
+                    <p class="muted">qty facturada</p>
+                </article>
+                <article class="info-card">
+                    <h2>@reconciliationRows.Sum(row => row.ExpectedBase).ToString("0.00") €</h2>
+                    <p class="muted">base prevista</p>
+                </article>
+                <article class="info-card">
+                    <h2>@reconciliationRows.Sum(row => row.InvoicedBase).ToString("0.00") €</h2>
+                    <p class="muted">base facturada</p>
+                </article>
+                <article class="info-card accent-card">
+                    <h2>@reconciliationRows.Count(row => row.HasDifference)</h2>
+                    <p class="muted">líneas con diferencia</p>
+                </article>
+                <article class="info-card">
+                    <h2>@TotalBaseDifference.ToString("0.00") €</h2>
+                    <p class="muted">desviación base</p>
+                </article>
+            </div>
+
+            @if (reconciliationRows.Count == 0)
+            {
+                <p class="muted">Todavía no hay datos suficientes para conciliar. Enlaza una recepción o marca el origen pedido de las líneas.</p>
+            }
+            else
+            {
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Pedido</th>
+                            <th>Línea</th>
+                            <th>Artículo</th>
+                            <th>Descripción</th>
+                            <th>Estado</th>
+                            <th>Pedida</th>
+                            <th>Recibida</th>
+                            <th>Facturada</th>
+                            <th>Dif. qty</th>
+                            <th>Precio pedido</th>
+                            <th>Precio factura</th>
+                            <th>Dif. precio</th>
+                            <th>Base prevista</th>
+                            <th>Base factura</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var row in reconciliationRows)
+                        {
+                            <tr class="@row.RowClass">
+                                <td>@(row.OrderNumber?.ToString() ?? "Sin dato")</td>
+                                <td>@(row.OrderLineNumber?.ToString() ?? "Sin dato")</td>
+                                <td>@DisplayValue(row.ItemCode)</td>
+                                <td>@row.Description</td>
+                                <td><span class="status-pill @row.StatusClass">@row.StatusLabel</span></td>
+                                <td>@row.OrderedQuantity.ToString("0.###")</td>
+                                <td>@row.ReceivedQuantity.ToString("0.###")</td>
+                                <td>@row.InvoicedQuantity.ToString("0.###")</td>
+                                <td>@row.QuantityDifference.ToString("0.###")</td>
+                                <td>@row.OrderUnitPrice.ToString("0.0000")</td>
+                                <td>@row.InvoiceUnitPrice.ToString("0.0000")</td>
+                                <td>@row.PriceDifference.ToString("0.0000")</td>
+                                <td>@row.ExpectedBase.ToString("0.00") €</td>
+                                <td>@row.InvoicedBase.ToString("0.00") €</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+        </section>
+
+        <section class="panel">
+            <div class="page-header">
+                <div>
+                    <h2>Líneas de factura</h2>
+                    <p class="muted">Puedes ajustar precios, IVA y descripciones antes de registrar la factura definitiva.</p>
+                </div>
+                @if (canEdit)
+                {
+                    <button class="secondary-button" type="button" @onclick="AddLine">Añadir línea</button>
+                }
+            </div>
+
+            <div class="stack">
+                @for (var index = 0; index < model.Lines.Count; index++)
+                {
+                    var line = model.Lines[index];
+                    <section class="panel line-editor">
+                        <div class="panel-header">
+                            <strong>Línea @line.LineNumber</strong>
+                            @if (canEdit && model.Lines.Count > 1)
+                            {
+                                <button class="secondary-button" type="button" @onclick="() => RemoveLine(index)">Quitar</button>
+                            }
+                        </div>
+                        <div class="form-grid">
+                            <label class="field">
+                                <span>Artículo</span>
+                                <InputText class="text-input" @bind-Value="line.ItemCode" disabled="@(!canEdit)" />
+                            </label>
+                            <label class="field wide">
+                                <span>Descripción</span>
+                                <InputText class="text-input" @bind-Value="line.Description" disabled="@(!canEdit)" />
+                            </label>
+                            <label class="field">
+                                <span>Cantidad</span>
+                                <InputNumber class="text-input" @bind-Value="line.Quantity" disabled="@(!canEdit)" />
+                            </label>
+                            <label class="field">
+                                <span>Unidad</span>
+                                <InputText class="text-input" @bind-Value="line.UnitOfMeasure" disabled="@(!canEdit)" />
+                            </label>
+                            <label class="field">
+                                <span>Precio unitario</span>
+                                <InputNumber class="text-input" @bind-Value="line.UnitPrice" disabled="@(!canEdit)" />
+                            </label>
+                            <label class="field">
+                                <span>IVA %</span>
+                                <InputNumber class="text-input" @bind-Value="line.TaxRate" disabled="@(!canEdit)" />
+                            </label>
+                        </div>
+                        <div class="receipt-kv-grid">
+                            <div>
+                                <span class="muted">Origen pedido</span>
+                                <strong>@(line.SourceOrderNumber?.ToString() ?? "Sin dato")</strong>
+                            </div>
+                            <div>
+                                <span class="muted">Línea pedido</span>
+                                <strong>@(line.SourceOrderLineNumber?.ToString() ?? "Sin dato")</strong>
+                            </div>
+                            <div>
+                                <span class="muted">Origen recepción</span>
+                                <strong>@(line.SourceReceiptNumber?.ToString() ?? "Sin dato")</strong>
+                            </div>
+                            <div>
+                                <span class="muted">Base</span>
+                                <strong>@LineSubtotal(line).ToString("0.00") €</strong>
+                            </div>
+                            <div>
+                                <span class="muted">Total</span>
+                                <strong>@LineTotal(line).ToString("0.00") €</strong>
+                            </div>
+                        </div>
+                    </section>
+                }
+            </div>
+        </section>
+
+        <section class="panel">
+            <h2>Resumen</h2>
+            <div class="card-grid purchase-summary-grid purchase-metrics-grid">
+                <article class="info-card">
+                    <h2>@model.Lines.Count</h2>
+                    <p class="muted">líneas</p>
+                </article>
+                <article class="info-card">
+                    <h2>@model.Receipts.Count</h2>
+                    <p class="muted">recepciones</p>
+                </article>
+                <article class="info-card">
+                    <h2>@TotalNetAmount.ToString("0.00") €</h2>
+                    <p class="muted">base</p>
+                </article>
+                <article class="info-card">
+                    <h2>@TotalTaxAmount.ToString("0.00") €</h2>
+                    <p class="muted">IVA</p>
+                </article>
+                <article class="info-card accent-card">
+                    <h2>@TotalAmount.ToString("0.00") €</h2>
+                    <p class="muted">total</p>
+                </article>
+            </div>
+        </section>
+
+        @if (InvoiceNumber.HasValue)
+        {
+            <section class="panel">
+                <div class="page-header">
+                    <div>
+                        <h2>Pagos proveedor</h2>
+                        <p class="muted">Registro simple de pagos aplicados a esta factura para controlar lo pendiente.</p>
+                    </div>
+                </div>
+
+                <div class="card-grid purchase-summary-grid purchase-metrics-grid">
+                    <article class="info-card">
+                        <h2>@model.AmountPaid.ToString("0.00") €</h2>
+                        <p class="muted">pagado</p>
+                    </article>
+                    <article class="info-card accent-card">
+                        <h2>@model.OutstandingAmount.ToString("0.00") €</h2>
+                        <p class="muted">pendiente</p>
+                    </article>
+                    <article class="info-card">
+                        <h2>@(model.LastPaymentUtc?.ToLocalTime().ToString("dd/MM/yyyy HH:mm") ?? "Sin pago")</h2>
+                        <p class="muted">último pago</p>
+                    </article>
+                </div>
+
+                @if (canRegisterPayments)
+                {
+                    <div class="form-grid">
+                        <label class="field">
+                            <span>Fecha pago</span>
+                            <InputDate class="text-input" @bind-Value="paymentModel.PaymentDate" />
+                        </label>
+                        <label class="field">
+                            <span>Importe</span>
+                            <InputNumber class="text-input" @bind-Value="paymentModel.Amount" />
+                        </label>
+                        <label class="field">
+                            <span>Método</span>
+                            <InputText class="text-input" @bind-Value="paymentModel.Method" />
+                        </label>
+                        <label class="field">
+                            <span>Referencia</span>
+                            <InputText class="text-input" @bind-Value="paymentModel.Reference" />
+                        </label>
+                        <label class="field wide">
+                            <span>Notas pago</span>
+                            <InputTextArea class="text-area" @bind-Value="paymentModel.Notes" />
+                        </label>
+                    </div>
+
+                    <div class="quick-links" style="margin-top: 1rem;">
+                        <button class="secondary-button" type="button" @onclick="RegisterPaymentAsync" disabled="@isRegisteringPayment">
+                            @(isRegisteringPayment ? "Registrando pago..." : "Registrar pago")
+                        </button>
+                    </div>
+                }
+
+                <table class="data-table" style="margin-top: 1rem;">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Fecha</th>
+                            <th>Importe</th>
+                            <th>Método</th>
+                            <th>Referencia</th>
+                            <th>Notas</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (model.Payments.Count == 0)
+                        {
+                            <tr><td colspan="6" class="table-empty">Todavía no hay pagos registrados.</td></tr>
+                        }
+                        else
+                        {
+                            @foreach (var payment in model.Payments)
+                            {
+                                <tr>
+                                    <td>@payment.PaymentNumber</td>
+                                    <td>@payment.PaymentDate.ToString("dd/MM/yyyy")</td>
+                                    <td>@payment.Amount.ToString("0.00") €</td>
+                                    <td>@DisplayValue(payment.Method)</td>
+                                    <td>@DisplayValue(payment.Reference)</td>
+                                    <td>@DisplayValue(payment.Notes)</td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </section>
+        }
+
+        @if (canEdit)
+        {
+            <div class="quick-links" style="margin-top: 1rem;">
+                <button class="primary-button" type="submit" disabled="@isSaving">@(isSaving ? "Guardando..." : "Guardar factura")</button>
+                @if (InvoiceNumber.HasValue)
+                {
+                    <button class="secondary-button" type="button" @onclick="DeleteAsync" disabled="@isDeleting">@(isDeleting ? "Eliminando..." : "Eliminar")</button>
+                }
+            </div>
+        }
+    </EditForm>
+}
+
+@code {
+    [Parameter]
+    public int? InvoiceNumber { get; set; }
+
+    [SupplyParameterFromQuery(Name = "receiptNumber")]
+    public int? ReceiptNumberQuery { get; set; }
+
+    private Guid? tenantId;
+    private Guid? companyId;
+    private bool canEdit;
+    private bool isSaving;
+    private bool isDeleting;
+    private bool isRegisteringPayment;
+    private bool hasReceiptLinks;
+    private string statusMessage = string.Empty;
+    private bool isError;
+    private InvoiceFormModel model = new();
+    private IReadOnlyCollection<ProveedorListItemDto> suppliers = [];
+    private List<ReconciliationRowModel> reconciliationRows = [];
+    private PaymentFormModel paymentModel = new();
+
+    private ProveedorListItemDto? SelectedSupplier =>
+        suppliers.FirstOrDefault(supplier => supplier.Code == model.SupplierCode);
+
+    private bool canRegisterPayments =>
+        canEdit &&
+        InvoiceNumber.HasValue &&
+        model.OutstandingAmount > 0m &&
+        !string.Equals(model.Status, PurchaseInvoiceStatuses.Cancelled, StringComparison.OrdinalIgnoreCase);
+
+    private bool ReconciliationHasDifferences => reconciliationRows.Any(row => row.HasDifference);
+    private int DifferenceLineCount => reconciliationRows.Count(row => row.HasDifference);
+    private decimal TotalQuantityDifference => decimal.Round(reconciliationRows.Sum(row => Math.Abs(row.QuantityDifference)), 3, MidpointRounding.AwayFromZero);
+    private decimal TotalPriceDifference => decimal.Round(reconciliationRows.Sum(row => Math.Abs(row.PriceDifference)), 4, MidpointRounding.AwayFromZero);
+    private decimal TotalBaseDifference => decimal.Round(reconciliationRows.Sum(row => row.BaseDifference), 2, MidpointRounding.AwayFromZero);
+    private string ReconciliationHeadline => ReconciliationHasDifferences ? "Factura con diferencias de conciliación" : "Factura cuadrada";
+
+    private decimal TotalNetAmount => model.Lines.Sum(LineSubtotal);
+    private decimal TotalTaxAmount => model.Lines.Sum(line => decimal.Round(LineSubtotal(line) * (line.TaxRate / 100m), 2, MidpointRounding.AwayFromZero));
+    private decimal TotalAmount => TotalNetAmount + TotalTaxAmount;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        tenantId = user.GetTenantId();
+        companyId = user.GetActiveCompanyId();
+        canEdit = user.IsPlatformAdmin() || user.IsInRole(PlatformRoles.TenantAdmin);
+
+        if (!tenantId.HasValue || !companyId.HasValue)
+        {
+            return;
+        }
+
+        await LoadSuppliersAsync();
+
+        if (InvoiceNumber.HasValue)
+        {
+            await LoadExistingInvoiceAsync();
+            return;
+        }
+
+        await InitializeNewAsync();
+    }
+
+    private async Task LoadSuppliersAsync()
+    {
+        var result = await ProveedorQueries.SearchAsync(
+            tenantId!.Value,
+            companyId!.Value,
+            new ProveedorFilter { Page = 1, PageSize = 200 },
+            CancellationToken.None);
+        suppliers = result.Items;
+    }
+
+    private async Task LoadExistingInvoiceAsync()
+    {
+        statusMessage = string.Empty;
+        isError = false;
+
+        var invoice = await PurchaseInvoiceQueries.GetInvoiceByNumberAsync(tenantId!.Value, companyId!.Value, InvoiceNumber!.Value);
+        if (invoice is null)
+        {
+            statusMessage = "No se ha encontrado la factura indicada.";
+            isError = true;
+            model = new InvoiceFormModel();
+            return;
+        }
+
+        model = new InvoiceFormModel
+        {
+            InvoiceNumber = invoice.InvoiceNumber,
+            SupplierCode = invoice.SupplierCode,
+            SupplierDocumentNumber = invoice.SupplierDocumentNumber,
+            DocumentDate = invoice.DocumentDate,
+            DueDate = invoice.DueDate,
+            Status = invoice.Status,
+            Notes = invoice.Notes,
+            AmountPaid = invoice.AmountPaid,
+            OutstandingAmount = invoice.OutstandingAmount,
+            LastPaymentUtc = invoice.LastPaymentUtc,
+            Receipts = invoice.Receipts.Select(receipt => new PurchaseInvoiceReceiptLinkDto
+            {
+                ReceiptId = receipt.ReceiptId,
+                ReceiptSeries = receipt.ReceiptSeries,
+                ReceiptNumber = receipt.ReceiptNumber,
+                OrderNumber = receipt.OrderNumber,
+                ReceiptDate = receipt.ReceiptDate,
+                TotalReceivedQuantity = receipt.TotalReceivedQuantity
+            }).ToList(),
+            Lines = invoice.Lines.Select(line => new InvoiceLineModel
+            {
+                LineNumber = line.LineNumber,
+                ItemCode = line.ItemCode,
+                Description = line.Description,
+                Quantity = line.Quantity,
+                UnitOfMeasure = line.UnitOfMeasure,
+                UnitPrice = line.UnitPrice,
+                TaxRate = line.TaxRate,
+                SourceOrderNumber = line.SourceOrderNumber,
+                SourceOrderLineNumber = line.SourceOrderLineNumber,
+                SourceReceiptNumber = line.SourceReceiptNumber
+            }).ToList(),
+            Payments = invoice.Payments.ToList()
+        };
+
+        hasReceiptLinks = model.Receipts.Count > 0;
+        paymentModel = new PaymentFormModel
+        {
+            PaymentDate = DateTime.Today,
+            Amount = model.OutstandingAmount
+        };
+        EnsureAtLeastOneLine();
+        await LoadReconciliationAsync();
+    }
+
+    private async Task InitializeNewAsync()
+    {
+        model = new InvoiceFormModel();
+        hasReceiptLinks = false;
+
+        if (ReceiptNumberQuery.HasValue && ReceiptNumberQuery.Value > 0)
+        {
+            var receipt = await PurchaseOrderQueries.GetReceiptByNumberAsync(tenantId!.Value, companyId!.Value, ReceiptNumberQuery.Value);
+            if (receipt is not null)
+            {
+                PurchaseOrderDetailDto? order = null;
+                if (receipt.OrderNumber > 0)
+                {
+                    order = await PurchaseOrderQueries.GetByOrderNumberAsync(tenantId.Value, companyId.Value, receipt.OrderNumber);
+                }
+
+                model.SupplierCode = receipt.SupplierCode;
+                model.SupplierDocumentNumber = receipt.SupplierReference;
+                model.DocumentDate = receipt.ReceiptDate;
+                model.DueDate = receipt.ReceiptDate;
+                model.Receipts =
+                [
+                    new PurchaseInvoiceReceiptLinkDto
+                    {
+                        ReceiptId = receipt.ReceiptId,
+                        ReceiptSeries = receipt.ReceiptSeries,
+                        ReceiptNumber = receipt.ReceiptNumber,
+                        OrderNumber = receipt.OrderNumber,
+                        ReceiptDate = receipt.ReceiptDate,
+                        TotalReceivedQuantity = receipt.TotalReceivedQuantity
+                    }
+                ];
+
+                model.Lines = receipt.Lines.Select(line =>
+                {
+                    var sourceLine = order?.Lines.FirstOrDefault(orderLine => orderLine.LineNumber == line.LineNumber);
+                    return new InvoiceLineModel
+                    {
+                        LineNumber = line.LineNumber,
+                        ItemCode = sourceLine?.ItemCode ?? string.Empty,
+                        Description = sourceLine?.Description ?? line.Description,
+                        Quantity = line.ReceivedQuantity,
+                        UnitOfMeasure = sourceLine?.UnitOfMeasure ?? string.Empty,
+                        UnitPrice = sourceLine?.UnitPrice ?? 0m,
+                        TaxRate = 21m,
+                        SourceOrderNumber = receipt.OrderNumber > 0 ? receipt.OrderNumber : sourceLine is null ? null : receipt.OrderNumber,
+                        SourceOrderLineNumber = sourceLine?.LineNumber ?? line.LineNumber,
+                        SourceReceiptNumber = receipt.ReceiptNumber
+                    };
+                }).ToList();
+
+                hasReceiptLinks = true;
+            }
+        }
+
+        paymentModel = new PaymentFormModel
+        {
+            PaymentDate = DateTime.Today,
+            Amount = 0m
+        };
+        EnsureAtLeastOneLine();
+        await LoadReconciliationAsync();
+    }
+
+    private void EnsureAtLeastOneLine()
+    {
+        if (model.Lines.Count == 0)
+        {
+            model.Lines.Add(new InvoiceLineModel { LineNumber = 1, TaxRate = 21m });
+        }
+
+        for (var index = 0; index < model.Lines.Count; index++)
+        {
+            model.Lines[index].LineNumber = index + 1;
+        }
+    }
+
+    private void AddLine()
+    {
+        model.Lines.Add(new InvoiceLineModel
+        {
+            LineNumber = model.Lines.Count + 1,
+            TaxRate = 21m
+        });
+    }
+
+    private void RemoveLine(int index)
+    {
+        if (index < 0 || index >= model.Lines.Count)
+        {
+            return;
+        }
+
+        model.Lines.RemoveAt(index);
+        EnsureAtLeastOneLine();
+    }
+
+    private async Task SaveAsync()
+    {
+        if (!tenantId.HasValue || !companyId.HasValue || !canEdit)
+        {
+            return;
+        }
+
+        isSaving = true;
+        statusMessage = string.Empty;
+        isError = false;
+
+        try
+        {
+            var supplier = SelectedSupplier;
+            var invoiceNumber = await PurchaseInvoiceService.SaveInvoiceAsync(new SavePurchaseInvoiceCommand
+            {
+                TenantId = tenantId.Value,
+                CompanyId = companyId.Value,
+                InvoiceNumber = InvoiceNumber,
+                SupplierCode = model.SupplierCode,
+                SupplierName = supplier?.Name ?? string.Empty,
+                SupplierTaxId = supplier?.TaxId ?? string.Empty,
+                SupplierDocumentNumber = model.SupplierDocumentNumber,
+                DocumentDate = model.DocumentDate,
+                DueDate = model.DueDate,
+                Status = model.Status,
+                Notes = model.Notes,
+                Receipts = model.Receipts,
+                Lines = model.Lines.Select(line => new SavePurchaseInvoiceLineInputDto
+                {
+                    LineNumber = line.LineNumber,
+                    ItemCode = line.ItemCode,
+                    Description = line.Description,
+                    Quantity = line.Quantity,
+                    UnitOfMeasure = line.UnitOfMeasure,
+                    UnitPrice = line.UnitPrice,
+                    TaxRate = line.TaxRate,
+                    SourceOrderNumber = line.SourceOrderNumber,
+                    SourceOrderLineNumber = line.SourceOrderLineNumber,
+                    SourceReceiptNumber = line.SourceReceiptNumber
+                }).ToList()
+            });
+
+            NavigationManager.NavigateTo($"/compras/facturas/editar/{invoiceNumber}");
+        }
+        catch (Exception exception)
+        {
+            statusMessage = exception.Message;
+            isError = true;
+        }
+        finally
+        {
+            isSaving = false;
+        }
+    }
+
+    private async Task RegisterPaymentAsync()
+    {
+        if (!tenantId.HasValue || !companyId.HasValue || !InvoiceNumber.HasValue || !canRegisterPayments)
+        {
+            return;
+        }
+
+        isRegisteringPayment = true;
+        statusMessage = string.Empty;
+        isError = false;
+
+        try
+        {
+            await PurchaseInvoiceService.RegisterPaymentAsync(new RegisterPurchaseInvoicePaymentCommand
+            {
+                TenantId = tenantId.Value,
+                CompanyId = companyId.Value,
+                InvoiceNumber = InvoiceNumber.Value,
+                PaymentDate = paymentModel.PaymentDate,
+                Amount = paymentModel.Amount,
+                Method = paymentModel.Method,
+                Reference = paymentModel.Reference,
+                Notes = paymentModel.Notes
+            });
+
+            await LoadExistingInvoiceAsync();
+            statusMessage = "Pago registrado correctamente.";
+        }
+        catch (Exception exception)
+        {
+            statusMessage = exception.Message;
+            isError = true;
+        }
+        finally
+        {
+            isRegisteringPayment = false;
+        }
+    }
+
+    private async Task DeleteAsync()
+    {
+        if (!tenantId.HasValue || !companyId.HasValue || !InvoiceNumber.HasValue || !canEdit)
+        {
+            return;
+        }
+
+        isDeleting = true;
+        statusMessage = string.Empty;
+        isError = false;
+
+        try
+        {
+            await PurchaseInvoiceService.DeleteInvoiceAsync(tenantId.Value, companyId.Value, InvoiceNumber.Value);
+            NavigationManager.NavigateTo("/compras/facturas");
+        }
+        catch (Exception exception)
+        {
+            statusMessage = exception.Message;
+            isError = true;
+        }
+        finally
+        {
+            isDeleting = false;
+        }
+    }
+
+    private static decimal LineSubtotal(InvoiceLineModel line) =>
+        decimal.Round(line.Quantity * line.UnitPrice, 2, MidpointRounding.AwayFromZero);
+
+    private static decimal LineTotal(InvoiceLineModel line) =>
+        LineSubtotal(line) + decimal.Round(LineSubtotal(line) * (line.TaxRate / 100m), 2, MidpointRounding.AwayFromZero);
+
+    private async Task LoadReconciliationAsync()
+    {
+        reconciliationRows = [];
+
+        if (!tenantId.HasValue || !companyId.HasValue)
+        {
+            return;
+        }
+
+        var receiptsByNumber = new Dictionary<int, PurchaseOrderReceiptDto>();
+        var ordersByNumber = new Dictionary<int, PurchaseOrderDetailDto>();
+
+        foreach (var linkedReceipt in model.Receipts.Where(receipt => receipt.ReceiptNumber > 0).GroupBy(receipt => receipt.ReceiptNumber).Select(group => group.First()))
+        {
+            var receipt = await PurchaseOrderQueries.GetReceiptByNumberAsync(tenantId.Value, companyId.Value, linkedReceipt.ReceiptNumber);
+            if (receipt is null)
+            {
+                continue;
+            }
+
+            receiptsByNumber[receipt.ReceiptNumber] = receipt;
+
+            if (receipt.OrderNumber > 0 && !ordersByNumber.ContainsKey(receipt.OrderNumber))
+            {
+                var order = await PurchaseOrderQueries.GetByOrderNumberAsync(tenantId.Value, companyId.Value, receipt.OrderNumber);
+                if (order is not null)
+                {
+                    ordersByNumber[receipt.OrderNumber] = order;
+                }
+            }
+        }
+
+        var rowsByKey = new Dictionary<string, ReconciliationRowModel>(StringComparer.OrdinalIgnoreCase);
+
+        foreach (var receipt in receiptsByNumber.Values)
+        {
+            ordersByNumber.TryGetValue(receipt.OrderNumber, out var order);
+            foreach (var receiptLine in receipt.Lines)
+            {
+                var orderLine = order?.Lines.FirstOrDefault(line => line.LineNumber == receiptLine.LineNumber);
+                var key = BuildReconciliationKey(receipt.OrderNumber, receiptLine.LineNumber, orderLine?.ItemCode ?? string.Empty, receiptLine.Description);
+                if (!rowsByKey.TryGetValue(key, out var row))
+                {
+                    row = new ReconciliationRowModel
+                    {
+                        OrderNumber = receipt.OrderNumber > 0 ? receipt.OrderNumber : null,
+                        OrderLineNumber = receiptLine.LineNumber,
+                        ItemCode = orderLine?.ItemCode ?? string.Empty,
+                        Description = orderLine?.Description ?? receiptLine.Description,
+                        OrderedQuantity = orderLine?.Quantity ?? 0m,
+                        OrderUnitPrice = orderLine?.UnitPrice ?? 0m
+                    };
+                    rowsByKey[key] = row;
+                }
+
+                row.ReceivedQuantity += receiptLine.ReceivedQuantity;
+            }
+        }
+
+        foreach (var line in model.Lines)
+        {
+            var key = BuildReconciliationKey(line.SourceOrderNumber, line.SourceOrderLineNumber, line.ItemCode, line.Description);
+            if (!rowsByKey.TryGetValue(key, out var row))
+            {
+                PurchaseOrderLineDto? orderLine = null;
+                if (line.SourceOrderNumber.HasValue &&
+                    ordersByNumber.TryGetValue(line.SourceOrderNumber.Value, out var order) &&
+                    line.SourceOrderLineNumber.HasValue)
+                {
+                    orderLine = order.Lines.FirstOrDefault(item => item.LineNumber == line.SourceOrderLineNumber.Value);
+                }
+
+                row = new ReconciliationRowModel
+                {
+                    OrderNumber = line.SourceOrderNumber,
+                    OrderLineNumber = line.SourceOrderLineNumber,
+                    ItemCode = string.IsNullOrWhiteSpace(line.ItemCode) ? orderLine?.ItemCode ?? string.Empty : line.ItemCode,
+                    Description = string.IsNullOrWhiteSpace(line.Description) ? orderLine?.Description ?? string.Empty : line.Description,
+                    OrderedQuantity = orderLine?.Quantity ?? 0m,
+                    OrderUnitPrice = orderLine?.UnitPrice ?? 0m
+                };
+                rowsByKey[key] = row;
+            }
+
+            row.InvoicedQuantity += line.Quantity;
+            row.InvoicedBase += LineSubtotal(line);
+            row.InvoiceUnitPrice = line.UnitPrice;
+        }
+
+        reconciliationRows = rowsByKey.Values
+            .OrderBy(row => row.OrderNumber ?? int.MaxValue)
+            .ThenBy(row => row.OrderLineNumber ?? int.MaxValue)
+            .ThenBy(row => row.Description)
+            .ToList();
+    }
+
+    private static string BuildReconciliationKey(int? orderNumber, int? orderLineNumber, string itemCode, string description)
+    {
+        if (orderNumber.HasValue && orderLineNumber.HasValue)
+        {
+            return $"{orderNumber.Value}:{orderLineNumber.Value}";
+        }
+
+        return $"{itemCode?.Trim().ToUpperInvariant()}|{description?.Trim().ToUpperInvariant()}";
+    }
+
+    private static string FormatStatus(string status) => status switch
+    {
+        PurchaseInvoiceStatuses.Draft => "Borrador",
+        PurchaseInvoiceStatuses.Registered => "Registrada",
+        PurchaseInvoiceStatuses.Paid => "Pagada",
+        PurchaseInvoiceStatuses.Cancelled => "Anulada",
+        _ => status
+    };
+
+    private static string DisplayValue(string? value) => string.IsNullOrWhiteSpace(value) ? "Sin dato" : value;
+
+    private sealed class InvoiceFormModel
+    {
+        public int? InvoiceNumber { get; set; }
+        public int SupplierCode { get; set; }
+        public string SupplierDocumentNumber { get; set; } = string.Empty;
+        public DateTime DocumentDate { get; set; } = DateTime.Today;
+        public DateTime? DueDate { get; set; }
+        public string Status { get; set; } = PurchaseInvoiceStatuses.Draft;
+        public string Notes { get; set; } = string.Empty;
+        public decimal AmountPaid { get; set; }
+        public decimal OutstandingAmount { get; set; }
+        public DateTime? LastPaymentUtc { get; set; }
+        public List<PurchaseInvoiceReceiptLinkDto> Receipts { get; set; } = [];
+        public List<InvoiceLineModel> Lines { get; set; } = [];
+        public List<PurchaseInvoicePaymentDto> Payments { get; set; } = [];
+    }
+
+    private sealed class InvoiceLineModel
+    {
+        public int LineNumber { get; set; }
+        public string ItemCode { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
+        public decimal Quantity { get; set; }
+        public string UnitOfMeasure { get; set; } = string.Empty;
+        public decimal UnitPrice { get; set; }
+        public decimal TaxRate { get; set; } = 21m;
+        public int? SourceOrderNumber { get; set; }
+        public int? SourceOrderLineNumber { get; set; }
+        public int? SourceReceiptNumber { get; set; }
+    }
+
+    private sealed class PaymentFormModel
+    {
+        public DateTime PaymentDate { get; set; } = DateTime.Today;
+        public decimal Amount { get; set; }
+        public string Method { get; set; } = string.Empty;
+        public string Reference { get; set; } = string.Empty;
+        public string Notes { get; set; } = string.Empty;
+    }
+
+    private sealed class ReconciliationRowModel
+    {
+        public int? OrderNumber { get; set; }
+        public int? OrderLineNumber { get; set; }
+        public string ItemCode { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
+        public decimal OrderedQuantity { get; set; }
+        public decimal ReceivedQuantity { get; set; }
+        public decimal InvoicedQuantity { get; set; }
+        public decimal OrderUnitPrice { get; set; }
+        public decimal InvoiceUnitPrice { get; set; }
+        public decimal QuantityDifference => decimal.Round(InvoicedQuantity - ReceivedQuantity, 3, MidpointRounding.AwayFromZero);
+        public decimal PriceDifference => decimal.Round(InvoiceUnitPrice - OrderUnitPrice, 4, MidpointRounding.AwayFromZero);
+        public decimal ExpectedBase => decimal.Round(ReceivedQuantity * OrderUnitPrice, 2, MidpointRounding.AwayFromZero);
+        public decimal InvoicedBase { get; set; }
+        public decimal BaseDifference => decimal.Round(InvoicedBase - ExpectedBase, 2, MidpointRounding.AwayFromZero);
+        public bool HasDifference => QuantityDifference != 0m || PriceDifference != 0m;
+        public bool HasQuantityDifference => QuantityDifference != 0m;
+        public bool HasPriceDifference => PriceDifference != 0m;
+        public string StatusLabel => !HasDifference ? "Cuadrada" : HasQuantityDifference && HasPriceDifference ? "Qty + precio" : HasQuantityDifference ? "Dif. qty" : "Dif. precio";
+        public string StatusClass => !HasDifference ? "success" : HasQuantityDifference && HasPriceDifference ? "danger" : "warning";
+        public string RowClass => !HasDifference ? string.Empty : HasQuantityDifference && HasPriceDifference ? "purchase-reconciliation-danger-row" : "purchase-reconciliation-warning-row";
+    }
+}

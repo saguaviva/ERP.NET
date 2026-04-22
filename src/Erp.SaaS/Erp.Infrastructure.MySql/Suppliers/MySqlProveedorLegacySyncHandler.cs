@@ -110,6 +110,10 @@ public sealed class MySqlProveedorLegacySyncHandler : ILegacyModuleSyncHandler
         var result = new TableImportResult();
         var orderByClause = BuildOrderByClause(columns, orderColumns);
         var columnList = string.Join(", ", columns.Select(column => $"`{column}`"));
+        var targetColumns = columns.ToList();
+        targetColumns.Add("origin");
+        targetColumns.Add("is_deleted");
+        targetColumns.Add("synced_utc");
 
         await using var readCommand = legacyConnection.CreateCommand();
         readCommand.CommandText =
@@ -125,8 +129,8 @@ public sealed class MySqlProveedorLegacySyncHandler : ILegacyModuleSyncHandler
         insertCommand.Transaction = transaction;
         insertCommand.CommandText =
             $"""
-            INSERT INTO `{tableName}` ({columnList})
-            VALUES ({string.Join(", ", columns.Select(column => $"@{column}"))});
+            INSERT INTO `{tableName}` ({string.Join(", ", targetColumns.Select(column => $"`{column}`"))})
+            VALUES ({string.Join(", ", columns.Select(column => $"@{column}"))}, 'legacy', 0, @syncedUtc);
             """;
 
         var ordinals = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
@@ -134,6 +138,7 @@ public sealed class MySqlProveedorLegacySyncHandler : ILegacyModuleSyncHandler
         {
             insertCommand.Parameters.Add(new MySqlParameter($"@{column}", DBNull.Value));
         }
+        insertCommand.Parameters.AddWithValue("@syncedUtc", DateTime.UtcNow);
 
         await using var reader = await readCommand.ExecuteReaderAsync(cancellationToken);
         while (await reader.ReadAsync(cancellationToken))
@@ -157,6 +162,10 @@ public sealed class MySqlProveedorLegacySyncHandler : ILegacyModuleSyncHandler
                 result.ImportedRows++;
 
                 onRowImported?.Invoke(new ImportedRowContext(GetEntityNumber(reader, ordinals)));
+            }
+            catch (MySqlException exception) when (exception.Number == 1062)
+            {
+                result.SkippedRows++;
             }
             catch (Exception exception)
             {
@@ -183,7 +192,7 @@ public sealed class MySqlProveedorLegacySyncHandler : ILegacyModuleSyncHandler
     {
         await using var command = saasConnection.CreateCommand();
         command.Transaction = transaction;
-        command.CommandText = $"DELETE FROM `{tableName}` WHERE `CENTRO` = @centerCode;";
+        command.CommandText = $"DELETE FROM `{tableName}` WHERE `CENTRO` = @centerCode AND origin = 'legacy';";
         command.Parameters.AddWithValue("@centerCode", centerCode);
         await command.ExecuteNonQueryAsync(cancellationToken);
     }

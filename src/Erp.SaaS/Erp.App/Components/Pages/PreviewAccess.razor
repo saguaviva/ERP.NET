@@ -2,26 +2,27 @@
 @attribute [AllowAnonymous]
 @inject IOptions<PreviewAccessOptions> PreviewAccessOptions
 @inject NavigationManager NavigationManager
+@inject AppText T
 
-<PageTitle>Acceso de pruebas</PageTitle>
+<PageTitle>@T["preview.title"]</PageTitle>
 
 <div class="auth-shell">
     <section class="auth-panel">
-        <p class="eyebrow">Preproduccion</p>
-        <h1>Acceso privado de pruebas</h1>
-        <p class="lead">Esta demo esta protegida antes del login principal. Solo las personas invitadas pueden continuar.</p>
+        <p class="eyebrow">@T["preview.kicker"]</p>
+        <h1>@T["preview.heading"]</h1>
+        <p class="lead">@T["preview.lead"]</p>
 
         @if (Error == "email")
         {
-            <div class="alert danger">El email no esta en la lista de acceso de pruebas.</div>
+            <div class="alert danger">@T["preview.error.email"]</div>
         }
         else if (Error == "password")
         {
-            <div class="alert danger">La clave de acceso de pruebas no es correcta.</div>
+            <div class="alert danger">@T["preview.error.password"]</div>
         }
         else if (Error == "config")
         {
-            <div class="alert danger">La puerta de pruebas esta activada pero no tiene ninguna regla configurada.</div>
+            <div class="alert danger">@T["preview.error.config"]</div>
         }
 
         <form class="auth-form" method="post" action="/preview-access/unlock">
@@ -31,29 +32,29 @@
             @if (RequiresEmail)
             {
                 <label class="field">
-                    <span>Email invitado</span>
-                    <input class="text-input" name="email" type="email" autocomplete="email" placeholder="tester@empresa.com" required />
+                    <span>@T["preview.email"]</span>
+                    <input class="text-input" name="email" type="email" autocomplete="email" placeholder="@T["preview.emailPlaceholder"]" required />
                 </label>
             }
 
             @if (RequiresPassword)
             {
                 <label class="field">
-                    <span>Clave de acceso</span>
-                    <input class="text-input" name="password" type="password" autocomplete="current-password" placeholder="Clave compartida de pruebas" required />
+                    <span>@T["preview.password"]</span>
+                    <input class="text-input" name="password" type="password" autocomplete="current-password" placeholder="@T["preview.passwordPlaceholder"]" required />
                 </label>
             }
 
-            <button class="primary-button" type="submit">Continuar a la demo</button>
+            <button class="primary-button" type="submit">@T["preview.submit"]</button>
         </form>
 
         <div class="stack preview-help">
             <div class="info-card">
-                <h2>Como funciona</h2>
-                <p class="muted">Primero validas el acceso de pruebas. Despues entraras al login normal del ERP con tu usuario y contraseña.</p>
+                <h2>@T["preview.howItWorks"]</h2>
+                <p class="muted">@T["preview.howItWorksText"]</p>
                 @if (RequiresEmail)
                 {
-                    <p class="muted">Si no tienes invitación todavía, puedes pedirla desde la landing pública en <strong>/DemoAccess</strong>.</p>
+                    <p class="muted">@T["preview.invitationText"]</p>
                 }
             </div>
         </div>

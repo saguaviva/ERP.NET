@@ -1,0 +1,184 @@
+@page "/articulos/muestras/impresion/desglose/{Code}/{SampleLineNumber:int}"
+@page "/articulos/complementos/impresion/desglose/{Code}/{SampleLineNumber:int}"
+@attribute [Authorize(Roles = "TenantAdmin,TenantReader")]
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IMuestraQueries MuestraQueries
+@inject NavigationManager NavigationManager
+
+<PageTitle>@PageTitleText</PageTitle>
+
+@if (!tenantId.HasValue || !companyId.HasValue)
+{
+    <div class="empty-state">
+        <p>Selecciona una empresa activa para imprimir el desglose del @moduleSingularLower.</p>
+    </div>
+}
+else if (detail is null || line is null || breakdown is null)
+{
+    <div class="empty-state">
+        <p>No se ha encontrado el desglose del @moduleSingularLower solicitado.</p>
+    </div>
+}
+else
+{
+    <section class="print-sheet-page">
+        <header class="print-sheet-header">
+            <div>
+                <p class="eyebrow">@EyebrowText</p>
+                <h1>@($"{(IsComplementMode ? "Desglose técnico complemento" : "Desglose técnico muestra")} · {detail.Code}")</h1>
+                <p>@detail.Description</p>
+                <p>@DisplayClient · @DisplayBreakdownTitle</p>
+            </div>
+            <div class="print-sheet-meta">
+                <span>@DisplayMachine</span>
+                <span>@DisplayDate</span>
+                <span>@($"{breakdown.Lines.Count} materiales")</span>
+                <span>@($"Coste {TotalCost.ToString("0.00##")}")</span>
+            </div>
+        </header>
+
+        <section class="print-sheet-grid">
+            <article>
+                <h2>Cabecera máquina</h2>
+                <dl class="print-definition-list">
+                    <div><dt>Cliente</dt><dd>@DisplayClient</dd></div>
+                    <div><dt>Color muestra</dt><dd>@DisplayColor</dd></div>
+                    <div><dt>Talla</dt><dd>@DisplaySize</dd></div>
+                    <div><dt>Máquina</dt><dd>@DisplayMachine</dd></div>
+                    <div><dt>Operación</dt><dd>@DisplayOperation</dd></div>
+                    <div><dt>Agujas</dt><dd>@breakdown.Needles.ToString("0.##")</dd></div>
+                    <div><dt>Velocidad</dt><dd>@breakdown.Speed.ToString("0.##")</dd></div>
+                    <div><dt>Disco</dt><dd>@DisplayDisk</dd></div>
+                    <div><dt>Tiempo</dt><dd>@($"{breakdown.TimeMinutes:0.##} min")</dd></div>
+                    <div><dt>Precio máquina</dt><dd>@breakdown.MachineRate.ToString("0.00##")</dd></div>
+                    <div><dt>Importe máquina</dt><dd>@MachineImport.ToString("0.00##")</dd></div>
+                    <div><dt>Cortes</dt><dd>@DisplayCuts</dd></div>
+                </dl>
+            </article>
+
+            <article>
+                <h2>Notas técnicas</h2>
+                <div class="print-notes-box">@DisplayNotes</div>
+            </article>
+        </section>
+
+        <section class="panel">
+            <h2>Desglose de hilos y consumos</h2>
+            <table class="data-table print-data-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Hilo</th>
+                        <th>Proveedor</th>
+                        <th>Color</th>
+                        <th>GH</th>
+                        <th>Cabos</th>
+                        <th>Passades</th>
+                        <th>Grad.</th>
+                        <th>Consum</th>
+                        <th>Precio</th>
+                        <th>Importe</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var material in breakdown.Lines.OrderBy(item => item.LineNumber))
+                    {
+                        <tr>
+                            <td>@material.LineNumber</td>
+                            <td>@DisplayYarn(material)</td>
+                            <td>@DisplayProvider(material)</td>
+                            <td>@DisplayMaterialColor(material)</td>
+                            <td>@material.YarnMetric.ToString("0.##")</td>
+                            <td>@material.Ends.ToString("0.##")</td>
+                            <td>@material.Passes.ToString("0.##")</td>
+                            <td>@material.Graduation</td>
+                            <td>@material.Consumption.ToString("0.00##")</td>
+                            <td>@material.Price.ToString("0.00##")</td>
+                            <td>@CalculateImport(material).ToString("0.00##")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </section>
+    </section>
+}
+
+@code {
+    [Parameter]
+    public string Code { get; set; } = string.Empty;
+
+    [Parameter]
+    public int SampleLineNumber { get; set; }
+
+    private Guid? tenantId;
+    private Guid? companyId;
+    private MuestraDetailDto? detail;
+    private MuestraLineDto? line;
+    private MuestraBreakdownDto? breakdown;
+    private bool IsComplementMode => NavigationManager.Uri.Contains("/articulos/complementos", StringComparison.OrdinalIgnoreCase);
+    private string moduleSingularLower => IsComplementMode ? "complemento" : "muestra";
+    private string EyebrowText => IsComplementMode ? "ARTÍCULOS / COMPLEMENTOS" : "ARTÍCULOS / MUESTRAS";
+    private string PageTitleText => $"{(IsComplementMode ? "Desglose complemento" : "Desglose muestra")} {Code}";
+
+    private string DisplayClient => breakdown is not null && !string.IsNullOrWhiteSpace(breakdown.ClientName)
+        ? breakdown.ClientName
+        : detail is not null && !string.IsNullOrWhiteSpace(detail.ClientName)
+            ? detail.ClientName
+            : detail is not null ? $"Cliente {detail.ClientCode}" : string.Empty;
+    private string DisplayBreakdownTitle => line is null ? string.Empty : $"{DisplayColor} · {DisplaySize}";
+    private string DisplayColor => line is null || string.IsNullOrWhiteSpace(line.Color) ? "Sin color" : line.Color;
+    private string DisplaySize => line is null ? "-" : BuildSizeLabel(line);
+    private string DisplayMachine => breakdown is null
+        ? "Sin máquina"
+        : !string.IsNullOrWhiteSpace(breakdown.MachineName) ? breakdown.MachineName : (breakdown.MachineCode > 0 ? $"Máquina {breakdown.MachineCode}" : "Sin máquina");
+    private string DisplayOperation => breakdown is null
+        ? "Sin operación"
+        : !string.IsNullOrWhiteSpace(breakdown.OperationName) ? breakdown.OperationName : (breakdown.OperationCode > 0 ? $"Operación {breakdown.OperationCode}" : "Sin operación");
+    private string DisplayDate => breakdown?.WorkDate?.ToString("dd/MM/yyyy") ?? "Sin fecha";
+    private string DisplayDisk => breakdown is null || string.IsNullOrWhiteSpace(breakdown.Disk) ? "-" : breakdown.Disk;
+    private string DisplayCuts => breakdown is null || string.IsNullOrWhiteSpace(breakdown.Cuts) ? "-" : breakdown.Cuts;
+    private string DisplayNotes => breakdown is null || string.IsNullOrWhiteSpace(breakdown.Notes) ? "Sin notas." : breakdown.Notes;
+    private decimal MachineImport => breakdown is null ? 0m : Math.Round(breakdown.TimeMinutes * breakdown.MachineRate, 2);
+    private decimal TotalCost => MachineImport + (breakdown?.Lines.Sum(CalculateImport) ?? 0m);
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        tenantId = user.GetTenantId();
+        companyId = user.GetActiveCompanyId();
+        if (!tenantId.HasValue || !companyId.HasValue)
+        {
+            detail = null;
+            line = null;
+            breakdown = null;
+            return;
+        }
+
+        detail = await MuestraQueries.GetByCodeAsync(tenantId.Value, companyId.Value, Uri.UnescapeDataString(Code));
+        line = detail?.Lines.FirstOrDefault(item => item.LineNumber == SampleLineNumber);
+        breakdown = line?.Breakdown;
+    }
+
+    private static string BuildSizeLabel(MuestraLineDto line)
+    {
+        var values = new[] { Normalize(line.SizeCode), Normalize(line.SizeHigh), Normalize(line.SizeLow) }
+            .Where(value => !string.IsNullOrWhiteSpace(value))
+            .ToArray();
+        return values.Length == 0 ? "-" : string.Join(" · ", values);
+    }
+
+    private static string DisplayYarn(MuestraBreakdownLineDto line) =>
+        string.IsNullOrWhiteSpace(line.YarnCode) ? "-" : line.YarnCode;
+
+    private static string DisplayProvider(MuestraBreakdownLineDto line) =>
+        !string.IsNullOrWhiteSpace(line.ProviderName) ? line.ProviderName : (line.ProviderCode > 0 ? $"Proveedor {line.ProviderCode}" : "-");
+
+    private static string DisplayMaterialColor(MuestraBreakdownLineDto line) =>
+        string.IsNullOrWhiteSpace(line.MaterialColor) ? "-" : line.MaterialColor;
+
+    private static decimal CalculateImport(MuestraBreakdownLineDto line) =>
+        Math.Round(line.Consumption * line.Price, 2);
+
+    private static string Normalize(string? value) => value?.Trim() ?? string.Empty;
+}

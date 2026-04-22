@@ -11,7 +11,7 @@ public sealed class SalesOrderDetailDto
     public DateTime DocumentDate { get; set; } = DateTime.Today;
     public DateTime? RequestedDate { get; set; }
     public string Status { get; set; } = SalesOrderStatuses.Draft;
-    public string Origin { get; set; } = SalesOrderOrigins.Saas;
+    public string Origin { get; set; } = SalesOrderOrigins.Local;
     public DateTime? SyncedUtc { get; set; }
     public string Notes { get; set; } = string.Empty;
     public decimal TotalAmount { get; set; }

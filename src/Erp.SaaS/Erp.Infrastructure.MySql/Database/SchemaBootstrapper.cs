@@ -161,6 +161,29 @@ public sealed class SchemaBootstrapper : IHostedService
             );
             """,
             """
+            CREATE TABLE IF NOT EXISTS base_catalog_items (
+                tenant_id CHAR(36) NOT NULL,
+                company_id CHAR(36) NOT NULL,
+                catalog_key VARCHAR(40) NOT NULL,
+                code VARCHAR(40) NOT NULL,
+                name VARCHAR(200) NOT NULL,
+                description VARCHAR(255) NULL,
+                reference_value VARCHAR(255) NULL,
+                secondary_reference_value VARCHAR(255) NULL,
+                numeric_value DECIMAL(18,4) NULL,
+                secondary_numeric_value DECIMAL(18,4) NULL,
+                notes TEXT NULL,
+                is_active TINYINT(1) NOT NULL DEFAULT 1,
+                origin VARCHAR(20) NOT NULL DEFAULT 'local',
+                is_deleted TINYINT(1) NOT NULL DEFAULT 0,
+                synced_utc DATETIME(6) NULL,
+                created_utc DATETIME(6) NOT NULL,
+                updated_utc DATETIME(6) NOT NULL,
+                PRIMARY KEY (tenant_id, company_id, catalog_key, code),
+                KEY ix_base_catalog_items_lookup (tenant_id, company_id, catalog_key, is_deleted, is_active, name)
+            );
+            """,
+            """
             CREATE TABLE IF NOT EXISTS demo_access_requests (
                 id CHAR(36) NOT NULL PRIMARY KEY,
                 contact_name VARCHAR(200) NOT NULL,
@@ -403,6 +426,86 @@ public sealed class SchemaBootstrapper : IHostedService
             );
             """,
             """
+            CREATE TABLE IF NOT EXISTS purchase_invoices (
+                invoice_id CHAR(36) NOT NULL PRIMARY KEY,
+                invoice_series VARCHAR(20) NULL,
+                invoice_number INT NOT NULL,
+                tenant_id CHAR(36) NOT NULL,
+                company_id CHAR(36) NOT NULL,
+                supplier_code INT NOT NULL,
+                supplier_name VARCHAR(200) NOT NULL,
+                supplier_tax_id VARCHAR(50) NULL,
+                supplier_document_number VARCHAR(120) NULL,
+                document_date DATETIME(6) NOT NULL,
+                due_date DATETIME(6) NULL,
+                status VARCHAR(30) NOT NULL,
+                total_net_amount DECIMAL(18,2) NOT NULL DEFAULT 0,
+                total_tax_amount DECIMAL(18,2) NOT NULL DEFAULT 0,
+                total_amount DECIMAL(18,2) NOT NULL DEFAULT 0,
+                origin VARCHAR(20) NOT NULL DEFAULT 'local',
+                is_deleted TINYINT(1) NOT NULL DEFAULT 0,
+                legacy_source_system VARCHAR(40) NULL,
+                legacy_center_code CHAR(1) NULL,
+                legacy_document_type VARCHAR(40) NULL,
+                legacy_document_number VARCHAR(80) NULL,
+                synced_utc DATETIME(6) NULL,
+                notes TEXT NULL,
+                created_utc DATETIME(6) NOT NULL,
+                updated_utc DATETIME(6) NOT NULL,
+                UNIQUE KEY uq_purchase_invoices_number (tenant_id, company_id, invoice_number),
+                KEY ix_purchase_invoices_supplier (tenant_id, company_id, supplier_code),
+                KEY ix_purchase_invoices_status (tenant_id, company_id, status)
+            );
+            """,
+            """
+            CREATE TABLE IF NOT EXISTS purchase_invoice_lines (
+                invoice_id CHAR(36) NOT NULL,
+                line_number INT NOT NULL,
+                item_code VARCHAR(120) NULL,
+                description VARCHAR(255) NOT NULL,
+                quantity DECIMAL(18,3) NOT NULL,
+                unit_of_measure VARCHAR(30) NULL,
+                unit_price DECIMAL(18,4) NOT NULL,
+                tax_rate DECIMAL(9,4) NOT NULL DEFAULT 21,
+                source_order_number INT NULL,
+                source_receipt_number INT NULL,
+                PRIMARY KEY (invoice_id, line_number),
+                KEY ix_purchase_invoice_lines_receipt (source_receipt_number),
+                KEY ix_purchase_invoice_lines_order (source_order_number)
+            );
+            """,
+            """
+            CREATE TABLE IF NOT EXISTS purchase_invoice_receipts (
+                invoice_id CHAR(36) NOT NULL,
+                receipt_id CHAR(36) NULL,
+                receipt_series VARCHAR(20) NULL,
+                receipt_number INT NOT NULL,
+                order_number INT NOT NULL DEFAULT 0,
+                receipt_date DATETIME(6) NOT NULL,
+                total_received_quantity DECIMAL(18,3) NOT NULL DEFAULT 0,
+                PRIMARY KEY (invoice_id, receipt_number),
+                KEY ix_purchase_invoice_receipts_receipt (receipt_number),
+                KEY ix_purchase_invoice_receipts_order (order_number)
+            );
+            """,
+            """
+            CREATE TABLE IF NOT EXISTS purchase_invoice_payments (
+                payment_id CHAR(36) NOT NULL PRIMARY KEY,
+                invoice_id CHAR(36) NOT NULL,
+                tenant_id CHAR(36) NOT NULL,
+                company_id CHAR(36) NOT NULL,
+                payment_number INT NOT NULL,
+                payment_date DATETIME(6) NOT NULL,
+                amount DECIMAL(18,2) NOT NULL,
+                method VARCHAR(80) NULL,
+                reference VARCHAR(120) NULL,
+                notes TEXT NULL,
+                created_utc DATETIME(6) NOT NULL,
+                UNIQUE KEY uq_purchase_invoice_payments_number (invoice_id, payment_number),
+                KEY ix_purchase_invoice_payments_lookup (tenant_id, company_id, invoice_id, payment_date)
+            );
+            """,
+            """
             CREATE TABLE IF NOT EXISTS inventory_movements (
                 movement_id CHAR(36) NOT NULL PRIMARY KEY,
                 tenant_id CHAR(36) NOT NULL,
@@ -412,6 +515,7 @@ public sealed class SchemaBootstrapper : IHostedService
                 warehouse VARCHAR(120) NULL,
                 item_code VARCHAR(120) NULL,
                 item_description VARCHAR(255) NOT NULL,
+                color VARCHAR(120) NULL,
                 quantity DECIMAL(18,3) NOT NULL,
                 unit_of_measure VARCHAR(30) NULL,
                 supplier_code INT NULL,
@@ -428,6 +532,145 @@ public sealed class SchemaBootstrapper : IHostedService
                 KEY ix_inventory_movements_lookup (tenant_id, company_id, movement_date),
                 KEY ix_inventory_movements_item (tenant_id, company_id, item_code),
                 KEY ix_inventory_movements_warehouse (tenant_id, company_id, warehouse)
+            );
+            """,
+            """
+            CREATE TABLE IF NOT EXISTS stock_transfers (
+                transfer_id CHAR(36) NOT NULL PRIMARY KEY,
+                tenant_id CHAR(36) NOT NULL,
+                company_id CHAR(36) NOT NULL,
+                transfer_number INT NOT NULL,
+                transfer_date DATETIME(6) NOT NULL,
+                status VARCHAR(30) NOT NULL,
+                from_warehouse VARCHAR(120) NOT NULL,
+                to_warehouse VARCHAR(120) NOT NULL,
+                line_count INT NOT NULL DEFAULT 0,
+                total_quantity DECIMAL(18,3) NOT NULL DEFAULT 0,
+                notes TEXT NULL,
+                origin VARCHAR(20) NOT NULL DEFAULT 'local',
+                is_deleted TINYINT(1) NOT NULL DEFAULT 0,
+                created_utc DATETIME(6) NOT NULL,
+                updated_utc DATETIME(6) NOT NULL,
+                UNIQUE KEY uq_stock_transfers_number (tenant_id, company_id, transfer_number),
+                KEY ix_stock_transfers_status (tenant_id, company_id, status),
+                KEY ix_stock_transfers_lookup (tenant_id, company_id, transfer_date),
+                KEY ix_stock_transfers_warehouse (tenant_id, company_id, from_warehouse, to_warehouse)
+            );
+            """,
+            """
+            CREATE TABLE IF NOT EXISTS stock_transfer_lines (
+                transfer_id CHAR(36) NOT NULL,
+                line_number INT NOT NULL,
+                item_code VARCHAR(120) NULL,
+                item_description VARCHAR(255) NOT NULL,
+                color VARCHAR(120) NULL,
+                quantity DECIMAL(18,3) NOT NULL DEFAULT 0,
+                unit_of_measure VARCHAR(30) NULL,
+                notes TEXT NULL,
+                PRIMARY KEY (transfer_id, line_number),
+                KEY ix_stock_transfer_lines_item (item_code),
+                KEY ix_stock_transfer_lines_color (color)
+            );
+            """,
+            """
+            CREATE TABLE IF NOT EXISTS stock_counts (
+                count_id CHAR(36) NOT NULL PRIMARY KEY,
+                tenant_id CHAR(36) NOT NULL,
+                company_id CHAR(36) NOT NULL,
+                count_number INT NOT NULL,
+                count_date DATETIME(6) NOT NULL,
+                status VARCHAR(30) NOT NULL,
+                warehouse VARCHAR(120) NOT NULL,
+                is_blind_count TINYINT(1) NOT NULL DEFAULT 0,
+                is_blind_count_revealed TINYINT(1) NOT NULL DEFAULT 0,
+                line_count INT NOT NULL DEFAULT 0,
+                difference_line_count INT NOT NULL DEFAULT 0,
+                expected_total_quantity DECIMAL(18,3) NOT NULL DEFAULT 0,
+                counted_total_quantity DECIMAL(18,3) NOT NULL DEFAULT 0,
+                difference_total_quantity DECIMAL(18,3) NOT NULL DEFAULT 0,
+                notes TEXT NULL,
+                origin VARCHAR(20) NOT NULL DEFAULT 'local',
+                is_deleted TINYINT(1) NOT NULL DEFAULT 0,
+                created_utc DATETIME(6) NOT NULL,
+                updated_utc DATETIME(6) NOT NULL,
+                UNIQUE KEY uq_stock_counts_number (tenant_id, company_id, count_number),
+                KEY ix_stock_counts_status (tenant_id, company_id, status),
+                KEY ix_stock_counts_lookup (tenant_id, company_id, count_date),
+                KEY ix_stock_counts_warehouse (tenant_id, company_id, warehouse)
+            );
+            """,
+            """
+            CREATE TABLE IF NOT EXISTS stock_count_lines (
+                count_id CHAR(36) NOT NULL,
+                line_number INT NOT NULL,
+                item_code VARCHAR(120) NULL,
+                item_description VARCHAR(255) NOT NULL,
+                color VARCHAR(120) NULL,
+                expected_quantity DECIMAL(18,3) NOT NULL DEFAULT 0,
+                counted_quantity DECIMAL(18,3) NOT NULL DEFAULT 0,
+                difference_quantity DECIMAL(18,3) NOT NULL DEFAULT 0,
+                is_difference_validated TINYINT(1) NOT NULL DEFAULT 0,
+                unit_of_measure VARCHAR(30) NULL,
+                notes TEXT NULL,
+                PRIMARY KEY (count_id, line_number),
+                KEY ix_stock_count_lines_item (item_code),
+                KEY ix_stock_count_lines_color (color)
+            );
+            """,
+            """
+            CREATE TABLE IF NOT EXISTS finish_work_orders (
+                order_id CHAR(36) NOT NULL PRIMARY KEY,
+                tenant_id CHAR(36) NOT NULL,
+                company_id CHAR(36) NOT NULL,
+                center_code CHAR(1) NOT NULL,
+                order_number INT NOT NULL,
+                work_date DATETIME(6) NOT NULL,
+                status VARCHAR(30) NOT NULL,
+                client_code INT NOT NULL DEFAULT 0,
+                client_name VARCHAR(255) NULL,
+                finisher_code INT NOT NULL DEFAULT 0,
+                finisher_name VARCHAR(255) NULL,
+                machine_code INT NOT NULL DEFAULT 0,
+                machine_name VARCHAR(255) NULL,
+                operation_code INT NOT NULL DEFAULT 0,
+                operation_name VARCHAR(255) NULL,
+                disposition_code INT NULL,
+                disposition_label VARCHAR(120) NULL,
+                source_sample_kind VARCHAR(30) NULL,
+                source_sample_code VARCHAR(120) NULL,
+                source_sample_line_number INT NULL,
+                primary_fabric_code VARCHAR(120) NULL,
+                primary_fabric_description VARCHAR(255) NULL,
+                primary_color VARCHAR(120) NULL,
+                total_kilograms DECIMAL(18,3) NOT NULL DEFAULT 0,
+                total_pieces DECIMAL(18,3) NOT NULL DEFAULT 0,
+                notes TEXT NULL,
+                origin VARCHAR(20) NOT NULL DEFAULT 'local',
+                is_deleted TINYINT(1) NOT NULL DEFAULT 0,
+                synced_utc DATETIME(6) NULL,
+                created_utc DATETIME(6) NOT NULL,
+                updated_utc DATETIME(6) NOT NULL,
+                UNIQUE KEY uq_finish_work_orders_number (tenant_id, company_id, order_number),
+                KEY ix_finish_work_orders_status (tenant_id, company_id, status),
+                KEY ix_finish_work_orders_lookup (tenant_id, company_id, center_code, work_date),
+                KEY ix_finish_work_orders_machine (tenant_id, company_id, machine_code),
+                KEY ix_finish_work_orders_operation (tenant_id, company_id, operation_code)
+            );
+            """,
+            """
+            CREATE TABLE IF NOT EXISTS finish_work_order_lines (
+                order_id CHAR(36) NOT NULL,
+                line_number INT NOT NULL,
+                fabric_code VARCHAR(120) NULL,
+                fabric_description VARCHAR(255) NULL,
+                color VARCHAR(120) NULL,
+                total_kilograms DECIMAL(18,3) NOT NULL DEFAULT 0,
+                total_pieces DECIMAL(18,3) NOT NULL DEFAULT 0,
+                status VARCHAR(30) NOT NULL,
+                notes TEXT NULL,
+                PRIMARY KEY (order_id, line_number),
+                KEY ix_finish_work_order_lines_fabric (fabric_code),
+                KEY ix_finish_work_order_lines_color (color)
             );
             """,
             """
@@ -548,6 +791,420 @@ public sealed class SchemaBootstrapper : IHostedService
                 KEY ix_forni_detail_lookup (CENTRO, FORNI_CODI),
                 KEY ix_forni_detail_provider_item (CENTRO, OBSERV),
                 KEY ix_forni_detail_color_measure (CENTRO, COLOR, MEDIDA)
+            );
+            """,
+            """
+            CREATE TABLE IF NOT EXISTS dispos (
+                CODI INT NOT NULL,
+                CODICLIENT VARCHAR(50) NULL,
+                CENTRO CHAR(1) NOT NULL,
+                ANY VARCHAR(10) NOT NULL,
+                IDDISPOS INT NOT NULL DEFAULT 0,
+                FECHA DATETIME NULL,
+                DRECEPCION DATETIME NULL,
+                ACABADOR INT NOT NULL DEFAULT 0,
+                ANULADA TINYINT(1) NOT NULL DEFAULT 0,
+                CLIENT INT NOT NULL DEFAULT 0,
+                OBSERV TEXT NULL,
+                COLORCLIENTE VARCHAR(120) NULL,
+                TOTALPIEZAS DECIMAL(18,3) NOT NULL DEFAULT 0,
+                TOTALKG DECIMAL(18,3) NOT NULL DEFAULT 0,
+                COLOR VARCHAR(120) NULL,
+                RECIBIDO TINYINT(1) NOT NULL DEFAULT 0,
+                COMANDA VARCHAR(120) NULL,
+                origin VARCHAR(20) NOT NULL DEFAULT 'legacy',
+                is_deleted TINYINT(1) NOT NULL DEFAULT 0,
+                synced_utc DATETIME(6) NULL,
+                PRIMARY KEY (CENTRO, CODI),
+                KEY ix_dispos_display (CENTRO, ANY, IDDISPOS),
+                KEY ix_dispos_client (CENTRO, CLIENT),
+                KEY ix_dispos_finisher (CENTRO, ACABADOR),
+                KEY ix_dispos_date (CENTRO, FECHA)
+            );
+            """,
+            """
+            CREATE TABLE IF NOT EXISTS ddispos (
+                CENTRO CHAR(1) NOT NULL,
+                DESCRIPCIO VARCHAR(255) NULL,
+                LINEA INT NOT NULL,
+                DISPOS INT NOT NULL,
+                TEJEDOR INT NOT NULL DEFAULT 0,
+                NALBARAN VARCHAR(80) NULL,
+                TEJIDO VARCHAR(50) NULL,
+                COMPOS VARCHAR(255) NULL,
+                NPIEZAS VARCHAR(255) NULL,
+                TOTALPIEZAS DECIMAL(18,3) NOT NULL DEFAULT 0,
+                TOTALKG DECIMAL(18,3) NOT NULL DEFAULT 0,
+                ACABADO VARCHAR(255) NULL,
+                ANCHO VARCHAR(120) NULL,
+                GRAMAJE DECIMAL(12,3) NOT NULL DEFAULT 0,
+                RENDIMIENTO DECIMAL(12,4) NOT NULL DEFAULT 0,
+                SERVIDO TINYINT(1) NOT NULL DEFAULT 0,
+                DISPUESTO TINYINT(1) NOT NULL DEFAULT 0,
+                PRIMARY KEY (CENTRO, DISPOS, LINEA),
+                KEY ix_ddispos_lookup (CENTRO, DISPOS),
+                KEY ix_ddispos_weaver (CENTRO, TEJEDOR),
+                KEY ix_ddispos_fabric (CENTRO, TEJIDO)
+            );
+            """,
+            """
+            CREATE TABLE IF NOT EXISTS fil (
+                CODI VARCHAR(30) NOT NULL,
+                DESCRI VARCHAR(255) NOT NULL,
+                PROVE INT NULL,
+                COST DECIMAL(12,4) NOT NULL DEFAULT 0,
+                PREU DECIMAL(12,4) NOT NULL DEFAULT 0,
+                IVA VARCHAR(20) NULL,
+                OBSERV TEXT NULL,
+                CENTRO CHAR(1) NOT NULL,
+                origin VARCHAR(20) NOT NULL DEFAULT 'legacy',
+                is_deleted TINYINT(1) NOT NULL DEFAULT 0,
+                synced_utc DATETIME(6) NULL,
+                PRIMARY KEY (CENTRO, CODI),
+                KEY ix_fil_descri (CENTRO, DESCRI),
+                KEY ix_fil_prove (CENTRO, PROVE),
+                KEY ix_fil_iva (CENTRO, IVA)
+            );
+            """,
+            """
+            CREATE TABLE IF NOT EXISTS fil_detail (
+                CENTRO CHAR(1) NOT NULL,
+                FIL_CODI VARCHAR(30) NOT NULL,
+                LINE_NUMBER INT NOT NULL,
+                PROVE INT NOT NULL DEFAULT 0,
+                COLOR VARCHAR(120) NULL,
+                ACTUAL DECIMAL(18,3) NOT NULL DEFAULT 0,
+                MINIM DECIMAL(18,3) NOT NULL DEFAULT 0,
+                PREU DECIMAL(12,4) NOT NULL DEFAULT 0,
+                PREUCOST DECIMAL(12,4) NOT NULL DEFAULT 0,
+                TINTAR DECIMAL(12,4) NOT NULL DEFAULT 0,
+                METRES DECIMAL(18,3) NOT NULL DEFAULT 0,
+                KG DECIMAL(18,3) NOT NULL DEFAULT 0,
+                OBSERV VARCHAR(255) NULL,
+                PRIMARY KEY (CENTRO, FIL_CODI, LINE_NUMBER),
+                KEY ix_fil_detail_lookup (CENTRO, FIL_CODI),
+                KEY ix_fil_detail_color (CENTRO, COLOR),
+                KEY ix_fil_detail_provider (CENTRO, PROVE)
+            );
+            """,
+            """
+            CREATE TABLE IF NOT EXISTS mostres (
+                CODI VARCHAR(40) NOT NULL,
+                CENTRO CHAR(1) NOT NULL,
+                DESCRI VARCHAR(255) NOT NULL,
+                CLIENT INT NOT NULL DEFAULT 0,
+                NOMCLIENT VARCHAR(255) NULL,
+                REFE VARCHAR(120) NULL,
+                TEMP VARCHAR(80) NULL,
+                MAQUINA INT NOT NULL DEFAULT 0,
+                NOMMAQUI VARCHAR(255) NULL,
+                MARGE DECIMAL(12,4) NOT NULL DEFAULT 0,
+                IVA VARCHAR(20) NULL,
+                OBSERV MEDIUMTEXT NULL,
+                COMPO VARCHAR(255) NULL,
+                PREU DECIMAL(12,4) NOT NULL DEFAULT 0,
+                origin VARCHAR(20) NOT NULL DEFAULT 'legacy',
+                is_deleted TINYINT(1) NOT NULL DEFAULT 0,
+                synced_utc DATETIME(6) NULL,
+                PRIMARY KEY (CENTRO, CODI),
+                KEY ix_mostres_descri (CENTRO, DESCRI),
+                KEY ix_mostres_client (CENTRO, CLIENT),
+                KEY ix_mostres_machine (CENTRO, MAQUINA),
+                KEY ix_mostres_refe (CENTRO, REFE)
+            );
+            """,
+            """
+            CREATE TABLE IF NOT EXISTS mostres_detail (
+                CENTRO CHAR(1) NOT NULL,
+                MOSTRA_CODI VARCHAR(40) NOT NULL,
+                LINE_NUMBER INT NOT NULL,
+                TALLA VARCHAR(80) NULL,
+                TALLAH VARCHAR(80) NULL,
+                TALLAL VARCHAR(80) NULL,
+                DESCRI VARCHAR(255) NULL,
+                COST DECIMAL(12,4) NOT NULL DEFAULT 0,
+                VENDA DECIMAL(12,4) NOT NULL DEFAULT 0,
+                COLOR VARCHAR(120) NULL,
+                CLIENT INT NOT NULL DEFAULT 0,
+                NOMCLIENT VARCHAR(255) NULL,
+                NCCODE VARCHAR(120) NULL,
+                PRIMARY KEY (CENTRO, MOSTRA_CODI, LINE_NUMBER),
+                KEY ix_mostres_detail_lookup (CENTRO, MOSTRA_CODI),
+                KEY ix_mostres_detail_color (CENTRO, COLOR),
+                KEY ix_mostres_detail_client (CENTRO, CLIENT)
+            );
+            """,
+            """
+            CREATE TABLE IF NOT EXISTS mostres_breakdown (
+                CENTRO CHAR(1) NOT NULL,
+                MOSTRA_CODI VARCHAR(40) NOT NULL,
+                SAMPLE_LINE_NUMBER INT NOT NULL,
+                DATA DATE NULL,
+                CLIENT INT NOT NULL DEFAULT 0,
+                NOMCLIENT VARCHAR(255) NULL,
+                MAQUINA INT NOT NULL DEFAULT 0,
+                NOMMAQUI VARCHAR(255) NULL,
+                OPERACIO INT NOT NULL DEFAULT 0,
+                NOMOPER VARCHAR(255) NULL,
+                AGULLES DECIMAL(12,4) NOT NULL DEFAULT 0,
+                VELOSITAT DECIMAL(12,4) NOT NULL DEFAULT 0,
+                DISCO VARCHAR(120) NULL,
+                TEMPS DECIMAL(12,4) NOT NULL DEFAULT 0,
+                MACHINE_RATE DECIMAL(12,4) NOT NULL DEFAULT 0,
+                MACHINE_IMPORT DECIMAL(12,4) NOT NULL DEFAULT 0,
+                CORTES VARCHAR(120) NULL,
+                NOTES MEDIUMTEXT NULL,
+                origin VARCHAR(20) NOT NULL DEFAULT 'legacy',
+                is_deleted TINYINT(1) NOT NULL DEFAULT 0,
+                synced_utc DATETIME(6) NULL,
+                PRIMARY KEY (CENTRO, MOSTRA_CODI, SAMPLE_LINE_NUMBER),
+                KEY ix_mostres_breakdown_machine (CENTRO, MAQUINA),
+                KEY ix_mostres_breakdown_client (CENTRO, CLIENT),
+                KEY ix_mostres_breakdown_operation (CENTRO, OPERACIO)
+            );
+            """,
+            """
+            CREATE TABLE IF NOT EXISTS mostres_breakdown_lines (
+                CENTRO CHAR(1) NOT NULL,
+                MOSTRA_CODI VARCHAR(40) NOT NULL,
+                SAMPLE_LINE_NUMBER INT NOT NULL,
+                LINE_NUMBER INT NOT NULL,
+                TEIXIT VARCHAR(80) NULL,
+                PROVE INT NOT NULL DEFAULT 0,
+                NOMPROVE VARCHAR(255) NULL,
+                COLOR VARCHAR(120) NULL,
+                FIL DECIMAL(12,4) NOT NULL DEFAULT 0,
+                CAPS DECIMAL(12,4) NOT NULL DEFAULT 0,
+                PASSADES DECIMAL(12,4) NOT NULL DEFAULT 0,
+                GRADUACION INT NOT NULL DEFAULT 0,
+                CONSUM DECIMAL(12,4) NOT NULL DEFAULT 0,
+                PREU DECIMAL(12,4) NOT NULL DEFAULT 0,
+                IMPORT DECIMAL(12,4) NOT NULL DEFAULT 0,
+                PRIMARY KEY (CENTRO, MOSTRA_CODI, SAMPLE_LINE_NUMBER, LINE_NUMBER),
+                KEY ix_mostres_breakdown_lines_teixit (CENTRO, TEIXIT),
+                KEY ix_mostres_breakdown_lines_prove (CENTRO, PROVE)
+            );
+            """,
+            """
+            CREATE TABLE IF NOT EXISTS article_models (
+                record_id CHAR(36) NOT NULL PRIMARY KEY,
+                tenant_id CHAR(36) NOT NULL,
+                company_id CHAR(36) NOT NULL,
+                CENTRO CHAR(1) NOT NULL,
+                CODI VARCHAR(40) NOT NULL,
+                SERIE VARCHAR(20) NOT NULL,
+                CLIENT INT NOT NULL DEFAULT 0,
+                NOMCLIENT VARCHAR(255) NULL,
+                TEMPORADA VARCHAR(80) NOT NULL,
+                DESCRI VARCHAR(255) NOT NULL,
+                CODIMODEL VARCHAR(120) NULL,
+                TEIXIT VARCHAR(40) NULL,
+                DESCRITEIXIT VARCHAR(255) NULL,
+                PROVE INT NOT NULL DEFAULT 0,
+                NOMPROVE VARCHAR(255) NULL,
+                AMPLE VARCHAR(120) NULL,
+                TINT INT NOT NULL DEFAULT 0,
+                NOMTINT VARCHAR(255) NULL,
+                ACA INT NOT NULL DEFAULT 0,
+                NOMACA VARCHAR(255) NULL,
+                ESTAM INT NOT NULL DEFAULT 0,
+                NOMESTAM VARCHAR(255) NULL,
+                CONFEC INT NOT NULL DEFAULT 0,
+                NOMCONFEC VARCHAR(255) NULL,
+                RENDIM DECIMAL(12,4) NOT NULL DEFAULT 0,
+                FORNITURA VARCHAR(255) NULL,
+                CESTAM VARCHAR(120) NULL,
+                CESTAM2 VARCHAR(120) NULL,
+                NESTAM DECIMAL(12,4) NOT NULL DEFAULT 0,
+                NESTAM2 DECIMAL(12,4) NOT NULL DEFAULT 0,
+                NCONFEC DECIMAL(12,4) NOT NULL DEFAULT 0,
+                NPLANXA DECIMAL(12,4) NOT NULL DEFAULT 0,
+                NREPAS DECIMAL(12,4) NOT NULL DEFAULT 0,
+                QTRANS DECIMAL(12,4) NOT NULL DEFAULT 0,
+                NTRANS DECIMAL(12,4) NOT NULL DEFAULT 0,
+                QFLOCAT DECIMAL(12,4) NOT NULL DEFAULT 0,
+                NFLOCAT DECIMAL(12,4) NOT NULL DEFAULT 0,
+                QBRODAT DECIMAL(12,4) NOT NULL DEFAULT 0,
+                NBRODAT DECIMAL(12,4) NOT NULL DEFAULT 0,
+                NESTAMP DECIMAL(12,4) NOT NULL DEFAULT 0,
+                NTINTP DECIMAL(12,4) NOT NULL DEFAULT 0,
+                NACAP DECIMAL(12,4) NOT NULL DEFAULT 0,
+                NFORNITURA DECIMAL(12,4) NOT NULL DEFAULT 0,
+                MANIPULACION DECIMAL(12,4) NOT NULL DEFAULT 0,
+                COST DECIMAL(12,4) NOT NULL DEFAULT 0,
+                MARGE DECIMAL(12,4) NOT NULL DEFAULT 0,
+                VENDA DECIMAL(12,4) NOT NULL DEFAULT 0,
+                VENDAFINAL DECIMAL(12,4) NOT NULL DEFAULT 0,
+                OBSERV MEDIUMTEXT NULL,
+                IVA VARCHAR(20) NULL,
+                TALLA01 VARCHAR(40) NULL,
+                TALLA02 VARCHAR(40) NULL,
+                TALLA03 VARCHAR(40) NULL,
+                TALLA04 VARCHAR(40) NULL,
+                TALLA05 VARCHAR(40) NULL,
+                TALLA06 VARCHAR(40) NULL,
+                TALLA07 VARCHAR(40) NULL,
+                TALLA08 VARCHAR(40) NULL,
+                TALLA09 VARCHAR(40) NULL,
+                TALLA10 VARCHAR(40) NULL,
+                NPACK DECIMAL(12,4) NOT NULL DEFAULT 0,
+                origin VARCHAR(20) NOT NULL DEFAULT 'local',
+                is_deleted TINYINT(1) NOT NULL DEFAULT 0,
+                synced_utc DATETIME(6) NULL,
+                created_utc DATETIME(6) NOT NULL,
+                updated_utc DATETIME(6) NOT NULL,
+                UNIQUE KEY uq_article_models_identity (tenant_id, company_id, CENTRO, CODI, SERIE, CLIENT, TEMPORADA),
+                KEY ix_article_models_lookup (tenant_id, company_id, CENTRO, TEMPORADA, SERIE, CLIENT, CODI),
+                KEY ix_article_models_description (tenant_id, company_id, DESCRI),
+                KEY ix_article_models_fabric (tenant_id, company_id, TEIXIT)
+            );
+            """,
+            """
+            CREATE TABLE IF NOT EXISTS article_model_scandallo (
+                model_id CHAR(36) NOT NULL,
+                line_number INT NOT NULL,
+                TITULO VARCHAR(120) NULL,
+                TEIXIT VARCHAR(40) NULL,
+                CONSUM DECIMAL(12,4) NOT NULL DEFAULT 0,
+                PREU DECIMAL(12,4) NOT NULL DEFAULT 0,
+                COST DECIMAL(12,4) NOT NULL DEFAULT 0,
+                PRIMARY KEY (model_id, line_number),
+                KEY ix_article_model_scandallo_fabric (TEIXIT)
+            );
+            """,
+            """
+            CREATE TABLE IF NOT EXISTS article_model_colors (
+                model_id CHAR(36) NOT NULL,
+                line_number INT NOT NULL,
+                MODCOL VARCHAR(40) NULL,
+                TITULO VARCHAR(120) NULL,
+                COLTITULO VARCHAR(120) NULL,
+                PRIMARY KEY (model_id, line_number),
+                KEY ix_article_model_colors_lookup (model_id, MODCOL),
+                KEY ix_article_model_colors_title (TITULO)
+            );
+            """,
+            """
+            CREATE TABLE IF NOT EXISTS article_model_fornituras (
+                model_id CHAR(36) NOT NULL,
+                line_number INT NOT NULL,
+                FORNI VARCHAR(40) NULL,
+                MEDIDA VARCHAR(120) NULL,
+                UNITATS DECIMAL(12,4) NOT NULL DEFAULT 0,
+                PREU DECIMAL(12,4) NOT NULL DEFAULT 0,
+                IMPORT DECIMAL(12,4) NOT NULL DEFAULT 0,
+                PRIMARY KEY (model_id, line_number),
+                KEY ix_article_model_fornituras_lookup (model_id, FORNI)
+            );
+            """,
+            """
+            CREATE TABLE IF NOT EXISTS article_model_stock (
+                model_id CHAR(36) NOT NULL,
+                line_number INT NOT NULL,
+                COLOR VARCHAR(120) NULL,
+                TALLA VARCHAR(40) NULL,
+                TALLA01 DECIMAL(12,4) NOT NULL DEFAULT 0,
+                TALLA02 DECIMAL(12,4) NOT NULL DEFAULT 0,
+                TALLA03 DECIMAL(12,4) NOT NULL DEFAULT 0,
+                TALLA04 DECIMAL(12,4) NOT NULL DEFAULT 0,
+                TALLA05 DECIMAL(12,4) NOT NULL DEFAULT 0,
+                TALLA06 DECIMAL(12,4) NOT NULL DEFAULT 0,
+                TALLA07 DECIMAL(12,4) NOT NULL DEFAULT 0,
+                TALLA08 DECIMAL(12,4) NOT NULL DEFAULT 0,
+                TALLA09 DECIMAL(12,4) NOT NULL DEFAULT 0,
+                TALLA10 DECIMAL(12,4) NOT NULL DEFAULT 0,
+                PRIMARY KEY (model_id, line_number),
+                KEY ix_article_model_stock_lookup (model_id, COLOR),
+                KEY ix_article_model_stock_size (TALLA)
+            );
+            """,
+            """
+            CREATE TABLE IF NOT EXISTS teixits (
+                CODI VARCHAR(10) NOT NULL,
+                CENTRO CHAR(1) NOT NULL,
+                DESCRI VARCHAR(255) NOT NULL,
+                NRO VARCHAR(120) NULL,
+                MAQUI INT NULL,
+                MATERIA DECIMAL(12,4) NOT NULL DEFAULT 0,
+                OBSERV MEDIUMTEXT NULL,
+                IVA VARCHAR(20) NULL,
+                TEIXIDOR INT NULL,
+                PTEIXIR DECIMAL(12,4) NOT NULL DEFAULT 0,
+                ESTAMPADOR INT NULL,
+                PESTAM DECIMAL(12,4) NOT NULL DEFAULT 0,
+                ACABADOR INT NULL,
+                ACABAT VARCHAR(255) NULL,
+                PACA DECIMAL(12,4) NOT NULL DEFAULT 0,
+                CRU DECIMAL(12,4) NOT NULL DEFAULT 0,
+                AMPLE VARCHAR(40) NULL,
+                RENDIMENT DECIMAL(12,4) NOT NULL DEFAULT 0,
+                MARGE DECIMAL(12,4) NOT NULL DEFAULT 0,
+                GRAMA DECIMAL(12,4) NOT NULL DEFAULT 0,
+                PREUM DECIMAL(12,4) NOT NULL DEFAULT 0,
+                PREUK DECIMAL(12,4) NOT NULL DEFAULT 0,
+                STCRUM DECIMAL(18,3) NOT NULL DEFAULT 0,
+                STDISPM DECIMAL(18,3) NOT NULL DEFAULT 0,
+                STCRUK DECIMAL(18,3) NOT NULL DEFAULT 0,
+                STDISPK DECIMAL(18,3) NOT NULL DEFAULT 0,
+                PREUPERMODEL DECIMAL(12,4) NOT NULL DEFAULT 0,
+                TUBULAR TINYINT(1) NOT NULL DEFAULT 0,
+                AMPLE2 DECIMAL(12,4) NOT NULL DEFAULT 0,
+                origin VARCHAR(20) NOT NULL DEFAULT 'legacy',
+                is_deleted TINYINT(1) NOT NULL DEFAULT 0,
+                synced_utc DATETIME(6) NULL,
+                PRIMARY KEY (CENTRO, CODI),
+                KEY ix_teixits_descri (CENTRO, DESCRI),
+                KEY ix_teixits_weaver (CENTRO, TEIXIDOR),
+                KEY ix_teixits_finisher (CENTRO, ACABADOR)
+            );
+            """,
+            """
+            CREATE TABLE IF NOT EXISTS teixits_color_detail (
+                CENTRO CHAR(1) NOT NULL,
+                TEIXIT_CODI VARCHAR(10) NOT NULL,
+                LINE_NUMBER INT NOT NULL,
+                PROVE INT NOT NULL DEFAULT 0,
+                COLOR VARCHAR(120) NULL,
+                ACTUAL DECIMAL(18,3) NOT NULL DEFAULT 0,
+                MINIM DECIMAL(18,3) NOT NULL DEFAULT 0,
+                TINTAR DECIMAL(12,4) NOT NULL DEFAULT 0,
+                PREU DECIMAL(12,4) NOT NULL DEFAULT 0,
+                METRES DECIMAL(18,3) NOT NULL DEFAULT 0,
+                KG DECIMAL(18,3) NOT NULL DEFAULT 0,
+                OBSERV VARCHAR(255) NULL,
+                PRIMARY KEY (CENTRO, TEIXIT_CODI, LINE_NUMBER),
+                KEY ix_teixits_color_lookup (CENTRO, TEIXIT_CODI),
+                KEY ix_teixits_color_color (CENTRO, COLOR)
+            );
+            """,
+            """
+            CREATE TABLE IF NOT EXISTS teixits_composition_detail (
+                CENTRO CHAR(1) NOT NULL,
+                TEIXIT_CODI VARCHAR(10) NOT NULL,
+                LINE_NUMBER INT NOT NULL,
+                COMP VARCHAR(30) NULL,
+                PER INT NOT NULL DEFAULT 0,
+                PROVE INT NOT NULL DEFAULT 0,
+                PREU DECIMAL(12,4) NOT NULL DEFAULT 0,
+                IMPORTE DECIMAL(12,4) NOT NULL DEFAULT 0,
+                PRIMARY KEY (CENTRO, TEIXIT_CODI, LINE_NUMBER),
+                KEY ix_teixits_comp_lookup (CENTRO, TEIXIT_CODI),
+                KEY ix_teixits_comp_component (CENTRO, COMP)
+            );
+            """,
+            """
+            CREATE TABLE IF NOT EXISTS teixits_finish_detail (
+                CENTRO CHAR(1) NOT NULL,
+                TEIXIT_CODI VARCHAR(10) NOT NULL,
+                LINE_NUMBER INT NOT NULL,
+                ACABAT VARCHAR(50) NULL,
+                PROVE INT NOT NULL DEFAULT 0,
+                ORDEN INT NOT NULL DEFAULT 0,
+                PREUM DECIMAL(12,4) NOT NULL DEFAULT 0,
+                PREUK DECIMAL(12,4) NOT NULL DEFAULT 0,
+                PRIMARY KEY (CENTRO, TEIXIT_CODI, LINE_NUMBER),
+                KEY ix_teixits_finish_lookup (CENTRO, TEIXIT_CODI),
+                KEY ix_teixits_finish_code (CENTRO, ACABAT)
             );
             """,
             """
@@ -864,8 +1521,44 @@ public sealed class SchemaBootstrapper : IHostedService
         await EnsurePurchaseOrderSyncColumnsAsync(connection, cancellationToken);
         await EnsurePurchaseOrderReceiptColumnsAsync(connection, cancellationToken);
         await EnsurePurchaseReceiptSyncColumnsAsync(connection, cancellationToken);
+        await EnsurePurchaseInvoiceColumnsAsync(connection, cancellationToken);
+        await EnsureFinishWorkOrderMachineColumnsAsync(connection, cancellationToken);
+        await EnsureFinishWorkOrderOperationColumnsAsync(connection, cancellationToken);
+        await EnsureFinishWorkOrderSampleColumnsAsync(connection, cancellationToken);
+        await EnsureMuestraBreakdownOperationColumnsAsync(connection, cancellationToken);
+        await EnsureColumnAsync(
+            connection,
+            "stock_counts",
+            "is_blind_count",
+            "ALTER TABLE stock_counts ADD COLUMN is_blind_count TINYINT(1) NOT NULL DEFAULT 0 AFTER warehouse;",
+            cancellationToken);
+        await EnsureColumnAsync(
+            connection,
+            "stock_counts",
+            "is_blind_count_revealed",
+            "ALTER TABLE stock_counts ADD COLUMN is_blind_count_revealed TINYINT(1) NOT NULL DEFAULT 0 AFTER is_blind_count;",
+            cancellationToken);
+        await EnsureColumnAsync(
+            connection,
+            "stock_count_lines",
+            "is_difference_validated",
+            "ALTER TABLE stock_count_lines ADD COLUMN is_difference_validated TINYINT(1) NOT NULL DEFAULT 0 AFTER difference_quantity;",
+            cancellationToken);
+        await EnsureColumnAsync(
+            connection,
+            "base_catalog_items",
+            "secondary_reference_value",
+            "ALTER TABLE base_catalog_items ADD COLUMN secondary_reference_value VARCHAR(255) NULL AFTER reference_value;",
+            cancellationToken);
+        await EnsureColumnAsync(
+            connection,
+            "base_catalog_items",
+            "secondary_numeric_value",
+            "ALTER TABLE base_catalog_items ADD COLUMN secondary_numeric_value DECIMAL(18,4) NULL AFTER numeric_value;",
+            cancellationToken);
         await EnsureSalesOrderShipmentColumnsAsync(connection, cancellationToken);
         await EnsureSalesInvoiceColumnsAsync(connection, cancellationToken);
+        await EnsureDispositionColumnsAsync(connection, cancellationToken);
     }
 
     private async Task SeedDefaultsAsync(MySqlConnection connection, CancellationToken cancellationToken)
@@ -1097,6 +1790,28 @@ public sealed class SchemaBootstrapper : IHostedService
         await backfillCommand.ExecuteNonQueryAsync(cancellationToken);
     }
 
+    private static async Task EnsureDispositionColumnsAsync(MySqlConnection connection, CancellationToken cancellationToken)
+    {
+        await EnsureColumnAsync(
+            connection,
+            "dispos",
+            "origin",
+            "ALTER TABLE dispos ADD COLUMN origin VARCHAR(20) NOT NULL DEFAULT 'legacy' AFTER COMANDA;",
+            cancellationToken);
+        await EnsureColumnAsync(
+            connection,
+            "dispos",
+            "is_deleted",
+            "ALTER TABLE dispos ADD COLUMN is_deleted TINYINT(1) NOT NULL DEFAULT 0 AFTER origin;",
+            cancellationToken);
+        await EnsureColumnAsync(
+            connection,
+            "dispos",
+            "synced_utc",
+            "ALTER TABLE dispos ADD COLUMN synced_utc DATETIME(6) NULL AFTER is_deleted;",
+            cancellationToken);
+    }
+
     private static async Task<Guid> EnsureTenantAsync(
         MySqlConnection connection,
         string name,
@@ -1322,6 +2037,13 @@ public sealed class SchemaBootstrapper : IHostedService
             "sales_orders",
             "origin",
             "ALTER TABLE sales_orders ADD COLUMN origin VARCHAR(20) NOT NULL DEFAULT 'saas' AFTER status;",
+            cancellationToken);
+
+        await EnsureColumnAsync(
+            connection,
+            "inventory_movements",
+            "color",
+            "ALTER TABLE inventory_movements ADD COLUMN color VARCHAR(120) NULL AFTER item_description;",
             cancellationToken);
 
         await EnsureColumnAsync(
@@ -1763,6 +2485,81 @@ public sealed class SchemaBootstrapper : IHostedService
 
         await EnsureColumnAsync(
             connection,
+            "fil",
+            "origin",
+            "ALTER TABLE fil ADD COLUMN origin VARCHAR(20) NOT NULL DEFAULT 'legacy' AFTER CENTRO;",
+            cancellationToken);
+        await EnsureColumnAsync(
+            connection,
+            "fil",
+            "is_deleted",
+            "ALTER TABLE fil ADD COLUMN is_deleted TINYINT(1) NOT NULL DEFAULT 0 AFTER origin;",
+            cancellationToken);
+        await EnsureColumnAsync(
+            connection,
+            "fil",
+            "synced_utc",
+            "ALTER TABLE fil ADD COLUMN synced_utc DATETIME(6) NULL AFTER is_deleted;",
+            cancellationToken);
+
+        await EnsureColumnAsync(
+            connection,
+            "teixits",
+            "AMPLE2",
+            "ALTER TABLE teixits ADD COLUMN AMPLE2 DECIMAL(12,4) NOT NULL DEFAULT 0 AFTER TUBULAR;",
+            cancellationToken);
+        await EnsureColumnAsync(
+            connection,
+            "teixits",
+            "origin",
+            "ALTER TABLE teixits ADD COLUMN origin VARCHAR(20) NOT NULL DEFAULT 'legacy' AFTER AMPLE2;",
+            cancellationToken);
+        await EnsureColumnAsync(
+            connection,
+            "teixits",
+            "is_deleted",
+            "ALTER TABLE teixits ADD COLUMN is_deleted TINYINT(1) NOT NULL DEFAULT 0 AFTER origin;",
+            cancellationToken);
+        await EnsureColumnAsync(
+            connection,
+            "teixits",
+            "synced_utc",
+            "ALTER TABLE teixits ADD COLUMN synced_utc DATETIME(6) NULL AFTER is_deleted;",
+            cancellationToken);
+
+        await EnsureColumnAsync(
+            connection,
+            "mostres",
+            "NOMCLIENT",
+            "ALTER TABLE mostres ADD COLUMN NOMCLIENT VARCHAR(255) NULL AFTER CLIENT;",
+            cancellationToken);
+        await EnsureColumnAsync(
+            connection,
+            "mostres",
+            "NOMMAQUI",
+            "ALTER TABLE mostres ADD COLUMN NOMMAQUI VARCHAR(255) NULL AFTER MAQUINA;",
+            cancellationToken);
+        await EnsureColumnAsync(
+            connection,
+            "mostres",
+            "origin",
+            "ALTER TABLE mostres ADD COLUMN origin VARCHAR(20) NOT NULL DEFAULT 'legacy' AFTER CENTRO;",
+            cancellationToken);
+        await EnsureColumnAsync(
+            connection,
+            "mostres",
+            "is_deleted",
+            "ALTER TABLE mostres ADD COLUMN is_deleted TINYINT(1) NOT NULL DEFAULT 0 AFTER origin;",
+            cancellationToken);
+        await EnsureColumnAsync(
+            connection,
+            "mostres",
+            "synced_utc",
+            "ALTER TABLE mostres ADD COLUMN synced_utc DATETIME(6) NULL AFTER is_deleted;",
+            cancellationToken);
+
+        await EnsureColumnAsync(
+            connection,
             "trans",
             "origin",
             "ALTER TABLE trans ADD COLUMN origin VARCHAR(20) NOT NULL DEFAULT 'legacy' AFTER CENTRO;",
@@ -1820,6 +2617,44 @@ public sealed class SchemaBootstrapper : IHostedService
 
         await EnsureColumnAsync(
             connection,
+            "clients",
+            "origin",
+            "ALTER TABLE clients ADD COLUMN origin VARCHAR(20) NOT NULL DEFAULT 'legacy' AFTER BLOQUEADO;",
+            cancellationToken);
+        await EnsureColumnAsync(
+            connection,
+            "clients",
+            "is_deleted",
+            "ALTER TABLE clients ADD COLUMN is_deleted TINYINT(1) NOT NULL DEFAULT 0 AFTER origin;",
+            cancellationToken);
+        await EnsureColumnAsync(
+            connection,
+            "clients",
+            "synced_utc",
+            "ALTER TABLE clients ADD COLUMN synced_utc DATETIME(6) NULL AFTER is_deleted;",
+            cancellationToken);
+
+        await EnsureColumnAsync(
+            connection,
+            "prove",
+            "origin",
+            "ALTER TABLE prove ADD COLUMN origin VARCHAR(20) NOT NULL DEFAULT 'legacy' AFTER NOTES;",
+            cancellationToken);
+        await EnsureColumnAsync(
+            connection,
+            "prove",
+            "is_deleted",
+            "ALTER TABLE prove ADD COLUMN is_deleted TINYINT(1) NOT NULL DEFAULT 0 AFTER origin;",
+            cancellationToken);
+        await EnsureColumnAsync(
+            connection,
+            "prove",
+            "synced_utc",
+            "ALTER TABLE prove ADD COLUMN synced_utc DATETIME(6) NULL AFTER is_deleted;",
+            cancellationToken);
+
+        await EnsureColumnAsync(
+            connection,
             "sales_invoice_drafts",
             "invoice_id",
             "ALTER TABLE sales_invoice_drafts ADD COLUMN invoice_id CHAR(36) NULL AFTER status;",
@@ -1830,6 +2665,118 @@ public sealed class SchemaBootstrapper : IHostedService
             "sales_invoice_drafts",
             "issued_utc",
             "ALTER TABLE sales_invoice_drafts ADD COLUMN issued_utc DATETIME(6) NULL AFTER invoice_id;",
+            cancellationToken);
+    }
+
+    private static async Task EnsurePurchaseInvoiceColumnsAsync(MySqlConnection connection, CancellationToken cancellationToken)
+    {
+        await EnsureColumnAsync(
+            connection,
+            "purchase_invoices",
+            "amount_paid",
+            "ALTER TABLE purchase_invoices ADD COLUMN amount_paid DECIMAL(18,2) NOT NULL DEFAULT 0 AFTER total_amount;",
+            cancellationToken);
+        await EnsureColumnAsync(
+            connection,
+            "purchase_invoices",
+            "outstanding_amount",
+            "ALTER TABLE purchase_invoices ADD COLUMN outstanding_amount DECIMAL(18,2) NOT NULL DEFAULT 0 AFTER amount_paid;",
+            cancellationToken);
+        await EnsureColumnAsync(
+            connection,
+            "purchase_invoices",
+            "last_payment_utc",
+            "ALTER TABLE purchase_invoices ADD COLUMN last_payment_utc DATETIME(6) NULL AFTER outstanding_amount;",
+            cancellationToken);
+        await EnsureColumnAsync(
+            connection,
+            "purchase_invoice_lines",
+            "source_order_line_number",
+            "ALTER TABLE purchase_invoice_lines ADD COLUMN source_order_line_number INT NULL AFTER source_order_number;",
+            cancellationToken);
+
+        await using var normalizeCommand = connection.CreateCommand();
+        normalizeCommand.CommandText =
+            """
+            UPDATE purchase_invoices
+            SET outstanding_amount = CASE
+                    WHEN status = 'Paid' THEN 0
+                    WHEN COALESCE(amount_paid, 0) <= 0 THEN total_amount
+                    ELSE GREATEST(total_amount - amount_paid, 0)
+                END
+            WHERE outstanding_amount = 0
+              AND total_amount > 0;
+            """;
+        await normalizeCommand.ExecuteNonQueryAsync(cancellationToken);
+    }
+
+    private static async Task EnsureFinishWorkOrderMachineColumnsAsync(MySqlConnection connection, CancellationToken cancellationToken)
+    {
+        await EnsureColumnAsync(
+            connection,
+            "finish_work_orders",
+            "machine_code",
+            "ALTER TABLE finish_work_orders ADD COLUMN machine_code INT NOT NULL DEFAULT 0 AFTER finisher_name;",
+            cancellationToken);
+        await EnsureColumnAsync(
+            connection,
+            "finish_work_orders",
+            "machine_name",
+            "ALTER TABLE finish_work_orders ADD COLUMN machine_name VARCHAR(255) NULL AFTER machine_code;",
+            cancellationToken);
+    }
+
+    private static async Task EnsureFinishWorkOrderSampleColumnsAsync(MySqlConnection connection, CancellationToken cancellationToken)
+    {
+        await EnsureColumnAsync(
+            connection,
+            "finish_work_orders",
+            "source_sample_kind",
+            "ALTER TABLE finish_work_orders ADD COLUMN source_sample_kind VARCHAR(30) NULL AFTER disposition_label;",
+            cancellationToken);
+        await EnsureColumnAsync(
+            connection,
+            "finish_work_orders",
+            "source_sample_code",
+            "ALTER TABLE finish_work_orders ADD COLUMN source_sample_code VARCHAR(120) NULL AFTER source_sample_kind;",
+            cancellationToken);
+        await EnsureColumnAsync(
+            connection,
+            "finish_work_orders",
+            "source_sample_line_number",
+            "ALTER TABLE finish_work_orders ADD COLUMN source_sample_line_number INT NULL AFTER source_sample_code;",
+            cancellationToken);
+    }
+
+    private static async Task EnsureFinishWorkOrderOperationColumnsAsync(MySqlConnection connection, CancellationToken cancellationToken)
+    {
+        await EnsureColumnAsync(
+            connection,
+            "finish_work_orders",
+            "operation_code",
+            "ALTER TABLE finish_work_orders ADD COLUMN operation_code INT NOT NULL DEFAULT 0 AFTER machine_name;",
+            cancellationToken);
+        await EnsureColumnAsync(
+            connection,
+            "finish_work_orders",
+            "operation_name",
+            "ALTER TABLE finish_work_orders ADD COLUMN operation_name VARCHAR(255) NULL AFTER operation_code;",
+            cancellationToken);
+    }
+
+    private static async Task EnsureMuestraBreakdownOperationColumnsAsync(MySqlConnection connection, CancellationToken cancellationToken)
+    {
+        await EnsureColumnAsync(
+            connection,
+            "mostres_breakdown",
+            "OPERACIO",
+            "ALTER TABLE mostres_breakdown ADD COLUMN OPERACIO INT NOT NULL DEFAULT 0 AFTER NOMMAQUI;",
+            cancellationToken);
+        await EnsureColumnAsync(
+            connection,
+            "mostres_breakdown",
+            "NOMOPER",
+            "ALTER TABLE mostres_breakdown ADD COLUMN NOMOPER VARCHAR(255) NULL AFTER OPERACIO;",
             cancellationToken);
     }
 

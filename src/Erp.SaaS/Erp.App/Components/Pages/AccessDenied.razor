@@ -1,10 +1,11 @@
 @page "/acceso-denegado"
 @attribute [AllowAnonymous]
+@inject AppText T
 
-<PageTitle>Acceso denegado</PageTitle>
+<PageTitle>@T["accessDenied.title"]</PageTitle>
 
 <div class="empty-state">
-    <h1>Acceso denegado</h1>
-    <p>No tienes permisos para abrir esta sección con el rol actual.</p>
-    <a class="action-link" href="/">Volver al dashboard</a>
+    <h1>@T["accessDenied.heading"]</h1>
+    <p>@T["accessDenied.message"]</p>
+    <a class="action-link" href="/">@T["accessDenied.back"]</a>
 </div>

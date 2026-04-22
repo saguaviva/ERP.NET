@@ -1,0 +1,220 @@
+@page "/articulos/disposiciones/{Code:int}/imprimir"
+@layout EmptyLayout
+@attribute [Authorize(Roles = "TenantAdmin,TenantReader")]
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IDisposicionQueries DisposicionQueries
+
+<PageTitle>Ficha disposición @Code</PageTitle>
+
+<div class="document-shell">
+    <div class="document-toolbar no-print">
+        <a class="secondary-button link-button" href="/articulos/disposiciones/editar/@Code">Volver a la disposición</a>
+        <button class="primary-button" type="button" onclick="window.print()">Guardar como PDF / Imprimir</button>
+    </div>
+
+    @if (!tenantId.HasValue || !companyId.HasValue)
+    {
+        <div class="empty-state document-state">
+            <p>No hay empresa activa seleccionada.</p>
+        </div>
+    }
+    else if (!string.IsNullOrWhiteSpace(errorMessage))
+    {
+        <div class="alert danger document-state">@errorMessage</div>
+    }
+    else if (detail is null)
+    {
+        <div class="empty-state document-state">
+            <p>No se ha encontrado la disposición solicitada.</p>
+        </div>
+    }
+    else
+    {
+        <section class="document-page">
+            <header class="document-header">
+                <div>
+                    <p class="eyebrow">Disposición</p>
+                    <h1>@VisibleNumber</h1>
+                    <p class="muted">Color @DisplayValue(detail.Color) · Comanda @DisplayValue(detail.OrderReference)</p>
+                </div>
+                <div class="document-header-meta">
+                    <div>
+                        <span class="muted">Fecha</span>
+                        <strong>@FormatDate(detail.Date)</strong>
+                    </div>
+                    <div>
+                        <span class="muted">Recepción</span>
+                        <strong>@FormatDate(detail.ReceptionDate)</strong>
+                    </div>
+                    <div>
+                        <span class="muted">Estado</span>
+                        <strong>@StatusLabel</strong>
+                    </div>
+                </div>
+            </header>
+
+            <section class="document-section">
+                <div class="document-grid-two">
+                    <section class="document-box">
+                        <h2>Cabecera</h2>
+                        <div class="document-kv-grid">
+                            <div><span class="muted">Cliente</span><strong>@DisplayClient</strong></div>
+                            <div><span class="muted">Acabador</span><strong>@DisplayFinisher</strong></div>
+                            <div><span class="muted">Código cliente</span><strong>@DisplayValue(detail.ClientReferenceCode)</strong></div>
+                            <div><span class="muted">Color cliente</span><strong>@DisplayValue(detail.ClientColor)</strong></div>
+                            <div><span class="muted">Origen</span><strong>@DisplayValue(detail.Origin)</strong></div>
+                            <div><span class="muted">Centro</span><strong>@DisplayValue(detail.CompanyCenterCode)</strong></div>
+                        </div>
+                    </section>
+                    <section class="document-box">
+                        <h2>Totales</h2>
+                        <div class="document-kv-grid">
+                            <div><span class="muted">Piezas</span><strong>@detail.TotalPieces.ToString("0.##")</strong></div>
+                            <div><span class="muted">Kg</span><strong>@detail.TotalKilograms.ToString("0.##")</strong></div>
+                            <div><span class="muted">Líneas</span><strong>@detail.Lines.Count</strong></div>
+                        </div>
+                    </section>
+                </div>
+            </section>
+
+            <section class="document-section">
+                <h2>Detalle de líneas</h2>
+                <table class="data-table document-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Descripción</th>
+                            <th>Tejedor</th>
+                            <th>Alb.</th>
+                            <th>Tejido</th>
+                            <th>Piezas</th>
+                            <th>Kg</th>
+                            <th>Acabado</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var line in detail.Lines.OrderBy(item => item.LineNumber))
+                        {
+                            <tr>
+                                <td>@line.LineNumber</td>
+                                <td>@DisplayValue(line.Description)</td>
+                                <td>@(line.WeaverCode > 0 ? line.WeaverCode.ToString() : "-")</td>
+                                <td>@DisplayValue(line.DeliveryNoteNumber)</td>
+                                <td>@DisplayValue(line.FabricCode)</td>
+                                <td>@line.TotalPieces.ToString("0.##")</td>
+                                <td>@line.TotalKilograms.ToString("0.##")</td>
+                                <td>@DisplayValue(line.FinishText)</td>
+                                <td>@BuildLineStatus(line)</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </section>
+
+            <section class="document-section">
+                <div class="document-grid-two">
+                    <section class="document-box">
+                        <h2>Observaciones</h2>
+                        <p>@(string.IsNullOrWhiteSpace(detail.Notes) ? "Sin observaciones." : detail.Notes)</p>
+                    </section>
+                    <section class="document-box">
+                        <h2>Movimientos de stock activos</h2>
+                        @if (ActiveMovementSummaries.Count == 0)
+                        {
+                            <p>Sin movimientos activos.</p>
+                        }
+                        else
+                        {
+                            <ul class="document-list">
+                                @foreach (var item in ActiveMovementSummaries)
+                                {
+                                    <li>@item</li>
+                                }
+                            </ul>
+                        }
+                    </section>
+                </div>
+            </section>
+        </section>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public int Code { get; set; }
+
+    private Guid? tenantId;
+    private Guid? companyId;
+    private DisposicionDetailDto? detail;
+    private string errorMessage = string.Empty;
+
+    private string VisibleNumber => detail is null ? Code.ToString() : FormatVisibleNumber(detail.Number, detail.Year);
+    private string StatusLabel => detail is null ? string.Empty : detail.IsCancelled ? "Anulada" : detail.IsReceived ? "Recibida" : "Pendiente";
+    private string DisplayClient => detail is null ? "-" : string.IsNullOrWhiteSpace(detail.ClientName) ? (detail.ClientCode > 0 ? detail.ClientCode.ToString() : "-") : $"{detail.ClientCode} · {detail.ClientName}";
+    private string DisplayFinisher => detail is null ? "-" : string.IsNullOrWhiteSpace(detail.FinisherName) ? (detail.FinisherCode > 0 ? detail.FinisherCode.ToString() : "-") : $"{detail.FinisherCode} · {detail.FinisherName}";
+
+    private IReadOnlyList<string> ActiveMovementSummaries =>
+        detail is null
+            ? []
+            : detail.Lines
+                .OrderBy(item => item.LineNumber)
+                .SelectMany(BuildActiveMovementLines)
+                .ToList();
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        tenantId = user.GetTenantId();
+        companyId = user.GetActiveCompanyId();
+
+        if (!tenantId.HasValue || !companyId.HasValue)
+        {
+            return;
+        }
+
+        try
+        {
+            errorMessage = string.Empty;
+            detail = await DisposicionQueries.GetByCodeAsync(tenantId.Value, companyId.Value, Code);
+        }
+        catch (Exception exception)
+        {
+            errorMessage = exception.Message;
+            detail = null;
+        }
+    }
+
+    private IEnumerable<string> BuildActiveMovementLines(DisposicionLineDto line)
+    {
+        if (string.IsNullOrWhiteSpace(line.FabricCode) || line.TotalKilograms <= 0)
+        {
+            yield break;
+        }
+
+        var meters = CalculateMeters(line.TotalKilograms, line.Yield);
+        if (line.IsDisposed)
+        {
+            yield return $"Línea {line.LineNumber}: crudo -> dispuesto · {line.FabricCode} · {line.TotalKilograms:0.##} kg · {meters:0.##} m";
+        }
+
+        if (line.IsServed)
+        {
+            yield return $"Línea {line.LineNumber}: dispuesto -> color · {line.FabricCode} · {DisplayValue(detail?.Color) } · {meters:0.##} m";
+        }
+    }
+
+    private static string BuildLineStatus(DisposicionLineDto line) =>
+        line.IsServed ? "Servido" : line.IsDisposed ? "Dispuesto" : "Pendiente";
+
+    private static decimal CalculateMeters(decimal kilograms, decimal yield)
+    {
+        var effectiveYield = yield == 0 ? 1m : yield;
+        return Math.Round(kilograms * effectiveYield, 2, MidpointRounding.AwayFromZero);
+    }
+
+    private static string DisplayValue(string? value) => string.IsNullOrWhiteSpace(value) ? "-" : value;
+    private static string FormatVisibleNumber(int number, string year) => string.IsNullOrWhiteSpace(year) ? number.ToString() : $"{number}-{year}";
+    private static string FormatDate(DateTime? value) => value?.ToString("dd/MM/yyyy") ?? "-";
+}

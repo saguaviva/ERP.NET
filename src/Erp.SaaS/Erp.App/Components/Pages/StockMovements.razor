@@ -1,47 +1,48 @@
 @page "/almacen/movimientos"
 @attribute [Authorize(Roles = "TenantAdmin,TenantReader")]
 @inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
 @inject IStockQueries StockQueries
+@inject AppText T
 
-<PageTitle>Almacén / Movimientos</PageTitle>
+<PageTitle>@L("Almacén / Movimientos", "Magatzem / Moviments", "Warehouse / Movements")</PageTitle>
 
 <div class="page-header">
     <div>
-        <p class="eyebrow">Almacén</p>
-        <h1>Movimientos</h1>
-        <p class="lead">Entradas de stock generadas desde recepciones y futuros movimientos de almacén.</p>
+        <p class="eyebrow">@L("Almacén", "Magatzem", "Warehouse")</p>
+        <h1>@L("Movimientos", "Moviments", "Movements")</h1>
+        <p class="lead">@L("Entradas de stock generadas desde recepciones y futuros movimientos de almacén.", "Entrades d'estoc generades des de recepcions i futurs moviments de magatzem.", "Stock entries generated from receipts and future warehouse movements.")</p>
     </div>
     <div class="quick-links">
-        <a class="secondary-button link-button" href="/almacen/stock-actual">Ver stock actual</a>
-        @if (!legacySyncInfo.IsActive)
-        {
-            <a class="secondary-button link-button" href="/almacen/ajustes">Nuevo ajuste</a>
-        }
+        <a class="secondary-button link-button" href="/almacen/stock-actual">@L("Ver stock actual", "Veure estoc actual", "View current stock")</a>
+        <a class="secondary-button link-button" href="/almacen/inventarios">@L("Ver inventarios", "Veure inventaris", "View inventories")</a>
+        <a class="secondary-button link-button" href="/almacen/traspasos">@L("Ver traspasos", "Veure traspassos", "View transfers")</a>
+        <a class="secondary-button link-button" href="/almacen/ajustes">@L("Nuevo ajuste", "Nou ajust", "New adjustment")</a>
     </div>
 </div>
 
 @if (!tenantId.HasValue || !companyId.HasValue)
 {
     <div class="empty-state">
-        <p>Selecciona una empresa activa para revisar movimientos de almacén.</p>
+        <p>@L("Selecciona una empresa activa para revisar movimientos de almacén.", "Selecciona una empresa activa per revisar moviments de magatzem.", "Select an active company to review warehouse movements.")</p>
     </div>
 }
 else
 {
     <section class="panel">
         <div class="filter-row">
-            <input class="text-input" @bind="filter.Search" placeholder="Buscar por artículo, proveedor, referencia, matrícula o documento" disabled="@isLoading" />
-            <input class="text-input" @bind="filter.Warehouse" placeholder="Almacén" disabled="@isLoading" />
-            <button class="secondary-button" @onclick="SearchAsync" disabled="@isLoading">@(isLoading ? "Cargando..." : "Buscar")</button>
+            <input class="text-input" @bind="filter.Search" placeholder="@L("Buscar por artículo, color, proveedor, referencia, matrícula o documento", "Buscar per article, color, proveïdor, referència, matrícula o document", "Search by item, color, supplier, reference, registration or document")" disabled="@isLoading" />
+            <input class="text-input" @bind="filter.Warehouse" placeholder="@L("Almacén", "Magatzem", "Warehouse")" disabled="@isLoading" />
+            <button class="secondary-button" @onclick="SearchAsync" disabled="@isLoading">@(isLoading ? L("Cargando...", "Carregant...", "Loading...") : L("Buscar", "Buscar", "Search"))</button>
         </div>
         <div class="filter-row results-toolbar" style="margin-top: 0.85rem;">
             <span class="results-summary">
                 @(totalCount == 0
-                    ? "Sin resultados"
-                    : $"Mostrando {PageStart}-{PageEnd} de {totalCount} movimientos")
+                    ? L("Sin resultados", "Sense resultats", "No results")
+                    : L($"Mostrando {PageStart}-{PageEnd} de {totalCount} movimientos", $"Mostrant {PageStart}-{PageEnd} de {totalCount} moviments", $"Showing {PageStart}-{PageEnd} of {totalCount} movements"))
             </span>
             <label class="field compact-field">
-                <span>Tamaño de página</span>
+                <span>@L("Tamaño de página", "Mida de pàgina", "Page size")</span>
                 <select class="sidebar-select compact-select" value="@filter.PageSize" @onchange="OnPageSizeChanged" disabled="@isLoading">
                     <option value="25">25</option>
                     <option value="50">50</option>
@@ -54,11 +55,11 @@ else
     @if (legacySyncInfo.IsActive)
     {
         <section class="panel" style="margin-top: 1rem;">
-            <p class="eyebrow">Sync legacy</p>
+            <p class="eyebrow">@L("Sync legacy", "Sync legacy", "Legacy sync")</p>
             <p class="muted">
-                El saldo actual manda desde TEX.NET y se replica en la SaaS local.
-                Esta pantalla sigue mostrando solo los movimientos web registrados en local; no es el histórico completo del legacy.
-                Última sync: @(legacySyncInfo.LastCompletedUtc?.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss") ?? "Sin fecha")
+                @L("El saldo actual manda desde TEX.NET y se replica en la SaaS local.", "El saldo actual mana des de TEX.NET i es replica a la SaaS local.", "Current stock is driven from TEX.NET and replicated into the local SaaS.")
+                @L("Esta pantalla sigue mostrando solo los movimientos web registrados en local; sirven como delta sobre el snapshot legacy y no tocan el remoto.", "Aquesta pantalla continua mostrant només els moviments web registrats en local; serveixen com a delta sobre l'snapshot legacy i no toquen el remot.", "This screen still shows only web movements stored locally; they work as a delta over the legacy snapshot and never touch the remote source.")
+                @L("Última sync:", "Última sync:", "Last sync:") @(legacySyncInfo.LastCompletedUtc?.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss") ?? L("Sin fecha", "Sense data", "No date"))
                 · Ins: @legacySyncInfo.LastInserted · Act: @legacySyncInfo.LastUpdated · Omi: @legacySyncInfo.LastSkipped · Err: @legacySyncInfo.LastErrors
             </p>
         </section>
@@ -72,15 +73,15 @@ else
     <div class="card-grid purchase-summary-grid">
         <section class="info-card">
             <h2>@totalCount</h2>
-            <p class="muted">movimientos</p>
+            <p class="muted">@L("movimientos", "moviments", "movements")</p>
         </section>
         <section class="info-card">
             <h2>@items.Select(item => item.Warehouse).Where(value => !string.IsNullOrWhiteSpace(value)).Distinct(StringComparer.OrdinalIgnoreCase).Count()</h2>
-            <p class="muted">almacenes en página</p>
+            <p class="muted">@L("almacenes en página", "magatzems en pàgina", "warehouses on page")</p>
         </section>
         <section class="info-card accent-card">
             <h2>@items.Sum(item => item.Quantity).ToString("0.###")</h2>
-            <p class="muted">cantidad movida en página</p>
+            <p class="muted">@L("cantidad movida en página", "quantitat moguda en pàgina", "quantity moved on page")</p>
         </section>
     </div>
 
@@ -89,21 +90,22 @@ else
         {
             <div class="loading-banner">
                 <span class="loading-indicator" aria-hidden="true"></span>
-                <span>Cargando movimientos de almacén...</span>
+                <span>@L("Cargando movimientos de almacén...", "Carregant moviments de magatzem...", "Loading warehouse movements...")</span>
             </div>
         }
 
         <table class="data-table">
             <thead>
                 <tr>
-                    <SortableHeader Label="Fecha" IsActive="@(sortColumn == nameof(StockMovementListItemDto.MovementDate))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(StockMovementListItemDto.MovementDate), true))" />
-                    <SortableHeader Label="Tipo" IsActive="@(sortColumn == nameof(StockMovementListItemDto.MovementType))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(StockMovementListItemDto.MovementType)))" />
-                    <SortableHeader Label="Almacén" IsActive="@(sortColumn == nameof(StockMovementListItemDto.Warehouse))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(StockMovementListItemDto.Warehouse)))" />
-                    <SortableHeader Label="Artículo" IsActive="@(sortColumn == nameof(StockMovementListItemDto.ItemCode))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(StockMovementListItemDto.ItemCode)))" />
-                    <SortableHeader Label="Descripción" IsActive="@(sortColumn == nameof(StockMovementListItemDto.ItemDescription))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(StockMovementListItemDto.ItemDescription)))" />
-                    <SortableHeader Label="Cantidad" IsActive="@(sortColumn == nameof(StockMovementListItemDto.Quantity))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(StockMovementListItemDto.Quantity), true))" />
-                    <SortableHeader Label="Proveedor" IsActive="@(sortColumn == nameof(StockMovementListItemDto.SupplierName))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(StockMovementListItemDto.SupplierName)))" />
-                    <SortableHeader Label="Documento" IsActive="@(sortColumn == nameof(StockMovementListItemDto.SourceDocumentDisplay))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(StockMovementListItemDto.SourceDocumentDisplay)))" />
+                    <SortableHeader Label="@L("Fecha", "Data", "Date")" IsActive="@(sortColumn == nameof(StockMovementListItemDto.MovementDate))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(StockMovementListItemDto.MovementDate), true))" />
+                    <SortableHeader Label="@L("Tipo", "Tipus", "Type")" IsActive="@(sortColumn == nameof(StockMovementListItemDto.MovementType))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(StockMovementListItemDto.MovementType)))" />
+                    <SortableHeader Label="@L("Almacén", "Magatzem", "Warehouse")" IsActive="@(sortColumn == nameof(StockMovementListItemDto.Warehouse))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(StockMovementListItemDto.Warehouse)))" />
+                    <SortableHeader Label="@L("Artículo", "Article", "Item")" IsActive="@(sortColumn == nameof(StockMovementListItemDto.ItemCode))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(StockMovementListItemDto.ItemCode)))" />
+                    <SortableHeader Label="@L("Descripción", "Descripció", "Description")" IsActive="@(sortColumn == nameof(StockMovementListItemDto.ItemDescription))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(StockMovementListItemDto.ItemDescription)))" />
+                    <SortableHeader Label="@L("Color", "Color", "Color")" IsActive="@(sortColumn == nameof(StockMovementListItemDto.Color))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(StockMovementListItemDto.Color)))" />
+                    <SortableHeader Label="@L("Cantidad", "Quantitat", "Quantity")" IsActive="@(sortColumn == nameof(StockMovementListItemDto.Quantity))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(StockMovementListItemDto.Quantity), true))" />
+                    <SortableHeader Label="@L("Proveedor", "Proveïdor", "Supplier")" IsActive="@(sortColumn == nameof(StockMovementListItemDto.SupplierName))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(StockMovementListItemDto.SupplierName)))" />
+                    <SortableHeader Label="@L("Documento", "Document", "Document")" IsActive="@(sortColumn == nameof(StockMovementListItemDto.SourceDocumentDisplay))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(StockMovementListItemDto.SourceDocumentDisplay)))" />
                 </tr>
             </thead>
             <tbody>
@@ -118,6 +120,7 @@ else
                             <td><span class="skeleton-line short"></span></td>
                             <td><span class="skeleton-line"></span></td>
                             <td><span class="skeleton-line short"></span></td>
+                            <td><span class="skeleton-line short"></span></td>
                             <td><span class="skeleton-line"></span></td>
                             <td><span class="skeleton-line short"></span></td>
                         </tr>
@@ -126,7 +129,7 @@ else
                 else if (items.Count == 0)
                 {
                     <tr>
-                        <td colspan="8" class="table-empty">Todavía no hay movimientos de almacén para mostrar.</td>
+                        <td colspan="9" class="table-empty">@L("Todavía no hay movimientos de almacén para mostrar.", "Encara no hi ha moviments de magatzem per mostrar.", "There are no warehouse movements to show yet.")</td>
                     </tr>
                 }
                 else
@@ -139,12 +142,22 @@ else
                             <td>@DisplayValue(item.Warehouse)</td>
                             <td>@DisplayValue(item.ItemCode)</td>
                             <td>@item.ItemDescription</td>
+                            <td>@DisplayValue(item.Color)</td>
                             <td>@item.Quantity.ToString("0.###") @item.UnitOfMeasure</td>
                             <td>@DisplayValue(item.SupplierName)</td>
                             <td>
                                 @if (string.Equals(item.SourceDocumentType, "PurchaseReceipt", StringComparison.OrdinalIgnoreCase) && item.SourceDocumentNumber.HasValue)
                                 {
                                     <a class="inline-link" href="/compras/recepciones/@item.SourceDocumentNumber.Value">@item.SourceDocumentDisplay</a>
+                                }
+                                else if ((string.Equals(item.SourceDocumentType, "StockTransferOutbound", StringComparison.OrdinalIgnoreCase) ||
+                                          string.Equals(item.SourceDocumentType, "StockTransferInbound", StringComparison.OrdinalIgnoreCase)) && item.SourceDocumentNumber.HasValue)
+                                {
+                                    <a class="inline-link" href="/almacen/traspasos/editar/@item.SourceDocumentNumber.Value">@item.SourceDocumentDisplay</a>
+                                }
+                                else if (string.Equals(item.SourceDocumentType, "StockCount", StringComparison.OrdinalIgnoreCase) && item.SourceDocumentNumber.HasValue)
+                                {
+                                    <a class="inline-link" href="/almacen/inventarios/editar/@item.SourceDocumentNumber.Value">@item.SourceDocumentDisplay</a>
                                 }
                                 else
                                 {
@@ -158,18 +171,44 @@ else
         </table>
 
         <div class="pagination-bar">
-            <span class="muted">Página @filter.Page de @TotalPages</span>
+            <span class="muted">@L($"Página {filter.Page} de {TotalPages}", $"Pàgina {filter.Page} de {TotalPages}", $"Page {filter.Page} of {TotalPages}")</span>
             <div class="pagination-actions">
-                <button class="secondary-button" @onclick="() => ChangePageAsync(1)" disabled="@(!CanGoPrevious || isLoading)">Primera</button>
-                <button class="secondary-button" @onclick="() => ChangePageAsync(filter.Page - 1)" disabled="@(!CanGoPrevious || isLoading)">Anterior</button>
-                <button class="secondary-button" @onclick="() => ChangePageAsync(filter.Page + 1)" disabled="@(!CanGoNext || isLoading)">Siguiente</button>
-                <button class="secondary-button" @onclick="() => ChangePageAsync(TotalPages)" disabled="@(!CanGoNext || isLoading)">Última</button>
+                <button class="secondary-button" @onclick="() => ChangePageAsync(1)" disabled="@(!CanGoPrevious || isLoading)">@L("Primera", "Primera", "First")</button>
+                <button class="secondary-button" @onclick="() => ChangePageAsync(filter.Page - 1)" disabled="@(!CanGoPrevious || isLoading)">@L("Anterior", "Anterior", "Previous")</button>
+                <button class="secondary-button" @onclick="() => ChangePageAsync(filter.Page + 1)" disabled="@(!CanGoNext || isLoading)">@L("Siguiente", "Següent", "Next")</button>
+                <button class="secondary-button" @onclick="() => ChangePageAsync(TotalPages)" disabled="@(!CanGoNext || isLoading)">@L("Última", "Última", "Last")</button>
             </div>
         </div>
     </section>
 }
 
 @code {
+    private string L(string spanish, string catalan, string english) =>
+        T.CurrentLanguage switch
+        {
+            AppLanguages.Catalan => catalan,
+            AppLanguages.English => english,
+            _ => spanish
+        };
+
+    [SupplyParameterFromQuery(Name = "search")]
+    public string? Search { get; set; }
+
+    [SupplyParameterFromQuery(Name = "warehouse")]
+    public string? Warehouse { get; set; }
+
+    [SupplyParameterFromQuery(Name = "page")]
+    public int? PageQuery { get; set; }
+
+    [SupplyParameterFromQuery(Name = "pageSize")]
+    public int? PageSizeQuery { get; set; }
+
+    [SupplyParameterFromQuery(Name = "sort")]
+    public string? SortQuery { get; set; }
+
+    [SupplyParameterFromQuery(Name = "desc")]
+    public bool? DescQuery { get; set; }
+
     private Guid? tenantId;
     private Guid? companyId;
     private bool isLoading;
@@ -186,12 +225,13 @@ else
     private int PageStart => totalCount == 0 ? 0 : ((filter.Page - 1) * filter.PageSize) + 1;
     private int PageEnd => totalCount == 0 ? 0 : Math.Min(filter.Page * filter.PageSize, totalCount);
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnParametersSetAsync()
     {
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         var user = authState.User;
         tenantId = user.GetTenantId();
         companyId = user.GetActiveCompanyId();
+        ApplyQueryState();
         await LoadAsync();
     }
 
@@ -233,7 +273,8 @@ else
     private async Task SearchAsync()
     {
         filter.Page = 1;
-        await LoadAsync();
+        UpdateQueryState();
+        await Task.CompletedTask;
     }
 
     private async Task SetSortAsync(string column, bool defaultDescending = false)
@@ -249,7 +290,8 @@ else
         }
 
         filter.Page = 1;
-        await LoadAsync();
+        UpdateQueryState();
+        await Task.CompletedTask;
     }
 
     private async Task ChangePageAsync(int page)
@@ -261,7 +303,8 @@ else
         }
 
         filter.Page = newPage;
-        await LoadAsync();
+        UpdateQueryState();
+        await Task.CompletedTask;
     }
 
     private async Task OnPageSizeChanged(ChangeEventArgs args)
@@ -273,17 +316,71 @@ else
 
         filter.PageSize = pageSize;
         filter.Page = 1;
-        await LoadAsync();
+        UpdateQueryState();
+        await Task.CompletedTask;
     }
 
-    private static string FormatMovementType(string movementType) => movementType switch
+    private void ApplyQueryState()
     {
-        StockMovementTypes.InboundPurchaseReceipt => "Entrada compra",
-        StockMovementTypes.InboundManualAdjustment => "Ajuste entrada",
-        StockMovementTypes.OutboundManualAdjustment => "Ajuste salida",
-        StockMovementTypes.OutboundSalesShipment => "Salida venta",
+        filter.Search = Search?.Trim() ?? string.Empty;
+        filter.Warehouse = Warehouse?.Trim() ?? string.Empty;
+        filter.Page = Math.Max(PageQuery.GetValueOrDefault(1), 1);
+        filter.PageSize = PageSizeQuery is 25 or 50 or 100 ? PageSizeQuery.Value : 25;
+        sortColumn = NormalizeSortColumn(SortQuery);
+        sortDescending = DescQuery ?? true;
+        filter.SortColumn = sortColumn;
+        filter.SortDescending = sortDescending;
+    }
+
+    private void UpdateQueryState()
+    {
+        var uri = NavigationManager.GetUriWithQueryParameters(new Dictionary<string, object?>
+        {
+            ["search"] = string.IsNullOrWhiteSpace(filter.Search) ? null : filter.Search,
+            ["warehouse"] = string.IsNullOrWhiteSpace(filter.Warehouse) ? null : filter.Warehouse,
+            ["page"] = filter.Page > 1 ? filter.Page : null,
+            ["pageSize"] = filter.PageSize != 25 ? filter.PageSize : null,
+            ["sort"] = string.Equals(sortColumn, nameof(StockMovementListItemDto.MovementDate), StringComparison.Ordinal) ? null : sortColumn,
+            ["desc"] = sortDescending ? null : false
+        });
+
+        NavigationManager.NavigateTo(uri, replace: true);
+    }
+
+    private static string NormalizeSortColumn(string? sortColumn) => sortColumn switch
+    {
+        nameof(StockMovementListItemDto.MovementDate) => nameof(StockMovementListItemDto.MovementDate),
+        nameof(StockMovementListItemDto.MovementType) => nameof(StockMovementListItemDto.MovementType),
+        nameof(StockMovementListItemDto.Warehouse) => nameof(StockMovementListItemDto.Warehouse),
+        nameof(StockMovementListItemDto.ItemCode) => nameof(StockMovementListItemDto.ItemCode),
+        nameof(StockMovementListItemDto.ItemDescription) => nameof(StockMovementListItemDto.ItemDescription),
+        nameof(StockMovementListItemDto.Color) => nameof(StockMovementListItemDto.Color),
+        nameof(StockMovementListItemDto.Quantity) => nameof(StockMovementListItemDto.Quantity),
+        nameof(StockMovementListItemDto.SupplierName) => nameof(StockMovementListItemDto.SupplierName),
+        nameof(StockMovementListItemDto.SourceDocumentDisplay) => nameof(StockMovementListItemDto.SourceDocumentDisplay),
+        _ => nameof(StockMovementListItemDto.MovementDate)
+    };
+
+    private string FormatMovementType(string movementType) => movementType switch
+    {
+        StockMovementTypes.InboundPurchaseReceipt => L("Entrada compra", "Entrada compra", "Purchase inbound"),
+        StockMovementTypes.InboundManualAdjustment => L("Ajuste entrada", "Ajust entrada", "Inbound adjustment"),
+        StockMovementTypes.OutboundManualAdjustment => L("Ajuste salida", "Ajust sortida", "Outbound adjustment"),
+        StockMovementTypes.OutboundSalesShipment => L("Salida venta", "Sortida venda", "Sales shipment"),
+        StockMovementTypes.OutboundTextileDispositionRaw => L("Disposición crudo salida", "Disposició cru sortida", "Disposition raw outbound"),
+        StockMovementTypes.InboundTextileDispositionRaw => L("Disposición crudo entrada", "Disposició cru entrada", "Disposition raw inbound"),
+        StockMovementTypes.OutboundTextileDispositionDisposed => L("Disposición dispuesto salida", "Disposició disposat sortida", "Disposition prepared outbound"),
+        StockMovementTypes.InboundTextileDispositionDisposed => L("Disposición dispuesto entrada", "Disposició disposat entrada", "Disposition prepared inbound"),
+        StockMovementTypes.OutboundTextileDispositionColor => L("Disposición color salida", "Disposició color sortida", "Disposition color outbound"),
+        StockMovementTypes.InboundTextileDispositionColor => L("Disposición color entrada", "Disposició color entrada", "Disposition color inbound"),
+        StockMovementTypes.FinishWorkOrderInProgress => L("Acabado en proceso", "Acabat en procés", "Finish in progress"),
+        StockMovementTypes.FinishWorkOrderFinished => L("Acabado terminado", "Acabat finalitzat", "Finish completed"),
+        StockMovementTypes.OutboundWarehouseTransfer => L("Traspaso salida", "Traspàs sortida", "Transfer outbound"),
+        StockMovementTypes.InboundWarehouseTransfer => L("Traspaso entrada", "Traspàs entrada", "Transfer inbound"),
+        StockMovementTypes.InboundInventoryCountAdjustment => L("Inventario entrada", "Inventari entrada", "Inventory inbound"),
+        StockMovementTypes.OutboundInventoryCountAdjustment => L("Inventario salida", "Inventari sortida", "Inventory outbound"),
         _ => movementType
     };
 
-    private static string DisplayValue(string value) => string.IsNullOrWhiteSpace(value) ? "Sin dato" : value;
+    private string DisplayValue(string value) => string.IsNullOrWhiteSpace(value) ? L("Sin dato", "Sense dada", "No data") : value;
 }

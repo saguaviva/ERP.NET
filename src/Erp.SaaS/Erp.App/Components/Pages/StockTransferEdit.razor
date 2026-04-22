@@ -1,0 +1,387 @@
+@page "/almacen/traspasos/nuevo"
+@page "/almacen/traspasos/editar/{TransferNumber:int}"
+@attribute [Authorize(Roles = "TenantAdmin,TenantReader")]
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
+@inject IStockQueries StockQueries
+@inject IStockService StockService
+
+<PageTitle>@(TransferNumber.HasValue ? $"Traspaso {TransferNumber}" : "Nuevo traspaso")</PageTitle>
+
+<div class="page-header">
+    <div>
+        <p class="eyebrow">Almacén</p>
+        <h1>@(TransferNumber.HasValue ? $"Traspaso {TransferNumber}" : "Nuevo traspaso")</h1>
+        <p class="lead">Movimiento interno entre almacenes con salida del origen y entrada automática en el destino al completar.</p>
+    </div>
+    <div class="quick-links">
+        <a class="secondary-button link-button" href="/almacen/traspasos">Volver al listado</a>
+        <a class="secondary-button link-button" href="/almacen/inventarios">Ver inventarios</a>
+        <a class="secondary-button link-button" href="/almacen/movimientos">Ver movimientos</a>
+    </div>
+</div>
+
+@if (!tenantId.HasValue || !companyId.HasValue)
+{
+    <div class="empty-state">
+        <p>No hay empresa activa seleccionada.</p>
+    </div>
+}
+else if (!canEdit && !TransferNumber.HasValue)
+{
+    <div class="empty-state">
+        <p>No tienes permisos para crear traspasos de almacén.</p>
+    </div>
+}
+else
+{
+    @if (!string.IsNullOrWhiteSpace(statusMessage))
+    {
+        <div class="alert @(isError ? "danger" : "success")">@statusMessage</div>
+    }
+
+    <section class="card-grid">
+        <article class="info-card">
+            <p class="eyebrow">Número</p>
+            <h2>@DisplayNumber</h2>
+            <p class="muted">Identificador interno del traspaso.</p>
+        </article>
+        <article class="info-card">
+            <p class="eyebrow">Estado</p>
+            <h2>@FormatStatus(model.Status)</h2>
+            <p class="muted">Borrador editable o completado con movimientos generados.</p>
+        </article>
+        <article class="info-card">
+            <p class="eyebrow">Líneas</p>
+            <h2>@model.Lines.Count</h2>
+            <p class="muted">Posiciones incluidas en el traslado.</p>
+        </article>
+        <article class="info-card accent-card">
+            <p class="eyebrow">Cantidad total</p>
+            <h2>@model.Lines.Sum(line => line.Quantity).ToString("0.###")</h2>
+            <p class="muted">Suma de cantidades de todas las líneas.</p>
+        </article>
+    </section>
+
+    <EditForm Model="model" OnValidSubmit="SaveAsync">
+        <fieldset disabled="@isReadOnly">
+            <div class="form-grid" style="margin-top: 1rem;">
+                <label class="field">
+                    <span>Fecha</span>
+                    <InputDate class="text-input" @bind-Value="model.TransferDate" />
+                </label>
+                <label class="field">
+                    <span>Estado</span>
+                    <InputSelect class="text-input" @bind-Value="model.Status">
+                        @foreach (var status in StockTransferStatuses.All)
+                        {
+                            <option value="@status">@FormatStatus(status)</option>
+                        }
+                    </InputSelect>
+                </label>
+                <label class="field">
+                    <span>Almacén origen</span>
+                    <InputText class="text-input" @bind-Value="model.FromWarehouse" />
+                </label>
+                <label class="field">
+                    <span>Almacén destino</span>
+                    <InputText class="text-input" @bind-Value="model.ToWarehouse" />
+                </label>
+                <label class="field wide">
+                    <span>Notas</span>
+                    <InputTextArea class="text-area" @bind-Value="model.Notes" />
+                </label>
+            </div>
+
+            <section class="panel detail-panel" style="margin-top: 1rem;">
+                <div class="detail-panel-header">
+                    <div>
+                        <h2>Líneas del traspaso</h2>
+                        <p class="muted">Artículo, color, cantidad y unidad a mover entre almacenes.</p>
+                    </div>
+                    @if (!isReadOnly)
+                    {
+                        <button class="secondary-button" type="button" @onclick="AddLine">Añadir línea</button>
+                    }
+                </div>
+
+                <div class="table-scroll">
+                    <table class="data-table detail-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Artículo</th>
+                                <th>Descripción</th>
+                                <th>Color</th>
+                                <th>Cantidad</th>
+                                <th>Unidad</th>
+                                <th>Notas</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (model.Lines.Count == 0)
+                            {
+                                <tr>
+                                    <td colspan="8" class="muted">No hay líneas cargadas todavía.</td>
+                                </tr>
+                            }
+                            else
+                            {
+                                @foreach (var line in model.Lines.OrderBy(item => item.LineNumber))
+                                {
+                                    <tr @key="line.LineNumber">
+                                        <td>@line.LineNumber</td>
+                                        <td><InputText class="text-input table-input" @bind-Value="line.ItemCode" /></td>
+                                        <td><InputText class="text-input table-input" @bind-Value="line.ItemDescription" /></td>
+                                        <td><InputText class="text-input table-input" @bind-Value="line.Color" /></td>
+                                        <td><InputNumber class="text-input table-input" @bind-Value="line.Quantity" /></td>
+                                        <td><InputText class="text-input table-input" @bind-Value="line.UnitOfMeasure" /></td>
+                                        <td><InputText class="text-input table-input" @bind-Value="line.Notes" /></td>
+                                        <td>
+                                            <div class="table-actions">
+                                                @if (!string.IsNullOrWhiteSpace(line.ItemDescription))
+                                                {
+                                                    <a class="inline-link" href="@BuildMovementsUrl(line, model.FromWarehouse)">Movs. origen</a>
+                                                    <a class="inline-link" href="@BuildMovementsUrl(line, model.ToWarehouse)">Movs. destino</a>
+                                                }
+                                                @if (!isReadOnly)
+                                                {
+                                                    <button class="secondary-button danger-button" type="button" @onclick="() => RemoveLine(line.LineNumber)">Quitar</button>
+                                                }
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            @if (canEdit)
+            {
+                <div class="quick-links" style="margin-top: 1rem;">
+                    <button class="primary-button" type="submit">Guardar</button>
+                    @if (TransferNumber.HasValue && !isReadOnly)
+                    {
+                        <button class="secondary-button danger-button" type="button" @onclick="DeleteAsync">Eliminar</button>
+                    }
+                </div>
+            }
+        </fieldset>
+    </EditForm>
+}
+
+@code {
+    [Parameter]
+    public int? TransferNumber { get; set; }
+
+    [SupplyParameterFromQuery]
+    public string? FromWarehouse { get; set; }
+
+    [SupplyParameterFromQuery]
+    public string? ItemCode { get; set; }
+
+    [SupplyParameterFromQuery]
+    public string? Description { get; set; }
+
+    [SupplyParameterFromQuery]
+    public string? Unit { get; set; }
+
+    [SupplyParameterFromQuery]
+    public decimal? Quantity { get; set; }
+
+    private Guid? tenantId;
+    private Guid? companyId;
+    private bool canEdit;
+    private bool isReadOnly;
+    private bool isError;
+    private string statusMessage = string.Empty;
+    private StockTransferDetailDto model = new()
+    {
+        Status = StockTransferStatuses.Draft,
+        TransferDate = DateTime.Today
+    };
+
+    private string DisplayNumber => TransferNumber?.ToString() ?? "Nuevo";
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        tenantId = user.GetTenantId();
+        companyId = user.GetActiveCompanyId();
+        canEdit = user.IsPlatformAdmin() || user.IsInRole(PlatformRoles.TenantAdmin);
+
+        if (!tenantId.HasValue || !companyId.HasValue)
+        {
+            return;
+        }
+
+        if (TransferNumber.HasValue)
+        {
+            var detail = await StockQueries.GetTransferByNumberAsync(tenantId.Value, companyId.Value, TransferNumber.Value);
+            if (detail is null)
+            {
+                statusMessage = "No se ha encontrado el traspaso solicitado.";
+                isError = true;
+                model = new StockTransferDetailDto();
+                isReadOnly = true;
+                return;
+            }
+
+            model = detail;
+        }
+        else if (model.Lines.Count == 0)
+        {
+            model = new StockTransferDetailDto
+            {
+                Status = StockTransferStatuses.Draft,
+                TransferDate = DateTime.Today,
+                Lines =
+                [
+                    new StockTransferLineDto { LineNumber = 1, UnitOfMeasure = "kg" }
+                ]
+            };
+        }
+
+        if (!TransferNumber.HasValue && model.Lines.Count > 0)
+        {
+            model.FromWarehouse = FromWarehouse?.Trim() ?? model.FromWarehouse;
+            model.Lines[0].ItemCode = ItemCode?.Trim() ?? model.Lines[0].ItemCode;
+            model.Lines[0].ItemDescription = Description?.Trim() ?? model.Lines[0].ItemDescription;
+            model.Lines[0].UnitOfMeasure = Unit?.Trim() ?? model.Lines[0].UnitOfMeasure;
+            model.Lines[0].Quantity = Quantity ?? model.Lines[0].Quantity;
+        }
+
+        isReadOnly = !canEdit ||
+            string.Equals(model.Status, StockTransferStatuses.Completed, StringComparison.OrdinalIgnoreCase) ||
+            string.Equals(model.Status, StockTransferStatuses.Cancelled, StringComparison.OrdinalIgnoreCase);
+    }
+
+    private async Task SaveAsync()
+    {
+        if (!tenantId.HasValue || !companyId.HasValue || !canEdit)
+        {
+            return;
+        }
+
+        try
+        {
+            statusMessage = string.Empty;
+            isError = false;
+
+            var transferNumber = await StockService.SaveTransferAsync(new SaveStockTransferCommand
+            {
+                TenantId = tenantId.Value,
+                CompanyId = companyId.Value,
+                TransferNumber = TransferNumber,
+                TransferDate = model.TransferDate,
+                Status = model.Status,
+                FromWarehouse = model.FromWarehouse,
+                ToWarehouse = model.ToWarehouse,
+                Notes = model.Notes,
+                Lines = model.Lines
+                    .OrderBy(line => line.LineNumber)
+                    .Select(line => new StockTransferLineDto
+                    {
+                        LineNumber = line.LineNumber,
+                        ItemCode = line.ItemCode,
+                        ItemDescription = line.ItemDescription,
+                        Color = line.Color,
+                        Quantity = line.Quantity,
+                        UnitOfMeasure = line.UnitOfMeasure,
+                        Notes = line.Notes
+                    })
+                    .ToList()
+            });
+
+            if (!TransferNumber.HasValue)
+            {
+                NavigationManager.NavigateTo($"/almacen/traspasos/editar/{transferNumber}", false);
+                return;
+            }
+
+            statusMessage = "Traspaso guardado correctamente.";
+            var detail = await StockQueries.GetTransferByNumberAsync(tenantId.Value, companyId.Value, transferNumber);
+            if (detail is not null)
+            {
+                model = detail;
+                isReadOnly = string.Equals(model.Status, StockTransferStatuses.Completed, StringComparison.OrdinalIgnoreCase) ||
+                             string.Equals(model.Status, StockTransferStatuses.Cancelled, StringComparison.OrdinalIgnoreCase);
+            }
+        }
+        catch (Exception exception)
+        {
+            statusMessage = exception.Message;
+            isError = true;
+        }
+    }
+
+    private async Task DeleteAsync()
+    {
+        if (!tenantId.HasValue || !companyId.HasValue || !TransferNumber.HasValue || !canEdit)
+        {
+            return;
+        }
+
+        try
+        {
+            await StockService.DeleteTransferAsync(tenantId.Value, companyId.Value, TransferNumber.Value);
+            NavigationManager.NavigateTo("/almacen/traspasos", false);
+        }
+        catch (Exception exception)
+        {
+            statusMessage = exception.Message;
+            isError = true;
+        }
+    }
+
+    private void AddLine()
+    {
+        var nextNumber = model.Lines.Count == 0 ? 1 : model.Lines.Max(line => line.LineNumber) + 1;
+        model.Lines.Add(new StockTransferLineDto
+        {
+            LineNumber = nextNumber,
+            UnitOfMeasure = "kg"
+        });
+    }
+
+    private void RemoveLine(int lineNumber)
+    {
+        var line = model.Lines.FirstOrDefault(item => item.LineNumber == lineNumber);
+        if (line is null)
+        {
+            return;
+        }
+
+        model.Lines.Remove(line);
+        var ordered = model.Lines.OrderBy(item => item.LineNumber).ToList();
+        for (var index = 0; index < ordered.Count; index++)
+        {
+            ordered[index].LineNumber = index + 1;
+        }
+    }
+
+    private string BuildMovementsUrl(StockTransferLineDto line, string warehouse)
+    {
+        var search = string.IsNullOrWhiteSpace(line.Color)
+            ? $"{line.ItemCode} {line.ItemDescription}".Trim()
+            : $"{line.ItemCode} {line.Color}".Trim();
+
+        return NavigationManager.GetUriWithQueryParameters("/almacen/movimientos", new Dictionary<string, object?>
+        {
+            ["search"] = string.IsNullOrWhiteSpace(search) ? null : search,
+            ["warehouse"] = string.IsNullOrWhiteSpace(warehouse) ? null : warehouse
+        });
+    }
+
+    private static string FormatStatus(string status) => status switch
+    {
+        StockTransferStatuses.Draft => "Borrador",
+        StockTransferStatuses.Completed => "Completado",
+        StockTransferStatuses.Cancelled => "Anulado",
+        _ => status
+    };
+}

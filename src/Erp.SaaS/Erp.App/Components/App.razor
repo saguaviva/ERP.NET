@@ -1,10 +1,29 @@
+@using System.Globalization
+
 <!DOCTYPE html>
-<html lang="es">
+<html lang="@CultureInfo.CurrentUICulture.TwoLetterISOLanguageName">
 
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <base href="/" />
+    <script>
+        (() => {
+            try {
+                const theme = localStorage.getItem("erp-theme");
+                const resolved = theme === "blue-modern" || theme === "compact" || theme === "ultra-compact" || theme === "current"
+                    ? theme
+                    : "current";
+                document.documentElement.setAttribute("data-theme", resolved);
+
+                const sidebarHidden = localStorage.getItem("erp-sidebar-hidden") === "true";
+                document.documentElement.setAttribute("data-sidebar-hidden", sidebarHidden ? "true" : "false");
+            } catch {
+                document.documentElement.setAttribute("data-theme", "current");
+                document.documentElement.setAttribute("data-sidebar-hidden", "false");
+            }
+        })();
+    </script>
     <ResourcePreloader />
     <link rel="stylesheet" href="@Assets["app.css"]" />
     <link rel="stylesheet" href="@Assets["Erp.App.styles.css"]" />
@@ -16,6 +35,7 @@
 <body>
     <Routes @rendermode="InteractiveServer" />
     <ReconnectModal />
+    <script src="@Assets["theme.js"]"></script>
     <script src="@Assets["_framework/blazor.web.js"]"></script>
 </body>
 

@@ -115,7 +115,7 @@ else
             <article class="info-card">
                 <p class="eyebrow">CRM / Clientes</p>
                 <h2>Sync legacy</h2>
-                <p class="muted">Replica clients y adres desde TEX.NET hacia la SaaS local. Mientras esta sync mande, el CRM web queda en solo lectura para esa company.</p>
+                <p class="muted">Replica clients y adres desde TEX.NET hacia la SaaS local. La sync manual refresca solo registros con origen legacy y deja intactos los cambios locales.</p>
                 <label class="field">
                     <span>Company</span>
                     <InputSelect class="text-input" @bind-Value="selectedCrmClientsSyncCompanyId">
@@ -144,7 +144,7 @@ else
             <article class="info-card">
                 <p class="eyebrow">CRM / Representantes</p>
                 <h2>Sync legacy</h2>
-                <p class="muted">Replica representantes desde TEX.NET hacia la SaaS local. Mientras esta sync mande, la ficha web queda en solo lectura para esa company.</p>
+                <p class="muted">Replica representantes desde TEX.NET hacia la SaaS local. La sync manual refresca solo registros con origen legacy y deja intactos los cambios locales.</p>
                 <label class="field">
                     <span>Company</span>
                     <InputSelect class="text-input" @bind-Value="selectedCrmRepresentativesSyncCompanyId">
@@ -173,7 +173,7 @@ else
             <article class="info-card">
                 <p class="eyebrow">CRM / Transportistas</p>
                 <h2>Sync legacy</h2>
-                <p class="muted">Replica transportistas desde TEX.NET hacia la SaaS local. Mientras esta sync mande, la ficha web queda en solo lectura para esa company.</p>
+                <p class="muted">Replica transportistas desde TEX.NET hacia la SaaS local. La sync manual refresca solo registros con origen legacy y deja intactos los cambios locales.</p>
                 <label class="field">
                     <span>Company</span>
                     <InputSelect class="text-input" @bind-Value="selectedCrmCarriersSyncCompanyId">
@@ -202,7 +202,7 @@ else
             <article class="info-card">
                 <p class="eyebrow">CRM / Talleres</p>
                 <h2>Sync legacy</h2>
-                <p class="muted">Replica talleres desde TEX.NET hacia la SaaS local. Mientras esta sync mande, la ficha web queda en solo lectura para esa company.</p>
+                <p class="muted">Replica talleres desde TEX.NET hacia la SaaS local. La sync manual refresca solo registros con origen legacy y deja intactos los cambios locales.</p>
                 <label class="field">
                     <span>Company</span>
                     <InputSelect class="text-input" @bind-Value="selectedCrmWorkshopsSyncCompanyId">
@@ -231,7 +231,7 @@ else
             <article class="info-card">
                 <p class="eyebrow">ARTÍCULOS / Fornituras</p>
                 <h2>Sync legacy</h2>
-                <p class="muted">Replica fornituras desde TEX.NET hacia la SaaS local. Mientras esta sync mande, la ficha web queda en solo lectura para esa company.</p>
+                <p class="muted">Replica fornituras desde TEX.NET hacia la SaaS local. La sync manual refresca solo registros con origen legacy y deja intactos los cambios locales.</p>
                 <label class="field">
                     <span>Company</span>
                     <InputSelect class="text-input" @bind-Value="selectedArticleForniturasSyncCompanyId">
@@ -258,9 +258,357 @@ else
                 </div>
             </article>
             <article class="info-card">
+                <p class="eyebrow">ARTÍCULOS / Hilos</p>
+                <h2>Sync legacy</h2>
+                <p class="muted">Replica hilos desde TEX.NET hacia la SaaS local. La sync manual refresca solo registros con origen legacy y deja intactos los cambios locales.</p>
+                <label class="field">
+                    <span>Company</span>
+                    <InputSelect class="text-input" @bind-Value="selectedArticleHilosSyncCompanyId">
+                        <option value="">Todas las companies del tenant</option>
+                        @foreach (var company in companies)
+                        {
+                            <option value="@company.Id.ToString()">@company.Name (@company.LegacyCenterCode)</option>
+                        }
+                    </InputSelect>
+                </label>
+                <button class="primary-button" type="button" @onclick="RunArticleHilosSyncAsync" disabled="@isRunningArticleHilosSync">
+                    @(isRunningArticleHilosSync ? "Sincronizando hilos..." : "Sincronizar artículos / hilos")
+                </button>
+                <div class="list-block" style="margin-top: 1rem;">
+                    @foreach (var status in articleHilosSyncStatuses)
+                    {
+                        <article class="list-item">
+                            <strong>@status.CompanyName (@status.CompanyLegacyCenterCode)</strong>
+                            <span>@(string.IsNullOrWhiteSpace(status.LastStatus) ? "Sin sincronizar" : status.LastStatus)</span>
+                            <span>@(status.LastCompletedUtc?.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss") ?? "Nunca")</span>
+                            <span>Ins: @status.LastInserted · Act: @status.LastUpdated · Omi: @status.LastSkipped · Err: @status.LastErrors</span>
+                        </article>
+                    }
+                </div>
+            </article>
+            <article class="info-card">
+                <p class="eyebrow">ARTÍCULOS / Tejidos</p>
+                <h2>Sync legacy</h2>
+                <p class="muted">Replica tejidos desde TEX.NET hacia la SaaS local. La sync manual refresca solo registros con origen legacy y deja intactos los cambios locales.</p>
+                <label class="field">
+                    <span>Company</span>
+                    <InputSelect class="text-input" @bind-Value="selectedArticleTejidosSyncCompanyId">
+                        <option value="">Todas las companies del tenant</option>
+                        @foreach (var company in companies)
+                        {
+                            <option value="@company.Id.ToString()">@company.Name (@company.LegacyCenterCode)</option>
+                        }
+                    </InputSelect>
+                </label>
+                <button class="primary-button" type="button" @onclick="RunArticleTejidosSyncAsync" disabled="@isRunningArticleTejidosSync">
+                    @(isRunningArticleTejidosSync ? "Sincronizando tejidos..." : "Sincronizar artículos / tejidos")
+                </button>
+                <div class="list-block" style="margin-top: 1rem;">
+                    @foreach (var status in articleTejidosSyncStatuses)
+                    {
+                        <article class="list-item">
+                            <strong>@status.CompanyName (@status.CompanyLegacyCenterCode)</strong>
+                            <span>@(string.IsNullOrWhiteSpace(status.LastStatus) ? "Sin sincronizar" : status.LastStatus)</span>
+                            <span>@(status.LastCompletedUtc?.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss") ?? "Nunca")</span>
+                            <span>Ins: @status.LastInserted · Act: @status.LastUpdated · Omi: @status.LastSkipped · Err: @status.LastErrors</span>
+                        </article>
+                    }
+                </div>
+            </article>
+            <article class="info-card">
+                <p class="eyebrow">ARTÍCULOS / Muestras</p>
+                <h2>Sync legacy</h2>
+                <p class="muted">Replica muestras desde TEX.NET hacia la SaaS local. La sync manual refresca solo registros con origen legacy y deja intactos los cambios locales.</p>
+                <label class="field">
+                    <span>Company</span>
+                    <InputSelect class="text-input" @bind-Value="selectedArticleMuestrasSyncCompanyId">
+                        <option value="">Todas las companies del tenant</option>
+                        @foreach (var company in companies)
+                        {
+                            <option value="@company.Id.ToString()">@company.Name (@company.LegacyCenterCode)</option>
+                        }
+                    </InputSelect>
+                </label>
+                <button class="primary-button" type="button" @onclick="RunArticleMuestrasSyncAsync" disabled="@isRunningArticleMuestrasSync">
+                    @(isRunningArticleMuestrasSync ? "Sincronizando muestras..." : "Sincronizar artículos / muestras")
+                </button>
+                <div class="list-block" style="margin-top: 1rem;">
+                    @foreach (var status in articleMuestrasSyncStatuses)
+                    {
+                        <article class="list-item">
+                            <strong>@status.CompanyName (@status.CompanyLegacyCenterCode)</strong>
+                            <span>@(string.IsNullOrWhiteSpace(status.LastStatus) ? "Sin sincronizar" : status.LastStatus)</span>
+                            <span>@(status.LastCompletedUtc?.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss") ?? "Nunca")</span>
+                            <span>Ins: @status.LastInserted · Act: @status.LastUpdated · Omi: @status.LastSkipped · Err: @status.LastErrors</span>
+                        </article>
+                    }
+                </div>
+            </article>
+            <article class="info-card">
+                <p class="eyebrow">ARTÍCULOS / Models</p>
+                <h2>Sync legacy</h2>
+                <p class="muted">Replica models desde TEX.NET hacia la SaaS local. La sync manual refresca solo registros con origen legacy y deja intactos los cambios locales.</p>
+                <label class="field">
+                    <span>Company</span>
+                    <InputSelect class="text-input" @bind-Value="selectedArticleModelsSyncCompanyId">
+                        <option value="">Todas las companies del tenant</option>
+                        @foreach (var company in companies)
+                        {
+                            <option value="@company.Id.ToString()">@company.Name (@company.LegacyCenterCode)</option>
+                        }
+                    </InputSelect>
+                </label>
+                <button class="primary-button" type="button" @onclick="RunArticleModelsSyncAsync" disabled="@isRunningArticleModelsSync">
+                    @(isRunningArticleModelsSync ? "Sincronizando models..." : "Sincronizar artículos / models")
+                </button>
+                <div class="list-block" style="margin-top: 1rem;">
+                    @foreach (var status in articleModelsSyncStatuses)
+                    {
+                        <article class="list-item">
+                            <strong>@status.CompanyName (@status.CompanyLegacyCenterCode)</strong>
+                            <span>@(string.IsNullOrWhiteSpace(status.LastStatus) ? "Sin sincronizar" : status.LastStatus)</span>
+                            <span>@(status.LastCompletedUtc?.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss") ?? "Nunca")</span>
+                            <span>Ins: @status.LastInserted · Act: @status.LastUpdated · Omi: @status.LastSkipped · Err: @status.LastErrors</span>
+                        </article>
+                    }
+                </div>
+            </article>
+            <article class="info-card">
+                <p class="eyebrow">ARTÍCULOS / Disposiciones</p>
+                <h2>Sync legacy</h2>
+                <p class="muted">Replica disposiciones desde TEX.NET hacia la SaaS local. La sync manual refresca solo registros con origen legacy y deja intactos los cambios locales.</p>
+                <label class="field">
+                    <span>Company</span>
+                    <InputSelect class="text-input" @bind-Value="selectedArticleDispositionsSyncCompanyId">
+                        <option value="">Todas las companies del tenant</option>
+                        @foreach (var company in companies)
+                        {
+                            <option value="@company.Id.ToString()">@company.Name (@company.LegacyCenterCode)</option>
+                        }
+                    </InputSelect>
+                </label>
+                <button class="primary-button" type="button" @onclick="RunArticleDispositionsSyncAsync" disabled="@isRunningArticleDispositionsSync">
+                    @(isRunningArticleDispositionsSync ? "Sincronizando disposiciones..." : "Sincronizar artículos / disposiciones")
+                </button>
+                <div class="list-block" style="margin-top: 1rem;">
+                    @foreach (var status in articleDispositionsSyncStatuses)
+                    {
+                        <article class="list-item">
+                            <strong>@status.CompanyName (@status.CompanyLegacyCenterCode)</strong>
+                            <span>@(string.IsNullOrWhiteSpace(status.LastStatus) ? "Sin sincronizar" : status.LastStatus)</span>
+                            <span>@(status.LastCompletedUtc?.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss") ?? "Nunca")</span>
+                            <span>Ins: @status.LastInserted · Act: @status.LastUpdated · Omi: @status.LastSkipped · Err: @status.LastErrors</span>
+                        </article>
+                    }
+                </div>
+            </article>
+            <article class="info-card">
+                <p class="eyebrow">BASE DE DATOS / Bancs · Caixes</p>
+                <h2>Sync legacy</h2>
+                <p class="muted">Replica bancos y cajas desde TEX.NET hacia la SaaS local. La sync manual refresca solo registros con origen legacy y deja intactos los cambios locales.</p>
+                <label class="field">
+                    <span>Company</span>
+                    <InputSelect class="text-input" @bind-Value="selectedBaseBanksCashboxesSyncCompanyId">
+                        <option value="">Todas las companies del tenant</option>
+                        @foreach (var company in companies)
+                        {
+                            <option value="@company.Id.ToString()">@company.Name (@company.LegacyCenterCode)</option>
+                        }
+                    </InputSelect>
+                </label>
+                <button class="primary-button" type="button" @onclick="RunBaseBanksCashboxesSyncAsync" disabled="@isRunningBaseBanksCashboxesSync">
+                    @(isRunningBaseBanksCashboxesSync ? "Sincronizando bancos..." : "Sincronizar base de datos / bancos · cajas")
+                </button>
+                <div class="list-block" style="margin-top: 1rem;">
+                    @foreach (var status in baseBanksCashboxesSyncStatuses)
+                    {
+                        <article class="list-item">
+                            <strong>@status.CompanyName (@status.CompanyLegacyCenterCode)</strong>
+                            <span>@(string.IsNullOrWhiteSpace(status.LastStatus) ? "Sin sincronizar" : status.LastStatus)</span>
+                            <span>@(status.LastCompletedUtc?.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss") ?? "Nunca")</span>
+                            <span>Ins: @status.LastInserted · Act: @status.LastUpdated · Omi: @status.LastSkipped · Err: @status.LastErrors</span>
+                        </article>
+                    }
+                </div>
+            </article>
+            <article class="info-card">
+                <p class="eyebrow">BASE DE DATOS / Formes de pagament</p>
+                <h2>Sync legacy</h2>
+                <p class="muted">Replica formas de pago desde TEX.NET hacia la SaaS local. La sync manual refresca solo registros con origen legacy y deja intactos los cambios locales.</p>
+                <label class="field">
+                    <span>Company</span>
+                    <InputSelect class="text-input" @bind-Value="selectedBasePaymentMethodsSyncCompanyId">
+                        <option value="">Todas las companies del tenant</option>
+                        @foreach (var company in companies)
+                        {
+                            <option value="@company.Id.ToString()">@company.Name (@company.LegacyCenterCode)</option>
+                        }
+                    </InputSelect>
+                </label>
+                <button class="primary-button" type="button" @onclick="RunBasePaymentMethodsSyncAsync" disabled="@isRunningBasePaymentMethodsSync">
+                    @(isRunningBasePaymentMethodsSync ? "Sincronizando formas de pago..." : "Sincronizar base de datos / formas de pago")
+                </button>
+                <div class="list-block" style="margin-top: 1rem;">
+                    @foreach (var status in basePaymentMethodsSyncStatuses)
+                    {
+                        <article class="list-item">
+                            <strong>@status.CompanyName (@status.CompanyLegacyCenterCode)</strong>
+                            <span>@(string.IsNullOrWhiteSpace(status.LastStatus) ? "Sin sincronizar" : status.LastStatus)</span>
+                            <span>@(status.LastCompletedUtc?.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss") ?? "Nunca")</span>
+                            <span>Ins: @status.LastInserted · Act: @status.LastUpdated · Omi: @status.LastSkipped · Err: @status.LastErrors</span>
+                        </article>
+                    }
+                </div>
+            </article>
+            <article class="info-card">
+                <p class="eyebrow">BASE DE DATOS / Operacions</p>
+                <h2>Sync legacy</h2>
+                <p class="muted">Replica operaciones desde TEX.NET hacia la SaaS local. La sync manual refresca solo registros con origen legacy y deja intactos los cambios locales.</p>
+                <label class="field">
+                    <span>Company</span>
+                    <InputSelect class="text-input" @bind-Value="selectedBaseOperationsSyncCompanyId">
+                        <option value="">Todas las companies del tenant</option>
+                        @foreach (var company in companies)
+                        {
+                            <option value="@company.Id.ToString()">@company.Name (@company.LegacyCenterCode)</option>
+                        }
+                    </InputSelect>
+                </label>
+                <button class="primary-button" type="button" @onclick="RunBaseOperationsSyncAsync" disabled="@isRunningBaseOperationsSync">
+                    @(isRunningBaseOperationsSync ? "Sincronizando operaciones..." : "Sincronizar base de datos / operacions")
+                </button>
+                <div class="list-block" style="margin-top: 1rem;">
+                    @foreach (var status in baseOperationsSyncStatuses)
+                    {
+                        <article class="list-item">
+                            <strong>@status.CompanyName (@status.CompanyLegacyCenterCode)</strong>
+                            <span>@(string.IsNullOrWhiteSpace(status.LastStatus) ? "Sin sincronizar" : status.LastStatus)</span>
+                            <span>@(status.LastCompletedUtc?.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss") ?? "Nunca")</span>
+                            <span>Ins: @status.LastInserted · Act: @status.LastUpdated · Omi: @status.LastSkipped · Err: @status.LastErrors</span>
+                        </article>
+                    }
+                </div>
+            </article>
+            <article class="info-card">
+                <p class="eyebrow">BASE DE DATOS / Màquines</p>
+                <h2>Sync legacy</h2>
+                <p class="muted">Replica máquinas desde TEX.NET hacia la SaaS local. La sync manual refresca solo registros con origen legacy y deja intactos los cambios locales.</p>
+                <label class="field">
+                    <span>Company</span>
+                    <InputSelect class="text-input" @bind-Value="selectedBaseMachinesSyncCompanyId">
+                        <option value="">Todas las companies del tenant</option>
+                        @foreach (var company in companies)
+                        {
+                            <option value="@company.Id.ToString()">@company.Name (@company.LegacyCenterCode)</option>
+                        }
+                    </InputSelect>
+                </label>
+                <button class="primary-button" type="button" @onclick="RunBaseMachinesSyncAsync" disabled="@isRunningBaseMachinesSync">
+                    @(isRunningBaseMachinesSync ? "Sincronizando máquinas..." : "Sincronizar base de datos / máquinas")
+                </button>
+                <div class="list-block" style="margin-top: 1rem;">
+                    @foreach (var status in baseMachinesSyncStatuses)
+                    {
+                        <article class="list-item">
+                            <strong>@status.CompanyName (@status.CompanyLegacyCenterCode)</strong>
+                            <span>@(string.IsNullOrWhiteSpace(status.LastStatus) ? "Sin sincronizar" : status.LastStatus)</span>
+                            <span>@(status.LastCompletedUtc?.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss") ?? "Nunca")</span>
+                            <span>Ins: @status.LastInserted · Act: @status.LastUpdated · Omi: @status.LastSkipped · Err: @status.LastErrors</span>
+                        </article>
+                    }
+                </div>
+            </article>
+            <article class="info-card">
+                <p class="eyebrow">BASE DE DATOS / Temporades</p>
+                <h2>Sync legacy</h2>
+                <p class="muted">Replica temporadas desde TEX.NET hacia la SaaS local. La sync manual refresca solo registros con origen legacy y deja intactos los cambios locales.</p>
+                <label class="field">
+                    <span>Company</span>
+                    <InputSelect class="text-input" @bind-Value="selectedBaseSeasonsSyncCompanyId">
+                        <option value="">Todas las companies del tenant</option>
+                        @foreach (var company in companies)
+                        {
+                            <option value="@company.Id.ToString()">@company.Name (@company.LegacyCenterCode)</option>
+                        }
+                    </InputSelect>
+                </label>
+                <button class="primary-button" type="button" @onclick="RunBaseSeasonsSyncAsync" disabled="@isRunningBaseSeasonsSync">
+                    @(isRunningBaseSeasonsSync ? "Sincronizando temporadas..." : "Sincronizar base de datos / temporadas")
+                </button>
+                <div class="list-block" style="margin-top: 1rem;">
+                    @foreach (var status in baseSeasonsSyncStatuses)
+                    {
+                        <article class="list-item">
+                            <strong>@status.CompanyName (@status.CompanyLegacyCenterCode)</strong>
+                            <span>@(string.IsNullOrWhiteSpace(status.LastStatus) ? "Sin sincronizar" : status.LastStatus)</span>
+                            <span>@(status.LastCompletedUtc?.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss") ?? "Nunca")</span>
+                            <span>Ins: @status.LastInserted · Act: @status.LastUpdated · Omi: @status.LastSkipped · Err: @status.LastErrors</span>
+                        </article>
+                    }
+                </div>
+            </article>
+            <article class="info-card">
+                <p class="eyebrow">BASE DE DATOS / Tipus d'IVA</p>
+                <h2>Sync legacy</h2>
+                <p class="muted">Replica tipos de IVA desde TEX.NET hacia la SaaS local. La sync manual refresca solo registros con origen legacy y deja intactos los cambios locales.</p>
+                <label class="field">
+                    <span>Company</span>
+                    <InputSelect class="text-input" @bind-Value="selectedBaseVatTypesSyncCompanyId">
+                        <option value="">Todas las companies del tenant</option>
+                        @foreach (var company in companies)
+                        {
+                            <option value="@company.Id.ToString()">@company.Name (@company.LegacyCenterCode)</option>
+                        }
+                    </InputSelect>
+                </label>
+                <button class="primary-button" type="button" @onclick="RunBaseVatTypesSyncAsync" disabled="@isRunningBaseVatTypesSync">
+                    @(isRunningBaseVatTypesSync ? "Sincronizando tipos de IVA..." : "Sincronizar base de datos / tipos de IVA")
+                </button>
+                <div class="list-block" style="margin-top: 1rem;">
+                    @foreach (var status in baseVatTypesSyncStatuses)
+                    {
+                        <article class="list-item">
+                            <strong>@status.CompanyName (@status.CompanyLegacyCenterCode)</strong>
+                            <span>@(string.IsNullOrWhiteSpace(status.LastStatus) ? "Sin sincronizar" : status.LastStatus)</span>
+                            <span>@(status.LastCompletedUtc?.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss") ?? "Nunca")</span>
+                            <span>Ins: @status.LastInserted · Act: @status.LastUpdated · Omi: @status.LastSkipped · Err: @status.LastErrors</span>
+                        </article>
+                    }
+                </div>
+            </article>
+            <article class="info-card">
+                <p class="eyebrow">BASE DE DATOS / Incoterms</p>
+                <h2>Sync legacy</h2>
+                <p class="muted">Replica incoterms desde TEX.NET hacia la SaaS local. La sync manual refresca solo registros con origen legacy y deja intactos los cambios locales.</p>
+                <label class="field">
+                    <span>Company</span>
+                    <InputSelect class="text-input" @bind-Value="selectedBaseIncotermsSyncCompanyId">
+                        <option value="">Todas las companies del tenant</option>
+                        @foreach (var company in companies)
+                        {
+                            <option value="@company.Id.ToString()">@company.Name (@company.LegacyCenterCode)</option>
+                        }
+                    </InputSelect>
+                </label>
+                <button class="primary-button" type="button" @onclick="RunBaseIncotermsSyncAsync" disabled="@isRunningBaseIncotermsSync">
+                    @(isRunningBaseIncotermsSync ? "Sincronizando incoterms..." : "Sincronizar base de datos / incoterms")
+                </button>
+                <div class="list-block" style="margin-top: 1rem;">
+                    @foreach (var status in baseIncotermsSyncStatuses)
+                    {
+                        <article class="list-item">
+                            <strong>@status.CompanyName (@status.CompanyLegacyCenterCode)</strong>
+                            <span>@(string.IsNullOrWhiteSpace(status.LastStatus) ? "Sin sincronizar" : status.LastStatus)</span>
+                            <span>@(status.LastCompletedUtc?.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss") ?? "Nunca")</span>
+                            <span>Ins: @status.LastInserted · Act: @status.LastUpdated · Omi: @status.LastSkipped · Err: @status.LastErrors</span>
+                        </article>
+                    }
+                </div>
+            </article>
+            <article class="info-card">
                 <p class="eyebrow">Compras / Proveedores</p>
                 <h2>Sync legacy</h2>
-                <p class="muted">Replica proveedores desde TEX.NET hacia la SaaS local. Mientras esta sync mande, la ficha web queda en solo lectura para esa company.</p>
+                <p class="muted">Replica proveedores desde TEX.NET hacia la SaaS local. La sync manual refresca solo registros con origen legacy y deja intactos los cambios locales.</p>
                 <label class="field">
                     <span>Company</span>
                     <InputSelect class="text-input" @bind-Value="selectedCrmSuppliersSyncCompanyId">
@@ -289,7 +637,7 @@ else
             <article class="info-card">
                 <p class="eyebrow">Compras / Pedidos</p>
                 <h2>Sync legacy</h2>
-                <p class="muted">Replica pedidos de compra desde TEX.NET hacia la SaaS local. Mientras esta sync mande, el módulo web de compras queda en solo lectura para esa company.</p>
+                <p class="muted">Replica pedidos de compra desde TEX.NET hacia la SaaS local. La sync manual refresca solo registros con origen legacy y deja intactos los cambios locales.</p>
                 <label class="field">
                     <span>Company</span>
                     <InputSelect class="text-input" @bind-Value="selectedPurchaseOrdersSyncCompanyId">
@@ -318,7 +666,7 @@ else
             <article class="info-card">
                 <p class="eyebrow">Compras / Recepciones</p>
                 <h2>Sync legacy</h2>
-                <p class="muted">Replica albaranes de compra desde TEX.NET hacia la SaaS local. Mientras esta sync mande, las recepciones web quedan en solo lectura para esa company.</p>
+                <p class="muted">Replica albaranes de compra desde TEX.NET hacia la SaaS local. La sync manual refresca solo registros con origen legacy y deja intactos los cambios locales.</p>
                 <label class="field">
                     <span>Company</span>
                     <InputSelect class="text-input" @bind-Value="selectedPurchaseReceiptsSyncCompanyId">
@@ -347,7 +695,7 @@ else
             <article class="info-card">
                 <p class="eyebrow">Almacén / Stock</p>
                 <h2>Sync legacy</h2>
-                <p class="muted">Replica artículos y saldo actual desde TEX.NET hacia la SaaS local. Mientras esta sync mande, el stock web pasa a leer la réplica y los ajustes manuales quedan en solo lectura para esa company.</p>
+                <p class="muted">Replica artículos y saldo actual desde TEX.NET hacia la SaaS local. La sync manual refresca el snapshot legacy y los ajustes web se aplican encima en local sin tocar el remoto.</p>
                 <label class="field">
                     <span>Company</span>
                     <InputSelect class="text-input" @bind-Value="selectedStockItemsSyncCompanyId">
@@ -376,7 +724,7 @@ else
             <article class="info-card">
                 <p class="eyebrow">Ventas / Albaranes</p>
                 <h2>Sync legacy</h2>
-                <p class="muted">Replica albaranes desde TEX.NET hacia la SaaS local. Mientras esta sync mande, la expedición web y la pre-facturación quedan en solo lectura para esa company.</p>
+                <p class="muted">Replica albaranes desde TEX.NET hacia la SaaS local. La sync manual refresca solo registros con origen legacy y deja intactos los cambios locales.</p>
                 <label class="field">
                     <span>Company</span>
                     <InputSelect class="text-input" @bind-Value="selectedSalesShipmentsSyncCompanyId">
@@ -405,7 +753,7 @@ else
             <article class="info-card">
                 <p class="eyebrow">Ventas / Facturas</p>
                 <h2>Sync legacy</h2>
-                <p class="muted">Replica facturas desde TEX.NET hacia la SaaS local. Mientras esta sync mande, las facturas web quedan en solo lectura y pendientes del origen legacy.</p>
+                <p class="muted">Replica facturas desde TEX.NET hacia la SaaS local. La sync manual refresca solo registros con origen legacy y deja intactos los cambios locales, incluidos los cobros web.</p>
                 <label class="field">
                     <span>Company</span>
                     <InputSelect class="text-input" @bind-Value="selectedSalesInvoicesSyncCompanyId">
@@ -796,6 +1144,30 @@ else
     private string selectedCrmWorkshopsSyncCompanyId = string.Empty;
     private bool isRunningArticleForniturasSync;
     private string selectedArticleForniturasSyncCompanyId = string.Empty;
+    private bool isRunningArticleHilosSync;
+    private string selectedArticleHilosSyncCompanyId = string.Empty;
+    private bool isRunningArticleTejidosSync;
+    private string selectedArticleTejidosSyncCompanyId = string.Empty;
+    private bool isRunningArticleModelsSync;
+    private string selectedArticleModelsSyncCompanyId = string.Empty;
+    private bool isRunningArticleMuestrasSync;
+    private string selectedArticleMuestrasSyncCompanyId = string.Empty;
+    private bool isRunningArticleDispositionsSync;
+    private string selectedArticleDispositionsSyncCompanyId = string.Empty;
+    private bool isRunningBaseBanksCashboxesSync;
+    private string selectedBaseBanksCashboxesSyncCompanyId = string.Empty;
+    private bool isRunningBasePaymentMethodsSync;
+    private string selectedBasePaymentMethodsSyncCompanyId = string.Empty;
+    private bool isRunningBaseOperationsSync;
+    private string selectedBaseOperationsSyncCompanyId = string.Empty;
+    private bool isRunningBaseMachinesSync;
+    private string selectedBaseMachinesSyncCompanyId = string.Empty;
+    private bool isRunningBaseSeasonsSync;
+    private string selectedBaseSeasonsSyncCompanyId = string.Empty;
+    private bool isRunningBaseVatTypesSync;
+    private string selectedBaseVatTypesSyncCompanyId = string.Empty;
+    private bool isRunningBaseIncotermsSync;
+    private string selectedBaseIncotermsSyncCompanyId = string.Empty;
     private bool isRunningCrmSuppliersSync;
     private string selectedCrmSuppliersSyncCompanyId = string.Empty;
     private bool isRunningPurchaseOrdersSync;
@@ -904,6 +1276,78 @@ else
     private IReadOnlyCollection<LegacySyncModuleStatusDto> articleForniturasSyncStatuses =>
         syncStatuses
             .Where(status => string.Equals(status.ModuleKey, LegacySyncModuleKeys.ArticleFornituras, StringComparison.OrdinalIgnoreCase))
+            .OrderBy(status => status.CompanyName, StringComparer.CurrentCultureIgnoreCase)
+            .ToArray();
+
+    private IReadOnlyCollection<LegacySyncModuleStatusDto> articleHilosSyncStatuses =>
+        syncStatuses
+            .Where(status => string.Equals(status.ModuleKey, LegacySyncModuleKeys.ArticleHilos, StringComparison.OrdinalIgnoreCase))
+            .OrderBy(status => status.CompanyName, StringComparer.CurrentCultureIgnoreCase)
+            .ToArray();
+
+    private IReadOnlyCollection<LegacySyncModuleStatusDto> articleTejidosSyncStatuses =>
+        syncStatuses
+            .Where(status => string.Equals(status.ModuleKey, LegacySyncModuleKeys.ArticleTejidos, StringComparison.OrdinalIgnoreCase))
+            .OrderBy(status => status.CompanyName, StringComparer.CurrentCultureIgnoreCase)
+            .ToArray();
+
+    private IReadOnlyCollection<LegacySyncModuleStatusDto> articleMuestrasSyncStatuses =>
+        syncStatuses
+            .Where(status => string.Equals(status.ModuleKey, LegacySyncModuleKeys.ArticleMuestras, StringComparison.OrdinalIgnoreCase))
+            .OrderBy(status => status.CompanyName, StringComparer.CurrentCultureIgnoreCase)
+            .ToArray();
+
+    private IReadOnlyCollection<LegacySyncModuleStatusDto> articleModelsSyncStatuses =>
+        syncStatuses
+            .Where(status => string.Equals(status.ModuleKey, LegacySyncModuleKeys.ArticleModels, StringComparison.OrdinalIgnoreCase))
+            .OrderBy(status => status.CompanyName, StringComparer.CurrentCultureIgnoreCase)
+            .ToArray();
+
+    private IReadOnlyCollection<LegacySyncModuleStatusDto> articleDispositionsSyncStatuses =>
+        syncStatuses
+            .Where(status => string.Equals(status.ModuleKey, LegacySyncModuleKeys.ArticleDispositions, StringComparison.OrdinalIgnoreCase))
+            .OrderBy(status => status.CompanyName, StringComparer.CurrentCultureIgnoreCase)
+            .ToArray();
+
+    private IReadOnlyCollection<LegacySyncModuleStatusDto> baseBanksCashboxesSyncStatuses =>
+        syncStatuses
+            .Where(status => string.Equals(status.ModuleKey, LegacySyncModuleKeys.BaseBanksCashboxes, StringComparison.OrdinalIgnoreCase))
+            .OrderBy(status => status.CompanyName, StringComparer.CurrentCultureIgnoreCase)
+            .ToArray();
+
+    private IReadOnlyCollection<LegacySyncModuleStatusDto> basePaymentMethodsSyncStatuses =>
+        syncStatuses
+            .Where(status => string.Equals(status.ModuleKey, LegacySyncModuleKeys.BasePaymentMethods, StringComparison.OrdinalIgnoreCase))
+            .OrderBy(status => status.CompanyName, StringComparer.CurrentCultureIgnoreCase)
+            .ToArray();
+
+    private IReadOnlyCollection<LegacySyncModuleStatusDto> baseOperationsSyncStatuses =>
+        syncStatuses
+            .Where(status => string.Equals(status.ModuleKey, LegacySyncModuleKeys.BaseOperations, StringComparison.OrdinalIgnoreCase))
+            .OrderBy(status => status.CompanyName, StringComparer.CurrentCultureIgnoreCase)
+            .ToArray();
+
+    private IReadOnlyCollection<LegacySyncModuleStatusDto> baseMachinesSyncStatuses =>
+        syncStatuses
+            .Where(status => string.Equals(status.ModuleKey, LegacySyncModuleKeys.BaseMachines, StringComparison.OrdinalIgnoreCase))
+            .OrderBy(status => status.CompanyName, StringComparer.CurrentCultureIgnoreCase)
+            .ToArray();
+
+    private IReadOnlyCollection<LegacySyncModuleStatusDto> baseSeasonsSyncStatuses =>
+        syncStatuses
+            .Where(status => string.Equals(status.ModuleKey, LegacySyncModuleKeys.BaseSeasons, StringComparison.OrdinalIgnoreCase))
+            .OrderBy(status => status.CompanyName, StringComparer.CurrentCultureIgnoreCase)
+            .ToArray();
+
+    private IReadOnlyCollection<LegacySyncModuleStatusDto> baseVatTypesSyncStatuses =>
+        syncStatuses
+            .Where(status => string.Equals(status.ModuleKey, LegacySyncModuleKeys.BaseVatTypes, StringComparison.OrdinalIgnoreCase))
+            .OrderBy(status => status.CompanyName, StringComparer.CurrentCultureIgnoreCase)
+            .ToArray();
+
+    private IReadOnlyCollection<LegacySyncModuleStatusDto> baseIncotermsSyncStatuses =>
+        syncStatuses
+            .Where(status => string.Equals(status.ModuleKey, LegacySyncModuleKeys.BaseIncoterms, StringComparison.OrdinalIgnoreCase))
             .OrderBy(status => status.CompanyName, StringComparer.CurrentCultureIgnoreCase)
             .ToArray();
 
@@ -1499,6 +1943,414 @@ else
         finally
         {
             isRunningArticleForniturasSync = false;
+        }
+    }
+
+    private async Task RunArticleHilosSyncAsync()
+    {
+        if (!currentTenantId.HasValue)
+        {
+            return;
+        }
+
+        isRunningArticleHilosSync = true;
+        try
+        {
+            statusMessage = string.Empty;
+            isError = false;
+
+            var result = await LegacySyncService.RunAsync(new RunLegacySyncCommand
+            {
+                TenantId = currentTenantId.Value,
+                CompanyId = Guid.TryParse(selectedArticleHilosSyncCompanyId, out var companyIdValue) ? companyIdValue : null,
+                ModuleKey = LegacySyncModuleKeys.ArticleHilos
+            });
+
+            statusMessage = $"Sincronización completada. Companies={result.CompaniesProcessed}, Insertados={result.RecordsInserted}, Actualizados={result.RecordsUpdated}, Omitidos={result.RecordsSkipped}, Errores={result.ErrorsCount}.";
+            await ReloadAsync();
+        }
+        catch (Exception exception)
+        {
+            isError = true;
+            statusMessage = exception.Message;
+        }
+        finally
+        {
+            isRunningArticleHilosSync = false;
+        }
+    }
+
+    private async Task RunArticleTejidosSyncAsync()
+    {
+        if (!currentTenantId.HasValue)
+        {
+            return;
+        }
+
+        isRunningArticleTejidosSync = true;
+        try
+        {
+            statusMessage = string.Empty;
+            isError = false;
+
+            var result = await LegacySyncService.RunAsync(new RunLegacySyncCommand
+            {
+                TenantId = currentTenantId.Value,
+                CompanyId = Guid.TryParse(selectedArticleTejidosSyncCompanyId, out var companyIdValue) ? companyIdValue : null,
+                ModuleKey = LegacySyncModuleKeys.ArticleTejidos
+            });
+
+            statusMessage = $"Sincronización completada. Companies={result.CompaniesProcessed}, Insertados={result.RecordsInserted}, Actualizados={result.RecordsUpdated}, Omitidos={result.RecordsSkipped}, Errores={result.ErrorsCount}.";
+            await ReloadAsync();
+        }
+        catch (Exception exception)
+        {
+            isError = true;
+            statusMessage = exception.Message;
+        }
+        finally
+        {
+            isRunningArticleTejidosSync = false;
+        }
+    }
+
+    private async Task RunArticleMuestrasSyncAsync()
+    {
+        if (!currentTenantId.HasValue)
+        {
+            return;
+        }
+
+        isRunningArticleMuestrasSync = true;
+        try
+        {
+            statusMessage = string.Empty;
+            isError = false;
+
+            var result = await LegacySyncService.RunAsync(new RunLegacySyncCommand
+            {
+                TenantId = currentTenantId.Value,
+                CompanyId = Guid.TryParse(selectedArticleMuestrasSyncCompanyId, out var companyIdValue) ? companyIdValue : null,
+                ModuleKey = LegacySyncModuleKeys.ArticleMuestras
+            });
+
+            statusMessage = $"Sincronización completada. Companies={result.CompaniesProcessed}, Insertados={result.RecordsInserted}, Actualizados={result.RecordsUpdated}, Omitidos={result.RecordsSkipped}, Errores={result.ErrorsCount}.";
+            await ReloadAsync();
+        }
+        catch (Exception exception)
+        {
+            isError = true;
+            statusMessage = exception.Message;
+        }
+        finally
+        {
+            isRunningArticleMuestrasSync = false;
+        }
+    }
+
+    private async Task RunArticleModelsSyncAsync()
+    {
+        if (!currentTenantId.HasValue)
+        {
+            return;
+        }
+
+        isRunningArticleModelsSync = true;
+        try
+        {
+            statusMessage = string.Empty;
+            isError = false;
+
+            var result = await LegacySyncService.RunAsync(new RunLegacySyncCommand
+            {
+                TenantId = currentTenantId.Value,
+                CompanyId = Guid.TryParse(selectedArticleModelsSyncCompanyId, out var companyIdValue) ? companyIdValue : null,
+                ModuleKey = LegacySyncModuleKeys.ArticleModels
+            });
+
+            statusMessage = $"Sincronización completada. Companies={result.CompaniesProcessed}, Insertados={result.RecordsInserted}, Actualizados={result.RecordsUpdated}, Omitidos={result.RecordsSkipped}, Errores={result.ErrorsCount}.";
+            await ReloadAsync();
+        }
+        catch (Exception exception)
+        {
+            isError = true;
+            statusMessage = exception.Message;
+        }
+        finally
+        {
+            isRunningArticleModelsSync = false;
+        }
+    }
+
+    private async Task RunArticleDispositionsSyncAsync()
+    {
+        if (!currentTenantId.HasValue)
+        {
+            return;
+        }
+
+        isRunningArticleDispositionsSync = true;
+        try
+        {
+            statusMessage = string.Empty;
+            isError = false;
+
+            var result = await LegacySyncService.RunAsync(new RunLegacySyncCommand
+            {
+                TenantId = currentTenantId.Value,
+                CompanyId = Guid.TryParse(selectedArticleDispositionsSyncCompanyId, out var companyIdValue) ? companyIdValue : null,
+                ModuleKey = LegacySyncModuleKeys.ArticleDispositions
+            });
+
+            statusMessage = $"Sincronización completada. Companies={result.CompaniesProcessed}, Insertados={result.RecordsInserted}, Actualizados={result.RecordsUpdated}, Omitidos={result.RecordsSkipped}, Errores={result.ErrorsCount}.";
+            await ReloadAsync();
+        }
+        catch (Exception exception)
+        {
+            isError = true;
+            statusMessage = exception.Message;
+        }
+        finally
+        {
+            isRunningArticleDispositionsSync = false;
+        }
+    }
+
+    private async Task RunBaseBanksCashboxesSyncAsync()
+    {
+        if (!currentTenantId.HasValue)
+        {
+            return;
+        }
+
+        isRunningBaseBanksCashboxesSync = true;
+        try
+        {
+            statusMessage = string.Empty;
+            isError = false;
+
+            var result = await LegacySyncService.RunAsync(new RunLegacySyncCommand
+            {
+                TenantId = currentTenantId.Value,
+                CompanyId = Guid.TryParse(selectedBaseBanksCashboxesSyncCompanyId, out var companyIdValue) ? companyIdValue : null,
+                ModuleKey = LegacySyncModuleKeys.BaseBanksCashboxes
+            });
+
+            statusMessage = $"Sincronización completada. Companies={result.CompaniesProcessed}, Insertados={result.RecordsInserted}, Actualizados={result.RecordsUpdated}, Omitidos={result.RecordsSkipped}, Errores={result.ErrorsCount}.";
+            await ReloadAsync();
+        }
+        catch (Exception exception)
+        {
+            isError = true;
+            statusMessage = exception.Message;
+        }
+        finally
+        {
+            isRunningBaseBanksCashboxesSync = false;
+        }
+    }
+
+    private async Task RunBasePaymentMethodsSyncAsync()
+    {
+        if (!currentTenantId.HasValue)
+        {
+            return;
+        }
+
+        isRunningBasePaymentMethodsSync = true;
+        try
+        {
+            statusMessage = string.Empty;
+            isError = false;
+
+            var result = await LegacySyncService.RunAsync(new RunLegacySyncCommand
+            {
+                TenantId = currentTenantId.Value,
+                CompanyId = Guid.TryParse(selectedBasePaymentMethodsSyncCompanyId, out var companyIdValue) ? companyIdValue : null,
+                ModuleKey = LegacySyncModuleKeys.BasePaymentMethods
+            });
+
+            statusMessage = $"Sincronización completada. Companies={result.CompaniesProcessed}, Insertados={result.RecordsInserted}, Actualizados={result.RecordsUpdated}, Omitidos={result.RecordsSkipped}, Errores={result.ErrorsCount}.";
+            await ReloadAsync();
+        }
+        catch (Exception exception)
+        {
+            isError = true;
+            statusMessage = exception.Message;
+        }
+        finally
+        {
+            isRunningBasePaymentMethodsSync = false;
+        }
+    }
+
+    private async Task RunBaseMachinesSyncAsync()
+    {
+        if (!currentTenantId.HasValue)
+        {
+            return;
+        }
+
+        isRunningBaseMachinesSync = true;
+        try
+        {
+            statusMessage = string.Empty;
+            isError = false;
+
+            var result = await LegacySyncService.RunAsync(new RunLegacySyncCommand
+            {
+                TenantId = currentTenantId.Value,
+                CompanyId = Guid.TryParse(selectedBaseMachinesSyncCompanyId, out var companyIdValue) ? companyIdValue : null,
+                ModuleKey = LegacySyncModuleKeys.BaseMachines
+            });
+
+            statusMessage = $"Sincronización completada. Companies={result.CompaniesProcessed}, Insertados={result.RecordsInserted}, Actualizados={result.RecordsUpdated}, Omitidos={result.RecordsSkipped}, Errores={result.ErrorsCount}.";
+            await ReloadAsync();
+        }
+        catch (Exception exception)
+        {
+            isError = true;
+            statusMessage = exception.Message;
+        }
+        finally
+        {
+            isRunningBaseMachinesSync = false;
+        }
+    }
+
+    private async Task RunBaseOperationsSyncAsync()
+    {
+        if (!currentTenantId.HasValue)
+        {
+            return;
+        }
+
+        isRunningBaseOperationsSync = true;
+        try
+        {
+            statusMessage = string.Empty;
+            isError = false;
+
+            var result = await LegacySyncService.RunAsync(new RunLegacySyncCommand
+            {
+                TenantId = currentTenantId.Value,
+                CompanyId = Guid.TryParse(selectedBaseOperationsSyncCompanyId, out var companyIdValue) ? companyIdValue : null,
+                ModuleKey = LegacySyncModuleKeys.BaseOperations
+            });
+
+            statusMessage = $"Sincronización completada. Companies={result.CompaniesProcessed}, Insertados={result.RecordsInserted}, Actualizados={result.RecordsUpdated}, Omitidos={result.RecordsSkipped}, Errores={result.ErrorsCount}.";
+            await ReloadAsync();
+        }
+        catch (Exception exception)
+        {
+            isError = true;
+            statusMessage = exception.Message;
+        }
+        finally
+        {
+            isRunningBaseOperationsSync = false;
+        }
+    }
+
+    private async Task RunBaseSeasonsSyncAsync()
+    {
+        if (!currentTenantId.HasValue)
+        {
+            return;
+        }
+
+        isRunningBaseSeasonsSync = true;
+        try
+        {
+            statusMessage = string.Empty;
+            isError = false;
+
+            var result = await LegacySyncService.RunAsync(new RunLegacySyncCommand
+            {
+                TenantId = currentTenantId.Value,
+                CompanyId = Guid.TryParse(selectedBaseSeasonsSyncCompanyId, out var companyIdValue) ? companyIdValue : null,
+                ModuleKey = LegacySyncModuleKeys.BaseSeasons
+            });
+
+            statusMessage = $"Sincronización completada. Companies={result.CompaniesProcessed}, Insertados={result.RecordsInserted}, Actualizados={result.RecordsUpdated}, Omitidos={result.RecordsSkipped}, Errores={result.ErrorsCount}.";
+            await ReloadAsync();
+        }
+        catch (Exception exception)
+        {
+            isError = true;
+            statusMessage = exception.Message;
+        }
+        finally
+        {
+            isRunningBaseSeasonsSync = false;
+        }
+    }
+
+    private async Task RunBaseVatTypesSyncAsync()
+    {
+        if (!currentTenantId.HasValue)
+        {
+            return;
+        }
+
+        isRunningBaseVatTypesSync = true;
+        try
+        {
+            statusMessage = string.Empty;
+            isError = false;
+
+            var result = await LegacySyncService.RunAsync(new RunLegacySyncCommand
+            {
+                TenantId = currentTenantId.Value,
+                CompanyId = Guid.TryParse(selectedBaseVatTypesSyncCompanyId, out var companyIdValue) ? companyIdValue : null,
+                ModuleKey = LegacySyncModuleKeys.BaseVatTypes
+            });
+
+            statusMessage = $"Sincronización completada. Companies={result.CompaniesProcessed}, Insertados={result.RecordsInserted}, Actualizados={result.RecordsUpdated}, Omitidos={result.RecordsSkipped}, Errores={result.ErrorsCount}.";
+            await ReloadAsync();
+        }
+        catch (Exception exception)
+        {
+            isError = true;
+            statusMessage = exception.Message;
+        }
+        finally
+        {
+            isRunningBaseVatTypesSync = false;
+        }
+    }
+
+    private async Task RunBaseIncotermsSyncAsync()
+    {
+        if (!currentTenantId.HasValue)
+        {
+            return;
+        }
+
+        isRunningBaseIncotermsSync = true;
+        try
+        {
+            statusMessage = string.Empty;
+            isError = false;
+
+            var result = await LegacySyncService.RunAsync(new RunLegacySyncCommand
+            {
+                TenantId = currentTenantId.Value,
+                CompanyId = Guid.TryParse(selectedBaseIncotermsSyncCompanyId, out var companyIdValue) ? companyIdValue : null,
+                ModuleKey = LegacySyncModuleKeys.BaseIncoterms
+            });
+
+            statusMessage = $"Sincronización completada. Companies={result.CompaniesProcessed}, Insertados={result.RecordsInserted}, Actualizados={result.RecordsUpdated}, Omitidos={result.RecordsSkipped}, Errores={result.ErrorsCount}.";
+            await ReloadAsync();
+        }
+        catch (Exception exception)
+        {
+            isError = true;
+            statusMessage = exception.Message;
+        }
+        finally
+        {
+            isRunningBaseIncotermsSync = false;
         }
     }
 

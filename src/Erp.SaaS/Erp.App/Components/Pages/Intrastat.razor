@@ -1,0 +1,602 @@
+@page "/ventas/intrastat"
+@attribute [Authorize(Roles = "TenantAdmin,TenantReader")]
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
+@inject IIntrastatQueries IntrastatQueries
+
+<PageTitle>Ventas / Intrastat</PageTitle>
+
+<div class="page-header">
+    <div>
+        <p class="eyebrow">Ventas</p>
+        <h1>Listado Intrastat</h1>
+        <p class="lead">Detalle y matriz mensual de Intrastat con la misma lectura operativa del Excel legacy: pesos, importes, transporte y códigos arancelarios.</p>
+    </div>
+    <div class="quick-links">
+        <a class="secondary-button link-button" href="@BuildPrintUrl()" target="_blank">Imprimir</a>
+        <a class="secondary-button link-button" href="@BuildExportUrl("excel")">Excel legacy</a>
+        <a class="secondary-button link-button" href="@BuildExportUrl("detail")">CSV detalle</a>
+        <a class="secondary-button link-button" href="@BuildExportUrl("summary")">CSV matriz</a>
+    </div>
+</div>
+
+@if (!tenantId.HasValue || !companyId.HasValue)
+{
+    <div class="empty-state">
+        <p>Selecciona una empresa activa para generar Intrastat.</p>
+    </div>
+}
+else
+{
+    <section class="panel">
+        <div class="filter-row">
+            <label class="field compact-field">
+                <span>Mes</span>
+                <select class="sidebar-select compact-select" @bind="filter.Month" disabled="@isLoading">
+                    @for (var month = 1; month <= 12; month++)
+                    {
+                        <option value="@month">@GetMonthLabel(month)</option>
+                    }
+                </select>
+            </label>
+            <label class="field compact-field">
+                <span>Año</span>
+                <input class="text-input compact-input" type="number" @bind="filter.Year" disabled="@isLoading" />
+            </label>
+            <input class="text-input" @bind="filter.Search" placeholder="Buscar por factura, cliente, VAT, NC code, artículo o descripción" disabled="@isLoading" />
+            <label class="checkbox-field compact">
+                <input type="checkbox" checked="@filter.OnlyClassified" @onchange="OnOnlyClassifiedChanged" disabled="@isLoading" />
+                <span>Solo clasificadas</span>
+            </label>
+            <button class="secondary-button" @onclick="SearchAsync" disabled="@isLoading">@(isLoading ? "Cargando..." : "Buscar")</button>
+        </div>
+        <div class="filter-row results-toolbar" style="margin-top: 0.85rem;">
+            <span class="results-summary">
+                @(totalCount == 0
+                    ? "Sin resultados"
+                    : $"Mostrando {PageStart}-{PageEnd} de {totalCount} líneas Intrastat")
+            </span>
+            <label class="field compact-field">
+                <span>Tamaño de página</span>
+                <select class="sidebar-select compact-select" value="@filter.PageSize" @onchange="OnPageSizeChanged" disabled="@isLoading">
+                    <option value="25">25</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                </select>
+            </label>
+        </div>
+    </section>
+
+    @if (!string.IsNullOrWhiteSpace(errorMessage))
+    {
+        <div class="alert danger">@errorMessage</div>
+    }
+    else if (!string.IsNullOrWhiteSpace(periodInfoMessage))
+    {
+        <div class="alert info">@periodInfoMessage</div>
+    }
+
+    <div class="card-grid purchase-summary-grid intrastat-summary-grid">
+        <section class="info-card">
+            <h2>@report.TotalWeightKg.ToString("0.00")</h2>
+            <p class="muted">kg total</p>
+        </section>
+        <section class="info-card">
+            <h2>@report.SalesAmount.ToString("0.00") €</h2>
+            <p class="muted">import venda</p>
+        </section>
+        <section class="info-card">
+            <h2>@report.TransportAmount.ToString("0.00") €</h2>
+            <p class="muted">transport</p>
+        </section>
+        <section class="info-card accent-card">
+            <h2>@report.TotalWithTransportAmount.ToString("0.00") €</h2>
+            <p class="muted">total amb transport</p>
+        </section>
+        <section class="info-card">
+            <h2>@report.CountriesCount</h2>
+            <p class="muted">países UE</p>
+        </section>
+        <section class="info-card">
+            <h2>@report.ClassifiedLinesCount</h2>
+            <p class="muted">líneas clasificadas</p>
+        </section>
+        <section class="info-card">
+            <h2>@report.UnclassifiedLinesCount</h2>
+            <p class="muted">sin NC code</p>
+        </section>
+    </div>
+
+    <section class="panel @(isLoading ? "loading-panel" : string.Empty)">
+        <div class="page-header">
+            <div>
+                <h2>Detalle de facturas</h2>
+                <p class="muted">Lectura tipo legacy: factura, cliente, descripción, composición, talla, peso, importe, VAT y descuento.</p>
+            </div>
+        </div>
+
+        @if (isLoading)
+        {
+            <div class="loading-banner">
+                <span class="loading-indicator" aria-hidden="true"></span>
+                <span>Generando detalle Intrastat...</span>
+            </div>
+        }
+
+        <div class="table-scroll">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <SortableHeader Label="Factura" IsActive="@(sortColumn == nameof(IntrastatLineDto.InvoiceNumber))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(IntrastatLineDto.InvoiceNumber), true))" />
+                        <SortableHeader Label="Fecha" IsActive="@(sortColumn == nameof(IntrastatLineDto.IssueDate))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(IntrastatLineDto.IssueDate), true))" />
+                        <SortableHeader Label="Cliente" IsActive="@(sortColumn == nameof(IntrastatLineDto.ClientName))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(IntrastatLineDto.ClientName)))" />
+                        <th>Descripción</th>
+                        <th>Composición</th>
+                        <th>Talla</th>
+                        <SortableHeader Label="Cantidad" IsActive="@(sortColumn == nameof(IntrastatLineDto.Quantity))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(IntrastatLineDto.Quantity), true))" />
+                        <th>Pes unit.</th>
+                        <SortableHeader Label="Pes total/Kgrs" IsActive="@(sortColumn == nameof(IntrastatLineDto.TotalWeightKg))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(IntrastatLineDto.TotalWeightKg), true))" />
+                        <SortableHeader Label="Import" IsActive="@(sortColumn == nameof(IntrastatLineDto.NetAmount))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(IntrastatLineDto.NetAmount), true))" />
+                        <SortableHeader Label="NC code" IsActive="@(sortColumn == nameof(IntrastatLineDto.IntrastatCode))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(IntrastatLineDto.IntrastatCode)))" />
+                        <th>VAT</th>
+                        <th>Dte?</th>
+                        <SortableHeader Label="País" IsActive="@(sortColumn == nameof(IntrastatLineDto.CountryCode))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(IntrastatLineDto.CountryCode)))" />
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (isLoading)
+                    {
+                        @for (var index = 0; index < 6; index++)
+                        {
+                            <tr class="table-skeleton-row">
+                                <td><span class="skeleton-line short"></span></td>
+                                <td><span class="skeleton-line short"></span></td>
+                                <td><span class="skeleton-line"></span></td>
+                                <td><span class="skeleton-line"></span></td>
+                                <td><span class="skeleton-line"></span></td>
+                                <td><span class="skeleton-line short"></span></td>
+                                <td><span class="skeleton-line short"></span></td>
+                                <td><span class="skeleton-line short"></span></td>
+                                <td><span class="skeleton-line short"></span></td>
+                                <td><span class="skeleton-line short"></span></td>
+                                <td><span class="skeleton-line short"></span></td>
+                                <td><span class="skeleton-line"></span></td>
+                                <td><span class="skeleton-line short"></span></td>
+                                <td><span class="skeleton-line short"></span></td>
+                            </tr>
+                        }
+                    }
+                    else if (items.Count == 0)
+                    {
+                        <tr>
+                            <td colspan="14" class="table-empty">No hay líneas Intrastat para el filtro seleccionado.</td>
+                        </tr>
+                    }
+                    else
+                    {
+                        @foreach (var item in items)
+                        {
+                            <tr class="@GetLineRowClass(item)">
+                                <td>
+                                    <a class="inline-link" href="/ventas/facturas/@item.InvoiceNumber">@item.DisplayInvoiceNumber</a>
+                                </td>
+                                <td>@item.IssueDate.ToString("dd/MM/yyyy")</td>
+                                <td>
+                                    <div>@item.ClientName</div>
+                                    <div class="table-subtitle">@item.ClientTaxId</div>
+                                </td>
+                                <td>
+                                    <div>@item.Description</div>
+                                    @if (!string.IsNullOrWhiteSpace(item.ItemCode))
+                                    {
+                                        <div class="table-subtitle">@item.ItemCode</div>
+                                    }
+                                    @if (item.IsTransportCharge)
+                                    {
+                                        <div class="intrastat-inline-note">Transit and courier charges</div>
+                                    }
+                                </td>
+                                <td>@DisplayValue(item.Composition)</td>
+                                <td>@DisplayValue(item.Size)</td>
+                                <td>@item.Quantity.ToString("0.###")</td>
+                                <td>@item.UnitWeight.ToString("0.###")</td>
+                                <td>@item.TotalWeightKg.ToString("0.00")</td>
+                                <td>@item.NetAmount.ToString("0.00") €</td>
+                                <td>
+                                    <span class="status-pill @(item.IsClassified ? "badge-info" : "badge-warning")">
+                                        @(item.IsClassified ? item.IntrastatCode : "Sin clasificar")
+                                    </span>
+                                </td>
+                                <td>@DisplayValue(item.ClientTaxId)</td>
+                                <td>@(item.DiscountAmount == 0m ? "-" : $"{item.DiscountAmount:0.00} €")</td>
+                                <td>
+                                    <div>@item.CountryCode</div>
+                                    <div class="table-subtitle">@item.CountryName</div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <div class="pagination-bar">
+            <span class="muted">Página @filter.Page de @TotalPages</span>
+            <div class="pagination-actions">
+                <button class="secondary-button" @onclick="() => ChangePageAsync(1)" disabled="@(!CanGoPrevious || isLoading)">Primera</button>
+                <button class="secondary-button" @onclick="() => ChangePageAsync(filter.Page - 1)" disabled="@(!CanGoPrevious || isLoading)">Anterior</button>
+                <button class="secondary-button" @onclick="() => ChangePageAsync(filter.Page + 1)" disabled="@(!CanGoNext || isLoading)">Siguiente</button>
+                <button class="secondary-button" @onclick="() => ChangePageAsync(TotalPages)" disabled="@(!CanGoNext || isLoading)">Última</button>
+            </div>
+        </div>
+    </section>
+
+    <section class="panel">
+        <div class="page-header">
+            <div>
+                <h2>Matriz Intrastat · Excel legacy</h2>
+                <p class="muted">Matriz fija por país UE y código arancelario, con pesos y facturación como en la hoja agrupada del legacy.</p>
+            </div>
+        </div>
+        <div class="table-scroll">
+            <table class="data-table intrastat-matrix-table">
+                <thead>
+                    <tr>
+                        <th rowspan="2">Clients</th>
+                        <th rowspan="2">Ordre alfabètic</th>
+                        <th rowspan="2">Sigles</th>
+                        <th colspan="@report.MatrixNcCodes.Count">Codis arancelaris · PESOS/Kgrs</th>
+                        <th rowspan="2">TOTAL PESOS/Kgrs</th>
+                        <th colspan="@report.MatrixNcCodes.Count">Codis arancelaris · FACTURES€</th>
+                        <th rowspan="2">TOTAL FACTURES€</th>
+                    </tr>
+                    <tr>
+                        @foreach (var ncCode in report.MatrixNcCodes)
+                        {
+                            <th>@ncCode</th>
+                        }
+                        @foreach (var ncCode in report.MatrixNcCodes)
+                        {
+                            <th>@ncCode</th>
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (report.MatrixRows.Count == 0)
+                    {
+                        <tr>
+                            <td colspan="@(5 + (report.MatrixNcCodes.Count * 2))" class="table-empty">No hay agrupación para este período.</td>
+                        </tr>
+                    }
+                    else
+                    {
+                        @foreach (var matrixRow in report.MatrixRows)
+                        {
+                            <tr class="@GetMatrixRowClass(matrixRow)">
+                                <td>@(matrixRow.HasClients ? "si" : "no")</td>
+                                <td>@matrixRow.CountryName</td>
+                                <td>@matrixRow.CountryCode</td>
+                                @foreach (var ncCode in report.MatrixNcCodes)
+                                {
+                                    <td class="numeric-cell">@FormatMatrixCell(matrixRow.WeightByNcCode.TryGetValue(ncCode, out var weightValue) ? weightValue : 0m)</td>
+                                }
+                                <td class="numeric-cell">@matrixRow.TotalWeightKg.ToString("0.00")</td>
+                                @foreach (var ncCode in report.MatrixNcCodes)
+                                {
+                                    <td class="numeric-cell">@FormatMatrixCell(matrixRow.AmountByNcCode.TryGetValue(ncCode, out var amountValue) ? amountValue : 0m)</td>
+                                }
+                                <td class="numeric-cell">@matrixRow.TotalInvoiceAmount.ToString("0.00")</td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </section>
+}
+
+@code {
+    [SupplyParameterFromQuery(Name = "month")]
+    public int? MonthQuery { get; set; }
+
+    [SupplyParameterFromQuery(Name = "year")]
+    public int? YearQuery { get; set; }
+
+    [SupplyParameterFromQuery(Name = "search")]
+    public string? SearchQuery { get; set; }
+
+    [SupplyParameterFromQuery(Name = "classified")]
+    public bool? OnlyClassifiedQuery { get; set; }
+
+    [SupplyParameterFromQuery(Name = "page")]
+    public int? PageQuery { get; set; }
+
+    [SupplyParameterFromQuery(Name = "pageSize")]
+    public int? PageSizeQuery { get; set; }
+
+    [SupplyParameterFromQuery(Name = "sort")]
+    public string? SortQuery { get; set; }
+
+    [SupplyParameterFromQuery(Name = "desc")]
+    public bool? DescQuery { get; set; }
+
+    private Guid? tenantId;
+    private Guid? companyId;
+    private IntrastatFilter filter = new();
+    private IntrastatReportDto report = new();
+    private IReadOnlyCollection<IntrastatLineDto> items = [];
+    private bool isLoading;
+    private string errorMessage = string.Empty;
+    private string periodInfoMessage = string.Empty;
+    private bool periodAutoSelected;
+    private string sortColumn = nameof(IntrastatLineDto.IssueDate);
+    private bool sortDescending = true;
+    private int totalCount;
+    private int TotalPages => Math.Max(1, (int)Math.Ceiling(totalCount / (double)filter.PageSize));
+    private bool CanGoPrevious => filter.Page > 1;
+    private bool CanGoNext => filter.Page < TotalPages;
+    private int PageStart => totalCount == 0 ? 0 : ((filter.Page - 1) * filter.PageSize) + 1;
+    private int PageEnd => totalCount == 0 ? 0 : Math.Min(filter.Page * filter.PageSize, totalCount);
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        tenantId = user.GetTenantId();
+        companyId = user.GetActiveCompanyId();
+        ApplyQueryState();
+        await EnsureDefaultPeriodAsync();
+        await LoadAsync();
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        ApplyQueryState();
+        await Task.CompletedTask;
+    }
+
+    private void ApplyQueryState()
+    {
+        filter.Month = Math.Clamp(MonthQuery ?? DateTime.Today.Month, 1, 12);
+        filter.Year = YearQuery ?? DateTime.Today.Year;
+        filter.Search = SearchQuery ?? string.Empty;
+        filter.OnlyClassified = OnlyClassifiedQuery ?? false;
+        filter.Page = Math.Max(PageQuery ?? 1, 1);
+        filter.PageSize = Math.Clamp(PageSizeQuery ?? 50, 25, 100);
+        sortColumn = string.IsNullOrWhiteSpace(SortQuery) ? nameof(IntrastatLineDto.IssueDate) : SortQuery!;
+        sortDescending = DescQuery ?? true;
+        filter.SortColumn = sortColumn;
+        filter.SortDescending = sortDescending;
+    }
+
+    private async Task EnsureDefaultPeriodAsync()
+    {
+        periodInfoMessage = string.Empty;
+        periodAutoSelected = false;
+        if (MonthQuery.HasValue || YearQuery.HasValue || !tenantId.HasValue || !companyId.HasValue)
+        {
+            return;
+        }
+
+        var latestPeriod = await IntrastatQueries.GetLatestPeriodAsync(tenantId.Value, companyId.Value);
+        if (latestPeriod is null)
+        {
+            return;
+        }
+
+        if (latestPeriod.Year == filter.Year && latestPeriod.Month == filter.Month)
+        {
+            return;
+        }
+
+        filter.Year = latestPeriod.Year;
+        filter.Month = latestPeriod.Month;
+        periodAutoSelected = true;
+        periodInfoMessage = $"Mostrando el último período con datos Intrastat: {GetMonthLabel(filter.Month)} {filter.Year}.";
+    }
+
+    private async Task LoadAsync()
+    {
+        errorMessage = string.Empty;
+        if (!tenantId.HasValue || !companyId.HasValue)
+        {
+            items = [];
+            report = new IntrastatReportDto();
+            totalCount = 0;
+            return;
+        }
+
+        isLoading = true;
+        await InvokeAsync(StateHasChanged);
+
+        try
+        {
+            report = await IntrastatQueries.GetReportAsync(tenantId.Value, companyId.Value, filter);
+            items = report.Items;
+            totalCount = report.TotalCount;
+            if (totalCount == 0)
+            {
+                var latestPeriod = await IntrastatQueries.GetLatestPeriodAsync(tenantId.Value, companyId.Value);
+                if (latestPeriod is not null && (latestPeriod.Year != filter.Year || latestPeriod.Month != filter.Month))
+                {
+                    periodInfoMessage = $"No hay líneas Intrastat para {GetMonthLabel(filter.Month)} {filter.Year}. Último período con datos: {GetMonthLabel(latestPeriod.Month)} {latestPeriod.Year}.";
+                }
+                else if (!periodAutoSelected)
+                {
+                    periodInfoMessage = string.Empty;
+                }
+            }
+            else if (!periodAutoSelected)
+            {
+                periodInfoMessage = string.Empty;
+            }
+        }
+        catch (Exception exception)
+        {
+            errorMessage = exception.Message;
+            items = [];
+            report = new IntrastatReportDto();
+            totalCount = 0;
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private async Task SearchAsync()
+    {
+        filter.Page = 1;
+        periodAutoSelected = false;
+        periodInfoMessage = string.Empty;
+        await UpdateQueryStateAsync();
+    }
+
+    private async Task SetSortAsync(string column, bool defaultDescending = false)
+    {
+        if (string.Equals(sortColumn, column, StringComparison.Ordinal))
+        {
+            sortDescending = !sortDescending;
+        }
+        else
+        {
+            sortColumn = column;
+            sortDescending = defaultDescending;
+        }
+
+        filter.SortColumn = sortColumn;
+        filter.SortDescending = sortDescending;
+        filter.Page = 1;
+        periodAutoSelected = false;
+        await UpdateQueryStateAsync();
+    }
+
+    private async Task ChangePageAsync(int page)
+    {
+        var newPage = Math.Max(1, Math.Min(page, TotalPages));
+        if (newPage == filter.Page)
+        {
+            return;
+        }
+
+        filter.Page = newPage;
+        periodAutoSelected = false;
+        await UpdateQueryStateAsync();
+    }
+
+    private async Task OnPageSizeChanged(ChangeEventArgs args)
+    {
+        if (!int.TryParse(args.Value?.ToString(), out var newPageSize))
+        {
+            return;
+        }
+
+        filter.PageSize = Math.Clamp(newPageSize, 25, 100);
+        filter.Page = 1;
+        periodAutoSelected = false;
+        await UpdateQueryStateAsync();
+    }
+
+    private async Task OnOnlyClassifiedChanged(ChangeEventArgs args)
+    {
+        filter.OnlyClassified = args.Value as bool? ?? false;
+        filter.Page = 1;
+        periodAutoSelected = false;
+        await UpdateQueryStateAsync();
+    }
+
+    private async Task UpdateQueryStateAsync()
+    {
+        var query = new Dictionary<string, object?>
+        {
+            ["month"] = filter.Month,
+            ["year"] = filter.Year,
+            ["search"] = string.IsNullOrWhiteSpace(filter.Search) ? null : filter.Search,
+            ["classified"] = filter.OnlyClassified ? true : null,
+            ["page"] = filter.Page > 1 ? filter.Page : null,
+            ["pageSize"] = filter.PageSize != 50 ? filter.PageSize : null,
+            ["sort"] = sortColumn != nameof(IntrastatLineDto.IssueDate) ? sortColumn : null,
+            ["desc"] = sortDescending ? true : null
+        };
+
+        NavigationManager.NavigateTo(NavigationManager.GetUriWithQueryParameters(query), replace: true);
+        await LoadAsync();
+    }
+
+    private string BuildExportUrl(string mode)
+    {
+        var query = BuildQueryString(includePaging: false);
+        return $"/ventas/intrastat/export/{mode}{query}";
+    }
+
+    private string BuildPrintUrl()
+    {
+        return $"/ventas/intrastat/imprimir{BuildQueryString(includePaging: false)}";
+    }
+
+    private string BuildQueryString(bool includePaging)
+    {
+        var parameters = new List<string>
+        {
+            $"month={filter.Month}",
+            $"year={filter.Year}"
+        };
+
+        if (!string.IsNullOrWhiteSpace(filter.Search))
+        {
+            parameters.Add($"search={Uri.EscapeDataString(filter.Search)}");
+        }
+
+        if (filter.OnlyClassified)
+        {
+            parameters.Add("classified=true");
+        }
+
+        if (includePaging)
+        {
+            if (filter.Page > 1)
+            {
+                parameters.Add($"page={filter.Page}");
+            }
+
+            if (filter.PageSize != 50)
+            {
+                parameters.Add($"pageSize={filter.PageSize}");
+            }
+        }
+
+        if (!string.Equals(sortColumn, nameof(IntrastatLineDto.IssueDate), StringComparison.Ordinal))
+        {
+            parameters.Add($"sort={Uri.EscapeDataString(sortColumn)}");
+        }
+
+        if (sortDescending)
+        {
+            parameters.Add("desc=true");
+        }
+
+        return parameters.Count == 0 ? string.Empty : $"?{string.Join("&", parameters)}";
+    }
+
+    private static string GetMonthLabel(int month) =>
+        new DateTime(DateTime.Today.Year, month, 1).ToString("MMMM");
+
+    private static string GetLineRowClass(IntrastatLineDto item)
+    {
+        if (item.IsTransportCharge)
+        {
+            return "intrastat-transport-row";
+        }
+
+        return item.IsClassified ? string.Empty : "table-row-warning";
+    }
+
+    private static string GetMatrixRowClass(IntrastatMatrixRowDto row) =>
+        row.IsDomesticReference ? "intrastat-domestic-row" : string.Empty;
+
+    private static string FormatMatrixCell(decimal value) =>
+        value == 0m ? string.Empty : value.ToString("0.00");
+
+    private static string DisplayValue(string value) =>
+        string.IsNullOrWhiteSpace(value) ? "-" : value;
+}

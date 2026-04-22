@@ -1,0 +1,343 @@
+@page "/articulos/models/{Id:guid}/imprimir"
+@layout EmptyLayout
+@attribute [Authorize(Roles = "TenantAdmin,TenantReader")]
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IModeloQueries ModeloQueries
+
+<PageTitle>Ficha model @Id</PageTitle>
+
+<div class="document-shell">
+    <div class="document-toolbar no-print">
+        <a class="secondary-button link-button" href="/articulos/models/editar/@Id">Volver al model</a>
+        <button class="primary-button" type="button" onclick="window.print()">Guardar como PDF / Imprimir</button>
+    </div>
+
+    @if (!tenantId.HasValue || !companyId.HasValue)
+    {
+        <div class="empty-state document-state">
+            <p>No hay empresa activa seleccionada.</p>
+        </div>
+    }
+    else if (!string.IsNullOrWhiteSpace(errorMessage))
+    {
+        <div class="alert danger document-state">@errorMessage</div>
+    }
+    else if (model is null)
+    {
+        <div class="empty-state document-state">
+            <p>No se ha encontrado el model solicitado.</p>
+        </div>
+    }
+    else
+    {
+        <section class="document-page">
+            <header class="document-header">
+                <div>
+                    <p class="eyebrow">Fitxa model</p>
+                    <h1>@model.Code</h1>
+                    <p class="muted">@DisplayValue(model.Description)</p>
+                </div>
+                <div class="document-header-meta">
+                    <div>
+                        <span class="muted">Centro</span>
+                        <strong>@DisplayValue(model.CompanyCenterCode)</strong>
+                    </div>
+                    <div>
+                        <span class="muted">Temporada</span>
+                        <strong>@DisplayValue(model.Season)</strong>
+                    </div>
+                    <div>
+                        <span class="muted">Serie</span>
+                        <strong>@DisplayValue(model.Series)</strong>
+                    </div>
+                </div>
+            </header>
+
+            <section class="document-section">
+                <div class="document-grid-two">
+                    <section class="document-box">
+                        <h2>Ficha principal</h2>
+                        <div class="document-kv-grid">
+                            <div><span class="muted">Cliente</span><strong>@DisplayClient</strong></div>
+                            <div><span class="muted">Codi model</span><strong>@DisplayValue(model.ModelCode)</strong></div>
+                            <div><span class="muted">Tejido</span><strong>@DisplayFabric</strong></div>
+                            <div><span class="muted">Proveedor</span><strong>@DisplaySupplier</strong></div>
+                            <div><span class="muted">Ample</span><strong>@DisplayValue(model.WidthText)</strong></div>
+                            <div><span class="muted">Rendiment</span><strong>@model.Yield.ToString("0.###")</strong></div>
+                            <div><span class="muted">IVA</span><strong>@DisplayValue(model.VatCode)</strong></div>
+                            <div><span class="muted">Origen</span><strong>@DisplayValue(model.Origin)</strong></div>
+                        </div>
+                    </section>
+                    <section class="document-box">
+                        <h2>Venta y costes</h2>
+                        <div class="document-kv-grid">
+                            <div><span class="muted">Coste</span><strong>@model.CostPrice.ToString("0.00##")</strong></div>
+                            <div><span class="muted">Margen</span><strong>@model.MarginPercent.ToString("0.0#") %</strong></div>
+                            <div><span class="muted">Venta</span><strong>@model.SalePrice.ToString("0.00##")</strong></div>
+                            <div><span class="muted">Venta final</span><strong>@model.FinalSalePrice.ToString("0.00##")</strong></div>
+                            <div><span class="muted">N pack</span><strong>@model.PackagingPrice.ToString("0.00##")</strong></div>
+                            <div><span class="muted">Manipulación</span><strong>@model.ManipulationPrice.ToString("0.00##")</strong></div>
+                            <div><span class="muted">N fornitura</span><strong>@model.FornituraPrice.ToString("0.00##")</strong></div>
+                            <div><span class="muted">N confec</span><strong>@model.TailoringPrice.ToString("0.00##")</strong></div>
+                        </div>
+                    </section>
+                </div>
+            </section>
+
+            <section class="document-section">
+                <div class="document-grid-two">
+                    <section class="document-box">
+                        <h2>Operaciones y talleres</h2>
+                        <div class="document-kv-grid">
+                            <div><span class="muted">Tint</span><strong>@DisplayWorkshop(model.DyeingWorkshopCode, model.DyeingWorkshopName)</strong></div>
+                            <div><span class="muted">Acabat</span><strong>@DisplayWorkshop(model.FinishingWorkshopCode, model.FinishingWorkshopName)</strong></div>
+                            <div><span class="muted">Estampació</span><strong>@DisplayWorkshop(model.PrintingWorkshopCode, model.PrintingWorkshopName)</strong></div>
+                            <div><span class="muted">Confecció</span><strong>@DisplayWorkshop(model.TailoringWorkshopCode, model.TailoringWorkshopName)</strong></div>
+                            <div><span class="muted">Fornitura resum</span><strong>@DisplayValue(model.FornituraSummary)</strong></div>
+                            <div><span class="muted">C estamp 1</span><strong>@DisplayValue(model.PrintingCode1)</strong></div>
+                            <div><span class="muted">C estamp 2</span><strong>@DisplayValue(model.PrintingCode2)</strong></div>
+                            <div><span class="muted">N estamp 1/2</span><strong>@($"{model.PrintingUnits1:0.##} / {model.PrintingUnits2:0.##}")</strong></div>
+                        </div>
+                    </section>
+                    <section class="document-box">
+                        <h2>Tallas y notas</h2>
+                        <div class="document-kv-grid">
+                            <div><span class="muted">Talla 01</span><strong>@DisplayValue(model.Size01)</strong></div>
+                            <div><span class="muted">Talla 02</span><strong>@DisplayValue(model.Size02)</strong></div>
+                            <div><span class="muted">Talla 03</span><strong>@DisplayValue(model.Size03)</strong></div>
+                            <div><span class="muted">Talla 04</span><strong>@DisplayValue(model.Size04)</strong></div>
+                            <div><span class="muted">Talla 05</span><strong>@DisplayValue(model.Size05)</strong></div>
+                            <div><span class="muted">Talla 06</span><strong>@DisplayValue(model.Size06)</strong></div>
+                            <div><span class="muted">Talla 07</span><strong>@DisplayValue(model.Size07)</strong></div>
+                            <div><span class="muted">Talla 08</span><strong>@DisplayValue(model.Size08)</strong></div>
+                            <div><span class="muted">Talla 09</span><strong>@DisplayValue(model.Size09)</strong></div>
+                            <div><span class="muted">Talla 10</span><strong>@DisplayValue(model.Size10)</strong></div>
+                        </div>
+                        <p style="margin-top: 1rem;">@(string.IsNullOrWhiteSpace(model.Notes) ? "Sin notas." : model.Notes)</p>
+                    </section>
+                </div>
+            </section>
+
+            <section class="document-section">
+                <h2>Escandall</h2>
+                <table class="data-table document-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Pieza</th>
+                            <th>Tejido</th>
+                            <th>Consum</th>
+                            <th>Preu</th>
+                            <th>Cost</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (model.ScandalloLines.Count == 0)
+                        {
+                            <tr><td colspan="6">Sin líneas de escandallo.</td></tr>
+                        }
+                        else
+                        {
+                            @foreach (var row in model.ScandalloLines.OrderBy(item => item.LineNumber))
+                            {
+                                <tr>
+                                    <td>@row.LineNumber</td>
+                                    <td>@DisplayValue(row.Title)</td>
+                                    <td>@DisplayValue(row.FabricCode)</td>
+                                    <td>@row.Consumption.ToString("0.####")</td>
+                                    <td>@row.UnitPrice.ToString("0.00##")</td>
+                                    <td>@row.CostPrice.ToString("0.00##")</td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </section>
+
+            <section class="document-section">
+                <div class="document-grid-two">
+                    <section class="document-box">
+                        <h2>Colores</h2>
+                        <table class="data-table document-table">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>MODCOL</th>
+                                    <th>Pieza</th>
+                                    <th>Color pieza</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (model.ColorLines.Count == 0)
+                                {
+                                    <tr><td colspan="4">Sin colores.</td></tr>
+                                }
+                                else
+                                {
+                                    @foreach (var row in model.ColorLines.OrderBy(item => item.LineNumber))
+                                    {
+                                        <tr>
+                                            <td>@row.LineNumber</td>
+                                            <td>@DisplayValue(row.ModelColorCode)</td>
+                                            <td>@DisplayValue(row.Title)</td>
+                                            <td>@DisplayValue(row.ColorTitle)</td>
+                                        </tr>
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </section>
+                    <section class="document-box">
+                        <h2>Fornitures</h2>
+                        <table class="data-table document-table">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Fornitura</th>
+                                    <th>Medida</th>
+                                    <th>Unitats</th>
+                                    <th>Preu</th>
+                                    <th>Import</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (model.FornituraLines.Count == 0)
+                                {
+                                    <tr><td colspan="6">Sin fornituras.</td></tr>
+                                }
+                                else
+                                {
+                                    @foreach (var row in model.FornituraLines.OrderBy(item => item.LineNumber))
+                                    {
+                                        <tr>
+                                            <td>@row.LineNumber</td>
+                                            <td>@DisplayValue(row.FornituraCode)</td>
+                                            <td>@DisplayValue(row.Measure)</td>
+                                            <td>@row.Units.ToString("0.####")</td>
+                                            <td>@row.UnitPrice.ToString("0.00##")</td>
+                                            <td>@row.ImportAmount.ToString("0.00##")</td>
+                                        </tr>
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </section>
+                </div>
+            </section>
+
+            <section class="document-section">
+                <h2>Stock</h2>
+                <table class="data-table document-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Color</th>
+                            <th>Talla</th>
+                            <th>01</th>
+                            <th>02</th>
+                            <th>03</th>
+                            <th>04</th>
+                            <th>05</th>
+                            <th>06</th>
+                            <th>07</th>
+                            <th>08</th>
+                            <th>09</th>
+                            <th>10</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (model.StockLines.Count == 0)
+                        {
+                            <tr><td colspan="13">Sin stock cargado.</td></tr>
+                        }
+                        else
+                        {
+                            @foreach (var row in model.StockLines.OrderBy(item => item.LineNumber))
+                            {
+                                <tr>
+                                    <td>@row.LineNumber</td>
+                                    <td>@DisplayValue(row.Color)</td>
+                                    <td>@DisplayValue(row.SizeText)</td>
+                                    <td>@row.SizeQuantity01.ToString("0.##")</td>
+                                    <td>@row.SizeQuantity02.ToString("0.##")</td>
+                                    <td>@row.SizeQuantity03.ToString("0.##")</td>
+                                    <td>@row.SizeQuantity04.ToString("0.##")</td>
+                                    <td>@row.SizeQuantity05.ToString("0.##")</td>
+                                    <td>@row.SizeQuantity06.ToString("0.##")</td>
+                                    <td>@row.SizeQuantity07.ToString("0.##")</td>
+                                    <td>@row.SizeQuantity08.ToString("0.##")</td>
+                                    <td>@row.SizeQuantity09.ToString("0.##")</td>
+                                    <td>@row.SizeQuantity10.ToString("0.##")</td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </section>
+        </section>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public Guid Id { get; set; }
+
+    private Guid? tenantId;
+    private Guid? companyId;
+    private ModeloDetailDto? model;
+    private string errorMessage = string.Empty;
+
+    private string DisplayClient => model is null
+        ? "-"
+        : string.IsNullOrWhiteSpace(model.ClientName)
+            ? (model.ClientCode > 0 ? model.ClientCode.ToString() : "-")
+            : $"{model.ClientCode} · {model.ClientName}";
+
+    private string DisplayFabric => model is null
+        ? "-"
+        : string.IsNullOrWhiteSpace(model.FabricDescription)
+            ? DisplayValue(model.FabricCode)
+            : $"{DisplayValue(model.FabricCode)} · {model.FabricDescription}";
+
+    private string DisplaySupplier => model is null
+        ? "-"
+        : string.IsNullOrWhiteSpace(model.SupplierName)
+            ? (model.SupplierCode > 0 ? model.SupplierCode.ToString() : "-")
+            : $"{model.SupplierCode} · {model.SupplierName}";
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        tenantId = user.GetTenantId();
+        companyId = user.GetActiveCompanyId();
+
+        if (!tenantId.HasValue || !companyId.HasValue)
+        {
+            return;
+        }
+
+        try
+        {
+            errorMessage = string.Empty;
+            model = await ModeloQueries.GetByIdAsync(tenantId.Value, companyId.Value, Id);
+        }
+        catch (Exception exception)
+        {
+            errorMessage = exception.Message;
+            model = null;
+        }
+    }
+
+    private static string DisplayValue(string? value) => string.IsNullOrWhiteSpace(value) ? "-" : value;
+
+    private static string DisplayWorkshop(int code, string? name)
+    {
+        if (!string.IsNullOrWhiteSpace(name))
+        {
+            return code > 0 ? $"{code} · {name}" : name;
+        }
+
+        return code > 0 ? code.ToString() : "-";
+    }
+}

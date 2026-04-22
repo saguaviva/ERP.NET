@@ -15,7 +15,7 @@
         <p class="eyebrow">CRM</p>
         <h1>@(Code.HasValue ? $"Editar cliente {Code}" : "Nuevo cliente")</h1>
         <p class="lead">@(isLegacySyncActive
-            ? "Consulta sobre la réplica SaaS local de clients, en solo lectura mientras el módulo siga sincronizado desde legacy."
+            ? "Alta y edición sobre la réplica SaaS local. La sincronización manual solo refresca los registros que sigan siendo de origen legacy."
             : "Alta y edición sobre la tabla clients replicada en la SaaS local, filtrada por la empresa activa.")</p>
     </div>
 </div>
@@ -37,7 +37,7 @@ else
     {
         <div class="alert">
             CRM / Clientes está en convivencia con legacy para esta empresa.
-            Esta ficha queda en solo lectura mientras la sincronización mande.
+            Esta ficha sigue siendo editable en local. Si modificas un cliente importado, pasará a tratarse como registro local y la sync manual ya no lo sobreescribirá.
             @if (!string.IsNullOrWhiteSpace(syncStatusLabel))
             {
                 <span>@syncStatusLabel</span>
@@ -66,7 +66,7 @@ else
                         {
                             <span>@FormatDuplicateReview(duplicate)</span>
                         }
-                        @if (Code.HasValue && !isLegacySyncActive)
+                        @if (Code.HasValue)
                         {
                             <div class="quick-links">
                                 <button class="secondary-button" type="button" @onclick="() => SetDuplicateReviewAsync(duplicate, ClienteDuplicateReviewStatus.Reviewed)">Marcar revisado</button>
@@ -85,7 +85,7 @@ else
     }
 
     <EditForm Model="model" OnValidSubmit="SaveAsync">
-        <fieldset disabled="@isLegacySyncActive">
+        <fieldset>
         <div class="form-grid">
             <label class="field">
                 <span>Nombre</span>
@@ -290,10 +290,11 @@ else
         </section>
 
         <div class="form-actions">
-            @if (!isLegacySyncActive)
+            <button class="primary-button" type="submit">Guardar</button>
+            <button class="secondary-button" type="button" @onclick="CheckDuplicatesAsync">Comprobar duplicados</button>
+            @if (Code.HasValue)
             {
-                <button class="primary-button" type="submit">Guardar</button>
-                <button class="secondary-button" type="button" @onclick="CheckDuplicatesAsync">Comprobar duplicados</button>
+                <button class="secondary-button danger" type="button" @onclick="DeleteAsync">Eliminar cliente</button>
             }
             <a class="secondary-button link-button" href="/crm/clientes">Volver al listado</a>
         </div>
@@ -420,13 +421,6 @@ else
         statusMessage = string.Empty;
         isError = false;
 
-        if (isLegacySyncActive)
-        {
-            statusMessage = "CRM / Clientes está en convivencia con legacy para esta empresa. La ficha queda en solo lectura.";
-            isError = true;
-            return;
-        }
-
         if (!tenantId.HasValue || !companyId.HasValue)
         {
             statusMessage = "No hay empresa activa seleccionada.";
@@ -443,6 +437,25 @@ else
             Code = code;
             await LoadAuditAsync(code);
             NavigationManager.NavigateTo($"/crm/clientes/editar/{code}", forceLoad: true);
+        }
+        catch (Exception exception)
+        {
+            statusMessage = exception.Message;
+            isError = true;
+        }
+    }
+
+    private async Task DeleteAsync()
+    {
+        if (!tenantId.HasValue || !companyId.HasValue || !Code.HasValue)
+        {
+            return;
+        }
+
+        try
+        {
+            await ClienteService.DeleteAsync(tenantId.Value, companyId.Value, Code.Value);
+            NavigationManager.NavigateTo("/crm/clientes", forceLoad: false);
         }
         catch (Exception exception)
         {

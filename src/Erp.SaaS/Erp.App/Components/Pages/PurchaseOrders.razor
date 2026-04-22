@@ -1,23 +1,25 @@
 @page "/compras/pedidos"
 @attribute [Authorize(Roles = "TenantAdmin,TenantReader")]
 @inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
 @inject ILegacySyncService LegacySyncService
 @inject IPurchaseOrderQueries PurchaseOrderQueries
+@inject AppText T
 
-<PageTitle>Compras / Pedidos</PageTitle>
+<PageTitle>@L("Compras / Pedidos", "Compres / Comandes", "Purchases / Orders")</PageTitle>
 
 <div class="page-header">
     <div>
-        <p class="eyebrow">Compras</p>
-        <h1>Pedidos a proveedor</h1>
+        <p class="eyebrow">@L("Compras", "Compres", "Purchases")</p>
+        <h1>@L("Pedidos a proveedor", "Comandes a proveïdor", "Supplier orders")</h1>
         <p class="lead">@(isLegacySyncActive
-            ? "Consulta y filtra los pedidos replicados en la SaaS local, en solo lectura mientras el módulo siga sincronizado desde legacy."
-            : "Listado web de pedidos por empresa activa, con estados, líneas y trazabilidad básica.")</p>
+            ? L("Consulta y filtra los pedidos replicados en la SaaS local. La sync manual refresca solo los pedidos con origen legacy.", "Consulta i filtra les comandes replicades a la SaaS local. La sync manual refresca només les comandes amb origen legacy.", "Browse and filter orders replicated into the local SaaS. Manual sync only refreshes legacy-origin orders.")
+            : L("Listado web de pedidos por empresa activa, con estados, líneas y trazabilidad básica.", "Llistat web de comandes per empresa activa, amb estats, línies i traçabilitat bàsica.", "Web list of orders for the active company, with statuses, lines and basic traceability."))</p>
     </div>
     <div class="quick-links">
         @if (canEdit)
         {
-            <a class="primary-button link-button" href="/compras/pedidos/nuevo">Nuevo pedido</a>
+            <a class="primary-button link-button" href="/compras/pedidos/nuevo">@L("Nuevo pedido", "Nova comanda", "New order")</a>
         }
     </div>
 </div>
@@ -25,16 +27,16 @@
 @if (!tenantId.HasValue || !companyId.HasValue)
 {
     <div class="empty-state">
-        <p>Selecciona una empresa activa para trabajar con pedidos de compra.</p>
+        <p>@L("Selecciona una empresa activa para trabajar con pedidos de compra.", "Selecciona una empresa activa per treballar amb comandes de compra.", "Select an active company to work with purchase orders.")</p>
     </div>
 }
 else
 {
     <section class="panel">
         <div class="filter-row">
-            <input class="text-input" @bind="filter.Search" placeholder="Buscar por número, proveedor o notas" />
+            <input class="text-input" @bind="filter.Search" placeholder="@L("Buscar por número, proveedor o notas", "Buscar per número, proveïdor o notes", "Search by number, supplier or notes")" />
             <select class="text-input" @bind="filter.Status">
-                <option value="">Todos los estados</option>
+                <option value="">@L("Todos los estados", "Tots els estats", "All statuses")</option>
                 @foreach (var status in PurchaseOrderStatuses.All)
                 {
                     <option value="@status">@FormatStatus(status)</option>
@@ -42,18 +44,18 @@ else
             </select>
             <label class="checkbox-field">
                 <input type="checkbox" @bind="filter.IncludeClosed" />
-                <span>Incluir cerrados</span>
+                <span>@L("Incluir cerrados", "Incloure tancades", "Include closed")</span>
             </label>
-            <button class="secondary-button" @onclick="SearchAsync" disabled="@isLoading">@(isLoading ? "Cargando..." : "Buscar")</button>
+            <button class="secondary-button" @onclick="SearchAsync" disabled="@isLoading">@(isLoading ? L("Cargando...", "Carregant...", "Loading...") : L("Buscar", "Buscar", "Search"))</button>
         </div>
         <div class="filter-row results-toolbar" style="margin-top: 0.85rem;">
             <span class="results-summary">
                 @(totalCount == 0
-                    ? "Sin resultados"
-                    : $"Mostrando {PageStart}-{PageEnd} de {totalCount} pedidos")
+                    ? L("Sin resultados", "Sense resultats", "No results")
+                    : L($"Mostrando {PageStart}-{PageEnd} de {totalCount} pedidos", $"Mostrant {PageStart}-{PageEnd} de {totalCount} comandes", $"Showing {PageStart}-{PageEnd} of {totalCount} orders"))
             </span>
             <label class="field compact-field">
-                <span>Tamaño de página</span>
+                <span>@L("Tamaño de página", "Mida de pàgina", "Page size")</span>
                 <select class="sidebar-select compact-select" value="@filter.PageSize" @onchange="OnPageSizeChanged" disabled="@isLoading">
                     <option value="25">25</option>
                     <option value="50">50</option>
@@ -71,8 +73,7 @@ else
     @if (isLegacySyncActive)
     {
         <div class="alert">
-            Compras / Pedidos está en convivencia con legacy para esta empresa.
-            La web muestra la réplica SaaS local y queda en solo lectura mientras la sincronización mande.
+            @L("Compras / Pedidos está en convivencia con legacy para esta empresa. La sync manual refresca solo los pedidos con origen legacy; los nuevos o modificados desde la web quedan como locales.", "Compres / Comandes està en convivència amb legacy per a aquesta empresa. La sync manual refresca només les comandes amb origen legacy; les noves o modificades des del web queden com a locals.", "Purchases / Orders is running in legacy coexistence mode for this company. Manual sync refreshes only legacy-origin orders; new or edited web orders remain local.")
             @if (!string.IsNullOrWhiteSpace(syncStatusLabel))
             {
                 <span>@syncStatusLabel</span>
@@ -85,20 +86,20 @@ else
         {
             <div class="loading-banner">
                 <span class="loading-indicator" aria-hidden="true"></span>
-                <span>Cargando pedidos de compra...</span>
+                <span>@L("Cargando pedidos de compra...", "Carregant comandes de compra...", "Loading purchase orders...")</span>
             </div>
         }
 
         <table class="data-table">
             <thead>
                 <tr>
-                    <SortableHeader Label="Número" IsActive="@(sortColumn == nameof(PurchaseOrderListItemDto.OrderNumber))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(PurchaseOrderListItemDto.OrderNumber), true))" />
-                    <SortableHeader Label="Proveedor" IsActive="@(sortColumn == nameof(PurchaseOrderListItemDto.SupplierName))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(PurchaseOrderListItemDto.SupplierName)))" />
-                    <SortableHeader Label="Fecha" IsActive="@(sortColumn == nameof(PurchaseOrderListItemDto.DocumentDate))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(PurchaseOrderListItemDto.DocumentDate), true))" />
-                    <SortableHeader Label="Prevista" IsActive="@(sortColumn == nameof(PurchaseOrderListItemDto.ExpectedDate))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(PurchaseOrderListItemDto.ExpectedDate), true))" />
-                    <SortableHeader Label="Estado" IsActive="@(sortColumn == nameof(PurchaseOrderListItemDto.Status))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(PurchaseOrderListItemDto.Status)))" />
-                    <SortableHeader Label="Líneas" IsActive="@(sortColumn == nameof(PurchaseOrderListItemDto.LineCount))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(PurchaseOrderListItemDto.LineCount), true))" />
-                    <SortableHeader Label="Total" IsActive="@(sortColumn == nameof(PurchaseOrderListItemDto.TotalAmount))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(PurchaseOrderListItemDto.TotalAmount), true))" />
+                    <SortableHeader Label="@L("Número", "Número", "Number")" IsActive="@(sortColumn == nameof(PurchaseOrderListItemDto.OrderNumber))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(PurchaseOrderListItemDto.OrderNumber), true))" />
+                    <SortableHeader Label="@L("Proveedor", "Proveïdor", "Supplier")" IsActive="@(sortColumn == nameof(PurchaseOrderListItemDto.SupplierName))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(PurchaseOrderListItemDto.SupplierName)))" />
+                    <SortableHeader Label="@L("Fecha", "Data", "Date")" IsActive="@(sortColumn == nameof(PurchaseOrderListItemDto.DocumentDate))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(PurchaseOrderListItemDto.DocumentDate), true))" />
+                    <SortableHeader Label="@L("Prevista", "Prevista", "Expected")" IsActive="@(sortColumn == nameof(PurchaseOrderListItemDto.ExpectedDate))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(PurchaseOrderListItemDto.ExpectedDate), true))" />
+                    <SortableHeader Label="@L("Estado", "Estat", "Status")" IsActive="@(sortColumn == nameof(PurchaseOrderListItemDto.Status))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(PurchaseOrderListItemDto.Status)))" />
+                    <SortableHeader Label="@L("Líneas", "Línies", "Lines")" IsActive="@(sortColumn == nameof(PurchaseOrderListItemDto.LineCount))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(PurchaseOrderListItemDto.LineCount), true))" />
+                    <SortableHeader Label="@L("Total", "Total", "Total")" IsActive="@(sortColumn == nameof(PurchaseOrderListItemDto.TotalAmount))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(PurchaseOrderListItemDto.TotalAmount), true))" />
                     <th></th>
                 </tr>
             </thead>
@@ -122,7 +123,7 @@ else
                 else if (items.Count == 0)
                 {
                     <tr>
-                        <td colspan="8" class="table-empty">No hay pedidos para mostrar.</td>
+                        <td colspan="8" class="table-empty">@L("No hay pedidos para mostrar.", "No hi ha comandes per mostrar.", "There are no orders to show.")</td>
                     </tr>
                 }
                 else
@@ -138,7 +139,7 @@ else
                             <td>@item.LineCount</td>
                             <td>@item.TotalAmount.ToString("0.00") €</td>
                             <td>
-                                <a class="inline-link" href="/compras/pedidos/editar/@item.OrderNumber">@(canEdit ? "Abrir" : "Ver")</a>
+                                <a class="inline-link" href="/compras/pedidos/editar/@item.OrderNumber">@(canEdit ? L("Abrir", "Obrir", "Open") : L("Ver", "Veure", "View"))</a>
                             </td>
                         </tr>
                     }
@@ -147,18 +148,47 @@ else
         </table>
 
         <div class="pagination-bar">
-            <span class="muted">Página @filter.Page de @TotalPages</span>
+            <span class="muted">@L($"Página {filter.Page} de {TotalPages}", $"Pàgina {filter.Page} de {TotalPages}", $"Page {filter.Page} of {TotalPages}")</span>
             <div class="pagination-actions">
-                <button class="secondary-button" @onclick="() => ChangePageAsync(1)" disabled="@(!CanGoPrevious || isLoading)">Primera</button>
-                <button class="secondary-button" @onclick="() => ChangePageAsync(filter.Page - 1)" disabled="@(!CanGoPrevious || isLoading)">Anterior</button>
-                <button class="secondary-button" @onclick="() => ChangePageAsync(filter.Page + 1)" disabled="@(!CanGoNext || isLoading)">Siguiente</button>
-                <button class="secondary-button" @onclick="() => ChangePageAsync(TotalPages)" disabled="@(!CanGoNext || isLoading)">Última</button>
+                <button class="secondary-button" @onclick="() => ChangePageAsync(1)" disabled="@(!CanGoPrevious || isLoading)">@L("Primera", "Primera", "First")</button>
+                <button class="secondary-button" @onclick="() => ChangePageAsync(filter.Page - 1)" disabled="@(!CanGoPrevious || isLoading)">@L("Anterior", "Anterior", "Previous")</button>
+                <button class="secondary-button" @onclick="() => ChangePageAsync(filter.Page + 1)" disabled="@(!CanGoNext || isLoading)">@L("Siguiente", "Següent", "Next")</button>
+                <button class="secondary-button" @onclick="() => ChangePageAsync(TotalPages)" disabled="@(!CanGoNext || isLoading)">@L("Última", "Última", "Last")</button>
             </div>
         </div>
     </section>
 }
 
 @code {
+    private string L(string spanish, string catalan, string english) =>
+        T.CurrentLanguage switch
+        {
+            AppLanguages.Catalan => catalan,
+            AppLanguages.English => english,
+            _ => spanish
+        };
+
+    [SupplyParameterFromQuery(Name = "q")]
+    public string? SearchQuery { get; set; }
+
+    [SupplyParameterFromQuery(Name = "status")]
+    public string? StatusQuery { get; set; }
+
+    [SupplyParameterFromQuery(Name = "closed")]
+    public bool? ClosedQuery { get; set; }
+
+    [SupplyParameterFromQuery(Name = "page")]
+    public int? PageQuery { get; set; }
+
+    [SupplyParameterFromQuery(Name = "pageSize")]
+    public int? PageSizeQuery { get; set; }
+
+    [SupplyParameterFromQuery(Name = "sort")]
+    public string? SortQuery { get; set; }
+
+    [SupplyParameterFromQuery(Name = "desc")]
+    public bool? DescQuery { get; set; }
+
     private Guid? tenantId;
     private Guid? companyId;
     private bool canEdit;
@@ -185,8 +215,11 @@ else
         companyId = user.GetActiveCompanyId();
         canEdit = user.IsPlatformAdmin() || user.IsInRole(PlatformRoles.TenantAdmin);
         await LoadSyncStatusAsync();
-        canEdit = canEdit && !isLegacySyncActive;
+    }
 
+    protected override async Task OnParametersSetAsync()
+    {
+        ApplyQueryState();
         await LoadAsync();
     }
 
@@ -212,8 +245,8 @@ else
 
         isLegacySyncActive = true;
         syncStatusLabel = status.LastCompletedUtc.HasValue
-            ? $"Última sync: {status.LastCompletedUtc.Value.ToLocalTime():dd/MM/yyyy HH:mm:ss} · Ins: {status.LastInserted} · Act: {status.LastUpdated} · Omi: {status.LastSkipped} · Err: {status.LastErrors}"
-            : $"Estado: {status.LastStatus}";
+            ? $"{L("Última sync:", "Última sync:", "Last sync:")} {status.LastCompletedUtc.Value.ToLocalTime():dd/MM/yyyy HH:mm:ss} · Ins: {status.LastInserted} · Act: {status.LastUpdated} · Omi: {status.LastSkipped} · Err: {status.LastErrors}"
+            : $"{L("Estado:", "Estat:", "Status:")} {status.LastStatus}";
     }
 
     private async Task LoadAsync()
@@ -253,7 +286,8 @@ else
     private Task SearchAsync()
     {
         filter.Page = 1;
-        return LoadAsync();
+        UpdateQueryState();
+        return Task.CompletedTask;
     }
 
     private async Task SetSortAsync(string column, bool defaultDescending = false)
@@ -269,7 +303,8 @@ else
         }
 
         filter.Page = 1;
-        await LoadAsync();
+        UpdateQueryState();
+        await Task.CompletedTask;
     }
 
     private async Task ChangePageAsync(int page)
@@ -281,7 +316,8 @@ else
         }
 
         filter.Page = nextPage;
-        await LoadAsync();
+        UpdateQueryState();
+        await Task.CompletedTask;
     }
 
     private async Task OnPageSizeChanged(ChangeEventArgs args)
@@ -293,16 +329,69 @@ else
 
         filter.PageSize = pageSize;
         filter.Page = 1;
-        await LoadAsync();
+        UpdateQueryState();
+        await Task.CompletedTask;
     }
 
-    private static string FormatStatus(string status) => status switch
+    private void ApplyQueryState()
     {
-        PurchaseOrderStatuses.Draft => "Borrador",
-        PurchaseOrderStatuses.Sent => "Enviado",
-        PurchaseOrderStatuses.PartiallyReceived => "Recibido parcial",
-        PurchaseOrderStatuses.Received => "Recibido total",
-        PurchaseOrderStatuses.Cancelled => "Cancelado",
+        filter.Search = SearchQuery?.Trim() ?? string.Empty;
+        filter.Status = NormalizeStatus(StatusQuery);
+        filter.IncludeClosed = ClosedQuery.GetValueOrDefault();
+        filter.Page = Math.Max(PageQuery.GetValueOrDefault(1), 1);
+        filter.PageSize = PageSizeQuery is 25 or 50 or 100 ? PageSizeQuery.Value : 25;
+        sortColumn = NormalizeSortColumn(SortQuery);
+        sortDescending = DescQuery ?? true;
+        filter.SortColumn = sortColumn;
+        filter.SortDescending = sortDescending;
+    }
+
+    private void UpdateQueryState()
+    {
+        var uri = NavigationManager.GetUriWithQueryParameters(new Dictionary<string, object?>
+        {
+            ["q"] = string.IsNullOrWhiteSpace(filter.Search) ? null : filter.Search,
+            ["status"] = string.IsNullOrWhiteSpace(filter.Status) ? null : filter.Status,
+            ["closed"] = filter.IncludeClosed ? true : null,
+            ["page"] = filter.Page > 1 ? filter.Page : null,
+            ["pageSize"] = filter.PageSize != 25 ? filter.PageSize : null,
+            ["sort"] = string.Equals(sortColumn, nameof(PurchaseOrderListItemDto.OrderNumber), StringComparison.Ordinal) ? null : sortColumn,
+            ["desc"] = sortDescending ? null : false
+        });
+
+        NavigationManager.NavigateTo(uri, replace: true);
+    }
+
+    private static string NormalizeStatus(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return string.Empty;
+        }
+
+        var match = PurchaseOrderStatuses.All.FirstOrDefault(item => string.Equals(item, value, StringComparison.OrdinalIgnoreCase));
+        return match ?? string.Empty;
+    }
+
+    private static string NormalizeSortColumn(string? sortColumn) => sortColumn switch
+    {
+        nameof(PurchaseOrderListItemDto.OrderNumber) => nameof(PurchaseOrderListItemDto.OrderNumber),
+        nameof(PurchaseOrderListItemDto.SupplierName) => nameof(PurchaseOrderListItemDto.SupplierName),
+        nameof(PurchaseOrderListItemDto.DocumentDate) => nameof(PurchaseOrderListItemDto.DocumentDate),
+        nameof(PurchaseOrderListItemDto.ExpectedDate) => nameof(PurchaseOrderListItemDto.ExpectedDate),
+        nameof(PurchaseOrderListItemDto.Status) => nameof(PurchaseOrderListItemDto.Status),
+        nameof(PurchaseOrderListItemDto.LineCount) => nameof(PurchaseOrderListItemDto.LineCount),
+        nameof(PurchaseOrderListItemDto.TotalAmount) => nameof(PurchaseOrderListItemDto.TotalAmount),
+        _ => nameof(PurchaseOrderListItemDto.OrderNumber)
+    };
+
+    private string FormatStatus(string status) => status switch
+    {
+        PurchaseOrderStatuses.Draft => L("Borrador", "Esborrany", "Draft"),
+        PurchaseOrderStatuses.Sent => L("Enviado", "Enviada", "Sent"),
+        PurchaseOrderStatuses.PartiallyReceived => L("Recibido parcial", "Rebut parcial", "Partially received"),
+        PurchaseOrderStatuses.Received => L("Recibido total", "Rebut total", "Fully received"),
+        PurchaseOrderStatuses.Cancelled => L("Cancelado", "Cancel·lada", "Cancelled"),
         _ => status
     };
 

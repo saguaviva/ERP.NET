@@ -1,0 +1,441 @@
+@page "/articulos/disposiciones"
+@attribute [Authorize(Roles = "TenantAdmin,TenantReader")]
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
+@inject IDisposicionQueries DisposicionQueries
+@inject ILegacySyncService LegacySyncService
+@inject AppText T
+
+<PageTitle>@L("Artículos / Disposiciones", "Articles / Disposicions", "Articles / Dispositions")</PageTitle>
+
+<div class="page-header">
+    <div>
+        <p class="eyebrow">@T["menu.articles"]</p>
+        <h1>@L("Disposiciones", "Disposicions", "Dispositions")</h1>
+        <p class="lead">@(isLegacySyncActive
+            ? L("Consulta y filtra las disposiciones de la SaaS local. La importación manual desde legacy refresca solo registros de origen legacy.", "Consulta i filtra les disposicions de la SaaS local. La importació manual des de legacy refresca només registres d'origen legacy.", "Browse and filter dispositions from the local SaaS. Manual import from legacy only refreshes legacy-origin records.")
+            : L("Consulta y filtra las disposiciones del centro legacy asociado a la empresa activa.", "Consulta i filtra les disposicions del centre legacy associat a l'empresa activa.", "Browse and filter dispositions from the legacy center linked to the active company."))</p>
+    </div>
+    <div class="quick-links">
+        @if (canEdit)
+        {
+            <a class="primary-button link-button" href="/articulos/disposiciones/nueva">@L("Nueva disposición", "Nova disposició", "New disposition")</a>
+        }
+    </div>
+</div>
+
+@if (!tenantId.HasValue || !companyId.HasValue)
+{
+    <div class="empty-state">
+        <p>@L("Selecciona una empresa activa para trabajar con disposiciones.", "Selecciona una empresa activa per treballar amb disposicions.", "Select an active company to work with dispositions.")</p>
+    </div>
+}
+else
+{
+    <section class="panel">
+        <div class="filter-row">
+            <input class="text-input" @bind="filter.Search" placeholder="@L("Buscar por número, cliente, acabador, color, comanda o notas", "Buscar per número, client, acabador, color, comanda o notes", "Search by number, client, finisher, color, order or notes")" />
+            <select class="sidebar-select compact-select" @bind="filter.ReceivedMode" disabled="@isLoading">
+                <option value="">@L("Todas", "Totes", "All")</option>
+                <option value="pending">@L("Pendientes", "Pendents", "Pending")</option>
+                <option value="received">@L("Recibidas", "Rebudes", "Received")</option>
+            </select>
+            <label class="checkbox-inline">
+                <InputCheckbox @bind-Value="filter.IncludeCancelled" disabled="@isLoading" />
+                <span>@L("Incluir anuladas", "Incloure anul·lades", "Include cancelled")</span>
+            </label>
+            <button class="secondary-button" @onclick="SearchAsync" disabled="@isLoading">@(isLoading ? L("Cargando...", "Carregant...", "Loading...") : L("Buscar", "Buscar", "Search"))</button>
+        </div>
+        <div class="filter-row results-toolbar" style="margin-top: 0.85rem;">
+            <span class="results-summary">
+                @(totalCount == 0
+                    ? L("Sin resultados", "Sense resultats", "No results")
+                    : L($"Mostrando {PageStart}-{PageEnd} de {totalCount} disposiciones", $"Mostrant {PageStart}-{PageEnd} de {totalCount} disposicions", $"Showing {PageStart}-{PageEnd} of {totalCount} dispositions"))
+            </span>
+            <label class="field compact-field">
+                <span>@L("Tamaño de página", "Mida de pàgina", "Page size")</span>
+                <select class="sidebar-select compact-select" value="@filter.PageSize" @onchange="OnPageSizeChanged" disabled="@isLoading">
+                    <option value="25">25</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                </select>
+            </label>
+        </div>
+    </section>
+
+    @if (!string.IsNullOrWhiteSpace(errorMessage))
+    {
+        <div class="alert danger">@errorMessage</div>
+    }
+
+    @if (isLegacySyncActive)
+    {
+        <div class="alert">
+            @L("Artículos / Disposiciones está en convivencia con legacy para esta empresa. La web guarda cambios solo en la SaaS local y la sync manual refresca únicamente registros de origen legacy.", "Articles / Disposicions està en convivència amb legacy per a aquesta empresa. La web guarda canvis només a la SaaS local i la sync manual refresca únicament registres d'origen legacy.", "Articles / Dispositions is running in legacy coexistence mode for this company. The web app saves changes only in the local SaaS and manual sync refreshes legacy-origin records only.")
+            @if (!string.IsNullOrWhiteSpace(syncStatusLabel))
+            {
+                <span>@syncStatusLabel</span>
+            }
+        </div>
+    }
+
+    <section class="panel @(isLoading ? "loading-panel" : string.Empty)" aria-busy="@isLoading">
+        @if (isLoading)
+        {
+            <div class="loading-banner">
+                <span class="loading-indicator" aria-hidden="true"></span>
+                <span>@L("Cargando disposiciones...", "Carregant disposicions...", "Loading dispositions...")</span>
+            </div>
+        }
+
+        <div class="table-scroll">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <SortableHeader Label="@L("Número", "Número", "Number")" IsActive="@(sortColumn == nameof(DisposicionListItemDto.Number))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(DisposicionListItemDto.Number), true))" />
+                        <SortableHeader Label="@L("Fecha", "Data", "Date")" IsActive="@(sortColumn == nameof(DisposicionListItemDto.Date))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(DisposicionListItemDto.Date), true))" />
+                        <SortableHeader Label="@L("Recepción", "Recepció", "Reception")" IsActive="@(sortColumn == nameof(DisposicionListItemDto.ReceptionDate))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(DisposicionListItemDto.ReceptionDate), true))" />
+                        <SortableHeader Label="@L("Cliente", "Client", "Client")" IsActive="@(sortColumn == nameof(DisposicionListItemDto.ClientName))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(DisposicionListItemDto.ClientName)))" />
+                        <SortableHeader Label="@L("Acabador", "Acabador", "Finisher")" IsActive="@(sortColumn == nameof(DisposicionListItemDto.FinisherName))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(DisposicionListItemDto.FinisherName)))" />
+                        <SortableHeader Label="@L("Color", "Color", "Color")" IsActive="@(sortColumn == nameof(DisposicionListItemDto.Color))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(DisposicionListItemDto.Color)))" />
+                        <SortableHeader Label="@L("Piezas", "Peces", "Pieces")" IsActive="@(sortColumn == nameof(DisposicionListItemDto.TotalPieces))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(DisposicionListItemDto.TotalPieces), true))" />
+                        <SortableHeader Label="Kg" IsActive="@(sortColumn == nameof(DisposicionListItemDto.TotalKilograms))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(DisposicionListItemDto.TotalKilograms), true))" />
+                        <th>@L("Estado", "Estat", "Status")</th>
+                        <SortableHeader Label="@L("Origen", "Origen", "Origin")" IsActive="@(sortColumn == nameof(DisposicionListItemDto.Origin))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(DisposicionListItemDto.Origin)))" />
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (isLoading)
+                    {
+                        @for (var index = 0; index < 5; index++)
+                        {
+                            <tr class="table-skeleton-row">
+                                <td><span class="skeleton-line short"></span></td>
+                                <td><span class="skeleton-line short"></span></td>
+                                <td><span class="skeleton-line short"></span></td>
+                                <td><span class="skeleton-line"></span></td>
+                                <td><span class="skeleton-line"></span></td>
+                                <td><span class="skeleton-line short"></span></td>
+                                <td><span class="skeleton-line short"></span></td>
+                                <td><span class="skeleton-line short"></span></td>
+                                <td><span class="skeleton-line short"></span></td>
+                                <td><span class="skeleton-line short"></span></td>
+                                <td><span class="skeleton-line short"></span></td>
+                            </tr>
+                        }
+                    }
+                    else if (items.Count == 0)
+                    {
+                        <tr>
+                            <td colspan="11" class="table-empty">@L("No hay disposiciones para mostrar.", "No hi ha disposicions per mostrar.", "There are no dispositions to display.")</td>
+                        </tr>
+                    }
+                    else
+                    {
+                        @foreach (var item in items)
+                        {
+                            <tr>
+                                <td>@FormatVisibleNumber(item.Number, item.Year)</td>
+                                <td>@FormatDate(item.Date)</td>
+                                <td>@FormatDate(item.ReceptionDate)</td>
+                                <td>
+                                    <div>@GetDisplayText(item.ClientName, item.ClientCode)</div>
+                                    @if (!string.IsNullOrWhiteSpace(item.ClientReferenceCode))
+                                    {
+                                        <div class="muted">@item.ClientReferenceCode</div>
+                                    }
+                                </td>
+                                <td>@GetDisplayText(item.FinisherName, item.FinisherCode)</td>
+                                <td>
+                                    <div>@item.Color</div>
+                                    @if (!string.IsNullOrWhiteSpace(item.ClientColor))
+                                    {
+                                        <div class="muted">@item.ClientColor</div>
+                                    }
+                                </td>
+                                <td>@item.TotalPieces.ToString("0.##")</td>
+                                <td>@item.TotalKilograms.ToString("0.##")</td>
+                                <td>
+                                    @if (item.IsCancelled)
+                                    {
+                                        <span class="status-pill status-pill-warning">@L("Anulada", "Anul·lada", "Cancelled")</span>
+                                    }
+                                    else if (item.IsReceived)
+                                    {
+                                        <span class="status-pill status-pill-success">@L("Recibida", "Rebuda", "Received")</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="status-pill">@L("Pendiente", "Pendent", "Pending")</span>
+                                    }
+                                </td>
+                                <td>@item.Origin</td>
+                                <td>
+                                    <div class="inline-action-list">
+                                        <a class="inline-link" href="/articulos/disposiciones/editar/@item.Code">@(canEdit ? L("Abrir", "Obrir", "Open") : L("Ver", "Veure", "View"))</a>
+                                        @if (canEdit && !item.IsCancelled)
+                                        {
+                                            <a class="inline-link" href="@BuildParteAcabadoUrl(item.Code)">@L("Crear parte", "Crear part", "Create job")</a>
+                                        }
+                                        <a class="inline-link" href="/articulos/disposiciones/@item.Code/imprimir" target="_blank" rel="noopener noreferrer">@L("Imprimir", "Imprimir", "Print")</a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <div class="pagination-bar">
+            <span class="muted">@L($"Página {filter.Page} de {TotalPages}", $"Pàgina {filter.Page} de {TotalPages}", $"Page {filter.Page} of {TotalPages}")</span>
+            <div class="pagination-actions">
+                <button class="secondary-button" @onclick="() => ChangePageAsync(1)" disabled="@(!CanGoPrevious || isLoading)">@L("Primera", "Primera", "First")</button>
+                <button class="secondary-button" @onclick="() => ChangePageAsync(filter.Page - 1)" disabled="@(!CanGoPrevious || isLoading)">@L("Anterior", "Anterior", "Previous")</button>
+                <button class="secondary-button" @onclick="() => ChangePageAsync(filter.Page + 1)" disabled="@(!CanGoNext || isLoading)">@L("Siguiente", "Següent", "Next")</button>
+                <button class="secondary-button" @onclick="() => ChangePageAsync(TotalPages)" disabled="@(!CanGoNext || isLoading)">@L("Última", "Última", "Last")</button>
+            </div>
+        </div>
+    </section>
+}
+
+@code {
+    [SupplyParameterFromQuery(Name = "q")]
+    public string? SearchQuery { get; set; }
+
+    [SupplyParameterFromQuery(Name = "received")]
+    public string? ReceivedQuery { get; set; }
+
+    [SupplyParameterFromQuery(Name = "cancelled")]
+    public bool? CancelledQuery { get; set; }
+
+    [SupplyParameterFromQuery(Name = "page")]
+    public int? PageQuery { get; set; }
+
+    [SupplyParameterFromQuery(Name = "pageSize")]
+    public int? PageSizeQuery { get; set; }
+
+    [SupplyParameterFromQuery(Name = "sort")]
+    public string? SortQuery { get; set; }
+
+    [SupplyParameterFromQuery(Name = "desc")]
+    public bool? DescQuery { get; set; }
+
+    private Guid? tenantId;
+    private Guid? companyId;
+    private bool canEdit;
+    private bool isLoading;
+    private DisposicionFilter filter = new() { Page = 1, PageSize = 25, SortColumn = nameof(DisposicionListItemDto.Date), SortDescending = true };
+    private IReadOnlyCollection<DisposicionListItemDto> items = [];
+    private string errorMessage = string.Empty;
+    private string sortColumn = nameof(DisposicionListItemDto.Date);
+    private bool sortDescending = true;
+    private bool isLegacySyncActive;
+    private string syncStatusLabel = string.Empty;
+    private int totalCount;
+    private int TotalPages => Math.Max(1, (int)Math.Ceiling(totalCount / (double)filter.PageSize));
+    private bool CanGoPrevious => filter.Page > 1;
+    private bool CanGoNext => filter.Page < TotalPages;
+    private int PageStart => totalCount == 0 ? 0 : ((filter.Page - 1) * filter.PageSize) + 1;
+    private int PageEnd => totalCount == 0 ? 0 : Math.Min(filter.Page * filter.PageSize, totalCount);
+    private string L(string spanish, string catalan, string english) =>
+        T.CurrentLanguage switch
+        {
+            AppLanguages.Catalan => catalan,
+            AppLanguages.English => english,
+            _ => spanish
+        };
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        tenantId = user.GetTenantId();
+        companyId = user.GetActiveCompanyId();
+
+        await LoadSyncStatusAsync();
+        canEdit = user.IsPlatformAdmin() || user.IsInRole(PlatformRoles.TenantAdmin);
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        ApplyQueryState();
+        await LoadAsync();
+    }
+
+    private async Task LoadSyncStatusAsync()
+    {
+        isLegacySyncActive = false;
+        syncStatusLabel = string.Empty;
+        if (!tenantId.HasValue || !companyId.HasValue)
+        {
+            return;
+        }
+
+        var status = (await LegacySyncService.GetModuleStatusesAsync(tenantId.Value))
+            .FirstOrDefault(item =>
+                item.CompanyId == companyId.Value &&
+                string.Equals(item.ModuleKey, LegacySyncModuleKeys.ArticleDispositions, StringComparison.OrdinalIgnoreCase));
+
+        if (status is null || !status.HasSuccessfulSync)
+        {
+            return;
+        }
+
+        isLegacySyncActive = true;
+        syncStatusLabel = status.LastCompletedUtc.HasValue
+            ? L($"Última sync: {status.LastCompletedUtc.Value.ToLocalTime():dd/MM/yyyy HH:mm:ss} · Ins: {status.LastInserted} · Act: {status.LastUpdated} · Omi: {status.LastSkipped} · Err: {status.LastErrors}", $"Última sync: {status.LastCompletedUtc.Value.ToLocalTime():dd/MM/yyyy HH:mm:ss} · Ins: {status.LastInserted} · Act: {status.LastUpdated} · Omi: {status.LastSkipped} · Err: {status.LastErrors}", $"Last sync: {status.LastCompletedUtc.Value.ToLocalTime():dd/MM/yyyy HH:mm:ss} · Ins: {status.LastInserted} · Upd: {status.LastUpdated} · Skp: {status.LastSkipped} · Err: {status.LastErrors}")
+            : L($"Estado: {status.LastStatus}", $"Estat: {status.LastStatus}", $"Status: {status.LastStatus}");
+    }
+
+    private async Task LoadAsync()
+    {
+        errorMessage = string.Empty;
+        if (!tenantId.HasValue || !companyId.HasValue)
+        {
+            items = [];
+            totalCount = 0;
+            return;
+        }
+
+        isLoading = true;
+        await InvokeAsync(StateHasChanged);
+        try
+        {
+            filter.SortColumn = sortColumn;
+            filter.SortDescending = sortDescending;
+            var result = await DisposicionQueries.SearchAsync(tenantId.Value, companyId.Value, filter);
+            items = result.Items;
+            totalCount = result.TotalCount;
+            if (filter.Page > TotalPages)
+            {
+                filter.Page = TotalPages;
+                result = await DisposicionQueries.SearchAsync(tenantId.Value, companyId.Value, filter);
+                items = result.Items;
+                totalCount = result.TotalCount;
+            }
+        }
+        catch (Exception exception)
+        {
+            errorMessage = exception.Message;
+            items = [];
+            totalCount = 0;
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private async Task SearchAsync()
+    {
+        filter.Page = 1;
+        UpdateQueryState();
+        await Task.CompletedTask;
+    }
+
+    private async Task ChangePageAsync(int page)
+    {
+        filter.Page = Math.Clamp(page, 1, TotalPages);
+        UpdateQueryState();
+        await Task.CompletedTask;
+    }
+
+    private async Task SetSortAsync(string column, bool defaultDescending = false)
+    {
+        if (string.Equals(sortColumn, column, StringComparison.Ordinal))
+        {
+            sortDescending = !sortDescending;
+        }
+        else
+        {
+            sortColumn = column;
+            sortDescending = defaultDescending;
+        }
+
+        filter.Page = 1;
+        UpdateQueryState();
+        await Task.CompletedTask;
+    }
+
+    private async Task OnPageSizeChanged(ChangeEventArgs args)
+    {
+        if (int.TryParse(args.Value?.ToString(), out var pageSize))
+        {
+            filter.PageSize = pageSize;
+            filter.Page = 1;
+            UpdateQueryState();
+            await Task.CompletedTask;
+        }
+    }
+
+    private void ApplyQueryState()
+    {
+        filter.Search = SearchQuery?.Trim() ?? string.Empty;
+        filter.ReceivedMode = NormalizeReceivedMode(ReceivedQuery);
+        filter.IncludeCancelled = CancelledQuery.GetValueOrDefault();
+        filter.Page = Math.Max(PageQuery.GetValueOrDefault(1), 1);
+        filter.PageSize = PageSizeQuery is 25 or 50 or 100 ? PageSizeQuery.Value : 25;
+        sortColumn = NormalizeSortColumn(SortQuery);
+        sortDescending = DescQuery ?? true;
+        filter.SortColumn = sortColumn;
+        filter.SortDescending = sortDescending;
+    }
+
+    private void UpdateQueryState()
+    {
+        var uri = NavigationManager.GetUriWithQueryParameters(new Dictionary<string, object?>
+        {
+            ["q"] = string.IsNullOrWhiteSpace(filter.Search) ? null : filter.Search,
+            ["received"] = string.IsNullOrWhiteSpace(filter.ReceivedMode) ? null : filter.ReceivedMode,
+            ["cancelled"] = filter.IncludeCancelled ? true : null,
+            ["page"] = filter.Page > 1 ? filter.Page : null,
+            ["pageSize"] = filter.PageSize != 25 ? filter.PageSize : null,
+            ["sort"] = string.Equals(sortColumn, nameof(DisposicionListItemDto.Date), StringComparison.Ordinal) ? null : sortColumn,
+            ["desc"] = sortDescending ? null : false
+        });
+
+        NavigationManager.NavigateTo(uri, replace: true);
+    }
+
+    private static string NormalizeReceivedMode(string? value) => value switch
+    {
+        "pending" => "pending",
+        "received" => "received",
+        _ => string.Empty
+    };
+
+    private static string NormalizeSortColumn(string? sortColumn) => sortColumn switch
+    {
+        nameof(DisposicionListItemDto.Number) => nameof(DisposicionListItemDto.Number),
+        nameof(DisposicionListItemDto.Date) => nameof(DisposicionListItemDto.Date),
+        nameof(DisposicionListItemDto.ReceptionDate) => nameof(DisposicionListItemDto.ReceptionDate),
+        nameof(DisposicionListItemDto.ClientName) => nameof(DisposicionListItemDto.ClientName),
+        nameof(DisposicionListItemDto.FinisherName) => nameof(DisposicionListItemDto.FinisherName),
+        nameof(DisposicionListItemDto.Color) => nameof(DisposicionListItemDto.Color),
+        nameof(DisposicionListItemDto.TotalPieces) => nameof(DisposicionListItemDto.TotalPieces),
+        nameof(DisposicionListItemDto.TotalKilograms) => nameof(DisposicionListItemDto.TotalKilograms),
+        nameof(DisposicionListItemDto.Origin) => nameof(DisposicionListItemDto.Origin),
+        _ => nameof(DisposicionListItemDto.Date)
+    };
+
+    private static string FormatVisibleNumber(int number, string year) =>
+        string.IsNullOrWhiteSpace(year) ? number.ToString() : $"{number}-{year}";
+
+    private static string FormatDate(DateTime? value) =>
+        value?.ToString("dd/MM/yyyy") ?? "-";
+
+    private static string GetDisplayText(string name, int code)
+    {
+        if (!string.IsNullOrWhiteSpace(name))
+        {
+            return name;
+        }
+
+        return code > 0 ? code.ToString() : "-";
+    }
+
+    private static string BuildParteAcabadoUrl(int code) =>
+        $"/produccion/acabados/nueva?disposicionCode={code}";
+}

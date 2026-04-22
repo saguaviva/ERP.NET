@@ -1,0 +1,183 @@
+@page "/almacen/inventarios/{CountNumber:int}/imprimir"
+@layout EmptyLayout
+@attribute [Authorize(Roles = "TenantAdmin,TenantReader")]
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IStockQueries StockQueries
+
+<PageTitle>Inventario @CountNumber</PageTitle>
+
+<div class="document-shell">
+    <div class="document-toolbar no-print">
+        <a class="secondary-button link-button" href="/almacen/inventarios/editar/@CountNumber">Volver al inventario</a>
+        <a class="secondary-button link-button" href="/almacen/inventarios/@CountNumber/imprimir-recuento">Hoja de recuento</a>
+        <button class="primary-button" type="button" onclick="window.print()">Guardar como PDF / Imprimir</button>
+    </div>
+
+    @if (!tenantId.HasValue || !companyId.HasValue)
+    {
+        <div class="empty-state document-state">
+            <p>No hay empresa activa seleccionada.</p>
+        </div>
+    }
+    else if (!string.IsNullOrWhiteSpace(errorMessage))
+    {
+        <div class="alert danger document-state">@errorMessage</div>
+    }
+    else if (detail is null)
+    {
+        <div class="empty-state document-state">
+            <p>No se ha encontrado el inventario solicitado.</p>
+        </div>
+    }
+    else
+    {
+        <section class="document-page">
+            <header class="document-header">
+                <div>
+                    <p class="eyebrow">Inventario</p>
+                    <h1>@detail.CountNumber</h1>
+                    <p class="muted">Almacén @DisplayValue(detail.Warehouse) · Estado @GetStatusLabel(detail.Status) · @(detail.IsBlindCount ? "Conteo ciego" : "Conteo normal")</p>
+                </div>
+                <div class="document-header-meta">
+                    <div>
+                        <span class="muted">Fecha</span>
+                        <strong>@detail.CountDate.ToString("dd/MM/yyyy")</strong>
+                    </div>
+                    <div>
+                        <span class="muted">Líneas</span>
+                        <strong>@detail.LineCount</strong>
+                    </div>
+                    <div>
+                        <span class="muted">Con diferencia</span>
+                        <strong>@detail.DifferenceLineCount</strong>
+                    </div>
+                </div>
+            </header>
+
+            <section class="document-section">
+                <div class="document-grid-two">
+                    <section class="document-box">
+                        <h2>Resumen</h2>
+                        <div class="document-kv-grid">
+                            <div><span class="muted">Esperado</span><strong>@detail.ExpectedTotalQuantity.ToString("0.###")</strong></div>
+                            <div><span class="muted">Modo</span><strong>@(detail.IsBlindCount ? "Ciego" : "Normal")</strong></div>
+                            <div><span class="muted">Contado</span><strong>@detail.CountedTotalQuantity.ToString("0.###")</strong></div>
+                            <div><span class="muted">Diferencia</span><strong>@(IsBlindHidden ? "Oculta" : detail.DifferenceTotalQuantity.ToString("0.###"))</strong></div>
+                            <div><span class="muted">Origen</span><strong>@DisplayValue(detail.Origin)</strong></div>
+                            <div><span class="muted">Esperado</span><strong>@(IsBlindHidden ? "Oculto" : detail.ExpectedTotalQuantity.ToString("0.###"))</strong></div>
+                        </div>
+                    </section>
+                    <section class="document-box">
+                        <h2>Observaciones</h2>
+                        <p>@(string.IsNullOrWhiteSpace(detail.Notes) ? "Sin observaciones." : detail.Notes)</p>
+                    </section>
+                </div>
+            </section>
+
+            <section class="document-section">
+                <h2>Detalle de líneas</h2>
+                <table class="data-table document-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Familia</th>
+                            <th>Artículo</th>
+                            <th>Descripción</th>
+                            <th>Color</th>
+                            <th>Esperado</th>
+                            <th>Contado</th>
+                            <th>Diferencia</th>
+                            <th>Validada</th>
+                            <th>Unidad</th>
+                            <th>Notas</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var line in detail.Lines.OrderBy(item => item.LineNumber))
+                        {
+                            <tr>
+                                <td>@line.LineNumber</td>
+                                <td>@GetFamilyKey(line)</td>
+                                <td>@DisplayValue(line.ItemCode)</td>
+                                <td>@DisplayValue(line.ItemDescription)</td>
+                                <td>@DisplayValue(line.Color)</td>
+                                <td>@(IsBlindHidden ? "Oculto" : line.ExpectedQuantity.ToString("0.###"))</td>
+                                <td>@line.CountedQuantity.ToString("0.###")</td>
+                                <td>@(IsBlindHidden ? "Oculta" : line.DifferenceQuantity.ToString("0.###"))</td>
+                                <td>@(IsBlindHidden ? "-" : (line.DifferenceQuantity == 0m ? "OK" : (line.IsDifferenceValidated ? "Sí" : "No")))</td>
+                                <td>@DisplayValue(line.UnitOfMeasure)</td>
+                                <td>@DisplayValue(line.Notes)</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </section>
+        </section>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public int CountNumber { get; set; }
+
+    private Guid? tenantId;
+    private Guid? companyId;
+    private StockCountDetailDto? detail;
+    private string errorMessage = string.Empty;
+    private bool IsBlindHidden => detail?.IsBlindCount == true && detail.IsBlindCountRevealed == false;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        tenantId = user.GetTenantId();
+        companyId = user.GetActiveCompanyId();
+
+        if (!tenantId.HasValue || !companyId.HasValue)
+        {
+            return;
+        }
+
+        try
+        {
+            errorMessage = string.Empty;
+            detail = await StockQueries.GetCountByNumberAsync(tenantId.Value, companyId.Value, CountNumber);
+        }
+        catch (Exception exception)
+        {
+            errorMessage = exception.Message;
+            detail = null;
+        }
+    }
+
+    private static string GetStatusLabel(string status) => status switch
+    {
+        StockCountStatuses.Draft => "Borrador",
+        StockCountStatuses.Completed => "Completado",
+        StockCountStatuses.Cancelled => "Anulado",
+        _ => status
+    };
+
+    private static string GetFamilyKey(StockCountLineDto line)
+    {
+        var code = line.ItemCode?.Trim() ?? string.Empty;
+        if (string.IsNullOrWhiteSpace(code))
+        {
+            return "Sin familia";
+        }
+
+        var separators = new[] { '-', '/', ' ', '_', '.' };
+        foreach (var separator in separators)
+        {
+            var index = code.IndexOf(separator);
+            if (index > 0)
+            {
+                return code[..index].Trim().ToUpperInvariant();
+            }
+        }
+
+        return (code.Length <= 4 ? code : code[..4]).ToUpperInvariant();
+    }
+
+    private static string DisplayValue(string? value) => string.IsNullOrWhiteSpace(value) ? "-" : value;
+}

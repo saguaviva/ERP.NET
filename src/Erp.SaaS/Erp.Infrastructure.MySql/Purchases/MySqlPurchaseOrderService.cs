@@ -626,7 +626,6 @@ public sealed class MySqlPurchaseOrderService : IPurchaseOrderQueries, IPurchase
         NormalizeAndValidate(command);
 
         await using var connection = await _connectionFactory.OpenConnectionAsync(cancellationToken);
-        await EnsurePurchaseOrdersWriteAllowedAsync(connection, command.TenantId, command.CompanyId, cancellationToken);
         var centerCode = await ResolveCompanyCenterCodeAsync(connection, command.TenantId, command.CompanyId, cancellationToken);
         var supplierSnapshot = await GetSupplierSnapshotAsync(connection, centerCode, command.SupplierCode, cancellationToken);
         if (supplierSnapshot is null)
@@ -664,6 +663,9 @@ public sealed class MySqlPurchaseOrderService : IPurchaseOrderQueries, IPurchase
                     expected_date = @expectedDate,
                     status = @status,
                     notes = @notes,
+                    origin = 'local',
+                    is_deleted = 0,
+                    synced_utc = NULL,
                     updated_utc = @updatedUtc
                 WHERE tenant_id = @tenantId
                   AND company_id = @companyId
@@ -694,6 +696,9 @@ public sealed class MySqlPurchaseOrderService : IPurchaseOrderQueries, IPurchase
                     expected_date,
                     status,
                     notes,
+                    origin,
+                    is_deleted,
+                    synced_utc,
                     created_utc,
                     updated_utc)
                 VALUES (
@@ -707,6 +712,9 @@ public sealed class MySqlPurchaseOrderService : IPurchaseOrderQueries, IPurchase
                     @expectedDate,
                     @status,
                     @notes,
+                    'local',
+                    0,
+                    NULL,
                     @createdUtc,
                     @updatedUtc);
                 """;
@@ -823,8 +831,6 @@ public sealed class MySqlPurchaseOrderService : IPurchaseOrderQueries, IPurchase
         }
 
         await using var connection = await _connectionFactory.OpenConnectionAsync(cancellationToken);
-        await EnsurePurchaseOrdersWriteAllowedAsync(connection, command.TenantId, command.CompanyId, cancellationToken);
-        await EnsurePurchaseReceiptsWriteAllowedAsync(connection, command.TenantId, command.CompanyId, cancellationToken);
         await using var transaction = await connection.BeginTransactionAsync(cancellationToken);
 
         var receiptId = Guid.NewGuid();
@@ -850,6 +856,9 @@ public sealed class MySqlPurchaseOrderService : IPurchaseOrderQueries, IPurchase
                     package_count,
                     gross_weight_kg,
                     notes,
+                    origin,
+                    is_deleted,
+                    synced_utc,
                     created_utc)
                 VALUES (
                     @receiptId,
@@ -866,6 +875,9 @@ public sealed class MySqlPurchaseOrderService : IPurchaseOrderQueries, IPurchase
                     @packageCount,
                     @grossWeightKg,
                     @notes,
+                    'local',
+                    0,
+                    NULL,
                     @createdUtc);
             """;
             insertReceiptCommand.Parameters.AddWithValue("@receiptId", receiptId.ToString());
@@ -1042,6 +1054,9 @@ public sealed class MySqlPurchaseOrderService : IPurchaseOrderQueries, IPurchase
                 """
                 UPDATE purchase_orders
                 SET status = @status,
+                    origin = 'local',
+                    is_deleted = 0,
+                    synced_utc = NULL,
                     updated_utc = @updatedUtc
                 WHERE tenant_id = @tenantId
                   AND company_id = @companyId
@@ -1465,30 +1480,6 @@ public sealed class MySqlPurchaseOrderService : IPurchaseOrderQueries, IPurchase
         command.Parameters.AddWithValue("@companyId", companyId.ToString());
         command.Parameters.AddWithValue("@moduleKey", moduleKey);
         return Convert.ToInt32(await command.ExecuteScalarAsync(cancellationToken)) > 0;
-    }
-
-    private static async Task EnsurePurchaseOrdersWriteAllowedAsync(
-        MySqlConnection connection,
-        Guid tenantId,
-        Guid companyId,
-        CancellationToken cancellationToken)
-    {
-        if (await IsLegacySyncActiveForCompanyAsync(connection, tenantId, companyId, LegacySyncModuleKeys.PurchaseOrders, cancellationToken))
-        {
-            throw new InvalidOperationException("Compras / Pedidos está en convivencia con legacy para esta empresa. Mientras el módulo esté sincronizado, la web queda en solo lectura.");
-        }
-    }
-
-    private static async Task EnsurePurchaseReceiptsWriteAllowedAsync(
-        MySqlConnection connection,
-        Guid tenantId,
-        Guid companyId,
-        CancellationToken cancellationToken)
-    {
-        if (await IsLegacySyncActiveForCompanyAsync(connection, tenantId, companyId, LegacySyncModuleKeys.PurchaseReceipts, cancellationToken))
-        {
-            throw new InvalidOperationException("Compras / Recepciones está en convivencia con legacy para esta empresa. Mientras el módulo esté sincronizado, la web queda en solo lectura.");
-        }
     }
 
     private void EnsureTenantWriteAccess()

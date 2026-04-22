@@ -1,0 +1,225 @@
+@page "/base-datos/{CatalogKey}"
+@attribute [Authorize(Roles = "TenantAdmin,TenantReader")]
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IBaseCatalogQueries BaseCatalogQueries
+
+<PageTitle>@Definition.Title</PageTitle>
+
+<div class="page-header">
+    <div>
+        <p class="eyebrow">Base de dades</p>
+        <h1>@Definition.Title</h1>
+        <p class="lead">@Definition.Lead</p>
+    </div>
+    <div class="quick-links">
+        @if (canEdit)
+        {
+            <a class="primary-button link-button" href="/base-datos/@CatalogKey/nuevo">Nuevo registro</a>
+        }
+    </div>
+</div>
+
+@if (!isValidCatalog)
+{
+    <div class="empty-state"><p>El catálogo solicitado no existe.</p></div>
+}
+else if (!tenantId.HasValue || !companyId.HasValue)
+{
+    <div class="empty-state"><p>Selecciona una empresa activa para trabajar con este catálogo.</p></div>
+}
+else
+{
+    <section class="panel">
+        <div class="filter-row">
+            <input class="text-input" @bind="filter.Search" placeholder="@Definition.SearchPlaceholder" />
+            <label class="inline-checkbox">
+                <input type="checkbox" @bind="filter.IncludeInactive" />
+                <span>Incluir inactivos</span>
+            </label>
+            <button class="secondary-button" @onclick="SearchAsync" disabled="@isLoading">@(isLoading ? "Cargando..." : "Buscar")</button>
+        </div>
+    </section>
+
+    @if (!string.IsNullOrWhiteSpace(errorMessage))
+    {
+        <div class="alert danger">@errorMessage</div>
+    }
+
+    <section class="panel">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>@Definition.CodeLabel</th>
+                    <th>@Definition.NameLabel</th>
+                    @if (HasDescription)
+                    {
+                        <th>@Definition.DescriptionLabel</th>
+                    }
+                    @if (HasReference)
+                    {
+                        <th>@Definition.ReferenceLabel</th>
+                    }
+                    @if (HasSecondaryReference)
+                    {
+                        <th>@Definition.SecondaryReferenceLabel</th>
+                    }
+                    @if (HasNumeric)
+                    {
+                        <th>@Definition.NumericLabel</th>
+                    }
+                    @if (!string.IsNullOrWhiteSpace(Definition.SecondaryNumericLabel))
+                    {
+                        <th>@Definition.SecondaryNumericLabel</th>
+                    }
+                    <th>Estado</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (items.Count == 0)
+                {
+                    <tr><td colspan="@EmptyColSpan" class="table-empty">No hay registros para mostrar.</td></tr>
+                }
+                else
+                {
+                    @foreach (var item in items)
+                    {
+                        <tr>
+                            <td>@item.Code</td>
+                            <td>@item.Name</td>
+                            @if (HasDescription)
+                            {
+                                <td>@DisplayValue(item.Description)</td>
+                            }
+                            @if (HasReference)
+                            {
+                                <td>@DisplayValue(item.Reference)</td>
+                            }
+                            @if (HasSecondaryReference)
+                            {
+                                <td>@DisplayValue(item.SecondaryReference)</td>
+                            }
+                            @if (HasNumeric)
+                            {
+                                <td>@FormatNumeric(item.NumericValue)</td>
+                            }
+                            @if (HasSecondaryNumeric)
+                            {
+                                <td>@FormatSecondaryNumeric(item.SecondaryNumericValue)</td>
+                            }
+                            <td><span class="status-pill @(item.IsActive ? "success" : "warning")">@(item.IsActive ? "Activo" : "Inactivo")</span></td>
+                            <td><a class="inline-link" href="/base-datos/@CatalogKey/editar/@Uri.EscapeDataString(item.Code)">@(canEdit ? "Abrir" : "Ver")</a></td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </section>
+}
+
+@code {
+    [Parameter] public string CatalogKey { get; set; } = string.Empty;
+
+    private Guid? tenantId;
+    private Guid? companyId;
+    private bool canEdit;
+    private bool isLoading;
+    private bool isValidCatalog;
+    private string errorMessage = string.Empty;
+    private BaseCatalogFilter filter = new();
+    private IReadOnlyCollection<BaseCatalogListItemDto> items = [];
+    private CatalogDefinition Definition = CatalogDefinitions.Empty;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        Definition = CatalogDefinitions.Get(CatalogKey);
+        isValidCatalog = Definition.IsValid;
+
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        tenantId = user.GetTenantId();
+        companyId = user.GetActiveCompanyId();
+        canEdit = user.IsPlatformAdmin() || user.IsInRole(PlatformRoles.TenantAdmin);
+
+        if (isValidCatalog)
+        {
+            await LoadAsync();
+        }
+    }
+
+    private async Task SearchAsync()
+    {
+        filter.Page = 1;
+        await LoadAsync();
+    }
+
+    private async Task LoadAsync()
+    {
+        errorMessage = string.Empty;
+        if (!tenantId.HasValue || !companyId.HasValue || !isValidCatalog)
+        {
+            items = [];
+            return;
+        }
+
+        isLoading = true;
+        try
+        {
+            var result = await BaseCatalogQueries.SearchAsync(tenantId.Value, companyId.Value, CatalogKey, filter);
+            items = result.Items;
+        }
+        catch (Exception exception)
+        {
+            errorMessage = exception.Message;
+            items = [];
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private static string DisplayValue(string value) => string.IsNullOrWhiteSpace(value) ? "-" : value;
+    private string FormatNumeric(decimal? value) => !value.HasValue ? "-" : value.Value.ToString(Definition.NumericFormat);
+    private string FormatSecondaryNumeric(decimal? value) => !value.HasValue ? "-" : value.Value.ToString(Definition.SecondaryNumericFormat);
+
+    private sealed record CatalogDefinition(
+        string Key,
+        string Title,
+        string Lead,
+        string SearchPlaceholder,
+        string CodeLabel,
+        string NameLabel,
+        string DescriptionLabel,
+        string ReferenceLabel,
+        string SecondaryReferenceLabel,
+        string NumericLabel,
+        string NumericFormat,
+        string SecondaryNumericLabel,
+        string SecondaryNumericFormat,
+        bool IsValid = true);
+
+    private bool HasDescription => !string.IsNullOrWhiteSpace(Definition.DescriptionLabel);
+    private bool HasReference => !string.IsNullOrWhiteSpace(Definition.ReferenceLabel);
+    private bool HasSecondaryReference => !string.IsNullOrWhiteSpace(Definition.SecondaryReferenceLabel);
+    private bool HasNumeric => !string.IsNullOrWhiteSpace(Definition.NumericLabel);
+    private bool HasSecondaryNumeric => !string.IsNullOrWhiteSpace(Definition.SecondaryNumericLabel);
+    private int EmptyColSpan => 4 + (HasDescription ? 1 : 0) + (HasReference ? 1 : 0) + (HasSecondaryReference ? 1 : 0) + (HasNumeric ? 1 : 0) + (HasSecondaryNumeric ? 1 : 0);
+
+    private static class CatalogDefinitions
+    {
+        public static readonly CatalogDefinition Empty = new("", "Catálogo", string.Empty, string.Empty, "Código", string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, "0.##", string.Empty, "0.##", false);
+
+        public static CatalogDefinition Get(string key) => key?.Trim().ToLowerInvariant() switch
+        {
+            BaseCatalogKeys.BanksCashboxes => new(key, "Bancs / Caixes", "Gestión local de bancos, cajas y cuentas operativas.", "Buscar por código, banco, cuenta, IBAN, SWIFT o notas", "Codi banc", "Nom banc", "Núm. compte", "IBAN", "SWIFT / BIC", string.Empty, "0.##", string.Empty, "0.##"),
+            BaseCatalogKeys.PaymentMethods => new(key, "Formes de pagament", "Métodos y condiciones de pago disponibles en la SaaS local.", "Buscar por código, forma, días o descuento", "Codi forma", "Forma pagament", "Descripción operativa", "Referencia / tipo", string.Empty, "Dies pagament", "0", "Dte. pagament %", "0.##"),
+            BaseCatalogKeys.Operations => new(key, "Operacions", "Catálogo de operaciones de trabajo y proceso, como en el legacy.", "Buscar por código o descripción", "Codi operació", "Descripció", string.Empty, string.Empty, string.Empty, string.Empty, "0", string.Empty, "0.##"),
+            BaseCatalogKeys.Machines => new(key, "Màquines", "Maestro de máquinas con código, descripción y precio operativo.", "Buscar por código, descripción o precio", "Codi màquina", "Descripció", string.Empty, string.Empty, string.Empty, "Preu", "0.00##", string.Empty, "0.##"),
+            BaseCatalogKeys.Seasons => new(key, "Temporades", "Catálogo simple de temporadas, como en el legacy.", "Buscar por código o descripción", "Temporada", "Descripció", string.Empty, string.Empty, string.Empty, string.Empty, "0", string.Empty, "0.##"),
+            BaseCatalogKeys.VatTypes => new(key, "Tipus d'IVA", "Tipos impositivos para ventas y compras, con IVA y recargo de equivalencia.", "Buscar por código, descripción, IVA, RE o clave fiscal", "Codi IVA", "Descripció", "Descripció operativa", "Clau fiscal", string.Empty, "% IVA", "0.##", "% RE", "0.##"),
+            BaseCatalogKeys.Incoterms => new(key, "Incoterms", "Condiciones de entrega y responsabilidad comercial.", "Buscar por nombre o descripción", "Nom", "Descripció", string.Empty, string.Empty, string.Empty, string.Empty, "0", string.Empty, "0.##"),
+            _ => Empty
+        };
+    }
+}

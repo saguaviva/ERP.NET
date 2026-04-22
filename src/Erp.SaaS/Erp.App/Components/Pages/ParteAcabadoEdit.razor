@@ -1,0 +1,983 @@
+@page "/produccion/acabados/nueva"
+@page "/produccion/acabados/editar/{OrderNumber:int}"
+@attribute [Authorize(Roles = "TenantAdmin,TenantReader")]
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IAuditLogService AuditLogService
+@inject IBaseCatalogQueries BaseCatalogQueries
+@inject IDisposicionQueries DisposicionQueries
+@inject IMuestraQueries MuestraQueries
+@inject IParteAcabadoQueries ParteAcabadoQueries
+@inject IParteAcabadoService ParteAcabadoService
+@inject ITejidoQueries TejidoQueries
+@inject NavigationManager NavigationManager
+
+<PageTitle>@(OrderNumber.HasValue ? $"Editar acabado {OrderNumber}" : "Nueva orden de acabado")</PageTitle>
+
+<div class="page-header">
+    <div>
+        <p class="eyebrow">PRODUCCIÓN</p>
+        <h1>@(OrderNumber.HasValue ? $"Editar orden de acabado {OrderNumber}" : "Nueva orden de acabado")</h1>
+        <p class="lead">Ficha operativa de acabado con estado, cliente, acabador y líneas de tejido/color.</p>
+    </div>
+    <div class="quick-links">
+        <a class="secondary-button link-button" href="/produccion/acabados">Volver al listado</a>
+        @if (OrderNumber.HasValue)
+        {
+            <a class="secondary-button link-button" href="/produccion/acabados/@OrderNumber/imprimir" target="_blank" rel="noopener noreferrer">Imprimir ficha</a>
+        }
+    </div>
+</div>
+
+@if (!tenantId.HasValue || !companyId.HasValue)
+{
+    <div class="empty-state">
+        <p>No hay empresa activa seleccionada.</p>
+    </div>
+}
+else
+{
+    @if (!string.IsNullOrWhiteSpace(statusMessage))
+    {
+        <div class="alert @(isError ? "danger" : "success")">@statusMessage</div>
+    }
+
+    @if (!canEdit && !OrderNumber.HasValue)
+    {
+        <div class="alert">
+            No tienes permisos para crear órdenes / partes de acabado nuevas en esta empresa.
+        </div>
+    }
+
+    <section class="card-grid">
+        <article class="info-card">
+            <p class="eyebrow">Número</p>
+            <h2>@DisplayNumber</h2>
+            <p class="muted">Identificador de trabajo interno.</p>
+        </article>
+        <article class="info-card">
+            <p class="eyebrow">Estado</p>
+            <h2>@GetStatusLabel(model.Status)</h2>
+            <p class="muted">Situación actual del trabajo de acabado.</p>
+        </article>
+        <article class="info-card">
+            <p class="eyebrow">Totales</p>
+            <h2>@model.TotalKilograms.ToString("0.##") kg</h2>
+            <p class="muted">@model.TotalPieces.ToString("0.##") piezas · @model.Lines.Count líneas</p>
+        </article>
+        <article class="info-card">
+            <p class="eyebrow">Origen</p>
+            <h2>@DisplayOrigin</h2>
+            <p class="muted">Todas las altas y cambios se guardan en local.</p>
+        </article>
+    </section>
+
+    <section class="card-grid" style="margin-top: 1rem;">
+        <article class="info-card">
+            <p class="eyebrow">Líneas pendientes</p>
+            <h2>@PendingLinesCount</h2>
+            <p class="muted">Todavía sin pasar a proceso.</p>
+        </article>
+        <article class="info-card">
+            <p class="eyebrow">En proceso</p>
+            <h2>@InProgressLinesCount</h2>
+            <p class="muted">Ya dispuestas, pendientes de terminar.</p>
+        </article>
+        <article class="info-card">
+            <p class="eyebrow">Terminadas</p>
+            <h2>@FinishedLinesCount</h2>
+            <p class="muted">Servidas y reflejadas en disposición.</p>
+        </article>
+        <article class="info-card">
+            <p class="eyebrow">Disposición enlazada</p>
+            <h2>@(string.IsNullOrWhiteSpace(model.DispositionLabel) ? "Sin enlace" : model.DispositionLabel)</h2>
+            <p class="muted">
+                @if (HasLinkedDisposition)
+                {
+                    <a class="inline-link" href="@BuildDispositionUrl()">Abrir disposición</a>
+                }
+                else
+                {
+                    <span>Sin disposición enlazada.</span>
+                }
+            </p>
+        </article>
+        <article class="info-card">
+            <p class="eyebrow">Muestra origen</p>
+            <h2>@DisplaySourceSample</h2>
+            <p class="muted">
+                @if (HasLinkedSample)
+                {
+                    <a class="inline-link" href="@BuildSampleUrl()">Abrir @DisplaySourceKind.ToLowerInvariant()</a>
+                }
+                else
+                {
+                    <span>Sin muestra enlazada.</span>
+                }
+            </p>
+        </article>
+        <article class="info-card">
+            <p class="eyebrow">Máquina</p>
+            <h2>@DisplayMachine</h2>
+            <p class="muted">Referencia principal de máquina para este trabajo de acabado.</p>
+        </article>
+        <article class="info-card">
+            <p class="eyebrow">Operación</p>
+            <h2>@DisplayOperation</h2>
+            <p class="muted">Proceso principal aplicado a esta orden de acabado.</p>
+        </article>
+    </section>
+
+    <EditForm Model="model" OnValidSubmit="SaveAsync">
+        <fieldset disabled="@isReadOnly">
+            <div class="form-grid" style="margin-top: 1rem;">
+                <label class="field">
+                    <span>Fecha</span>
+                    <InputDate TValue="DateTime?" class="text-input" @bind-Value="model.Date" />
+                </label>
+                <label class="field">
+                    <span>Estado</span>
+                    <InputSelect class="text-input" @bind-Value="model.Status">
+                        @foreach (var status in ParteAcabadoStatuses.All)
+                        {
+                            <option value="@status">@GetStatusLabel(status)</option>
+                        }
+                    </InputSelect>
+                </label>
+                <label class="field">
+                    <span>Cliente</span>
+                    <InputNumber class="text-input" @bind-Value="model.ClientCode" />
+                </label>
+                <label class="field wide">
+                    <span>Nombre cliente</span>
+                    <InputText class="text-input" @bind-Value="model.ClientName" />
+                </label>
+                <label class="field">
+                    <span>Acabador</span>
+                    <InputNumber class="text-input" @bind-Value="model.FinisherCode" />
+                </label>
+                <label class="field wide">
+                    <span>Nombre acabador</span>
+                    <InputText class="text-input" @bind-Value="model.FinisherName" />
+                </label>
+                <label class="field">
+                    <span>Máquina</span>
+                    @if (machineOptions.Count == 0)
+                    {
+                        <InputNumber class="text-input" @bind-Value="model.MachineCode" />
+                    }
+                    else
+                    {
+                        <select class="text-input" value="@model.MachineCode" @onchange="OnMachineChanged">
+                            <option value="0">Selecciona máquina</option>
+                            @foreach (var machine in machineOptions)
+                            {
+                                <option value="@ParseMachineCode(machine.Code)">@FormatMachineOption(machine)</option>
+                            }
+                        </select>
+                    }
+                </label>
+                <label class="field wide">
+                    <span>Nombre máquina</span>
+                    @if (machineOptions.Count == 0)
+                    {
+                        <InputText class="text-input" @bind-Value="model.MachineName" />
+                    }
+                    else
+                    {
+                        <input class="text-input" value="@model.MachineName" disabled />
+                    }
+                </label>
+                <label class="field">
+                    <span>Operación</span>
+                    @if (operationOptions.Count == 0)
+                    {
+                        <InputNumber class="text-input" @bind-Value="model.OperationCode" />
+                    }
+                    else
+                    {
+                        <select class="text-input" value="@model.OperationCode" @onchange="OnOperationChanged">
+                            <option value="0">Selecciona operación</option>
+                            @foreach (var operation in operationOptions)
+                            {
+                                <option value="@ParseOperationCode(operation.Code)">@FormatOperationOption(operation)</option>
+                            }
+                        </select>
+                    }
+                </label>
+                <label class="field wide">
+                    <span>Nombre operación</span>
+                    @if (operationOptions.Count == 0)
+                    {
+                        <InputText class="text-input" @bind-Value="model.OperationName" />
+                    }
+                    else
+                    {
+                        <input class="text-input" value="@model.OperationName" disabled />
+                    }
+                </label>
+                <label class="field">
+                    <span>Disposición</span>
+                    <InputNumber class="text-input" @bind-Value="model.DispositionCode" />
+                </label>
+                <label class="field wide">
+                    <span>Etiqueta disposición</span>
+                    <InputText class="text-input" @bind-Value="model.DispositionLabel" />
+                </label>
+                <label class="field">
+                    <span>Tipo origen</span>
+                    <InputSelect class="text-input" @bind-Value="model.SourceSampleKind">
+                        <option value="">Sin enlace</option>
+                        <option value="@ParteAcabadoSourceKinds.Sample">Muestra</option>
+                        <option value="@ParteAcabadoSourceKinds.Complement">Complemento</option>
+                    </InputSelect>
+                </label>
+                <label class="field">
+                    <span>Código origen</span>
+                    <InputText class="text-input" @bind-Value="model.SourceSampleCode" />
+                </label>
+                <label class="field">
+                    <span>Línea origen</span>
+                    <InputNumber class="text-input" @bind-Value="model.SourceSampleLineNumber" />
+                </label>
+                <label class="field wide">
+                    <span>Notas</span>
+                    <InputTextArea class="text-input textarea-input" @bind-Value="model.Notes" />
+                </label>
+            </div>
+
+            <section class="panel detail-panel" style="margin-top: 1rem;">
+                <div class="detail-panel-header">
+                    <div>
+                        <h2>Líneas del parte</h2>
+                        <p class="muted">Tejido, color, piezas, kg y estado de cada trabajo de acabado.</p>
+                    </div>
+                    @if (!isReadOnly)
+                    {
+                        <button class="secondary-button" type="button" @onclick="AddLine">Añadir línea</button>
+                    }
+                </div>
+
+                <div class="table-scroll">
+                    <table class="data-table detail-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Tejido</th>
+                                <th>Descripción</th>
+                                <th>Color</th>
+                                <th>Kg</th>
+                                <th>Piezas</th>
+                                <th>Estado</th>
+                                <th>Notas</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (model.Lines.Count == 0)
+                            {
+                                <tr>
+                                    <td colspan="9" class="muted">No hay líneas cargadas para este parte de acabado.</td>
+                                </tr>
+                            }
+                            else
+                            {
+                                @foreach (var line in model.Lines.OrderBy(item => item.LineNumber))
+                                {
+                                    <tr @key="line.LineNumber">
+                                        <td>@line.LineNumber</td>
+                                        <td><InputText class="text-input table-input" @bind-Value="line.FabricCode" /></td>
+                                        <td><InputText class="text-input table-input" @bind-Value="line.FabricDescription" /></td>
+                                        <td><InputText class="text-input table-input" @bind-Value="line.Color" /></td>
+                                        <td><InputNumber class="text-input table-input" @bind-Value="line.TotalKilograms" /></td>
+                                        <td><InputNumber class="text-input table-input" @bind-Value="line.TotalPieces" /></td>
+                                        <td>
+                                            <InputSelect class="text-input table-input" @bind-Value="line.Status">
+                                                @foreach (var status in ParteAcabadoStatuses.All)
+                                                {
+                                                    <option value="@status">@GetStatusLabel(status)</option>
+                                                }
+                                            </InputSelect>
+                                        </td>
+                                        <td><InputText class="text-input table-input" @bind-Value="line.Notes" /></td>
+                                        <td>
+                                            <div class="inline-action-list">
+                                                @if (!string.IsNullOrWhiteSpace(line.FabricCode))
+                                                {
+                                                    <a class="inline-link" href="@BuildTejidoUrl(line)">Tejido</a>
+                                                    <a class="inline-link" href="@BuildMovementsUrl(line)">Movs.</a>
+                                                }
+                                                @if (!isReadOnly)
+                                                {
+                                                    <button class="danger-link" type="button" @onclick="() => RemoveLine(line.LineNumber)">Quitar</button>
+                                                }
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <div class="quick-links" style="margin-top: 1rem;">
+                @if (canEdit)
+                {
+                    <button class="primary-button" type="submit">Guardar parte de acabado</button>
+                }
+                @if (canEdit && OrderNumber.HasValue)
+                {
+                    <button class="secondary-button danger-button" type="button" @onclick="DeleteAsync">Eliminar parte</button>
+                }
+                @if (OrderNumber.HasValue)
+                {
+                    <button class="secondary-button" type="button" @onclick="LoadAuditAsync">Recargar historial</button>
+                }
+            </div>
+        </fieldset>
+    </EditForm>
+
+    @if (OrderNumber.HasValue)
+    {
+        <section class="panel" style="margin-top: 1rem;">
+            <h2>Historial reciente del parte de acabado</h2>
+            <div class="list-block">
+                @if (recentAuditLogs.Count == 0)
+                {
+                    <p class="muted">Todavía no hay eventos auditados para este parte.</p>
+                }
+                else
+                {
+                    @foreach (var entry in recentAuditLogs)
+                    {
+                        <article class="list-item">
+                            <strong>@entry.Action</strong>
+                            @if (!string.IsNullOrWhiteSpace(entry.Details))
+                            {
+                                <span>@entry.Details</span>
+                            }
+                            <span>@entry.CreatedUtc.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss")</span>
+                        </article>
+                    }
+                }
+            </div>
+        </section>
+    }
+}
+
+@code {
+    [Parameter]
+    public int? OrderNumber { get; set; }
+    [SupplyParameterFromQuery(Name = "disposicionCode")]
+    public int? DispositionCodeFromQuery { get; set; }
+    [SupplyParameterFromQuery(Name = "sampleCode")]
+    public string? SampleCodeFromQuery { get; set; }
+    [SupplyParameterFromQuery(Name = "sampleLine")]
+    public int? SampleLineFromQuery { get; set; }
+    [SupplyParameterFromQuery(Name = "sampleKind")]
+    public string? SampleKindFromQuery { get; set; }
+
+    private Guid? tenantId;
+    private Guid? companyId;
+    private bool canEdit;
+    private bool isReadOnly;
+    private ParteAcabadoDetailDto model = new() { Date = DateTime.Today };
+    private IReadOnlyCollection<BaseCatalogListItemDto> machineOptions = [];
+    private IReadOnlyCollection<BaseCatalogListItemDto> operationOptions = [];
+    private string statusMessage = string.Empty;
+    private bool isError;
+    private IReadOnlyCollection<AuditLogEntryDto> recentAuditLogs = [];
+    private int? appliedDispositionCode;
+    private string? appliedSampleCode;
+    private int? appliedSampleLineNumber;
+    private string? appliedSampleKind;
+
+    private string DisplayNumber => model.OrderNumber > 0 ? model.OrderNumber.ToString() : "Nuevo";
+    private string DisplayOrigin => string.IsNullOrWhiteSpace(model.Origin) ? "local" : model.Origin;
+    private int PendingLinesCount => model.Lines.Count(item => string.Equals(item.Status, ParteAcabadoStatuses.Pending, StringComparison.OrdinalIgnoreCase));
+    private int InProgressLinesCount => model.Lines.Count(item => string.Equals(item.Status, ParteAcabadoStatuses.InProgress, StringComparison.OrdinalIgnoreCase));
+    private int FinishedLinesCount => model.Lines.Count(item => string.Equals(item.Status, ParteAcabadoStatuses.Finished, StringComparison.OrdinalIgnoreCase));
+    private bool HasLinkedDisposition => model.DispositionCode.HasValue && model.DispositionCode.Value > 0;
+    private bool HasLinkedSample => !string.IsNullOrWhiteSpace(model.SourceSampleCode);
+    private string DisplaySourceKind => HasLinkedSample ? ParteAcabadoSourceKinds.GetLabel(model.SourceSampleKind) : "Sin enlace";
+    private string DisplaySourceSample => HasLinkedSample
+        ? (model.SourceSampleLineNumber.HasValue ? $"{DisplaySourceKind} {model.SourceSampleCode} · línea {model.SourceSampleLineNumber.Value}" : $"{DisplaySourceKind} {model.SourceSampleCode}")
+        : "Sin enlace";
+    private string DisplayMachine => model.MachineCode > 0
+        ? (string.IsNullOrWhiteSpace(model.MachineName) ? model.MachineCode.ToString() : $"{model.MachineCode} · {model.MachineName}")
+        : "Sin máquina";
+    private string DisplayOperation => model.OperationCode > 0
+        ? (string.IsNullOrWhiteSpace(model.OperationName) ? model.OperationCode.ToString() : $"{model.OperationCode} · {model.OperationName}")
+        : "Sin operación";
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        tenantId = user.GetTenantId();
+        companyId = user.GetActiveCompanyId();
+        canEdit = user.IsPlatformAdmin() || user.IsInRole(PlatformRoles.TenantAdmin);
+        isReadOnly = !canEdit;
+
+        if (!tenantId.HasValue || !companyId.HasValue)
+        {
+            return;
+        }
+
+        await LoadMachineOptionsAsync();
+        await LoadOperationOptionsAsync();
+
+        if (OrderNumber.HasValue)
+        {
+            var detail = await ParteAcabadoQueries.GetByNumberAsync(tenantId.Value, companyId.Value, OrderNumber.Value);
+            if (detail is null)
+            {
+                statusMessage = "No se ha encontrado la orden / parte de acabado solicitada.";
+                isError = true;
+                model = new ParteAcabadoDetailDto { Date = DateTime.Today };
+                recentAuditLogs = [];
+                return;
+            }
+
+            model = detail;
+            await LoadAuditAsync();
+            return;
+        }
+
+        model = new ParteAcabadoDetailDto
+        {
+                Date = DateTime.Today,
+                Status = ParteAcabadoStatuses.Pending
+            };
+        recentAuditLogs = [];
+        await TryApplySampleBaseAsync();
+        await TryApplyDispositionBaseAsync();
+    }
+
+    private async Task SaveAsync()
+    {
+        if (!tenantId.HasValue || !companyId.HasValue)
+        {
+            return;
+        }
+
+        if (isReadOnly)
+        {
+            statusMessage = "No tienes permisos de edición en este tenant.";
+            isError = true;
+            return;
+        }
+
+        try
+        {
+            statusMessage = string.Empty;
+            isError = false;
+
+            var savedOrderNumber = await ParteAcabadoService.SaveAsync(new SaveParteAcabadoCommand
+            {
+                TenantId = tenantId.Value,
+                CompanyId = companyId.Value,
+                OrderNumber = OrderNumber,
+                Date = model.Date,
+                Status = model.Status,
+                ClientCode = model.ClientCode,
+                ClientName = model.ClientName,
+                FinisherCode = model.FinisherCode,
+                FinisherName = model.FinisherName,
+                MachineCode = model.MachineCode,
+                MachineName = model.MachineName,
+                OperationCode = model.OperationCode,
+                OperationName = model.OperationName,
+                DispositionCode = model.DispositionCode,
+                DispositionLabel = model.DispositionLabel,
+                SourceSampleKind = model.SourceSampleKind,
+                SourceSampleCode = model.SourceSampleCode,
+                SourceSampleLineNumber = model.SourceSampleLineNumber,
+                Notes = model.Notes,
+                Lines = model.Lines
+                    .OrderBy(item => item.LineNumber)
+                    .Select(item => new SaveParteAcabadoLineInput
+                    {
+                        LineNumber = item.LineNumber,
+                        FabricCode = item.FabricCode,
+                        FabricDescription = item.FabricDescription,
+                        Color = item.Color,
+                        TotalKilograms = item.TotalKilograms,
+                        TotalPieces = item.TotalPieces,
+                        Status = item.Status,
+                        Notes = item.Notes
+                    })
+                    .ToList()
+            });
+
+            statusMessage = OrderNumber.HasValue
+                ? "Parte de acabado actualizado correctamente."
+                : "Parte de acabado creado correctamente.";
+
+            if (!OrderNumber.HasValue)
+            {
+                NavigationManager.NavigateTo($"/produccion/acabados/editar/{savedOrderNumber}", forceLoad: false);
+                return;
+            }
+
+            model.OrderNumber = savedOrderNumber;
+            model.TotalKilograms = model.Lines.Sum(item => item.TotalKilograms);
+            model.TotalPieces = model.Lines.Sum(item => item.TotalPieces);
+            model.Origin = "local";
+            await LoadAuditAsync();
+        }
+        catch (Exception exception)
+        {
+            statusMessage = exception.Message;
+            isError = true;
+        }
+    }
+
+    private async Task DeleteAsync()
+    {
+        if (!tenantId.HasValue || !companyId.HasValue || !OrderNumber.HasValue)
+        {
+            return;
+        }
+
+        try
+        {
+            await ParteAcabadoService.DeleteAsync(tenantId.Value, companyId.Value, OrderNumber.Value);
+            NavigationManager.NavigateTo("/produccion/acabados", forceLoad: false);
+        }
+        catch (Exception exception)
+        {
+            statusMessage = exception.Message;
+            isError = true;
+        }
+    }
+
+    private async Task LoadMachineOptionsAsync()
+    {
+        if (!tenantId.HasValue || !companyId.HasValue)
+        {
+            machineOptions = [];
+            return;
+        }
+
+        var result = await BaseCatalogQueries.SearchAsync(tenantId.Value, companyId.Value, BaseCatalogKeys.Machines, new BaseCatalogFilter
+        {
+            Page = 1,
+            PageSize = 200
+        });
+
+        machineOptions = result.Items
+            .Where(item => int.TryParse(item.Code, out _))
+            .OrderBy(item => ParseMachineCode(item.Code))
+            .ToArray();
+    }
+
+    private async Task LoadOperationOptionsAsync()
+    {
+        if (!tenantId.HasValue || !companyId.HasValue)
+        {
+            operationOptions = [];
+            return;
+        }
+
+        var result = await BaseCatalogQueries.SearchAsync(tenantId.Value, companyId.Value, BaseCatalogKeys.Operations, new BaseCatalogFilter
+        {
+            Page = 1,
+            PageSize = 200
+        });
+
+        operationOptions = result.Items
+            .Where(item => int.TryParse(item.Code, out _))
+            .OrderBy(item => ParseOperationCode(item.Code))
+            .ToArray();
+    }
+
+    private Task OnMachineChanged(ChangeEventArgs args)
+    {
+        var machineCode = ParseMachineCode(args.Value?.ToString() ?? string.Empty);
+        model.MachineCode = machineCode;
+        model.MachineName = ResolveMachineName(machineCode);
+        return Task.CompletedTask;
+    }
+
+    private Task OnOperationChanged(ChangeEventArgs args)
+    {
+        var operationCode = ParseOperationCode(args.Value?.ToString() ?? string.Empty);
+        model.OperationCode = operationCode;
+        model.OperationName = ResolveOperationName(operationCode);
+        return Task.CompletedTask;
+    }
+
+    private void AddLine()
+    {
+        var nextLine = model.Lines.Count == 0 ? 1 : model.Lines.Max(item => item.LineNumber) + 1;
+        model.Lines.Add(new ParteAcabadoLineDto
+        {
+            LineNumber = nextLine,
+            Status = ParteAcabadoStatuses.Pending
+        });
+    }
+
+    private void RemoveLine(int lineNumber)
+    {
+        var line = model.Lines.FirstOrDefault(item => item.LineNumber == lineNumber);
+        if (line is null)
+        {
+            return;
+        }
+
+        model.Lines.Remove(line);
+        model.TotalKilograms = model.Lines.Sum(item => item.TotalKilograms);
+        model.TotalPieces = model.Lines.Sum(item => item.TotalPieces);
+    }
+
+    private async Task LoadAuditAsync()
+    {
+        if (!tenantId.HasValue || !OrderNumber.HasValue)
+        {
+            recentAuditLogs = [];
+            return;
+        }
+
+        recentAuditLogs = await AuditLogService.GetRecentAsync(
+            limit: 15,
+            tenantId: tenantId.Value,
+            entityName: "ParteAcabado",
+            entityId: OrderNumber.Value.ToString());
+    }
+
+    private static string GetStatusLabel(string status) => status switch
+    {
+        ParteAcabadoStatuses.Pending => "Pendiente",
+        ParteAcabadoStatuses.InProgress => "En proceso",
+        ParteAcabadoStatuses.Finished => "Terminado",
+        ParteAcabadoStatuses.Cancelled => "Anulado",
+        _ => status
+    };
+
+    private static string BuildTejidoUrl(ParteAcabadoLineDto line) =>
+        string.IsNullOrWhiteSpace(line.FabricCode)
+            ? string.Empty
+            : $"/articulos/tejidos/editar/{Uri.EscapeDataString(line.FabricCode.Trim())}";
+
+    private static string BuildMovementsUrl(ParteAcabadoLineDto line)
+    {
+        if (string.IsNullOrWhiteSpace(line.FabricCode))
+        {
+            return string.Empty;
+        }
+
+        var search = string.IsNullOrWhiteSpace(line.Color)
+            ? line.FabricCode.Trim()
+            : $"{line.FabricCode.Trim()} {line.Color.Trim()}";
+
+        return $"/almacen/movimientos?search={Uri.EscapeDataString(search)}";
+    }
+
+    private string BuildDispositionUrl() =>
+        HasLinkedDisposition ? $"/articulos/disposiciones/editar/{model.DispositionCode!.Value}" : "/articulos/disposiciones";
+
+    private string BuildSampleUrl() =>
+        HasLinkedSample ? $"{ParteAcabadoSourceKinds.GetRouteBase(model.SourceSampleKind)}/editar/{Uri.EscapeDataString(model.SourceSampleCode.Trim())}" : "/articulos/muestras";
+
+    private async Task TryApplyDispositionBaseAsync()
+    {
+        if (!tenantId.HasValue || !companyId.HasValue || OrderNumber.HasValue || !DispositionCodeFromQuery.HasValue || !string.IsNullOrWhiteSpace(SampleCodeFromQuery))
+        {
+            return;
+        }
+
+        if (appliedDispositionCode == DispositionCodeFromQuery.Value)
+        {
+            return;
+        }
+
+        var disposition = await DisposicionQueries.GetByCodeAsync(tenantId.Value, companyId.Value, DispositionCodeFromQuery.Value);
+        if (disposition is null)
+        {
+            statusMessage = "No se ha encontrado la disposición usada como base para el parte de acabado.";
+            isError = true;
+            return;
+        }
+
+        model = BuildFromDisposition(disposition);
+        await InferMachineFromLinesAsync();
+        appliedDispositionCode = DispositionCodeFromQuery.Value;
+        statusMessage = $"Parte precargado desde la disposición {FormatDispositionLabel(disposition)}.";
+        isError = false;
+    }
+
+    private async Task TryApplySampleBaseAsync()
+    {
+        if (!tenantId.HasValue || !companyId.HasValue || OrderNumber.HasValue || string.IsNullOrWhiteSpace(SampleCodeFromQuery))
+        {
+            return;
+        }
+
+        var sampleCode = SampleCodeFromQuery.Trim();
+        var sampleLine = SampleLineFromQuery.GetValueOrDefault();
+        var sampleKind = ParteAcabadoSourceKinds.Normalize(SampleKindFromQuery, hasLinkedSource: true);
+        if (string.Equals(appliedSampleCode, sampleCode, StringComparison.OrdinalIgnoreCase) &&
+            appliedSampleLineNumber == sampleLine &&
+            string.Equals(appliedSampleKind, sampleKind, StringComparison.OrdinalIgnoreCase))
+        {
+            return;
+        }
+
+        var sample = await MuestraQueries.GetByCodeAsync(tenantId.Value, companyId.Value, sampleCode);
+        if (sample is null)
+        {
+            statusMessage = "No se ha encontrado la muestra usada como base para el parte de acabado.";
+            isError = true;
+            return;
+        }
+
+        model = BuildFromSample(sample, sampleLine > 0 ? sampleLine : null, sampleKind);
+        appliedSampleCode = sampleCode;
+        appliedSampleLineNumber = sampleLine > 0 ? sampleLine : null;
+        appliedSampleKind = sampleKind;
+        statusMessage = sampleLine > 0
+            ? $"Parte precargado desde {ParteAcabadoSourceKinds.GetLabel(sampleKind).ToLowerInvariant()} {sample.Code}, línea {sampleLine}."
+            : $"Parte precargado desde {ParteAcabadoSourceKinds.GetLabel(sampleKind).ToLowerInvariant()} {sample.Code}.";
+        isError = false;
+    }
+
+    private async Task InferMachineFromLinesAsync()
+    {
+        if (!tenantId.HasValue || !companyId.HasValue || model.MachineCode > 0)
+        {
+            if (model.MachineCode > 0 && string.IsNullOrWhiteSpace(model.MachineName))
+            {
+                model.MachineName = ResolveMachineName(model.MachineCode);
+            }
+
+            if (model.OperationCode > 0 && string.IsNullOrWhiteSpace(model.OperationName))
+            {
+                model.OperationName = ResolveOperationName(model.OperationCode);
+            }
+
+            return;
+        }
+
+        foreach (var line in model.Lines.OrderBy(item => item.LineNumber))
+        {
+            if (string.IsNullOrWhiteSpace(line.FabricCode))
+            {
+                continue;
+            }
+
+            var fabric = await TejidoQueries.GetByCodeAsync(tenantId.Value, companyId.Value, line.FabricCode);
+            if (fabric is null || fabric.MachineCode <= 0)
+            {
+                continue;
+            }
+
+            model.MachineCode = fabric.MachineCode;
+            model.MachineName = ResolveMachineName(fabric.MachineCode);
+            return;
+        }
+    }
+
+    private static ParteAcabadoDetailDto BuildFromDisposition(DisposicionDetailDto disposition)
+    {
+        var detail = new ParteAcabadoDetailDto
+        {
+            Date = disposition.Date ?? DateTime.Today,
+            Status = ParteAcabadoStatuses.Pending,
+            ClientCode = disposition.ClientCode,
+            ClientName = disposition.ClientName,
+            FinisherCode = disposition.FinisherCode,
+            FinisherName = disposition.FinisherName,
+            DispositionCode = disposition.Code,
+            DispositionLabel = FormatDispositionLabel(disposition),
+            Notes = disposition.Notes,
+            Origin = "local",
+            Lines = disposition.Lines
+                .OrderBy(item => item.LineNumber)
+                .Select(item => new ParteAcabadoLineDto
+                {
+                    LineNumber = item.LineNumber,
+                    FabricCode = item.FabricCode,
+                    FabricDescription = item.Description,
+                    Color = disposition.Color,
+                    TotalKilograms = item.TotalKilograms,
+                    TotalPieces = item.TotalPieces,
+                    Status = item.IsServed
+                        ? ParteAcabadoStatuses.Finished
+                        : item.IsDisposed
+                            ? ParteAcabadoStatuses.InProgress
+                            : ParteAcabadoStatuses.Pending,
+                    Notes = item.FinishText
+                })
+                .ToList()
+        };
+
+        detail.TotalKilograms = detail.Lines.Sum(item => item.TotalKilograms);
+        detail.TotalPieces = detail.Lines.Sum(item => item.TotalPieces);
+        return detail;
+    }
+
+    private static ParteAcabadoDetailDto BuildFromSample(MuestraDetailDto sample, int? sampleLineNumber, string sourceSampleKind)
+    {
+        var selectedLines = sampleLineNumber.HasValue
+            ? sample.Lines.Where(item => item.LineNumber == sampleLineNumber.Value).ToList()
+            : sample.Lines.OrderBy(item => item.LineNumber).ToList();
+
+        if (selectedLines.Count == 0)
+        {
+            selectedLines =
+            [
+                new MuestraLineDto
+                {
+                    LineNumber = 1,
+                    Description = sample.Description,
+                    Color = string.Empty,
+                    ClientCode = sample.ClientCode,
+                    ClientName = sample.ClientName
+                }
+            ];
+        }
+
+        var primaryBreakdown = selectedLines
+            .Select(item => item.Breakdown)
+            .FirstOrDefault(item => item is not null && (item.MachineCode > 0 || item.WorkDate.HasValue || item.OperationCode > 0 || !string.IsNullOrWhiteSpace(item.OperationName)));
+
+        var detail = new ParteAcabadoDetailDto
+        {
+            Date = primaryBreakdown?.WorkDate ?? DateTime.Today,
+            Status = ParteAcabadoStatuses.Pending,
+            ClientCode = sample.ClientCode,
+            ClientName = sample.ClientName,
+            MachineCode = primaryBreakdown?.MachineCode ?? sample.MachineCode,
+            MachineName = !string.IsNullOrWhiteSpace(primaryBreakdown?.MachineName) ? primaryBreakdown.MachineName : sample.MachineName,
+            OperationCode = primaryBreakdown?.OperationCode ?? 0,
+            OperationName = primaryBreakdown?.OperationName ?? string.Empty,
+            SourceSampleKind = ParteAcabadoSourceKinds.Normalize(sourceSampleKind, hasLinkedSource: true),
+            SourceSampleCode = sample.Code,
+            SourceSampleLineNumber = sampleLineNumber,
+            Notes = BuildSampleNotes(sample, sampleLineNumber, primaryBreakdown),
+            Origin = "local",
+            Lines = selectedLines
+                .OrderBy(item => item.LineNumber)
+                .Select(item => new ParteAcabadoLineDto
+                {
+                    LineNumber = item.LineNumber,
+                    FabricCode = sample.Code,
+                    FabricDescription = string.IsNullOrWhiteSpace(item.Description) ? sample.Description : item.Description,
+                    Color = item.Color,
+                    TotalKilograms = 0,
+                    TotalPieces = 1,
+                    Status = ParteAcabadoStatuses.Pending,
+                    Notes = BuildSampleLineNotes(item)
+                })
+                .ToList()
+        };
+
+        detail.TotalKilograms = detail.Lines.Sum(item => item.TotalKilograms);
+        detail.TotalPieces = detail.Lines.Sum(item => item.TotalPieces);
+        return detail;
+    }
+
+    private static string BuildSampleNotes(MuestraDetailDto sample, int? sampleLineNumber, MuestraBreakdownDto? breakdown)
+    {
+        var notes = new List<string>
+        {
+            $"Base muestra: {sample.Code}"
+        };
+
+        if (sampleLineNumber.HasValue)
+        {
+            notes.Add($"Línea muestra: {sampleLineNumber.Value}");
+        }
+
+        if (!string.IsNullOrWhiteSpace(sample.Reference))
+        {
+            notes.Add($"Referencia: {sample.Reference}");
+        }
+
+        if (!string.IsNullOrWhiteSpace(sample.Season))
+        {
+            notes.Add($"Temporada: {sample.Season}");
+        }
+
+        if (breakdown is not null)
+        {
+            if (!string.IsNullOrWhiteSpace(breakdown.Cuts))
+            {
+                notes.Add($"Cortes: {breakdown.Cuts}");
+            }
+
+            if (!string.IsNullOrWhiteSpace(breakdown.Notes))
+            {
+                notes.Add($"Desglose: {breakdown.Notes}");
+            }
+        }
+
+        if (!string.IsNullOrWhiteSpace(sample.Notes))
+        {
+            notes.Add(sample.Notes);
+        }
+
+        return string.Join(" · ", notes.Where(item => !string.IsNullOrWhiteSpace(item)));
+    }
+
+    private static string BuildSampleLineNotes(MuestraLineDto line)
+    {
+        var notes = new List<string>();
+
+        var size = string.Join(" / ", new[] { line.SizeCode, line.SizeHigh, line.SizeLow }.Where(item => !string.IsNullOrWhiteSpace(item)));
+        if (!string.IsNullOrWhiteSpace(size))
+        {
+            notes.Add($"Talla: {size}");
+        }
+
+        if (line.ClientCode > 0)
+        {
+            notes.Add($"Cliente línea: {line.ClientCode}");
+        }
+
+        if (!string.IsNullOrWhiteSpace(line.NcCode))
+        {
+            notes.Add($"NC: {line.NcCode}");
+        }
+
+        return string.Join(" · ", notes);
+    }
+
+    private string ResolveMachineName(int machineCode)
+    {
+        if (machineCode <= 0)
+        {
+            return string.Empty;
+        }
+
+        return machineOptions.FirstOrDefault(item => ParseMachineCode(item.Code) == machineCode)?.Name ?? string.Empty;
+    }
+
+    private string ResolveOperationName(int operationCode)
+    {
+        if (operationCode <= 0)
+        {
+            return string.Empty;
+        }
+
+        return operationOptions.FirstOrDefault(item => ParseOperationCode(item.Code) == operationCode)?.Name ?? string.Empty;
+    }
+
+    private static string FormatDispositionLabel(DisposicionDetailDto disposition) =>
+        string.IsNullOrWhiteSpace(disposition.Year)
+            ? disposition.Number.ToString()
+            : $"{disposition.Number}-{disposition.Year}";
+
+    private static int ParseMachineCode(string code) =>
+        int.TryParse(code, out var parsedValue) ? parsedValue : 0;
+
+    private static string FormatMachineOption(BaseCatalogListItemDto item) =>
+        string.IsNullOrWhiteSpace(item.Name) ? item.Code : $"{item.Code} · {item.Name}";
+
+    private static int ParseOperationCode(string code) =>
+        int.TryParse(code, out var parsedValue) ? parsedValue : 0;
+
+    private static string FormatOperationOption(BaseCatalogListItemDto item) =>
+        string.IsNullOrWhiteSpace(item.Name) ? item.Code : $"{item.Code} · {item.Name}";
+}

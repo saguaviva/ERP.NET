@@ -1566,7 +1566,6 @@ public sealed class MySqlSalesOrderService : ISalesOrderQueries, ISalesOrderServ
         NormalizeAndValidate(command);
 
         await using var connection = await _saasConnectionFactory.OpenConnectionAsync(cancellationToken);
-        await EnsureSalesOrdersWriteAllowedAsync(connection, command.TenantId, command.CompanyId, cancellationToken);
         var centerCode = await ResolveCompanyCenterCodeAsync(connection, command.TenantId, command.CompanyId, cancellationToken);
         await using var legacyConnection = await _legacyConnectionFactory.OpenConnectionAsync(cancellationToken);
         var clientSnapshot = await GetClientSnapshotAsync(legacyConnection, centerCode, command.ClientCode, cancellationToken);
@@ -1584,10 +1583,6 @@ public sealed class MySqlSalesOrderService : ISalesOrderQueries, ISalesOrderServ
                 throw new InvalidOperationException("No se ha encontrado el pedido de cliente que intentas modificar.");
             }
 
-            if (string.Equals(previous.Origin, SalesOrderOrigins.Legacy, StringComparison.OrdinalIgnoreCase))
-            {
-                throw new InvalidOperationException("Este pedido está sincronizado desde legacy y no se puede editar desde la web mientras el módulo siga en convivencia.");
-            }
         }
 
         var existingLineState = previous?.Lines.ToDictionary(line => line.LineNumber) ?? [];
@@ -1610,12 +1605,16 @@ public sealed class MySqlSalesOrderService : ISalesOrderQueries, ISalesOrderServ
                     requested_date = @requestedDate,
                     status = @status,
                     notes = @notes,
+                    origin = @origin,
+                    is_deleted = 0,
+                    synced_utc = NULL,
                     updated_utc = @updatedUtc
                 WHERE tenant_id = @tenantId
                   AND company_id = @companyId
                   AND order_number = @orderNumber;
                 """;
             FillHeaderParameters(updateCommand, command, orderNumber, clientSnapshot);
+            updateCommand.Parameters.AddWithValue("@origin", SalesOrderOrigins.Local);
             updateCommand.Parameters.AddWithValue("@updatedUtc", DateTime.UtcNow);
             if (await updateCommand.ExecuteNonQueryAsync(cancellationToken) == 0)
             {
@@ -1660,7 +1659,7 @@ public sealed class MySqlSalesOrderService : ISalesOrderQueries, ISalesOrderServ
                     @updatedUtc);
                 """;
             FillHeaderParameters(insertCommand, command, orderNumber, clientSnapshot);
-            insertCommand.Parameters.AddWithValue("@origin", SalesOrderOrigins.Saas);
+            insertCommand.Parameters.AddWithValue("@origin", SalesOrderOrigins.Local);
             insertCommand.Parameters.AddWithValue("@createdUtc", DateTime.UtcNow);
             insertCommand.Parameters.AddWithValue("@updatedUtc", DateTime.UtcNow);
             await insertCommand.ExecuteNonQueryAsync(cancellationToken);
@@ -1751,15 +1750,9 @@ public sealed class MySqlSalesOrderService : ISalesOrderQueries, ISalesOrderServ
         NormalizeAndValidateShipment(command);
 
         await using var connection = await _saasConnectionFactory.OpenConnectionAsync(cancellationToken);
-        await EnsureSalesShipmentsWriteAllowedAsync(connection, command.TenantId, command.CompanyId, cancellationToken);
 
         var currentOrder = await GetByOrderNumberAsync(command.TenantId, command.CompanyId, command.OrderNumber, cancellationToken)
             ?? throw new InvalidOperationException("No se ha encontrado el pedido de cliente a expedir.");
-
-        if (string.Equals(currentOrder.Origin, SalesOrderOrigins.Legacy, StringComparison.OrdinalIgnoreCase))
-        {
-            throw new InvalidOperationException("Este pedido está sincronizado desde legacy y no se puede expedir desde la web mientras el módulo siga en convivencia.");
-        }
 
         if (string.Equals(currentOrder.Status, SalesOrderStatuses.Cancelled, StringComparison.OrdinalIgnoreCase))
         {
@@ -1822,6 +1815,9 @@ public sealed class MySqlSalesOrderService : ISalesOrderQueries, ISalesOrderServ
                     invoice_reference,
                     invoice_ready_utc,
                     notes,
+                    origin,
+                    is_deleted,
+                    synced_utc,
                     created_utc)
                 VALUES (
                     @shipmentId,
@@ -1836,6 +1832,9 @@ public sealed class MySqlSalesOrderService : ISalesOrderQueries, ISalesOrderServ
                     @invoiceReference,
                     @invoiceReadyUtc,
                     @notes,
+                    @origin,
+                    0,
+                    NULL,
                     @createdUtc);
                 """;
             insertShipmentCommand.Parameters.AddWithValue("@shipmentId", shipmentId.ToString());
@@ -1850,6 +1849,7 @@ public sealed class MySqlSalesOrderService : ISalesOrderQueries, ISalesOrderServ
             insertShipmentCommand.Parameters.AddWithValue("@invoiceReference", DBNull.Value);
             insertShipmentCommand.Parameters.AddWithValue("@invoiceReadyUtc", DateTime.UtcNow);
             insertShipmentCommand.Parameters.AddWithValue("@notes", DbValue(command.Notes));
+            insertShipmentCommand.Parameters.AddWithValue("@origin", SalesOrderOrigins.Local);
             insertShipmentCommand.Parameters.AddWithValue("@createdUtc", DateTime.UtcNow);
             await insertShipmentCommand.ExecuteNonQueryAsync(cancellationToken);
         }
@@ -1998,12 +1998,16 @@ public sealed class MySqlSalesOrderService : ISalesOrderQueries, ISalesOrderServ
                 """
                 UPDATE sales_orders
                 SET status = @status,
+                    origin = @origin,
+                    is_deleted = 0,
+                    synced_utc = NULL,
                     updated_utc = @updatedUtc
                 WHERE tenant_id = @tenantId
                   AND company_id = @companyId
                   AND order_number = @orderNumber;
                 """;
             updateOrderCommand.Parameters.AddWithValue("@status", newStatus);
+            updateOrderCommand.Parameters.AddWithValue("@origin", SalesOrderOrigins.Local);
             updateOrderCommand.Parameters.AddWithValue("@updatedUtc", DateTime.UtcNow);
             updateOrderCommand.Parameters.AddWithValue("@tenantId", command.TenantId.ToString());
             updateOrderCommand.Parameters.AddWithValue("@companyId", command.CompanyId.ToString());
@@ -2039,7 +2043,6 @@ public sealed class MySqlSalesOrderService : ISalesOrderQueries, ISalesOrderServ
         NormalizeAndValidateInvoiceDraft(command);
 
         await using var connection = await _saasConnectionFactory.OpenConnectionAsync(cancellationToken);
-        await EnsureSalesShipmentsWriteAllowedAsync(connection, command.TenantId, command.CompanyId, cancellationToken);
         var centerCode = await ResolveCompanyCenterCodeAsync(connection, command.TenantId, command.CompanyId, cancellationToken);
         await using var transaction = await connection.BeginTransactionAsync(cancellationToken);
 
@@ -2214,7 +2217,10 @@ public sealed class MySqlSalesOrderService : ISalesOrderQueries, ISalesOrderServ
                 UPDATE sales_order_shipments
                 SET invoice_status = @invoiceStatus,
                     invoice_reference = @invoiceReference,
-                    invoice_draft_id = @invoiceDraftId
+                    invoice_draft_id = @invoiceDraftId,
+                    origin = @origin,
+                    is_deleted = 0,
+                    synced_utc = NULL
                 WHERE shipment_id = @shipmentId
                   AND tenant_id = @tenantId
                   AND company_id = @companyId
@@ -2223,6 +2229,7 @@ public sealed class MySqlSalesOrderService : ISalesOrderQueries, ISalesOrderServ
             updateShipmentCommand.Parameters.AddWithValue("@invoiceStatus", "Drafted");
             updateShipmentCommand.Parameters.AddWithValue("@invoiceReference", draftReference);
             updateShipmentCommand.Parameters.AddWithValue("@invoiceDraftId", draftId.ToString());
+            updateShipmentCommand.Parameters.AddWithValue("@origin", SalesOrderOrigins.Local);
             updateShipmentCommand.Parameters.AddWithValue("@shipmentId", shipment.ShipmentId.ToString());
             updateShipmentCommand.Parameters.AddWithValue("@tenantId", command.TenantId.ToString());
             updateShipmentCommand.Parameters.AddWithValue("@companyId", command.CompanyId.ToString());
@@ -2312,7 +2319,6 @@ public sealed class MySqlSalesOrderService : ISalesOrderQueries, ISalesOrderServ
         }
 
         await using var connection = await _saasConnectionFactory.OpenConnectionAsync(cancellationToken);
-        await EnsureSalesInvoicesWriteAllowedAsync(connection, command.TenantId, command.CompanyId, cancellationToken);
         var centerCode = await ResolveCompanyCenterCodeAsync(connection, command.TenantId, command.CompanyId, cancellationToken);
         var nowUtc = DateTime.UtcNow;
 
@@ -2494,6 +2500,9 @@ public sealed class MySqlSalesOrderService : ISalesOrderQueries, ISalesOrderServ
                     accounting_reference,
                     accounting_ready_utc,
                     notes,
+                    origin,
+                    is_deleted,
+                    synced_utc,
                     issued_utc,
                     created_utc,
                     updated_utc)
@@ -2525,6 +2534,9 @@ public sealed class MySqlSalesOrderService : ISalesOrderQueries, ISalesOrderServ
                     @accountingReference,
                     @accountingReadyUtc,
                     @notes,
+                    @origin,
+                    0,
+                    NULL,
                     @issuedUtc,
                     @createdUtc,
                     @updatedUtc);
@@ -2556,6 +2568,7 @@ public sealed class MySqlSalesOrderService : ISalesOrderQueries, ISalesOrderServ
             insertInvoiceCommand.Parameters.AddWithValue("@accountingReference", DBNull.Value);
             insertInvoiceCommand.Parameters.AddWithValue("@accountingReadyUtc", nowUtc);
             insertInvoiceCommand.Parameters.AddWithValue("@notes", DbValue(header.Notes));
+            insertInvoiceCommand.Parameters.AddWithValue("@origin", SalesOrderOrigins.Local);
             insertInvoiceCommand.Parameters.AddWithValue("@issuedUtc", nowUtc);
             insertInvoiceCommand.Parameters.AddWithValue("@createdUtc", nowUtc);
             insertInvoiceCommand.Parameters.AddWithValue("@updatedUtc", nowUtc);
@@ -2615,7 +2628,10 @@ public sealed class MySqlSalesOrderService : ISalesOrderQueries, ISalesOrderServ
                 UPDATE sales_order_shipments
                 SET invoice_status = @invoiceStatus,
                     invoice_reference = @invoiceReference,
-                    invoice_id = @invoiceId
+                    invoice_id = @invoiceId,
+                    origin = @origin,
+                    is_deleted = 0,
+                    synced_utc = NULL
                 WHERE shipment_id = @shipmentId
                   AND tenant_id = @tenantId
                   AND company_id = @companyId
@@ -2625,6 +2641,7 @@ public sealed class MySqlSalesOrderService : ISalesOrderQueries, ISalesOrderServ
             updateShipmentCommand.Parameters.AddWithValue("@invoiceStatus", "Invoiced");
             updateShipmentCommand.Parameters.AddWithValue("@invoiceReference", invoiceReference);
             updateShipmentCommand.Parameters.AddWithValue("@invoiceId", invoiceId.ToString());
+            updateShipmentCommand.Parameters.AddWithValue("@origin", SalesOrderOrigins.Local);
             updateShipmentCommand.Parameters.AddWithValue("@shipmentId", shipment.ShipmentId.ToString());
             updateShipmentCommand.Parameters.AddWithValue("@tenantId", command.TenantId.ToString());
             updateShipmentCommand.Parameters.AddWithValue("@companyId", command.CompanyId.ToString());
@@ -2750,7 +2767,6 @@ public sealed class MySqlSalesOrderService : ISalesOrderQueries, ISalesOrderServ
         NormalizeAndValidateInvoicePayment(command);
 
         await using var connection = await _saasConnectionFactory.OpenConnectionAsync(cancellationToken);
-        await EnsureSalesInvoicesWriteAllowedAsync(connection, command.TenantId, command.CompanyId, cancellationToken);
         await using var transaction = await connection.BeginTransactionAsync(cancellationToken);
 
         var invoiceHeader = await LoadInvoicePaymentHeaderAsync(connection, transaction, command.TenantId, command.CompanyId, command.InvoiceNumber, cancellationToken)
@@ -2834,6 +2850,9 @@ public sealed class MySqlSalesOrderService : ISalesOrderQueries, ISalesOrderServ
                     amount_paid = @amountPaid,
                     outstanding_amount = @outstandingAmount,
                     last_payment_utc = @lastPaymentUtc,
+                    origin = @origin,
+                    is_deleted = 0,
+                    synced_utc = NULL,
                     updated_utc = @updatedUtc
                 WHERE invoice_id = @invoiceId
                   AND tenant_id = @tenantId
@@ -2843,6 +2862,7 @@ public sealed class MySqlSalesOrderService : ISalesOrderQueries, ISalesOrderServ
             updateInvoiceCommand.Parameters.AddWithValue("@amountPaid", amountPaid);
             updateInvoiceCommand.Parameters.AddWithValue("@outstandingAmount", remainingAmount);
             updateInvoiceCommand.Parameters.AddWithValue("@lastPaymentUtc", nowUtc);
+            updateInvoiceCommand.Parameters.AddWithValue("@origin", SalesOrderOrigins.Local);
             updateInvoiceCommand.Parameters.AddWithValue("@updatedUtc", nowUtc);
             updateInvoiceCommand.Parameters.AddWithValue("@invoiceId", invoiceHeader.InvoiceId.ToString());
             updateInvoiceCommand.Parameters.AddWithValue("@tenantId", command.TenantId.ToString());
@@ -3602,8 +3622,34 @@ public sealed class MySqlSalesOrderService : ISalesOrderQueries, ISalesOrderServ
         string itemDescription,
         CancellationToken cancellationToken)
     {
-        await using var command = connection.CreateCommand();
-        command.CommandText =
+        decimal legacyStock = 0m;
+        await using (var legacyCommand = connection.CreateCommand())
+        {
+            legacyCommand.CommandText =
+                """
+                SELECT COALESCE(current_stock, 0)
+                FROM legacy_stock_balances
+                WHERE tenant_id = @tenantId
+                  AND company_id = @companyId
+                  AND COALESCE(warehouse, '') = @warehouse
+                  AND COALESCE(item_code, '') = @itemCode
+                  AND item_description = @itemDescription
+                LIMIT 1;
+                """;
+            legacyCommand.Parameters.AddWithValue("@tenantId", tenantId.ToString());
+            legacyCommand.Parameters.AddWithValue("@companyId", companyId.ToString());
+            legacyCommand.Parameters.AddWithValue("@warehouse", warehouse);
+            legacyCommand.Parameters.AddWithValue("@itemCode", itemCode);
+            legacyCommand.Parameters.AddWithValue("@itemDescription", itemDescription);
+            var legacyScalar = await legacyCommand.ExecuteScalarAsync(cancellationToken);
+            if (legacyScalar is not null && legacyScalar != DBNull.Value)
+            {
+                legacyStock = Convert.ToDecimal(legacyScalar);
+            }
+        }
+
+        await using var movementCommand = connection.CreateCommand();
+        movementCommand.CommandText =
             """
             SELECT COALESCE(SUM(
                 CASE
@@ -3618,12 +3664,13 @@ public sealed class MySqlSalesOrderService : ISalesOrderQueries, ISalesOrderServ
               AND COALESCE(item_code, '') = @itemCode
               AND item_description = @itemDescription;
             """;
-        command.Parameters.AddWithValue("@tenantId", tenantId.ToString());
-        command.Parameters.AddWithValue("@companyId", companyId.ToString());
-        command.Parameters.AddWithValue("@warehouse", warehouse);
-        command.Parameters.AddWithValue("@itemCode", itemCode);
-        command.Parameters.AddWithValue("@itemDescription", itemDescription);
-        return Convert.ToDecimal(await command.ExecuteScalarAsync(cancellationToken));
+        movementCommand.Parameters.AddWithValue("@tenantId", tenantId.ToString());
+        movementCommand.Parameters.AddWithValue("@companyId", companyId.ToString());
+        movementCommand.Parameters.AddWithValue("@warehouse", warehouse);
+        movementCommand.Parameters.AddWithValue("@itemCode", itemCode);
+        movementCommand.Parameters.AddWithValue("@itemDescription", itemDescription);
+        var localDelta = Convert.ToDecimal(await movementCommand.ExecuteScalarAsync(cancellationToken));
+        return legacyStock + localDelta;
     }
 
     private async Task<ClientSnapshot?> GetClientSnapshotAsync(
@@ -3990,42 +4037,6 @@ public sealed class MySqlSalesOrderService : ISalesOrderQueries, ISalesOrderServ
         command.Parameters.AddWithValue("@companyId", companyId.ToString());
         command.Parameters.AddWithValue("@moduleKey", moduleKey);
         return Convert.ToInt32(await command.ExecuteScalarAsync(cancellationToken)) > 0;
-    }
-
-    private static async Task EnsureSalesOrdersWriteAllowedAsync(
-        MySqlConnection connection,
-        Guid tenantId,
-        Guid companyId,
-        CancellationToken cancellationToken)
-    {
-        if (await IsLegacySyncActiveForCompanyAsync(connection, tenantId, companyId, LegacySyncModuleKeys.SalesOrders, cancellationToken))
-        {
-            throw new InvalidOperationException("Ventas / Pedidos está en convivencia con legacy para esta empresa. Mientras el módulo esté sincronizado, la web queda en solo lectura.");
-        }
-    }
-
-    private static async Task EnsureSalesShipmentsWriteAllowedAsync(
-        MySqlConnection connection,
-        Guid tenantId,
-        Guid companyId,
-        CancellationToken cancellationToken)
-    {
-        if (await IsLegacySyncActiveForCompanyAsync(connection, tenantId, companyId, LegacySyncModuleKeys.SalesShipments, cancellationToken))
-        {
-            throw new InvalidOperationException("Ventas / Albaranes está en convivencia con legacy para esta empresa. Mientras el módulo esté sincronizado, la web queda en solo lectura.");
-        }
-    }
-
-    private static async Task EnsureSalesInvoicesWriteAllowedAsync(
-        MySqlConnection connection,
-        Guid tenantId,
-        Guid companyId,
-        CancellationToken cancellationToken)
-    {
-        if (await IsLegacySyncActiveForCompanyAsync(connection, tenantId, companyId, LegacySyncModuleKeys.SalesInvoices, cancellationToken))
-        {
-            throw new InvalidOperationException("Ventas / Facturas está en convivencia con legacy para esta empresa. Mientras el módulo esté sincronizado, la web queda en solo lectura.");
-        }
     }
 
     private static async Task<InvoicePaymentHeader?> LoadInvoicePaymentHeaderAsync(

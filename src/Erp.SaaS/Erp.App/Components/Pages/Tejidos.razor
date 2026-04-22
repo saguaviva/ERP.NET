@@ -1,0 +1,497 @@
+@page "/articulos/tejidos"
+@attribute [Authorize(Roles = "TenantAdmin,TenantReader")]
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
+@inject ITejidoQueries TejidoQueries
+@inject ILegacySyncService LegacySyncService
+@inject AppText T
+
+<PageTitle>@L("Artículos / Tejidos", "Articles / Teixits", "Articles / Fabrics")</PageTitle>
+
+<div class="page-header">
+    <div>
+        <p class="eyebrow">@T["menu.articles"]</p>
+        <h1>@L("Tejidos", "Teixits", "Fabrics")</h1>
+        <p class="lead">@(isLegacySyncActive
+            ? L("Consulta y filtra los tejidos de la SaaS local. La importación manual desde legacy refresca solo registros de origen legacy.", "Consulta i filtra els teixits de la SaaS local. La importació manual des de legacy refresca només registres d'origen legacy.", "Browse and filter fabrics from the local SaaS. Manual import from legacy only refreshes legacy-origin records.")
+            : L("Consulta y filtra los tejidos del centro legacy asociado a la empresa activa.", "Consulta i filtra els teixits del centre legacy associat a l'empresa activa.", "Browse and filter fabrics from the legacy center linked to the active company."))</p>
+    </div>
+    <div class="quick-links">
+        @if (canEdit)
+        {
+            <a class="primary-button link-button" href="/articulos/tejidos/nuevo">@L("Nuevo tejido", "Nou teixit", "New fabric")</a>
+        }
+    </div>
+</div>
+
+@if (!tenantId.HasValue || !companyId.HasValue)
+{
+    <div class="empty-state">
+        <p>@L("Selecciona una empresa activa para trabajar con tejidos.", "Selecciona una empresa activa per treballar amb teixits.", "Select an active company to work with fabrics.")</p>
+    </div>
+}
+else
+{
+    <section class="panel">
+        <div class="filter-row">
+            <input class="text-input" @bind="filter.Search" placeholder="@L("Buscar por código, descripción, ancho, máquina, tejedor o acabador", "Buscar per codi, descripció, ample, màquina, teixidor o acabador", "Search by code, description, width, machine, knitter or finisher")" />
+            <button class="secondary-button" @onclick="SearchAsync" disabled="@isLoading">@(isLoading ? L("Cargando...", "Carregant...", "Loading...") : L("Buscar", "Buscar", "Search"))</button>
+        </div>
+        <div class="form-grid" style="margin-top: 1rem; margin-bottom: 0;">
+            <label class="field">
+                <span>@L("Tejedor", "Teixidor", "Knitter")</span>
+                <InputNumber class="text-input" @bind-Value="filter.WeaverCode" />
+            </label>
+            <label class="field">
+                <span>@L("Acabador", "Acabador", "Finisher")</span>
+                <InputNumber class="text-input" @bind-Value="filter.FinisherCode" />
+            </label>
+            <label class="field">
+                <span>@L("Tubular", "Tubular", "Tubular")</span>
+                <InputSelect class="text-input" @bind-Value="filter.TubularMode">
+                    <option value="">@L("Todos", "Tots", "All")</option>
+                    <option value="yes">@L("Solo tubular", "Només tubular", "Tubular only")</option>
+                    <option value="no">@L("Solo no tubular", "Només no tubular", "Non-tubular only")</option>
+                </InputSelect>
+            </label>
+            <label class="field checkbox-field">
+                <InputCheckbox @bind-Value="filter.OnlyWithAvailableStock" />
+                <span>@L("Solo con stock disponible", "Només amb estoc disponible", "Only with available stock")</span>
+            </label>
+        </div>
+        <div class="form-grid" style="margin-top: 1rem; margin-bottom: 0;">
+            <label class="field">
+                <span>@L("Gramaje desde", "Gramatge des de", "Weight from")</span>
+                <InputNumber class="text-input" @bind-Value="filter.GramWeightMin" />
+            </label>
+            <label class="field">
+                <span>@L("Gramaje hasta", "Gramatge fins a", "Weight to")</span>
+                <InputNumber class="text-input" @bind-Value="filter.GramWeightMax" />
+            </label>
+            <label class="field">
+                <span>@L("Ancho desde", "Ample des de", "Width from")</span>
+                <InputNumber class="text-input" @bind-Value="filter.WidthMin" />
+            </label>
+            <label class="field">
+                <span>@L("Ancho hasta", "Ample fins a", "Width to")</span>
+                <InputNumber class="text-input" @bind-Value="filter.WidthMax" />
+            </label>
+        </div>
+        <div class="form-grid" style="margin-top: 1rem; margin-bottom: 0;">
+            <label class="field">
+                <span>@L("€/m desde", "€/m des de", "€/m from")</span>
+                <InputNumber class="text-input" @bind-Value="filter.PricePerMeterMin" />
+            </label>
+            <label class="field">
+                <span>@L("€/m hasta", "€/m fins a", "€/m to")</span>
+                <InputNumber class="text-input" @bind-Value="filter.PricePerMeterMax" />
+            </label>
+            <label class="field">
+                <span>@L("€/kg desde", "€/kg des de", "€/kg from")</span>
+                <InputNumber class="text-input" @bind-Value="filter.PricePerKilogramMin" />
+            </label>
+            <label class="field">
+                <span>@L("€/kg hasta", "€/kg fins a", "€/kg to")</span>
+                <InputNumber class="text-input" @bind-Value="filter.PricePerKilogramMax" />
+            </label>
+        </div>
+        <div class="filter-row results-toolbar" style="margin-top: 0.85rem;">
+            <span class="results-summary">
+                @(totalCount == 0
+                    ? L("Sin resultados", "Sense resultats", "No results")
+                    : L($"Mostrando {PageStart}-{PageEnd} de {totalCount} tejidos", $"Mostrant {PageStart}-{PageEnd} de {totalCount} teixits", $"Showing {PageStart}-{PageEnd} of {totalCount} fabrics"))
+            </span>
+            <label class="field compact-field">
+                <span>@L("Tamaño de página", "Mida de pàgina", "Page size")</span>
+                <select class="sidebar-select compact-select" value="@filter.PageSize" @onchange="OnPageSizeChanged" disabled="@isLoading">
+                    <option value="25">25</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                </select>
+            </label>
+        </div>
+    </section>
+
+    @if (!string.IsNullOrWhiteSpace(errorMessage))
+    {
+        <div class="alert danger">@errorMessage</div>
+    }
+
+    @if (isLegacySyncActive)
+    {
+        <div class="alert">
+            @L("Artículos / Tejidos está en convivencia con legacy para esta empresa. La web guarda cambios solo en la SaaS local y la sync manual refresca únicamente registros de origen legacy.", "Articles / Teixits està en convivència amb legacy per a aquesta empresa. La web desa canvis només a la SaaS local i la sync manual refresca únicament registres d'origen legacy.", "Articles / Fabrics is running in legacy coexistence mode for this company. The web app stores changes only in the local SaaS and manual sync refreshes only legacy-origin records.")
+            @if (!string.IsNullOrWhiteSpace(syncStatusLabel))
+            {
+                <span>@syncStatusLabel</span>
+            }
+        </div>
+    }
+
+    <section class="panel @(isLoading ? "loading-panel" : string.Empty)" aria-busy="@isLoading">
+        @if (isLoading)
+        {
+            <div class="loading-banner">
+                <span class="loading-indicator" aria-hidden="true"></span>
+                <span>@L("Cargando tejidos...", "Carregant teixits...", "Loading fabrics...")</span>
+            </div>
+        }
+
+        <div class="table-scroll">
+            <table class="data-table tejidos-table">
+                <thead>
+                    <tr>
+                        <SortableHeader Label="@L("Código", "Codi", "Code")" IsActive="@(sortColumn == nameof(TejidoListItemDto.Code))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(TejidoListItemDto.Code)))" />
+                        <SortableHeader Label="@L("Descripción", "Descripció", "Description")" IsActive="@(sortColumn == nameof(TejidoListItemDto.Description))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(TejidoListItemDto.Description)))" />
+                        <SortableHeader Label="@L("Máquina", "Màquina", "Machine")" IsActive="@(sortColumn == nameof(TejidoListItemDto.MachineCode))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(TejidoListItemDto.MachineCode), true))" />
+                        <SortableHeader Label="@L("Tejedor", "Teixidor", "Knitter")" IsActive="@(sortColumn == nameof(TejidoListItemDto.WeaverCode))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(TejidoListItemDto.WeaverCode), true))" />
+                        <SortableHeader Label="Acabador" IsActive="@(sortColumn == nameof(TejidoListItemDto.FinisherCode))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(TejidoListItemDto.FinisherCode), true))" />
+                        <SortableHeader Label="@L("Ancho", "Ample", "Width")" IsActive="@(sortColumn == nameof(TejidoListItemDto.WidthText))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(TejidoListItemDto.WidthText)))" />
+                        <SortableHeader Label="@L("Gramaje", "Gramatge", "Weight")" IsActive="@(sortColumn == nameof(TejidoListItemDto.GramWeight))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(TejidoListItemDto.GramWeight), true))" />
+                        <SortableHeader Label="€/m" IsActive="@(sortColumn == nameof(TejidoListItemDto.PricePerMeter))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(TejidoListItemDto.PricePerMeter), true))" />
+                        <SortableHeader Label="€/kg" IsActive="@(sortColumn == nameof(TejidoListItemDto.PricePerKilogram))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(TejidoListItemDto.PricePerKilogram), true))" />
+                        <SortableHeader Label="Disp. m" IsActive="@(sortColumn == nameof(TejidoListItemDto.AvailableStockMeters))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(TejidoListItemDto.AvailableStockMeters), true))" />
+                        <th>@L("Tubular", "Tubular", "Tubular")</th>
+                        <th>@L("Origen", "Origen", "Origin")</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (isLoading)
+                    {
+                        @for (var index = 0; index < 5; index++)
+                        {
+                            <tr class="table-skeleton-row">
+                                <td><span class="skeleton-line short"></span></td>
+                                <td><span class="skeleton-line"></span></td>
+                                <td><span class="skeleton-line short"></span></td>
+                                <td><span class="skeleton-line short"></span></td>
+                                <td><span class="skeleton-line short"></span></td>
+                                <td><span class="skeleton-line short"></span></td>
+                                <td><span class="skeleton-line short"></span></td>
+                                <td><span class="skeleton-line short"></span></td>
+                                <td><span class="skeleton-line short"></span></td>
+                                <td><span class="skeleton-line short"></span></td>
+                                <td><span class="skeleton-line short"></span></td>
+                                <td><span class="skeleton-line short"></span></td>
+                                <td><span class="skeleton-line short"></span></td>
+                            </tr>
+                        }
+                    }
+                    else if (items.Count == 0)
+                    {
+                        <tr>
+                            <td colspan="13" class="table-empty">@L("No hay tejidos para mostrar.", "No hi ha teixits per mostrar.", "No fabrics to display.")</td>
+                        </tr>
+                    }
+                    else
+                    {
+                        @foreach (var item in items)
+                        {
+                            <tr>
+                                <td><a class="inline-link" href="/articulos/tejidos/editar/@Uri.EscapeDataString(item.Code)">@item.Code</a></td>
+                                <td><a class="inline-link" href="/articulos/tejidos/editar/@Uri.EscapeDataString(item.Code)">@item.Description</a></td>
+                                <td>@item.MachineCode</td>
+                                <td>@item.WeaverCode</td>
+                                <td>@item.FinisherCode</td>
+                                <td>@item.WidthText</td>
+                                <td>@item.GramWeight.ToString("0.###")</td>
+                                <td>@item.PricePerMeter.ToString("0.00##")</td>
+                                <td>@item.PricePerKilogram.ToString("0.00##")</td>
+                                <td>@item.AvailableStockMeters.ToString("0.###")</td>
+                                <td>@(item.IsTubular ? L("Sí", "Sí", "Yes") : L("No", "No", "No"))</td>
+                                <td>@(string.IsNullOrWhiteSpace(item.Origin) ? "-" : item.Origin)</td>
+                                <td><a class="inline-link" href="/articulos/tejidos/editar/@Uri.EscapeDataString(item.Code)">@(canEdit ? L("Abrir ficha", "Obrir fitxa", "Open record") : L("Ver ficha", "Veure fitxa", "View record"))</a></td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <div class="pagination-bar">
+            <span class="muted">@L($"Página {filter.Page} de {TotalPages}", $"Pàgina {filter.Page} de {TotalPages}", $"Page {filter.Page} of {TotalPages}")</span>
+            <div class="pagination-actions">
+                <button class="secondary-button" @onclick="() => ChangePageAsync(1)" disabled="@(!CanGoPrevious || isLoading)">@L("Primera", "Primera", "First")</button>
+                <button class="secondary-button" @onclick="() => ChangePageAsync(filter.Page - 1)" disabled="@(!CanGoPrevious || isLoading)">@L("Anterior", "Anterior", "Previous")</button>
+                <button class="secondary-button" @onclick="() => ChangePageAsync(filter.Page + 1)" disabled="@(!CanGoNext || isLoading)">@L("Siguiente", "Següent", "Next")</button>
+                <button class="secondary-button" @onclick="() => ChangePageAsync(TotalPages)" disabled="@(!CanGoNext || isLoading)">@L("Última", "Última", "Last")</button>
+            </div>
+        </div>
+    </section>
+}
+
+@code {
+    [SupplyParameterFromQuery(Name = "q")]
+    public string? SearchQuery { get; set; }
+
+    [SupplyParameterFromQuery(Name = "weaver")]
+    public int? WeaverQuery { get; set; }
+
+    [SupplyParameterFromQuery(Name = "finisher")]
+    public int? FinisherQuery { get; set; }
+
+    [SupplyParameterFromQuery(Name = "tubular")]
+    public string? TubularQuery { get; set; }
+
+    [SupplyParameterFromQuery(Name = "stock")]
+    public bool? StockQuery { get; set; }
+
+    [SupplyParameterFromQuery(Name = "gramMin")]
+    public decimal? GramMinQuery { get; set; }
+
+    [SupplyParameterFromQuery(Name = "gramMax")]
+    public decimal? GramMaxQuery { get; set; }
+
+    [SupplyParameterFromQuery(Name = "widthMin")]
+    public decimal? WidthMinQuery { get; set; }
+
+    [SupplyParameterFromQuery(Name = "widthMax")]
+    public decimal? WidthMaxQuery { get; set; }
+
+    [SupplyParameterFromQuery(Name = "meterMin")]
+    public decimal? MeterMinQuery { get; set; }
+
+    [SupplyParameterFromQuery(Name = "meterMax")]
+    public decimal? MeterMaxQuery { get; set; }
+
+    [SupplyParameterFromQuery(Name = "kgMin")]
+    public decimal? KilogramMinQuery { get; set; }
+
+    [SupplyParameterFromQuery(Name = "kgMax")]
+    public decimal? KilogramMaxQuery { get; set; }
+
+    [SupplyParameterFromQuery(Name = "page")]
+    public int? PageQuery { get; set; }
+
+    [SupplyParameterFromQuery(Name = "pageSize")]
+    public int? PageSizeQuery { get; set; }
+
+    [SupplyParameterFromQuery(Name = "sort")]
+    public string? SortQuery { get; set; }
+
+    [SupplyParameterFromQuery(Name = "desc")]
+    public bool? DescQuery { get; set; }
+
+    private Guid? tenantId;
+    private Guid? companyId;
+    private bool canEdit;
+    private bool isLoading;
+    private TejidoFilter filter = new() { Page = 1, PageSize = 25, SortColumn = nameof(TejidoListItemDto.Code) };
+    private IReadOnlyCollection<TejidoListItemDto> items = [];
+    private string errorMessage = string.Empty;
+    private string sortColumn = nameof(TejidoListItemDto.Code);
+    private bool sortDescending;
+    private bool isLegacySyncActive;
+    private string syncStatusLabel = string.Empty;
+    private int totalCount;
+    private string L(string spanish, string catalan, string english) =>
+        T.CurrentLanguage switch
+        {
+            AppLanguages.Catalan => catalan,
+            AppLanguages.English => english,
+            _ => spanish
+        };
+    private int TotalPages => Math.Max(1, (int)Math.Ceiling(totalCount / (double)filter.PageSize));
+    private bool CanGoPrevious => filter.Page > 1;
+    private bool CanGoNext => filter.Page < TotalPages;
+    private int PageStart => totalCount == 0 ? 0 : ((filter.Page - 1) * filter.PageSize) + 1;
+    private int PageEnd => totalCount == 0 ? 0 : Math.Min(filter.Page * filter.PageSize, totalCount);
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        tenantId = user.GetTenantId();
+        companyId = user.GetActiveCompanyId();
+        canEdit = user.IsPlatformAdmin() || user.IsInRole(PlatformRoles.TenantAdmin);
+        await LoadSyncStatusAsync();
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        ApplyQueryState();
+        await LoadAsync();
+    }
+
+    private async Task LoadSyncStatusAsync()
+    {
+        isLegacySyncActive = false;
+        syncStatusLabel = string.Empty;
+        if (!tenantId.HasValue || !companyId.HasValue)
+        {
+            return;
+        }
+
+        var status = (await LegacySyncService.GetModuleStatusesAsync(tenantId.Value))
+            .FirstOrDefault(item =>
+                item.CompanyId == companyId.Value &&
+                string.Equals(item.ModuleKey, LegacySyncModuleKeys.ArticleTejidos, StringComparison.OrdinalIgnoreCase));
+
+        if (status is null || !status.HasSuccessfulSync)
+        {
+            return;
+        }
+
+        isLegacySyncActive = true;
+        syncStatusLabel = status.LastCompletedUtc.HasValue
+            ? L($"Última sync: {status.LastCompletedUtc.Value.ToLocalTime():dd/MM/yyyy HH:mm:ss} · Ins: {status.LastInserted} · Act: {status.LastUpdated} · Omi: {status.LastSkipped} · Err: {status.LastErrors}",
+                $"Última sync: {status.LastCompletedUtc.Value.ToLocalTime():dd/MM/yyyy HH:mm:ss} · Ins: {status.LastInserted} · Act: {status.LastUpdated} · Omi: {status.LastSkipped} · Err: {status.LastErrors}",
+                $"Last sync: {status.LastCompletedUtc.Value.ToLocalTime():dd/MM/yyyy HH:mm:ss} · Ins: {status.LastInserted} · Upd: {status.LastUpdated} · Skip: {status.LastSkipped} · Err: {status.LastErrors}")
+            : L($"Estado: {status.LastStatus}", $"Estat: {status.LastStatus}", $"Status: {status.LastStatus}");
+    }
+
+    private async Task LoadAsync()
+    {
+        errorMessage = string.Empty;
+        if (!tenantId.HasValue || !companyId.HasValue)
+        {
+            items = [];
+            totalCount = 0;
+            return;
+        }
+
+        isLoading = true;
+        await InvokeAsync(StateHasChanged);
+        try
+        {
+            filter.SortColumn = sortColumn;
+            filter.SortDescending = sortDescending;
+            var result = await TejidoQueries.SearchAsync(tenantId.Value, companyId.Value, filter);
+            items = result.Items;
+            totalCount = result.TotalCount;
+            if (filter.Page > TotalPages)
+            {
+                filter.Page = TotalPages;
+                result = await TejidoQueries.SearchAsync(tenantId.Value, companyId.Value, filter);
+                items = result.Items;
+                totalCount = result.TotalCount;
+            }
+        }
+        catch (Exception exception)
+        {
+            errorMessage = exception.Message;
+            items = [];
+            totalCount = 0;
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private async Task SearchAsync()
+    {
+        filter.Page = 1;
+        UpdateQueryState();
+        await Task.CompletedTask;
+    }
+
+    private async Task ChangePageAsync(int page)
+    {
+        filter.Page = Math.Clamp(page, 1, TotalPages);
+        UpdateQueryState();
+        await Task.CompletedTask;
+    }
+
+    private async Task SetSortAsync(string column, bool defaultDescending = false)
+    {
+        if (string.Equals(sortColumn, column, StringComparison.Ordinal))
+        {
+            sortDescending = !sortDescending;
+        }
+        else
+        {
+            sortColumn = column;
+            sortDescending = defaultDescending;
+        }
+
+        filter.Page = 1;
+        UpdateQueryState();
+        await Task.CompletedTask;
+    }
+
+    private async Task OnPageSizeChanged(ChangeEventArgs args)
+    {
+        if (!int.TryParse(args.Value?.ToString(), out var pageSize))
+        {
+            return;
+        }
+
+        filter.PageSize = pageSize;
+        filter.Page = 1;
+        UpdateQueryState();
+        await Task.CompletedTask;
+    }
+
+    private void ApplyQueryState()
+    {
+        filter.Search = SearchQuery?.Trim() ?? string.Empty;
+        filter.WeaverCode = WeaverQuery > 0 ? WeaverQuery : null;
+        filter.FinisherCode = FinisherQuery > 0 ? FinisherQuery : null;
+        filter.TubularMode = NormalizeTubularMode(TubularQuery);
+        filter.OnlyWithAvailableStock = StockQuery.GetValueOrDefault();
+        filter.GramWeightMin = GramMinQuery;
+        filter.GramWeightMax = GramMaxQuery;
+        filter.WidthMin = WidthMinQuery;
+        filter.WidthMax = WidthMaxQuery;
+        filter.PricePerMeterMin = MeterMinQuery;
+        filter.PricePerMeterMax = MeterMaxQuery;
+        filter.PricePerKilogramMin = KilogramMinQuery;
+        filter.PricePerKilogramMax = KilogramMaxQuery;
+        filter.Page = Math.Max(PageQuery.GetValueOrDefault(1), 1);
+        filter.PageSize = PageSizeQuery is 25 or 50 or 100 ? PageSizeQuery.Value : 25;
+        sortColumn = NormalizeSortColumn(SortQuery);
+        sortDescending = DescQuery.GetValueOrDefault();
+        filter.SortColumn = sortColumn;
+        filter.SortDescending = sortDescending;
+    }
+
+    private void UpdateQueryState()
+    {
+        var uri = NavigationManager.GetUriWithQueryParameters(new Dictionary<string, object?>
+        {
+            ["q"] = string.IsNullOrWhiteSpace(filter.Search) ? null : filter.Search,
+            ["weaver"] = filter.WeaverCode,
+            ["finisher"] = filter.FinisherCode,
+            ["tubular"] = string.IsNullOrWhiteSpace(filter.TubularMode) ? null : filter.TubularMode,
+            ["stock"] = filter.OnlyWithAvailableStock ? true : null,
+            ["gramMin"] = filter.GramWeightMin,
+            ["gramMax"] = filter.GramWeightMax,
+            ["widthMin"] = filter.WidthMin,
+            ["widthMax"] = filter.WidthMax,
+            ["meterMin"] = filter.PricePerMeterMin,
+            ["meterMax"] = filter.PricePerMeterMax,
+            ["kgMin"] = filter.PricePerKilogramMin,
+            ["kgMax"] = filter.PricePerKilogramMax,
+            ["page"] = filter.Page > 1 ? filter.Page : null,
+            ["pageSize"] = filter.PageSize != 25 ? filter.PageSize : null,
+            ["sort"] = string.Equals(sortColumn, nameof(TejidoListItemDto.Code), StringComparison.Ordinal) ? null : sortColumn,
+            ["desc"] = sortDescending ? true : null
+        });
+
+        NavigationManager.NavigateTo(uri, replace: true);
+    }
+
+    private static string NormalizeTubularMode(string? value) => value switch
+    {
+        "yes" => "yes",
+        "no" => "no",
+        _ => string.Empty
+    };
+
+    private static string NormalizeSortColumn(string? sortColumn) => sortColumn switch
+    {
+        nameof(TejidoListItemDto.Code) => nameof(TejidoListItemDto.Code),
+        nameof(TejidoListItemDto.Description) => nameof(TejidoListItemDto.Description),
+        nameof(TejidoListItemDto.MachineCode) => nameof(TejidoListItemDto.MachineCode),
+        nameof(TejidoListItemDto.WeaverCode) => nameof(TejidoListItemDto.WeaverCode),
+        nameof(TejidoListItemDto.FinisherCode) => nameof(TejidoListItemDto.FinisherCode),
+        nameof(TejidoListItemDto.WidthText) => nameof(TejidoListItemDto.WidthText),
+        nameof(TejidoListItemDto.GramWeight) => nameof(TejidoListItemDto.GramWeight),
+        nameof(TejidoListItemDto.PricePerMeter) => nameof(TejidoListItemDto.PricePerMeter),
+        nameof(TejidoListItemDto.PricePerKilogram) => nameof(TejidoListItemDto.PricePerKilogram),
+        nameof(TejidoListItemDto.AvailableStockMeters) => nameof(TejidoListItemDto.AvailableStockMeters),
+        _ => nameof(TejidoListItemDto.Code)
+    };
+}

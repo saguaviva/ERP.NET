@@ -5,21 +5,22 @@
 @inject ISalesOrderService SalesOrderService
 @inject ILegacySyncService LegacySyncService
 @inject NavigationManager NavigationManager
+@inject AppText T
 
-<PageTitle>Ventas / Pre-facturación</PageTitle>
+<PageTitle>@L("Ventas / Pre-facturación", "Vendes / Pre-facturació", "Sales / Pre-invoicing")</PageTitle>
 
 <div class="page-header">
     <div>
-        <p class="eyebrow">Ventas</p>
-        <h1>Pre-facturación</h1>
-        <p class="lead">Bandeja de albaranes pendientes y generación de borradores de factura agrupados por cliente.</p>
+        <p class="eyebrow">@L("Ventas", "Vendes", "Sales")</p>
+        <h1>@L("Pre-facturación", "Pre-facturació", "Pre-invoicing")</h1>
+        <p class="lead">@L("Bandeja de albaranes pendientes y generación de borradores de factura agrupados por cliente.", "Safata d'albarans pendents i generació d'esborranys de factura agrupats per client.", "Queue of pending shipments and invoice draft generation grouped by client.")</p>
     </div>
 </div>
 
 @if (!tenantId.HasValue || !companyId.HasValue)
 {
     <div class="empty-state">
-        <p>Selecciona una empresa activa para preparar borradores de factura.</p>
+        <p>@L("Selecciona una empresa activa para preparar borradores de factura.", "Selecciona una empresa activa per preparar esborranys de factura.", "Select an active company to prepare invoice drafts.")</p>
     </div>
 }
 else
@@ -27,10 +28,10 @@ else
     @if (shipmentsSyncStatus?.HasSuccessfulSync == true)
     {
         <div class="alert warning">
-            Ventas / Albaranes está en convivencia con legacy para esta empresa. La pre-facturación web queda en solo lectura mientras la sincronización mande.
+            @L("Ventas / Albaranes está en convivencia con legacy para esta empresa. La sync manual refresca solo los albaranes con origen legacy; cuando reserves albaranes desde la web para un borrador, esos cambios quedan en local.", "Vendes / Albarans està en convivència amb legacy per a aquesta empresa. La sync manual refresca només els albarans amb origen legacy; quan reservis albarans des del web per a un esborrany, aquests canvis queden en local.", "Sales / Shipments is running in legacy coexistence mode for this company. Manual sync refreshes only legacy-origin shipments; when you reserve shipments on the web for a draft, those changes remain local.")
             @if (shipmentsSyncStatus.LastCompletedUtc.HasValue)
             {
-                <span>Última sync: @shipmentsSyncStatus.LastCompletedUtc.Value.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss") · Ins: @shipmentsSyncStatus.LastInserted · Act: @shipmentsSyncStatus.LastUpdated · Omi: @shipmentsSyncStatus.LastSkipped · Err: @shipmentsSyncStatus.LastErrors</span>
+                <span>@L("Última sync:", "Última sync:", "Last sync:") @shipmentsSyncStatus.LastCompletedUtc.Value.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss") · Ins: @shipmentsSyncStatus.LastInserted · Act: @shipmentsSyncStatus.LastUpdated · Omi: @shipmentsSyncStatus.LastSkipped · Err: @shipmentsSyncStatus.LastErrors</span>
             }
         </div>
     }
@@ -42,55 +43,55 @@ else
 
     <section class="panel">
         <div class="filter-row">
-            <input class="text-input" @bind="searchText" placeholder="Buscar por albarán, pedido, cliente o notas" disabled="@isLoading" />
-            <button class="secondary-button" @onclick="SearchAsync" disabled="@isLoading">@(isLoading ? "Cargando..." : "Buscar")</button>
+            <input class="text-input" @bind="searchText" placeholder="@L("Buscar por albarán, pedido, cliente o notas", "Buscar per albarà, comanda, client o notes", "Search by shipment, order, client or notes")" disabled="@isLoading" />
+            <button class="secondary-button" @onclick="SearchAsync" disabled="@isLoading">@(isLoading ? L("Cargando...", "Carregant...", "Loading...") : L("Buscar", "Buscar", "Search"))</button>
         </div>
     </section>
 
     <div class="card-grid purchase-summary-grid purchase-metrics-grid">
         <article class="info-card accent-card">
             <h2>@pendingTotalCount</h2>
-            <p class="muted">albaranes pendientes</p>
+            <p class="muted">@L("albaranes pendientes", "albarans pendents", "pending shipments")</p>
         </article>
         <article class="info-card">
             <h2>@pendingShipments.Sum(item => item.EstimatedAmount).ToString("0.00") €</h2>
-            <p class="muted">importe pendiente en página</p>
+            <p class="muted">@L("importe pendiente en página", "import pendent en pàgina", "outstanding amount on page")</p>
         </article>
         <article class="info-card">
             <h2>@draftTotalCount</h2>
-            <p class="muted">borradores creados</p>
+            <p class="muted">@L("borradores creados", "esborranys creats", "created drafts")</p>
         </article>
         <article class="info-card">
             <h2>@invoiceDrafts.Sum(item => item.TotalAmount).ToString("0.00") €</h2>
-            <p class="muted">importe en borrador en página</p>
+            <p class="muted">@L("importe en borrador en página", "import en esborrany en pàgina", "draft amount on page")</p>
         </article>
     </div>
 
     @if (canEdit)
     {
         <section class="panel" style="margin-top: 1rem;">
-            <h2>Crear borrador</h2>
-            <p class="muted">Selecciona uno o varios albaranes pendientes del mismo cliente para agruparlos en un primer borrador de factura.</p>
+            <h2>@L("Crear borrador", "Crear esborrany", "Create draft")</h2>
+            <p class="muted">@L("Selecciona uno o varios albaranes pendientes del mismo cliente para agruparlos en un primer borrador de factura.", "Selecciona un o diversos albarans pendents del mateix client per agrupar-los en un primer esborrany de factura.", "Select one or more pending shipments from the same client to group them into a first invoice draft.")</p>
 
             <div class="form-grid">
                 <label class="field">
-                    <span>Fecha borrador</span>
+                    <span>@L("Fecha borrador", "Data esborrany", "Draft date")</span>
                     <InputDate class="text-input" @bind-Value="draftForm.IssueDate" />
                 </label>
                 <label class="field">
-                    <span>Vencimiento</span>
+                    <span>@L("Vencimiento", "Venciment", "Due date")</span>
                     <InputDate class="text-input" @bind-Value="draftForm.DueDate" />
                 </label>
                 <label class="field wide">
-                    <span>Notas</span>
+                    <span>@L("Notas", "Notes", "Notes")</span>
                     <InputTextArea class="text-area" @bind-Value="draftForm.Notes" />
                 </label>
             </div>
 
             <div class="quick-links">
-                <span class="muted">Seleccionados: @selectedShipmentIds.Count @(selectedClientName is null ? string.Empty : $"· Cliente {selectedClientName}")</span>
-                <button class="primary-button" type="button" disabled="@(selectedShipmentIds.Count == 0)" @onclick="CreateDraftAsync">Crear borrador</button>
-                <button class="secondary-button" type="button" disabled="@(selectedShipmentIds.Count == 0)" @onclick="ClearSelection">Limpiar selección</button>
+                <span class="muted">@L($"Seleccionados: {selectedShipmentIds.Count}", $"Seleccionats: {selectedShipmentIds.Count}", $"Selected: {selectedShipmentIds.Count}") @(selectedClientName is null ? string.Empty : L($"· Cliente {selectedClientName}", $"· Client {selectedClientName}", $"· Client {selectedClientName}"))</span>
+                <button class="primary-button" type="button" disabled="@(selectedShipmentIds.Count == 0)" @onclick="CreateDraftAsync">@L("Crear borrador", "Crear esborrany", "Create draft")</button>
+                <button class="secondary-button" type="button" disabled="@(selectedShipmentIds.Count == 0)" @onclick="ClearSelection">@L("Limpiar selección", "Netejar selecció", "Clear selection")</button>
             </div>
         </section>
     }
@@ -99,11 +100,11 @@ else
         <div class="filter-row results-toolbar">
             <span class="results-summary">
                 @(pendingTotalCount == 0
-                    ? "Sin albaranes pendientes"
-                    : $"Mostrando {PendingPageStart}-{PendingPageEnd} de {pendingTotalCount} albaranes pendientes")
+                    ? L("Sin albaranes pendientes", "Sense albarans pendents", "No pending shipments")
+                    : L($"Mostrando {PendingPageStart}-{PendingPageEnd} de {pendingTotalCount} albaranes pendientes", $"Mostrant {PendingPageStart}-{PendingPageEnd} de {pendingTotalCount} albarans pendents", $"Showing {PendingPageStart}-{PendingPageEnd} of {pendingTotalCount} pending shipments"))
             </span>
             <label class="field compact-field">
-                <span>Tamaño de página</span>
+                <span>@L("Tamaño de página", "Mida de pàgina", "Page size")</span>
                 <select class="sidebar-select compact-select" value="@pendingFilter.PageSize" @onchange="OnPendingPageSizeChanged" disabled="@isLoading">
                     <option value="25">25</option>
                     <option value="50">50</option>
@@ -116,11 +117,11 @@ else
         {
             <div class="loading-banner">
                 <span class="loading-indicator" aria-hidden="true"></span>
-                <span>Cargando albaranes pendientes...</span>
+                <span>@L("Cargando albaranes pendientes...", "Carregant albarans pendents...", "Loading pending shipments...")</span>
             </div>
         }
 
-        <h2>Albaranes pendientes</h2>
+        <h2>@L("Albaranes pendientes", "Albarans pendents", "Pending shipments")</h2>
         <table class="data-table">
             <thead>
                 <tr>
@@ -128,13 +129,13 @@ else
                     {
                         <th></th>
                     }
-                    <SortableHeader Label="Albarán" IsActive="@(pendingSortColumn == nameof(PendingSalesShipmentDto.ShipmentNumber))" Descending="@pendingSortDescending" OnSort="@(() => SetPendingSortAsync(nameof(PendingSalesShipmentDto.ShipmentNumber), true))" />
-                    <SortableHeader Label="Pedido" IsActive="@(pendingSortColumn == nameof(PendingSalesShipmentDto.OrderNumber))" Descending="@pendingSortDescending" OnSort="@(() => SetPendingSortAsync(nameof(PendingSalesShipmentDto.OrderNumber), true))" />
-                    <SortableHeader Label="Cliente" IsActive="@(pendingSortColumn == nameof(PendingSalesShipmentDto.ClientName))" Descending="@pendingSortDescending" OnSort="@(() => SetPendingSortAsync(nameof(PendingSalesShipmentDto.ClientName)))" />
-                    <SortableHeader Label="Fecha" IsActive="@(pendingSortColumn == nameof(PendingSalesShipmentDto.ShipmentDate))" Descending="@pendingSortDescending" OnSort="@(() => SetPendingSortAsync(nameof(PendingSalesShipmentDto.ShipmentDate), true))" />
-                    <SortableHeader Label="Almacén" IsActive="@(pendingSortColumn == nameof(PendingSalesShipmentDto.Warehouse))" Descending="@pendingSortDescending" OnSort="@(() => SetPendingSortAsync(nameof(PendingSalesShipmentDto.Warehouse)))" />
-                    <SortableHeader Label="Cantidad" IsActive="@(pendingSortColumn == nameof(PendingSalesShipmentDto.TotalShippedQuantity))" Descending="@pendingSortDescending" OnSort="@(() => SetPendingSortAsync(nameof(PendingSalesShipmentDto.TotalShippedQuantity), true))" />
-                    <SortableHeader Label="Importe" IsActive="@(pendingSortColumn == nameof(PendingSalesShipmentDto.EstimatedAmount))" Descending="@pendingSortDescending" OnSort="@(() => SetPendingSortAsync(nameof(PendingSalesShipmentDto.EstimatedAmount), true))" />
+                    <SortableHeader Label="@L("Albarán", "Albarà", "Shipment")" IsActive="@(pendingSortColumn == nameof(PendingSalesShipmentDto.ShipmentNumber))" Descending="@pendingSortDescending" OnSort="@(() => SetPendingSortAsync(nameof(PendingSalesShipmentDto.ShipmentNumber), true))" />
+                    <SortableHeader Label="@L("Pedido", "Comanda", "Order")" IsActive="@(pendingSortColumn == nameof(PendingSalesShipmentDto.OrderNumber))" Descending="@pendingSortDescending" OnSort="@(() => SetPendingSortAsync(nameof(PendingSalesShipmentDto.OrderNumber), true))" />
+                    <SortableHeader Label="@L("Cliente", "Client", "Client")" IsActive="@(pendingSortColumn == nameof(PendingSalesShipmentDto.ClientName))" Descending="@pendingSortDescending" OnSort="@(() => SetPendingSortAsync(nameof(PendingSalesShipmentDto.ClientName)))" />
+                    <SortableHeader Label="@L("Fecha", "Data", "Date")" IsActive="@(pendingSortColumn == nameof(PendingSalesShipmentDto.ShipmentDate))" Descending="@pendingSortDescending" OnSort="@(() => SetPendingSortAsync(nameof(PendingSalesShipmentDto.ShipmentDate), true))" />
+                    <SortableHeader Label="@L("Almacén", "Magatzem", "Warehouse")" IsActive="@(pendingSortColumn == nameof(PendingSalesShipmentDto.Warehouse))" Descending="@pendingSortDescending" OnSort="@(() => SetPendingSortAsync(nameof(PendingSalesShipmentDto.Warehouse)))" />
+                    <SortableHeader Label="@L("Cantidad", "Quantitat", "Quantity")" IsActive="@(pendingSortColumn == nameof(PendingSalesShipmentDto.TotalShippedQuantity))" Descending="@pendingSortDescending" OnSort="@(() => SetPendingSortAsync(nameof(PendingSalesShipmentDto.TotalShippedQuantity), true))" />
+                    <SortableHeader Label="@L("Importe", "Import", "Amount")" IsActive="@(pendingSortColumn == nameof(PendingSalesShipmentDto.EstimatedAmount))" Descending="@pendingSortDescending" OnSort="@(() => SetPendingSortAsync(nameof(PendingSalesShipmentDto.EstimatedAmount), true))" />
                     <th></th>
                 </tr>
             </thead>
@@ -162,7 +163,7 @@ else
                 else if (pendingShipments.Count == 0)
                 {
                     <tr>
-                        <td colspan="@(canEdit ? 9 : 8)" class="table-empty">No hay albaranes pendientes de facturar.</td>
+                        <td colspan="@(canEdit ? 9 : 8)" class="table-empty">@L("No hay albaranes pendientes de facturar.", "No hi ha albarans pendents de facturar.", "There are no shipments pending invoicing.")</td>
                     </tr>
                 }
                 else
@@ -186,7 +187,7 @@ else
                             <td>@DisplayValue(item.Warehouse)</td>
                             <td>@item.TotalShippedQuantity.ToString("0.###")</td>
                             <td>@item.EstimatedAmount.ToString("0.00") €</td>
-                            <td><a class="inline-link" href="/ventas/albaranes/@item.ShipmentNumber">Abrir</a></td>
+                            <td><a class="inline-link" href="/ventas/albaranes/@item.ShipmentNumber">@L("Abrir", "Obrir", "Open")</a></td>
                         </tr>
                     }
                 }
@@ -194,12 +195,12 @@ else
         </table>
 
         <div class="pagination-bar">
-            <span class="muted">Página @pendingFilter.Page de @PendingTotalPages</span>
+            <span class="muted">@L($"Página {pendingFilter.Page} de {PendingTotalPages}", $"Pàgina {pendingFilter.Page} de {PendingTotalPages}", $"Page {pendingFilter.Page} of {PendingTotalPages}")</span>
             <div class="pagination-actions">
-                <button class="secondary-button" @onclick="() => ChangePendingPageAsync(1)" disabled="@(!CanGoPendingPrevious || isLoading)">Primera</button>
-                <button class="secondary-button" @onclick="() => ChangePendingPageAsync(pendingFilter.Page - 1)" disabled="@(!CanGoPendingPrevious || isLoading)">Anterior</button>
-                <button class="secondary-button" @onclick="() => ChangePendingPageAsync(pendingFilter.Page + 1)" disabled="@(!CanGoPendingNext || isLoading)">Siguiente</button>
-                <button class="secondary-button" @onclick="() => ChangePendingPageAsync(PendingTotalPages)" disabled="@(!CanGoPendingNext || isLoading)">Última</button>
+                <button class="secondary-button" @onclick="() => ChangePendingPageAsync(1)" disabled="@(!CanGoPendingPrevious || isLoading)">@L("Primera", "Primera", "First")</button>
+                <button class="secondary-button" @onclick="() => ChangePendingPageAsync(pendingFilter.Page - 1)" disabled="@(!CanGoPendingPrevious || isLoading)">@L("Anterior", "Anterior", "Previous")</button>
+                <button class="secondary-button" @onclick="() => ChangePendingPageAsync(pendingFilter.Page + 1)" disabled="@(!CanGoPendingNext || isLoading)">@L("Siguiente", "Següent", "Next")</button>
+                <button class="secondary-button" @onclick="() => ChangePendingPageAsync(PendingTotalPages)" disabled="@(!CanGoPendingNext || isLoading)">@L("Última", "Última", "Last")</button>
             </div>
         </div>
     </section>
@@ -208,11 +209,11 @@ else
         <div class="filter-row results-toolbar">
             <span class="results-summary">
                 @(draftTotalCount == 0
-                    ? "Sin borradores"
-                    : $"Mostrando {DraftPageStart}-{DraftPageEnd} de {draftTotalCount} borradores")
+                    ? L("Sin borradores", "Sense esborranys", "No drafts")
+                    : L($"Mostrando {DraftPageStart}-{DraftPageEnd} de {draftTotalCount} borradores", $"Mostrant {DraftPageStart}-{DraftPageEnd} de {draftTotalCount} esborranys", $"Showing {DraftPageStart}-{DraftPageEnd} of {draftTotalCount} drafts"))
             </span>
             <label class="field compact-field">
-                <span>Tamaño de página</span>
+                <span>@L("Tamaño de página", "Mida de pàgina", "Page size")</span>
                 <select class="sidebar-select compact-select" value="@draftFilter.PageSize" @onchange="OnDraftPageSizeChanged" disabled="@isLoading">
                     <option value="25">25</option>
                     <option value="50">50</option>
@@ -221,17 +222,17 @@ else
             </label>
         </div>
 
-        <h2>Borradores recientes</h2>
+        <h2>@L("Borradores recientes", "Esborranys recents", "Recent drafts")</h2>
         <table class="data-table">
             <thead>
                 <tr>
-                    <SortableHeader Label="Borrador" IsActive="@(draftSortColumn == nameof(SalesInvoiceDraftListItemDto.DraftNumber))" Descending="@draftSortDescending" OnSort="@(() => SetDraftSortAsync(nameof(SalesInvoiceDraftListItemDto.DraftNumber), true))" />
-                    <SortableHeader Label="Cliente" IsActive="@(draftSortColumn == nameof(SalesInvoiceDraftListItemDto.ClientName))" Descending="@draftSortDescending" OnSort="@(() => SetDraftSortAsync(nameof(SalesInvoiceDraftListItemDto.ClientName)))" />
-                    <SortableHeader Label="Fecha" IsActive="@(draftSortColumn == nameof(SalesInvoiceDraftListItemDto.IssueDate))" Descending="@draftSortDescending" OnSort="@(() => SetDraftSortAsync(nameof(SalesInvoiceDraftListItemDto.IssueDate), true))" />
-                    <SortableHeader Label="Vencimiento" IsActive="@(draftSortColumn == nameof(SalesInvoiceDraftListItemDto.DueDate))" Descending="@draftSortDescending" OnSort="@(() => SetDraftSortAsync(nameof(SalesInvoiceDraftListItemDto.DueDate), true))" />
-                    <SortableHeader Label="Estado" IsActive="@(draftSortColumn == nameof(SalesInvoiceDraftListItemDto.Status))" Descending="@draftSortDescending" OnSort="@(() => SetDraftSortAsync(nameof(SalesInvoiceDraftListItemDto.Status)))" />
-                    <SortableHeader Label="Albaranes" IsActive="@(draftSortColumn == nameof(SalesInvoiceDraftListItemDto.ShipmentCount))" Descending="@draftSortDescending" OnSort="@(() => SetDraftSortAsync(nameof(SalesInvoiceDraftListItemDto.ShipmentCount), true))" />
-                    <SortableHeader Label="Total" IsActive="@(draftSortColumn == nameof(SalesInvoiceDraftListItemDto.TotalAmount))" Descending="@draftSortDescending" OnSort="@(() => SetDraftSortAsync(nameof(SalesInvoiceDraftListItemDto.TotalAmount), true))" />
+                    <SortableHeader Label="@L("Borrador", "Esborrany", "Draft")" IsActive="@(draftSortColumn == nameof(SalesInvoiceDraftListItemDto.DraftNumber))" Descending="@draftSortDescending" OnSort="@(() => SetDraftSortAsync(nameof(SalesInvoiceDraftListItemDto.DraftNumber), true))" />
+                    <SortableHeader Label="@L("Cliente", "Client", "Client")" IsActive="@(draftSortColumn == nameof(SalesInvoiceDraftListItemDto.ClientName))" Descending="@draftSortDescending" OnSort="@(() => SetDraftSortAsync(nameof(SalesInvoiceDraftListItemDto.ClientName)))" />
+                    <SortableHeader Label="@L("Fecha", "Data", "Date")" IsActive="@(draftSortColumn == nameof(SalesInvoiceDraftListItemDto.IssueDate))" Descending="@draftSortDescending" OnSort="@(() => SetDraftSortAsync(nameof(SalesInvoiceDraftListItemDto.IssueDate), true))" />
+                    <SortableHeader Label="@L("Vencimiento", "Venciment", "Due date")" IsActive="@(draftSortColumn == nameof(SalesInvoiceDraftListItemDto.DueDate))" Descending="@draftSortDescending" OnSort="@(() => SetDraftSortAsync(nameof(SalesInvoiceDraftListItemDto.DueDate), true))" />
+                    <SortableHeader Label="@L("Estado", "Estat", "Status")" IsActive="@(draftSortColumn == nameof(SalesInvoiceDraftListItemDto.Status))" Descending="@draftSortDescending" OnSort="@(() => SetDraftSortAsync(nameof(SalesInvoiceDraftListItemDto.Status)))" />
+                    <SortableHeader Label="@L("Albaranes", "Albarans", "Shipments")" IsActive="@(draftSortColumn == nameof(SalesInvoiceDraftListItemDto.ShipmentCount))" Descending="@draftSortDescending" OnSort="@(() => SetDraftSortAsync(nameof(SalesInvoiceDraftListItemDto.ShipmentCount), true))" />
+                    <SortableHeader Label="@L("Total", "Total", "Total")" IsActive="@(draftSortColumn == nameof(SalesInvoiceDraftListItemDto.TotalAmount))" Descending="@draftSortDescending" OnSort="@(() => SetDraftSortAsync(nameof(SalesInvoiceDraftListItemDto.TotalAmount), true))" />
                     <th></th>
                 </tr>
             </thead>
@@ -255,7 +256,7 @@ else
                 else if (invoiceDrafts.Count == 0)
                 {
                     <tr>
-                        <td colspan="8" class="table-empty">Todavía no hay borradores de factura.</td>
+                        <td colspan="8" class="table-empty">@L("Todavía no hay borradores de factura.", "Encara no hi ha esborranys de factura.", "There are no invoice drafts yet.")</td>
                     </tr>
                 }
                 else
@@ -272,10 +273,10 @@ else
                             <td>@item.TotalAmount.ToString("0.00") €</td>
                             <td>
                                 <div class="table-actions">
-                                    <a class="inline-link" href="/ventas/pre-facturacion/borradores/@item.DraftNumber">Ver borrador</a>
+                                    <a class="inline-link" href="/ventas/pre-facturacion/borradores/@item.DraftNumber">@L("Ver borrador", "Veure esborrany", "View draft")</a>
                                     @if (item.InvoiceNumber is int invoiceNumber)
                                     {
-                                        <a class="inline-link" href="/ventas/facturas/@invoiceNumber">Abrir factura</a>
+                                        <a class="inline-link" href="/ventas/facturas/@invoiceNumber">@L("Abrir factura", "Obrir factura", "Open invoice")</a>
                                     }
                                 </div>
                             </td>
@@ -286,18 +287,53 @@ else
         </table>
 
         <div class="pagination-bar">
-            <span class="muted">Página @draftFilter.Page de @DraftTotalPages</span>
+            <span class="muted">@L($"Página {draftFilter.Page} de {DraftTotalPages}", $"Pàgina {draftFilter.Page} de {DraftTotalPages}", $"Page {draftFilter.Page} of {DraftTotalPages}")</span>
             <div class="pagination-actions">
-                <button class="secondary-button" @onclick="() => ChangeDraftPageAsync(1)" disabled="@(!CanGoDraftPrevious || isLoading)">Primera</button>
-                <button class="secondary-button" @onclick="() => ChangeDraftPageAsync(draftFilter.Page - 1)" disabled="@(!CanGoDraftPrevious || isLoading)">Anterior</button>
-                <button class="secondary-button" @onclick="() => ChangeDraftPageAsync(draftFilter.Page + 1)" disabled="@(!CanGoDraftNext || isLoading)">Siguiente</button>
-                <button class="secondary-button" @onclick="() => ChangeDraftPageAsync(DraftTotalPages)" disabled="@(!CanGoDraftNext || isLoading)">Última</button>
+                <button class="secondary-button" @onclick="() => ChangeDraftPageAsync(1)" disabled="@(!CanGoDraftPrevious || isLoading)">@L("Primera", "Primera", "First")</button>
+                <button class="secondary-button" @onclick="() => ChangeDraftPageAsync(draftFilter.Page - 1)" disabled="@(!CanGoDraftPrevious || isLoading)">@L("Anterior", "Anterior", "Previous")</button>
+                <button class="secondary-button" @onclick="() => ChangeDraftPageAsync(draftFilter.Page + 1)" disabled="@(!CanGoDraftNext || isLoading)">@L("Siguiente", "Següent", "Next")</button>
+                <button class="secondary-button" @onclick="() => ChangeDraftPageAsync(DraftTotalPages)" disabled="@(!CanGoDraftNext || isLoading)">@L("Última", "Última", "Last")</button>
             </div>
         </div>
     </section>
 }
 
 @code {
+    private string L(string spanish, string catalan, string english) =>
+        T.CurrentLanguage switch
+        {
+            AppLanguages.Catalan => catalan,
+            AppLanguages.English => english,
+            _ => spanish
+        };
+
+    [SupplyParameterFromQuery(Name = "q")]
+    public string? SearchQuery { get; set; }
+
+    [SupplyParameterFromQuery(Name = "ppage")]
+    public int? PendingPageQuery { get; set; }
+
+    [SupplyParameterFromQuery(Name = "ppageSize")]
+    public int? PendingPageSizeQuery { get; set; }
+
+    [SupplyParameterFromQuery(Name = "psort")]
+    public string? PendingSortQuery { get; set; }
+
+    [SupplyParameterFromQuery(Name = "pdesc")]
+    public bool? PendingDescQuery { get; set; }
+
+    [SupplyParameterFromQuery(Name = "dpage")]
+    public int? DraftPageQuery { get; set; }
+
+    [SupplyParameterFromQuery(Name = "dpageSize")]
+    public int? DraftPageSizeQuery { get; set; }
+
+    [SupplyParameterFromQuery(Name = "dsort")]
+    public string? DraftSortQuery { get; set; }
+
+    [SupplyParameterFromQuery(Name = "ddesc")]
+    public bool? DraftDescQuery { get; set; }
+
     private Guid? tenantId;
     private Guid? companyId;
     private bool canEdit;
@@ -345,11 +381,12 @@ else
                 .FirstOrDefault(status =>
                     status.CompanyId == companyId.Value &&
                     string.Equals(status.ModuleKey, LegacySyncModuleKeys.SalesShipments, StringComparison.OrdinalIgnoreCase));
-            if (shipmentsSyncStatus?.HasSuccessfulSync == true)
-            {
-                canEdit = false;
-            }
         }
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        ApplyQueryState();
         await LoadAsync();
     }
 
@@ -413,7 +450,8 @@ else
         pendingFilter.Page = 1;
         draftFilter.Page = 1;
         ClearSelection();
-        await LoadAsync();
+        UpdateQueryState();
+        await Task.CompletedTask;
     }
 
     private async Task CreateDraftAsync()
@@ -510,7 +548,8 @@ else
 
         pendingFilter.Page = 1;
         ClearSelection();
-        await LoadAsync();
+        UpdateQueryState();
+        await Task.CompletedTask;
     }
 
     private async Task SetDraftSortAsync(string column, bool defaultDescending = false)
@@ -526,7 +565,8 @@ else
         }
 
         draftFilter.Page = 1;
-        await LoadAsync();
+        UpdateQueryState();
+        await Task.CompletedTask;
     }
 
     private async Task ChangePendingPageAsync(int page)
@@ -539,7 +579,8 @@ else
 
         pendingFilter.Page = newPage;
         ClearSelection();
-        await LoadAsync();
+        UpdateQueryState();
+        await Task.CompletedTask;
     }
 
     private async Task ChangeDraftPageAsync(int page)
@@ -551,7 +592,8 @@ else
         }
 
         draftFilter.Page = newPage;
-        await LoadAsync();
+        UpdateQueryState();
+        await Task.CompletedTask;
     }
 
     private async Task OnPendingPageSizeChanged(ChangeEventArgs args)
@@ -564,7 +606,8 @@ else
         pendingFilter.PageSize = pageSize;
         pendingFilter.Page = 1;
         ClearSelection();
-        await LoadAsync();
+        UpdateQueryState();
+        await Task.CompletedTask;
     }
 
     private async Task OnDraftPageSizeChanged(ChangeEventArgs args)
@@ -576,14 +619,77 @@ else
 
         draftFilter.PageSize = pageSize;
         draftFilter.Page = 1;
-        await LoadAsync();
+        UpdateQueryState();
+        await Task.CompletedTask;
     }
 
-    private static string DisplayValue(string value) => string.IsNullOrWhiteSpace(value) ? "Sin dato" : value;
-    private static string FormatDraftStatus(string status) => status switch
+    private void ApplyQueryState()
     {
-        SalesInvoiceDraftStatuses.Draft => "Borrador",
-        SalesInvoiceDraftStatuses.Issued => "Emitido",
+        searchText = SearchQuery?.Trim() ?? string.Empty;
+        pendingFilter.Search = searchText;
+        draftFilter.Search = searchText;
+        pendingFilter.Page = Math.Max(PendingPageQuery.GetValueOrDefault(1), 1);
+        pendingFilter.PageSize = PendingPageSizeQuery is 25 or 50 or 100 ? PendingPageSizeQuery.Value : 25;
+        pendingSortColumn = NormalizePendingSortColumn(PendingSortQuery);
+        pendingSortDescending = PendingDescQuery ?? true;
+        pendingFilter.SortColumn = pendingSortColumn;
+        pendingFilter.SortDescending = pendingSortDescending;
+
+        draftFilter.Page = Math.Max(DraftPageQuery.GetValueOrDefault(1), 1);
+        draftFilter.PageSize = DraftPageSizeQuery is 25 or 50 or 100 ? DraftPageSizeQuery.Value : 25;
+        draftSortColumn = NormalizeDraftSortColumn(DraftSortQuery);
+        draftSortDescending = DraftDescQuery ?? true;
+        draftFilter.SortColumn = draftSortColumn;
+        draftFilter.SortDescending = draftSortDescending;
+    }
+
+    private void UpdateQueryState()
+    {
+        var uri = NavigationManager.GetUriWithQueryParameters(new Dictionary<string, object?>
+        {
+            ["q"] = string.IsNullOrWhiteSpace(searchText) ? null : searchText,
+            ["ppage"] = pendingFilter.Page > 1 ? pendingFilter.Page : null,
+            ["ppageSize"] = pendingFilter.PageSize != 25 ? pendingFilter.PageSize : null,
+            ["psort"] = string.Equals(pendingSortColumn, nameof(PendingSalesShipmentDto.ShipmentNumber), StringComparison.Ordinal) ? null : pendingSortColumn,
+            ["pdesc"] = pendingSortDescending ? null : false,
+            ["dpage"] = draftFilter.Page > 1 ? draftFilter.Page : null,
+            ["dpageSize"] = draftFilter.PageSize != 25 ? draftFilter.PageSize : null,
+            ["dsort"] = string.Equals(draftSortColumn, nameof(SalesInvoiceDraftListItemDto.DraftNumber), StringComparison.Ordinal) ? null : draftSortColumn,
+            ["ddesc"] = draftSortDescending ? null : false
+        });
+
+        NavigationManager.NavigateTo(uri, replace: true);
+    }
+
+    private static string NormalizePendingSortColumn(string? sortColumn) => sortColumn switch
+    {
+        nameof(PendingSalesShipmentDto.ShipmentNumber) => nameof(PendingSalesShipmentDto.ShipmentNumber),
+        nameof(PendingSalesShipmentDto.OrderNumber) => nameof(PendingSalesShipmentDto.OrderNumber),
+        nameof(PendingSalesShipmentDto.ClientName) => nameof(PendingSalesShipmentDto.ClientName),
+        nameof(PendingSalesShipmentDto.ShipmentDate) => nameof(PendingSalesShipmentDto.ShipmentDate),
+        nameof(PendingSalesShipmentDto.Warehouse) => nameof(PendingSalesShipmentDto.Warehouse),
+        nameof(PendingSalesShipmentDto.TotalShippedQuantity) => nameof(PendingSalesShipmentDto.TotalShippedQuantity),
+        nameof(PendingSalesShipmentDto.EstimatedAmount) => nameof(PendingSalesShipmentDto.EstimatedAmount),
+        _ => nameof(PendingSalesShipmentDto.ShipmentNumber)
+    };
+
+    private static string NormalizeDraftSortColumn(string? sortColumn) => sortColumn switch
+    {
+        nameof(SalesInvoiceDraftListItemDto.DraftNumber) => nameof(SalesInvoiceDraftListItemDto.DraftNumber),
+        nameof(SalesInvoiceDraftListItemDto.ClientName) => nameof(SalesInvoiceDraftListItemDto.ClientName),
+        nameof(SalesInvoiceDraftListItemDto.IssueDate) => nameof(SalesInvoiceDraftListItemDto.IssueDate),
+        nameof(SalesInvoiceDraftListItemDto.DueDate) => nameof(SalesInvoiceDraftListItemDto.DueDate),
+        nameof(SalesInvoiceDraftListItemDto.Status) => nameof(SalesInvoiceDraftListItemDto.Status),
+        nameof(SalesInvoiceDraftListItemDto.ShipmentCount) => nameof(SalesInvoiceDraftListItemDto.ShipmentCount),
+        nameof(SalesInvoiceDraftListItemDto.TotalAmount) => nameof(SalesInvoiceDraftListItemDto.TotalAmount),
+        _ => nameof(SalesInvoiceDraftListItemDto.DraftNumber)
+    };
+
+    private string DisplayValue(string value) => string.IsNullOrWhiteSpace(value) ? L("Sin dato", "Sense dada", "No data") : value;
+    private string FormatDraftStatus(string status) => status switch
+    {
+        SalesInvoiceDraftStatuses.Draft => L("Borrador", "Esborrany", "Draft"),
+        SalesInvoiceDraftStatuses.Issued => L("Emitido", "Emès", "Issued"),
         _ => status
     };
 

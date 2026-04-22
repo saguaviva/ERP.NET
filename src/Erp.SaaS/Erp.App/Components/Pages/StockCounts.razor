@@ -1,0 +1,393 @@
+@page "/almacen/inventarios"
+@attribute [Authorize(Roles = "TenantAdmin,TenantReader")]
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
+@inject IStockQueries StockQueries
+@inject AppText T
+
+<PageTitle>@L("Almacén / Inventarios", "Magatzem / Inventaris", "Warehouse / Counts")</PageTitle>
+
+<div class="page-header">
+    <div>
+        <p class="eyebrow">@T["menu.warehouse"]</p>
+        <h1>@L("Inventarios y conteos", "Inventaris i recomptes", "Counts and inventories")</h1>
+        <p class="lead">@L("Conteos de stock por almacén, con diferencias y regularización automática al completar.", "Recomptes d'estoc per magatzem, amb diferències i regularització automàtica en completar.", "Warehouse stock counts with differences and automatic regularization on completion.")</p>
+    </div>
+    <div class="quick-links">
+        @if (canEdit)
+        {
+            <a class="primary-button link-button" href="/almacen/inventarios/nuevo">@L("Nuevo inventario", "Nou inventari", "New count")</a>
+        }
+        <a class="secondary-button link-button" href="/almacen/stock-actual">@L("Nuevo desde stock", "Nou des d'estoc", "New from stock")</a>
+        <a class="secondary-button link-button" href="/almacen/stock-actual">@L("Ver stock actual", "Veure estoc actual", "View current stock")</a>
+        <a class="secondary-button link-button" href="/almacen/movimientos">@L("Ver movimientos", "Veure moviments", "View movements")</a>
+    </div>
+</div>
+
+@if (!tenantId.HasValue || !companyId.HasValue)
+{
+    <div class="empty-state">
+        <p>@L("Selecciona una empresa activa para revisar inventarios.", "Selecciona una empresa activa per revisar inventaris.", "Select an active company to review counts.")</p>
+    </div>
+}
+else
+{
+    <section class="panel">
+        <div class="filter-row">
+            <input class="text-input" @bind="filter.Search" placeholder="@L("Buscar por número, almacén, artículo, color o notas", "Buscar per número, magatzem, article, color o notes", "Search by number, warehouse, item, color or notes")" disabled="@isLoading" />
+            <input class="text-input" @bind="filter.Warehouse" placeholder="@L("Almacén", "Magatzem", "Warehouse")" disabled="@isLoading" />
+            <select class="sidebar-select compact-select" @bind="filter.Status" disabled="@isLoading">
+                <option value="">@L("Todos los estados", "Tots els estats", "All statuses")</option>
+                @foreach (var status in StockCountStatuses.All)
+                {
+                    <option value="@status">@FormatStatus(status)</option>
+                }
+            </select>
+            <label class="inline-checkbox">
+                <input type="checkbox" @bind="filter.IncludeClosed" disabled="@isLoading" />
+                <span>@L("Incluir cerrados", "Incloure tancats", "Include closed")</span>
+            </label>
+            <button class="secondary-button" @onclick="SearchAsync" disabled="@isLoading">@(isLoading ? L("Cargando...", "Carregant...", "Loading...") : L("Buscar", "Buscar", "Search"))</button>
+        </div>
+        <div class="filter-row results-toolbar" style="margin-top: 0.85rem;">
+            <span class="results-summary">
+                @(totalCount == 0
+                    ? L("Sin resultados", "Sense resultats", "No results")
+                    : L($"Mostrando {PageStart}-{PageEnd} de {totalCount} inventarios", $"Mostrant {PageStart}-{PageEnd} de {totalCount} inventaris", $"Showing {PageStart}-{PageEnd} of {totalCount} counts"))
+            </span>
+            <label class="field compact-field">
+                <span>@L("Tamaño de página", "Mida de pàgina", "Page size")</span>
+                <select class="sidebar-select compact-select" value="@filter.PageSize" @onchange="OnPageSizeChanged" disabled="@isLoading">
+                    <option value="25">25</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                </select>
+            </label>
+        </div>
+    </section>
+
+    @if (!string.IsNullOrWhiteSpace(errorMessage))
+    {
+        <div class="alert danger">@errorMessage</div>
+    }
+
+    <div class="card-grid purchase-summary-grid">
+        <section class="info-card">
+            <h2>@totalCount</h2>
+            <p class="muted">@L("inventarios", "inventaris", "counts")</p>
+        </section>
+        <section class="info-card">
+            <h2>@items.Count(item => string.Equals(item.Status, StockCountStatuses.Draft, StringComparison.OrdinalIgnoreCase))</h2>
+            <p class="muted">@L("borradores en página", "esborranys a la pàgina", "drafts on page")</p>
+        </section>
+        <section class="info-card">
+            <h2>@items.Sum(item => item.DifferenceLineCount)</h2>
+            <p class="muted">@L("líneas con diferencia", "línies amb diferència", "lines with differences")</p>
+        </section>
+        <section class="info-card accent-card">
+            <h2>@items.Sum(item => item.DifferenceTotalQuantity).ToString("0.###")</h2>
+            <p class="muted">@L("diferencia neta en página", "diferència neta a la pàgina", "net difference on page")</p>
+        </section>
+    </div>
+
+    <section class="panel @(isLoading ? "loading-panel" : string.Empty)">
+        @if (isLoading)
+        {
+            <div class="loading-banner">
+                <span class="loading-indicator" aria-hidden="true"></span>
+                <span>@L("Cargando inventarios...", "Carregant inventaris...", "Loading counts...")</span>
+            </div>
+        }
+
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <SortableHeader Label="@L("Inventario", "Inventari", "Count")" IsActive="@(sortColumn == nameof(StockCountListItemDto.CountNumber))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(StockCountListItemDto.CountNumber), true))" />
+                    <SortableHeader Label="@L("Fecha", "Data", "Date")" IsActive="@(sortColumn == nameof(StockCountListItemDto.CountDate))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(StockCountListItemDto.CountDate), true))" />
+                    <SortableHeader Label="@L("Estado", "Estat", "Status")" IsActive="@(sortColumn == nameof(StockCountListItemDto.Status))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(StockCountListItemDto.Status)))" />
+                    <th>@L("Modo", "Mode", "Mode")</th>
+                    <SortableHeader Label="@L("Almacén", "Magatzem", "Warehouse")" IsActive="@(sortColumn == nameof(StockCountListItemDto.Warehouse))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(StockCountListItemDto.Warehouse)))" />
+                    <SortableHeader Label="@L("Líneas", "Línies", "Lines")" IsActive="@(sortColumn == nameof(StockCountListItemDto.LineCount))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(StockCountListItemDto.LineCount), true))" />
+                    <SortableHeader Label="@L("Con diferencia", "Amb diferència", "With difference")" IsActive="@(sortColumn == nameof(StockCountListItemDto.DifferenceLineCount))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(StockCountListItemDto.DifferenceLineCount), true))" />
+                    <SortableHeader Label="@L("Diferencia neta", "Diferència neta", "Net difference")" IsActive="@(sortColumn == nameof(StockCountListItemDto.DifferenceTotalQuantity))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(StockCountListItemDto.DifferenceTotalQuantity), true))" />
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (isLoading)
+                {
+                    @for (var index = 0; index < 5; index++)
+                    {
+                        <tr class="table-skeleton-row">
+                            <td><span class="skeleton-line short"></span></td>
+                            <td><span class="skeleton-line short"></span></td>
+                            <td><span class="skeleton-line short"></span></td>
+                            <td><span class="skeleton-line short"></span></td>
+                            <td><span class="skeleton-line short"></span></td>
+                            <td><span class="skeleton-line short"></span></td>
+                            <td><span class="skeleton-line short"></span></td>
+                            <td><span class="skeleton-line short"></span></td>
+                        </tr>
+                    }
+                }
+                else if (items.Count == 0)
+                {
+                    <tr>
+                        <td colspan="9" class="table-empty">@L("Todavía no hay inventarios registrados.", "Encara no hi ha inventaris registrats.", "There are no counts registered yet.")</td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var item in items)
+                    {
+                        <tr>
+                            <td>@item.CountNumber</td>
+                            <td>@item.CountDate.ToString("dd/MM/yyyy")</td>
+                            <td><span class="status-pill @GetStatusClass(item.Status)">@FormatStatus(item.Status)</span></td>
+                            <td>
+                                @if (item.IsBlindCount)
+                                {
+                                    <span class="status-pill @(item.IsBlindCountRevealed ? "warning" : "warning")">
+                                        @(item.IsBlindCountRevealed ? L("Ciego revelado", "Cec revelat", "Blind revealed") : L("Ciego", "Cec", "Blind"))
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="muted">@L("Normal", "Normal", "Normal")</span>
+                                }
+                            </td>
+                            <td>@DisplayValue(item.Warehouse)</td>
+                            <td>@item.LineCount</td>
+                            <td>@item.DifferenceLineCount</td>
+                            <td>@item.DifferenceTotalQuantity.ToString("0.###")</td>
+                            <td>
+                                <div class="table-actions">
+                                    <a class="inline-link" href="/almacen/inventarios/editar/@item.CountNumber">@L("Abrir", "Obrir", "Open")</a>
+                                    <a class="inline-link" href="/almacen/inventarios/@item.CountNumber/imprimir">@L("Imprimir", "Imprimir", "Print")</a>
+                                    <a class="inline-link" href="/almacen/inventarios/@item.CountNumber/imprimir-recuento">@L("Hoja", "Full", "Sheet")</a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+
+        <div class="pagination-bar">
+            <span class="muted">@L($"Página {filter.Page} de {TotalPages}", $"Pàgina {filter.Page} de {TotalPages}", $"Page {filter.Page} of {TotalPages}")</span>
+            <div class="pagination-actions">
+                <button class="secondary-button" @onclick="() => ChangePageAsync(1)" disabled="@(!CanGoPrevious || isLoading)">@L("Primera", "Primera", "First")</button>
+                <button class="secondary-button" @onclick="() => ChangePageAsync(filter.Page - 1)" disabled="@(!CanGoPrevious || isLoading)">@L("Anterior", "Anterior", "Previous")</button>
+                <button class="secondary-button" @onclick="() => ChangePageAsync(filter.Page + 1)" disabled="@(!CanGoNext || isLoading)">@L("Siguiente", "Següent", "Next")</button>
+                <button class="secondary-button" @onclick="() => ChangePageAsync(TotalPages)" disabled="@(!CanGoNext || isLoading)">@L("Última", "Última", "Last")</button>
+            </div>
+        </div>
+    </section>
+}
+
+@code {
+    [SupplyParameterFromQuery(Name = "q")]
+    public string? SearchQuery { get; set; }
+
+    [SupplyParameterFromQuery(Name = "warehouse")]
+    public string? WarehouseQuery { get; set; }
+
+    [SupplyParameterFromQuery(Name = "status")]
+    public string? StatusQuery { get; set; }
+
+    [SupplyParameterFromQuery(Name = "closed")]
+    public bool? IncludeClosedQuery { get; set; }
+
+    [SupplyParameterFromQuery(Name = "page")]
+    public int? PageQuery { get; set; }
+
+    [SupplyParameterFromQuery(Name = "pageSize")]
+    public int? PageSizeQuery { get; set; }
+
+    [SupplyParameterFromQuery(Name = "sort")]
+    public string? SortQuery { get; set; }
+
+    [SupplyParameterFromQuery(Name = "desc")]
+    public bool? DescQuery { get; set; }
+
+    private Guid? tenantId;
+    private Guid? companyId;
+    private bool canEdit;
+    private bool isLoading;
+    private string errorMessage = string.Empty;
+    private StockCountFilter filter = new() { Page = 1, PageSize = 25, SortColumn = nameof(StockCountListItemDto.CountDate), SortDescending = true };
+    private IReadOnlyCollection<StockCountListItemDto> items = [];
+    private string sortColumn = nameof(StockCountListItemDto.CountDate);
+    private bool sortDescending = true;
+    private int totalCount;
+    private int TotalPages => Math.Max(1, (int)Math.Ceiling(totalCount / (double)filter.PageSize));
+    private bool CanGoPrevious => filter.Page > 1;
+    private bool CanGoNext => filter.Page < TotalPages;
+    private int PageStart => totalCount == 0 ? 0 : ((filter.Page - 1) * filter.PageSize) + 1;
+    private int PageEnd => totalCount == 0 ? 0 : Math.Min(filter.Page * filter.PageSize, totalCount);
+    private string L(string spanish, string catalan, string english) =>
+        T.CurrentLanguage switch
+        {
+            AppLanguages.Catalan => catalan,
+            AppLanguages.English => english,
+            _ => spanish
+        };
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        tenantId = user.GetTenantId();
+        companyId = user.GetActiveCompanyId();
+        canEdit = user.IsPlatformAdmin() || user.IsInRole(PlatformRoles.TenantAdmin);
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        ApplyQueryState();
+        await LoadAsync();
+    }
+
+    private async Task LoadAsync()
+    {
+        errorMessage = string.Empty;
+        if (!tenantId.HasValue || !companyId.HasValue)
+        {
+            items = [];
+            totalCount = 0;
+            return;
+        }
+
+        isLoading = true;
+        await InvokeAsync(StateHasChanged);
+
+        try
+        {
+            filter.SortColumn = sortColumn;
+            filter.SortDescending = sortDescending;
+            var result = await StockQueries.SearchCountsAsync(tenantId.Value, companyId.Value, filter);
+            items = result.Items;
+            totalCount = result.TotalCount;
+        }
+        catch (Exception exception)
+        {
+            errorMessage = exception.Message;
+            items = [];
+            totalCount = 0;
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private Task SearchAsync()
+    {
+        filter.Page = 1;
+        UpdateQueryState();
+        return Task.CompletedTask;
+    }
+
+    private Task SetSortAsync(string column, bool defaultDescending = false)
+    {
+        if (string.Equals(sortColumn, column, StringComparison.Ordinal))
+        {
+            sortDescending = !sortDescending;
+        }
+        else
+        {
+            sortColumn = column;
+            sortDescending = defaultDescending;
+        }
+
+        filter.Page = 1;
+        UpdateQueryState();
+        return Task.CompletedTask;
+    }
+
+    private Task ChangePageAsync(int page)
+    {
+        var newPage = Math.Max(1, Math.Min(page, TotalPages));
+        if (newPage == filter.Page)
+        {
+            return Task.CompletedTask;
+        }
+
+        filter.Page = newPage;
+        UpdateQueryState();
+        return Task.CompletedTask;
+    }
+
+    private Task OnPageSizeChanged(ChangeEventArgs args)
+    {
+        if (!int.TryParse(args.Value?.ToString(), out var pageSize))
+        {
+            return Task.CompletedTask;
+        }
+
+        filter.PageSize = pageSize;
+        filter.Page = 1;
+        UpdateQueryState();
+        return Task.CompletedTask;
+    }
+
+    private void ApplyQueryState()
+    {
+        filter.Search = SearchQuery?.Trim() ?? string.Empty;
+        filter.Warehouse = WarehouseQuery?.Trim() ?? string.Empty;
+        filter.Status = StatusQuery?.Trim() ?? string.Empty;
+        filter.IncludeClosed = IncludeClosedQuery ?? false;
+        filter.Page = Math.Max(PageQuery.GetValueOrDefault(1), 1);
+        filter.PageSize = PageSizeQuery is 25 or 50 or 100 ? PageSizeQuery.Value : 25;
+        sortColumn = NormalizeSortColumn(SortQuery);
+        sortDescending = DescQuery ?? true;
+        filter.SortColumn = sortColumn;
+        filter.SortDescending = sortDescending;
+    }
+
+    private void UpdateQueryState()
+    {
+        var uri = NavigationManager.GetUriWithQueryParameters(new Dictionary<string, object?>
+        {
+            ["q"] = string.IsNullOrWhiteSpace(filter.Search) ? null : filter.Search,
+            ["warehouse"] = string.IsNullOrWhiteSpace(filter.Warehouse) ? null : filter.Warehouse,
+            ["status"] = string.IsNullOrWhiteSpace(filter.Status) ? null : filter.Status,
+            ["closed"] = filter.IncludeClosed ? true : null,
+            ["page"] = filter.Page > 1 ? filter.Page : null,
+            ["pageSize"] = filter.PageSize != 25 ? filter.PageSize : null,
+            ["sort"] = string.Equals(sortColumn, nameof(StockCountListItemDto.CountDate), StringComparison.Ordinal) ? null : sortColumn,
+            ["desc"] = sortDescending ? null : false
+        });
+
+        NavigationManager.NavigateTo(uri, replace: true);
+    }
+
+    private static string NormalizeSortColumn(string? sortColumn) => sortColumn switch
+    {
+        nameof(StockCountListItemDto.CountNumber) => nameof(StockCountListItemDto.CountNumber),
+        nameof(StockCountListItemDto.CountDate) => nameof(StockCountListItemDto.CountDate),
+        nameof(StockCountListItemDto.Status) => nameof(StockCountListItemDto.Status),
+        nameof(StockCountListItemDto.Warehouse) => nameof(StockCountListItemDto.Warehouse),
+        nameof(StockCountListItemDto.LineCount) => nameof(StockCountListItemDto.LineCount),
+        nameof(StockCountListItemDto.DifferenceLineCount) => nameof(StockCountListItemDto.DifferenceLineCount),
+        nameof(StockCountListItemDto.DifferenceTotalQuantity) => nameof(StockCountListItemDto.DifferenceTotalQuantity),
+        _ => nameof(StockCountListItemDto.CountDate)
+    };
+
+    private string FormatStatus(string status) => status switch
+    {
+        StockCountStatuses.Draft => L("Borrador", "Esborrany", "Draft"),
+        StockCountStatuses.Completed => L("Completado", "Completat", "Completed"),
+        StockCountStatuses.Cancelled => L("Anulado", "Anul·lat", "Cancelled"),
+        _ => status
+    };
+
+    private static string GetStatusClass(string status) => status switch
+    {
+        StockCountStatuses.Completed => "success",
+        StockCountStatuses.Cancelled => "danger",
+        _ => "warning"
+    };
+
+    private string DisplayValue(string value) => string.IsNullOrWhiteSpace(value) ? L("Sin dato", "Sense dada", "No data") : value;
+}

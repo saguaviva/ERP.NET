@@ -16,7 +16,7 @@
         <p class="eyebrow">Compras</p>
         <h1>@(OrderNumber.HasValue ? $"Pedido {OrderNumber}" : "Nuevo pedido a proveedor")</h1>
         <p class="lead">@(isLegacySyncActive
-            ? "Consulta sobre la réplica SaaS local de pedidos de compra, en solo lectura mientras el módulo siga sincronizado desde legacy."
+            ? "Consulta y edición sobre la réplica SaaS local de pedidos de compra. La sync manual refresca solo los pedidos con origen legacy."
             : "Cabecera, líneas, recepción parcial o total y auditoría sobre el nuevo módulo web de compras.")</p>
     </div>
     <div class="quick-links">
@@ -30,16 +30,10 @@
         <p>No hay empresa activa seleccionada.</p>
     </div>
 }
-else if (!canEdit && !OrderNumber.HasValue && !isLegacySyncActive)
+else if (!canEdit && !OrderNumber.HasValue)
 {
     <div class="empty-state">
         <p>No tienes permisos para crear pedidos de compra.</p>
-    </div>
-}
-else if (isLegacySyncActive && !OrderNumber.HasValue)
-{
-    <div class="empty-state">
-        <p>Compras / Pedidos está en convivencia con legacy para esta empresa. Mientras la sync mande, no se pueden crear pedidos web nuevos.</p>
     </div>
 }
 else
@@ -53,7 +47,7 @@ else
     {
         <div class="alert">
             Compras / Pedidos está en convivencia con legacy para esta empresa.
-            Esta ficha queda en solo lectura mientras la sincronización mande.
+            La sync manual refresca solo los pedidos con origen legacy; los cambios que guardes desde la web convertirán este pedido a local y ya no se sobrescribirá.
             @if (!string.IsNullOrWhiteSpace(syncStatusLabel))
             {
                 <span>@syncStatusLabel</span>
@@ -62,7 +56,6 @@ else
     }
 
     <EditForm Model="model" OnValidSubmit="SaveAsync">
-        <fieldset disabled="@isLegacySyncActive">
         <div class="form-grid">
             <label class="field">
                 <span>Proveedor</span>
@@ -200,12 +193,11 @@ else
                 <button class="primary-button" type="submit">Guardar pedido</button>
             </div>
         }
-        </fieldset>
     </EditForm>
 
     @if (OrderNumber.HasValue)
     {
-        @if (canEdit && !isLegacySyncActive && model.Lines.Any(line => line.PendingQuantity > 0) && !string.Equals(model.Status, PurchaseOrderStatuses.Cancelled, StringComparison.OrdinalIgnoreCase))
+        @if (canEdit && model.Lines.Any(line => line.PendingQuantity > 0) && !string.Equals(model.Status, PurchaseOrderStatuses.Cancelled, StringComparison.OrdinalIgnoreCase))
         {
             <section class="panel" style="margin-top: 1rem;">
                 <h2>Recepción de mercancía</h2>
@@ -366,7 +358,6 @@ else
         companyId = user.GetActiveCompanyId();
         canEdit = user.IsPlatformAdmin() || user.IsInRole(PlatformRoles.TenantAdmin);
         await LoadSyncStatusAsync();
-        canEdit = canEdit && !isLegacySyncActive;
 
         if (!tenantId.HasValue || !companyId.HasValue)
         {

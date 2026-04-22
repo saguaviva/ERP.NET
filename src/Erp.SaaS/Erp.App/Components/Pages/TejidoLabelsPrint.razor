@@ -1,0 +1,123 @@
+@page "/articulos/tejidos/{Code}/etiquetas/{LabelCount:int}"
+@layout EmptyLayout
+@attribute [Authorize(Roles = "TenantAdmin,TenantReader")]
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject ITejidoQueries TejidoQueries
+
+<PageTitle>Etiquetas tejido @Code</PageTitle>
+
+<div class="document-shell">
+    <div class="document-toolbar no-print">
+        <a class="secondary-button link-button" href="/articulos/tejidos/editar/@Uri.EscapeDataString(Code)">Volver al tejido</a>
+        <button class="primary-button" type="button" onclick="window.print()">Guardar como PDF / Imprimir</button>
+    </div>
+
+    @if (!tenantId.HasValue || !companyId.HasValue)
+    {
+        <div class="empty-state document-state">
+            <p>No hay empresa activa seleccionada.</p>
+        </div>
+    }
+    else if (!string.IsNullOrWhiteSpace(errorMessage))
+    {
+        <div class="alert danger document-state">@errorMessage</div>
+    }
+    else if (tejido is null)
+    {
+        <div class="empty-state document-state">
+            <p>No se ha encontrado el tejido solicitado.</p>
+        </div>
+    }
+    else
+    {
+        <section class="document-page">
+            <header class="document-header">
+                <div>
+                    <p class="eyebrow">Etiquetes teixit</p>
+                    <h1>@tejido.Code</h1>
+                    <p class="muted">@tejido.Description</p>
+                </div>
+                <div class="document-header-meta">
+                    <div>
+                        <span class="muted">Cantidad</span>
+                        <strong>@Math.Max(LabelCount, 1)</strong>
+                    </div>
+                </div>
+            </header>
+
+            <div class="labels-grid">
+                @for (var index = 0; index < Math.Max(LabelCount, 1); index++)
+                {
+                    @RenderLabel()
+                }
+            </div>
+        </section>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public string Code { get; set; } = string.Empty;
+
+    [Parameter]
+    public int LabelCount { get; set; }
+
+    [SupplyParameterFromQuery]
+    public string? Mode { get; set; }
+
+    private Guid? tenantId;
+    private Guid? companyId;
+    private TejidoDetailDto? tejido;
+    private string errorMessage = string.Empty;
+    private string EffectiveMode => string.IsNullOrWhiteSpace(Mode) ? "standard" : Mode.Trim().ToLowerInvariant();
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        tenantId = user.GetTenantId();
+        companyId = user.GetActiveCompanyId();
+
+        if (!tenantId.HasValue || !companyId.HasValue)
+        {
+            return;
+        }
+
+        try
+        {
+            errorMessage = string.Empty;
+            tejido = await TejidoQueries.GetByCodeAsync(tenantId.Value, companyId.Value, Uri.UnescapeDataString(Code));
+        }
+        catch (Exception exception)
+        {
+            errorMessage = exception.Message;
+        }
+    }
+
+    private static string DisplayValue(string value) => string.IsNullOrWhiteSpace(value) ? "-" : value;
+
+    private RenderFragment RenderLabel() => @<article class="fabric-label @(EffectiveMode == "compact" ? "compact" : EffectiveMode == "warehouse" ? "warehouse" : null)">
+        @if (EffectiveMode == "warehouse")
+        {
+            <p class="eyebrow">Almacén</p>
+            <h2>@tejido!.Code</h2>
+            <p><strong>@tejido.Description</strong></p>
+            <p>Disponible @tejido.AvailableStockMeters.ToString("0.###") m · @tejido.AvailableStockKilograms.ToString("0.###") kg</p>
+            <p>@DisplayValue(tejido.WidthText) · @(tejido.IsTubular ? "Tubular" : "Plano")</p>
+        }
+        else if (EffectiveMode == "compact")
+        {
+            <p class="eyebrow">Teixit</p>
+            <h2>@tejido!.Code</h2>
+            <p>@tejido.Description</p>
+        }
+        else
+        {
+            <p class="eyebrow">Teixit</p>
+            <h2>@tejido!.Code</h2>
+            <p><strong>@tejido.Description</strong></p>
+            <p>@DisplayValue(tejido.CompositionText)</p>
+            <p>@DisplayValue(tejido.WidthText) · @tejido.GramWeight.ToString("0.###") gr/m2</p>
+        }
+    </article>;
+}

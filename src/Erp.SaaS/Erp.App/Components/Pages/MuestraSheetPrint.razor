@@ -1,0 +1,159 @@
+@page "/articulos/muestras/impresion/ficha/{Code}"
+@page "/articulos/complementos/impresion/ficha/{Code}"
+@attribute [Authorize(Roles = "TenantAdmin,TenantReader")]
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IMuestraQueries MuestraQueries
+@inject NavigationManager NavigationManager
+
+<PageTitle>@PageTitleText</PageTitle>
+
+@if (!tenantId.HasValue || !companyId.HasValue)
+{
+    <div class="empty-state">
+        <p>Selecciona una empresa activa para imprimir el @moduleSingularLower.</p>
+    </div>
+}
+else if (detail is null)
+{
+    <div class="empty-state">
+        <p>No se ha encontrado el @moduleSingularLower solicitado.</p>
+    </div>
+}
+else
+{
+    <section class="print-sheet-page">
+        <header class="print-sheet-header">
+            <div>
+                <p class="eyebrow">@EyebrowText</p>
+                <h1>@detail.Code · @detail.Description</h1>
+                <p>@DisplayClient</p>
+                <p>@DisplayReference · @DisplaySeason · @DisplayMachine</p>
+            </div>
+            <div class="print-sheet-meta">
+                <span>Origen: @DisplayOrigin</span>
+                <span>Líneas: @detail.Lines.Count</span>
+                <span>Colores: @DistinctColorCount</span>
+                <span>Tallas: @DistinctSizeCount</span>
+            </div>
+        </header>
+
+        <section class="print-sheet-grid">
+            <article>
+                <h2>Ficha comercial</h2>
+                <dl class="print-definition-list">
+                    <div><dt>Cliente</dt><dd>@DisplayClient</dd></div>
+                    <div><dt>Máquina</dt><dd>@DisplayMachine</dd></div>
+                    <div><dt>Referencia</dt><dd>@DisplayReference</dd></div>
+                    <div><dt>Temporada</dt><dd>@DisplaySeason</dd></div>
+                    <div><dt>% margen</dt><dd>@detail.MarginPercent.ToString("0.0#")</dd></div>
+                    <div><dt>IVA</dt><dd>@DisplayVat</dd></div>
+                    <div><dt>Precio unidad</dt><dd>@detail.UnitPrice.ToString("0.00##")</dd></div>
+                    <div><dt>Composición</dt><dd>@DisplayComposition</dd></div>
+                </dl>
+            </article>
+
+            <article>
+                <h2>Notas</h2>
+                <div class="print-notes-box">@DisplayNotes</div>
+            </article>
+        </section>
+
+        <section class="panel">
+            <h2>Carta de colores y tallas</h2>
+            <table class="data-table print-data-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Talla</th>
+                        <th>Descripción</th>
+                        <th>Color</th>
+                        <th>Cliente</th>
+                        <th>Coste</th>
+                        <th>Venta</th>
+                        <th>NC code</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var line in detail.Lines.OrderBy(item => item.LineNumber))
+                    {
+                        <tr>
+                            <td>@line.LineNumber</td>
+                            <td>@BuildSizeLabel(line)</td>
+                            <td>@DisplayLineDescription(line)</td>
+                            <td>@DisplayColor(line)</td>
+                            <td>@DisplayLineClient(line)</td>
+                            <td>@line.CostPrice.ToString("0.00##")</td>
+                            <td>@line.SalePrice.ToString("0.00##")</td>
+                            <td>@DisplayNcCode(line)</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </section>
+    </section>
+}
+
+@code {
+    [Parameter]
+    public string Code { get; set; } = string.Empty;
+
+    private Guid? tenantId;
+    private Guid? companyId;
+    private MuestraDetailDto? detail;
+    private bool IsComplementMode => NavigationManager.Uri.Contains("/articulos/complementos", StringComparison.OrdinalIgnoreCase);
+    private string moduleSingularLower => IsComplementMode ? "complemento" : "muestra";
+    private string EyebrowText => IsComplementMode ? "ARTÍCULOS / COMPLEMENTOS" : "ARTÍCULOS / MUESTRAS";
+    private string PageTitleText => $"{(IsComplementMode ? "Ficha complemento" : "Ficha muestra")} {Code}";
+
+    private string DisplayClient => detail is null
+        ? string.Empty
+        : !string.IsNullOrWhiteSpace(detail.ClientName) ? detail.ClientName : $"Cliente {detail.ClientCode}";
+    private string DisplayMachine => detail is null
+        ? string.Empty
+        : !string.IsNullOrWhiteSpace(detail.MachineName) ? detail.MachineName : $"Máquina {detail.MachineCode}";
+    private string DisplayReference => detail is null || string.IsNullOrWhiteSpace(detail.Reference) ? "Sin referencia" : detail.Reference;
+    private string DisplaySeason => detail is null || string.IsNullOrWhiteSpace(detail.Season) ? "Sin temporada" : detail.Season;
+    private string DisplayOrigin => detail is null || string.IsNullOrWhiteSpace(detail.Origin) ? "local" : detail.Origin;
+    private string DisplayVat => detail is null || string.IsNullOrWhiteSpace(detail.VatCode) ? "-" : detail.VatCode;
+    private string DisplayComposition => detail is null || string.IsNullOrWhiteSpace(detail.Composition) ? "Pendiente" : detail.Composition;
+    private string DisplayNotes => detail is null || string.IsNullOrWhiteSpace(detail.Notes) ? "Sin notas." : detail.Notes;
+    private int DistinctColorCount => detail?.Lines.Select(line => Normalize(line.Color)).Where(value => !string.IsNullOrWhiteSpace(value)).Distinct(StringComparer.OrdinalIgnoreCase).Count() ?? 0;
+    private int DistinctSizeCount => detail?.Lines.Select(BuildSizeLabel).Where(value => !string.IsNullOrWhiteSpace(value)).Distinct(StringComparer.OrdinalIgnoreCase).Count() ?? 0;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        tenantId = user.GetTenantId();
+        companyId = user.GetActiveCompanyId();
+        if (!tenantId.HasValue || !companyId.HasValue)
+        {
+            detail = null;
+            return;
+        }
+
+        detail = await MuestraQueries.GetByCodeAsync(tenantId.Value, companyId.Value, Uri.UnescapeDataString(Code));
+    }
+
+    private static string BuildSizeLabel(MuestraLineDto line)
+    {
+        var values = new[] { Normalize(line.SizeCode), Normalize(line.SizeHigh), Normalize(line.SizeLow) }
+            .Where(value => !string.IsNullOrWhiteSpace(value))
+            .ToArray();
+        return values.Length == 0 ? "-" : string.Join(" · ", values);
+    }
+
+    private static string DisplayLineDescription(MuestraLineDto line) =>
+        string.IsNullOrWhiteSpace(line.Description) ? "Sin descripción" : line.Description;
+
+    private static string DisplayColor(MuestraLineDto line) =>
+        string.IsNullOrWhiteSpace(line.Color) ? "-" : line.Color;
+
+    private static string DisplayLineClient(MuestraLineDto line) =>
+        !string.IsNullOrWhiteSpace(line.ClientName) ? line.ClientName : (line.ClientCode > 0 ? $"Cliente {line.ClientCode}" : "-");
+
+    private static string DisplayNcCode(MuestraLineDto line) =>
+        string.IsNullOrWhiteSpace(line.NcCode) ? "-" : line.NcCode;
+
+    private static string Normalize(string? value) => value?.Trim() ?? string.Empty;
+}

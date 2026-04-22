@@ -8,7 +8,7 @@ public sealed class SalesOrderListItemDto
     public DateTime DocumentDate { get; set; }
     public DateTime? RequestedDate { get; set; }
     public string Status { get; set; } = SalesOrderStatuses.Draft;
-    public string Origin { get; set; } = SalesOrderOrigins.Saas;
+    public string Origin { get; set; } = SalesOrderOrigins.Local;
     public DateTime? SyncedUtc { get; set; }
     public int LineCount { get; set; }
     public decimal TotalAmount { get; set; }

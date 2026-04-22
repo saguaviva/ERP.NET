@@ -1,18 +1,24 @@
+@implements IDisposable
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject ICompanyAccessService CompanyAccessService
+@inject IJSRuntime JS
 @inject NavigationManager NavigationManager
+@inject AppText T
 
 <div class="brand-block">
     <a class="brand-link" href="/">
-        <span class="brand-kicker">ERP SaaS</span>
+        <span class="brand-kicker">@T["brand.kicker"]</span>
         <strong>CoreFlow</strong>
     </a>
 </div>
 
+<LanguageSwitcher />
+<ThemeSwitcher />
+
 @if (isAuthenticated)
 {
     <div class="sidebar-panel">
-        <div class="sidebar-label">Usuario</div>
+        <div class="sidebar-label">@T["menu.user"]</div>
         <div class="sidebar-user">@displayName</div>
         <div class="sidebar-muted">@email</div>
     </div>
@@ -20,24 +26,23 @@
     @if (requiresPasswordChange)
     {
         <div class="sidebar-panel">
-            <div class="sidebar-label">Seguridad</div>
-            <div class="sidebar-muted">Debes cambiar la contraseña temporal antes de usar el resto de la aplicación.</div>
+            <div class="sidebar-label">@T["menu.security"]</div>
+            <div class="sidebar-muted">@T["menu.security.passwordChangeRequired"]</div>
         </div>
     }
     else if (allowedCompanies.Count > 0)
     {
         <div class="sidebar-panel">
-            <div class="sidebar-label">Empresa activa</div>
-            <form method="post" action="/account/switch-company">
+            <div class="sidebar-label">@T["menu.activeCompany"]</div>
+            <form method="post" action="/account/switch-company" data-enhance="false">
                 <AntiforgeryToken />
                 <input type="hidden" name="returnUrl" value="@CurrentPath" />
-                <select class="sidebar-select" name="companyId">
+                <select class="sidebar-select" name="companyId" onchange="this.form.submit()">
                     @foreach (var company in allowedCompanies)
                     {
                         <option selected="@(company.CompanyId == activeCompanyId)" value="@company.CompanyId">@company.Name (@company.LegacyCenterCode)</option>
                     }
                 </select>
-                <button class="sidebar-button" type="submit">Cambiar empresa</button>
             </form>
         </div>
     }
@@ -45,43 +50,44 @@
     @if (!requiresPasswordChange)
     {
         <nav class="sidebar-nav">
-            <NavLink class="sidebar-link" href="/" Match="NavLinkMatch.All">Dashboard</NavLink>
-            <NavLink class="sidebar-link" href="/crm/clientes">CRM / Clientes</NavLink>
-            <NavLink class="sidebar-link" href="/crm/clientes/duplicados">CRM / Duplicados</NavLink>
-            <NavLink class="sidebar-link" href="/crm/representantes">CRM / Representantes</NavLink>
-            <NavLink class="sidebar-link" href="/crm/transportistas">CRM / Transportistas</NavLink>
-            <NavLink class="sidebar-link" href="/crm/talleres">CRM / Talleres</NavLink>
-            <NavLink class="sidebar-link" href="/articulos/fornituras">Artículos / Fornituras</NavLink>
-            <NavLink class="sidebar-link" href="/ventas/pedidos">Ventas / Pedidos</NavLink>
-            <NavLink class="sidebar-link" href="/ventas/albaranes">Ventas / Albaranes</NavLink>
-            <NavLink class="sidebar-link" href="/ventas/pre-facturacion">Ventas / Pre-facturación</NavLink>
-            <NavLink class="sidebar-link" href="/ventas/facturas">Ventas / Facturas</NavLink>
-            <NavLink class="sidebar-link" href="/crm/proveedores">Compras / Proveedores</NavLink>
-            <NavLink class="sidebar-link" href="/compras/pedidos">Compras / Pedidos</NavLink>
-            <NavLink class="sidebar-link" href="/compras/recepciones">Compras / Recepciones</NavLink>
-            <NavLink class="sidebar-link" href="/almacen/stock-actual">Almacén / Stock</NavLink>
-            <NavLink class="sidebar-link" href="/almacen/movimientos">Almacén / Movimientos</NavLink>
-            <NavLink class="sidebar-link" href="/almacen/ajustes">Almacén / Ajustes</NavLink>
-            @if (canManageTenant)
+            <NavLink class="sidebar-link sidebar-link-home" href="/" Match="NavLinkMatch.All">@T["menu.dashboard"]</NavLink>
+            <NavLink class="sidebar-link sidebar-link-home" href="/manual">@T["menu.manual"]</NavLink>
+
+            @foreach (var navSection in navigationSections)
             {
-                <NavLink class="sidebar-link" href="/administracion">Administración</NavLink>
-            }
-            @if (isPlatformAdmin)
-            {
-                <NavLink class="sidebar-link" href="/plataforma">Plataforma</NavLink>
+                var isCollapsed = collapsedSectionKeys.Contains(navSection.Key);
+                <div class="sidebar-nav-group">
+                    <button type="button"
+                            class="sidebar-group-toggle @(isCollapsed ? "collapsed" : "expanded")"
+                            aria-expanded="@(!isCollapsed)"
+                            @onclick="() => ToggleSectionAsync(navSection.Key)">
+                        <span class="sidebar-group-title">@navSection.Title</span>
+                        <span class="sidebar-group-toggle-icon" aria-hidden="true">@(isCollapsed ? "▸" : "▾")</span>
+                    </button>
+
+                    @if (!isCollapsed)
+                    {
+                        <div class="sidebar-group-links">
+                            @foreach (var link in navSection.Links)
+                            {
+                            <NavLink class="sidebar-link" href="@link.Href" Match="@link.Match">@link.Label</NavLink>
+                        }
+                    </div>
+                    }
+                </div>
             }
         </nav>
     }
 
-    <form method="post" action="/account/logout">
+    <form method="post" action="/account/logout" data-enhance="false">
         <AntiforgeryToken />
-        <button class="sidebar-logout" type="submit">Cerrar sesión</button>
+        <button class="sidebar-logout" type="submit">@T["menu.logout"]</button>
     </form>
 }
 else
 {
     <nav class="sidebar-nav">
-        <NavLink class="sidebar-link" href="/login">Acceder</NavLink>
+        <NavLink class="sidebar-link" href="/login">@T["menu.login"]</NavLink>
     </nav>
 }
 
@@ -90,10 +96,13 @@ else
     private bool isPlatformAdmin;
     private bool canManageTenant;
     private bool requiresPasswordChange;
+    private bool navCollapseStateLoaded;
     private string displayName = string.Empty;
     private string email = string.Empty;
     private Guid? activeCompanyId;
     private IReadOnlyCollection<AllowedCompanyDto> allowedCompanies = [];
+    private IReadOnlyList<SidebarSection> navigationSections = [];
+    private HashSet<string> collapsedSectionKeys = new(StringComparer.OrdinalIgnoreCase);
 
     private string CurrentPath
     {
@@ -113,6 +122,7 @@ else
         if (!isAuthenticated)
         {
             allowedCompanies = [];
+            navigationSections = [];
             return;
         }
 
@@ -126,6 +136,7 @@ else
         if (requiresPasswordChange)
         {
             allowedCompanies = [];
+            navigationSections = [];
             return;
         }
 
@@ -139,5 +150,167 @@ else
         {
             allowedCompanies = [];
         }
+
+        navigationSections = BuildNavigationSections();
+        if (!navCollapseStateLoaded)
+        {
+            collapsedSectionKeys = GetDefaultCollapsedSectionKeys();
+        }
+    }
+
+    protected override void OnInitialized()
+    {
+        NavigationManager.LocationChanged += OnLocationChanged;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+
+        try
+        {
+            var storedKeys = await JS.InvokeAsync<string[]?>("erpUi.getCollapsedNavSections");
+            collapsedSectionKeys = storedKeys is null
+                ? GetDefaultCollapsedSectionKeys()
+                : new HashSet<string>(storedKeys, StringComparer.OrdinalIgnoreCase);
+            navCollapseStateLoaded = true;
+            StateHasChanged();
+        }
+        catch (JSException)
+        {
+            collapsedSectionKeys = GetDefaultCollapsedSectionKeys();
+            navCollapseStateLoaded = true;
+        }
+        catch (InvalidOperationException)
+        {
+            collapsedSectionKeys = GetDefaultCollapsedSectionKeys();
+            navCollapseStateLoaded = true;
+        }
+    }
+
+    private void OnLocationChanged(object? sender, Microsoft.AspNetCore.Components.Routing.LocationChangedEventArgs e)
+    {
+        _ = InvokeAsync(StateHasChanged);
+    }
+
+    private IReadOnlyList<SidebarSection> BuildNavigationSections()
+    {
+        var sections = new List<SidebarSection>
+        {
+            new("crm", T["menu.crm"],
+            [
+                new(T["menu.crm.clients"], "/crm/clientes"),
+                new(T["menu.crm.duplicates"], "/crm/clientes/duplicados"),
+                new(T["menu.crm.representatives"], "/crm/representantes"),
+                new(T["menu.crm.carriers"], "/crm/transportistas"),
+                new(T["menu.crm.workshops"], "/crm/talleres")
+            ]),
+            new("articles", T["menu.articles"],
+            [
+                new(T["menu.articles.fornituras"], "/articulos/fornituras"),
+                new(T["menu.articles.hilos"], "/articulos/hilos"),
+                new(T["menu.articles.tejidos"], "/articulos/tejidos"),
+                new(T["menu.articles.models"], "/articulos/models"),
+                new(T["menu.articles.samples"], "/articulos/muestras"),
+                new(T["menu.articles.complements"], "/articulos/complementos"),
+                new(T["menu.articles.dispositions"], "/articulos/disposiciones")
+            ]),
+            new("base", T["menu.base"],
+            [
+                new(T["menu.base.banks"], "/base-datos/bancos-cajas"),
+                new(T["menu.base.paymentForms"], "/base-datos/formas-pago"),
+                new(T["menu.base.operations"], "/base-datos/operacions"),
+                new(T["menu.base.machines"], "/base-datos/maquinas"),
+                new(T["menu.base.seasons"], "/base-datos/temporadas"),
+                new(T["menu.base.vatTypes"], "/base-datos/tipos-iva"),
+                new(T["menu.base.incoterms"], "/base-datos/incoterms")
+            ]),
+            new("production", T["menu.production"],
+            [
+                new(T["menu.production.finishing"], "/produccion/acabados")
+            ]),
+            new("sales", T["menu.sales"],
+            [
+                new(T["menu.sales.orders"], "/ventas/pedidos"),
+                new(T["menu.sales.shipments"], "/ventas/albaranes"),
+                new(T["menu.sales.preinvoicing"], "/ventas/pre-facturacion"),
+                new(T["menu.sales.invoices"], "/ventas/facturas"),
+                new(T["menu.sales.intrastat"], "/ventas/intrastat")
+            ]),
+            new("purchases", T["menu.purchases"],
+            [
+                new(T["menu.purchases.suppliers"], "/crm/proveedores"),
+                new(T["menu.purchases.orders"], "/compras/pedidos"),
+                new(T["menu.purchases.receipts"], "/compras/recepciones"),
+                new(T["menu.purchases.invoices"], "/compras/facturas")
+            ]),
+            new("warehouse", T["menu.warehouse"],
+            [
+                new(T["menu.warehouse.stock"], "/almacen/stock-actual"),
+                new(T["menu.warehouse.counts"], "/almacen/inventarios"),
+                new(T["menu.warehouse.transfers"], "/almacen/traspasos"),
+                new(T["menu.warehouse.movements"], "/almacen/movimientos"),
+                new(T["menu.warehouse.adjustments"], "/almacen/ajustes")
+            ])
+        };
+
+        var adminLinks = new List<SidebarLink>();
+
+        if (canManageTenant)
+        {
+            adminLinks.Add(new(T["menu.admin.tenant"], "/administracion"));
+        }
+
+        if (isPlatformAdmin)
+        {
+            adminLinks.Add(new(T["menu.admin.platform"], "/plataforma"));
+        }
+
+        if (adminLinks.Count > 0)
+        {
+            sections.Add(new SidebarSection("admin", T["menu.admin"], adminLinks));
+        }
+
+        return sections;
+    }
+
+    private async Task ToggleSectionAsync(string key)
+    {
+        if (collapsedSectionKeys.Contains(key))
+        {
+            collapsedSectionKeys.Remove(key);
+        }
+        else
+        {
+            collapsedSectionKeys.Add(key);
+        }
+
+        if (!navCollapseStateLoaded)
+        {
+            return;
+        }
+
+        try
+        {
+            await JS.InvokeVoidAsync("erpUi.setCollapsedNavSections", collapsedSectionKeys.ToArray());
+        }
+        catch (JSException)
+        {
+        }
+    }
+
+    private HashSet<string> GetDefaultCollapsedSectionKeys() =>
+        new(navigationSections.Select(section => section.Key), StringComparer.OrdinalIgnoreCase);
+
+    private sealed record SidebarSection(string Key, string Title, IReadOnlyList<SidebarLink> Links);
+
+    private sealed record SidebarLink(string Label, string Href, NavLinkMatch Match = NavLinkMatch.Prefix);
+
+    public void Dispose()
+    {
+        NavigationManager.LocationChanged -= OnLocationChanged;
     }
 }

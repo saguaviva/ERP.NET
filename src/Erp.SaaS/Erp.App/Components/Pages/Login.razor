@@ -2,23 +2,24 @@
 @attribute [AllowAnonymous]
 @inject ITenantAdminService TenantAdminService
 @inject NavigationManager NavigationManager
+@inject AppText T
 
-<PageTitle>Acceso</PageTitle>
+<PageTitle>@T["login.title"]</PageTitle>
 
 <div class="auth-shell">
     <section class="auth-panel">
-        <p class="eyebrow">ERP SaaS</p>
-        <h1>Acceso seguro</h1>
-        <p class="lead">Tenant, roles y empresa activa preparados para la migración desde el ERP actual.</p>
+        <p class="eyebrow">@T["brand.kicker"]</p>
+        <h1>@T["login.heading"]</h1>
+        <p class="lead">@T["login.lead"]</p>
 
         @if (Error == "1")
         {
-            <div class="alert danger">Email o contraseña incorrectos.</div>
+            <div class="alert danger">@T["login.error.invalid"]</div>
         }
 
         @if (Setup == "1")
         {
-            <div class="alert success">La instalacion inicial se ha creado correctamente. Ya puedes entrar con el administrador que acabas de definir.</div>
+            <div class="alert success">@T["login.setup.success"]</div>
         }
 
         <form class="auth-form" method="post" action="/account/login">
@@ -26,21 +27,21 @@
             <input type="hidden" name="returnUrl" value="@ResolvedReturnUrl" />
 
             <label class="field">
-                <span>Email</span>
-                <input class="text-input" name="email" type="email" autocomplete="username" placeholder="admin@empresa.com" required />
+                <span>@T["login.email"]</span>
+                <input class="text-input" name="email" type="email" autocomplete="username" placeholder="@T["login.emailPlaceholder"]" required />
             </label>
 
             <label class="field">
-                <span>Contraseña</span>
-                <input class="text-input" name="password" type="password" autocomplete="current-password" placeholder="Tu contraseña" required />
+                <span>@T["login.password"]</span>
+                <input class="text-input" name="password" type="password" autocomplete="current-password" placeholder="@T["login.passwordPlaceholder"]" required />
             </label>
 
             <label class="checkbox-field">
                 <input name="rememberMe" type="checkbox" value="true" />
-                <span>Recordar sesión</span>
+                <span>@T["login.remember"]</span>
             </label>
 
-            <button class="primary-button" type="submit">Entrar</button>
+            <button class="primary-button" type="submit">@T["login.submit"]</button>
         </form>
     </section>
 </div>

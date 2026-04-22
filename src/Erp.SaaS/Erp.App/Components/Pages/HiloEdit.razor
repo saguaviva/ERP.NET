@@ -1,0 +1,403 @@
+@page "/articulos/hilos/nuevo"
+@page "/articulos/hilos/editar/{Code}"
+@attribute [Authorize(Roles = "TenantAdmin,TenantReader")]
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IAuditLogService AuditLogService
+@inject ILegacySyncService LegacySyncService
+@inject IHiloQueries HiloQueries
+@inject IHiloService HiloService
+@inject NavigationManager NavigationManager
+
+<PageTitle>@(!string.IsNullOrWhiteSpace(Code) ? $"Editar hilo {Code}" : "Nuevo hilo")</PageTitle>
+
+<div class="page-header">
+    <div>
+        <p class="eyebrow">ARTÍCULOS</p>
+        <h1>@(!string.IsNullOrWhiteSpace(Code) ? $"Editar hilo {Code}" : "Nuevo hilo")</h1>
+        <p class="lead">@(isLegacySyncActive
+            ? "Edición sobre la SaaS local. La importación manual desde legacy refresca solo registros marcados como legacy."
+            : "Alta y edición sobre la tabla fil replicada en la SaaS local, filtrada por la empresa activa.")</p>
+    </div>
+    <div class="quick-links">
+        <a class="secondary-button link-button" href="/articulos/hilos">Volver al listado</a>
+    </div>
+</div>
+
+@if (!tenantId.HasValue || !companyId.HasValue)
+{
+    <div class="empty-state">
+        <p>No hay empresa activa seleccionada.</p>
+    </div>
+}
+else
+{
+    @if (!string.IsNullOrWhiteSpace(statusMessage))
+    {
+        <div class="alert @(isError ? "danger" : "success")">@statusMessage</div>
+    }
+
+    @if (isLegacySyncActive)
+    {
+        <div class="alert">
+            Artículos / Hilos está en convivencia con legacy para esta empresa.
+            Esta ficha guarda cambios solo en la SaaS local y la sync manual refresca únicamente registros de origen legacy.
+            @if (!string.IsNullOrWhiteSpace(syncStatusLabel))
+            {
+                <span>@syncStatusLabel</span>
+            }
+        </div>
+    }
+
+    @if (!canEdit && string.IsNullOrWhiteSpace(Code))
+    {
+        <div class="alert">
+            No tienes permisos de edición para crear hilos nuevos en esta empresa.
+        </div>
+    }
+
+    <EditForm Model="model" OnValidSubmit="SaveAsync">
+        <fieldset disabled="@isReadOnly">
+            <div class="form-grid">
+                <label class="field">
+                    <span>Código</span>
+                    <InputText class="text-input" @bind-Value="model.Code" disabled="@(!string.IsNullOrWhiteSpace(Code))" />
+                </label>
+                <label class="field wide">
+                    <span>Descripción</span>
+                    <InputText class="text-input" @bind-Value="model.Description" />
+                </label>
+                <label class="field">
+                    <span>Proveedor</span>
+                    <InputNumber class="text-input" @bind-Value="model.SupplierCode" />
+                </label>
+                <label class="field">
+                    <span>Coste</span>
+                    <InputNumber class="text-input" @bind-Value="model.CostPrice" />
+                </label>
+                <label class="field">
+                    <span>Precio</span>
+                    <InputNumber class="text-input" @bind-Value="model.UnitPrice" />
+                </label>
+                <label class="field">
+                    <span>IVA</span>
+                    <InputText class="text-input" @bind-Value="model.VatCode" />
+                </label>
+                <label class="field wide">
+                    <span>Notas</span>
+                    <InputText class="text-input" @bind-Value="model.Notes" />
+                </label>
+            </div>
+
+            <section class="panel detail-panel" style="margin-top: 1rem;">
+                <div class="detail-panel-header">
+                    <div>
+                        <h2>Carta de colores</h2>
+                        <p class="muted">Color, stock, coste, precio y metrado del hilo por variante.</p>
+                    </div>
+                    @if (!isReadOnly)
+                    {
+                        <button class="secondary-button" type="button" @onclick="AddColor">Añadir línea</button>
+                    }
+                </div>
+
+                <div class="table-scroll">
+                    <table class="data-table detail-table">
+                        <thead>
+                            <tr>
+                                <th>Proveedor</th>
+                                <th>Color</th>
+                                <th>Actual</th>
+                                <th>Mínimo</th>
+                                <th>Precio</th>
+                                <th>Coste</th>
+                                <th>Tintar</th>
+                                <th>Metros</th>
+                                <th>Kg</th>
+                                <th>Notas</th>
+                                @if (!isReadOnly)
+                                {
+                                    <th></th>
+                                }
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (model.Colors.Count == 0)
+                            {
+                                <tr>
+                                    <td colspan="@(isReadOnly ? 10 : 11)" class="muted">No hay detalle cargado para este hilo.</td>
+                                </tr>
+                            }
+                            else
+                            {
+                                @foreach (var color in model.Colors.OrderBy(item => item.LineNumber))
+                                {
+                                    <tr @key="color.LineNumber">
+                                        <td><InputNumber class="text-input table-input" @bind-Value="color.SupplierCode" /></td>
+                                        <td><InputText class="text-input table-input" @bind-Value="color.Color" /></td>
+                                        <td><InputNumber class="text-input table-input" @bind-Value="color.CurrentStock" /></td>
+                                        <td><InputNumber class="text-input table-input" @bind-Value="color.MinimumStock" /></td>
+                                        <td><InputNumber class="text-input table-input" @bind-Value="color.UnitPrice" /></td>
+                                        <td><InputNumber class="text-input table-input" @bind-Value="color.CostPrice" /></td>
+                                        <td><InputNumber class="text-input table-input" @bind-Value="color.DyeingPrice" /></td>
+                                        <td><InputNumber class="text-input table-input" @bind-Value="color.Meters" /></td>
+                                        <td><InputNumber class="text-input table-input" @bind-Value="color.Kilograms" /></td>
+                                        <td><InputText class="text-input table-input" @bind-Value="color.Notes" /></td>
+                                        @if (!isReadOnly)
+                                        {
+                                            <td><button class="danger-link" type="button" @onclick="() => RemoveColor(color.LineNumber)">Quitar</button></td>
+                                        }
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <div class="quick-links" style="margin-top: 1rem;">
+                @if (canEdit)
+                {
+                    <button class="primary-button" type="submit">Guardar hilo</button>
+                }
+                @if (canEdit && !string.IsNullOrWhiteSpace(Code))
+                {
+                    <button class="secondary-button danger-button" type="button" @onclick="DeleteAsync">Eliminar hilo</button>
+                }
+                @if (!string.IsNullOrWhiteSpace(Code))
+                {
+                    <button class="secondary-button" type="button" @onclick="LoadAuditAsync">Recargar historial</button>
+                }
+            </div>
+        </fieldset>
+    </EditForm>
+
+    @if (!string.IsNullOrWhiteSpace(Code))
+    {
+        <section class="panel" style="margin-top: 1rem;">
+            <h2>Historial reciente del hilo</h2>
+            <div class="list-block">
+                @if (recentAuditLogs.Count == 0)
+                {
+                    <p class="muted">Todavía no hay eventos auditados para este hilo.</p>
+                }
+                else
+                {
+                    @foreach (var entry in recentAuditLogs)
+                    {
+                        <article class="list-item">
+                            <strong>@entry.Action</strong>
+                            @if (!string.IsNullOrWhiteSpace(entry.Details))
+                            {
+                                <span>@entry.Details</span>
+                            }
+                            <span>@entry.CreatedUtc.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss")</span>
+                        </article>
+                    }
+                }
+            </div>
+        </section>
+    }
+}
+
+@code {
+    [Parameter]
+    public string? Code { get; set; }
+
+    private Guid? tenantId;
+    private Guid? companyId;
+    private bool canEdit;
+    private bool isReadOnly;
+    private HiloDetailDto model = new();
+    private string statusMessage = string.Empty;
+    private bool isError;
+    private bool isLegacySyncActive;
+    private string syncStatusLabel = string.Empty;
+    private IReadOnlyCollection<AuditLogEntryDto> recentAuditLogs = [];
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        tenantId = user.GetTenantId();
+        companyId = user.GetActiveCompanyId();
+        canEdit = user.IsPlatformAdmin() || user.IsInRole(PlatformRoles.TenantAdmin);
+
+        if (!tenantId.HasValue || !companyId.HasValue)
+        {
+            return;
+        }
+
+        await LoadSyncStatusAsync();
+        isReadOnly = !canEdit;
+
+        if (!string.IsNullOrWhiteSpace(Code))
+        {
+            var detail = await HiloQueries.GetByCodeAsync(tenantId.Value, companyId.Value, Uri.UnescapeDataString(Code));
+            if (detail is null)
+            {
+                statusMessage = "No se ha encontrado el hilo solicitado.";
+                isError = true;
+                model = new HiloDetailDto();
+                recentAuditLogs = [];
+                return;
+            }
+
+            model = detail;
+            await LoadAuditAsync();
+        }
+        else
+        {
+            model = new HiloDetailDto();
+            recentAuditLogs = [];
+        }
+    }
+
+    private async Task SaveAsync()
+    {
+        if (!tenantId.HasValue || !companyId.HasValue)
+        {
+            return;
+        }
+
+        if (isReadOnly)
+        {
+            statusMessage = "No tienes permisos de edición en este tenant.";
+            isError = true;
+            return;
+        }
+
+        try
+        {
+            statusMessage = string.Empty;
+            isError = false;
+
+            var savedCode = await HiloService.SaveAsync(new SaveHiloCommand
+            {
+                TenantId = tenantId.Value,
+                CompanyId = companyId.Value,
+                Code = string.IsNullOrWhiteSpace(Code) ? model.Code : Uri.UnescapeDataString(Code),
+                Description = model.Description,
+                SupplierCode = model.SupplierCode,
+                CostPrice = model.CostPrice,
+                UnitPrice = model.UnitPrice,
+                VatCode = model.VatCode,
+                Notes = model.Notes,
+                Colors = model.Colors
+                    .OrderBy(item => item.LineNumber)
+                    .Select(item => new SaveHiloColorInput
+                    {
+                        LineNumber = item.LineNumber,
+                        SupplierCode = item.SupplierCode,
+                        Color = item.Color,
+                        CurrentStock = item.CurrentStock,
+                        MinimumStock = item.MinimumStock,
+                        UnitPrice = item.UnitPrice,
+                        CostPrice = item.CostPrice,
+                        DyeingPrice = item.DyeingPrice,
+                        Meters = item.Meters,
+                        Kilograms = item.Kilograms,
+                        Notes = item.Notes
+                    })
+                    .ToList()
+            });
+
+            statusMessage = !string.IsNullOrWhiteSpace(Code)
+                ? "Hilo actualizado correctamente."
+                : "Hilo creado correctamente.";
+
+            if (string.IsNullOrWhiteSpace(Code))
+            {
+                NavigationManager.NavigateTo($"/articulos/hilos/editar/{Uri.EscapeDataString(savedCode)}", forceLoad: false);
+                return;
+            }
+
+            await LoadAuditAsync();
+        }
+        catch (Exception exception)
+        {
+            statusMessage = exception.Message;
+            isError = true;
+        }
+    }
+
+    private async Task LoadSyncStatusAsync()
+    {
+        isLegacySyncActive = false;
+        syncStatusLabel = string.Empty;
+        if (!tenantId.HasValue || !companyId.HasValue)
+        {
+            return;
+        }
+
+        var status = (await LegacySyncService.GetModuleStatusesAsync(tenantId.Value))
+            .FirstOrDefault(item =>
+                item.CompanyId == companyId.Value &&
+                string.Equals(item.ModuleKey, LegacySyncModuleKeys.ArticleHilos, StringComparison.OrdinalIgnoreCase));
+
+        if (status is null || !status.HasSuccessfulSync)
+        {
+            return;
+        }
+
+        isLegacySyncActive = true;
+        syncStatusLabel = status.LastCompletedUtc.HasValue
+            ? $"Última sync: {status.LastCompletedUtc.Value.ToLocalTime():dd/MM/yyyy HH:mm:ss} · Ins: {status.LastInserted} · Act: {status.LastUpdated} · Omi: {status.LastSkipped} · Err: {status.LastErrors}"
+            : $"Estado: {status.LastStatus}";
+    }
+
+    private void AddColor()
+    {
+        var nextLineNumber = model.Colors.Count == 0 ? 1 : model.Colors.Max(item => item.LineNumber) + 1;
+        model.Colors.Add(new HiloColorDetailDto { LineNumber = nextLineNumber, SupplierCode = model.SupplierCode });
+    }
+
+    private void RemoveColor(int lineNumber)
+    {
+        var color = model.Colors.FirstOrDefault(item => item.LineNumber == lineNumber);
+        if (color is null)
+        {
+            return;
+        }
+
+        model.Colors.Remove(color);
+        var reordered = model.Colors.OrderBy(item => item.LineNumber).ToList();
+        for (var index = 0; index < reordered.Count; index++)
+        {
+            reordered[index].LineNumber = index + 1;
+        }
+    }
+
+    private async Task DeleteAsync()
+    {
+        if (!tenantId.HasValue || !companyId.HasValue || string.IsNullOrWhiteSpace(Code))
+        {
+            return;
+        }
+
+        try
+        {
+            await HiloService.DeleteAsync(tenantId.Value, companyId.Value, Uri.UnescapeDataString(Code));
+            NavigationManager.NavigateTo("/articulos/hilos");
+        }
+        catch (Exception exception)
+        {
+            statusMessage = exception.Message;
+            isError = true;
+        }
+    }
+
+    private async Task LoadAuditAsync()
+    {
+        if (!tenantId.HasValue || string.IsNullOrWhiteSpace(Code))
+        {
+            recentAuditLogs = [];
+            return;
+        }
+
+        recentAuditLogs = await AuditLogService.GetRecentAsync(
+            limit: 12,
+            tenantId: tenantId.Value,
+            entityName: "Hilo",
+            entityId: Uri.UnescapeDataString(Code));
+    }
+}

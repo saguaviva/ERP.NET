@@ -1,0 +1,274 @@
+@page "/manual"
+@attribute [Authorize]
+
+<PageTitle>Manual de usuario</PageTitle>
+
+<div class="page-header">
+    <div>
+        <p class="eyebrow">Ayuda</p>
+        <h1>Manual de usuario</h1>
+        <p class="lead">Guía práctica para moverse por la aplicación, entender cada bloque funcional y saber qué operaciones se pueden hacer hoy en la SaaS.</p>
+    </div>
+    <div class="form-actions no-print">
+        <a class="secondary-button link-button" href="#primeros-pasos">Primeros pasos</a>
+        <a class="primary-button link-button" href="#mapa-funcional">Ver mapa funcional</a>
+    </div>
+</div>
+
+<section class="panel" id="primeros-pasos">
+    <h2>Primeros pasos</h2>
+    <div class="manual-step-grid">
+        <article class="info-card">
+            <h3>1. Cambia de empresa</h3>
+            <p>Usa el selector del menú lateral para trabajar con la empresa activa correcta. Toda la navegación y los datos que ves dependen de esa selección.</p>
+        </article>
+        <article class="info-card">
+            <h3>2. Elige tema visual</h3>
+            <p>Puedes cambiar entre los temas `Actual`, `Azul moderno`, `Compacto` y `Ultracompacto`. El sistema recuerda tu elección y también si ocultas el menú lateral.</p>
+        </article>
+        <article class="info-card">
+            <h3>3. Usa el menú por bloques</h3>
+            <p>La navegación está agrupada por `CRM`, `Artículos`, `Base`, `Producción`, `Ventas`, `Compras`, `Almacén` y `Administración`, para localizar antes cada función.</p>
+        </article>
+        <article class="info-card">
+            <h3>4. Aprovecha los listados</h3>
+            <p>Los listados grandes ya recuerdan filtros, orden y paginación en la URL. Si compartes o recargas un enlace, vuelves al mismo contexto de trabajo.</p>
+        </article>
+    </div>
+</section>
+
+<section class="panel" id="mapa-funcional">
+    <div class="panel-header">
+        <div>
+            <h2>Mapa funcional</h2>
+            <p class="muted">Cada bloque resume qué se puede hacer y desde qué pantallas entrar.</p>
+        </div>
+    </div>
+
+    <nav class="manual-index no-print" aria-label="Índice del manual">
+        @foreach (var area in areas)
+        {
+            <a class="manual-index-link" href="@($"#{area.Id}")">@area.Title</a>
+        }
+    </nav>
+</section>
+
+@foreach (var area in areas)
+{
+    <section class="panel manual-area" id="@area.Id">
+        <div class="manual-area-grid">
+            <div class="manual-area-main">
+                <p class="eyebrow">@area.Kicker</p>
+                <h2>@area.Title</h2>
+                <p>@area.Summary</p>
+
+                <div class="manual-highlight-list">
+                    @foreach (var highlight in area.Highlights)
+                    {
+                        <article class="manual-highlight-card">
+                            <strong>@highlight.Title</strong>
+                            <span>@highlight.Description</span>
+                        </article>
+                    }
+                </div>
+
+                <div class="manual-links">
+                    @foreach (var link in area.Links)
+                    {
+                        <a class="action-link" href="@link.Href">@link.Label</a>
+                    }
+                </div>
+            </div>
+
+            <aside class="manual-area-visual">
+                <div class="manual-capture-card">
+                    <div class="manual-capture-meta">
+                        <strong>Vista orientativa</strong>
+                        <span>@area.CaptureLabel</span>
+                    </div>
+                    <div class="manual-capture @($"manual-capture-{area.CaptureKind}")" aria-hidden="true">
+                        <div class="manual-capture-topbar">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
+                        <div class="manual-capture-body">
+                            <div class="manual-capture-sidebar"></div>
+                            <div class="manual-capture-content">
+                                <div class="manual-capture-content-header"></div>
+                                <div class="manual-capture-content-toolbar"></div>
+                                <div class="manual-capture-content-grid">
+                                    <span></span>
+                                    <span></span>
+                                    <span></span>
+                                    <span></span>
+                                </div>
+                                <div class="manual-capture-content-table">
+                                    <span></span>
+                                    <span></span>
+                                    <span></span>
+                                    <span></span>
+                                    <span></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="manual-capture-note">La sección está preparada para sustituir estas vistas por capturas reales de cada pantalla cuando quieras rematar el manual visual definitivo.</p>
+                </div>
+            </aside>
+        </div>
+    </section>
+}
+
+@code {
+    private static IReadOnlyList<ManualArea> areas { get; } =
+    [
+        new(
+            "crm",
+            "CRM",
+            "Gestión de clientes, duplicados, representantes, transportistas y talleres. Es el punto de entrada para mantener datos comerciales y operativos.",
+            "CRM",
+            "list",
+            "Listados con búsqueda, orden y edición rápida",
+            [
+                new("Clientes", "Alta, edición, deduplicación y navegación rápida al detalle."),
+                new("Representantes y transportistas", "Mantenimiento local con sync legacy sin tocar la base remota."),
+                new("Talleres", "Gestión de talleres y uso posterior en compras, producción y artículos.")
+            ],
+            [
+                new("Abrir CRM / Clientes", "/crm/clientes"),
+                new("Abrir CRM / Duplicados", "/crm/clientes/duplicados"),
+                new("Abrir CRM / Representantes", "/crm/representantes")
+            ]),
+        new(
+            "articulos",
+            "Artículos",
+            "Bloque principal para tejidos, hilos, fornituras, models, muestras, complementos y disposiciones. Aquí está gran parte del núcleo funcional heredado del legacy.",
+            "Artículos",
+            "detail",
+            "Ficha con pestañas, detalle y ayudas de trabajo",
+            [
+                new("Tejidos", "Carta de colores, reposición agrupada, valoración de stock, impresión y acciones rápidas."),
+                new("Muestras y complementos", "Ficha técnica, colores/tallas, impresión y desglose color · máquina."),
+                new("Disposiciones y models", "Trabajo por detalle, stock asociado y soporte de producción.")
+            ],
+            [
+                new("Abrir Artículos / Tejidos", "/articulos/tejidos"),
+                new("Abrir Artículos / Muestras", "/articulos/muestras"),
+                new("Abrir Artículos / Models", "/articulos/models")
+            ]),
+        new(
+            "base",
+            "Base",
+            "Catálogos maestros reutilizables por toda la aplicación: formas de pago, tipos de IVA, máquinas, incoterms, temporadas, operaciones y bancos/cajas.",
+            "Base",
+            "catalog",
+            "Catálogo maestro con alta y edición directa",
+            [
+                new("Catálogos editables", "Todos permiten trabajo local y varios ya soportan sync legacy por centro."),
+                new("Campos especializados", "Formas de pago, IVA, bancos y otros ya no son catálogos genéricos, sino pantallas adaptadas."),
+                new("Uso transversal", "Estos valores alimentan compras, ventas, producción y fichas de artículos.")
+            ],
+            [
+                new("Abrir Base / Operacions", "/base-datos/operacions"),
+                new("Abrir Base / Màquines", "/base-datos/maquinas"),
+                new("Abrir Base / Formes de pagament", "/base-datos/formas-pago")
+            ]),
+        new(
+            "produccion",
+            "Producción",
+            "Partes de acabado con estado, origen, trazabilidad con muestras y disposiciones, impresión, tablero por estado y trabajo vivo.",
+            "Producción",
+            "board",
+            "Tablero operativo por estado",
+            [
+                new("Partes de acabado", "Alta manual o guiada desde disposiciones y muestras."),
+                new("Trazabilidad", "Enlace a la muestra origen, operación, disposición enlazada y movimientos derivados."),
+                new("Panel operativo", "Listado y tablero con filtros por acabador, máquina y trabajo vivo.")
+            ],
+            [
+                new("Abrir Producción / Acabados", "/produccion/acabados")
+            ]),
+        new(
+            "ventas",
+            "Ventas",
+            "Pedidos, albaranes, pre-facturación, facturas e Intrastat. La navegación ya guarda filtros y el flujo documental está bastante cerrado.",
+            "Ventas",
+            "documents",
+            "Circuito documental de ventas",
+            [
+                new("Pedidos y albaranes", "Listados paginados y fichas de documento con continuidad funcional."),
+                new("Pre-facturación y facturas", "Trabajo por borradores, detalle y documentos imprimibles."),
+                new("Intrastat", "Pantalla específica y exportación Excel, aún pendiente de remate fino frente al legacy.")
+            ],
+            [
+                new("Abrir Ventas / Pedidos", "/ventas/pedidos"),
+                new("Abrir Ventas / Facturas", "/ventas/facturas"),
+                new("Abrir Ventas / Intrastat", "/ventas/intrastat")
+            ]),
+        new(
+            "compras",
+            "Compras",
+            "Proveedores, pedidos, recepciones y facturas de proveedor con conciliación pedido → recepción → factura y pagos registrados.",
+            "Compras",
+            "reconciliation",
+            "Conciliación y seguimiento de factura",
+            [
+                new("Pedidos y recepciones", "Control documental y continuidad con recepciones parciales."),
+                new("Facturas de proveedor", "Líneas conciliadas, diferencias visibles y registro de pagos."),
+                new("PDF y seguimiento", "Documentos imprimibles y estado de factura pendiente/cuadrada.")
+            ],
+            [
+                new("Abrir Compras / Pedidos", "/compras/pedidos"),
+                new("Abrir Compras / Recepciones", "/compras/recepciones"),
+                new("Abrir Compras / Facturas", "/compras/facturas")
+            ]),
+        new(
+            "almacen",
+            "Almacén",
+            "Consulta de stock, movimientos, ajustes, traspasos e inventarios con conteo normal o ciego y cierres por familia/almacén.",
+            "Almacén",
+            "stock",
+            "Trabajo operativo de stock e inventarios",
+            [
+                new("Stock actual", "Consulta, salto a movimientos, ajustes, traspasos e inventarios parciales."),
+                new("Traspasos", "Movimiento entre almacenes con doble apunte automático."),
+                new("Inventarios", "Conteo, conteo ciego, validación masiva y hojas de recuento de planta.")
+            ],
+            [
+                new("Abrir Almacén / Stock", "/almacen/stock-actual"),
+                new("Abrir Almacén / Inventarios", "/almacen/inventarios"),
+                new("Abrir Almacén / Traspasos", "/almacen/traspasos")
+            ]),
+        new(
+            "administracion",
+            "Administración",
+            "Control de módulos sincronizables, ejecución manual de sync legacy, gestión de tenant y accesos de plataforma para quienes tengan permisos.",
+            "Administración",
+            "admin",
+            "Panel de sync y gobierno",
+            [
+                new("Sync manual", "Cada módulo muestra estado, última ejecución, inserciones, omitidos y errores."),
+                new("Convivencia controlada", "Se lee del legacy remoto y se escribe solo en la base local SaaS."),
+                new("Gestión de plataforma", "Los administradores pueden abrir el área de plataforma y seguir ampliando configuración.")
+            ],
+            [
+                new("Abrir Administración", "/administracion"),
+                new("Abrir Plataforma", "/plataforma")
+            ])
+    ];
+
+    private sealed record ManualArea(
+        string Id,
+        string Title,
+        string Summary,
+        string Kicker,
+        string CaptureKind,
+        string CaptureLabel,
+        IReadOnlyList<ManualHighlight> Highlights,
+        IReadOnlyList<ManualLink> Links);
+
+    private sealed record ManualHighlight(string Title, string Description);
+
+    private sealed record ManualLink(string Label, string Href);
+}

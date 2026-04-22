@@ -1,0 +1,1700 @@
+@page "/articulos/tejidos/nuevo"
+@page "/articulos/tejidos/editar/{Code}"
+@attribute [Authorize(Roles = "TenantAdmin,TenantReader")]
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IAuditLogService AuditLogService
+@inject IBaseCatalogQueries BaseCatalogQueries
+@inject ILegacySyncService LegacySyncService
+@inject ITejidoQueries TejidoQueries
+@inject ITejidoService TejidoService
+@inject NavigationManager NavigationManager
+
+<PageTitle>@(!string.IsNullOrWhiteSpace(Code) ? $"Editar tejido {Code}" : "Nuevo tejido")</PageTitle>
+
+<div class="page-header">
+    <div>
+        <p class="eyebrow">ARTÍCULOS</p>
+        <h1>@(!string.IsNullOrWhiteSpace(Code) ? $"Ficha tejido {Code}" : "Nuevo tejido")</h1>
+        <p class="lead">@(isLegacySyncActive
+            ? "Edición sobre la SaaS local. La importación manual desde legacy refresca solo registros marcados como legacy."
+            : "Alta y edición sobre la réplica local de tejidos, filtrada por la empresa activa.")</p>
+    </div>
+    <div class="quick-links">
+        <a class="secondary-button link-button" href="/articulos/tejidos">Volver al listado</a>
+    </div>
+</div>
+
+@if (!tenantId.HasValue || !companyId.HasValue)
+{
+    <div class="empty-state">
+        <p>No hay empresa activa seleccionada.</p>
+    </div>
+}
+else
+{
+    @if (!string.IsNullOrWhiteSpace(statusMessage))
+    {
+        <div class="alert @(isError ? "danger" : "success")">@statusMessage</div>
+    }
+
+    @if (isLegacySyncActive)
+    {
+        <div class="alert">
+            Artículos / Tejidos está en convivencia con legacy para esta empresa.
+            Esta ficha guarda cambios solo en la SaaS local y la sync manual refresca únicamente registros de origen legacy.
+            @if (!string.IsNullOrWhiteSpace(syncStatusLabel))
+            {
+                <span>@syncStatusLabel</span>
+            }
+        </div>
+    }
+
+    @if (!canEdit && string.IsNullOrWhiteSpace(Code))
+    {
+        <div class="alert">
+            No tienes permisos de edición para crear tejidos nuevos en esta empresa.
+        </div>
+    }
+
+    <section class="card-grid tejido-metrics-grid">
+        <article class="info-card">
+            <p class="eyebrow">Origen</p>
+            <h2>@(string.IsNullOrWhiteSpace(Code) ? "Nuevo tejido" : model.Code)</h2>
+            <p class="muted">@DisplayOrigin</p>
+        </article>
+        <article class="info-card">
+            <p class="eyebrow">Detalle</p>
+            <h2>@ColorsCount colores</h2>
+            <p class="muted">@CompositionCount composiciones · @FinishesCount acabados</p>
+        </article>
+        <article class="info-card">
+            <p class="eyebrow">Composición</p>
+            <h2>@CompositionPercentageTotal%</h2>
+            <p class="muted">Total declarado en escandallo</p>
+        </article>
+        <article class="info-card">
+            <p class="eyebrow">Stock disponible</p>
+            <h2>@model.AvailableStockMeters.ToString("0.###") m</h2>
+            <p class="muted">@model.AvailableStockKilograms.ToString("0.###") kg</p>
+        </article>
+    </section>
+
+    <EditForm Model="model" OnValidSubmit="SaveAsync">
+        <fieldset disabled="@isReadOnly">
+            <div class="module-tabs" style="margin-top: 1rem;">
+                <button class="module-tab @(activeTab == TejidoTab.Teixit ? "active" : null)" type="button" @onclick="@(() => SetTab(TejidoTab.Teixit))">Teixit</button>
+                <button class="module-tab @(activeTab == TejidoTab.Escandall ? "active" : null)" type="button" @onclick="@(() => SetTab(TejidoTab.Escandall))">Escandall Teixit</button>
+                <button class="module-tab @(activeTab == TejidoTab.Impresion ? "active" : null)" type="button" @onclick="@(() => SetTab(TejidoTab.Impresion))">Impressió Fitxa · Etiquetes</button>
+                <button class="module-tab @(activeTab == TejidoTab.Valoracion ? "active" : null)" type="button" @onclick="@(() => SetTab(TejidoTab.Valoracion))">Valoració Stock</button>
+            </div>
+
+            @switch (activeTab)
+            {
+                case TejidoTab.Teixit:
+                    @RenderFichaTab()
+                    break;
+                case TejidoTab.Escandall:
+                    @RenderEscandalloTab()
+                    break;
+                case TejidoTab.Impresion:
+                    @RenderImpresionTab()
+                    break;
+                case TejidoTab.Valoracion:
+                    @RenderValoracionTab()
+                    break;
+            }
+
+            <div class="quick-links" style="margin-top: 1rem;">
+                @if (canEdit)
+                {
+                    <button class="primary-button" type="submit">Guardar tejido</button>
+                }
+                @if (canEdit && !string.IsNullOrWhiteSpace(Code))
+                {
+                    <button class="secondary-button danger-button" type="button" @onclick="DeleteAsync">Eliminar tejido</button>
+                }
+                @if (!string.IsNullOrWhiteSpace(Code))
+                {
+                    <button class="secondary-button" type="button" @onclick="LoadAuditAsync">Recargar historial</button>
+                }
+            </div>
+        </fieldset>
+    </EditForm>
+
+    @if (!string.IsNullOrWhiteSpace(Code))
+    {
+        <section class="panel" style="margin-top: 1rem;">
+            <h2>Historial reciente del tejido</h2>
+            <div class="list-block">
+                @if (recentAuditLogs.Count == 0)
+                {
+                    <p class="muted">Todavía no hay eventos auditados para este tejido.</p>
+                }
+                else
+                {
+                    @foreach (var entry in recentAuditLogs)
+                    {
+                        <article class="list-item">
+                            <strong>@entry.Action</strong>
+                            @if (!string.IsNullOrWhiteSpace(entry.Details))
+                            {
+                                <span>@entry.Details</span>
+                            }
+                            <span>@entry.CreatedUtc.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss")</span>
+                        </article>
+                    }
+                }
+            </div>
+        </section>
+    }
+}
+
+@code {
+    [Parameter]
+    public string? Code { get; set; }
+
+    private enum TejidoTab
+    {
+        Teixit,
+        Escandall,
+        Impresion,
+        Valoracion
+    }
+
+    private sealed record TejidoValuationRow(
+        string Color,
+        decimal CurrentMeters,
+        decimal MinimumMeters,
+        decimal DyeingPrice,
+        decimal UnitCost,
+        decimal MetersPrice,
+        decimal KilogramsPrice,
+        decimal EstimatedValue,
+        decimal CoverageRatio,
+        bool IsBelowMinimum,
+        bool HasNoStock);
+
+    private Guid? tenantId;
+    private Guid? companyId;
+    private bool canEdit;
+    private bool isReadOnly;
+    private TejidoDetailDto model = new();
+    private string statusMessage = string.Empty;
+    private bool isError;
+    private bool isLegacySyncActive;
+    private string syncStatusLabel = string.Empty;
+    private IReadOnlyCollection<AuditLogEntryDto> recentAuditLogs = [];
+    private IReadOnlyCollection<BaseCatalogListItemDto> machineOptions = [];
+    private TejidoTab activeTab = TejidoTab.Teixit;
+    private int labelCount = 12;
+    private string labelMode = "standard";
+    private HashSet<int> selectedReplenishmentLines = [];
+
+    private int ColorsCount => model.Colors.Count;
+    private int CompositionCount => model.Composition.Count;
+    private int FinishesCount => model.Finishes.Count;
+    private int ColorsWithoutStockCount => model.Colors.Count(item => item.CurrentStock <= 0m);
+    private int ColorsBelowMinimumCount => model.Colors.Count(item => item.CurrentStock > 0m && item.CurrentStock < item.MinimumStock);
+    private int ColorsHealthyCount => model.Colors.Count(item => item.CurrentStock >= item.MinimumStock && item.CurrentStock > 0m);
+    private int ColorsWithoutMinimumCount => model.Colors.Count(item => item.MinimumStock <= 0m);
+    private int CompositionPercentageTotal => model.Composition.Sum(item => Math.Max(item.Percentage, 0));
+    private decimal CompositionPercentageGap => 100m - CompositionPercentageTotal;
+    private string DisplayOrigin => string.IsNullOrWhiteSpace(model.Code) ? "Pendiente de guardar" : $"Origen {(string.IsNullOrWhiteSpace(Code) ? "local" : "local/legacy")} · centro {model.CompanyCenterCode}";
+    private decimal NormalizedWidthMeters => ResolveWidthMeters(model.Width2, model.WidthText);
+    private decimal LinearMeterWeight => Math.Round(model.GramWeight * Math.Max(NormalizedWidthMeters, 0m) * (model.IsTubular ? 2m : 1m), 3, MidpointRounding.AwayFromZero);
+    private decimal RawStockValue => Math.Round(model.RawStockKilograms * model.RawCost, 2, MidpointRounding.AwayFromZero);
+    private decimal FinishedStockValue => Math.Round(model.Colors.Sum(item => Math.Max(item.CurrentStock, 0m) * Math.Max(item.MetersPrice, 0m)), 2, MidpointRounding.AwayFromZero);
+    private decimal TotalStockValue => RawStockValue + FinishedStockValue;
+    private decimal TotalColorMeters => model.Colors.Sum(item => Math.Max(item.CurrentStock, 0m));
+    private int ValuationBelowMinimumCount => ValuationRows.Count(item => item.IsBelowMinimum);
+    private int ValuationWithoutStockCount => ValuationRows.Count(item => item.HasNoStock);
+    private int ValuationHealthyCount => ValuationRows.Count(item => !item.HasNoStock && !item.IsBelowMinimum);
+    private decimal CoveragePercentage => ValuationRows.Count == 0 ? 100m : Math.Round((decimal)ValuationHealthyCount / ValuationRows.Count * 100m, 1, MidpointRounding.AwayFromZero);
+    private decimal RawVsFinishedPercentage => TotalStockValue <= 0m ? 0m : Math.Round(FinishedStockValue / TotalStockValue * 100m, 1, MidpointRounding.AwayFromZero);
+    private IReadOnlyList<TejidoValuationRow> TopValuationRows => ValuationRows.OrderByDescending(item => item.EstimatedValue).Take(5).ToList();
+    private IReadOnlyList<TejidoValuationRow> AlertValuationRows => ValuationRows.Where(item => item.HasNoStock || item.IsBelowMinimum).OrderBy(item => item.HasNoStock ? 0 : 1).ThenBy(item => item.Color).ToList();
+    private decimal SuggestedReplenishmentMeters => model.Colors.Sum(GetSuggestedReplenishmentMeters);
+    private decimal SuggestedReplenishmentValue => model.Colors.Sum(GetSuggestedReplenishmentValue);
+    private IReadOnlyList<TejidoColorDetailDto> ReplenishmentCandidates => model.Colors
+        .Where(item => GetSuggestedReplenishmentMeters(item) > 0m)
+        .OrderByDescending(GetSuggestedReplenishmentMeters)
+        .ThenBy(item => item.Color)
+        .ToList();
+    private IReadOnlyList<TejidoColorDetailDto> SelectedReplenishmentCandidates => ReplenishmentCandidates
+        .Where(item => selectedReplenishmentLines.Contains(item.LineNumber))
+        .ToList();
+    private decimal SelectedReplenishmentMeters => SelectedReplenishmentCandidates.Sum(GetSuggestedReplenishmentMeters);
+    private decimal SelectedReplenishmentValue => SelectedReplenishmentCandidates.Sum(GetSuggestedReplenishmentValue);
+    private string TechnicalSheetUrl => string.IsNullOrWhiteSpace(model.Code) ? string.Empty : $"/articulos/tejidos/{Uri.EscapeDataString(model.Code)}/ficha";
+    private string LabelsSheetUrl => string.IsNullOrWhiteSpace(model.Code) ? string.Empty : $"/articulos/tejidos/{Uri.EscapeDataString(model.Code)}/etiquetas/{Math.Max(labelCount, 1)}?mode={Uri.EscapeDataString(EffectiveLabelMode)}";
+    private string ValuationSheetUrl => string.IsNullOrWhiteSpace(model.Code) ? string.Empty : $"/articulos/tejidos/{Uri.EscapeDataString(model.Code)}/valoracion";
+    private string ReplenishmentSheetUrl => string.IsNullOrWhiteSpace(model.Code)
+        ? string.Empty
+        : $"/articulos/tejidos/{Uri.EscapeDataString(model.Code)}/reposicion?lines={Uri.EscapeDataString(string.Join(",", SelectedReplenishmentCandidates.Select(item => item.LineNumber)))}";
+    private IReadOnlyList<TejidoValuationRow> ValuationRows => BuildValuationRows();
+    private string CompositionStatusLabel => CompositionPercentageTotal == 100 ? "Completa" : CompositionPercentageTotal < 100 ? "Incompleta" : "Excedida";
+    private string FinishSummarySuggested => string.Join(" · ", model.Finishes.OrderBy(item => item.Order).ThenBy(item => item.LineNumber).Select(item => item.FinishCode).Where(item => !string.IsNullOrWhiteSpace(item)).Distinct(StringComparer.OrdinalIgnoreCase));
+    private string CompositionTextSuggested => string.Join(" + ", model.Composition.OrderBy(item => item.LineNumber).Where(item => item.Percentage > 0 || !string.IsNullOrWhiteSpace(item.ComponentCode)).Select(item => $"{item.Percentage}% {item.ComponentCode}".Trim()).Where(item => !string.IsNullOrWhiteSpace(item)));
+    private string EffectiveLabelMode => NormalizeLabelMode(labelMode);
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        tenantId = user.GetTenantId();
+        companyId = user.GetActiveCompanyId();
+        canEdit = user.IsPlatformAdmin() || user.IsInRole(PlatformRoles.TenantAdmin);
+
+        if (!tenantId.HasValue || !companyId.HasValue)
+        {
+            return;
+        }
+
+        await LoadMachineOptionsAsync();
+        await LoadSyncStatusAsync();
+        isReadOnly = !canEdit;
+
+        if (!string.IsNullOrWhiteSpace(Code))
+        {
+            var detail = await TejidoQueries.GetByCodeAsync(tenantId.Value, companyId.Value, Uri.UnescapeDataString(Code));
+            if (detail is null)
+            {
+                statusMessage = "No se ha encontrado el tejido solicitado.";
+                isError = true;
+                model = new TejidoDetailDto();
+                recentAuditLogs = [];
+                return;
+            }
+
+            model = detail;
+            RecalculateColorPrices();
+            SyncReplenishmentSelection();
+            await LoadAuditAsync();
+            return;
+        }
+
+        model = new TejidoDetailDto();
+        RecalculateColorPrices();
+        SyncReplenishmentSelection();
+        recentAuditLogs = [];
+    }
+
+    private void SetTab(TejidoTab tab) => activeTab = tab;
+
+    private async Task LoadMachineOptionsAsync()
+    {
+        if (!tenantId.HasValue || !companyId.HasValue)
+        {
+            machineOptions = [];
+            return;
+        }
+
+        var result = await BaseCatalogQueries.SearchAsync(tenantId.Value, companyId.Value, BaseCatalogKeys.Machines, new BaseCatalogFilter
+        {
+            Page = 1,
+            PageSize = 200
+        });
+
+        machineOptions = result.Items
+            .Where(item => int.TryParse(item.Code, out _))
+            .OrderBy(item => ParseMachineCode(item.Code))
+            .ToArray();
+    }
+
+    private async Task SaveAsync()
+    {
+        if (!tenantId.HasValue || !companyId.HasValue)
+        {
+            return;
+        }
+
+        if (isReadOnly)
+        {
+            statusMessage = "No tienes permisos de edición en este tenant.";
+            isError = true;
+            return;
+        }
+
+        try
+        {
+            statusMessage = string.Empty;
+            isError = false;
+            RecalculateColorPrices();
+
+            var savedCode = await TejidoService.SaveAsync(new SaveTejidoCommand
+            {
+                TenantId = tenantId.Value,
+                CompanyId = companyId.Value,
+                Code = string.IsNullOrWhiteSpace(Code) ? model.Code : Uri.UnescapeDataString(Code),
+                Description = model.Description,
+                CompositionText = model.CompositionText,
+                MachineCode = model.MachineCode,
+                MaterialCost = model.MaterialCost,
+                Notes = model.Notes,
+                VatCode = model.VatCode,
+                WeaverCode = model.WeaverCode,
+                WeavingCost = model.WeavingCost,
+                PrinterCode = model.PrinterCode,
+                PrintingCost = model.PrintingCost,
+                FinisherCode = model.FinisherCode,
+                FinishSummary = model.FinishSummary,
+                FinishingCost = model.FinishingCost,
+                RawCost = model.RawCost,
+                WidthText = model.WidthText,
+                Yield = model.Yield,
+                Margin = model.Margin,
+                GramWeight = model.GramWeight,
+                PricePerMeter = model.PricePerMeter,
+                PricePerKilogram = model.PricePerKilogram,
+                RawStockMeters = model.RawStockMeters,
+                AvailableStockMeters = model.AvailableStockMeters,
+                RawStockKilograms = model.RawStockKilograms,
+                AvailableStockKilograms = model.AvailableStockKilograms,
+                SamplePrice = model.SamplePrice,
+                IsTubular = model.IsTubular,
+                Width2 = model.Width2,
+                Colors = model.Colors.OrderBy(item => item.LineNumber).Select(item => new SaveTejidoColorInput
+                {
+                    LineNumber = item.LineNumber,
+                    SupplierCode = item.SupplierCode,
+                    Color = item.Color,
+                    CurrentStock = item.CurrentStock,
+                    MinimumStock = item.MinimumStock,
+                    DyeingPrice = item.DyeingPrice,
+                    UnitCost = item.UnitCost,
+                    MetersPrice = item.MetersPrice,
+                    KilogramsPrice = item.KilogramsPrice,
+                    Notes = item.Notes
+                }).ToList(),
+                Composition = model.Composition.OrderBy(item => item.LineNumber).Select(item => new SaveTejidoCompositionInput
+                {
+                    LineNumber = item.LineNumber,
+                    ComponentCode = item.ComponentCode,
+                    Percentage = item.Percentage,
+                    SupplierCode = item.SupplierCode,
+                    UnitPrice = item.UnitPrice,
+                    Amount = item.Amount
+                }).ToList(),
+                Finishes = model.Finishes.OrderBy(item => item.LineNumber).Select(item => new SaveTejidoFinishInput
+                {
+                    LineNumber = item.LineNumber,
+                    FinishCode = item.FinishCode,
+                    SupplierCode = item.SupplierCode,
+                    Order = item.Order,
+                    PricePerMeter = item.PricePerMeter,
+                    PricePerKilogram = item.PricePerKilogram
+                }).ToList()
+            });
+
+            statusMessage = !string.IsNullOrWhiteSpace(Code)
+                ? "Tejido actualizado correctamente."
+                : "Tejido creado correctamente.";
+
+            if (string.IsNullOrWhiteSpace(Code))
+            {
+                NavigationManager.NavigateTo($"/articulos/tejidos/editar/{Uri.EscapeDataString(savedCode)}", forceLoad: false);
+                return;
+            }
+
+            await LoadAuditAsync();
+        }
+        catch (Exception exception)
+        {
+            statusMessage = exception.Message;
+            isError = true;
+        }
+    }
+
+    private async Task LoadSyncStatusAsync()
+    {
+        isLegacySyncActive = false;
+        syncStatusLabel = string.Empty;
+        if (!tenantId.HasValue || !companyId.HasValue)
+        {
+            return;
+        }
+
+        var status = (await LegacySyncService.GetModuleStatusesAsync(tenantId.Value))
+            .FirstOrDefault(item =>
+                item.CompanyId == companyId.Value &&
+                string.Equals(item.ModuleKey, LegacySyncModuleKeys.ArticleTejidos, StringComparison.OrdinalIgnoreCase));
+
+        if (status is null || !status.HasSuccessfulSync)
+        {
+            return;
+        }
+
+        isLegacySyncActive = true;
+        syncStatusLabel = status.LastCompletedUtc.HasValue
+            ? $"Última sync: {status.LastCompletedUtc.Value.ToLocalTime():dd/MM/yyyy HH:mm:ss} · Ins: {status.LastInserted} · Act: {status.LastUpdated} · Omi: {status.LastSkipped} · Err: {status.LastErrors}"
+            : $"Estado: {status.LastStatus}";
+    }
+
+    private void AddColor()
+    {
+        model.Colors.Add(new TejidoColorDetailDto { LineNumber = NextLineNumber(model.Colors.Select(item => item.LineNumber)), SupplierCode = 0 });
+        RecalculateColorPrices();
+        SyncReplenishmentSelection();
+    }
+
+    private void AddComposition()
+    {
+        model.Composition.Add(new TejidoCompositionDetailDto { LineNumber = NextLineNumber(model.Composition.Select(item => item.LineNumber)) });
+    }
+
+    private void AddFinish()
+    {
+        model.Finishes.Add(new TejidoFinishDetailDto { LineNumber = NextLineNumber(model.Finishes.Select(item => item.LineNumber)), SupplierCode = model.FinisherCode });
+    }
+
+    private void RemoveColor(int lineNumber)
+    {
+        RemoveAndReorder(model.Colors, lineNumber, item => item.LineNumber, (item, number) => item.LineNumber = number);
+        RecalculateColorPrices();
+        SyncReplenishmentSelection();
+    }
+
+    private void RemoveComposition(int lineNumber)
+    {
+        RemoveAndReorder(model.Composition, lineNumber, item => item.LineNumber, (item, number) => item.LineNumber = number);
+    }
+
+    private void RemoveFinish(int lineNumber)
+    {
+        RemoveAndReorder(model.Finishes, lineNumber, item => item.LineNumber, (item, number) => item.LineNumber = number);
+    }
+
+    private async Task DeleteAsync()
+    {
+        if (!tenantId.HasValue || !companyId.HasValue || string.IsNullOrWhiteSpace(Code))
+        {
+            return;
+        }
+
+        try
+        {
+            await TejidoService.DeleteAsync(tenantId.Value, companyId.Value, Uri.UnescapeDataString(Code));
+            NavigationManager.NavigateTo("/articulos/tejidos");
+        }
+        catch (Exception exception)
+        {
+            statusMessage = exception.Message;
+            isError = true;
+        }
+    }
+
+    private async Task LoadAuditAsync()
+    {
+        if (!tenantId.HasValue || string.IsNullOrWhiteSpace(Code))
+        {
+            recentAuditLogs = [];
+            return;
+        }
+
+        recentAuditLogs = await AuditLogService.GetRecentAsync(
+            limit: 12,
+            tenantId: tenantId.Value,
+            entityName: "Tejido",
+            entityId: Uri.UnescapeDataString(Code));
+    }
+
+    private void OpenLabelsPrint()
+    {
+        if (!string.IsNullOrWhiteSpace(model.Code))
+        {
+            NavigationManager.NavigateTo(LabelsSheetUrl, forceLoad: false);
+        }
+    }
+
+    private void SelectLabelMode(string mode)
+    {
+        labelMode = NormalizeLabelMode(mode);
+    }
+
+    private void SelectAllReplenishmentCandidates()
+    {
+        selectedReplenishmentLines = ReplenishmentCandidates.Select(item => item.LineNumber).ToHashSet();
+    }
+
+    private void ClearReplenishmentSelection()
+    {
+        selectedReplenishmentLines.Clear();
+    }
+
+    private void SetReplenishmentSelection(int lineNumber, ChangeEventArgs args)
+    {
+        var selected = args.Value switch
+        {
+            bool value => value,
+            string text when bool.TryParse(text, out var parsed) => parsed,
+            _ => false
+        };
+
+        if (selected)
+        {
+            selectedReplenishmentLines.Add(lineNumber);
+        }
+        else
+        {
+            selectedReplenishmentLines.Remove(lineNumber);
+        }
+    }
+
+    private bool IsSelectedForReplenishment(int lineNumber) => selectedReplenishmentLines.Contains(lineNumber);
+
+    private void UseCurrentStockAsMissingMinimums()
+    {
+        foreach (var item in model.Colors.Where(item => item.MinimumStock <= 0m && item.CurrentStock > 0m))
+        {
+            item.MinimumStock = Math.Round(item.CurrentStock, 2, MidpointRounding.AwayFromZero);
+        }
+
+        SyncReplenishmentSelection();
+    }
+
+    private void UseCurrentStockAsMinimum(TejidoColorDetailDto item)
+    {
+        item.MinimumStock = Math.Round(Math.Max(item.CurrentStock, 0m), 2, MidpointRounding.AwayFromZero);
+        SyncReplenishmentSelection();
+    }
+
+    private void SyncReplenishmentSelection()
+    {
+        var candidateLines = ReplenishmentCandidates.Select(item => item.LineNumber).ToHashSet();
+        if (candidateLines.Count == 0)
+        {
+            selectedReplenishmentLines.Clear();
+            return;
+        }
+
+        selectedReplenishmentLines.RemoveWhere(lineNumber => !candidateLines.Contains(lineNumber));
+        if (selectedReplenishmentLines.Count == 0)
+        {
+            selectedReplenishmentLines = candidateLines;
+        }
+    }
+
+    private void RecalculateColorPrices()
+    {
+        var safeMarginFactor = 1m - (model.Margin / 100m);
+        if (safeMarginFactor <= 0m)
+        {
+            safeMarginFactor = 0.01m;
+        }
+
+        var safeYield = model.Yield <= 0m ? 1m : model.Yield;
+
+        foreach (var color in model.Colors)
+        {
+            var productionBase = Math.Round(model.RawCost + Math.Max(color.DyeingPrice, 0m), 2, MidpointRounding.AwayFromZero);
+            color.UnitCost = productionBase;
+            color.KilogramsPrice = Math.Round(productionBase / safeMarginFactor, 2, MidpointRounding.AwayFromZero);
+            color.MetersPrice = Math.Round(color.KilogramsPrice / safeYield, 2, MidpointRounding.AwayFromZero);
+        }
+    }
+
+    private void ApplySuggestedFinishSummary()
+    {
+        model.FinishSummary = FinishSummarySuggested;
+    }
+
+    private void ApplySuggestedCompositionText()
+    {
+        model.CompositionText = CompositionTextSuggested;
+    }
+
+    private RenderFragment RenderFichaTab() => @<section class="panel" style="margin-top: 1rem;">
+        <div class="teixit-layout">
+            <div>
+                <div class="detail-panel-header">
+                    <div>
+                        <h2>Teixit</h2>
+                        <p class="muted">Ficha principal, stock y carta de colores del tejido.</p>
+                    </div>
+                </div>
+                <div class="form-grid">
+                    <label class="field">
+                        <span>Codi teixit</span>
+                        <InputText class="text-input" @bind-Value="model.Code" disabled="@(!string.IsNullOrWhiteSpace(Code))" />
+                    </label>
+                    <label class="field wide">
+                        <span>Descripció</span>
+                        <InputText class="text-input" @bind-Value="model.Description" />
+                    </label>
+                    <label class="field">
+                        <span>Gramatge gr/m2</span>
+                        <InputNumber class="text-input" @bind-Value="model.GramWeight" @bind-Value:after="RecalculateColorPrices" />
+                    </label>
+                    <label class="field">
+                        <span>Metre lineal</span>
+                        <input class="text-input" value="@LinearMeterWeight.ToString("0.###")" disabled />
+                    </label>
+                    <label class="field wide">
+                        <span>Nro de fil</span>
+                        <InputText class="text-input" @bind-Value="model.CompositionText" />
+                    </label>
+                    <label class="field">
+                        <span>NC code</span>
+                        <InputText class="text-input" @bind-Value="model.VatCode" />
+                    </label>
+                    <label class="field wide">
+                        <span>Composició resum</span>
+                        <InputText class="text-input" @bind-Value="model.FinishSummary" />
+                    </label>
+                    <label class="field">
+                        <span>Ample</span>
+                        <InputText class="text-input" @bind-Value="model.WidthText" />
+                    </label>
+                    <label class="field">
+                        <span>Ample nou</span>
+                        <InputNumber class="text-input" @bind-Value="model.Width2" @bind-Value:after="RecalculateColorPrices" />
+                    </label>
+                    <label class="field checkbox-field">
+                        <InputCheckbox @bind-Value="model.IsTubular" @bind-Value:after="RecalculateColorPrices" />
+                        <span>Tubular</span>
+                    </label>
+                    <label class="field">
+                        <span>Rendiment</span>
+                        <InputNumber class="text-input" @bind-Value="model.Yield" @bind-Value:after="RecalculateColorPrices" />
+                    </label>
+                    <label class="field">
+                        <span>% marge</span>
+                        <InputNumber class="text-input" @bind-Value="model.Margin" @bind-Value:after="RecalculateColorPrices" />
+                    </label>
+                    <label class="field">
+                        <span>Màquina</span>
+                        @if (machineOptions.Count == 0)
+                        {
+                            <InputNumber class="text-input" @bind-Value="model.MachineCode" />
+                        }
+                        else
+                        {
+                            <InputSelect class="text-input" @bind-Value="model.MachineCode">
+                                <option value="0">Selecciona máquina</option>
+                                @foreach (var machine in machineOptions)
+                                {
+                                    <option value="@ParseMachineCode(machine.Code)">@FormatMachineOption(machine)</option>
+                                }
+                            </InputSelect>
+                        }
+                    </label>
+                    <label class="field">
+                        <span>Preu metre</span>
+                        <InputNumber class="text-input" @bind-Value="model.PricePerMeter" />
+                    </label>
+                    <label class="field">
+                        <span>Preu quilo</span>
+                        <InputNumber class="text-input" @bind-Value="model.PricePerKilogram" />
+                    </label>
+                    <label class="field">
+                        <span>Preu model</span>
+                        <InputNumber class="text-input" @bind-Value="model.SamplePrice" />
+                    </label>
+                </div>
+            </div>
+            <label class="field tejido-notes-area">
+                <span>Notes</span>
+                <InputTextArea class="text-area" @bind-Value="model.Notes" />
+            </label>
+        </div>
+
+        <div class="tejido-stock-grid" style="margin-top: 1rem;">
+            <article class="info-card stock-card raw">
+                <p class="eyebrow">Stock cru</p>
+                <h3>@model.RawStockKilograms.ToString("0.###") kg</h3>
+                <p class="muted">@model.RawStockMeters.ToString("0.###") metres · valor @RawStockValue.ToString("0.00") €</p>
+            </article>
+            <article class="info-card stock-card finished">
+                <p class="eyebrow">Stock disposat / color</p>
+                <h3>@model.AvailableStockKilograms.ToString("0.###") kg</h3>
+                <p class="muted">@TotalColorMeters.ToString("0.###") metres · valor @FinishedStockValue.ToString("0.00") €</p>
+            </article>
+        </div>
+
+        <div class="tejido-color-signal-grid" style="margin-top: 1rem;">
+            <article class="info-card stock-signal-card warning">
+                <p class="eyebrow">Colores bajo mínimo</p>
+                <h3>@ColorsBelowMinimumCount</h3>
+                <p class="muted">Necesitan reposición o revisión de stock.</p>
+            </article>
+            <article class="info-card stock-signal-card danger">
+                <p class="eyebrow">Colores sin stock</p>
+                <h3>@ColorsWithoutStockCount</h3>
+                <p class="muted">No tienen metros disponibles ahora mismo.</p>
+            </article>
+            <article class="info-card stock-signal-card success">
+                <p class="eyebrow">Colores en rango</p>
+                <h3>@ColorsHealthyCount</h3>
+                <p class="muted">Cumplen mínimo y tienen stock disponible.</p>
+            </article>
+        </div>
+
+        @RenderColorsSection()
+    </section>;
+
+    private RenderFragment RenderEscandalloTab() => @<section class="panel" style="margin-top: 1rem;">
+        <div class="detail-panel-header">
+            <div>
+                <h2>Escandall Teixit</h2>
+                <p class="muted">Costes del circuito productivo, composición y acabados del tejido.</p>
+            </div>
+        </div>
+
+        <div class="tejido-cost-grid">
+            <article class="info-card">
+                <p class="eyebrow">Material</p>
+                <h3>@model.MaterialCost.ToString("0.0000")</h3>
+                <p class="muted">Coste base de hilo / materia prima</p>
+            </article>
+            <article class="info-card">
+                <p class="eyebrow">Tejedor</p>
+                <h3>@DisplayValue(model.WeaverCode)</h3>
+                <p class="muted">Coste @model.WeavingCost.ToString("0.0000")</p>
+            </article>
+            <article class="info-card">
+                <p class="eyebrow">Estampador</p>
+                <h3>@DisplayValue(model.PrinterCode)</h3>
+                <p class="muted">Coste @model.PrintingCost.ToString("0.0000")</p>
+            </article>
+            <article class="info-card">
+                <p class="eyebrow">Acabador</p>
+                <h3>@DisplayValue(model.FinisherCode)</h3>
+                <p class="muted">Coste @model.FinishingCost.ToString("0.0000")</p>
+            </article>
+            <article class="info-card">
+                <p class="eyebrow">Coste cru</p>
+                <h3>@model.RawCost.ToString("0.0000")</h3>
+                <p class="muted">Base usada para valoración y colores</p>
+            </article>
+            <article class="info-card">
+                <p class="eyebrow">Composición</p>
+                <h3>@CompositionStatusLabel</h3>
+                <p class="muted">@CompositionPercentageTotal% · gap @CompositionPercentageGap.ToString("+0;-0;0")%</p>
+            </article>
+        </div>
+
+        <div class="form-grid" style="margin-top: 1rem;">
+            <label class="field">
+                <span>Coste material</span>
+                <InputNumber class="text-input" @bind-Value="model.MaterialCost" @bind-Value:after="RecalculateColorPrices" />
+            </label>
+            <label class="field">
+                <span>Tejedor</span>
+                <InputNumber class="text-input" @bind-Value="model.WeaverCode" />
+            </label>
+            <label class="field">
+                <span>Coste tejer</span>
+                <InputNumber class="text-input" @bind-Value="model.WeavingCost" />
+            </label>
+            <label class="field">
+                <span>Estampador</span>
+                <InputNumber class="text-input" @bind-Value="model.PrinterCode" />
+            </label>
+            <label class="field">
+                <span>Coste estampar</span>
+                <InputNumber class="text-input" @bind-Value="model.PrintingCost" />
+            </label>
+            <label class="field">
+                <span>Acabador</span>
+                <InputNumber class="text-input" @bind-Value="model.FinisherCode" />
+            </label>
+            <label class="field wide">
+                <span>Resumen acabados</span>
+                <InputText class="text-input" @bind-Value="model.FinishSummary" />
+            </label>
+            <label class="field">
+                <span>Coste acabats</span>
+                <InputNumber class="text-input" @bind-Value="model.FinishingCost" />
+            </label>
+            <label class="field">
+                <span>Coste cru</span>
+                <InputNumber class="text-input" @bind-Value="model.RawCost" @bind-Value:after="RecalculateColorPrices" />
+            </label>
+        </div>
+
+        <div class="quick-links" style="margin-top: 1rem;">
+            <button class="secondary-button" type="button" @onclick="RecalculateColorPrices">Recalcular precios de colores</button>
+            <button class="secondary-button" type="button" @onclick="ApplySuggestedCompositionText">Autocompletar composición texto</button>
+            <button class="secondary-button" type="button" @onclick="ApplySuggestedFinishSummary">Autocompletar resumen acabados</button>
+        </div>
+
+        @if (CompositionPercentageTotal != 100)
+        {
+            <div class="alert" style="margin-top: 1rem;">
+                El escandallo de composición suma <strong>@CompositionPercentageTotal%</strong>.
+                @if (CompositionPercentageTotal < 100)
+                {
+                    <span> Faltan @Math.Abs(CompositionPercentageGap)% para llegar a 100%.</span>
+                }
+                else
+                {
+                    <span> Sobran @(Math.Abs(CompositionPercentageGap))% sobre el 100%.</span>
+                }
+            </div>
+        }
+
+        @RenderCompositionSection()
+        @RenderFinishesSection()
+    </section>;
+
+    private RenderFragment RenderImpresionTab() => @<section class="panel" style="margin-top: 1rem;">
+        <div class="detail-panel-header">
+            <div>
+                <h2>Impressió Fitxa · Etiquetes</h2>
+                <p class="muted">Previsualiza la ficha, las etiquetas y la valoración antes de abrir cada documento.</p>
+            </div>
+        </div>
+
+        @if (string.IsNullOrWhiteSpace(model.Code))
+        {
+            <div class="alert">
+                Guarda primero el tejido para poder generar la ficha técnica, las etiquetas y la valoración imprimible.
+            </div>
+        }
+        else
+        {
+            <div class="impression-preview-grid">
+                <article class="panel print-preview-card">
+                    <p class="eyebrow">Fitxa tècnica</p>
+                    <h3>@model.Code · Fitxa completa</h3>
+                    <p class="muted">Incluye cabecera, costes, stock, carta de colores, composición y acabados.</p>
+                    <div class="print-preview-sheet">
+                        <div class="print-preview-sheet-header">
+                            <strong>@model.Code</strong>
+                            <span>@DisplayValue(model.Description)</span>
+                        </div>
+                        <div class="print-preview-kpis">
+                            <span>@model.GramWeight.ToString("0.###") gr/m2</span>
+                            <span>@DisplayValue(model.WidthText)</span>
+                            <span>@(model.IsTubular ? "Tubular" : "Plano")</span>
+                            <span>@ColorsCount colores</span>
+                        </div>
+                        <ul class="document-list print-preview-list">
+                            <li>Composición texto: @DisplayValue(model.CompositionText)</li>
+                            <li>Escandallo: @CompositionCount composiciones · @FinishesCount acabados</li>
+                            <li>Stock: @model.AvailableStockMeters.ToString("0.###") m · @model.AvailableStockKilograms.ToString("0.###") kg</li>
+                        </ul>
+                    </div>
+                    <div class="quick-links" style="margin-top: 0.85rem;">
+                        <a class="primary-button link-button" href="@TechnicalSheetUrl" target="_blank">Abrir ficha imprimible</a>
+                    </div>
+                </article>
+                <article class="panel print-preview-card">
+                    <p class="eyebrow">Etiquetes</p>
+                    <h3>@Math.Max(labelCount, 1) uds. · @GetLabelModeDisplayName(EffectiveLabelMode)</h3>
+                    <p class="muted">@GetLabelModeDescription(EffectiveLabelMode)</p>
+                    <div class="form-grid" style="margin-top: 0.75rem;">
+                        <label class="field">
+                            <span>Nº etiquetas</span>
+                            <InputNumber class="text-input" @bind-Value="labelCount" />
+                        </label>
+                        <label class="field">
+                            <span>Formato</span>
+                            <InputSelect class="text-input" @bind-Value="labelMode">
+                                <option value="standard">Estándar</option>
+                                <option value="compact">Compacta</option>
+                                <option value="warehouse">Almacén</option>
+                            </InputSelect>
+                        </label>
+                    </div>
+                    <div class="inline-action-list" style="margin-top: 0.35rem;">
+                        <button class="secondary-button @(EffectiveLabelMode == "standard" ? "active-filter-chip" : null)" type="button" @onclick="@(() => SelectLabelMode("standard"))">Estándar</button>
+                        <button class="secondary-button @(EffectiveLabelMode == "compact" ? "active-filter-chip" : null)" type="button" @onclick="@(() => SelectLabelMode("compact"))">Compacta</button>
+                        <button class="secondary-button @(EffectiveLabelMode == "warehouse" ? "active-filter-chip" : null)" type="button" @onclick="@(() => SelectLabelMode("warehouse"))">Almacén</button>
+                    </div>
+                    <div class="labels-grid labels-grid-preview" style="margin-top: 1rem;">
+                        @for (var previewIndex = 0; previewIndex < Math.Min(Math.Max(labelCount, 1), 2); previewIndex++)
+                        {
+                            @RenderLabelPreview()
+                        }
+                    </div>
+                    <div class="quick-links" style="margin-top: 0.85rem;">
+                        <button class="secondary-button" type="button" @onclick="OpenLabelsPrint">Abrir etiquetas</button>
+                    </div>
+                </article>
+                <article class="panel print-preview-card">
+                    <p class="eyebrow">Valoració stock</p>
+                    <h3>@TotalStockValue.ToString("0.00") €</h3>
+                    <p class="muted">Resumen económico del stock cru y del stock por color, con alertas y ranking.</p>
+                    <div class="print-preview-sheet">
+                        <div class="print-preview-kpis">
+                            <span>Stock cru @RawStockValue.ToString("0.00") €</span>
+                            <span>Stock color @FinishedStockValue.ToString("0.00") €</span>
+                            <span>Cobertura @CoveragePercentage.ToString("0.#")%</span>
+                        </div>
+                        <ul class="document-list print-preview-list">
+                            <li>@ValuationHealthyCount colores en rango</li>
+                            <li>@ValuationBelowMinimumCount colores bajo mínimo</li>
+                            <li>@ValuationWithoutStockCount colores sin stock</li>
+                            @if (TopValuationRows.Count > 0)
+                            {
+                                <li>Top valor: @TopValuationRows[0].Color · @TopValuationRows[0].EstimatedValue.ToString("0.00") €</li>
+                            }
+                        </ul>
+                    </div>
+                    <div class="quick-links" style="margin-top: 0.85rem;">
+                        <a class="secondary-button link-button" href="@ValuationSheetUrl" target="_blank">Abrir valoración</a>
+                    </div>
+                </article>
+                <article class="panel print-preview-card">
+                    <p class="eyebrow">Reposició</p>
+                    <h3>@SelectedReplenishmentMeters.ToString("0.###") m</h3>
+                    <p class="muted">Hoja agrupada con los colores seleccionados para reponer y su valor estimado.</p>
+                    <div class="print-preview-sheet">
+                        <div class="print-preview-kpis">
+                            <span>@SelectedReplenishmentCandidates.Count colores</span>
+                            <span>@SelectedReplenishmentValue.ToString("0.00") €</span>
+                        </div>
+                        @if (SelectedReplenishmentCandidates.Count == 0)
+                        {
+                            <p class="muted">No hay colores seleccionados para reposición en este momento.</p>
+                        }
+                        else
+                        {
+                            <ul class="document-list print-preview-list">
+                                @foreach (var item in SelectedReplenishmentCandidates.Take(4))
+                                {
+                                    <li>@DisplayValue(item.Color) · faltan @GetSuggestedReplenishmentMeters(item).ToString("0.###") m</li>
+                                }
+                                @if (SelectedReplenishmentCandidates.Count > 4)
+                                {
+                                    <li>Y @((SelectedReplenishmentCandidates.Count - 4)) colores más en la selección.</li>
+                                }
+                            </ul>
+                        }
+                    </div>
+                    <div class="quick-links" style="margin-top: 0.85rem;">
+                        <a class="secondary-button link-button" href="@ReplenishmentSheetUrl" target="_blank">Abrir reposición</a>
+                    </div>
+                </article>
+            </div>
+        }
+    </section>;
+
+    private RenderFragment RenderLabelPreview() => @<article class="fabric-label fabric-label-preview @(EffectiveLabelMode == "compact" ? "compact" : EffectiveLabelMode == "warehouse" ? "warehouse" : null)">
+        @if (EffectiveLabelMode == "warehouse")
+        {
+            <p class="eyebrow">Almacén</p>
+            <h2>@model.Code</h2>
+            <p><strong>@DisplayValue(model.Description)</strong></p>
+            <p>Disponible @model.AvailableStockMeters.ToString("0.###") m · @model.AvailableStockKilograms.ToString("0.###") kg</p>
+            <p>@DisplayValue(model.WidthText) · @(model.IsTubular ? "Tubular" : "Plano")</p>
+        }
+        else if (EffectiveLabelMode == "compact")
+        {
+            <p class="eyebrow">Teixit</p>
+            <h2>@model.Code</h2>
+            <p>@DisplayValue(model.Description)</p>
+        }
+        else
+        {
+            <p class="eyebrow">Teixit</p>
+            <h2>@model.Code</h2>
+            <p><strong>@DisplayValue(model.Description)</strong></p>
+            <p>@DisplayValue(model.CompositionText)</p>
+            <p>@DisplayValue(model.WidthText) · @model.GramWeight.ToString("0.###") gr/m2</p>
+        }
+    </article>;
+
+    private RenderFragment RenderValoracionTab() => @<section class="panel" style="margin-top: 1rem;">
+        <div class="detail-panel-header">
+            <div>
+                <h2>Valoració Stock</h2>
+                <p class="muted">Resumen económico del stock cru y del stock por color usando la información local del tejido.</p>
+            </div>
+        </div>
+
+        <div class="tejido-valuation-grid">
+            <article class="info-card">
+                <p class="eyebrow">Stock cru</p>
+                <h3>@RawStockValue.ToString("0.00") €</h3>
+                <p class="muted">@model.RawStockKilograms.ToString("0.###") kg · @model.RawStockMeters.ToString("0.###") m</p>
+            </article>
+            <article class="info-card">
+                <p class="eyebrow">Stock color</p>
+                <h3>@FinishedStockValue.ToString("0.00") €</h3>
+                <p class="muted">@TotalColorMeters.ToString("0.###") m sobre @ColorsCount colores</p>
+            </article>
+            <article class="info-card">
+                <p class="eyebrow">Total</p>
+                <h3>@TotalStockValue.ToString("0.00") €</h3>
+                <p class="muted">Valor conjunto del tejido</p>
+            </article>
+            <article class="info-card">
+                <p class="eyebrow">Cobertura</p>
+                <h3>@CoveragePercentage.ToString("0.#")%</h3>
+                <p class="muted">@ValuationHealthyCount en rango · @ValuationBelowMinimumCount bajo mínimo · @ValuationWithoutStockCount sin stock</p>
+            </article>
+            <article class="info-card">
+                <p class="eyebrow">Peso stock color</p>
+                <h3>@RawVsFinishedPercentage.ToString("0.#")%</h3>
+                <p class="muted">del valor total está ya en colores</p>
+            </article>
+        </div>
+
+        <div class="tejido-valuation-grid" style="margin-top: 1rem;">
+            <article class="panel valuation-mini-panel">
+                <div class="detail-panel-header">
+                    <div>
+                        <h3>Ranking por valor</h3>
+                        <p class="muted">Colores que más valor concentran en stock.</p>
+                    </div>
+                </div>
+                @if (TopValuationRows.Count == 0)
+                {
+                    <p class="muted">Sin colores valorables todavía.</p>
+                }
+                else
+                {
+                    <div class="list-block">
+                        @foreach (var row in TopValuationRows)
+                        {
+                            <article class="list-item">
+                                <strong>@row.Color</strong>
+                                <span>@row.EstimatedValue.ToString("0.00") € · @row.CurrentMeters.ToString("0.###") m · @GetCoverageLabel(row)</span>
+                            </article>
+                        }
+                    </div>
+                }
+            </article>
+            <article class="panel valuation-mini-panel">
+                <div class="detail-panel-header">
+                    <div>
+                        <h3>Alertas de stock</h3>
+                        <p class="muted">Colores con falta de cobertura o sin stock.</p>
+                    </div>
+                </div>
+                @if (AlertValuationRows.Count == 0)
+                {
+                    <p class="muted">No hay alertas activas en la carta de colores.</p>
+                }
+                else
+                {
+                    <div class="list-block">
+                        @foreach (var row in AlertValuationRows.Take(6))
+                        {
+                            <article class="list-item">
+                                <strong>@row.Color</strong>
+                                <span>@GetCoverageLabel(row) · mínimo @row.MinimumMeters.ToString("0.###") m · actual @row.CurrentMeters.ToString("0.###") m</span>
+                            </article>
+                        }
+                    </div>
+                }
+            </article>
+        </div>
+
+        <div class="table-scroll" style="margin-top: 1rem;">
+            <table class="data-table detail-table">
+                <thead>
+                    <tr>
+                        <th>Color</th>
+                        <th>Estado</th>
+                        <th>Cobertura</th>
+                        <th>Actual</th>
+                        <th>Mínimo</th>
+                        <th>Tintar</th>
+                        <th>Precio</th>
+                        <th>€/Mts.</th>
+                        <th>€/KG</th>
+                        <th>Valor stock</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (ValuationRows.Count == 0)
+                    {
+                        <tr><td colspan="10" class="muted">No hay colores cargados para valorar el stock del tejido.</td></tr>
+                    }
+                    else
+                    {
+                        @foreach (var row in ValuationRows)
+                        {
+                            <tr class="@GetValuationRowClass(row)">
+                                <td>@row.Color</td>
+                                <td><span class="status-pill status-pill-@GetValuationPillClass(row)">@GetValuationStatus(row)</span></td>
+                                <td>@GetCoverageLabel(row)</td>
+                                <td>@row.CurrentMeters.ToString("0.###")</td>
+                                <td>@row.MinimumMeters.ToString("0.###")</td>
+                                <td>@row.DyeingPrice.ToString("0.0000")</td>
+                                <td>@row.UnitCost.ToString("0.0000")</td>
+                                <td>@row.MetersPrice.ToString("0.0000")</td>
+                                <td>@row.KilogramsPrice.ToString("0.0000")</td>
+                                <td>@row.EstimatedValue.ToString("0.00") €</td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </section>;
+
+    private RenderFragment RenderColorsSection() => @<section class="panel detail-panel" style="margin-top: 1rem;">
+        <div class="detail-panel-header">
+            <div>
+                <h2>Colors per tipus de teixit</h2>
+                <p class="muted">Color, stock, mínimos y acciones rápidas de reposición por variante.</p>
+            </div>
+            @if (!isReadOnly)
+            {
+                <div class="inline-action-list">
+                    <button class="secondary-button" type="button" @onclick="UseCurrentStockAsMissingMinimums">Fijar mínimos vacíos con stock actual</button>
+                    <button class="secondary-button" type="button" @onclick="AddColor">Añadir línea</button>
+                </div>
+            }
+        </div>
+        @if (ReplenishmentCandidates.Count > 0)
+        {
+            <section class="panel comparison-panel" style="margin-bottom: 1rem;">
+                <div class="detail-panel-header">
+                    <div>
+                        <h3>Reposición agrupada</h3>
+                        <p class="muted">Selecciona los colores a reponer y genera una hoja agrupada del tejido.</p>
+                    </div>
+                    <div class="inline-action-list">
+                        <button class="secondary-button" type="button" @onclick="SelectAllReplenishmentCandidates">Seleccionar todos</button>
+                        <button class="secondary-button" type="button" @onclick="ClearReplenishmentSelection">Limpiar selección</button>
+                        <a class="primary-button link-button" href="@ReplenishmentSheetUrl" target="_blank">Abrir hoja de reposición</a>
+                    </div>
+                </div>
+                <div class="stock-summary-status-grid">
+                    <article class="stock-summary-status-card warning">
+                        <strong>@SelectedReplenishmentCandidates.Count</strong>
+                        <span>colores seleccionados</span>
+                    </article>
+                    <article class="stock-summary-status-card warning">
+                        <strong>@SelectedReplenishmentMeters.ToString("0.###") m</strong>
+                        <span>metros a reponer</span>
+                    </article>
+                    <article class="stock-summary-status-card warning">
+                        <strong>@SelectedReplenishmentValue.ToString("0.00") €</strong>
+                        <span>valor estimado</span>
+                    </article>
+                </div>
+                <div class="table-scroll">
+                    <table class="data-table detail-table">
+                        <thead>
+                            <tr>
+                                <th>Incl.</th>
+                                <th>Color</th>
+                                <th>Estado</th>
+                                <th>Actual</th>
+                                <th>Mínimo</th>
+                                <th>Falta</th>
+                                <th>€/Mts.</th>
+                                <th>Valor rep.</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in ReplenishmentCandidates)
+                            {
+                                <tr class="@GetColorRowClass(item)">
+                                    <td>
+                                        <input type="checkbox" checked="@IsSelectedForReplenishment(item.LineNumber)" @onchange="args => SetReplenishmentSelection(item.LineNumber, args)" />
+                                    </td>
+                                    <td><strong>@DisplayValue(item.Color)</strong></td>
+                                    <td><span class="status-pill @GetColorStatusClass(item)">@GetColorStatusLabel(item)</span></td>
+                                    <td>@item.CurrentStock.ToString("0.###")</td>
+                                    <td>@item.MinimumStock.ToString("0.###")</td>
+                                    <td>@GetSuggestedReplenishmentMeters(item).ToString("0.###") m</td>
+                                    <td>@item.MetersPrice.ToString("0.0000")</td>
+                                    <td>@GetSuggestedReplenishmentValue(item).ToString("0.00") €</td>
+                                    <td>
+                                        <div class="table-actions compact-actions">
+                                            <a class="inline-link" href="@BuildColorMovementsUrl(item)">Movs. color</a>
+                                            <a class="inline-link" href="@BuildReplenishmentAdjustmentUrl(item)">Reponer</a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        }
+        <div class="tejido-color-signal-grid" style="margin-bottom: 1rem;">
+            <article class="info-card stock-signal-card warning">
+                <p class="eyebrow">Reposición</p>
+                <h3>@ColorsBelowMinimumCount colores</h3>
+                <p class="muted">@SuggestedReplenishmentMeters.ToString("0.###") m sugeridos</p>
+            </article>
+            <article class="info-card stock-signal-card danger">
+                <p class="eyebrow">Sin mínimo</p>
+                <h3>@ColorsWithoutMinimumCount colores</h3>
+                <p class="muted">Revisa mínimos base para no perder cobertura.</p>
+            </article>
+            <article class="info-card stock-signal-card success">
+                <p class="eyebrow">Valor reposición</p>
+                <h3>@SuggestedReplenishmentValue.ToString("0.00") €</h3>
+                <p class="muted">Estimado usando el €/mts. actual de cada color.</p>
+            </article>
+        </div>
+        <div class="table-scroll">
+            <table class="data-table detail-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Codi proveïdor</th>
+                        <th>Color</th>
+                        <th>Estado</th>
+                        <th>Cobertura</th>
+                        <th>Actual</th>
+                        <th>Mínimo</th>
+                        <th>Reposición</th>
+                        <th>Valor rep.</th>
+                        <th>Tintar</th>
+                        <th>Precio</th>
+                        <th>€/Mts.</th>
+                        <th>€/KG</th>
+                        <th>Valor stock</th>
+                        <th>Notas</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (model.Colors.Count == 0)
+                    {
+                        <tr><td colspan="16" class="muted">No hay colores cargados para este tejido.</td></tr>
+                    }
+                    else
+                    {
+                        @foreach (var item in model.Colors.OrderBy(item => item.LineNumber))
+                        {
+                            <tr @key="item.LineNumber" class="@GetColorRowClass(item)">
+                                <td><strong>@item.LineNumber</strong></td>
+                                <td><InputNumber class="text-input table-input" @bind-Value="item.SupplierCode" /></td>
+                                <td><InputText class="text-input table-input" @bind-Value="item.Color" /></td>
+                                <td>
+                                    <span class="status-pill @GetColorStatusClass(item)">@GetColorStatusLabel(item)</span>
+                                </td>
+                                <td>@GetColorCoverageLabel(item)</td>
+                                <td><InputNumber class="text-input table-input" @bind-Value="item.CurrentStock" /></td>
+                                <td><InputNumber class="text-input table-input" @bind-Value="item.MinimumStock" /></td>
+                                <td><strong>@GetSuggestedReplenishmentMeters(item).ToString("0.###") m</strong></td>
+                                <td><strong>@GetSuggestedReplenishmentValue(item).ToString("0.00") €</strong></td>
+                                <td><InputNumber class="text-input table-input" @bind-Value="item.DyeingPrice" @bind-Value:after="RecalculateColorPrices" /></td>
+                                <td><InputNumber class="text-input table-input" @bind-Value="item.UnitCost" disabled /></td>
+                                <td><InputNumber class="text-input table-input" @bind-Value="item.MetersPrice" disabled /></td>
+                                <td><InputNumber class="text-input table-input" @bind-Value="item.KilogramsPrice" disabled /></td>
+                                <td><strong>@GetColorStockValue(item).ToString("0.00") €</strong></td>
+                                <td><InputText class="text-input table-input" @bind-Value="item.Notes" /></td>
+                                <td>
+                                    <div class="table-actions compact-actions">
+                                        <a class="inline-link" href="@BuildColorMovementsUrl(item)">Movs. color</a>
+                                        <a class="inline-link" href="@BuildDisposedMovementsUrl(item)">Movs. disp.</a>
+                                        <a class="inline-link" href="@BuildRawMovementsUrl()">Movs. cru</a>
+                                        <a class="inline-link" href="@BuildStockAdjustmentUrl(item)">Ajuste</a>
+                                        @if (GetSuggestedReplenishmentMeters(item) > 0m)
+                                        {
+                                            <a class="inline-link" href="@BuildReplenishmentAdjustmentUrl(item)">Reponer</a>
+                                        }
+                                        @if (!isReadOnly)
+                                        {
+                                            <button class="secondary-button minimal-button" type="button" @onclick="() => UseCurrentStockAsMinimum(item)">Usar actual como mínimo</button>
+                                            <button class="danger-link" type="button" @onclick="() => RemoveColor(item.LineNumber)">Quitar</button>
+                                        }
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </section>;
+
+    private RenderFragment RenderCompositionSection() => @<section class="panel detail-panel" style="margin-top: 1rem;">
+        <div class="detail-panel-header">
+            <div>
+                <h2>Composició</h2>
+                <p class="muted">Materias primas y porcentaje de composición. Total actual: @CompositionPercentageTotal%.</p>
+            </div>
+            @if (!isReadOnly)
+            {
+                <button class="secondary-button" type="button" @onclick="AddComposition">Añadir línea</button>
+            }
+        </div>
+        <div class="table-scroll">
+            <table class="data-table detail-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Component</th>
+                        <th>%</th>
+                        <th>Proveedor</th>
+                        <th>Precio</th>
+                        <th>Importe</th>
+                        @if (!isReadOnly)
+                        {
+                            <th></th>
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (model.Composition.Count == 0)
+                    {
+                        <tr><td colspan="@(isReadOnly ? 6 : 7)" class="muted">No hay composición cargada para este tejido.</td></tr>
+                    }
+                    else
+                    {
+                        @foreach (var item in model.Composition.OrderBy(item => item.LineNumber))
+                        {
+                            <tr @key="item.LineNumber">
+                                <td><strong>@item.LineNumber</strong></td>
+                                <td><InputText class="text-input table-input" @bind-Value="item.ComponentCode" /></td>
+                                <td><InputNumber class="text-input table-input" @bind-Value="item.Percentage" /></td>
+                                <td><InputNumber class="text-input table-input" @bind-Value="item.SupplierCode" /></td>
+                                <td><InputNumber class="text-input table-input" @bind-Value="item.UnitPrice" /></td>
+                                <td><InputNumber class="text-input table-input" @bind-Value="item.Amount" /></td>
+                                @if (!isReadOnly)
+                                {
+                                    <td><button class="danger-link" type="button" @onclick="() => RemoveComposition(item.LineNumber)">Quitar</button></td>
+                                }
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </section>;
+
+    private RenderFragment RenderFinishesSection() => @<section class="panel detail-panel" style="margin-top: 1rem;">
+        <div class="detail-panel-header">
+            <div>
+                <h2>Acabados</h2>
+                <p class="muted">Secuencia de acabados aplicada al tejido.</p>
+            </div>
+            @if (!isReadOnly)
+            {
+                <button class="secondary-button" type="button" @onclick="AddFinish">Añadir línea</button>
+            }
+        </div>
+        <div class="table-scroll">
+            <table class="data-table detail-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Acabado</th>
+                        <th>Proveedor</th>
+                        <th>Orden</th>
+                        <th>Precio m</th>
+                        <th>Precio kg</th>
+                        @if (!isReadOnly)
+                        {
+                            <th></th>
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (model.Finishes.Count == 0)
+                    {
+                        <tr><td colspan="@(isReadOnly ? 6 : 7)" class="muted">No hay acabados cargados para este tejido.</td></tr>
+                    }
+                    else
+                    {
+                        @foreach (var item in model.Finishes.OrderBy(item => item.LineNumber))
+                        {
+                            <tr @key="item.LineNumber">
+                                <td><strong>@item.LineNumber</strong></td>
+                                <td><InputText class="text-input table-input" @bind-Value="item.FinishCode" /></td>
+                                <td><InputNumber class="text-input table-input" @bind-Value="item.SupplierCode" /></td>
+                                <td><InputNumber class="text-input table-input" @bind-Value="item.Order" /></td>
+                                <td><InputNumber class="text-input table-input" @bind-Value="item.PricePerMeter" /></td>
+                                <td><InputNumber class="text-input table-input" @bind-Value="item.PricePerKilogram" /></td>
+                                @if (!isReadOnly)
+                                {
+                                    <td><button class="danger-link" type="button" @onclick="() => RemoveFinish(item.LineNumber)">Quitar</button></td>
+                                }
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </section>;
+
+    private List<TejidoValuationRow> BuildValuationRows() =>
+        model.Colors
+            .OrderBy(item => item.LineNumber)
+            .Select(item => new TejidoValuationRow(
+                string.IsNullOrWhiteSpace(item.Color) ? $"Línea {item.LineNumber}" : item.Color,
+                item.CurrentStock,
+                item.MinimumStock,
+                item.DyeingPrice,
+                item.UnitCost,
+                item.MetersPrice,
+                item.KilogramsPrice,
+                Math.Round(Math.Max(item.CurrentStock, 0m) * Math.Max(item.MetersPrice, 0m), 2, MidpointRounding.AwayFromZero),
+                item.MinimumStock <= 0m
+                    ? (item.CurrentStock > 0m ? 1m : 0m)
+                    : Math.Round(item.CurrentStock / item.MinimumStock, 2, MidpointRounding.AwayFromZero),
+                item.CurrentStock > 0m && item.MinimumStock > 0m && item.CurrentStock < item.MinimumStock,
+                item.CurrentStock <= 0m))
+            .ToList();
+
+    private static decimal GetColorStockValue(TejidoColorDetailDto item) =>
+        Math.Round(Math.Max(item.CurrentStock, 0m) * Math.Max(item.MetersPrice, 0m), 2, MidpointRounding.AwayFromZero);
+
+    private string BuildColorMovementsUrl(TejidoColorDetailDto item) =>
+        BuildMovementsUrl(BuildStockSearchText(item), "TEJIDO-COLOR");
+
+    private string BuildDisposedMovementsUrl(TejidoColorDetailDto item) =>
+        BuildMovementsUrl(model.Code ?? string.Empty, "TEJIDO-DISPUESTO");
+
+    private string BuildRawMovementsUrl() =>
+        BuildMovementsUrl(model.Code ?? string.Empty, "TEJIDO-CRUDO");
+
+    private string BuildStockAdjustmentUrl(TejidoColorDetailDto item)
+    {
+        var description = string.IsNullOrWhiteSpace(item.Color)
+            ? model.Description
+            : $"{model.Description} · {item.Color}";
+
+        return string.Concat(
+            "/almacen/ajustes?ItemCode=", Uri.EscapeDataString(model.Code ?? string.Empty),
+            "&Description=", Uri.EscapeDataString(description ?? string.Empty),
+            "&Color=", Uri.EscapeDataString(item.Color ?? string.Empty),
+            "&Unit=", Uri.EscapeDataString("m"),
+            "&CurrentStock=", Uri.EscapeDataString(item.CurrentStock.ToString(System.Globalization.CultureInfo.InvariantCulture)));
+    }
+
+    private string BuildReplenishmentAdjustmentUrl(TejidoColorDetailDto item)
+    {
+        var suggestedMeters = GetSuggestedReplenishmentMeters(item);
+        var description = string.IsNullOrWhiteSpace(item.Color)
+            ? model.Description
+            : $"{model.Description} · {item.Color}";
+        var notes = string.Concat(
+            "Reposición sugerida desde ficha de tejido. ",
+            "Mínimo ", item.MinimumStock.ToString("0.###"),
+            " m · actual ", item.CurrentStock.ToString("0.###"),
+            " m.");
+
+        return string.Concat(
+            "/almacen/ajustes?Warehouse=", Uri.EscapeDataString("TEJIDO-COLOR"),
+            "&ItemCode=", Uri.EscapeDataString(model.Code ?? string.Empty),
+            "&Description=", Uri.EscapeDataString(description ?? string.Empty),
+            "&Color=", Uri.EscapeDataString(item.Color ?? string.Empty),
+            "&Unit=", Uri.EscapeDataString("m"),
+            "&CurrentStock=", Uri.EscapeDataString(item.CurrentStock.ToString(System.Globalization.CultureInfo.InvariantCulture)),
+            "&AdjustmentType=", Uri.EscapeDataString(StockMovementTypes.InboundManualAdjustment),
+            "&Quantity=", Uri.EscapeDataString(suggestedMeters.ToString(System.Globalization.CultureInfo.InvariantCulture)),
+            "&Notes=", Uri.EscapeDataString(notes));
+    }
+
+    private string BuildStockSearchText(TejidoColorDetailDto item)
+    {
+        if (string.IsNullOrWhiteSpace(item.Color))
+        {
+            return model.Code ?? string.Empty;
+        }
+
+        return string.Concat(model.Code, " ", item.Color).Trim();
+    }
+
+    private static string BuildMovementsUrl(string search, string warehouse)
+    {
+        return string.Concat(
+            "/almacen/movimientos?search=", Uri.EscapeDataString(search ?? string.Empty),
+            "&warehouse=", Uri.EscapeDataString(warehouse ?? string.Empty));
+    }
+
+    private static decimal GetSuggestedReplenishmentMeters(TejidoColorDetailDto item) =>
+        Math.Round(Math.Max(item.MinimumStock - item.CurrentStock, 0m), 3, MidpointRounding.AwayFromZero);
+
+    private static decimal GetSuggestedReplenishmentValue(TejidoColorDetailDto item) =>
+        Math.Round(GetSuggestedReplenishmentMeters(item) * Math.Max(item.MetersPrice, 0m), 2, MidpointRounding.AwayFromZero);
+
+    private static string GetColorCoverageLabel(TejidoColorDetailDto item) =>
+        GetCoverageLabel(item.CurrentStock, item.MinimumStock);
+
+    private static string GetColorStatusLabel(TejidoColorDetailDto item)
+    {
+        if (item.CurrentStock <= 0m)
+        {
+            return "Sin stock";
+        }
+
+        if (item.CurrentStock < item.MinimumStock)
+        {
+            return "Bajo mínimo";
+        }
+
+        return "OK";
+    }
+
+    private static string GetColorStatusClass(TejidoColorDetailDto item)
+    {
+        if (item.CurrentStock <= 0m)
+        {
+            return "danger";
+        }
+
+        if (item.CurrentStock < item.MinimumStock)
+        {
+            return "warning";
+        }
+
+        return "success";
+    }
+
+    private static string GetColorRowClass(TejidoColorDetailDto item)
+    {
+        if (item.CurrentStock <= 0m)
+        {
+            return "stock-zero-row";
+        }
+
+        if (item.CurrentStock < item.MinimumStock)
+        {
+            return "stock-warning-row";
+        }
+
+        return string.Empty;
+    }
+
+    private static string GetValuationStatus(TejidoValuationRow row)
+    {
+        if (row.HasNoStock)
+        {
+            return "Sin stock";
+        }
+
+        if (row.IsBelowMinimum)
+        {
+            return "Bajo mínimo";
+        }
+
+        return "En rango";
+    }
+
+    private static string GetValuationPillClass(TejidoValuationRow row)
+    {
+        if (row.HasNoStock)
+        {
+            return "danger";
+        }
+
+        if (row.IsBelowMinimum)
+        {
+            return "warning";
+        }
+
+        return "success";
+    }
+
+    private static string GetValuationRowClass(TejidoValuationRow row)
+    {
+        if (row.HasNoStock)
+        {
+            return "stock-zero-row";
+        }
+
+        if (row.IsBelowMinimum)
+        {
+            return "stock-warning-row";
+        }
+
+        return string.Empty;
+    }
+
+    private static string GetCoverageLabel(TejidoValuationRow row)
+    {
+        return GetCoverageLabel(row.CurrentMeters, row.MinimumMeters);
+    }
+
+    private static string GetCoverageLabel(decimal currentMeters, decimal minimumMeters)
+    {
+        if (minimumMeters <= 0m)
+        {
+            return currentMeters > 0m ? "Sin mínimo · con stock" : "Sin mínimo";
+        }
+
+        return $"{Math.Round(currentMeters / minimumMeters * 100m, 1, MidpointRounding.AwayFromZero):0.#}%";
+    }
+
+    private static string NormalizeLabelMode(string? mode)
+    {
+        return mode?.Trim().ToLowerInvariant() switch
+        {
+            "compact" => "compact",
+            "warehouse" => "warehouse",
+            _ => "standard"
+        };
+    }
+
+    private static string GetLabelModeDisplayName(string mode)
+    {
+        return NormalizeLabelMode(mode) switch
+        {
+            "compact" => "Compacta",
+            "warehouse" => "Almacén",
+            _ => "Estándar"
+        };
+    }
+
+    private static string GetLabelModeDescription(string mode)
+    {
+        return NormalizeLabelMode(mode) switch
+        {
+            "compact" => "Formato corto para identificar rápido código y descripción en tiradas cortas.",
+            "warehouse" => "Formato pensado para almacén, centrado en disponibilidad, ancho y tipo de tejido.",
+            _ => "Formato completo con código, descripción, composición y datos básicos del tejido."
+        };
+    }
+
+    private static int NextLineNumber(IEnumerable<int> lineNumbers) =>
+        lineNumbers.Any() ? lineNumbers.Max() + 1 : 1;
+
+    private static void RemoveAndReorder<T>(ICollection<T> items, int lineNumber, Func<T, int> getLineNumber, Action<T, int> setLineNumber)
+    {
+        var item = items.FirstOrDefault(current => getLineNumber(current) == lineNumber);
+        if (item is null)
+        {
+            return;
+        }
+
+        items.Remove(item);
+        var ordered = items.OrderBy(getLineNumber).ToList();
+        for (var index = 0; index < ordered.Count; index++)
+        {
+            setLineNumber(ordered[index], index + 1);
+        }
+    }
+
+    private static decimal ResolveWidthMeters(decimal width2, string widthText)
+    {
+        if (width2 > 0)
+        {
+            return width2;
+        }
+
+        if (string.IsNullOrWhiteSpace(widthText))
+        {
+            return 0m;
+        }
+
+        var filtered = new string(widthText
+            .Replace(',', '.')
+            .Where(character => char.IsDigit(character) || character == '.')
+            .ToArray());
+
+        if (!decimal.TryParse(filtered, System.Globalization.NumberStyles.Number, System.Globalization.CultureInfo.InvariantCulture, out var parsed))
+        {
+            return 0m;
+        }
+
+        return parsed >= 10m ? parsed / 100m : parsed;
+    }
+
+    private static string DisplayValue(string value) =>
+        string.IsNullOrWhiteSpace(value) ? "-" : value;
+
+    private static string DisplayValue(int value) =>
+        value <= 0 ? "-" : value.ToString();
+
+    private static int ParseMachineCode(string code) =>
+        int.TryParse(code, out var parsedValue) ? parsedValue : 0;
+
+    private static string FormatMachineOption(BaseCatalogListItemDto item) =>
+        string.IsNullOrWhiteSpace(item.Name) ? item.Code : $"{item.Code} · {item.Name}";
+}

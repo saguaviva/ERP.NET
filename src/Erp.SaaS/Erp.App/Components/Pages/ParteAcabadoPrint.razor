@@ -1,0 +1,197 @@
+@page "/produccion/acabados/{OrderNumber:int}/imprimir"
+@layout EmptyLayout
+@attribute [Authorize(Roles = "TenantAdmin,TenantReader")]
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IParteAcabadoQueries ParteAcabadoQueries
+
+<PageTitle>Parte de acabado @OrderNumber</PageTitle>
+
+<div class="document-shell">
+    <div class="document-toolbar no-print">
+        <a class="secondary-button link-button" href="/produccion/acabados/editar/@OrderNumber">Volver al parte</a>
+        <button class="primary-button" type="button" onclick="window.print()">Guardar como PDF / Imprimir</button>
+    </div>
+
+    @if (!tenantId.HasValue || !companyId.HasValue)
+    {
+        <div class="empty-state document-state">
+            <p>No hay empresa activa seleccionada.</p>
+        </div>
+    }
+    else if (!string.IsNullOrWhiteSpace(errorMessage))
+    {
+        <div class="alert danger document-state">@errorMessage</div>
+    }
+    else if (detail is null)
+    {
+        <div class="empty-state document-state">
+            <p>No se ha encontrado el parte de acabado solicitado.</p>
+        </div>
+    }
+    else
+    {
+        <section class="document-page">
+            <header class="document-header">
+                <div>
+                    <p class="eyebrow">Parte de acabado</p>
+                    <h1>@detail.OrderNumber</h1>
+                    <p class="muted">Cliente @DisplayClient · Acabador @DisplayFinisher · Máquina @DisplayMachine</p>
+                </div>
+                <div class="document-header-meta">
+                    <div>
+                        <span class="muted">Fecha</span>
+                        <strong>@FormatDate(detail.Date)</strong>
+                    </div>
+                    <div>
+                        <span class="muted">Estado</span>
+                        <strong>@GetStatusLabel(detail.Status)</strong>
+                    </div>
+                    <div>
+                        <span class="muted">Origen</span>
+                        <strong>@DisplayValue(detail.Origin)</strong>
+                    </div>
+                </div>
+            </header>
+
+            <section class="document-section">
+                <div class="document-grid-two">
+                    <section class="document-box">
+                        <h2>Cabecera</h2>
+                        <div class="document-kv-grid">
+                            <div><span class="muted">Cliente</span><strong>@DisplayClient</strong></div>
+                            <div><span class="muted">Acabador</span><strong>@DisplayFinisher</strong></div>
+                            <div><span class="muted">Máquina</span><strong>@DisplayMachine</strong></div>
+                            <div><span class="muted">Operación</span><strong>@DisplayOperation</strong></div>
+                            <div><span class="muted">Disposición</span><strong>@DisplayDisposition</strong></div>
+                            <div><span class="muted">Origen técnico</span><strong>@DisplaySourceSample</strong></div>
+                            <div><span class="muted">Centro</span><strong>@DisplayValue(detail.CompanyCenterCode)</strong></div>
+                        </div>
+                    </section>
+                    <section class="document-box">
+                        <h2>Resumen de avance</h2>
+                        <div class="document-kv-grid">
+                            <div><span class="muted">Pendientes</span><strong>@PendingLinesCount</strong></div>
+                            <div><span class="muted">En proceso</span><strong>@InProgressLinesCount</strong></div>
+                            <div><span class="muted">Terminadas</span><strong>@FinishedLinesCount</strong></div>
+                            <div><span class="muted">Kg totales</span><strong>@detail.TotalKilograms.ToString("0.##")</strong></div>
+                            <div><span class="muted">Piezas totales</span><strong>@detail.TotalPieces.ToString("0.##")</strong></div>
+                            <div><span class="muted">Líneas</span><strong>@detail.Lines.Count</strong></div>
+                        </div>
+                    </section>
+                </div>
+            </section>
+
+            <section class="document-section">
+                <h2>Detalle de líneas</h2>
+                <table class="data-table document-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Tejido</th>
+                            <th>Descripción</th>
+                            <th>Color</th>
+                            <th>Kg</th>
+                            <th>Piezas</th>
+                            <th>Estado</th>
+                            <th>Notas</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var line in detail.Lines.OrderBy(item => item.LineNumber))
+                        {
+                            <tr>
+                                <td>@line.LineNumber</td>
+                                <td>@DisplayValue(line.FabricCode)</td>
+                                <td>@DisplayValue(line.FabricDescription)</td>
+                                <td>@DisplayValue(line.Color)</td>
+                                <td>@line.TotalKilograms.ToString("0.##")</td>
+                                <td>@line.TotalPieces.ToString("0.##")</td>
+                                <td>@GetStatusLabel(line.Status)</td>
+                                <td>@DisplayValue(line.Notes)</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </section>
+
+            <section class="document-section">
+                <div class="document-grid-two">
+                    <section class="document-box">
+                        <h2>Observaciones</h2>
+                        <p>@(string.IsNullOrWhiteSpace(detail.Notes) ? "Sin observaciones." : detail.Notes)</p>
+                    </section>
+                    <section class="document-box">
+                        <h2>Trazabilidad operativa</h2>
+                        <ul class="document-list">
+                            <li>Las líneas en proceso quedan reflejadas en la disposición como dispuestas.</li>
+                            <li>Las líneas terminadas quedan reflejadas en la disposición como servidas.</li>
+                            <li>El stock registra avance en proceso y terminado en almacenes lógicos.</li>
+                        </ul>
+                    </section>
+                </div>
+            </section>
+        </section>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public int OrderNumber { get; set; }
+
+    private Guid? tenantId;
+    private Guid? companyId;
+    private ParteAcabadoDetailDto? detail;
+    private string errorMessage = string.Empty;
+
+    private string DisplayClient => detail is null ? "-" : string.IsNullOrWhiteSpace(detail.ClientName) ? (detail.ClientCode > 0 ? detail.ClientCode.ToString() : "-") : $"{detail.ClientCode} · {detail.ClientName}";
+    private string DisplayFinisher => detail is null ? "-" : string.IsNullOrWhiteSpace(detail.FinisherName) ? (detail.FinisherCode > 0 ? detail.FinisherCode.ToString() : "-") : $"{detail.FinisherCode} · {detail.FinisherName}";
+    private string DisplayMachine => detail is null ? "-" : string.IsNullOrWhiteSpace(detail.MachineName) ? (detail.MachineCode > 0 ? detail.MachineCode.ToString() : "-") : $"{detail.MachineCode} · {detail.MachineName}";
+    private string DisplayOperation => detail is null ? "-" : string.IsNullOrWhiteSpace(detail.OperationName) ? (detail.OperationCode > 0 ? detail.OperationCode.ToString() : "-") : $"{detail.OperationCode} · {detail.OperationName}";
+    private string DisplayDisposition => detail is null ? "-" : string.IsNullOrWhiteSpace(detail.DispositionLabel) ? (detail.DispositionCode?.ToString() ?? "-") : detail.DispositionLabel;
+    private string DisplaySourceSample => detail is null
+        ? "-"
+        : string.IsNullOrWhiteSpace(detail.SourceSampleCode)
+            ? "-"
+            : detail.SourceSampleLineNumber.HasValue
+                ? $"{ParteAcabadoSourceKinds.GetLabel(detail.SourceSampleKind)} {detail.SourceSampleCode} · línea {detail.SourceSampleLineNumber.Value}"
+                : $"{ParteAcabadoSourceKinds.GetLabel(detail.SourceSampleKind)} {detail.SourceSampleCode}";
+    private int PendingLinesCount => detail?.Lines.Count(item => string.Equals(item.Status, ParteAcabadoStatuses.Pending, StringComparison.OrdinalIgnoreCase)) ?? 0;
+    private int InProgressLinesCount => detail?.Lines.Count(item => string.Equals(item.Status, ParteAcabadoStatuses.InProgress, StringComparison.OrdinalIgnoreCase)) ?? 0;
+    private int FinishedLinesCount => detail?.Lines.Count(item => string.Equals(item.Status, ParteAcabadoStatuses.Finished, StringComparison.OrdinalIgnoreCase)) ?? 0;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        tenantId = user.GetTenantId();
+        companyId = user.GetActiveCompanyId();
+
+        if (!tenantId.HasValue || !companyId.HasValue)
+        {
+            return;
+        }
+
+        try
+        {
+            errorMessage = string.Empty;
+            detail = await ParteAcabadoQueries.GetByNumberAsync(tenantId.Value, companyId.Value, OrderNumber);
+        }
+        catch (Exception exception)
+        {
+            errorMessage = exception.Message;
+            detail = null;
+        }
+    }
+
+    private static string GetStatusLabel(string status) => status switch
+    {
+        ParteAcabadoStatuses.Pending => "Pendiente",
+        ParteAcabadoStatuses.InProgress => "En proceso",
+        ParteAcabadoStatuses.Finished => "Terminado",
+        ParteAcabadoStatuses.Cancelled => "Anulado",
+        _ => status
+    };
+
+    private static string DisplayValue(string? value) => string.IsNullOrWhiteSpace(value) ? "-" : value;
+    private static string FormatDate(DateTime? value) => value?.ToString("dd/MM/yyyy") ?? "-";
+}

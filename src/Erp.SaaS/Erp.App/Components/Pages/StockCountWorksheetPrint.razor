@@ -1,0 +1,165 @@
+@page "/almacen/inventarios/{CountNumber:int}/imprimir-recuento"
+@layout EmptyLayout
+@attribute [Authorize(Roles = "TenantAdmin,TenantReader")]
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IStockQueries StockQueries
+
+<PageTitle>Hoja de recuento @CountNumber</PageTitle>
+
+<div class="document-shell">
+    <div class="document-toolbar no-print">
+        <a class="secondary-button link-button" href="/almacen/inventarios/editar/@CountNumber">Volver al inventario</a>
+        <a class="secondary-button link-button" href="/almacen/inventarios/@CountNumber/imprimir">Ver ficha completa</a>
+        <button class="primary-button" type="button" onclick="window.print()">Guardar como PDF / Imprimir</button>
+    </div>
+
+    @if (!tenantId.HasValue || !companyId.HasValue)
+    {
+        <div class="empty-state document-state">
+            <p>No hay empresa activa seleccionada.</p>
+        </div>
+    }
+    else if (!string.IsNullOrWhiteSpace(errorMessage))
+    {
+        <div class="alert danger document-state">@errorMessage</div>
+    }
+    else if (detail is null)
+    {
+        <div class="empty-state document-state">
+            <p>No se ha encontrado el inventario solicitado.</p>
+        </div>
+    }
+    else
+    {
+        <section class="document-page count-sheet-page">
+            <header class="count-sheet-header">
+                <div>
+                    <p class="eyebrow">Almacén / Inventarios</p>
+                    <h1>Hoja de recuento @detail.CountNumber</h1>
+                    <p class="muted">
+                        @(detail.IsBlindCount ? "Conteo ciego de planta." : "Hoja de recuento para planta.")
+                        Casillas vacías para anotar el conteo manual.
+                    </p>
+                </div>
+                <div class="count-sheet-meta">
+                    <span><strong>Fecha:</strong> @detail.CountDate.ToString("dd/MM/yyyy")</span>
+                    <span><strong>Almacén:</strong> @DisplayValue(detail.Warehouse)</span>
+                    <span><strong>Líneas:</strong> @detail.LineCount</span>
+                    <span><strong>Modo:</strong> @(detail.IsBlindCount ? "Ciego" : "Normal")</span>
+                </div>
+            </header>
+
+            @if (!string.IsNullOrWhiteSpace(detail.Notes))
+            {
+                <section class="document-section">
+                    <div class="document-box">
+                        <h2>Observaciones</h2>
+                        <p>@detail.Notes</p>
+                    </div>
+                </section>
+            }
+
+            <section class="document-section">
+                <table class="data-table document-table count-sheet-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Familia</th>
+                            <th>Artículo</th>
+                            <th>Descripción</th>
+                            <th>Color</th>
+                            <th>Unidad</th>
+                            <th>Conteo</th>
+                            <th>Repaso</th>
+                            <th>Final</th>
+                            <th>Observaciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var line in OrderedLines)
+                        {
+                            <tr>
+                                <td>@line.LineNumber</td>
+                                <td>@GetFamilyKey(line)</td>
+                                <td>@DisplayValue(line.ItemCode)</td>
+                                <td>@DisplayValue(line.ItemDescription)</td>
+                                <td>@DisplayValue(line.Color)</td>
+                                <td>@DisplayValue(line.UnitOfMeasure)</td>
+                                <td><span class="count-sheet-box" aria-hidden="true"></span></td>
+                                <td><span class="count-sheet-box" aria-hidden="true"></span></td>
+                                <td><span class="count-sheet-box" aria-hidden="true"></span></td>
+                                <td><span class="count-sheet-notes" aria-hidden="true"></span></td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </section>
+        </section>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public int CountNumber { get; set; }
+
+    private Guid? tenantId;
+    private Guid? companyId;
+    private StockCountDetailDto? detail;
+    private string errorMessage = string.Empty;
+
+    private IEnumerable<StockCountLineDto> OrderedLines =>
+        detail is null
+            ? Array.Empty<StockCountLineDto>()
+            : detail.Lines
+                .OrderBy(line => GetFamilyKey(line), StringComparer.OrdinalIgnoreCase)
+                .ThenBy(line => line.ItemCode, StringComparer.OrdinalIgnoreCase)
+                .ThenBy(line => line.Color, StringComparer.OrdinalIgnoreCase)
+                .ThenBy(line => line.LineNumber);
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        tenantId = user.GetTenantId();
+        companyId = user.GetActiveCompanyId();
+
+        if (!tenantId.HasValue || !companyId.HasValue)
+        {
+            return;
+        }
+
+        try
+        {
+            errorMessage = string.Empty;
+            detail = await StockQueries.GetCountByNumberAsync(tenantId.Value, companyId.Value, CountNumber);
+        }
+        catch (Exception exception)
+        {
+            errorMessage = exception.Message;
+            detail = null;
+        }
+    }
+
+    private static string GetFamilyKey(StockCountLineDto line)
+    {
+        var code = line.ItemCode?.Trim() ?? string.Empty;
+        if (string.IsNullOrWhiteSpace(code))
+        {
+            return "Sin familia";
+        }
+
+        var separators = new[] { '-', '/', ' ', '_', '.' };
+        foreach (var separator in separators)
+        {
+            var index = code.IndexOf(separator);
+            if (index > 0)
+            {
+                return code[..index].Trim().ToUpperInvariant();
+            }
+        }
+
+        return (code.Length <= 4 ? code : code[..4]).ToUpperInvariant();
+    }
+
+    private static string DisplayValue(string? value) => string.IsNullOrWhiteSpace(value) ? "-" : value;
+}

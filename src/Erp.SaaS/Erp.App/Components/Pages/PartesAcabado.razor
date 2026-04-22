@@ -1,0 +1,737 @@
+@page "/produccion/acabados"
+@attribute [Authorize(Roles = "TenantAdmin,TenantReader")]
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IBaseCatalogQueries BaseCatalogQueries
+@inject NavigationManager NavigationManager
+@inject IParteAcabadoQueries ParteAcabadoQueries
+@inject AppText T
+
+<PageTitle>@L("Producción / Acabados", "Producció / Acabats", "Production / Finishing")</PageTitle>
+
+<div class="page-header">
+    <div>
+        <p class="eyebrow">@T["menu.production"]</p>
+        <h1>@L("Órdenes / Partes de acabado", "Ordres / Parts d'acabat", "Finishing orders / jobs")</h1>
+        <p class="lead">@L("Listado operativo de trabajos de acabado sobre la SaaS local, con cliente, acabador, tejido, color, kg y piezas.", "Llistat operatiu de treballs d'acabat sobre la SaaS local, amb client, acabador, teixit, color, kg i peces.", "Operational list of finishing work in the local SaaS, including client, finisher, fabric, color, kg and pieces.")</p>
+    </div>
+    <div class="quick-links">
+        @if (canEdit)
+        {
+            <a class="primary-button link-button" href="/produccion/acabados/nueva">@L("Nueva orden de acabado", "Nova ordre d'acabat", "New finishing order")</a>
+        }
+    </div>
+</div>
+
+@if (!tenantId.HasValue || !companyId.HasValue)
+{
+    <div class="empty-state">
+        <p>@L("Selecciona una empresa activa para trabajar con órdenes / partes de acabado.", "Selecciona una empresa activa per treballar amb ordres / parts d'acabat.", "Select an active company to work with finishing orders / jobs.")</p>
+    </div>
+}
+else
+{
+    <section class="panel">
+        <div class="filter-row">
+            <input class="text-input" @bind="filter.Search" placeholder="@L("Buscar por número, cliente, acabador, tejido, color o notas", "Buscar per número, client, acabador, teixit, color o notes", "Search by number, client, finisher, fabric, color or notes")" />
+            <select class="sidebar-select compact-select" @bind="filter.Status" disabled="@isLoading">
+                <option value="">@L("Todos los estados", "Tots els estats", "All statuses")</option>
+                @foreach (var status in ParteAcabadoStatuses.All)
+                {
+                    <option value="@status">@GetStatusLabel(status)</option>
+                }
+            </select>
+            <select class="sidebar-select compact-select" value="@filter.MachineCode" @onchange="OnMachineChanged" disabled="@isLoading">
+                <option value="0">@L("Todas las máquinas", "Totes les màquines", "All machines")</option>
+                @foreach (var machine in machineOptions)
+                {
+                    <option value="@ParseMachineCode(machine.Code)">@FormatMachineOption(machine)</option>
+                }
+            </select>
+            <select class="sidebar-select compact-select" value="@filter.OperationCode" @onchange="OnOperationChanged" disabled="@isLoading">
+                <option value="0">@L("Todas las operaciones", "Totes les operacions", "All operations")</option>
+                @foreach (var operation in operationOptions)
+                {
+                    <option value="@ParseOperationCode(operation.Code)">@FormatOperationOption(operation)</option>
+                }
+            </select>
+            <button class="secondary-button" @onclick="SearchAsync" disabled="@isLoading">@(isLoading ? L("Cargando...", "Carregant...", "Loading...") : L("Buscar", "Buscar", "Search"))</button>
+        </div>
+        <div class="filter-row" style="margin-top: 0.85rem;">
+            <label class="checkbox-field compact">
+                <input type="checkbox" checked="@filter.LiveOnly" @onchange="OnLiveOnlyChanged" disabled="@isLoading" />
+                <span>@L("Solo trabajo vivo", "Només treball viu", "Live work only")</span>
+            </label>
+            @if (AvailableFinishers.Count > 0)
+            {
+                <div class="active-filter-row">
+                    <span class="muted">@L("Acabador rápido:", "Acabador ràpid:", "Quick finisher:")</span>
+                    <button class="@GetQuickFilterCss(!filter.FinisherCode.HasValue)" @onclick="() => ApplyFinisherFilterAsync(null)" type="button" disabled="@isLoading">@L("Todos", "Tots", "All")</button>
+                    @foreach (var finisher in AvailableFinishers)
+                    {
+                        <button class="@GetQuickFilterCss(filter.FinisherCode == finisher.Code)" @onclick="() => ApplyFinisherFilterAsync(finisher.Code)" type="button" disabled="@isLoading">
+                            @($"{finisher.Label} ({finisher.Count})")
+                        </button>
+                    }
+                </div>
+            }
+        </div>
+        <div class="filter-row results-toolbar" style="margin-top: 0.85rem;">
+                <span class="results-summary">
+                    @(totalCount == 0
+                        ? L("Sin resultados", "Sense resultats", "No results")
+                        : L($"Mostrando {PageStart}-{PageEnd} de {totalCount} órdenes / partes", $"Mostrant {PageStart}-{PageEnd} de {totalCount} ordres / parts", $"Showing {PageStart}-{PageEnd} of {totalCount} orders / jobs"))
+                </span>
+                <div class="view-toggle" role="tablist" aria-label="@L("Vista de acabados", "Vista d'acabats", "Finishing view")">
+                    <button class="@GetViewButtonCss(ListViewMode)" @onclick="() => SetViewMode(ListViewMode)" type="button" aria-pressed="@(viewMode == ListViewMode)">@L("Listado", "Llistat", "List")</button>
+                    <button class="@GetViewButtonCss(BoardViewMode)" @onclick="() => SetViewMode(BoardViewMode)" type="button" aria-pressed="@(viewMode == BoardViewMode)">@L("Tablero", "Tauler", "Board")</button>
+                </div>
+                <label class="field compact-field">
+                    <span>@L("Tamaño de página", "Mida de pàgina", "Page size")</span>
+                    <select class="sidebar-select compact-select" value="@filter.PageSize" @onchange="OnPageSizeChanged" disabled="@isLoading">
+                        <option value="25">25</option>
+                        <option value="50">50</option>
+                    <option value="100">100</option>
+                </select>
+            </label>
+        </div>
+    </section>
+
+    @if (!string.IsNullOrWhiteSpace(errorMessage))
+    {
+        <div class="alert danger">@errorMessage</div>
+    }
+
+    <section class="panel @(isLoading ? "loading-panel" : string.Empty)" aria-busy="@isLoading">
+        @if (isLoading)
+        {
+            <div class="loading-banner">
+                <span class="loading-indicator" aria-hidden="true"></span>
+                <span>@L("Cargando órdenes / partes de acabado...", "Carregant ordres / parts d'acabat...", "Loading finishing orders / jobs...")</span>
+            </div>
+        }
+
+        @if (viewMode == BoardViewMode)
+        {
+            <div class="kanban-board">
+                @foreach (var column in BoardColumns)
+                {
+                    var columnItems = GetItemsForStatus(column.Status);
+                    <section class="kanban-column">
+                        <header class="kanban-column-header">
+                            <div>
+                                <h3>@column.Label</h3>
+                                <p class="muted">@column.Description</p>
+                            </div>
+                            <span class="@GetStatusCss(column.Status)">@columnItems.Count</span>
+                        </header>
+
+                        @if (isLoading)
+                        {
+                            <div class="kanban-card kanban-card-skeleton">
+                                <span class="skeleton-line short"></span>
+                                <span class="skeleton-line"></span>
+                                <span class="skeleton-line short"></span>
+                            </div>
+                        }
+                        else if (columnItems.Count == 0)
+                        {
+                            <div class="kanban-empty">@L("Sin órdenes en esta columna.", "Sense ordres en aquesta columna.", "No orders in this column.")</div>
+                        }
+                        else
+                        {
+                            <div class="kanban-cards">
+                                @foreach (var item in columnItems)
+                                {
+                                    <article class="kanban-card">
+                                        <div class="kanban-card-top">
+                                            <div>
+                                                <p class="eyebrow">Parte @item.OrderNumber</p>
+                                                <h4>@GetFabricLabel(item)</h4>
+                                            </div>
+                                            <span class="@GetStatusCss(item.Status)">@GetStatusLabel(item.Status)</span>
+                                        </div>
+                                        <dl class="kanban-card-metrics">
+                                            <div>
+                                                <dt>@L("Cliente", "Client", "Client")</dt>
+                                                <dd>@GetDisplayText(item.ClientName, item.ClientCode)</dd>
+                                            </div>
+                                            <div>
+                                                <dt>@L("Acabador", "Acabador", "Finisher")</dt>
+                                                <dd>@GetDisplayText(item.FinisherName, item.FinisherCode)</dd>
+                                            </div>
+                                            <div>
+                                                <dt>@L("Máquina", "Màquina", "Machine")</dt>
+                                                <dd>@GetDisplayText(item.MachineName, item.MachineCode)</dd>
+                                            </div>
+                                            <div>
+                                                <dt>@L("Operación", "Operació", "Operation")</dt>
+                                                <dd>@GetDisplayText(item.OperationName, item.OperationCode)</dd>
+                                            </div>
+                                            <div>
+                                                <dt>@L("Origen", "Origen", "Origin")</dt>
+                                                <dd>@GetSampleLabel(item)</dd>
+                                            </div>
+                                            <div>
+                                                <dt>@L("Color", "Color", "Color")</dt>
+                                                <dd>@(string.IsNullOrWhiteSpace(item.PrimaryColor) ? "-" : item.PrimaryColor)</dd>
+                                            </div>
+                                            <div>
+                                                <dt>@L("Fecha", "Data", "Date")</dt>
+                                                <dd>@FormatDate(item.Date)</dd>
+                                            </div>
+                                        </dl>
+                                        <div class="kanban-card-totals">
+                                            <span>@L($"{item.TotalPieces:0.##} piezas", $"{item.TotalPieces:0.##} peces", $"{item.TotalPieces:0.##} pieces")</span>
+                                            <span>@item.TotalKilograms.ToString("0.##") kg</span>
+                                            <span>@L($"{item.LinesCount} líneas", $"{item.LinesCount} línies", $"{item.LinesCount} lines")</span>
+                                        </div>
+                                        <div class="inline-action-list">
+                                            <a class="inline-link" href="/produccion/acabados/editar/@item.OrderNumber">@(canEdit ? L("Abrir", "Obrir", "Open") : L("Ver", "Veure", "View"))</a>
+                                            <a class="inline-link" href="/produccion/acabados/@item.OrderNumber/imprimir" target="_blank" rel="noopener noreferrer">@L("Imprimir", "Imprimir", "Print")</a>
+                                        </div>
+                                    </article>
+                                }
+                            </div>
+                        }
+                    </section>
+                }
+            </div>
+            @if (totalCount > items.Count)
+            {
+                <p class="muted board-footnote">@L("El tablero refleja la página actual del filtro. Usa la paginación para recorrer el resto de órdenes.", "El tauler reflecteix la pàgina actual del filtre. Fes servir la paginació per recórrer la resta d'ordres.", "The board reflects the current filter page. Use pagination to review the rest of the orders.")</p>
+            }
+        }
+        else
+        {
+            <div class="table-scroll">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <SortableHeader Label="@L("Número", "Número", "Number")" IsActive="@(sortColumn == nameof(ParteAcabadoListItemDto.OrderNumber))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(ParteAcabadoListItemDto.OrderNumber), true))" />
+                            <SortableHeader Label="@L("Fecha", "Data", "Date")" IsActive="@(sortColumn == nameof(ParteAcabadoListItemDto.Date))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(ParteAcabadoListItemDto.Date), true))" />
+                            <th>@L("Estado", "Estat", "Status")</th>
+                            <SortableHeader Label="@L("Cliente", "Client", "Client")" IsActive="@(sortColumn == nameof(ParteAcabadoListItemDto.ClientName))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(ParteAcabadoListItemDto.ClientName)))" />
+                            <SortableHeader Label="@L("Acabador", "Acabador", "Finisher")" IsActive="@(sortColumn == nameof(ParteAcabadoListItemDto.FinisherName))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(ParteAcabadoListItemDto.FinisherName)))" />
+                            <SortableHeader Label="@L("Máquina", "Màquina", "Machine")" IsActive="@(sortColumn == nameof(ParteAcabadoListItemDto.MachineName))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(ParteAcabadoListItemDto.MachineName)))" />
+                            <SortableHeader Label="@L("Operación", "Operació", "Operation")" IsActive="@(sortColumn == nameof(ParteAcabadoListItemDto.OperationName))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(ParteAcabadoListItemDto.OperationName)))" />
+                            <th>@L("Origen", "Origen", "Origin")</th>
+                            <SortableHeader Label="@L("Tejido", "Teixit", "Fabric")" IsActive="@(sortColumn == nameof(ParteAcabadoListItemDto.PrimaryFabricCode))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(ParteAcabadoListItemDto.PrimaryFabricCode)))" />
+                            <SortableHeader Label="@L("Color", "Color", "Color")" IsActive="@(sortColumn == nameof(ParteAcabadoListItemDto.PrimaryColor))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(ParteAcabadoListItemDto.PrimaryColor)))" />
+                            <SortableHeader Label="@L("Piezas", "Peces", "Pieces")" IsActive="@(sortColumn == nameof(ParteAcabadoListItemDto.TotalPieces))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(ParteAcabadoListItemDto.TotalPieces), true))" />
+                            <SortableHeader Label="Kg" IsActive="@(sortColumn == nameof(ParteAcabadoListItemDto.TotalKilograms))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(ParteAcabadoListItemDto.TotalKilograms), true))" />
+                            <SortableHeader Label="@L("Fuente", "Font", "Source")" IsActive="@(sortColumn == nameof(ParteAcabadoListItemDto.Origin))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(ParteAcabadoListItemDto.Origin)))" />
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (isLoading)
+                        {
+                            @for (var index = 0; index < 5; index++)
+                            {
+                                <tr class="table-skeleton-row">
+                                    <td><span class="skeleton-line short"></span></td>
+                                    <td><span class="skeleton-line short"></span></td>
+                                    <td><span class="skeleton-line short"></span></td>
+                                    <td><span class="skeleton-line"></span></td>
+                                    <td><span class="skeleton-line"></span></td>
+                                    <td><span class="skeleton-line"></span></td>
+                                    <td><span class="skeleton-line short"></span></td>
+                                    <td><span class="skeleton-line short"></span></td>
+                                    <td><span class="skeleton-line short"></span></td>
+                                    <td><span class="skeleton-line short"></span></td>
+                                    <td><span class="skeleton-line short"></span></td>
+                                    <td><span class="skeleton-line short"></span></td>
+                                    <td><span class="skeleton-line short"></span></td>
+                                    <td><span class="skeleton-line short"></span></td>
+                                </tr>
+                            }
+                        }
+                        else if (items.Count == 0)
+                        {
+                            <tr>
+                                <td colspan="14" class="table-empty">@L("No hay órdenes / partes de acabado para mostrar.", "No hi ha ordres / parts d'acabat per mostrar.", "There are no finishing orders / jobs to display.")</td>
+                            </tr>
+                        }
+                        else
+                        {
+                            @foreach (var item in items)
+                            {
+                                <tr>
+                                    <td>@item.OrderNumber</td>
+                                    <td>@FormatDate(item.Date)</td>
+                                    <td><span class="@GetStatusCss(item.Status)">@GetStatusLabel(item.Status)</span></td>
+                                    <td>
+                                        <div>@GetDisplayText(item.ClientName, item.ClientCode)</div>
+                                    </td>
+                                    <td>@GetDisplayText(item.FinisherName, item.FinisherCode)</td>
+                                    <td>@GetDisplayText(item.MachineName, item.MachineCode)</td>
+                                    <td>@GetDisplayText(item.OperationName, item.OperationCode)</td>
+                                    <td>
+                                        @if (!string.IsNullOrWhiteSpace(item.SourceSampleCode))
+                                        {
+                                            <a class="inline-link" href="@BuildSampleUrl(item)">@GetSampleLabel(item)</a>
+                                        }
+                                        else
+                                        {
+                                            <span class="muted">-</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        <div>@GetFabricLabel(item)</div>
+                                    </td>
+                                    <td>@(string.IsNullOrWhiteSpace(item.PrimaryColor) ? "-" : item.PrimaryColor)</td>
+                                    <td>@item.TotalPieces.ToString("0.##")</td>
+                                    <td>@item.TotalKilograms.ToString("0.##")</td>
+                                    <td>@item.Origin</td>
+                                    <td>
+                                        <div class="inline-action-list">
+                                            <a class="inline-link" href="/produccion/acabados/editar/@item.OrderNumber">@(canEdit ? L("Abrir", "Obrir", "Open") : L("Ver", "Veure", "View"))</a>
+                                            <a class="inline-link" href="/produccion/acabados/@item.OrderNumber/imprimir" target="_blank" rel="noopener noreferrer">@L("Imprimir", "Imprimir", "Print")</a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+
+        <div class="pagination-bar">
+            <span class="muted">@L($"Página {filter.Page} de {TotalPages}", $"Pàgina {filter.Page} de {TotalPages}", $"Page {filter.Page} of {TotalPages}")</span>
+            <div class="pagination-actions">
+                <button class="secondary-button" @onclick="() => ChangePageAsync(1)" disabled="@(!CanGoPrevious || isLoading)">@L("Primera", "Primera", "First")</button>
+                <button class="secondary-button" @onclick="() => ChangePageAsync(filter.Page - 1)" disabled="@(!CanGoPrevious || isLoading)">@L("Anterior", "Anterior", "Previous")</button>
+                <button class="secondary-button" @onclick="() => ChangePageAsync(filter.Page + 1)" disabled="@(!CanGoNext || isLoading)">@L("Siguiente", "Següent", "Next")</button>
+                <button class="secondary-button" @onclick="() => ChangePageAsync(TotalPages)" disabled="@(!CanGoNext || isLoading)">@L("Última", "Última", "Last")</button>
+            </div>
+        </div>
+    </section>
+}
+
+@code {
+    [SupplyParameterFromQuery(Name = "q")]
+    public string? SearchQuery { get; set; }
+
+    [SupplyParameterFromQuery(Name = "status")]
+    public string? StatusQuery { get; set; }
+
+    [SupplyParameterFromQuery(Name = "finisher")]
+    public int? FinisherQuery { get; set; }
+
+    [SupplyParameterFromQuery(Name = "machine")]
+    public int? MachineQuery { get; set; }
+
+    [SupplyParameterFromQuery(Name = "operation")]
+    public int? OperationQuery { get; set; }
+
+    [SupplyParameterFromQuery(Name = "sourceKind")]
+    public string? SourceKindQuery { get; set; }
+
+    [SupplyParameterFromQuery(Name = "sourceCode")]
+    public string? SourceCodeQuery { get; set; }
+
+    [SupplyParameterFromQuery(Name = "live")]
+    public bool? LiveOnlyQuery { get; set; }
+
+    [SupplyParameterFromQuery(Name = "view")]
+    public string? ViewQuery { get; set; }
+
+    [SupplyParameterFromQuery(Name = "page")]
+    public int? PageQuery { get; set; }
+
+    [SupplyParameterFromQuery(Name = "pageSize")]
+    public int? PageSizeQuery { get; set; }
+
+    [SupplyParameterFromQuery(Name = "sort")]
+    public string? SortQuery { get; set; }
+
+    [SupplyParameterFromQuery(Name = "desc")]
+    public bool? DescQuery { get; set; }
+
+    private Guid? tenantId;
+    private Guid? companyId;
+    private bool canEdit;
+    private bool isLoading;
+    private ParteAcabadoFilter filter = new();
+    private IReadOnlyCollection<BaseCatalogListItemDto> machineOptions = [];
+    private IReadOnlyCollection<BaseCatalogListItemDto> operationOptions = [];
+    private IReadOnlyCollection<ParteAcabadoListItemDto> items = [];
+    private string errorMessage = string.Empty;
+    private string viewMode = ListViewMode;
+    private string sortColumn = nameof(ParteAcabadoListItemDto.Date);
+    private bool sortDescending = true;
+    private int totalCount;
+    private string L(string spanish, string catalan, string english) =>
+        T.CurrentLanguage switch
+        {
+            AppLanguages.Catalan => catalan,
+            AppLanguages.English => english,
+            _ => spanish
+        };
+    private IReadOnlyList<FinisherQuickFilter> AvailableFinishers => items
+        .Where(item => item.FinisherCode > 0 || !string.IsNullOrWhiteSpace(item.FinisherName))
+        .GroupBy(item => new { item.FinisherCode, item.FinisherName })
+        .Select(group => new FinisherQuickFilter(
+            group.Key.FinisherCode,
+            GetDisplayText(group.Key.FinisherName, group.Key.FinisherCode),
+            group.Count()))
+        .OrderBy(item => item.Label)
+        .ToList();
+    private const string ListViewMode = "list";
+    private const string BoardViewMode = "board";
+    private IReadOnlyList<BoardColumnDefinition> BoardColumns =>
+    [
+        new(ParteAcabadoStatuses.Pending, L("Pendiente", "Pendent", "Pending"), L("Trabajos listos para arrancar.", "Treballs a punt per arrencar.", "Work ready to start.")),
+        new(ParteAcabadoStatuses.InProgress, L("En proceso", "En procés", "In progress"), L("Partes ya movidos a producción.", "Parts ja moguts a producció.", "Jobs already moved to production.")),
+        new(ParteAcabadoStatuses.Finished, L("Terminadas", "Acabades", "Finished"), L("Partes cerrados y recibidos.", "Parts tancats i rebuts.", "Jobs closed and received.")),
+        new(ParteAcabadoStatuses.Cancelled, L("Anuladas", "Anul·lades", "Cancelled"), L("Partes cerrados sin avance operativo.", "Parts tancats sense avanç operatiu.", "Jobs closed without operational progress."))
+    ];
+    private int TotalPages => Math.Max(1, (int)Math.Ceiling(totalCount / (double)filter.PageSize));
+    private bool CanGoPrevious => filter.Page > 1;
+    private bool CanGoNext => filter.Page < TotalPages;
+    private int PageStart => totalCount == 0 ? 0 : ((filter.Page - 1) * filter.PageSize) + 1;
+    private int PageEnd => totalCount == 0 ? 0 : Math.Min(filter.Page * filter.PageSize, totalCount);
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        tenantId = user.GetTenantId();
+        companyId = user.GetActiveCompanyId();
+        canEdit = user.IsPlatformAdmin() || user.IsInRole(PlatformRoles.TenantAdmin);
+        await LoadMachineOptionsAsync();
+        await LoadOperationOptionsAsync();
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        ApplyQueryState();
+        await LoadAsync();
+    }
+
+    private async Task LoadAsync()
+    {
+        errorMessage = string.Empty;
+        if (!tenantId.HasValue || !companyId.HasValue)
+        {
+            items = [];
+            totalCount = 0;
+            return;
+        }
+
+        isLoading = true;
+        await InvokeAsync(StateHasChanged);
+        try
+        {
+            filter.SortColumn = sortColumn;
+            filter.SortDescending = sortDescending;
+            var result = await ParteAcabadoQueries.SearchAsync(tenantId.Value, companyId.Value, filter);
+            items = result.Items;
+            totalCount = result.TotalCount;
+            if (filter.Page > TotalPages)
+            {
+                filter.Page = TotalPages;
+                result = await ParteAcabadoQueries.SearchAsync(tenantId.Value, companyId.Value, filter);
+                items = result.Items;
+                totalCount = result.TotalCount;
+            }
+        }
+        catch (Exception exception)
+        {
+            errorMessage = exception.Message;
+            items = [];
+            totalCount = 0;
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private async Task SearchAsync()
+    {
+        filter.Page = 1;
+        UpdateQueryState();
+        await Task.CompletedTask;
+    }
+
+    private async Task ChangePageAsync(int page)
+    {
+        filter.Page = Math.Clamp(page, 1, TotalPages);
+        UpdateQueryState();
+        await Task.CompletedTask;
+    }
+
+    private async Task SetSortAsync(string column, bool defaultDescending = false)
+    {
+        if (string.Equals(sortColumn, column, StringComparison.Ordinal))
+        {
+            sortDescending = !sortDescending;
+        }
+        else
+        {
+            sortColumn = column;
+            sortDescending = defaultDescending;
+        }
+
+        filter.Page = 1;
+        UpdateQueryState();
+        await Task.CompletedTask;
+    }
+
+    private async Task OnPageSizeChanged(ChangeEventArgs args)
+    {
+        if (int.TryParse(args.Value?.ToString(), out var pageSize))
+        {
+            filter.PageSize = pageSize;
+            filter.Page = 1;
+            UpdateQueryState();
+        }
+    }
+
+    private void SetViewMode(string mode)
+    {
+        viewMode = mode;
+        UpdateQueryState();
+    }
+
+    private string GetViewButtonCss(string mode) =>
+        viewMode == mode ? "secondary-button view-toggle-button active" : "secondary-button view-toggle-button";
+
+    private string GetQuickFilterCss(bool isActive) =>
+        isActive ? "secondary-button quick-filter-button active-filter-chip" : "secondary-button quick-filter-button";
+
+    private IReadOnlyList<ParteAcabadoListItemDto> GetItemsForStatus(string status) =>
+        items.Where(item => string.Equals(item.Status, status, StringComparison.OrdinalIgnoreCase))
+             .OrderByDescending(item => item.Date ?? DateTime.MinValue)
+             .ThenByDescending(item => item.OrderNumber)
+             .ToList();
+
+    private async Task ApplyFinisherFilterAsync(int? finisherCode)
+    {
+        filter.FinisherCode = finisherCode;
+        filter.Page = 1;
+        UpdateQueryState();
+        await Task.CompletedTask;
+    }
+
+    private async Task OnMachineChanged(ChangeEventArgs args)
+    {
+        var machineCode = ParseMachineCode(args.Value?.ToString() ?? string.Empty);
+        filter.MachineCode = machineCode > 0 ? machineCode : null;
+        filter.Page = 1;
+        UpdateQueryState();
+        await Task.CompletedTask;
+    }
+
+    private async Task OnOperationChanged(ChangeEventArgs args)
+    {
+        var operationCode = ParseOperationCode(args.Value?.ToString() ?? string.Empty);
+        filter.OperationCode = operationCode > 0 ? operationCode : null;
+        filter.Page = 1;
+        UpdateQueryState();
+        await Task.CompletedTask;
+    }
+
+    private async Task OnLiveOnlyChanged(ChangeEventArgs args)
+    {
+        filter.LiveOnly = args.Value is bool boolValue && boolValue;
+        if (!filter.LiveOnly)
+        {
+            UpdateQueryState();
+            return;
+        }
+
+        if (string.Equals(filter.Status, ParteAcabadoStatuses.Finished, StringComparison.OrdinalIgnoreCase) ||
+            string.Equals(filter.Status, ParteAcabadoStatuses.Cancelled, StringComparison.OrdinalIgnoreCase))
+        {
+            filter.Status = string.Empty;
+        }
+
+        filter.Page = 1;
+        UpdateQueryState();
+    }
+
+    private void ApplyQueryState()
+    {
+        filter.Search = SearchQuery?.Trim() ?? string.Empty;
+        filter.Status = NormalizeStatusFilter(StatusQuery);
+        filter.FinisherCode = FinisherQuery > 0 ? FinisherQuery : null;
+        filter.MachineCode = MachineQuery > 0 ? MachineQuery : null;
+        filter.OperationCode = OperationQuery > 0 ? OperationQuery : null;
+        filter.SourceSampleKind = ParteAcabadoSourceKinds.Normalize(SourceKindQuery);
+        filter.SourceSampleCode = SourceCodeQuery?.Trim() ?? string.Empty;
+        filter.LiveOnly = LiveOnlyQuery.GetValueOrDefault();
+        filter.Page = Math.Max(PageQuery.GetValueOrDefault(1), 1);
+        filter.PageSize = PageSizeQuery is 25 or 50 or 100 ? PageSizeQuery.Value : 25;
+        sortColumn = NormalizeSortColumn(SortQuery);
+        sortDescending = DescQuery ?? true;
+        filter.SortColumn = sortColumn;
+        filter.SortDescending = sortDescending;
+        viewMode = string.Equals(ViewQuery, BoardViewMode, StringComparison.OrdinalIgnoreCase) ? BoardViewMode : ListViewMode;
+
+        if (filter.LiveOnly &&
+            (string.Equals(filter.Status, ParteAcabadoStatuses.Finished, StringComparison.OrdinalIgnoreCase) ||
+             string.Equals(filter.Status, ParteAcabadoStatuses.Cancelled, StringComparison.OrdinalIgnoreCase)))
+        {
+            filter.Status = string.Empty;
+        }
+    }
+
+    private void UpdateQueryState()
+    {
+        var uri = NavigationManager.GetUriWithQueryParameters(new Dictionary<string, object?>
+        {
+            ["q"] = string.IsNullOrWhiteSpace(filter.Search) ? null : filter.Search,
+            ["status"] = string.IsNullOrWhiteSpace(filter.Status) ? null : filter.Status,
+            ["finisher"] = filter.FinisherCode,
+            ["machine"] = filter.MachineCode,
+            ["operation"] = filter.OperationCode,
+            ["sourceKind"] = string.IsNullOrWhiteSpace(filter.SourceSampleKind) ? null : filter.SourceSampleKind,
+            ["sourceCode"] = string.IsNullOrWhiteSpace(filter.SourceSampleCode) ? null : filter.SourceSampleCode,
+            ["live"] = filter.LiveOnly ? true : null,
+            ["view"] = string.Equals(viewMode, BoardViewMode, StringComparison.OrdinalIgnoreCase) ? BoardViewMode : null,
+            ["page"] = filter.Page > 1 ? filter.Page : null,
+            ["pageSize"] = filter.PageSize != 25 ? filter.PageSize : null,
+            ["sort"] = string.Equals(sortColumn, nameof(ParteAcabadoListItemDto.Date), StringComparison.Ordinal) ? null : sortColumn,
+            ["desc"] = sortDescending ? null : false
+        });
+
+        NavigationManager.NavigateTo(uri, replace: true);
+    }
+
+    private static string NormalizeStatusFilter(string? status)
+    {
+        if (string.IsNullOrWhiteSpace(status))
+        {
+            return string.Empty;
+        }
+
+        var match = ParteAcabadoStatuses.All.FirstOrDefault(item => string.Equals(item, status, StringComparison.OrdinalIgnoreCase));
+        return match ?? string.Empty;
+    }
+
+    private static string NormalizeSortColumn(string? sortColumn) => sortColumn switch
+    {
+        nameof(ParteAcabadoListItemDto.OrderNumber) => nameof(ParteAcabadoListItemDto.OrderNumber),
+        nameof(ParteAcabadoListItemDto.Date) => nameof(ParteAcabadoListItemDto.Date),
+        nameof(ParteAcabadoListItemDto.ClientName) => nameof(ParteAcabadoListItemDto.ClientName),
+        nameof(ParteAcabadoListItemDto.FinisherName) => nameof(ParteAcabadoListItemDto.FinisherName),
+        nameof(ParteAcabadoListItemDto.MachineName) => nameof(ParteAcabadoListItemDto.MachineName),
+        nameof(ParteAcabadoListItemDto.OperationName) => nameof(ParteAcabadoListItemDto.OperationName),
+        nameof(ParteAcabadoListItemDto.PrimaryFabricCode) => nameof(ParteAcabadoListItemDto.PrimaryFabricCode),
+        nameof(ParteAcabadoListItemDto.PrimaryColor) => nameof(ParteAcabadoListItemDto.PrimaryColor),
+        nameof(ParteAcabadoListItemDto.TotalPieces) => nameof(ParteAcabadoListItemDto.TotalPieces),
+        nameof(ParteAcabadoListItemDto.TotalKilograms) => nameof(ParteAcabadoListItemDto.TotalKilograms),
+        nameof(ParteAcabadoListItemDto.Origin) => nameof(ParteAcabadoListItemDto.Origin),
+        _ => nameof(ParteAcabadoListItemDto.Date)
+    };
+
+    private static string FormatDate(DateTime? value) => value?.ToString("dd/MM/yyyy") ?? "-";
+
+    private static string GetDisplayText(string name, int code)
+    {
+        if (!string.IsNullOrWhiteSpace(name))
+        {
+            return name;
+        }
+
+        return code > 0 ? code.ToString() : "-";
+    }
+
+    private async Task LoadMachineOptionsAsync()
+    {
+        if (!tenantId.HasValue || !companyId.HasValue)
+        {
+            machineOptions = [];
+            return;
+        }
+
+        var result = await BaseCatalogQueries.SearchAsync(tenantId.Value, companyId.Value, BaseCatalogKeys.Machines, new BaseCatalogFilter
+        {
+            Page = 1,
+            PageSize = 200
+        });
+
+        machineOptions = result.Items
+            .Where(item => int.TryParse(item.Code, out _))
+            .OrderBy(item => ParseMachineCode(item.Code))
+            .ToArray();
+    }
+
+    private async Task LoadOperationOptionsAsync()
+    {
+        if (!tenantId.HasValue || !companyId.HasValue)
+        {
+            operationOptions = [];
+            return;
+        }
+
+        var result = await BaseCatalogQueries.SearchAsync(tenantId.Value, companyId.Value, BaseCatalogKeys.Operations, new BaseCatalogFilter
+        {
+            Page = 1,
+            PageSize = 200
+        });
+
+        operationOptions = result.Items
+            .Where(item => int.TryParse(item.Code, out _))
+            .OrderBy(item => ParseOperationCode(item.Code))
+            .ToArray();
+    }
+
+    private static string GetFabricLabel(ParteAcabadoListItemDto item)
+    {
+        if (!string.IsNullOrWhiteSpace(item.PrimaryFabricDescription))
+        {
+            return item.PrimaryFabricDescription;
+        }
+
+        return string.IsNullOrWhiteSpace(item.PrimaryFabricCode) ? "-" : item.PrimaryFabricCode;
+    }
+
+    private static string GetSampleLabel(ParteAcabadoListItemDto item) =>
+        string.IsNullOrWhiteSpace(item.SourceSampleCode)
+            ? "-"
+            : item.SourceSampleLineNumber.HasValue
+                ? $"{ParteAcabadoSourceKinds.GetLabel(item.SourceSampleKind)} {item.SourceSampleCode} · L{item.SourceSampleLineNumber.Value}"
+                : $"{ParteAcabadoSourceKinds.GetLabel(item.SourceSampleKind)} {item.SourceSampleCode}";
+
+    private static string BuildSampleUrl(ParteAcabadoListItemDto item) =>
+        string.IsNullOrWhiteSpace(item.SourceSampleCode)
+            ? "/articulos/muestras"
+            : $"{ParteAcabadoSourceKinds.GetRouteBase(item.SourceSampleKind)}/editar/{Uri.EscapeDataString(item.SourceSampleCode.Trim())}";
+
+    private string GetStatusLabel(string status) => status switch
+    {
+        ParteAcabadoStatuses.Pending => L("Pendiente", "Pendent", "Pending"),
+        ParteAcabadoStatuses.InProgress => L("En proceso", "En procés", "In progress"),
+        ParteAcabadoStatuses.Finished => L("Terminado", "Acabat", "Finished"),
+        ParteAcabadoStatuses.Cancelled => L("Anulado", "Anul·lat", "Cancelled"),
+        _ => status
+    };
+
+    private static string GetStatusCss(string status) => status switch
+    {
+        ParteAcabadoStatuses.Pending => "status-pill",
+        ParteAcabadoStatuses.InProgress => "status-pill status-pill-warning",
+        ParteAcabadoStatuses.Finished => "status-pill status-pill-success",
+        ParteAcabadoStatuses.Cancelled => "status-pill status-pill-danger",
+        _ => "status-pill"
+    };
+
+    private static int ParseMachineCode(string code) =>
+        int.TryParse(code, out var parsedValue) ? parsedValue : 0;
+
+    private static string FormatMachineOption(BaseCatalogListItemDto item) =>
+        string.IsNullOrWhiteSpace(item.Name) ? item.Code : $"{item.Code} · {item.Name}";
+
+    private static int ParseOperationCode(string code) =>
+        int.TryParse(code, out var parsedValue) ? parsedValue : 0;
+
+    private static string FormatOperationOption(BaseCatalogListItemDto item) =>
+        string.IsNullOrWhiteSpace(item.Name) ? item.Code : $"{item.Code} · {item.Name}";
+
+    private sealed record BoardColumnDefinition(string Status, string Label, string Description);
+    private sealed record FinisherQuickFilter(int Code, string Label, int Count);
+}

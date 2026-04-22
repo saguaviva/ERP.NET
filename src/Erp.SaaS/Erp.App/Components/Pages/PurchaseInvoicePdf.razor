@@ -1,0 +1,233 @@
+@page "/compras/facturas/{InvoiceNumber:int}/pdf"
+@attribute [Authorize(Roles = "TenantAdmin,TenantReader")]
+@layout EmptyLayout
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IPurchaseInvoiceQueries PurchaseInvoiceQueries
+
+<PageTitle>Factura proveedor @InvoiceNumber</PageTitle>
+
+@if (!tenantId.HasValue || !companyId.HasValue || invoice is null)
+{
+    <div class="print-sheet">
+        <p>No se ha encontrado la factura de proveedor solicitada.</p>
+    </div>
+}
+else
+{
+    <article class="print-sheet">
+        <header class="print-header">
+            <div>
+                <p class="eyebrow">Compras</p>
+                <h1>Factura de proveedor @invoice.DisplayNumber</h1>
+                <p class="muted">@invoice.CompanyName · Centro @invoice.CompanyLegacyCenterCode</p>
+            </div>
+            <div class="print-meta">
+                <div><strong>Fecha:</strong> @invoice.DocumentDate.ToString("dd/MM/yyyy")</div>
+                <div><strong>Vencimiento:</strong> @(invoice.DueDate?.ToString("dd/MM/yyyy") ?? "Sin dato")</div>
+                <div><strong>Estado:</strong> @FormatStatus(invoice.Status)</div>
+            </div>
+        </header>
+
+        <section class="comparison-grid">
+            <section class="info-card">
+                <h2>Proveedor</h2>
+                <p><strong>@invoice.SupplierName</strong></p>
+                <p class="muted">@DisplayValue(invoice.SupplierTaxId)</p>
+                <p class="muted">@SupplierLocation</p>
+                <p class="muted">Factura proveedor: @DisplayValue(invoice.SupplierDocumentNumber)</p>
+            </section>
+            <section class="info-card">
+                <h2>Resumen</h2>
+                <div class="receipt-kv-grid">
+                    <div>
+                        <span class="muted">Base</span>
+                        <strong>@invoice.TotalNetAmount.ToString("0.00") €</strong>
+                    </div>
+                    <div>
+                        <span class="muted">IVA</span>
+                        <strong>@invoice.TotalTaxAmount.ToString("0.00") €</strong>
+                    </div>
+                    <div>
+                        <span class="muted">Total</span>
+                        <strong>@invoice.TotalAmount.ToString("0.00") €</strong>
+                    </div>
+                    <div>
+                        <span class="muted">Pagado</span>
+                        <strong>@invoice.AmountPaid.ToString("0.00") €</strong>
+                    </div>
+                    <div>
+                        <span class="muted">Pendiente</span>
+                        <strong>@invoice.OutstandingAmount.ToString("0.00") €</strong>
+                    </div>
+                    <div>
+                        <span class="muted">Último pago</span>
+                        <strong>@(invoice.LastPaymentUtc?.ToLocalTime().ToString("dd/MM/yyyy HH:mm") ?? "Sin pago")</strong>
+                    </div>
+                    <div>
+                        <span class="muted">Recepciones</span>
+                        <strong>@invoice.Receipts.Count</strong>
+                    </div>
+                </div>
+            </section>
+        </section>
+
+        <section class="panel">
+            <h2>Recepciones enlazadas</h2>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Entrada</th>
+                        <th>Pedido</th>
+                        <th>Fecha</th>
+                        <th>Cantidad</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (invoice.Receipts.Count == 0)
+                    {
+                        <tr><td colspan="4" class="table-empty">Sin recepciones enlazadas.</td></tr>
+                    }
+                    else
+                    {
+                        @foreach (var receipt in invoice.Receipts)
+                        {
+                            <tr>
+                                <td>@receipt.DisplayNumber</td>
+                                <td>@receipt.OrderNumber</td>
+                                <td>@receipt.ReceiptDate.ToString("dd/MM/yyyy")</td>
+                                <td>@receipt.TotalReceivedQuantity.ToString("0.###")</td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </section>
+
+        <section class="panel">
+            <h2>Líneas</h2>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Línea</th>
+                        <th>Artículo</th>
+                        <th>Descripción</th>
+                        <th>Cantidad</th>
+                        <th>Precio</th>
+                        <th>IVA</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var line in invoice.Lines)
+                    {
+                        <tr>
+                            <td>@line.LineNumber</td>
+                            <td>@DisplayValue(line.ItemCode)</td>
+                            <td>@line.Description</td>
+                            <td>@line.Quantity.ToString("0.###") @line.UnitOfMeasure</td>
+                            <td>@line.UnitPrice.ToString("0.0000")</td>
+                            <td>@line.TaxRate.ToString("0.##") %</td>
+                            <td>@line.LineTotal.ToString("0.00") €</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </section>
+
+        @if (invoice.Payments.Count > 0)
+        {
+            <section class="panel">
+                <h2>Pagos registrados</h2>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Fecha</th>
+                            <th>Importe</th>
+                            <th>Método</th>
+                            <th>Referencia</th>
+                            <th>Notas</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var payment in invoice.Payments)
+                        {
+                            <tr>
+                                <td>@payment.PaymentNumber</td>
+                                <td>@payment.PaymentDate.ToString("dd/MM/yyyy")</td>
+                                <td>@payment.Amount.ToString("0.00") €</td>
+                                <td>@DisplayValue(payment.Method)</td>
+                                <td>@DisplayValue(payment.Reference)</td>
+                                <td>@DisplayValue(payment.Notes)</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </section>
+        }
+
+        @if (!string.IsNullOrWhiteSpace(invoice.Notes))
+        {
+            <section class="panel">
+                <h2>Notas</h2>
+                <p>@invoice.Notes</p>
+            </section>
+        }
+    </article>
+}
+
+@code {
+    [Parameter]
+    public int InvoiceNumber { get; set; }
+
+    private Guid? tenantId;
+    private Guid? companyId;
+    private PurchaseInvoiceDetailDto? invoice;
+
+    private string SupplierLocation
+    {
+        get
+        {
+            if (invoice is null)
+            {
+                return string.Empty;
+            }
+
+            var parts = new[]
+            {
+                invoice.SupplierAddress,
+                $"{invoice.SupplierPostalCode} {invoice.SupplierCity}".Trim(),
+                invoice.SupplierProvince,
+                invoice.SupplierCountry
+            }.Where(part => !string.IsNullOrWhiteSpace(part));
+
+            return string.Join(" · ", parts);
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        tenantId = user.GetTenantId();
+        companyId = user.GetActiveCompanyId();
+
+        if (!tenantId.HasValue || !companyId.HasValue)
+        {
+            return;
+        }
+
+        invoice = await PurchaseInvoiceQueries.GetInvoiceByNumberAsync(tenantId.Value, companyId.Value, InvoiceNumber);
+    }
+
+    private static string FormatStatus(string status) => status switch
+    {
+        PurchaseInvoiceStatuses.Draft => "Borrador",
+        PurchaseInvoiceStatuses.Registered => "Registrada",
+        PurchaseInvoiceStatuses.Paid => "Pagada",
+        PurchaseInvoiceStatuses.Cancelled => "Anulada",
+        _ => status
+    };
+
+    private static string DisplayValue(string value) => string.IsNullOrWhiteSpace(value) ? "Sin dato" : value;
+}

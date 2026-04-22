@@ -1,0 +1,47 @@
+@implements IDisposable
+@inject AppText T
+@inject NavigationManager NavigationManager
+
+<div class="sidebar-panel language-panel">
+    <div class="sidebar-label">@T["language.label"]</div>
+    <form method="post" action="/account/set-language" data-enhance="false" class="language-switcher-form">
+        <AntiforgeryToken />
+        <input type="hidden" name="returnUrl" value="@CurrentPath" />
+        <select class="sidebar-select" name="culture" onchange="this.form.submit()">
+            @foreach (var option in AppLanguages.Supported)
+            {
+                <option value="@option.Key" selected="@(string.Equals(currentLanguage, option.Key, StringComparison.OrdinalIgnoreCase))">@option.DisplayName</option>
+            }
+        </select>
+    </form>
+</div>
+
+@code {
+    private string currentLanguage = AppLanguages.Spanish;
+
+    private string CurrentPath
+    {
+        get
+        {
+            var relativePath = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
+            return string.IsNullOrWhiteSpace(relativePath) ? "/" : $"/{relativePath}";
+        }
+    }
+
+    protected override void OnInitialized()
+    {
+        currentLanguage = T.CurrentLanguage;
+        NavigationManager.LocationChanged += OnLocationChanged;
+    }
+
+    private void OnLocationChanged(object? sender, Microsoft.AspNetCore.Components.Routing.LocationChangedEventArgs e)
+    {
+        currentLanguage = T.CurrentLanguage;
+        _ = InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        NavigationManager.LocationChanged -= OnLocationChanged;
+    }
+}

@@ -2,7 +2,6 @@ using Erp.Application.Clients;
 using Erp.Application.Auditing;
 using Erp.Application.Companies;
 using Erp.Application.Contexts;
-using Erp.Application.LegacySync;
 using Erp.Application.Tenants;
 using Erp.Domain.Common;
 using Erp.Infrastructure.MySql.Database;
@@ -73,6 +72,7 @@ public sealed class MySqlClienteService : IClienteQueries, IClienteService
                 SELECT COUNT(*)
                 FROM clients c
                 WHERE c.CENTRO IN ({string.Join(", ", mainCenterParameterNames)})
+                  AND COALESCE(c.is_deleted, 0) = 0
                   AND (@includeBlocked = 1 OR COALESCE(c.BLOQUEADO, 0) = 0)
                   AND (
                         @search = ''
@@ -111,6 +111,7 @@ public sealed class MySqlClienteService : IClienteQueries, IClienteService
                 COALESCE(c.BLOQUEADO, 0) AS BLOQUEADO
             FROM clients c
             WHERE c.CENTRO IN ({string.Join(", ", mainCenterParameterNames)})
+              AND COALESCE(c.is_deleted, 0) = 0
               AND (@includeBlocked = 1 OR COALESCE(c.BLOQUEADO, 0) = 0)
               AND (
                     @search = ''
@@ -186,6 +187,7 @@ public sealed class MySqlClienteService : IClienteQueries, IClienteService
             FROM clients
             WHERE CODI = @code
               AND CENTRO IN ({string.Join(", ", centerParameterNames)})
+              AND COALESCE(is_deleted, 0) = 0
             ORDER BY CASE WHEN CENTRO = @activeCenterCode THEN 0 ELSE 1 END, CENTRO
             LIMIT 1;
             """;
@@ -281,6 +283,8 @@ public sealed class MySqlClienteService : IClienteQueries, IClienteService
             LEFT JOIN app_users pu ON pu.id = dr.preferred_updated_by_user_id
             WHERE c1.CENTRO IN ({string.Join(", ", leftCenterParameterNames)})
               AND c2.CENTRO IN ({string.Join(", ", rightCenterParameterNames)})
+              AND COALESCE(c1.is_deleted, 0) = 0
+              AND COALESCE(c2.is_deleted, 0) = 0
               AND (
                     (UPPER(TRIM(COALESCE(c1.NIF, ''))) <> '' AND UPPER(TRIM(COALESCE(c1.NIF, ''))) = UPPER(TRIM(COALESCE(c2.NIF, ''))))
                  OR (LOWER(TRIM(COALESCE(c1.EMAIL1, ''))) <> '' AND (
@@ -416,6 +420,7 @@ public sealed class MySqlClienteService : IClienteQueries, IClienteService
              AND dr.right_client_code = GREATEST(c.CODI, @code)
             LEFT JOIN app_users u ON u.id = dr.updated_by_user_id
             WHERE CENTRO IN ({string.Join(", ", centerParameterNames)})
+              AND COALESCE(c.is_deleted, 0) = 0
               AND (@code IS NULL OR c.CODI <> @code)
               AND (
                     (@normalizedTaxId <> '' AND UPPER(TRIM(COALESCE(c.NIF, ''))) = @normalizedTaxId)
@@ -514,7 +519,6 @@ public sealed class MySqlClienteService : IClienteQueries, IClienteService
         var (leftCode, rightCode) = NormalizeClientPair(command.ClientCode, command.DuplicateClientCode);
 
         await using var connection = await _connectionFactory.OpenConnectionAsync(cancellationToken);
-        await EnsureClientsWriteAllowedAsync(connection, command.TenantId, command.CompanyId, cancellationToken);
         var moduleContext = await ResolveClientModuleContextAsync(connection, command.TenantId, command.CompanyId, cancellationToken);
 
         if (string.IsNullOrWhiteSpace(command.Status))
@@ -610,7 +614,6 @@ public sealed class MySqlClienteService : IClienteQueries, IClienteService
         var (leftCode, rightCode) = NormalizeClientPair(command.ClientCode, command.DuplicateClientCode);
 
         await using var connection = await _connectionFactory.OpenConnectionAsync(cancellationToken);
-        await EnsureClientsWriteAllowedAsync(connection, command.TenantId, command.CompanyId, cancellationToken);
         var moduleContext = await ResolveClientModuleContextAsync(connection, command.TenantId, command.CompanyId, cancellationToken);
 
         if (!command.PreferredClientCode.HasValue)
@@ -709,7 +712,6 @@ public sealed class MySqlClienteService : IClienteQueries, IClienteService
         }
 
         await using var connection = await _connectionFactory.OpenConnectionAsync(cancellationToken);
-        await EnsureClientsWriteAllowedAsync(connection, command.TenantId, command.CompanyId, cancellationToken);
         var moduleContext = await ResolveClientModuleContextAsync(connection, command.TenantId, command.CompanyId, cancellationToken);
         var capabilities = await GetClientCapabilitiesAsync(connection, cancellationToken);
 
@@ -739,15 +741,18 @@ public sealed class MySqlClienteService : IClienteQueries, IClienteService
                   EMAIL2 = @secondaryEmail,
                   WEB = @website,
                   NOTES = @notes,
-                  BLOQUEADO = @isBlocked{(capabilities.HasMesesCompletosColumn ? ",\n                  MESESCOMPLETOS = @mesesCompletos" : string.Empty)}
+                  BLOQUEADO = @isBlocked,
+                  origin = 'local',
+                  is_deleted = 0,
+                  synced_utc = NULL{(capabilities.HasMesesCompletosColumn ? ",\n                  MESESCOMPLETOS = @mesesCompletos" : string.Empty)}
               WHERE CODI = @code
                 AND CENTRO = @centerCode;
               """
             : $"""
               INSERT INTO clients
-              (CODI, CENTRO, NOM, NIF, DOM, CP, POB, PROV, PAIS, CONTACTE, TEL, FAX, EMAIL1, EMAIL2, WEB, NOTES, BLOQUEADO{(capabilities.HasMesesCompletosColumn ? ", MESESCOMPLETOS" : string.Empty)})
+              (CODI, CENTRO, NOM, NIF, DOM, CP, POB, PROV, PAIS, CONTACTE, TEL, FAX, EMAIL1, EMAIL2, WEB, NOTES, BLOQUEADO, origin, is_deleted, synced_utc{(capabilities.HasMesesCompletosColumn ? ", MESESCOMPLETOS" : string.Empty)})
               VALUES
-              (@code, @centerCode, @name, @taxId, @address, @postalCode, @city, @province, @country, @contactName, @phone, @fax, @primaryEmail, @secondaryEmail, @website, @notes, @isBlocked{(capabilities.HasMesesCompletosColumn ? ", @mesesCompletos" : string.Empty)});
+              (@code, @centerCode, @name, @taxId, @address, @postalCode, @city, @province, @country, @contactName, @phone, @fax, @primaryEmail, @secondaryEmail, @website, @notes, @isBlocked, 'local', 0, NULL{(capabilities.HasMesesCompletosColumn ? ", @mesesCompletos" : string.Empty)});
               """;
 
         dbCommand.Parameters.AddWithValue("@code", code);
@@ -777,6 +782,76 @@ public sealed class MySqlClienteService : IClienteQueries, IClienteService
         await SyncContactsAsync(connection, command.TenantId, moduleContext.ScopeCompanyId, code, command.Contacts, cancellationToken);
         await WriteAuditEntryAsync(command, targetCenterCode, code, previous, cancellationToken);
         return code;
+    }
+
+    public async Task DeleteAsync(Guid tenantId, Guid companyId, int code, CancellationToken cancellationToken = default)
+    {
+        if (!_connectionFactory.IsConfigured)
+        {
+            return;
+        }
+
+        await EnsureCompanyAccessAsync(tenantId, companyId, cancellationToken);
+        EnsureTenantWriteAccess();
+
+        var previous = await GetByCodeAsync(tenantId, companyId, code, cancellationToken)
+            ?? throw new InvalidOperationException("No se ha encontrado el cliente que intentas eliminar.");
+
+        await using var connection = await _connectionFactory.OpenConnectionAsync(cancellationToken);
+
+        await using (var command = connection.CreateCommand())
+        {
+            command.CommandText =
+                """
+                UPDATE clients
+                SET is_deleted = 1,
+                    origin = 'local',
+                    synced_utc = NULL
+                WHERE CODI = @code
+                  AND CENTRO = @centerCode;
+                """;
+            command.Parameters.AddWithValue("@code", code);
+            command.Parameters.AddWithValue("@centerCode", previous.CompanyCenterCode);
+            await command.ExecuteNonQueryAsync(cancellationToken);
+        }
+
+        await using (var addressCommand = connection.CreateCommand())
+        {
+            addressCommand.CommandText =
+                """
+                DELETE FROM adres
+                WHERE CODI = @code
+                  AND CENTRO = @centerCode;
+                """;
+            addressCommand.Parameters.AddWithValue("@code", code);
+            addressCommand.Parameters.AddWithValue("@centerCode", previous.CompanyCenterCode);
+            await addressCommand.ExecuteNonQueryAsync(cancellationToken);
+        }
+
+        await using (var contactCommand = connection.CreateCommand())
+        {
+            contactCommand.CommandText =
+                """
+                DELETE FROM client_contacts
+                WHERE tenant_id = @tenantId
+                  AND company_id = @companyId
+                  AND client_code = @code;
+                """;
+            contactCommand.Parameters.AddWithValue("@tenantId", tenantId.ToString());
+            contactCommand.Parameters.AddWithValue("@companyId", companyId.ToString());
+            contactCommand.Parameters.AddWithValue("@code", code);
+            await contactCommand.ExecuteNonQueryAsync(cancellationToken);
+        }
+
+        await _auditLogService.WriteAsync(new WriteAuditLogCommand
+        {
+            TenantId = tenantId,
+            CompanyId = companyId,
+            Action = "ClienteDeleted",
+            EntityName = "Cliente",
+            EntityId = code.ToString(),
+            Details = $"Codigo={code}; Nombre={previous.Name}; Centro={previous.CompanyCenterCode}"
+        }, cancellationToken);
     }
 
     private async Task WriteAuditEntryAsync(
@@ -937,40 +1012,6 @@ public sealed class MySqlClienteService : IClienteQueries, IClienteService
         throw new InvalidOperationException("No tienes permisos de escritura en este tenant.");
     }
 
-    private static async Task<bool> IsLegacySyncActiveForCompanyAsync(
-        MySqlConnection connection,
-        Guid tenantId,
-        Guid companyId,
-        CancellationToken cancellationToken)
-    {
-        await using var command = connection.CreateCommand();
-        command.CommandText =
-            """
-            SELECT COUNT(*)
-            FROM legacy_sync_checkpoints
-            WHERE tenant_id = @tenantId
-              AND company_id = @companyId
-              AND module_key = @moduleKey
-              AND last_status IN ('Completed', 'CompletedWithErrors');
-            """;
-        command.Parameters.AddWithValue("@tenantId", tenantId.ToString());
-        command.Parameters.AddWithValue("@companyId", companyId.ToString());
-        command.Parameters.AddWithValue("@moduleKey", LegacySyncModuleKeys.CrmClients);
-        return Convert.ToInt32(await command.ExecuteScalarAsync(cancellationToken)) > 0;
-    }
-
-    private static async Task EnsureClientsWriteAllowedAsync(
-        MySqlConnection connection,
-        Guid tenantId,
-        Guid companyId,
-        CancellationToken cancellationToken)
-    {
-        if (await IsLegacySyncActiveForCompanyAsync(connection, tenantId, companyId, cancellationToken))
-        {
-            throw new InvalidOperationException("CRM / Clientes está en convivencia con legacy para esta empresa. Mientras el módulo esté sincronizado, la web queda en solo lectura.");
-        }
-    }
-
     private async Task EnsureCompanyAccessAsync(Guid tenantId, Guid companyId, CancellationToken cancellationToken)
     {
         if (!_currentUserContext.IsAuthenticated || !_currentUserContext.UserId.HasValue)
@@ -1087,8 +1128,8 @@ public sealed class MySqlClienteService : IClienteQueries, IClienteService
             item => GetClientItemKey(item.CompanyCenterCode, item.Code),
             StringComparer.OrdinalIgnoreCase);
         var duplicateCenterFilter = isTenantShared
-            ? $"dup.CENTRO IN ({string.Join(", ", duplicateCenterParameterNames)})"
-            : "dup.CENTRO = c.CENTRO";
+            ? $"dup.CENTRO IN ({string.Join(", ", duplicateCenterParameterNames)}) AND COALESCE(dup.is_deleted, 0) = 0"
+            : "dup.CENTRO = c.CENTRO AND COALESCE(dup.is_deleted, 0) = 0";
 
         await using var command = connection.CreateCommand();
         command.CommandText =
@@ -1136,6 +1177,7 @@ public sealed class MySqlClienteService : IClienteQueries, IClienteService
              AND dr.status = @falsePositiveStatus
             WHERE c.CODI IN ({string.Join(", ", codeParameterNames)})
               AND c.CENTRO IN ({string.Join(", ", duplicateCenterParameterNames)})
+              AND COALESCE(c.is_deleted, 0) = 0
               AND (dup.CODI IS NULL OR dr.left_client_code IS NULL)
             GROUP BY c.CENTRO, c.CODI;
             """;

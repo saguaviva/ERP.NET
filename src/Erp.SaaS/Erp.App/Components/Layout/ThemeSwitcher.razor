@@ -1,0 +1,119 @@
+@inject IJSRuntime JS
+@inject AppText T
+
+<div class="sidebar-panel theme-panel">
+    <div class="sidebar-label">@T["theme.label"]</div>
+    <button type="button"
+            class="theme-dropdown-trigger @(isOpen ? "open" : string.Empty)"
+            aria-haspopup="true"
+            aria-expanded="@isOpen"
+            @onclick="ToggleOpen">
+        @if (isOpen)
+        {
+            <span class="theme-dropdown-summary">
+                <span class="theme-dropdown-copy">
+                    <span class="theme-dropdown-title">@CurrentOption.Title(T)</span>
+                    <span class="theme-dropdown-description">@CurrentOption.Description(T)</span>
+                </span>
+                <span class="theme-option-preview theme-dropdown-preview theme-preview-@CurrentOption.PreviewKey" aria-hidden="true">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </span>
+            </span>
+        }
+        else
+        {
+            <span class="theme-dropdown-collapsed-label">@CurrentOption.Title(T)</span>
+        }
+        <span class="theme-dropdown-icon" aria-hidden="true">@(isOpen ? "▴" : "▾")</span>
+    </button>
+
+    @if (isOpen)
+    {
+        <div class="theme-switcher" role="radiogroup" aria-label="@T["theme.label"]">
+            @foreach (var option in ThemeOptions)
+            {
+                var isActive = string.Equals(currentTheme, option.Key, StringComparison.OrdinalIgnoreCase);
+                <button type="button"
+                    class="theme-option @(isActive ? "active" : string.Empty)"
+                    role="radio"
+                    aria-checked="@isActive"
+                    @onclick="() => SelectThemeAsync(option.Key)">
+                    <span class="theme-option-title">@option.Title(T)</span>
+                    <span class="theme-option-description">@option.Description(T)</span>
+                    <span class="theme-option-preview theme-preview-@option.PreviewKey" aria-hidden="true">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </span>
+                </button>
+            }
+        </div>
+    }
+</div>
+
+@code {
+    private string currentTheme = "current";
+    private bool isOpen;
+
+    private static IReadOnlyList<ThemeOption> ThemeOptions { get; } =
+    [
+        new("current", "theme.current.title", "theme.current.description", "current"),
+        new("blue-modern", "theme.blue.title", "theme.blue.description", "blue"),
+        new("compact", "theme.compact.title", "theme.compact.description", "compact"),
+        new("ultra-compact", "theme.ultra.title", "theme.ultra.description", "ultra")
+    ];
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+
+        try
+        {
+            currentTheme = await JS.InvokeAsync<string>("erpTheme.get");
+            await JS.InvokeVoidAsync("erpTheme.apply", currentTheme);
+            StateHasChanged();
+        }
+        catch (JSException)
+        {
+            currentTheme = "current";
+        }
+        catch (InvalidOperationException)
+        {
+            currentTheme = "current";
+        }
+    }
+
+    private ThemeOption CurrentOption =>
+        ThemeOptions.FirstOrDefault(option => string.Equals(option.Key, currentTheme, StringComparison.OrdinalIgnoreCase))
+        ?? ThemeOptions[0];
+
+    private void ToggleOpen()
+    {
+        isOpen = !isOpen;
+    }
+
+    private async Task SelectThemeAsync(string themeKey)
+    {
+        currentTheme = themeKey;
+        isOpen = false;
+
+        try
+        {
+            await JS.InvokeVoidAsync("erpTheme.set", themeKey);
+        }
+        catch (JSException)
+        {
+        }
+    }
+
+    private sealed record ThemeOption(string Key, string TitleKey, string DescriptionKey, string PreviewKey)
+    {
+        public string Title(AppText text) => text[TitleKey];
+        public string Description(AppText text) => text[DescriptionKey];
+    }
+}

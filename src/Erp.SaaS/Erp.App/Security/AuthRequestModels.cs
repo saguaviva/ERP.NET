@@ -31,3 +31,9 @@ public sealed class PreviewAccessForm
     public string Password { get; set; } = string.Empty;
     public string? ReturnUrl { get; set; }
 }
+
+public sealed class SetLanguageForm
+{
+    public string Culture { get; set; } = string.Empty;
+    public string? ReturnUrl { get; set; }
+}

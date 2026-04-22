@@ -4,25 +4,28 @@
 @inject IStockService StockService
 @inject IStockQueries StockQueries
 @inject NavigationManager NavigationManager
+@inject AppText T
 
-<PageTitle>Almacén / Ajuste manual</PageTitle>
+<PageTitle>@L("Almacén / Ajuste manual", "Magatzem / Ajust manual", "Warehouse / Manual adjustment")</PageTitle>
 
 <div class="page-header">
     <div>
-        <p class="eyebrow">Almacén</p>
-        <h1>Ajuste manual</h1>
-        <p class="lead">Primera salida real de stock y correcciones manuales sobre la empresa activa.</p>
+        <p class="eyebrow">@L("Almacén", "Magatzem", "Warehouse")</p>
+        <h1>@L("Ajuste manual", "Ajust manual", "Manual adjustment")</h1>
+        <p class="lead">@L("Primera salida real de stock y correcciones manuales sobre la empresa activa.", "Primera sortida real d'estoc i correccions manuals sobre l'empresa activa.", "First real stock outbound and manual corrections on the active company.")</p>
     </div>
     <div class="quick-links">
-        <a class="secondary-button link-button" href="/almacen/stock-actual">Volver a stock</a>
-        <a class="secondary-button link-button" href="/almacen/movimientos">Ver movimientos</a>
+        <a class="secondary-button link-button" href="/almacen/stock-actual">@L("Volver a stock", "Tornar a estoc", "Back to stock")</a>
+        <a class="secondary-button link-button" href="/almacen/inventarios">@L("Ver inventarios", "Veure inventaris", "View inventories")</a>
+        <a class="secondary-button link-button" href="/almacen/traspasos">@L("Ver traspasos", "Veure traspassos", "View transfers")</a>
+        <a class="secondary-button link-button" href="/almacen/movimientos">@L("Ver movimientos", "Veure moviments", "View movements")</a>
     </div>
 </div>
 
 @if (!tenantId.HasValue || !companyId.HasValue)
 {
     <div class="empty-state">
-        <p>No hay empresa activa seleccionada.</p>
+        <p>@L("No hay empresa activa seleccionada.", "No hi ha cap empresa activa seleccionada.", "No active company is selected.")</p>
     </div>
 }
 else if (!canEdit)
@@ -38,54 +41,73 @@ else
         <div class="alert @(isError ? "danger" : "success")">@statusMessage</div>
     }
 
+    @if (legacySyncInfo.IsActive)
+    {
+        <div class="alert warning">
+            @L("Almacén / Stock está en convivencia con legacy para esta empresa. La sync manual refresca solo el snapshot legacy; los ajustes que registres en la web se aplican encima en local y no tocan el remoto.", "Magatzem / Estoc està en convivència amb legacy per a aquesta empresa. La sync manual refresca només l'snapshot legacy; els ajustos que registris al web s'apliquen a sobre en local i no toquen el remot.", "Warehouse / Stock is running in legacy coexistence mode for this company. Manual sync refreshes only the legacy snapshot; adjustments entered on the web are applied locally on top and never touch the remote source.")
+        </div>
+    }
+
     <EditForm Model="model" OnValidSubmit="SaveAsync">
         <section class="panel">
             <div class="form-grid">
                 <label class="field">
-                    <span>Tipo de ajuste</span>
+                    <span>@L("Tipo de ajuste", "Tipus d'ajust", "Adjustment type")</span>
                     <InputSelect class="text-input" @bind-Value="model.AdjustmentType">
-                        <option value="@StockMovementTypes.InboundManualAdjustment">Entrada manual</option>
-                        <option value="@StockMovementTypes.OutboundManualAdjustment">Salida manual</option>
+                        <option value="@StockMovementTypes.InboundManualAdjustment">@L("Entrada manual", "Entrada manual", "Manual inbound")</option>
+                        <option value="@StockMovementTypes.OutboundManualAdjustment">@L("Salida manual", "Sortida manual", "Manual outbound")</option>
                     </InputSelect>
                 </label>
                 <label class="field">
-                    <span>Fecha</span>
+                    <span>@L("Fecha", "Data", "Date")</span>
                     <InputDate class="text-input" @bind-Value="model.MovementDate" />
                 </label>
                 <label class="field">
-                    <span>Almacén</span>
+                    <span>@L("Almacén", "Magatzem", "Warehouse")</span>
                     <InputText class="text-input" @bind-Value="model.Warehouse" />
                 </label>
                 <label class="field">
-                    <span>Código artículo</span>
+                    <span>@L("Código artículo", "Codi article", "Item code")</span>
                     <InputText class="text-input" @bind-Value="model.ItemCode" />
                 </label>
                 <label class="field wide">
-                    <span>Descripción artículo</span>
+                    <span>@L("Descripción artículo", "Descripció article", "Item description")</span>
                     <InputText class="text-input" @bind-Value="model.ItemDescription" />
                 </label>
                 <label class="field">
-                    <span>Unidad</span>
+                    <span>@L("Color", "Color", "Color")</span>
+                    <InputText class="text-input" @bind-Value="model.Color" />
+                </label>
+                <label class="field">
+                    <span>@L("Unidad", "Unitat", "Unit")</span>
                     <InputText class="text-input" @bind-Value="model.UnitOfMeasure" />
                 </label>
                 <label class="field">
-                    <span>Cantidad</span>
+                    <span>@L("Cantidad", "Quantitat", "Quantity")</span>
                     <InputNumber class="text-input" @bind-Value="model.Quantity" />
                 </label>
                 <label class="field wide">
-                    <span>Notas</span>
+                    <span>@L("Notas", "Notes", "Notes")</span>
                     <InputTextArea class="text-area" @bind-Value="model.Notes" />
                 </label>
             </div>
 
             <div class="quick-links">
-                <button class="primary-button" type="submit">Registrar ajuste</button>
+                <button class="primary-button" type="submit">@L("Registrar ajuste", "Registrar ajust", "Save adjustment")</button>
             </div>
         </section>
     </EditForm>
 }
 
 @code {
+    private string L(string spanish, string catalan, string english) =>
+        T.CurrentLanguage switch
+        {
+            AppLanguages.Catalan => catalan,
+            AppLanguages.English => english,
+            _ => spanish
+        };
+
     [SupplyParameterFromQuery]
     public string? Warehouse { get; set; }
 
@@ -96,7 +118,19 @@ else
     public string? Description { get; set; }
 
     [SupplyParameterFromQuery]
+    public string? Color { get; set; }
+
+    [SupplyParameterFromQuery]
     public string? Unit { get; set; }
+
+    [SupplyParameterFromQuery]
+    public string? AdjustmentType { get; set; }
+
+    [SupplyParameterFromQuery]
+    public decimal? Quantity { get; set; }
+
+    [SupplyParameterFromQuery]
+    public string? Notes { get; set; }
 
     [SupplyParameterFromQuery]
     public decimal? CurrentStock { get; set; }
@@ -104,6 +138,7 @@ else
     private Guid? tenantId;
     private Guid? companyId;
     private bool canEdit;
+    private StockLegacySyncInfoDto legacySyncInfo = new();
     private string blockedReason = "No tienes permisos para registrar ajustes de almacén.";
     private string statusMessage = string.Empty;
     private bool isError;
@@ -116,25 +151,29 @@ else
         tenantId = user.GetTenantId();
         companyId = user.GetActiveCompanyId();
         canEdit = user.IsPlatformAdmin() || user.IsInRole(PlatformRoles.TenantAdmin);
-        blockedReason = "No tienes permisos para registrar ajustes de almacén.";
+        blockedReason = L("No tienes permisos para registrar ajustes de almacén.", "No tens permisos per registrar ajustos de magatzem.", "You do not have permission to save warehouse adjustments.");
 
         if (tenantId.HasValue && companyId.HasValue)
         {
-            var legacySyncInfo = await StockQueries.GetLegacySyncInfoAsync(tenantId.Value, companyId.Value);
-            if (legacySyncInfo.IsActive)
-            {
-                canEdit = false;
-                blockedReason = "Almacén / Stock está en convivencia con legacy para esta empresa. Mientras la sync mande, los ajustes manuales quedan en solo lectura.";
-            }
+            legacySyncInfo = await StockQueries.GetLegacySyncInfoAsync(tenantId.Value, companyId.Value);
         }
 
         model.Warehouse = Warehouse?.Trim() ?? model.Warehouse;
         model.ItemCode = ItemCode?.Trim() ?? model.ItemCode;
         model.ItemDescription = Description?.Trim() ?? model.ItemDescription;
+        model.Color = Color?.Trim() ?? model.Color;
         model.UnitOfMeasure = Unit?.Trim() ?? model.UnitOfMeasure;
-        model.Notes = CurrentStock.HasValue && string.IsNullOrWhiteSpace(model.Notes)
-            ? $"Stock actual previo: {CurrentStock.Value:0.###}"
-            : model.Notes;
+        model.AdjustmentType = string.IsNullOrWhiteSpace(AdjustmentType) ? model.AdjustmentType : AdjustmentType.Trim();
+        model.Quantity = Quantity ?? model.Quantity;
+
+        if (!string.IsNullOrWhiteSpace(Notes))
+        {
+            model.Notes = Notes.Trim();
+        }
+        else if (CurrentStock.HasValue && string.IsNullOrWhiteSpace(model.Notes))
+        {
+            model.Notes = L($"Stock actual previo: {CurrentStock.Value:0.###}", $"Estoc actual previ: {CurrentStock.Value:0.###}", $"Previous current stock: {CurrentStock.Value:0.###}");
+        }
     }
 
     private async Task SaveAsync()
@@ -156,14 +195,16 @@ else
                 Warehouse = model.Warehouse,
                 ItemCode = model.ItemCode,
                 ItemDescription = model.ItemDescription,
+                Color = model.Color,
                 UnitOfMeasure = model.UnitOfMeasure,
                 AdjustmentType = model.AdjustmentType,
                 Quantity = model.Quantity,
+                CurrentStockHint = CurrentStock,
                 MovementDate = model.MovementDate,
                 Notes = model.Notes
             });
 
-            statusMessage = "Ajuste registrado correctamente.";
+            statusMessage = L("Ajuste registrado correctamente.", "Ajust registrat correctament.", "Adjustment saved successfully.");
             NavigationManager.NavigateTo("/almacen/movimientos", forceLoad: false);
         }
         catch (Exception exception)
@@ -178,6 +219,7 @@ else
         public string Warehouse { get; set; } = string.Empty;
         public string ItemCode { get; set; } = string.Empty;
         public string ItemDescription { get; set; } = string.Empty;
+        public string Color { get; set; } = string.Empty;
         public string UnitOfMeasure { get; set; } = string.Empty;
         public string AdjustmentType { get; set; } = StockMovementTypes.InboundManualAdjustment;
         public decimal Quantity { get; set; }

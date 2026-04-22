@@ -1,14 +1,19 @@
 using System.Security.Claims;
+using System.Globalization;
 using Erp.App.Components;
+using Erp.App.Components.Pages;
+using Erp.App.Localization;
 using Erp.App.Security;
 using Erp.Application.Auth;
 using Erp.Application.Auditing;
 using Erp.Application.Companies;
 using Erp.Application.Contexts;
 using Erp.Application.DemoAccess;
+using Erp.Application.Intrastat;
 using Erp.Infrastructure.MySql;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 
@@ -17,9 +22,25 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 builder.Services.AddCascadingAuthenticationState();
+builder.Services.AddLocalization();
 builder.Services.AddHttpContextAccessor();
 builder.Services.Configure<PreviewAccessOptions>(builder.Configuration.GetSection(PreviewAccessOptions.SectionName));
+builder.Services.Configure<RequestLocalizationOptions>(options =>
+{
+    var supportedCultures = AppLanguages.Supported
+        .Select(option => new CultureInfo(option.Key))
+        .ToArray();
+
+    options.DefaultRequestCulture = new RequestCulture(AppLanguages.Spanish);
+    options.SupportedCultures = supportedCultures;
+    options.SupportedUICultures = supportedCultures;
+    options.RequestCultureProviders =
+    [
+        new CookieRequestCultureProvider()
+    ];
+});
 builder.Services.AddSingleton<PreviewAccessCookieProtector>();
+builder.Services.AddScoped<AppText>();
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
@@ -44,6 +65,7 @@ if (!app.Environment.IsDevelopment())
 
 app.UseStatusCodePagesWithReExecute("/not-found", createScopeForStatusCodePages: true);
 app.UseHttpsRedirection();
+app.UseRequestLocalization(app.Services.GetRequiredService<IOptions<RequestLocalizationOptions>>().Value);
 app.Use(async (context, next) =>
 {
     var options = context.RequestServices.GetRequiredService<IOptionsMonitor<PreviewAccessOptions>>().CurrentValue;
@@ -206,6 +228,28 @@ app.MapPost("/account/logout", async Task<IResult> (HttpContext httpContext) =>
     return Results.Redirect("/login");
 });
 
+app.MapPost("/account/set-language", ([FromForm] SetLanguageForm form, HttpContext httpContext) =>
+{
+    var culture = AppLanguages.Normalize(form.Culture);
+    var requestCulture = new RequestCulture(culture);
+    var returnUrl = ResolvePostReturnUrl(httpContext.Request, form.ReturnUrl);
+
+    httpContext.Response.Cookies.Append(
+        CookieRequestCultureProvider.DefaultCookieName,
+        CookieRequestCultureProvider.MakeCookieValue(requestCulture),
+        new CookieOptions
+        {
+            HttpOnly = false,
+            IsEssential = true,
+            SameSite = SameSiteMode.Lax,
+            Secure = httpContext.Request.IsHttps,
+            Path = "/",
+            Expires = DateTimeOffset.UtcNow.AddYears(1)
+        });
+
+    return Results.Redirect(returnUrl);
+});
+
 app.MapPost("/account/switch-company", async Task<IResult> (
     HttpContext httpContext,
     [FromForm] SwitchCompanyForm form,
@@ -217,6 +261,8 @@ app.MapPost("/account/switch-company", async Task<IResult> (
     {
         return Results.Redirect("/login");
     }
+
+    var returnUrl = ResolvePostReturnUrl(httpContext.Request, form.ReturnUrl);
 
     var userId = httpContext.User.GetUserId();
     var tenantId = httpContext.User.GetTenantId();
@@ -259,7 +305,7 @@ app.MapPost("/account/switch-company", async Task<IResult> (
         Details = $"CompanyName={selectedCompany.Name}; LegacyCenter={selectedCompany.LegacyCenterCode}"
     }, cancellationToken);
 
-    return Results.Redirect(string.IsNullOrWhiteSpace(form.ReturnUrl) ? "/" : form.ReturnUrl);
+    return Results.Redirect(returnUrl);
 }).RequireAuthorization();
 
 app.MapPost("/account/change-password", async Task<IResult> (
@@ -314,6 +360,61 @@ app.MapPost("/account/change-password", async Task<IResult> (
     return Results.Redirect(string.IsNullOrWhiteSpace(form.ReturnUrl) ? "/" : form.ReturnUrl);
 }).RequireAuthorization();
 
+app.MapGet("/ventas/intrastat/export/{kind}", async Task<IResult> (
+    HttpContext httpContext,
+    string kind,
+    [FromQuery] int? month,
+    [FromQuery] int? year,
+    [FromQuery] string? search,
+    [FromQuery(Name = "classified")] bool? onlyClassified,
+    IIntrastatQueries intrastatQueries,
+    CancellationToken cancellationToken) =>
+{
+    if (!(httpContext.User.Identity?.IsAuthenticated ?? false))
+    {
+        return Results.Redirect("/login");
+    }
+
+    var tenantId = httpContext.User.GetTenantId();
+    var companyId = httpContext.User.GetActiveCompanyId();
+    if (!tenantId.HasValue || !companyId.HasValue)
+    {
+        return Results.BadRequest("No hay tenant o empresa activa para exportar Intrastat.");
+    }
+
+    var filter = new IntrastatFilter
+    {
+        Month = Math.Clamp(month ?? DateTime.Today.Month, 1, 12),
+        Year = year ?? DateTime.Today.Year,
+        Search = search ?? string.Empty,
+        OnlyClassified = onlyClassified ?? false,
+        Page = 1,
+        PageSize = 50000,
+        SortColumn = nameof(IntrastatLineDto.IssueDate),
+        SortDescending = true
+    };
+
+    var report = await intrastatQueries.GetReportAsync(tenantId.Value, companyId.Value, filter, cancellationToken);
+    if (string.Equals(kind, "excel", StringComparison.OrdinalIgnoreCase) ||
+        string.Equals(kind, "xlsx", StringComparison.OrdinalIgnoreCase))
+    {
+        var workbookPayload = IntrastatExcelExporter.BuildWorkbook(report, filter.Year, filter.Month);
+        var workbookName = $"intrastat-{filter.Year}-{filter.Month:00}.xlsx";
+        return Results.File(
+            workbookPayload,
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            workbookName);
+    }
+
+    var safeKind = string.Equals(kind, "summary", StringComparison.OrdinalIgnoreCase) ? "summary" : "detail";
+    var fileName = $"intrastat-{safeKind}-{filter.Year}-{filter.Month:00}.csv";
+    var payload = safeKind == "summary"
+        ? IntrastatCsvExporter.BuildSummaryCsv(report)
+        : IntrastatCsvExporter.BuildDetailCsv(report);
+
+    return Results.File(payload, "text/csv; charset=utf-8", fileName);
+}).RequireAuthorization();
+
 app.MapStaticAssets();
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
@@ -336,6 +437,27 @@ static string NormalizeReturnUrl(string? returnUrl)
     }
 
     return returnUrl.StartsWith('/') ? returnUrl : "/";
+}
+
+static string ResolvePostReturnUrl(HttpRequest request, string? formReturnUrl)
+{
+    var normalizedFormReturnUrl = NormalizeReturnUrl(formReturnUrl);
+    if (!string.Equals(normalizedFormReturnUrl, "/", StringComparison.Ordinal) ||
+        string.Equals(formReturnUrl, "/", StringComparison.Ordinal))
+    {
+        return normalizedFormReturnUrl;
+    }
+
+    if (Uri.TryCreate(request.Headers.Referer.ToString(), UriKind.Absolute, out var refererUri))
+    {
+        var refererPathAndQuery = string.IsNullOrWhiteSpace(refererUri.PathAndQuery)
+            ? "/"
+            : refererUri.PathAndQuery;
+
+        return NormalizeReturnUrl(refererPathAndQuery);
+    }
+
+    return "/";
 }
 
 static bool IsPreviewExemptPath(PathString path) =>

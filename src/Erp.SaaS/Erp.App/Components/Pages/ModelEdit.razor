@@ -1,0 +1,1241 @@
+@page "/articulos/models/nuevo"
+@page "/articulos/models/editar/{Id}"
+@attribute [Authorize(Roles = "TenantAdmin,TenantReader")]
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IAuditLogService AuditLogService
+@inject IModeloQueries ModeloQueries
+@inject IModeloService ModeloService
+@inject ILegacySyncService LegacySyncService
+@inject NavigationManager NavigationManager
+
+<PageTitle>@PageTitleText</PageTitle>
+
+<div class="page-header">
+    <div>
+        <p class="eyebrow">ARTÍCULOS</p>
+        <h1>@PageTitleText</h1>
+        <p class="lead">@(isLegacySyncActive
+            ? "Edición sobre la SaaS local. La importación manual desde legacy refresca solo registros marcados como legacy."
+            : "Alta y edición sobre la réplica SaaS de models, aislada por tenant y empresa activa.")</p>
+    </div>
+    <div class="quick-links">
+        <a class="secondary-button link-button" href="/articulos/models">Volver al listado</a>
+        @if (model.Id != Guid.Empty)
+        {
+            <a class="secondary-button link-button" href="@BuildPrintUrl(model.Id)">Imprimir ficha</a>
+        }
+        @if (!string.IsNullOrWhiteSpace(model.FabricCode))
+        {
+            <a class="secondary-button link-button" href="@BuildTejidoUrl(model.FabricCode)">Abrir tejido</a>
+        }
+    </div>
+</div>
+
+@if (!tenantId.HasValue || !companyId.HasValue)
+{
+    <div class="empty-state">
+        <p>No hay empresa activa seleccionada.</p>
+    </div>
+}
+else
+{
+    @if (!string.IsNullOrWhiteSpace(statusMessage))
+    {
+        <div class="alert @(isError ? "danger" : "success")">@statusMessage</div>
+    }
+
+    @if (isLegacySyncActive)
+    {
+        <div class="alert">
+            Artículos / Models está en convivencia con legacy para esta empresa.
+            La ficha guarda cambios solo en la SaaS local y la sync manual refresca únicamente registros de origen legacy.
+            @if (!string.IsNullOrWhiteSpace(syncStatusLabel))
+            {
+                <span>@syncStatusLabel</span>
+            }
+        </div>
+    }
+
+    @if (!canEdit && string.IsNullOrWhiteSpace(Id))
+    {
+        <div class="alert">
+            No tienes permisos de edición para crear models en esta empresa.
+        </div>
+    }
+
+    <section class="summary-card-grid">
+        <article class="summary-card">
+            <span class="summary-card-label">Origen</span>
+            <strong>@DisplayOrigin</strong>
+            <span class="summary-card-meta">@($"{model.CompanyCenterCode} · {model.Season} · {model.Series}")</span>
+        </article>
+        <article class="summary-card">
+            <span class="summary-card-label">Cliente</span>
+            <strong>@DisplayClient</strong>
+            <span class="summary-card-meta">@($"Código {model.ClientCode}")</span>
+        </article>
+        <article class="summary-card">
+            <span class="summary-card-label">Detalle</span>
+            <strong>@($"{model.ScandalloLines.Count} esc. · {model.ColorLines.Count} col.")</strong>
+            <span class="summary-card-meta">@($"{model.FornituraLines.Count} forn. · {model.StockLines.Count} stock")</span>
+        </article>
+        <article class="summary-card">
+            <span class="summary-card-label">Venta final</span>
+            <strong>@model.FinalSalePrice.ToString("0.00##")</strong>
+            <span class="summary-card-meta">@($"Coste {model.CostPrice.ToString("0.00##")} · margen {model.MarginPercent.ToString("0.0#")}%")</span>
+        </article>
+    </section>
+
+    <div class="record-tabs" style="margin-top: 1rem;">
+        <button class="record-tab @(activeTab == ModelTab.Ficha ? "active" : null)" type="button" @onclick="@(() => activeTab = ModelTab.Ficha)">Model</button>
+        <button class="record-tab @(activeTab == ModelTab.Scandallo ? "active" : null)" type="button" @onclick="@(() => activeTab = ModelTab.Scandallo)">Escandall</button>
+        <button class="record-tab @(activeTab == ModelTab.Colores ? "active" : null)" type="button" @onclick="@(() => activeTab = ModelTab.Colores)">Colores</button>
+        <button class="record-tab @(activeTab == ModelTab.Fornituras ? "active" : null)" type="button" @onclick="@(() => activeTab = ModelTab.Fornituras)">Fornitures</button>
+        <button class="record-tab @(activeTab == ModelTab.Stock ? "active" : null)" type="button" @onclick="@(() => activeTab = ModelTab.Stock)">Stock</button>
+    </div>
+
+    <EditForm Model="model" OnValidSubmit="SaveAsync">
+        <fieldset disabled="@isReadOnly">
+            @if (activeTab == ModelTab.Ficha)
+            {
+                <div class="legacy-record-grid" style="margin-top: 1rem;">
+                    <section class="panel detail-panel">
+                        <div class="detail-panel-header">
+                            <div>
+                                <h2>Ficha principal</h2>
+                                <p class="muted">Identidad comercial del model, tejido base, cliente y coste/venta.</p>
+                            </div>
+                            @if (!string.IsNullOrWhiteSpace(model.Code))
+                            {
+                                <span class="stock-state-badge ok">@model.Code</span>
+                            }
+                        </div>
+
+                        <div class="form-grid">
+                            <label class="field">
+                                <span>Código</span>
+                                <InputText class="text-input" @bind-Value="model.Code" />
+                            </label>
+                            <label class="field">
+                                <span>Serie</span>
+                                <InputText class="text-input" @bind-Value="model.Series" />
+                            </label>
+                            <label class="field">
+                                <span>Temporada</span>
+                                <InputText class="text-input" @bind-Value="model.Season" />
+                            </label>
+                            <label class="field">
+                                <span>Cliente</span>
+                                <InputNumber class="text-input" @bind-Value="model.ClientCode" />
+                            </label>
+                            <label class="field wide">
+                                <span>Nombre cliente</span>
+                                <InputText class="text-input" @bind-Value="model.ClientName" />
+                            </label>
+                            <label class="field wide">
+                                <span>Descripción</span>
+                                <InputText class="text-input" @bind-Value="model.Description" />
+                            </label>
+                            <label class="field">
+                                <span>Codi model</span>
+                                <InputText class="text-input" @bind-Value="model.ModelCode" />
+                            </label>
+                            <label class="field">
+                                <span>Tejido</span>
+                                <InputText class="text-input" @bind-Value="model.FabricCode" />
+                            </label>
+                            <label class="field wide">
+                                <span>Nombre tejido</span>
+                                <InputText class="text-input" @bind-Value="model.FabricDescription" />
+                            </label>
+                            <label class="field">
+                                <span>Proveedor</span>
+                                <InputNumber class="text-input" @bind-Value="model.SupplierCode" />
+                            </label>
+                            <label class="field wide">
+                                <span>Nombre proveedor</span>
+                                <InputText class="text-input" @bind-Value="model.SupplierName" />
+                            </label>
+                            <label class="field">
+                                <span>Ample</span>
+                                <InputText class="text-input" @bind-Value="model.WidthText" />
+                            </label>
+                            <label class="field">
+                                <span>Rendiment</span>
+                                <InputNumber class="text-input" @bind-Value="model.Yield" />
+                            </label>
+                            <label class="field">
+                                <span>IVA</span>
+                                <InputText class="text-input" @bind-Value="model.VatCode" />
+                            </label>
+                            <label class="field">
+                                <span>Coste</span>
+                                <InputNumber class="text-input" @bind-Value="model.CostPrice" />
+                            </label>
+                            <label class="field">
+                                <span>% margen</span>
+                                <InputNumber class="text-input" @bind-Value="model.MarginPercent" />
+                            </label>
+                            <label class="field">
+                                <span>Venta</span>
+                                <InputNumber class="text-input" @bind-Value="model.SalePrice" />
+                            </label>
+                            <label class="field">
+                                <span>Venta final</span>
+                                <InputNumber class="text-input" @bind-Value="model.FinalSalePrice" />
+                            </label>
+                        </div>
+                    </section>
+
+                    <section class="panel detail-panel">
+                        <div class="detail-panel-header">
+                            <div>
+                                <h2>Operaciones y talleres</h2>
+                                <p class="muted">Asignación de tint, acabat, estampación y confección.</p>
+                            </div>
+                        </div>
+
+                        <div class="form-grid">
+                            <label class="field">
+                                <span>Tint</span>
+                                <InputNumber class="text-input" @bind-Value="model.DyeingWorkshopCode" />
+                            </label>
+                            <label class="field wide">
+                                <span>Nombre tint</span>
+                                <InputText class="text-input" @bind-Value="model.DyeingWorkshopName" />
+                            </label>
+                            <label class="field">
+                                <span>Acabat</span>
+                                <InputNumber class="text-input" @bind-Value="model.FinishingWorkshopCode" />
+                            </label>
+                            <label class="field wide">
+                                <span>Nombre acabat</span>
+                                <InputText class="text-input" @bind-Value="model.FinishingWorkshopName" />
+                            </label>
+                            <label class="field">
+                                <span>Estampació</span>
+                                <InputNumber class="text-input" @bind-Value="model.PrintingWorkshopCode" />
+                            </label>
+                            <label class="field wide">
+                                <span>Nombre estampació</span>
+                                <InputText class="text-input" @bind-Value="model.PrintingWorkshopName" />
+                            </label>
+                            <label class="field">
+                                <span>Confecció</span>
+                                <InputNumber class="text-input" @bind-Value="model.TailoringWorkshopCode" />
+                            </label>
+                            <label class="field wide">
+                                <span>Nombre confecció</span>
+                                <InputText class="text-input" @bind-Value="model.TailoringWorkshopName" />
+                            </label>
+                            <label class="field">
+                                <span>Fornitura</span>
+                                <InputText class="text-input" @bind-Value="model.FornituraSummary" />
+                            </label>
+                            <label class="field">
+                                <span>Manipulación</span>
+                                <InputNumber class="text-input" @bind-Value="model.ManipulationPrice" />
+                            </label>
+                            <label class="field">
+                                <span>Cost estamp 1</span>
+                                <InputText class="text-input" @bind-Value="model.PrintingCode1" />
+                            </label>
+                            <label class="field">
+                                <span>Cost estamp 2</span>
+                                <InputText class="text-input" @bind-Value="model.PrintingCode2" />
+                            </label>
+                            <label class="field">
+                                <span>Unitats estamp 1</span>
+                                <InputNumber class="text-input" @bind-Value="model.PrintingUnits1" />
+                            </label>
+                            <label class="field">
+                                <span>Unitats estamp 2</span>
+                                <InputNumber class="text-input" @bind-Value="model.PrintingUnits2" />
+                            </label>
+                        </div>
+                    </section>
+                </div>
+
+                <section class="panel detail-panel" style="margin-top: 1rem;">
+                    <div class="detail-panel-header">
+                        <div>
+                            <h2>Costes secundarios, tallas y notas</h2>
+                            <p class="muted">Bloque económico complementario y tallas de referencia del model.</p>
+                        </div>
+                    </div>
+
+                    <div class="form-grid">
+                        <label class="field">
+                            <span>C estamp</span>
+                            <InputText class="text-input" @bind-Value="model.PrintingCode1" />
+                        </label>
+                        <label class="field">
+                            <span>C estamp 2</span>
+                            <InputText class="text-input" @bind-Value="model.PrintingCode2" />
+                        </label>
+                        <label class="field">
+                            <span>N estamp</span>
+                            <InputNumber class="text-input" @bind-Value="model.PrintingUnits1" />
+                        </label>
+                        <label class="field">
+                            <span>N estamp 2</span>
+                            <InputNumber class="text-input" @bind-Value="model.PrintingUnits2" />
+                        </label>
+                        <label class="field">
+                            <span>N confec</span>
+                            <InputNumber class="text-input" @bind-Value="model.TailoringPrice" />
+                        </label>
+                        <label class="field">
+                            <span>N planxa</span>
+                            <InputNumber class="text-input" @bind-Value="model.PlatePrice" />
+                        </label>
+                        <label class="field">
+                            <span>N repas</span>
+                            <InputNumber class="text-input" @bind-Value="model.ReviewPrice" />
+                        </label>
+                        <label class="field">
+                            <span>Q trans</span>
+                            <InputNumber class="text-input" @bind-Value="model.TransferQuantity" />
+                        </label>
+                        <label class="field">
+                            <span>N trans</span>
+                            <InputNumber class="text-input" @bind-Value="model.TransferPrice" />
+                        </label>
+                        <label class="field">
+                            <span>Q flocat</span>
+                            <InputNumber class="text-input" @bind-Value="model.FlockedQuantity" />
+                        </label>
+                        <label class="field">
+                            <span>N flocat</span>
+                            <InputNumber class="text-input" @bind-Value="model.FlockedPrice" />
+                        </label>
+                        <label class="field">
+                            <span>Q brodat</span>
+                            <InputNumber class="text-input" @bind-Value="model.EmbroideredQuantity" />
+                        </label>
+                        <label class="field">
+                            <span>N brodat</span>
+                            <InputNumber class="text-input" @bind-Value="model.EmbroideredPrice" />
+                        </label>
+                        <label class="field">
+                            <span>N estamp</span>
+                            <InputNumber class="text-input" @bind-Value="model.PrintingPrice" />
+                        </label>
+                        <label class="field">
+                            <span>N tint p</span>
+                            <InputNumber class="text-input" @bind-Value="model.DyeingPrice" />
+                        </label>
+                        <label class="field">
+                            <span>N acab p</span>
+                            <InputNumber class="text-input" @bind-Value="model.FinishingPrice" />
+                        </label>
+                        <label class="field">
+                            <span>N fornitura</span>
+                            <InputNumber class="text-input" @bind-Value="model.FornituraPrice" />
+                        </label>
+                        <label class="field">
+                            <span>N pack</span>
+                            <InputNumber class="text-input" @bind-Value="model.PackagingPrice" />
+                        </label>
+                    </div>
+
+                    <div class="form-grid" style="margin-top: 1rem;">
+                        <label class="field"><span>Talla 01</span><InputText class="text-input" @bind-Value="model.Size01" /></label>
+                        <label class="field"><span>Talla 02</span><InputText class="text-input" @bind-Value="model.Size02" /></label>
+                        <label class="field"><span>Talla 03</span><InputText class="text-input" @bind-Value="model.Size03" /></label>
+                        <label class="field"><span>Talla 04</span><InputText class="text-input" @bind-Value="model.Size04" /></label>
+                        <label class="field"><span>Talla 05</span><InputText class="text-input" @bind-Value="model.Size05" /></label>
+                        <label class="field"><span>Talla 06</span><InputText class="text-input" @bind-Value="model.Size06" /></label>
+                        <label class="field"><span>Talla 07</span><InputText class="text-input" @bind-Value="model.Size07" /></label>
+                        <label class="field"><span>Talla 08</span><InputText class="text-input" @bind-Value="model.Size08" /></label>
+                        <label class="field"><span>Talla 09</span><InputText class="text-input" @bind-Value="model.Size09" /></label>
+                        <label class="field"><span>Talla 10</span><InputText class="text-input" @bind-Value="model.Size10" /></label>
+                    </div>
+
+                    <label class="field field-full" style="margin-top: 1rem;">
+                        <span>Observaciones</span>
+                        <InputTextArea class="text-input textarea-input" @bind-Value="model.Notes" />
+                    </label>
+                </section>
+            }
+
+            @if (activeTab == ModelTab.Scandallo)
+            {
+                <section class="panel detail-panel" style="margin-top: 1rem;">
+                    <div class="detail-panel-header">
+                        <div>
+                            <h2>Escandall del model</h2>
+                            <p class="muted">Tejidos, consumos y coste detallado por línea.</p>
+                        </div>
+                        @if (!isReadOnly)
+                        {
+                            <button class="secondary-button" type="button" @onclick="AddScandalloLine">Añadir línea</button>
+                        }
+                    </div>
+                    <div class="table-scroll">
+                        <table class="data-table detail-table">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Título</th>
+                                    <th>Tejido</th>
+                                    <th>Consum</th>
+                                    <th>Preu</th>
+                                    <th>Cost</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (model.ScandalloLines.Count == 0)
+                                {
+                                    <tr><td colspan="7" class="muted">No hay escandallo cargado.</td></tr>
+                                }
+                                else
+                                {
+                                    @foreach (var line in model.ScandalloLines.OrderBy(item => item.LineNumber))
+                                    {
+                                        <tr @key="line.LineNumber">
+                                            <td><span class="line-number-badge">#@line.LineNumber</span></td>
+                                            <td><InputText class="text-input table-input" @bind-Value="line.Title" /></td>
+                                            <td><InputText class="text-input table-input" @bind-Value="line.FabricCode" /></td>
+                                            <td><InputNumber class="text-input table-input" @bind-Value="line.Consumption" /></td>
+                                            <td><InputNumber class="text-input table-input" @bind-Value="line.UnitPrice" /></td>
+                                            <td><InputNumber class="text-input table-input" @bind-Value="line.CostPrice" /></td>
+                                            <td>
+                                                @if (!isReadOnly)
+                                                {
+                                                    <button class="secondary-button" type="button" @onclick="() => RemoveScandalloLine(line.LineNumber)">Quitar</button>
+                                                }
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            }
+
+            @if (activeTab == ModelTab.Colores)
+            {
+                <section class="panel detail-panel" style="margin-top: 1rem;">
+                    <div class="detail-panel-header">
+                        <div>
+                            <h2>Carta de colores del model</h2>
+                            <p class="muted">Detalle MODCOL y títulos/color tal como llega del legacy.</p>
+                        </div>
+                        @if (!isReadOnly)
+                        {
+                            <button class="secondary-button" type="button" @onclick="AddColorLine">Añadir línea</button>
+                        }
+                    </div>
+                    @if (HasScandalloPieces)
+                    {
+                        <div class="alert" style="margin-bottom: 1rem;">
+                            El escandallo define @DistinctScandalloTitles.Count piezas activas. Puedes añadir un color a todas las piezas o completar colores pendientes sin tocar la remota.
+                            @if (MissingColorPieceRowsCount > 0)
+                            {
+                                <span>@($" Faltan {MissingColorPieceRowsCount} combinaciones color/pieza por expandir.")</span>
+                            }
+                            @if (OrphanColorTitleCount > 0)
+                            {
+                                <span>@($" Hay {OrphanColorTitleCount} líneas con títulos que ya no existen en el escandallo.")</span>
+                            }
+                        </div>
+                    }
+                    @if (!isReadOnly)
+                    {
+                        <div class="form-grid" style="margin-bottom: 1rem;">
+                            <label class="field">
+                                <span>Color a añadir</span>
+                                <InputText class="text-input" @bind-Value="colorToAdd" />
+                            </label>
+                            <label class="field">
+                                <span>Color a quitar</span>
+                                <InputText class="text-input" @bind-Value="colorToRemove" />
+                            </label>
+                        </div>
+                        <div class="filter-row" style="margin-bottom: 1rem;">
+                            <button class="secondary-button" type="button" @onclick="AddColorAcrossPieces" disabled="@(!HasScandalloPieces || string.IsNullOrWhiteSpace(colorToAdd))">Añadir color a todas las piezas</button>
+                            <button class="secondary-button" type="button" @onclick="ExpandColorsToScandalloTitles" disabled="@(!HasScandalloPieces || !HasColorCodes)">Expandir colores a piezas actuales</button>
+                            <button class="secondary-button" type="button" @onclick="RemoveColorEverywhere" disabled="@string.IsNullOrWhiteSpace(colorToRemove)">Quitar color del model</button>
+                        </div>
+                    }
+                    <div class="table-scroll">
+                        <table class="data-table detail-table">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>MODCOL</th>
+                                    <th>Título</th>
+                                    <th>Título color</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (model.ColorLines.Count == 0)
+                                {
+                                    <tr><td colspan="5" class="muted">No hay colores cargados.</td></tr>
+                                }
+                                else
+                                {
+                                    @foreach (var line in model.ColorLines.OrderBy(item => item.LineNumber))
+                                    {
+                                        <tr @key="line.LineNumber">
+                                            <td><span class="line-number-badge">#@line.LineNumber</span></td>
+                                            <td><InputText class="text-input table-input" @bind-Value="line.ModelColorCode" /></td>
+                                            <td><InputText class="text-input table-input" @bind-Value="line.Title" /></td>
+                                            <td><InputText class="text-input table-input" @bind-Value="line.ColorTitle" /></td>
+                                            <td>
+                                                @if (!isReadOnly)
+                                                {
+                                                    <button class="secondary-button" type="button" @onclick="() => RemoveColorLine(line.LineNumber)">Quitar</button>
+                                                }
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            }
+
+            @if (activeTab == ModelTab.Fornituras)
+            {
+                <section class="panel detail-panel" style="margin-top: 1rem;">
+                    <div class="detail-panel-header">
+                        <div>
+                            <h2>Fornitures del model</h2>
+                            <p class="muted">Detalle de fornituras y coste unitario/import.</p>
+                        </div>
+                        @if (!isReadOnly)
+                        {
+                            <button class="secondary-button" type="button" @onclick="AddFornituraLine">Añadir línea</button>
+                        }
+                    </div>
+                    <div class="table-scroll">
+                        <table class="data-table detail-table">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Fornitura</th>
+                                    <th>Medida</th>
+                                    <th>Unidades</th>
+                                    <th>Preu</th>
+                                    <th>Import</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (model.FornituraLines.Count == 0)
+                                {
+                                    <tr><td colspan="7" class="muted">No hay fornituras cargadas.</td></tr>
+                                }
+                                else
+                                {
+                                    @foreach (var line in model.FornituraLines.OrderBy(item => item.LineNumber))
+                                    {
+                                        <tr @key="line.LineNumber">
+                                            <td><span class="line-number-badge">#@line.LineNumber</span></td>
+                                            <td><InputText class="text-input table-input" @bind-Value="line.FornituraCode" /></td>
+                                            <td><InputText class="text-input table-input" @bind-Value="line.Measure" /></td>
+                                            <td><InputNumber class="text-input table-input" @bind-Value="line.Units" /></td>
+                                            <td><InputNumber class="text-input table-input" @bind-Value="line.UnitPrice" /></td>
+                                            <td><InputNumber class="text-input table-input" @bind-Value="line.ImportAmount" /></td>
+                                            <td>
+                                                @if (!isReadOnly)
+                                                {
+                                                    <button class="secondary-button" type="button" @onclick="() => RemoveFornituraLine(line.LineNumber)">Quitar</button>
+                                                }
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            }
+
+            @if (activeTab == ModelTab.Stock)
+            {
+                <section class="panel detail-panel" style="margin-top: 1rem;">
+                    <div class="detail-panel-header">
+                        <div>
+                            <h2>Stock del model</h2>
+                            <p class="muted">Distribución por color y cantidades de talla 01 a 10.</p>
+                        </div>
+                        @if (!isReadOnly)
+                        {
+                            <button class="secondary-button" type="button" @onclick="AddStockLine">Añadir línea</button>
+                        }
+                    </div>
+                    @if (!isReadOnly)
+                    {
+                        <div class="filter-row" style="margin-bottom: 1rem;">
+                            <button class="secondary-button" type="button" @onclick="SeedStockFromColors" disabled="@(!HasColorCodes)">Sembrar stock desde colores</button>
+                            <span class="muted">Genera una línea de stock por color distinto del model usando las tallas de cabecera como guía.</span>
+                        </div>
+                    }
+                    <div class="table-scroll">
+                        <table class="data-table detail-table">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Color</th>
+                                    <th>Talla</th>
+                                    <th>01</th>
+                                    <th>02</th>
+                                    <th>03</th>
+                                    <th>04</th>
+                                    <th>05</th>
+                                    <th>06</th>
+                                    <th>07</th>
+                                    <th>08</th>
+                                    <th>09</th>
+                                    <th>10</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (model.StockLines.Count == 0)
+                                {
+                                    <tr><td colspan="14" class="muted">No hay stock cargado.</td></tr>
+                                }
+                                else
+                                {
+                                    @foreach (var line in model.StockLines.OrderBy(item => item.LineNumber))
+                                    {
+                                        <tr @key="line.LineNumber">
+                                            <td><span class="line-number-badge">#@line.LineNumber</span></td>
+                                            <td><InputText class="text-input table-input" @bind-Value="line.Color" /></td>
+                                            <td><InputText class="text-input table-input" @bind-Value="line.SizeText" /></td>
+                                            <td><InputNumber class="text-input table-input" @bind-Value="line.SizeQuantity01" /></td>
+                                            <td><InputNumber class="text-input table-input" @bind-Value="line.SizeQuantity02" /></td>
+                                            <td><InputNumber class="text-input table-input" @bind-Value="line.SizeQuantity03" /></td>
+                                            <td><InputNumber class="text-input table-input" @bind-Value="line.SizeQuantity04" /></td>
+                                            <td><InputNumber class="text-input table-input" @bind-Value="line.SizeQuantity05" /></td>
+                                            <td><InputNumber class="text-input table-input" @bind-Value="line.SizeQuantity06" /></td>
+                                            <td><InputNumber class="text-input table-input" @bind-Value="line.SizeQuantity07" /></td>
+                                            <td><InputNumber class="text-input table-input" @bind-Value="line.SizeQuantity08" /></td>
+                                            <td><InputNumber class="text-input table-input" @bind-Value="line.SizeQuantity09" /></td>
+                                            <td><InputNumber class="text-input table-input" @bind-Value="line.SizeQuantity10" /></td>
+                                            <td>
+                                                @if (!isReadOnly)
+                                                {
+                                                    <button class="secondary-button" type="button" @onclick="() => RemoveStockLine(line.LineNumber)">Quitar</button>
+                                                }
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            }
+
+            <div class="detail-actions" style="margin-top: 1rem;">
+                @if (canEdit)
+                {
+                    <button class="primary-button" type="submit" disabled="@isLoading">Guardar</button>
+                    @if (model.Id != Guid.Empty)
+                    {
+                        <button class="secondary-button" type="button" @onclick="DeleteAsync" disabled="@isLoading">Eliminar</button>
+                    }
+                }
+                @if (model.Id != Guid.Empty)
+                {
+                    <button class="secondary-button" type="button" @onclick="LoadAuditAsync">Recargar historial</button>
+                }
+            </div>
+        </fieldset>
+    </EditForm>
+
+    @if (model.Id != Guid.Empty)
+    {
+        <section class="panel" style="margin-top: 1rem;">
+            <h2>Historial reciente del model</h2>
+            <div class="list-block">
+                @if (recentAuditLogs.Count == 0)
+                {
+                    <p class="muted">Todavía no hay eventos auditados para este model.</p>
+                }
+                else
+                {
+                    @foreach (var entry in recentAuditLogs)
+                    {
+                        <article class="list-item">
+                            <strong>@entry.Action</strong>
+                            @if (!string.IsNullOrWhiteSpace(entry.Details))
+                            {
+                                <span>@entry.Details</span>
+                            }
+                            <span>@entry.CreatedUtc.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss")</span>
+                            <span>@entry.ActorDisplayName</span>
+                        </article>
+                    }
+                }
+            </div>
+        </section>
+    }
+}
+
+@code {
+    [Parameter]
+    public string? Id { get; set; }
+
+    private Guid? tenantId;
+    private Guid? companyId;
+    private bool canEdit;
+    private bool isLoading;
+    private bool isError;
+    private bool isLegacySyncActive;
+    private string syncStatusLabel = string.Empty;
+    private string statusMessage = string.Empty;
+    private ModeloDetailDto model = new();
+    private IReadOnlyCollection<AuditLogEntryDto> recentAuditLogs = [];
+    private ModelTab activeTab = ModelTab.Ficha;
+    private string colorToAdd = string.Empty;
+    private string colorToRemove = string.Empty;
+
+    private string PageTitleText => string.IsNullOrWhiteSpace(Id) ? "Nuevo model" : $"Model · {model.Code}";
+    private bool isReadOnly => isLoading || !canEdit;
+    private string DisplayOrigin => string.IsNullOrWhiteSpace(model.Origin) ? "local" : model.Origin;
+    private string DisplayClient => string.IsNullOrWhiteSpace(model.ClientName) ? $"Cliente {model.ClientCode}" : model.ClientName;
+    private List<string> DistinctScandalloTitles => model.ScandalloLines
+        .Select(item => item.Title?.Trim())
+        .Where(item => !string.IsNullOrWhiteSpace(item))
+        .Select(item => item!)
+        .Distinct(StringComparer.OrdinalIgnoreCase)
+        .OrderBy(item => item, StringComparer.OrdinalIgnoreCase)
+        .ToList();
+    private List<string> DistinctModelColorCodes => model.ColorLines
+        .Select(item => item.ModelColorCode?.Trim())
+        .Where(item => !string.IsNullOrWhiteSpace(item))
+        .Select(item => item!)
+        .Distinct(StringComparer.OrdinalIgnoreCase)
+        .OrderBy(item => item, StringComparer.OrdinalIgnoreCase)
+        .ToList();
+    private bool HasScandalloPieces => DistinctScandalloTitles.Count > 0;
+    private bool HasColorCodes => DistinctModelColorCodes.Count > 0;
+    private int MissingColorPieceRowsCount => CountMissingColorPieceRows();
+    private int OrphanColorTitleCount => model.ColorLines.Count(item =>
+        !string.IsNullOrWhiteSpace(item.Title) &&
+        !DistinctScandalloTitles.Contains(item.Title.Trim(), StringComparer.OrdinalIgnoreCase));
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        tenantId = user.GetTenantId();
+        companyId = user.GetActiveCompanyId();
+        canEdit = user.IsPlatformAdmin() || user.IsInRole(PlatformRoles.TenantAdmin);
+        await LoadSyncStatusAsync();
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await LoadAsync();
+    }
+
+    private async Task LoadAsync()
+    {
+        statusMessage = string.Empty;
+        isError = false;
+
+        if (!tenantId.HasValue || !companyId.HasValue)
+        {
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(Id))
+        {
+            model = new ModeloDetailDto();
+            recentAuditLogs = [];
+            activeTab = ModelTab.Ficha;
+            return;
+        }
+
+        if (!Guid.TryParse(Id, out var idValue))
+        {
+            statusMessage = "El identificador del model no es válido.";
+            isError = true;
+            model = new ModeloDetailDto();
+            recentAuditLogs = [];
+            return;
+        }
+
+        isLoading = true;
+        try
+        {
+            var detail = await ModeloQueries.GetByIdAsync(tenantId.Value, companyId.Value, idValue);
+            if (detail is null)
+            {
+                statusMessage = "No se ha encontrado el model solicitado.";
+                isError = true;
+                model = new ModeloDetailDto();
+                recentAuditLogs = [];
+                return;
+            }
+
+            model = detail;
+            await LoadAuditAsync();
+        }
+        catch (Exception exception)
+        {
+            statusMessage = exception.Message;
+            isError = true;
+            model = new ModeloDetailDto();
+            recentAuditLogs = [];
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private async Task LoadSyncStatusAsync()
+    {
+        isLegacySyncActive = false;
+        syncStatusLabel = string.Empty;
+        if (!tenantId.HasValue || !companyId.HasValue)
+        {
+            return;
+        }
+
+        var status = (await LegacySyncService.GetModuleStatusesAsync(tenantId.Value))
+            .FirstOrDefault(item =>
+                item.CompanyId == companyId.Value &&
+                string.Equals(item.ModuleKey, LegacySyncModuleKeys.ArticleModels, StringComparison.OrdinalIgnoreCase));
+
+        if (status is null || !status.HasSuccessfulSync)
+        {
+            return;
+        }
+
+        isLegacySyncActive = true;
+        syncStatusLabel = status.LastCompletedUtc.HasValue
+            ? $"Última sync: {status.LastCompletedUtc.Value.ToLocalTime():dd/MM/yyyy HH:mm:ss} · Ins: {status.LastInserted} · Act: {status.LastUpdated} · Omi: {status.LastSkipped} · Err: {status.LastErrors}"
+            : string.Empty;
+    }
+
+    private async Task SaveAsync()
+    {
+        if (!tenantId.HasValue || !companyId.HasValue || !canEdit)
+        {
+            return;
+        }
+
+        isLoading = true;
+        try
+        {
+            var savedId = await ModeloService.SaveAsync(new SaveModeloCommand
+            {
+                TenantId = tenantId.Value,
+                CompanyId = companyId.Value,
+                Id = model.Id == Guid.Empty ? null : model.Id,
+                Code = model.Code,
+                Series = model.Series,
+                Season = model.Season,
+                ClientCode = model.ClientCode,
+                ClientName = model.ClientName,
+                Description = model.Description,
+                ModelCode = model.ModelCode,
+                FabricCode = model.FabricCode,
+                FabricDescription = model.FabricDescription,
+                SupplierCode = model.SupplierCode,
+                SupplierName = model.SupplierName,
+                WidthText = model.WidthText,
+                DyeingWorkshopCode = model.DyeingWorkshopCode,
+                DyeingWorkshopName = model.DyeingWorkshopName,
+                FinishingWorkshopCode = model.FinishingWorkshopCode,
+                FinishingWorkshopName = model.FinishingWorkshopName,
+                PrintingWorkshopCode = model.PrintingWorkshopCode,
+                PrintingWorkshopName = model.PrintingWorkshopName,
+                TailoringWorkshopCode = model.TailoringWorkshopCode,
+                TailoringWorkshopName = model.TailoringWorkshopName,
+                Yield = model.Yield,
+                FornituraSummary = model.FornituraSummary,
+                PrintingCode1 = model.PrintingCode1,
+                PrintingCode2 = model.PrintingCode2,
+                PrintingUnits1 = model.PrintingUnits1,
+                PrintingUnits2 = model.PrintingUnits2,
+                TailoringPrice = model.TailoringPrice,
+                PlatePrice = model.PlatePrice,
+                ReviewPrice = model.ReviewPrice,
+                TransferQuantity = model.TransferQuantity,
+                TransferPrice = model.TransferPrice,
+                FlockedQuantity = model.FlockedQuantity,
+                FlockedPrice = model.FlockedPrice,
+                EmbroideredQuantity = model.EmbroideredQuantity,
+                EmbroideredPrice = model.EmbroideredPrice,
+                PrintingPrice = model.PrintingPrice,
+                DyeingPrice = model.DyeingPrice,
+                FinishingPrice = model.FinishingPrice,
+                FornituraPrice = model.FornituraPrice,
+                ManipulationPrice = model.ManipulationPrice,
+                PackagingPrice = model.PackagingPrice,
+                CostPrice = model.CostPrice,
+                MarginPercent = model.MarginPercent,
+                SalePrice = model.SalePrice,
+                FinalSalePrice = model.FinalSalePrice,
+                Notes = model.Notes,
+                VatCode = model.VatCode,
+                Size01 = model.Size01,
+                Size02 = model.Size02,
+                Size03 = model.Size03,
+                Size04 = model.Size04,
+                Size05 = model.Size05,
+                Size06 = model.Size06,
+                Size07 = model.Size07,
+                Size08 = model.Size08,
+                Size09 = model.Size09,
+                Size10 = model.Size10,
+                ScandalloLines = model.ScandalloLines
+                    .OrderBy(item => item.LineNumber)
+                    .Select((item, index) => new SaveModeloScandalloLineInput
+                    {
+                        LineNumber = index + 1,
+                        Title = item.Title,
+                        FabricCode = item.FabricCode,
+                        Consumption = item.Consumption,
+                        UnitPrice = item.UnitPrice,
+                        CostPrice = item.CostPrice
+                    })
+                    .ToList(),
+                ColorLines = model.ColorLines
+                    .OrderBy(item => item.LineNumber)
+                    .Select((item, index) => new SaveModeloColorLineInput
+                    {
+                        LineNumber = index + 1,
+                        ModelColorCode = item.ModelColorCode,
+                        Title = item.Title,
+                        ColorTitle = item.ColorTitle
+                    })
+                    .ToList(),
+                FornituraLines = model.FornituraLines
+                    .OrderBy(item => item.LineNumber)
+                    .Select((item, index) => new SaveModeloFornituraLineInput
+                    {
+                        LineNumber = index + 1,
+                        FornituraCode = item.FornituraCode,
+                        Measure = item.Measure,
+                        Units = item.Units,
+                        UnitPrice = item.UnitPrice,
+                        ImportAmount = item.ImportAmount
+                    })
+                    .ToList(),
+                StockLines = model.StockLines
+                    .OrderBy(item => item.LineNumber)
+                    .Select((item, index) => new SaveModeloStockLineInput
+                    {
+                        LineNumber = index + 1,
+                        Color = item.Color,
+                        SizeText = item.SizeText,
+                        SizeQuantity01 = item.SizeQuantity01,
+                        SizeQuantity02 = item.SizeQuantity02,
+                        SizeQuantity03 = item.SizeQuantity03,
+                        SizeQuantity04 = item.SizeQuantity04,
+                        SizeQuantity05 = item.SizeQuantity05,
+                        SizeQuantity06 = item.SizeQuantity06,
+                        SizeQuantity07 = item.SizeQuantity07,
+                        SizeQuantity08 = item.SizeQuantity08,
+                        SizeQuantity09 = item.SizeQuantity09,
+                        SizeQuantity10 = item.SizeQuantity10
+                    })
+                    .ToList()
+            });
+
+            statusMessage = model.Id == Guid.Empty ? "Model creado correctamente." : "Model actualizado correctamente.";
+            isError = false;
+
+            var targetUrl = $"/articulos/models/editar/{savedId}";
+            if (!string.Equals(NavigationManager.Uri, NavigationManager.ToAbsoluteUri(targetUrl).ToString(), StringComparison.OrdinalIgnoreCase))
+            {
+                NavigationManager.NavigateTo(targetUrl, replace: true);
+            }
+
+            Id = savedId.ToString();
+            await LoadAsync();
+        }
+        catch (Exception exception)
+        {
+            statusMessage = exception.Message;
+            isError = true;
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private async Task DeleteAsync()
+    {
+        if (!tenantId.HasValue || !companyId.HasValue || !canEdit || model.Id == Guid.Empty)
+        {
+            return;
+        }
+
+        isLoading = true;
+        try
+        {
+            await ModeloService.DeleteAsync(tenantId.Value, companyId.Value, model.Id);
+            NavigationManager.NavigateTo("/articulos/models");
+        }
+        catch (Exception exception)
+        {
+            statusMessage = exception.Message;
+            isError = true;
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private async Task LoadAuditAsync()
+    {
+        if (!tenantId.HasValue || model.Id == Guid.Empty)
+        {
+            recentAuditLogs = [];
+            return;
+        }
+
+        recentAuditLogs = await AuditLogService.GetRecentAsync(
+            limit: 15,
+            tenantId: tenantId.Value,
+            entityName: "article_model",
+            entityId: model.Id.ToString());
+    }
+
+    private void AddScandalloLine()
+    {
+        model.ScandalloLines.Add(new ModeloScandalloLineDto
+        {
+            LineNumber = NextLineNumber(model.ScandalloLines.Select(item => item.LineNumber))
+        });
+    }
+
+    private void RemoveScandalloLine(int lineNumber)
+    {
+        var line = model.ScandalloLines.FirstOrDefault(item => item.LineNumber == lineNumber);
+        if (line is not null)
+        {
+            model.ScandalloLines.Remove(line);
+        }
+    }
+
+    private void AddColorLine()
+    {
+        model.ColorLines.Add(new ModeloColorLineDto
+        {
+            LineNumber = NextLineNumber(model.ColorLines.Select(item => item.LineNumber))
+        });
+    }
+
+    private void AddColorAcrossPieces()
+    {
+        var colorCode = colorToAdd.Trim().ToUpperInvariant();
+        if (string.IsNullOrWhiteSpace(colorCode))
+        {
+            return;
+        }
+
+        if (!HasScandalloPieces)
+        {
+            AddColorLine();
+            model.ColorLines[^1].ModelColorCode = colorCode;
+            colorToAdd = string.Empty;
+            return;
+        }
+
+        foreach (var title in DistinctScandalloTitles)
+        {
+            var exists = model.ColorLines.Any(item =>
+                string.Equals(item.ModelColorCode?.Trim(), colorCode, StringComparison.OrdinalIgnoreCase) &&
+                string.Equals(item.Title?.Trim(), title, StringComparison.OrdinalIgnoreCase));
+
+            if (exists)
+            {
+                continue;
+            }
+
+            model.ColorLines.Add(new ModeloColorLineDto
+            {
+                LineNumber = NextLineNumber(model.ColorLines.Select(item => item.LineNumber)),
+                ModelColorCode = colorCode,
+                Title = title
+            });
+        }
+
+        colorToAdd = string.Empty;
+    }
+
+    private void RemoveColorLine(int lineNumber)
+    {
+        var line = model.ColorLines.FirstOrDefault(item => item.LineNumber == lineNumber);
+        if (line is not null)
+        {
+            model.ColorLines.Remove(line);
+        }
+    }
+
+    private void RemoveColorEverywhere()
+    {
+        var colorCode = colorToRemove.Trim();
+        if (string.IsNullOrWhiteSpace(colorCode))
+        {
+            return;
+        }
+
+        model.ColorLines.RemoveAll(item => string.Equals(item.ModelColorCode?.Trim(), colorCode, StringComparison.OrdinalIgnoreCase));
+        model.StockLines.RemoveAll(item => string.Equals(item.Color?.Trim(), colorCode, StringComparison.OrdinalIgnoreCase));
+        colorToRemove = string.Empty;
+    }
+
+    private void ExpandColorsToScandalloTitles()
+    {
+        if (!HasScandalloPieces || !HasColorCodes)
+        {
+            return;
+        }
+
+        foreach (var colorCode in DistinctModelColorCodes)
+        {
+            foreach (var title in DistinctScandalloTitles)
+            {
+                var exists = model.ColorLines.Any(item =>
+                    string.Equals(item.ModelColorCode?.Trim(), colorCode, StringComparison.OrdinalIgnoreCase) &&
+                    string.Equals(item.Title?.Trim(), title, StringComparison.OrdinalIgnoreCase));
+
+                if (exists)
+                {
+                    continue;
+                }
+
+                model.ColorLines.Add(new ModeloColorLineDto
+                {
+                    LineNumber = NextLineNumber(model.ColorLines.Select(item => item.LineNumber)),
+                    ModelColorCode = colorCode,
+                    Title = title
+                });
+            }
+        }
+    }
+
+    private void AddFornituraLine()
+    {
+        model.FornituraLines.Add(new ModeloFornituraLineDto
+        {
+            LineNumber = NextLineNumber(model.FornituraLines.Select(item => item.LineNumber))
+        });
+    }
+
+    private void RemoveFornituraLine(int lineNumber)
+    {
+        var line = model.FornituraLines.FirstOrDefault(item => item.LineNumber == lineNumber);
+        if (line is not null)
+        {
+            model.FornituraLines.Remove(line);
+        }
+    }
+
+    private void AddStockLine()
+    {
+        model.StockLines.Add(new ModeloStockLineDto
+        {
+            LineNumber = NextLineNumber(model.StockLines.Select(item => item.LineNumber))
+        });
+    }
+
+    private void SeedStockFromColors()
+    {
+        foreach (var colorCode in DistinctModelColorCodes)
+        {
+            var exists = model.StockLines.Any(item => string.Equals(item.Color?.Trim(), colorCode, StringComparison.OrdinalIgnoreCase));
+            if (exists)
+            {
+                continue;
+            }
+
+            model.StockLines.Add(new ModeloStockLineDto
+            {
+                LineNumber = NextLineNumber(model.StockLines.Select(item => item.LineNumber)),
+                Color = colorCode,
+                SizeText = string.Join(" / ", GetDefinedSizes())
+            });
+        }
+    }
+
+    private void RemoveStockLine(int lineNumber)
+    {
+        var line = model.StockLines.FirstOrDefault(item => item.LineNumber == lineNumber);
+        if (line is not null)
+        {
+            model.StockLines.Remove(line);
+        }
+    }
+
+    private int CountMissingColorPieceRows()
+    {
+        if (!HasScandalloPieces || !HasColorCodes)
+        {
+            return 0;
+        }
+
+        var missing = 0;
+        foreach (var colorCode in DistinctModelColorCodes)
+        {
+            foreach (var title in DistinctScandalloTitles)
+            {
+                var exists = model.ColorLines.Any(item =>
+                    string.Equals(item.ModelColorCode?.Trim(), colorCode, StringComparison.OrdinalIgnoreCase) &&
+                    string.Equals(item.Title?.Trim(), title, StringComparison.OrdinalIgnoreCase));
+
+                if (!exists)
+                {
+                    missing++;
+                }
+            }
+        }
+
+        return missing;
+    }
+
+    private IEnumerable<string> GetDefinedSizes()
+    {
+        return new[]
+        {
+            model.Size01,
+            model.Size02,
+            model.Size03,
+            model.Size04,
+            model.Size05,
+            model.Size06,
+            model.Size07,
+            model.Size08,
+            model.Size09,
+            model.Size10
+        }
+        .Where(value => !string.IsNullOrWhiteSpace(value))
+        .Select(value => value.Trim());
+    }
+
+    private static int NextLineNumber(IEnumerable<int> lineNumbers) => lineNumbers.DefaultIfEmpty(0).Max() + 1;
+
+    private static string BuildTejidoUrl(string fabricCode) =>
+        $"/articulos/tejidos/editar/{Uri.EscapeDataString(fabricCode)}";
+
+    private static string BuildPrintUrl(Guid id) => $"/articulos/models/{id}/imprimir";
+
+    private enum ModelTab
+    {
+        Ficha,
+        Scandallo,
+        Colores,
+        Fornituras,
+        Stock
+    }
+}

@@ -1,0 +1,729 @@
+@page "/almacen/inventarios/nuevo"
+@page "/almacen/inventarios/editar/{CountNumber:int}"
+@attribute [Authorize(Roles = "TenantAdmin,TenantReader")]
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
+@inject IStockQueries StockQueries
+@inject IStockService StockService
+
+<PageTitle>@(CountNumber.HasValue ? $"Inventario {CountNumber}" : "Nuevo inventario")</PageTitle>
+
+<div class="page-header">
+    <div>
+        <p class="eyebrow">Almacén</p>
+        <h1>@(CountNumber.HasValue ? $"Inventario {CountNumber}" : "Nuevo inventario")</h1>
+        <p class="lead">Conteo por almacén con comparación entre stock esperado y contado, y ajuste automático al completar.</p>
+    </div>
+    <div class="quick-links">
+        <a class="secondary-button link-button" href="/almacen/inventarios">Volver al listado</a>
+        <a class="secondary-button link-button" href="/almacen/stock-actual">Ver stock actual</a>
+        <a class="secondary-button link-button" href="/almacen/movimientos">Ver movimientos</a>
+        @if (CountNumber.HasValue)
+        {
+            <a class="secondary-button link-button" href="/almacen/inventarios/@CountNumber.Value/imprimir">Imprimir ficha</a>
+            <a class="secondary-button link-button" href="/almacen/inventarios/@CountNumber.Value/imprimir-recuento">Hoja de recuento</a>
+        }
+    </div>
+</div>
+
+@if (!tenantId.HasValue || !companyId.HasValue)
+{
+    <div class="empty-state">
+        <p>No hay empresa activa seleccionada.</p>
+    </div>
+}
+else if (!canEdit && !CountNumber.HasValue)
+{
+    <div class="empty-state">
+        <p>No tienes permisos para crear inventarios.</p>
+    </div>
+}
+else
+{
+    @if (!string.IsNullOrWhiteSpace(statusMessage))
+    {
+        <div class="alert @(isError ? "danger" : "success")">@statusMessage</div>
+    }
+
+    <section class="card-grid">
+        <article class="info-card">
+            <p class="eyebrow">Número</p>
+            <h2>@DisplayNumber</h2>
+            <p class="muted">Identificador interno del inventario.</p>
+        </article>
+        <article class="info-card">
+            <p class="eyebrow">Estado</p>
+            <h2>@FormatStatus(model.Status)</h2>
+            <p class="muted">Borrador editable o inventario completado con movimientos generados.</p>
+        </article>
+        <article class="info-card">
+            <p class="eyebrow">Líneas</p>
+            <h2>@model.Lines.Count</h2>
+            <p class="muted">Artículos incluidos en el conteo.</p>
+        </article>
+        <article class="info-card accent-card">
+            <p class="eyebrow">Diferencia neta</p>
+            <h2>@(IsBlindHidden ? "Oculta" : model.Lines.Sum(GetDifference).ToString("0.###"))</h2>
+            <p class="muted">@(IsBlindHidden ? "El esperado sigue oculto hasta la validación." : "Resultado entre stock esperado y contado.")</p>
+        </article>
+        <article class="info-card">
+            <p class="eyebrow">Modo</p>
+            <h2>@(model.IsBlindCount ? "Conteo ciego" : "Conteo normal")</h2>
+            <p class="muted">
+                @(model.IsBlindCount
+                    ? (model.IsBlindCountRevealed ? "Esperado ya visible para validar." : "Esperado oculto hasta revelar.")
+                    : "El esperado está visible durante todo el conteo.")
+            </p>
+        </article>
+        <article class="info-card">
+            <p class="eyebrow">Dif. validadas</p>
+            <h2>@(IsBlindHidden ? "-" : $"{ValidatedDifferenceLinesCount} / {DifferenceLinesCount}")</h2>
+            <p class="muted">@(IsBlindHidden ? "Se habilitan al revelar el esperado." : "Líneas con diferencia ya revisadas.")</p>
+        </article>
+    </section>
+
+    <EditForm Model="model" OnValidSubmit="SaveAsync">
+        <fieldset disabled="@isReadOnly">
+            <div class="form-grid" style="margin-top: 1rem;">
+                <label class="field">
+                    <span>Fecha</span>
+                    <InputDate class="text-input" @bind-Value="model.CountDate" />
+                </label>
+                <label class="field">
+                    <span>Estado</span>
+                    <InputSelect class="text-input" @bind-Value="model.Status">
+                        @foreach (var status in StockCountStatuses.All)
+                        {
+                            <option value="@status">@FormatStatus(status)</option>
+                        }
+                    </InputSelect>
+                </label>
+                <label class="field">
+                    <span>Almacén</span>
+                    <InputText class="text-input" @bind-Value="model.Warehouse" />
+                </label>
+                <label class="field">
+                    <span>Conteo ciego</span>
+                    <InputCheckbox @bind-Value="model.IsBlindCount" />
+                </label>
+                <label class="field wide">
+                    <span>Notas</span>
+                    <InputTextArea class="text-area" @bind-Value="model.Notes" />
+                </label>
+            </div>
+
+            @if (!isReadOnly && model.IsBlindCount)
+            {
+                <div class="quick-links" style="margin-top: 1rem;">
+                    @if (!model.IsBlindCountRevealed)
+                    {
+                        <button class="secondary-button" type="button" @onclick="RevealBlindCount">Mostrar esperado para validación</button>
+                    }
+                    else
+                    {
+                        <span class="muted">El stock esperado ya está visible para revisar diferencias.</span>
+                    }
+                </div>
+            }
+
+            @if (!isReadOnly)
+            {
+                <section class="panel" style="margin-top: 1rem;">
+                    <div class="detail-panel-header">
+                        <div>
+                            <h2>Conteo parcial</h2>
+                            <p class="muted">Limita la recarga del stock actual a un artículo, descripción o color concretos.</p>
+                        </div>
+                    </div>
+                    <div class="form-grid">
+                        <label class="field">
+                            <span>Artículo</span>
+                            <InputText class="text-input" @bind-Value="seedItemCode" />
+                        </label>
+                        <label class="field">
+                            <span>Descripción contiene</span>
+                            <InputText class="text-input" @bind-Value="seedDescription" />
+                        </label>
+                        <label class="field">
+                            <span>Color contiene</span>
+                            <InputText class="text-input" @bind-Value="seedColor" />
+                        </label>
+                    </div>
+                </section>
+
+                <section class="panel" style="margin-top: 1rem;">
+                    <div class="detail-panel-header">
+                        <div>
+                            <h2>Cierre por familia / almacén</h2>
+                            <p class="muted">Agrupa por familia calculada del artículo y valida diferencias de forma masiva antes de completar.</p>
+                        </div>
+                        @if (!IsBlindHidden)
+                        {
+                            <div class="quick-links">
+                                <button class="secondary-button" type="button" @onclick="ValidateVisibleDifferences">Validar visibles</button>
+                                <button class="secondary-button" type="button" @onclick="ValidateAllDifferences">Validar todo</button>
+                                <button class="secondary-button" type="button" @onclick="ClearVisibleValidations">Quitar validación visibles</button>
+                            </div>
+                        }
+                    </div>
+
+                    @if (IsBlindHidden)
+                    {
+                        <div class="alert warning">
+                            El conteo es ciego. Revela el stock esperado para activar la validación masiva de diferencias por familia.
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="form-grid">
+                            <label class="field">
+                                <span>Familia activa</span>
+                                <InputSelect class="text-input" @bind-Value="activeFamilyFilter">
+                                    <option value="">Todas las familias</option>
+                                    @foreach (var summary in FamilySummaries)
+                                    {
+                                        <option value="@summary.FamilyKey">@summary.DisplayName (@summary.LineCount)</option>
+                                    }
+                                </InputSelect>
+                            </label>
+                        </div>
+
+                        <div class="table-scroll" style="margin-top: 1rem;">
+                            <table class="data-table detail-table">
+                                <thead>
+                                    <tr>
+                                        <th>Familia</th>
+                                        <th>Líneas</th>
+                                        <th>Con diferencia</th>
+                                        <th>Validadas</th>
+                                        <th>Diferencia neta</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var summary in FamilySummaries)
+                                    {
+                                        <tr>
+                                            <td>@summary.DisplayName</td>
+                                            <td>@summary.LineCount</td>
+                                            <td>@summary.DifferenceLineCount</td>
+                                            <td>@summary.ValidatedDifferenceLineCount</td>
+                                            <td>@summary.DifferenceTotal.ToString("0.###")</td>
+                                            <td>
+                                                <div class="table-actions">
+                                                    <button class="secondary-button" type="button" @onclick="() => activeFamilyFilter = summary.FamilyKey">Ver</button>
+                                                    <button class="secondary-button" type="button" @onclick="() => ValidateDifferencesForFamily(summary.FamilyKey)">Validar</button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                </section>
+            }
+
+            <section class="panel detail-panel" style="margin-top: 1rem;">
+                <div class="detail-panel-header">
+                    <div>
+                        <h2>Líneas del inventario</h2>
+                        <p class="muted">Puedes contar desde cero o recargar el stock actual del almacén seleccionado.</p>
+                    </div>
+                    @if (!isReadOnly)
+                    {
+                        <div class="quick-links">
+                            <button class="secondary-button" type="button" @onclick="ReloadSeedLinesAsync">Recargar stock actual</button>
+                            <button class="secondary-button" type="button" @onclick="AddLine">Añadir línea</button>
+                        </div>
+                    }
+                </div>
+
+                <div class="table-scroll">
+                    <table class="data-table detail-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Familia</th>
+                                <th>Artículo</th>
+                                <th>Descripción</th>
+                                <th>Color</th>
+                                <th>Esperado</th>
+                                <th>Contado</th>
+                                <th>Diferencia</th>
+                                <th>Validada</th>
+                                <th>Unidad</th>
+                                <th>Notas</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (VisibleLines.Count == 0)
+                            {
+                                <tr>
+                                    <td colspan="12" class="muted">No hay líneas cargadas para el filtro actual.</td>
+                                </tr>
+                            }
+                            else
+                            {
+                                @foreach (var line in VisibleLines)
+                                {
+                                    var difference = GetDifference(line);
+                                    <tr @key="line.LineNumber">
+                                        <td>@line.LineNumber</td>
+                                        <td>@GetFamilyDisplay(line)</td>
+                                        <td><InputText class="text-input table-input" @bind-Value="line.ItemCode" /></td>
+                                        <td><InputText class="text-input table-input" @bind-Value="line.ItemDescription" /></td>
+                                        <td><InputText class="text-input table-input" @bind-Value="line.Color" /></td>
+                                        <td>
+                                            @if (IsBlindHidden)
+                                            {
+                                                <span class="muted">Oculto</span>
+                                            }
+                                            else
+                                            {
+                                                <InputNumber class="text-input table-input" @bind-Value="line.ExpectedQuantity" disabled="@isReadOnly" />
+                                            }
+                                        </td>
+                                        <td><InputNumber class="text-input table-input" @bind-Value="line.CountedQuantity" /></td>
+                                        <td>
+                                            <strong>@(IsBlindHidden ? "Oculta" : difference.ToString("0.###"))</strong>
+                                        </td>
+                                        <td>
+                                            @if (IsBlindHidden)
+                                            {
+                                                <span class="muted">Pend.</span>
+                                            }
+                                            else if (difference == 0m)
+                                            {
+                                                <span class="muted">OK</span>
+                                            }
+                                            else
+                                            {
+                                                <InputCheckbox @bind-Value="line.IsDifferenceValidated" disabled="@isReadOnly" />
+                                            }
+                                        </td>
+                                        <td><InputText class="text-input table-input" @bind-Value="line.UnitOfMeasure" /></td>
+                                        <td><InputText class="text-input table-input" @bind-Value="line.Notes" /></td>
+                                        <td>
+                                            <div class="table-actions">
+                                                @if (!string.IsNullOrWhiteSpace(line.ItemDescription))
+                                                {
+                                                    <a class="inline-link" href="@BuildMovementsUrl(line)">Movs.</a>
+                                                }
+                                                @if (!isReadOnly)
+                                                {
+                                                    <button class="secondary-button danger-button" type="button" @onclick="() => RemoveLine(line.LineNumber)">Quitar</button>
+                                                }
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            @if (canEdit)
+            {
+                <div class="quick-links" style="margin-top: 1rem;">
+                    <button class="primary-button" type="submit">Guardar</button>
+                    @if (CountNumber.HasValue && !isReadOnly)
+                    {
+                        <button class="secondary-button danger-button" type="button" @onclick="DeleteAsync">Eliminar</button>
+                    }
+                </div>
+            }
+        </fieldset>
+    </EditForm>
+}
+
+@code {
+    [Parameter]
+    public int? CountNumber { get; set; }
+
+    [SupplyParameterFromQuery(Name = "warehouse")]
+    public string? Warehouse { get; set; }
+
+    [SupplyParameterFromQuery(Name = "itemCode")]
+    public string? ItemCode { get; set; }
+
+    [SupplyParameterFromQuery(Name = "description")]
+    public string? Description { get; set; }
+
+    [SupplyParameterFromQuery(Name = "color")]
+    public string? Color { get; set; }
+
+    private Guid? tenantId;
+    private Guid? companyId;
+    private bool canEdit;
+    private bool isReadOnly;
+    private bool isError;
+    private string statusMessage = string.Empty;
+    private string? initializedSeedSignature;
+    private string activeFamilyFilter = string.Empty;
+    private string seedItemCode = string.Empty;
+    private string seedDescription = string.Empty;
+    private string seedColor = string.Empty;
+    private StockCountDetailDto model = new()
+    {
+        Status = StockCountStatuses.Draft,
+        CountDate = DateTime.Today
+    };
+
+    private string DisplayNumber => CountNumber?.ToString() ?? "Nuevo";
+    private bool IsBlindHidden => model.IsBlindCount && !model.IsBlindCountRevealed;
+    private int DifferenceLinesCount => model.Lines.Count(line => GetDifference(line) != 0m);
+    private int ValidatedDifferenceLinesCount => model.Lines.Count(line => GetDifference(line) != 0m && line.IsDifferenceValidated);
+    private IReadOnlyList<StockCountLineDto> VisibleLines => model.Lines
+        .Where(line => string.IsNullOrWhiteSpace(activeFamilyFilter) || string.Equals(GetFamilyKey(line), activeFamilyFilter, StringComparison.OrdinalIgnoreCase))
+        .OrderBy(line => line.LineNumber)
+        .ToList();
+    private IReadOnlyList<FamilySummaryRow> FamilySummaries => model.Lines
+        .GroupBy(GetFamilyKey, StringComparer.OrdinalIgnoreCase)
+        .OrderBy(group => group.Key, StringComparer.OrdinalIgnoreCase)
+        .Select(group => new FamilySummaryRow(
+            group.Key,
+            group.Key,
+            group.Count(),
+            group.Count(line => GetDifference(line) != 0m),
+            group.Count(line => GetDifference(line) != 0m && line.IsDifferenceValidated),
+            group.Sum(GetDifference)))
+        .ToList();
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        tenantId = user.GetTenantId();
+        companyId = user.GetActiveCompanyId();
+        canEdit = user.IsPlatformAdmin() || user.IsInRole(PlatformRoles.TenantAdmin);
+
+        if (!tenantId.HasValue || !companyId.HasValue)
+        {
+            return;
+        }
+
+        if (!CountNumber.HasValue)
+        {
+            seedItemCode = ItemCode?.Trim() ?? seedItemCode;
+            seedDescription = Description?.Trim() ?? seedDescription;
+            seedColor = Color?.Trim() ?? seedColor;
+        }
+
+        if (CountNumber.HasValue)
+        {
+            var detail = await StockQueries.GetCountByNumberAsync(tenantId.Value, companyId.Value, CountNumber.Value);
+            if (detail is null)
+            {
+                statusMessage = "No se ha encontrado el inventario solicitado.";
+                isError = true;
+                model = new StockCountDetailDto();
+                isReadOnly = true;
+                return;
+            }
+
+            model = detail;
+        }
+        else if (!string.Equals(initializedSeedSignature, BuildSeedSignature(), StringComparison.Ordinal))
+        {
+            await InitializeNewAsync();
+        }
+        else if (model.Lines.Count == 0)
+        {
+            AddLine();
+        }
+
+        isReadOnly = !canEdit ||
+            string.Equals(model.Status, StockCountStatuses.Completed, StringComparison.OrdinalIgnoreCase) ||
+            string.Equals(model.Status, StockCountStatuses.Cancelled, StringComparison.OrdinalIgnoreCase);
+    }
+
+    private async Task InitializeNewAsync()
+    {
+        initializedSeedSignature = BuildSeedSignature();
+        var warehouse = Warehouse?.Trim() ?? string.Empty;
+        model = new StockCountDetailDto
+        {
+            Status = StockCountStatuses.Draft,
+            CountDate = DateTime.Today,
+            Warehouse = warehouse
+        };
+
+        if (!string.IsNullOrWhiteSpace(warehouse) && tenantId.HasValue && companyId.HasValue)
+        {
+            var lines = await StockQueries.GetCountSeedLinesAsync(tenantId.Value, companyId.Value, warehouse);
+            model.Lines = ApplySeedFilter(lines).ToList();
+        }
+
+        if (model.Lines.Count == 0)
+        {
+            AddLine();
+        }
+    }
+
+    private async Task ReloadSeedLinesAsync()
+    {
+        if (!tenantId.HasValue || !companyId.HasValue)
+        {
+            return;
+        }
+
+        try
+        {
+            statusMessage = string.Empty;
+            isError = false;
+
+            var warehouse = model.Warehouse?.Trim() ?? string.Empty;
+            if (string.IsNullOrWhiteSpace(warehouse))
+            {
+                throw new InvalidOperationException("Indica un almacén antes de recargar el stock actual.");
+            }
+
+            var lines = await StockQueries.GetCountSeedLinesAsync(tenantId.Value, companyId.Value, warehouse);
+            model.Lines = ApplySeedFilter(lines).ToList();
+            if (model.Lines.Count == 0)
+            {
+                AddLine();
+            }
+
+            statusMessage = "Stock actual recargado correctamente.";
+        }
+        catch (Exception exception)
+        {
+            statusMessage = exception.Message;
+            isError = true;
+        }
+    }
+
+    private IEnumerable<StockCountLineDto> ApplySeedFilter(IEnumerable<StockCountLineDto> lines)
+    {
+        var filtered = lines;
+        if (!string.IsNullOrWhiteSpace(seedItemCode))
+        {
+            filtered = filtered.Where(line => line.ItemCode.Contains(seedItemCode, StringComparison.OrdinalIgnoreCase));
+        }
+
+        if (!string.IsNullOrWhiteSpace(seedDescription))
+        {
+            filtered = filtered.Where(line => line.ItemDescription.Contains(seedDescription, StringComparison.OrdinalIgnoreCase));
+        }
+
+        if (!string.IsNullOrWhiteSpace(seedColor))
+        {
+            filtered = filtered.Where(line => line.Color.Contains(seedColor, StringComparison.OrdinalIgnoreCase));
+        }
+
+        return filtered
+            .Select((line, index) =>
+            {
+                line.LineNumber = index + 1;
+                line.IsDifferenceValidated = GetDifference(line) == 0m;
+                return line;
+            })
+            .ToArray();
+    }
+
+    private void ValidateAllDifferences()
+    {
+        foreach (var line in model.Lines.Where(line => GetDifference(line) != 0m))
+        {
+            line.IsDifferenceValidated = true;
+        }
+    }
+
+    private void RevealBlindCount()
+    {
+        model.IsBlindCountRevealed = true;
+        statusMessage = "Stock esperado visible. Ya puedes revisar y validar diferencias.";
+        isError = false;
+    }
+
+    private void ValidateVisibleDifferences() => ValidateDifferencesForFamily(activeFamilyFilter);
+
+    private void ValidateDifferencesForFamily(string? familyKey)
+    {
+        foreach (var line in model.Lines.Where(line => MatchesFamily(line, familyKey) && GetDifference(line) != 0m))
+        {
+            line.IsDifferenceValidated = true;
+        }
+    }
+
+    private void ClearVisibleValidations()
+    {
+        foreach (var line in model.Lines.Where(line => MatchesFamily(line, activeFamilyFilter) && GetDifference(line) != 0m))
+        {
+            line.IsDifferenceValidated = false;
+        }
+    }
+
+    private async Task SaveAsync()
+    {
+        if (!tenantId.HasValue || !companyId.HasValue || !canEdit)
+        {
+            return;
+        }
+
+        try
+        {
+            statusMessage = string.Empty;
+            isError = false;
+
+            var countNumber = await StockService.SaveCountAsync(new SaveStockCountCommand
+            {
+                TenantId = tenantId.Value,
+                CompanyId = companyId.Value,
+                CountNumber = CountNumber,
+                CountDate = model.CountDate,
+                Status = model.Status,
+                Warehouse = model.Warehouse,
+                IsBlindCount = model.IsBlindCount,
+                IsBlindCountRevealed = model.IsBlindCountRevealed,
+                Notes = model.Notes,
+                Lines = model.Lines
+                    .OrderBy(line => line.LineNumber)
+                    .Select(line => new StockCountLineDto
+                    {
+                        LineNumber = line.LineNumber,
+                        ItemCode = line.ItemCode,
+                        ItemDescription = line.ItemDescription,
+                        Color = line.Color,
+                        ExpectedQuantity = line.ExpectedQuantity,
+                        CountedQuantity = line.CountedQuantity,
+                        DifferenceQuantity = GetDifference(line),
+                        IsDifferenceValidated = GetDifference(line) == 0m || line.IsDifferenceValidated,
+                        UnitOfMeasure = line.UnitOfMeasure,
+                        Notes = line.Notes
+                    })
+                    .ToList()
+            });
+
+            if (!CountNumber.HasValue)
+            {
+                NavigationManager.NavigateTo($"/almacen/inventarios/editar/{countNumber}", false);
+                return;
+            }
+
+            statusMessage = "Inventario guardado correctamente.";
+            var detail = await StockQueries.GetCountByNumberAsync(tenantId.Value, companyId.Value, countNumber);
+            if (detail is not null)
+            {
+                model = detail;
+                isReadOnly = string.Equals(model.Status, StockCountStatuses.Completed, StringComparison.OrdinalIgnoreCase) ||
+                             string.Equals(model.Status, StockCountStatuses.Cancelled, StringComparison.OrdinalIgnoreCase);
+            }
+        }
+        catch (Exception exception)
+        {
+            statusMessage = exception.Message;
+            isError = true;
+        }
+    }
+
+    private async Task DeleteAsync()
+    {
+        if (!tenantId.HasValue || !companyId.HasValue || !CountNumber.HasValue || !canEdit)
+        {
+            return;
+        }
+
+        try
+        {
+            await StockService.DeleteCountAsync(tenantId.Value, companyId.Value, CountNumber.Value);
+            NavigationManager.NavigateTo("/almacen/inventarios", false);
+        }
+        catch (Exception exception)
+        {
+            statusMessage = exception.Message;
+            isError = true;
+        }
+    }
+
+    private void AddLine()
+    {
+        var nextNumber = model.Lines.Count == 0 ? 1 : model.Lines.Max(line => line.LineNumber) + 1;
+        model.Lines.Add(new StockCountLineDto
+        {
+            LineNumber = nextNumber,
+            UnitOfMeasure = "kg"
+        });
+    }
+
+    private void RemoveLine(int lineNumber)
+    {
+        var line = model.Lines.FirstOrDefault(item => item.LineNumber == lineNumber);
+        if (line is null)
+        {
+            return;
+        }
+
+        model.Lines.Remove(line);
+        var ordered = model.Lines.OrderBy(item => item.LineNumber).ToList();
+        for (var index = 0; index < ordered.Count; index++)
+        {
+            ordered[index].LineNumber = index + 1;
+        }
+    }
+
+    private string BuildMovementsUrl(StockCountLineDto line)
+    {
+        var search = string.IsNullOrWhiteSpace(line.Color)
+            ? $"{line.ItemCode} {line.ItemDescription}".Trim()
+            : $"{line.ItemCode} {line.Color}".Trim();
+
+        return NavigationManager.GetUriWithQueryParameters("/almacen/movimientos", new Dictionary<string, object?>
+        {
+            ["search"] = string.IsNullOrWhiteSpace(search) ? null : search,
+            ["warehouse"] = string.IsNullOrWhiteSpace(model.Warehouse) ? null : model.Warehouse
+        });
+    }
+
+    private string BuildSeedSignature() =>
+        $"{Warehouse?.Trim() ?? string.Empty}\u001f{seedItemCode}\u001f{seedDescription}\u001f{seedColor}";
+
+    private static bool MatchesFamily(StockCountLineDto line, string? familyKey) =>
+        string.IsNullOrWhiteSpace(familyKey) || string.Equals(GetFamilyKey(line), familyKey, StringComparison.OrdinalIgnoreCase);
+
+    private static string GetFamilyDisplay(StockCountLineDto line) => GetFamilyKey(line);
+
+    private static string GetFamilyKey(StockCountLineDto line)
+    {
+        var code = line.ItemCode?.Trim() ?? string.Empty;
+        if (string.IsNullOrWhiteSpace(code))
+        {
+            return "Sin familia";
+        }
+
+        var separators = new[] { '-', '/', ' ', '_', '.' };
+        foreach (var separator in separators)
+        {
+            var index = code.IndexOf(separator);
+            if (index > 0)
+            {
+                return code[..index].Trim().ToUpperInvariant();
+            }
+        }
+
+        return (code.Length <= 4 ? code : code[..4]).ToUpperInvariant();
+    }
+
+    private static decimal GetDifference(StockCountLineDto line) =>
+        decimal.Round(line.CountedQuantity - line.ExpectedQuantity, 3, MidpointRounding.AwayFromZero);
+
+    private static string FormatStatus(string status) => status switch
+    {
+        StockCountStatuses.Draft => "Borrador",
+        StockCountStatuses.Completed => "Completado",
+        StockCountStatuses.Cancelled => "Anulado",
+        _ => status
+    };
+
+    private sealed record FamilySummaryRow(
+        string FamilyKey,
+        string DisplayName,
+        int LineCount,
+        int DifferenceLineCount,
+        int ValidatedDifferenceLineCount,
+        decimal DifferenceTotal);
+}

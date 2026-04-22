@@ -52,7 +52,7 @@ else
     @if (invoiceSyncStatus?.HasSuccessfulSync == true)
     {
         <div class="alert warning">
-            Ventas / Facturas está en convivencia con legacy para esta empresa. La web muestra la réplica SaaS local y el registro de cobros queda en solo lectura mientras la sincronización mande.
+            Ventas / Facturas está en convivencia con legacy para esta empresa. La sync manual refresca solo las facturas con origen legacy; si registras cobros o haces cambios web, esa factura pasa a tratarse como local.
             @if (invoiceSyncStatus.LastCompletedUtc.HasValue)
             {
                 <span>Última sync: @invoiceSyncStatus.LastCompletedUtc.Value.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss") · Ins: @invoiceSyncStatus.LastInserted · Act: @invoiceSyncStatus.LastUpdated · Omi: @invoiceSyncStatus.LastSkipped · Err: @invoiceSyncStatus.LastErrors</span>
@@ -384,10 +384,6 @@ else
                 .FirstOrDefault(status =>
                     status.CompanyId == companyId.Value &&
                     string.Equals(status.ModuleKey, LegacySyncModuleKeys.SalesInvoices, StringComparison.OrdinalIgnoreCase));
-            if (invoiceSyncStatus?.HasSuccessfulSync == true)
-            {
-                canEdit = false;
-            }
         }
 
         if (!tenantId.HasValue || !companyId.HasValue)

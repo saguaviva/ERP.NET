@@ -11,7 +11,7 @@
         <p class="eyebrow">Compras</p>
         <h1>Proveedores</h1>
         <p class="lead">@(isLegacySyncActive
-            ? "Consulta y filtra los proveedores replicados en la SaaS local, en solo lectura mientras el módulo siga sincronizado desde legacy."
+            ? "Consulta y edita los proveedores en la SaaS local. La sincronización manual solo refresca los registros que sigan siendo de origen legacy."
             : "Consulta y filtra los proveedores del centro legacy asociado a la empresa activa.")</p>
     </div>
     <div class="quick-links">
@@ -61,7 +61,7 @@ else
     {
         <div class="alert">
             Compras / Proveedores está en convivencia con legacy para esta empresa.
-            La web muestra la réplica SaaS local y queda en solo lectura mientras la sincronización mande.
+            La web sigue siendo editable en local y la sync manual solo actualiza los registros que sigan marcados como legacy.
             @if (!string.IsNullOrWhiteSpace(syncStatusLabel))
             {
                 <span>@syncStatusLabel</span>
@@ -133,7 +133,7 @@ else
                                 }
                                 else
                                 {
-                                    <span class="muted">Solo lectura</span>
+                                    <span class="muted">Sin permiso de edición</span>
                                 }
                             </td>
                         </tr>
@@ -182,7 +182,6 @@ else
         canEdit = user.IsInRole(PlatformRoles.TenantAdmin);
 
         await LoadSyncStatusAsync();
-        canEdit = canEdit && !isLegacySyncActive;
 
         await LoadAsync();
     }

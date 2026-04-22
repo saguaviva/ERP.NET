@@ -1,0 +1,258 @@
+@page "/base-datos/{CatalogKey}/nuevo"
+@page "/base-datos/{CatalogKey}/editar/{Code}"
+@attribute [Authorize(Roles = "TenantAdmin,TenantReader")]
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IBaseCatalogQueries BaseCatalogQueries
+@inject IBaseCatalogService BaseCatalogService
+@inject NavigationManager NavigationManager
+
+<PageTitle>@($"{Definition.Title} · {(string.IsNullOrWhiteSpace(Code) ? "Nuevo" : "Editar")}")</PageTitle>
+
+<div class="page-header">
+    <div>
+        <p class="eyebrow">Base de dades</p>
+        <h1>@(string.IsNullOrWhiteSpace(Code) ? $"Nuevo {Definition.Title}" : $"Editar {Definition.Title}: {Code}")</h1>
+        <p class="lead">@Definition.Lead</p>
+    </div>
+    <div class="quick-links">
+        <a class="secondary-button link-button" href="/base-datos/@CatalogKey">Volver al listado</a>
+    </div>
+</div>
+
+@if (!isValidCatalog)
+{
+    <div class="empty-state"><p>El catálogo solicitado no existe.</p></div>
+}
+else if (!tenantId.HasValue || !companyId.HasValue)
+{
+    <div class="empty-state"><p>No hay empresa activa seleccionada.</p></div>
+}
+else
+{
+    @if (!string.IsNullOrWhiteSpace(statusMessage))
+    {
+        <div class="alert @(isError ? "danger" : "success")">@statusMessage</div>
+    }
+
+    <EditForm Model="model" OnValidSubmit="SaveAsync">
+        <fieldset disabled="@isReadOnly">
+            <div class="form-grid">
+                <label class="field">
+                    <span>@Definition.CodeLabel</span>
+                    <InputText class="text-input" @bind-Value="model.Code" />
+                </label>
+                <label class="field">
+                    <span>@Definition.NameLabel</span>
+                    <InputText class="text-input" @bind-Value="model.Name" />
+                </label>
+                @if (HasDescription)
+                {
+                    <label class="field wide">
+                        <span>@Definition.DescriptionLabel</span>
+                        <InputText class="text-input" @bind-Value="model.Description" />
+                    </label>
+                }
+                @if (HasReference)
+                {
+                    <label class="field wide">
+                        <span>@Definition.ReferenceLabel</span>
+                        <InputText class="text-input" @bind-Value="model.Reference" />
+                    </label>
+                }
+                @if (HasSecondaryReference)
+                {
+                    <label class="field wide">
+                        <span>@Definition.SecondaryReferenceLabel</span>
+                        <InputText class="text-input" @bind-Value="model.SecondaryReference" />
+                    </label>
+                }
+                @if (HasNumeric)
+                {
+                    <label class="field">
+                        <span>@Definition.NumericLabel</span>
+                        <InputNumber class="text-input" @bind-Value="model.NumericValue" />
+                    </label>
+                }
+                @if (HasSecondaryNumeric)
+                {
+                    <label class="field">
+                        <span>@Definition.SecondaryNumericLabel</span>
+                        <InputNumber class="text-input" @bind-Value="model.SecondaryNumericValue" />
+                    </label>
+                }
+                <label class="field checkbox-field">
+                    <InputCheckbox @bind-Value="model.IsActive" />
+                    <span>Activo</span>
+                </label>
+                <label class="field wide">
+                    <span>Notas</span>
+                    <InputTextArea class="text-area" @bind-Value="model.Notes" />
+                </label>
+            </div>
+
+            <div class="quick-links" style="margin-top: 1rem;">
+                @if (canEdit)
+                {
+                    <button class="primary-button" type="submit">Guardar</button>
+                }
+                @if (canEdit && !string.IsNullOrWhiteSpace(Code))
+                {
+                    <button class="secondary-button danger-button" type="button" @onclick="DeleteAsync">Eliminar</button>
+                }
+            </div>
+        </fieldset>
+    </EditForm>
+}
+
+@code {
+    [Parameter] public string CatalogKey { get; set; } = string.Empty;
+    [Parameter] public string? Code { get; set; }
+
+    private Guid? tenantId;
+    private Guid? companyId;
+    private bool canEdit;
+    private bool isReadOnly;
+    private bool isValidCatalog;
+    private string statusMessage = string.Empty;
+    private bool isError;
+    private CatalogDefinition Definition = CatalogDefinitions.Empty;
+    private BaseCatalogDetailDto model = new();
+
+    protected override async Task OnParametersSetAsync()
+    {
+        Definition = CatalogDefinitions.Get(CatalogKey);
+        isValidCatalog = Definition.IsValid;
+
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        tenantId = user.GetTenantId();
+        companyId = user.GetActiveCompanyId();
+        canEdit = user.IsPlatformAdmin() || user.IsInRole(PlatformRoles.TenantAdmin);
+        isReadOnly = !canEdit;
+
+        if (!tenantId.HasValue || !companyId.HasValue || !isValidCatalog)
+        {
+            return;
+        }
+
+        if (!string.IsNullOrWhiteSpace(Code))
+        {
+            var detail = await BaseCatalogQueries.GetByCodeAsync(tenantId.Value, companyId.Value, CatalogKey, Code);
+            if (detail is null)
+            {
+                statusMessage = "No se ha encontrado el registro solicitado.";
+                isError = true;
+                model = new BaseCatalogDetailDto { CatalogKey = CatalogKey };
+                return;
+            }
+
+            model = detail;
+            return;
+        }
+
+        model = new BaseCatalogDetailDto
+        {
+            CatalogKey = CatalogKey,
+            IsActive = true
+        };
+    }
+
+    private async Task SaveAsync()
+    {
+        if (!tenantId.HasValue || !companyId.HasValue || isReadOnly)
+        {
+            return;
+        }
+
+        try
+        {
+            statusMessage = string.Empty;
+            isError = false;
+
+            var code = await BaseCatalogService.SaveAsync(new SaveBaseCatalogItemCommand
+            {
+                TenantId = tenantId.Value,
+                CompanyId = companyId.Value,
+                CatalogKey = CatalogKey,
+                OriginalCode = Code,
+                Code = model.Code,
+                Name = model.Name,
+                Description = model.Description,
+                Reference = model.Reference,
+                SecondaryReference = model.SecondaryReference,
+                NumericValue = model.NumericValue,
+                SecondaryNumericValue = model.SecondaryNumericValue,
+                Notes = model.Notes,
+                IsActive = model.IsActive
+            });
+
+            if (string.IsNullOrWhiteSpace(Code))
+            {
+                NavigationManager.NavigateTo($"/base-datos/{CatalogKey}/editar/{Uri.EscapeDataString(code)}", false);
+                return;
+            }
+
+            statusMessage = "Registro guardado correctamente.";
+        }
+        catch (Exception exception)
+        {
+            statusMessage = exception.Message;
+            isError = true;
+        }
+    }
+
+    private async Task DeleteAsync()
+    {
+        if (!tenantId.HasValue || !companyId.HasValue || string.IsNullOrWhiteSpace(Code) || !canEdit)
+        {
+            return;
+        }
+
+        try
+        {
+            await BaseCatalogService.DeleteAsync(tenantId.Value, companyId.Value, CatalogKey, Code);
+            NavigationManager.NavigateTo($"/base-datos/{CatalogKey}", false);
+        }
+        catch (Exception exception)
+        {
+            statusMessage = exception.Message;
+            isError = true;
+        }
+    }
+
+    private bool HasDescription => !string.IsNullOrWhiteSpace(Definition.DescriptionLabel);
+    private bool HasReference => !string.IsNullOrWhiteSpace(Definition.ReferenceLabel);
+    private bool HasSecondaryReference => !string.IsNullOrWhiteSpace(Definition.SecondaryReferenceLabel);
+    private bool HasNumeric => !string.IsNullOrWhiteSpace(Definition.NumericLabel);
+    private bool HasSecondaryNumeric => !string.IsNullOrWhiteSpace(Definition.SecondaryNumericLabel);
+
+    private sealed record CatalogDefinition(
+        string Key,
+        string Title,
+        string Lead,
+        string CodeLabel,
+        string NameLabel,
+        string DescriptionLabel,
+        string ReferenceLabel,
+        string SecondaryReferenceLabel,
+        string NumericLabel,
+        string SecondaryNumericLabel,
+        bool IsValid = true);
+
+    private static class CatalogDefinitions
+    {
+        public static readonly CatalogDefinition Empty = new("", "Catálogo", string.Empty, "Código", string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, false);
+
+        public static CatalogDefinition Get(string key) => key?.Trim().ToLowerInvariant() switch
+        {
+            BaseCatalogKeys.BanksCashboxes => new(key, "Bancs / Caixes", "Gestión local de bancos, cajas y cuentas operativas.", "Codi banc", "Nom banc", "Núm. compte", "IBAN", "SWIFT / BIC", string.Empty, string.Empty),
+            BaseCatalogKeys.PaymentMethods => new(key, "Formes de pagament", "Métodos y condiciones de pago disponibles en la SaaS local.", "Codi forma", "Forma pagament", "Descripción operativa", "Referencia / tipo", string.Empty, "Dies pagament", "Dte. pagament %"),
+            BaseCatalogKeys.Operations => new(key, "Operacions", "Catálogo de operaciones de trabajo y proceso, como en el legacy.", "Codi operació", "Descripció", string.Empty, string.Empty, string.Empty, string.Empty, string.Empty),
+            BaseCatalogKeys.Machines => new(key, "Màquines", "Maestro de máquinas con código, descripción y precio operativo.", "Codi màquina", "Descripció", string.Empty, string.Empty, string.Empty, "Preu", string.Empty),
+            BaseCatalogKeys.Seasons => new(key, "Temporades", "Catálogo simple de temporadas, como en el legacy.", "Temporada", "Descripció", string.Empty, string.Empty, string.Empty, string.Empty, string.Empty),
+            BaseCatalogKeys.VatTypes => new(key, "Tipus d'IVA", "Tipos impositivos para ventas y compras, con IVA y recargo de equivalencia.", "Codi IVA", "Descripció", "Descripció operativa", "Clau fiscal", string.Empty, "% IVA", "% RE"),
+            BaseCatalogKeys.Incoterms => new(key, "Incoterms", "Condiciones de entrega y responsabilidad comercial, como en el legacy.", "Nom", "Descripció", string.Empty, string.Empty, string.Empty, string.Empty, string.Empty),
+            _ => Empty
+        };
+    }
+}

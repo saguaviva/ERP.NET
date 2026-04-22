@@ -51,8 +51,10 @@ public sealed class MySqlClienteLegacySyncHandler : ILegacyModuleSyncHandler
         try
         {
             await DeleteExistingMappingsAsync(saasConnection, transaction, context, cancellationToken);
-            await DeleteTargetRowsAsync(saasConnection, transaction, "adres", context.CompanyLegacyCenterCode, cancellationToken);
+            await DeleteLegacyAddressesAsync(saasConnection, transaction, context.CompanyLegacyCenterCode, cancellationToken);
             await DeleteTargetRowsAsync(saasConnection, transaction, "clients", context.CompanyLegacyCenterCode, cancellationToken);
+
+            var importedClientCodes = new HashSet<int>();
 
             var clientImport = await CopyRowsAsync(
                 legacyConnection,
@@ -63,8 +65,14 @@ public sealed class MySqlClienteLegacySyncHandler : ILegacyModuleSyncHandler
                 columns: sharedClientColumns,
                 orderColumns: ["CODI"],
                 stage: "clients",
+                importedEntityCodes: null,
                 onRowImported: row =>
                 {
+                    if (int.TryParse(row.EntityNumber, out var clientCode))
+                    {
+                        importedClientCodes.Add(clientCode);
+                    }
+
                     mappings.Add(new LegacySyncMappingRecord
                     {
                         LegacySourceSystem = "legacy",
@@ -89,6 +97,7 @@ public sealed class MySqlClienteLegacySyncHandler : ILegacyModuleSyncHandler
                     columns: sharedAddressColumns,
                     orderColumns: ["CODI", "DOM"],
                     stage: "adres",
+                    importedEntityCodes: importedClientCodes,
                     onRowImported: null,
                     errors,
                     cancellationToken);
@@ -122,6 +131,7 @@ public sealed class MySqlClienteLegacySyncHandler : ILegacyModuleSyncHandler
         IReadOnlyList<string> columns,
         IReadOnlyList<string> orderColumns,
         string stage,
+        IReadOnlyCollection<int>? importedEntityCodes,
         Action<ImportedRowContext>? onRowImported,
         List<LegacySyncErrorRecord> errors,
         CancellationToken cancellationToken)
@@ -140,12 +150,20 @@ public sealed class MySqlClienteLegacySyncHandler : ILegacyModuleSyncHandler
             """;
         readCommand.Parameters.AddWithValue("@centerCode", centerCode);
 
+        var targetColumns = columns.ToList();
+        if (string.Equals(tableName, "clients", StringComparison.OrdinalIgnoreCase))
+        {
+            targetColumns.Add("origin");
+            targetColumns.Add("is_deleted");
+            targetColumns.Add("synced_utc");
+        }
+
         await using var insertCommand = saasConnection.CreateCommand();
         insertCommand.Transaction = transaction;
         insertCommand.CommandText =
             $"""
-            INSERT INTO `{tableName}` ({columnList})
-            VALUES ({string.Join(", ", columns.Select(column => $"@{column}"))});
+            INSERT INTO `{tableName}` ({string.Join(", ", targetColumns.Select(column => $"`{column}`"))})
+            VALUES ({string.Join(", ", columns.Select(column => $"@{column}"))}{(string.Equals(tableName, "clients", StringComparison.OrdinalIgnoreCase) ? ", 'legacy', 0, @syncedUtc" : string.Empty)});
             """;
 
         var ordinals = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
@@ -153,12 +171,26 @@ public sealed class MySqlClienteLegacySyncHandler : ILegacyModuleSyncHandler
         {
             insertCommand.Parameters.Add(new MySqlParameter($"@{column}", DBNull.Value));
         }
+        if (string.Equals(tableName, "clients", StringComparison.OrdinalIgnoreCase))
+        {
+            insertCommand.Parameters.AddWithValue("@syncedUtc", DateTime.UtcNow);
+        }
 
         await using var reader = await readCommand.ExecuteReaderAsync(cancellationToken);
         while (await reader.ReadAsync(cancellationToken))
         {
             try
             {
+                if (importedEntityCodes is not null)
+                {
+                    var entityNumber = GetEntityNumber(reader, ordinals);
+                    if (!int.TryParse(entityNumber, out var entityCode) || !importedEntityCodes.Contains(entityCode))
+                    {
+                        result.SkippedRows++;
+                        continue;
+                    }
+                }
+
                 foreach (var column in columns)
                 {
                     if (!ordinals.TryGetValue(column, out var ordinal))
@@ -178,6 +210,10 @@ public sealed class MySqlClienteLegacySyncHandler : ILegacyModuleSyncHandler
                 onRowImported?.Invoke(new ImportedRowContext(
                     EntityNumber: GetEntityNumber(reader, ordinals),
                     EntityLine: GetEntityLine(reader, ordinals)));
+            }
+            catch (MySqlException exception) when (exception.Number == 1062)
+            {
+                result.SkippedRows++;
             }
             catch (Exception exception)
             {
@@ -204,7 +240,29 @@ public sealed class MySqlClienteLegacySyncHandler : ILegacyModuleSyncHandler
     {
         await using var command = saasConnection.CreateCommand();
         command.Transaction = transaction;
-        command.CommandText = $"DELETE FROM `{tableName}` WHERE `CENTRO` = @centerCode;";
+        command.CommandText = $"DELETE FROM `{tableName}` WHERE `CENTRO` = @centerCode AND origin = 'legacy';";
+        command.Parameters.AddWithValue("@centerCode", centerCode);
+        await command.ExecuteNonQueryAsync(cancellationToken);
+    }
+
+    private static async Task DeleteLegacyAddressesAsync(
+        MySqlConnection saasConnection,
+        MySqlTransaction transaction,
+        string centerCode,
+        CancellationToken cancellationToken)
+    {
+        await using var command = saasConnection.CreateCommand();
+        command.Transaction = transaction;
+        command.CommandText =
+            """
+            DELETE a
+            FROM adres a
+            INNER JOIN clients c
+                ON c.CODI = a.CODI
+               AND c.CENTRO = a.CENTRO
+            WHERE a.CENTRO = @centerCode
+              AND c.origin = 'legacy';
+            """;
         command.Parameters.AddWithValue("@centerCode", centerCode);
         await command.ExecuteNonQueryAsync(cancellationToken);
     }

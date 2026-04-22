@@ -1,4 +1,6 @@
 @inherits LayoutComponentBase
+@inject IJSRuntime JS
+@inject AppText T
 
 <div class="shell">
     <aside class="shell-sidebar">
@@ -6,6 +8,17 @@
     </aside>
 
     <main class="shell-main">
+        <div class="shell-toolbar no-print">
+            <button type="button"
+                    class="shell-toggle"
+                    aria-label="Mostrar u ocultar menú lateral"
+                    aria-expanded="@(!isSidebarHidden)"
+                    @onclick="ToggleSidebarAsync">
+                <span class="shell-toggle-icon" aria-hidden="true">@(isSidebarHidden ? "☰" : "←")</span>
+                <span class="shell-toggle-label">@(isSidebarHidden ? T["shell.showMenu"] : T["shell.hideMenu"])</span>
+            </button>
+        </div>
+
         <article class="shell-content">
             @Body
         </article>
@@ -17,3 +30,42 @@
     <a href="." class="reload">Recargar</a>
     <span class="dismiss">x</span>
 </div>
+
+@code {
+    private bool isSidebarHidden;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+
+        try
+        {
+            isSidebarHidden = await JS.InvokeAsync<bool>("erpUi.getSidebarHidden");
+            StateHasChanged();
+        }
+        catch (JSException)
+        {
+            isSidebarHidden = false;
+        }
+        catch (InvalidOperationException)
+        {
+            isSidebarHidden = false;
+        }
+    }
+
+    private async Task ToggleSidebarAsync()
+    {
+        isSidebarHidden = !isSidebarHidden;
+
+        try
+        {
+            await JS.InvokeVoidAsync("erpUi.setSidebarHidden", isSidebarHidden);
+        }
+        catch (JSException)
+        {
+        }
+    }
+}

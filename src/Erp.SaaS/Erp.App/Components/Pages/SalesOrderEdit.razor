@@ -35,12 +35,6 @@ else if (!canEdit && !OrderNumber.HasValue)
         <p>No tienes permisos para crear pedidos de cliente.</p>
     </div>
 }
-else if (isLegacySyncActive && !OrderNumber.HasValue)
-{
-    <div class="empty-state">
-        <p>Ventas / Pedidos está en convivencia con legacy para esta empresa. Los nuevos pedidos deben seguir creándose en TEX.NET mientras dure esta fase.</p>
-    </div>
-}
 else
 {
     @if (!string.IsNullOrWhiteSpace(statusMessage))
@@ -51,7 +45,7 @@ else
     @if (isLegacySyncActive)
     {
         <div class="alert warning">
-            Este módulo está sincronizado desde legacy para la empresa activa. La edición y expedición quedan bloqueadas en la web mientras siga la convivencia.
+            Este módulo está sincronizado desde legacy para la empresa activa. La sync manual refresca solo los pedidos con origen legacy; cualquier cambio que guardes desde la web convertirá el pedido a local y ya no se sobrescribirá.
             @if (lastSyncUtc.HasValue)
             {
                 <span> Última sync: @lastSyncUtc.Value.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss").</span>
@@ -335,7 +329,7 @@ else
     private decimal TotalShippedQuantity => model.Lines.Sum(line => line.ShippedQuantity);
     private decimal TotalPendingQuantity => model.Lines.Sum(line => line.PendingQuantity);
     private bool HasAnyShipment => model.Lines.Any(line => line.ShippedQuantity > 0);
-    private bool canModify => canEdit && !isLegacySyncActive && !isLegacyOriginOrder;
+    private bool canModify => canEdit;
 
     protected override async Task OnParametersSetAsync()
     {

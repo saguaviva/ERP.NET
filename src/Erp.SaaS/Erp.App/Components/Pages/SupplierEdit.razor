@@ -15,7 +15,7 @@
         <p class="eyebrow">Compras</p>
         <h1>@(Code.HasValue ? $"Editar proveedor {Code}" : "Nuevo proveedor")</h1>
         <p class="lead">@(isLegacySyncActive
-            ? "Consulta sobre la réplica SaaS local de prove, en solo lectura mientras el módulo siga sincronizado desde legacy."
+            ? "Alta y edición sobre la réplica SaaS local. La sincronización manual solo refresca los registros que sigan siendo de origen legacy."
             : "Alta y edición sobre la tabla prove replicada en la SaaS local, filtrada por la empresa activa.")</p>
     </div>
     <div class="quick-links">
@@ -40,7 +40,7 @@ else
     {
         <div class="alert">
             Compras / Proveedores está en convivencia con legacy para esta empresa.
-            Esta ficha queda en solo lectura mientras la sincronización mande.
+            Esta ficha sigue siendo editable en local. Si modificas un proveedor importado, pasará a tratarse como registro local y la sync manual ya no lo sobreescribirá.
             @if (!string.IsNullOrWhiteSpace(syncStatusLabel))
             {
                 <span>@syncStatusLabel</span>
@@ -49,7 +49,7 @@ else
     }
 
     <EditForm Model="model" OnValidSubmit="SaveAsync">
-        <fieldset disabled="@isLegacySyncActive">
+        <fieldset>
         <div class="form-grid">
             <label class="field">
                 <span>Nombre</span>
@@ -216,12 +216,10 @@ else
         </div>
 
         <div class="quick-links" style="margin-top: 1rem;">
-            @if (!isLegacySyncActive)
-            {
-                <button class="primary-button" type="submit">Guardar proveedor</button>
-            }
+            <button class="primary-button" type="submit">Guardar proveedor</button>
             @if (Code.HasValue)
             {
+                <button class="secondary-button danger" type="button" @onclick="DeleteAsync">Eliminar proveedor</button>
                 <button class="secondary-button" type="button" @onclick="LoadAuditAsync">Recargar historial</button>
             }
         </div>
@@ -326,13 +324,6 @@ else
             return;
         }
 
-        if (isLegacySyncActive)
-        {
-            statusMessage = "Compras / Proveedores está en convivencia con legacy para esta empresa. La ficha queda en solo lectura.";
-            isError = true;
-            return;
-        }
-
         try
         {
             statusMessage = string.Empty;
@@ -387,6 +378,25 @@ else
             }
 
             await LoadAuditAsync();
+        }
+        catch (Exception exception)
+        {
+            statusMessage = exception.Message;
+            isError = true;
+        }
+    }
+
+    private async Task DeleteAsync()
+    {
+        if (!tenantId.HasValue || !companyId.HasValue || !Code.HasValue)
+        {
+            return;
+        }
+
+        try
+        {
+            await ProveedorService.DeleteAsync(tenantId.Value, companyId.Value, Code.Value);
+            NavigationManager.NavigateTo("/crm/proveedores", forceLoad: false);
         }
         catch (Exception exception)
         {

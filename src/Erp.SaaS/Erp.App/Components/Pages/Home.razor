@@ -1,66 +1,156 @@
 @page "/"
 @attribute [Authorize]
+@using System.Globalization
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject ICompanyAccessService CompanyAccessService
+@inject ILegacySyncService LegacySyncService
+@inject IClienteQueries ClienteQueries
+@inject IProveedorQueries ProveedorQueries
+@inject IRepresentativeQueries RepresentativeQueries
+@inject ITejidoQueries TejidoQueries
+@inject IModeloQueries ModeloQueries
+@inject IMuestraQueries MuestraQueries
+@inject IDisposicionQueries DisposicionQueries
+@inject IParteAcabadoQueries ParteAcabadoQueries
+@inject ISalesOrderQueries SalesOrderQueries
+@inject IPurchaseOrderQueries PurchaseOrderQueries
+@inject IPurchaseInvoiceQueries PurchaseInvoiceQueries
+@inject IStockQueries StockQueries
+@inject AppText T
 
-<PageTitle>Dashboard</PageTitle>
+<PageTitle>@T["menu.dashboard"]</PageTitle>
 
 <div class="page-header">
     <div>
-        <p class="eyebrow">Aplicación privada</p>
-        <h1>Panel de trabajo</h1>
-        <p class="lead">La base SaaS ya separa tenant, empresa activa y usuarios con roles.</p>
+        <p class="eyebrow">@T["home.kicker"]</p>
+        <h1>@T["home.title"]</h1>
+        <p class="lead">@T["home.lead"]</p>
     </div>
 </div>
 
-<div class="card-grid">
-    <section class="info-card accent-card">
-        <h2>@displayName</h2>
-        <p>@email</p>
-        <p class="muted">Rol principal: @(roles.FirstOrDefault() ?? "Sin rol")</p>
-    </section>
-    <section class="info-card">
-        <h2>Tenant</h2>
-        <p>@(tenantId?.ToString() ?? "Sin tenant asignado")</p>
-    </section>
-    <section class="info-card">
-        <h2>Empresa activa</h2>
-        <p>@(activeCompany?.Name ?? "Selecciona una empresa para trabajar")</p>
-    </section>
-</div>
+@if (!activeCompanyId.HasValue)
+{
+    <div class="empty-state">
+        <p>@T["home.noCompany"]</p>
+    </div>
+}
+else
+{
+    <div class="dashboard-shell">
+        <div class="dashboard-hero-grid">
+            <section class="info-card accent-card dashboard-hero-card">
+                <p class="eyebrow">@T["home.user"]</p>
+                <h2>@displayName</h2>
+                <p>@email</p>
+                <p class="muted">@T.Format("home.mainRole", roles.FirstOrDefault() ?? T["home.noRole"])</p>
+            </section>
 
-<section class="panel">
-    <h2>Accesos rápidos</h2>
-    <div class="quick-links">
-        <a class="action-link" href="/crm/clientes">Abrir CRM / Clientes</a>
-        <a class="action-link" href="/crm/representantes">Abrir CRM / Representantes</a>
-        <a class="action-link" href="/crm/transportistas">Abrir CRM / Transportistas</a>
-        <a class="action-link" href="/crm/talleres">Abrir CRM / Talleres</a>
-        <a class="action-link" href="/articulos/fornituras">Abrir Artículos / Fornituras</a>
-        <a class="action-link" href="/ventas/pedidos">Abrir Ventas / Pedidos</a>
-        <a class="action-link" href="/ventas/albaranes">Abrir Ventas / Albaranes</a>
-        <a class="action-link" href="/ventas/pre-facturacion">Abrir Ventas / Pre-facturación</a>
-        <a class="action-link" href="/ventas/facturas">Abrir Ventas / Facturas</a>
-        <a class="action-link" href="/crm/proveedores">Abrir Compras / Proveedores</a>
-        <a class="action-link" href="/compras/pedidos">Abrir Compras / Pedidos</a>
-        <a class="action-link" href="/compras/recepciones">Abrir Compras / Recepciones</a>
-        <a class="action-link" href="/almacen/stock-actual">Abrir Almacén / Stock</a>
-        <a class="action-link" href="/almacen/movimientos">Abrir Almacén / Movimientos</a>
-        <a class="action-link" href="/almacen/ajustes">Registrar ajuste manual</a>
-        @if (isPlatformAdmin)
+            <section class="info-card dashboard-hero-card">
+                <p class="eyebrow">@T["home.activeCompany"]</p>
+                <h2>@(activeCompany?.Name ?? T["home.noCompanyShort"])</h2>
+                <div class="dashboard-hero-meta">
+                    <span>@T.Format("home.tenant", tenantId?.ToString() ?? T["home.noTenant"])</span>
+                    @if (!string.IsNullOrWhiteSpace(activeCompany?.LegacyCenterCode))
+                    {
+                        <span>@T.Format("home.legacyCenter", activeCompany.LegacyCenterCode)</span>
+                    }
+                </div>
+            </section>
+
+            <section class="info-card dashboard-hero-card">
+                <p class="eyebrow">@T["home.sync"]</p>
+                <h2>@T.Format("home.modulesOk", syncSummary.HealthyModules, syncSummary.TotalModules)</h2>
+                <div class="dashboard-hero-meta">
+                    <span>@T.Format("home.modulesWarnings", syncSummary.WarningModules)</span>
+                    <span>@syncSummary.LastSyncLabel</span>
+                </div>
+                @if (canManageTenant)
+                {
+                    <a class="action-link dashboard-inline-link" href="/administracion">@T["home.openAdmin"]</a>
+                }
+            </section>
+        </div>
+
+        @if (!string.IsNullOrWhiteSpace(dashboardWarning))
         {
-            <a class="action-link" href="/plataforma">Administrar tenants y usuarios</a>
+            <div class="alert">@dashboardWarning</div>
+        }
+
+        @if (isDashboardLoading)
+        {
+            <section class="panel">
+                <div class="loading-banner">
+                    <span class="loading-indicator" aria-hidden="true"></span>
+                    <span>@T["home.loading"]</span>
+                </div>
+            </section>
+        }
+        else
+        {
+            @foreach (var dashboardSection in dashboardSections)
+            {
+                <section class="panel dashboard-section">
+                    <div class="dashboard-section-header">
+                        <div>
+                            <p class="eyebrow">@dashboardSection.Kicker</p>
+                            <h2>@dashboardSection.Title</h2>
+                            <p class="lead">@dashboardSection.Description</p>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-metric-grid">
+                        @foreach (var card in dashboardSection.Cards)
+                        {
+                            <a class="dashboard-metric-card @GetMetricToneClass(card.Tone)" href="@card.Href">
+                                <span class="dashboard-metric-label">@card.Label</span>
+                                <strong class="dashboard-metric-value">@card.Value</strong>
+                                <span class="dashboard-metric-description">@card.Description</span>
+                                <span class="dashboard-metric-link">@card.LinkLabel</span>
+                            </a>
+                        }
+                    </div>
+                </section>
+            }
+
+            <section class="panel dashboard-section">
+                <div class="dashboard-section-header">
+                    <div>
+                        <p class="eyebrow">@T["home.shortcuts.kicker"]</p>
+                        <h2>@T["home.shortcuts.title"]</h2>
+                        <p class="lead">@T["home.shortcuts.description"]</p>
+                    </div>
+                </div>
+
+                <div class="dashboard-actions-grid">
+                    @foreach (var shortcut in shortcuts)
+                    {
+                        <a class="dashboard-action-tile" href="@shortcut.Href">
+                            <strong>@shortcut.Title</strong>
+                            <span>@shortcut.Description</span>
+                        </a>
+                    }
+                </div>
+            </section>
         }
     </div>
-</section>
+}
 
 @code {
     private string displayName = string.Empty;
     private string email = string.Empty;
     private Guid? tenantId;
+    private Guid? activeCompanyId;
     private IReadOnlyCollection<string> roles = [];
     private AllowedCompanyDto? activeCompany;
     private bool isPlatformAdmin;
+    private bool canManageTenant;
+    private bool isDashboardLoading = true;
+    private string dashboardWarning = string.Empty;
+    private IReadOnlyList<DashboardSectionModel> dashboardSections = [];
+
+    private DashboardSyncSummary syncSummary = DashboardSyncSummary.Empty;
+
+    private IReadOnlyList<DashboardShortcut> shortcuts => BuildShortcuts();
 
     protected override async Task OnInitializedAsync()
     {
@@ -70,14 +160,299 @@
         displayName = user.Identity?.Name ?? string.Empty;
         email = user.FindFirstValue(ClaimTypes.Email) ?? string.Empty;
         tenantId = user.GetTenantId();
+        activeCompanyId = user.GetActiveCompanyId();
         roles = user.FindAll(ClaimTypes.Role).Select(claim => claim.Value).ToArray();
         isPlatformAdmin = user.IsPlatformAdmin();
+        canManageTenant = isPlatformAdmin || user.IsInRole(PlatformRoles.TenantAdmin);
 
         var userId = user.GetUserId();
         if (userId.HasValue && tenantId.HasValue)
         {
             var companies = await CompanyAccessService.GetAllowedCompaniesAsync(userId.Value, tenantId.Value);
-            activeCompany = companies.FirstOrDefault(company => company.CompanyId == user.GetActiveCompanyId());
+            activeCompany = companies.FirstOrDefault(company => company.CompanyId == activeCompanyId);
         }
+
+        if (tenantId.HasValue && activeCompanyId.HasValue)
+        {
+            await LoadDashboardAsync(tenantId.Value, activeCompanyId.Value);
+        }
+        else
+        {
+            isDashboardLoading = false;
+        }
+    }
+
+    private async Task LoadDashboardAsync(Guid currentTenantId, Guid currentCompanyId)
+    {
+        isDashboardLoading = true;
+        dashboardWarning = string.Empty;
+        var failedMetricLoads = 0;
+
+        var clientsTask = SafeCountAsync(
+            () => ClienteQueries.SearchAsync(currentTenantId, currentCompanyId, new ClienteFilter { IncludeBlocked = true, Page = 1, PageSize = 1 }),
+            result => result.TotalCount,
+            () => failedMetricLoads++);
+
+        var suppliersTask = SafeCountAsync(
+            () => ProveedorQueries.SearchAsync(currentTenantId, currentCompanyId, new ProveedorFilter { Page = 1, PageSize = 1 }),
+            result => result.TotalCount,
+            () => failedMetricLoads++);
+
+        var representativesTask = SafeCountAsync(
+            () => RepresentativeQueries.SearchAsync(currentTenantId, currentCompanyId, new RepresentativeFilter { Page = 1, PageSize = 1 }),
+            result => result.TotalCount,
+            () => failedMetricLoads++);
+
+        var tejidosTask = SafeCountAsync(
+            () => TejidoQueries.SearchAsync(currentTenantId, currentCompanyId, new TejidoFilter { Page = 1, PageSize = 1 }),
+            result => result.TotalCount,
+            () => failedMetricLoads++);
+
+        var modelsTask = SafeCountAsync(
+            () => ModeloQueries.SearchAsync(currentTenantId, currentCompanyId, new ModeloFilter { Page = 1, PageSize = 1 }),
+            result => result.TotalCount,
+            () => failedMetricLoads++);
+
+        var muestrasTask = SafeCountAsync(
+            () => MuestraQueries.SearchAsync(currentTenantId, currentCompanyId, new MuestraFilter { Page = 1, PageSize = 1 }),
+            result => result.TotalCount,
+            () => failedMetricLoads++);
+
+        var pendingDispositionsTask = SafeCountAsync(
+            () => DisposicionQueries.SearchAsync(currentTenantId, currentCompanyId, new DisposicionFilter { ReceivedMode = "pending", IncludeCancelled = false, Page = 1, PageSize = 1 }),
+            result => result.TotalCount,
+            () => failedMetricLoads++);
+
+        var liveFinishOrdersTask = SafeCountAsync(
+            () => ParteAcabadoQueries.SearchAsync(currentTenantId, currentCompanyId, new ParteAcabadoFilter { LiveOnly = true, Page = 1, PageSize = 1 }),
+            result => result.TotalCount,
+            () => failedMetricLoads++);
+
+        var openSalesOrdersTask = SafeCountAsync(
+            () => SalesOrderQueries.SearchAsync(currentTenantId, currentCompanyId, new SalesOrderFilter { IncludeClosed = false, Page = 1, PageSize = 1 }),
+            result => result.TotalCount,
+            () => failedMetricLoads++);
+
+        var pendingShipmentTask = SafeCountAsync(
+            () => SalesOrderQueries.SearchPendingShipmentsAsync(currentTenantId, currentCompanyId, new SalesPreInvoiceFilter { Page = 1, PageSize = 1 }),
+            result => result.TotalCount,
+            () => failedMetricLoads++);
+
+        var salesInvoicesTask = SafeCountAsync(
+            () => SalesOrderQueries.SearchInvoicesAsync(currentTenantId, currentCompanyId, new SalesPreInvoiceFilter { Page = 1, PageSize = 1 }),
+            result => result.TotalCount,
+            () => failedMetricLoads++);
+
+        var openPurchaseOrdersTask = SafeCountAsync(
+            () => PurchaseOrderQueries.SearchAsync(currentTenantId, currentCompanyId, new PurchaseOrderFilter { IncludeClosed = false, Page = 1, PageSize = 1 }),
+            result => result.TotalCount,
+            () => failedMetricLoads++);
+
+        var receiptsTask = SafeCountAsync(
+            () => PurchaseOrderQueries.SearchReceiptsAsync(currentTenantId, currentCompanyId, new PurchaseReceiptFilter { Page = 1, PageSize = 1 }),
+            result => result.TotalCount,
+            () => failedMetricLoads++);
+
+        var registeredPurchaseInvoicesTask = SafeCountAsync(
+            () => PurchaseInvoiceQueries.SearchInvoicesAsync(currentTenantId, currentCompanyId, new PurchaseInvoiceFilter { Status = PurchaseInvoiceStatuses.Registered, IncludeClosed = true, Page = 1, PageSize = 1 }),
+            result => result.TotalCount,
+            () => failedMetricLoads++);
+
+        var stockBalancesTask = SafeCountAsync(
+            () => StockQueries.SearchBalancesAsync(currentTenantId, currentCompanyId, new StockBalanceFilter { Page = 1, PageSize = 1 }),
+            result => result.TotalCount,
+            () => failedMetricLoads++);
+
+        var stockMovementsTask = SafeCountAsync(
+            () => StockQueries.SearchMovementsAsync(currentTenantId, currentCompanyId, new StockMovementFilter { Page = 1, PageSize = 1 }),
+            result => result.TotalCount,
+            () => failedMetricLoads++);
+
+        var draftCountsTask = SafeCountAsync(
+            () => StockQueries.SearchCountsAsync(currentTenantId, currentCompanyId, new StockCountFilter { Status = StockCountStatuses.Draft, IncludeClosed = true, Page = 1, PageSize = 1 }),
+            result => result.TotalCount,
+            () => failedMetricLoads++);
+
+        var draftTransfersTask = SafeCountAsync(
+            () => StockQueries.SearchTransfersAsync(currentTenantId, currentCompanyId, new StockTransferFilter { Status = StockTransferStatuses.Draft, IncludeClosed = true, Page = 1, PageSize = 1 }),
+            result => result.TotalCount,
+            () => failedMetricLoads++);
+
+        var syncTask = SafeSyncSummaryAsync(currentTenantId, currentCompanyId, () => failedMetricLoads++);
+
+        await Task.WhenAll(
+            clientsTask,
+            suppliersTask,
+            representativesTask,
+            tejidosTask,
+            modelsTask,
+            muestrasTask,
+            pendingDispositionsTask,
+            liveFinishOrdersTask,
+            openSalesOrdersTask,
+            pendingShipmentTask,
+            salesInvoicesTask,
+            openPurchaseOrdersTask,
+            receiptsTask,
+            registeredPurchaseInvoicesTask,
+            stockBalancesTask,
+            stockMovementsTask,
+            draftCountsTask,
+            draftTransfersTask,
+            syncTask);
+
+        syncSummary = syncTask.Result;
+
+        dashboardSections =
+        [
+            new DashboardSectionModel(
+                T["home.crm.title"],
+                T["home.crm.description"],
+                T["home.crm.kicker"],
+                [
+                    new(T["home.crm.clients"], FormatCount(clientsTask.Result), T["home.crm.clients.desc"], "/crm/clientes", T["home.crm.openClients"]),
+                    new(T["home.crm.suppliers"], FormatCount(suppliersTask.Result), T["home.crm.suppliers.desc"], "/crm/proveedores", T["home.crm.openSuppliers"]),
+                    new(T["home.crm.representatives"], FormatCount(representativesTask.Result), T["home.crm.representatives.desc"], "/crm/representantes", T["home.crm.openRepresentatives"])
+                ]),
+            new DashboardSectionModel(
+                T["home.articles.title"],
+                T["home.articles.description"],
+                T["home.articles.kicker"],
+                [
+                    new(T["home.articles.fabric"], FormatCount(tejidosTask.Result), T["home.articles.fabric.desc"], "/articulos/tejidos", T["home.articles.openFabric"], "info"),
+                    new(T["home.articles.models"], FormatCount(modelsTask.Result), T["home.articles.models.desc"], "/articulos/models", T["home.articles.openModels"]),
+                    new(T["home.articles.samples"], FormatCount(muestrasTask.Result), T["home.articles.samples.desc"], "/articulos/muestras", T["home.articles.openSamples"]),
+                    new(T["home.articles.dispositions"], FormatCount(pendingDispositionsTask.Result), T["home.articles.dispositions.desc"], "/articulos/disposiciones?received=pending", T["home.articles.openDispositions"], "warning")
+                ]),
+            new DashboardSectionModel(
+                T["home.operations.title"],
+                T["home.operations.description"],
+                T["home.operations.kicker"],
+                [
+                    new(T["home.operations.finishOrders"], FormatCount(liveFinishOrdersTask.Result), T["home.operations.finishOrders.desc"], "/produccion/acabados?live=true&view=board", T["home.operations.openFinishOrders"], "warning"),
+                    new(T["home.operations.stockPositions"], FormatCount(stockBalancesTask.Result), T["home.operations.stockPositions.desc"], "/almacen/stock-actual", T["home.operations.openStock"]),
+                    new(T["home.operations.stockMovements"], FormatCount(stockMovementsTask.Result), T["home.operations.stockMovements.desc"], "/almacen/movimientos", T["home.operations.openMovements"]),
+                    new(T["home.operations.draftCounts"], FormatCount(draftCountsTask.Result), T["home.operations.draftCounts.desc"], "/almacen/inventarios", T["home.operations.openCounts"], "warning"),
+                    new(T["home.operations.draftTransfers"], FormatCount(draftTransfersTask.Result), T["home.operations.draftTransfers.desc"], "/almacen/traspasos", T["home.operations.openTransfers"], "warning")
+                ]),
+            new DashboardSectionModel(
+                T["home.commercial.title"],
+                T["home.commercial.description"],
+                T["home.commercial.kicker"],
+                [
+                    new(T["home.commercial.salesOrders"], FormatCount(openSalesOrdersTask.Result), T["home.commercial.salesOrders.desc"], "/ventas/pedidos", T["home.commercial.openSalesOrders"]),
+                    new(T["home.commercial.pendingShipments"], FormatCount(pendingShipmentTask.Result), T["home.commercial.pendingShipments.desc"], "/ventas/pre-facturacion", T["home.commercial.openPreinvoicing"]),
+                    new(T["home.commercial.salesInvoices"], FormatCount(salesInvoicesTask.Result), T["home.commercial.salesInvoices.desc"], "/ventas/facturas", T["home.commercial.openSalesInvoices"]),
+                    new(T["home.commercial.purchaseOrders"], FormatCount(openPurchaseOrdersTask.Result), T["home.commercial.purchaseOrders.desc"], "/compras/pedidos", T["home.commercial.openPurchaseOrders"]),
+                    new(T["home.commercial.receipts"], FormatCount(receiptsTask.Result), T["home.commercial.receipts.desc"], "/compras/recepciones", T["home.commercial.openReceipts"]),
+                    new(T["home.commercial.purchaseInvoices"], FormatCount(registeredPurchaseInvoicesTask.Result), T["home.commercial.purchaseInvoices.desc"], "/compras/facturas", T["home.commercial.openPurchaseInvoices"], "warning")
+                ])
+        ];
+
+        if (failedMetricLoads > 0)
+        {
+            dashboardWarning = failedMetricLoads == 1
+                ? T["home.loadWarning.single"]
+                : T.Format("home.loadWarning.multiple", failedMetricLoads);
+        }
+
+        isDashboardLoading = false;
+    }
+
+    private static async Task<int> SafeCountAsync<TResult>(
+        Func<Task<TResult>> loader,
+        Func<TResult, int> selector,
+        Action onFailure)
+    {
+        try
+        {
+            return selector(await loader());
+        }
+        catch
+        {
+            onFailure();
+            return 0;
+        }
+    }
+
+    private async Task<DashboardSyncSummary> SafeSyncSummaryAsync(Guid currentTenantId, Guid currentCompanyId, Action onFailure)
+    {
+        try
+        {
+            var statuses = await LegacySyncService.GetModuleStatusesAsync(currentTenantId);
+            var companyStatuses = statuses
+                .Where(status => status.CompanyId == currentCompanyId)
+                .ToArray();
+
+            if (companyStatuses.Length == 0)
+            {
+                return DashboardSyncSummary.Empty with { LastSyncLabel = T["sync.noModules"] };
+            }
+
+            var latestCompleted = companyStatuses
+                .Where(status => status.LastCompletedUtc.HasValue)
+                .OrderByDescending(status => status.LastCompletedUtc)
+                .Select(status => status.LastCompletedUtc!.Value)
+                .FirstOrDefault();
+
+            var healthy = companyStatuses.Count(status => status.HasSuccessfulSync && status.LastErrors == 0);
+            var warnings = companyStatuses.Count(status => !status.HasSuccessfulSync || status.LastErrors > 0);
+
+            return new DashboardSyncSummary(
+                companyStatuses.Length,
+                healthy,
+                warnings,
+                latestCompleted == default
+                    ? T["sync.noRuns"]
+                    : T.Format("sync.lastRun", latestCompleted.ToLocalTime().ToString("dd/MM/yyyy HH:mm", CultureInfo.CurrentCulture)));
+        }
+        catch
+        {
+            onFailure();
+            return DashboardSyncSummary.Empty with { LastSyncLabel = T["sync.unavailable"] };
+        }
+    }
+
+    private static string FormatCount(int value) =>
+        value.ToString("N0", CultureInfo.GetCultureInfo("es-ES"));
+
+    private static string GetMetricToneClass(string tone) => tone switch
+    {
+        "warning" => "dashboard-metric-card-warning",
+        "info" => "dashboard-metric-card-info",
+        "accent" => "dashboard-metric-card-accent",
+        _ => string.Empty
+    };
+
+    private IReadOnlyList<DashboardShortcut> BuildShortcuts()
+    {
+        var items = new List<DashboardShortcut>
+        {
+            new(T["shortcut.fabrics.title"], T["shortcut.fabrics.description"], "/articulos/tejidos"),
+            new(T["shortcut.models.title"], T["shortcut.models.description"], "/articulos/models"),
+            new(T["shortcut.samples.title"], T["shortcut.samples.description"], "/articulos/muestras"),
+            new(T["shortcut.dispositions.title"], T["shortcut.dispositions.description"], "/articulos/disposiciones"),
+            new(T["shortcut.finishing.title"], T["shortcut.finishing.description"], "/produccion/acabados"),
+            new(T["shortcut.purchaseInvoices.title"], T["shortcut.purchaseInvoices.description"], "/compras/facturas"),
+            new(T["shortcut.counts.title"], T["shortcut.counts.description"], "/almacen/inventarios")
+        };
+
+        if (canManageTenant)
+        {
+            items.Add(new(T["shortcut.admin.title"], T["shortcut.admin.description"], "/administracion"));
+        }
+
+        return items;
+    }
+
+    private sealed record DashboardMetricCard(string Label, string Value, string Description, string Href, string LinkLabel, string Tone = "");
+
+    private sealed record DashboardSectionModel(string Title, string Description, string Kicker, IReadOnlyList<DashboardMetricCard> Cards);
+
+    private sealed record DashboardShortcut(string Title, string Description, string Href);
+
+    private sealed record DashboardSyncSummary(int TotalModules, int HealthyModules, int WarningModules, string LastSyncLabel)
+    {
+        public static DashboardSyncSummary Empty { get; } = new(0, 0, 0, "Sin datos de sync");
     }
 }

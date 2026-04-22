@@ -11,7 +11,7 @@ public sealed class SalesInvoiceListItemDto
     public DateTime IssueDate { get; set; }
     public DateTime? DueDate { get; set; }
     public string Status { get; set; } = SalesInvoiceStatuses.Issued;
-    public string Origin { get; set; } = SalesOrderOrigins.Saas;
+    public string Origin { get; set; } = SalesOrderOrigins.Local;
     public string PaymentStatus { get; set; } = SalesInvoicePaymentStatuses.Pending;
     public int ShipmentCount { get; set; }
     public decimal TotalQuantity { get; set; }

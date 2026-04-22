@@ -2,37 +2,43 @@
 @attribute [Authorize(Roles = "TenantAdmin,TenantReader")]
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject ILegacySyncService LegacySyncService
+@inject IPurchaseInvoiceQueries PurchaseInvoiceQueries
 @inject IPurchaseOrderQueries PurchaseOrderQueries
 @inject IStockQueries StockQueries
+@inject AppText T
 
-<PageTitle>Albarán de compra @ReceiptNumber</PageTitle>
+<PageTitle>@L($"Albarán de compra {ReceiptNumber}", $"Albarà de compra {ReceiptNumber}", $"Purchase receipt {ReceiptNumber}")</PageTitle>
 
 <div class="page-header">
     <div>
-        <p class="eyebrow">Compras</p>
-        <h1>@(receipt?.DisplayNumber ?? $"Entrada {ReceiptNumber}")</h1>
+        <p class="eyebrow">@L("Compras", "Compres", "Purchases")</p>
+        <h1>@(receipt?.DisplayNumber ?? L($"Entrada {ReceiptNumber}", $"Entrada {ReceiptNumber}", $"Receipt {ReceiptNumber}"))</h1>
         <p class="lead">@(isLegacySyncActive
-            ? "Documento replicado desde TEX.NET en la SaaS local, en solo lectura mientras el módulo siga sincronizado desde legacy."
-            : "Albarán de compra generado desde la recepción del pedido.")</p>
+            ? L("Documento replicado desde TEX.NET en la SaaS local. La sync manual refresca solo las recepciones con origen legacy.", "Document replicat des de TEX.NET a la SaaS local. La sync manual refresca només les recepcions amb origen legacy.", "Document replicated from TEX.NET into the local SaaS. Manual sync refreshes only legacy-origin receipts.")
+            : L("Albarán de compra generado desde la recepción del pedido.", "Albarà de compra generat des de la recepció de la comanda.", "Purchase receipt generated from the order receipt."))</p>
     </div>
     <div class="quick-links no-print">
-        <a class="secondary-button link-button" href="/compras/recepciones">Volver a recepciones</a>
+        <a class="secondary-button link-button" href="/compras/recepciones">@L("Volver a recepciones", "Tornar a recepcions", "Back to receipts")</a>
         @if (receipt is not null)
         {
             @if (receipt.OrderNumber > 0)
             {
-                <a class="secondary-button link-button" href="/compras/pedidos/editar/@receipt.OrderNumber">Abrir pedido</a>
+                <a class="secondary-button link-button" href="/compras/pedidos/editar/@receipt.OrderNumber">@L("Abrir pedido", "Obrir comanda", "Open order")</a>
             }
-            <a class="secondary-button link-button" href="/compras/recepciones/@receipt.ReceiptNumber/pdf" target="_blank">Versión PDF</a>
+            @if (canEdit)
+            {
+                <a class="secondary-button link-button" href="/compras/facturas/nueva?receiptNumber=@receipt.ReceiptNumber">@L("Crear factura proveedor", "Crear factura proveïdor", "Create supplier invoice")</a>
+            }
+            <a class="secondary-button link-button" href="/compras/recepciones/@receipt.ReceiptNumber/pdf" target="_blank">@L("Versión PDF", "Versió PDF", "PDF version")</a>
         }
-        <button class="secondary-button" type="button" onclick="window.print()">Imprimir</button>
+        <button class="secondary-button" type="button" onclick="window.print()">@L("Imprimir", "Imprimir", "Print")</button>
     </div>
 </div>
 
 @if (!tenantId.HasValue || !companyId.HasValue)
 {
     <div class="empty-state">
-        <p>No hay empresa activa seleccionada.</p>
+        <p>@L("No hay empresa activa seleccionada.", "No hi ha cap empresa activa seleccionada.", "No active company is selected.")</p>
     </div>
 }
 else if (!string.IsNullOrWhiteSpace(errorMessage))
@@ -42,7 +48,7 @@ else if (!string.IsNullOrWhiteSpace(errorMessage))
 else if (receipt is null)
 {
     <div class="empty-state">
-        <p>No se ha encontrado la recepción solicitada.</p>
+        <p>@L("No se ha encontrado la recepción solicitada.", "No s'ha trobat la recepció sol·licitada.", "The requested receipt was not found.")</p>
     </div>
 }
 else
@@ -50,37 +56,36 @@ else
     @if (isLegacySyncActive && !string.IsNullOrWhiteSpace(syncStatusLabel))
     {
         <div class="alert">
-            Compras / Recepciones está en convivencia con legacy para esta empresa.
-            @syncStatusLabel
+            @L("Compras / Recepciones está en convivencia con legacy para esta empresa. La sync manual refresca solo las recepciones con origen legacy.", "Compres / Recepcions està en convivència amb legacy per a aquesta empresa. La sync manual refresca només les recepcions amb origen legacy.", "Purchases / Receipts is running in legacy coexistence mode for this company. Manual sync refreshes only legacy-origin receipts.") @syncStatusLabel
         </div>
     }
 
     <section class="panel receipt-document">
         <div class="receipt-document-header">
             <div>
-                <p class="eyebrow">Albarán de compra</p>
+                <p class="eyebrow">@L("Albarán de compra", "Albarà de compra", "Purchase receipt")</p>
                 <h2>@receipt.DisplayNumber</h2>
-                <p class="muted">Pedido origen @receipt.OrderNumber</p>
+                <p class="muted">@L($"Pedido origen {receipt.OrderNumber}", $"Comanda origen {receipt.OrderNumber}", $"Source order {receipt.OrderNumber}")</p>
             </div>
             <div class="receipt-document-meta">
-                <strong>Fecha</strong>
+                <strong>@L("Fecha", "Data", "Date")</strong>
                 <span>@receipt.ReceiptDate.ToString("dd/MM/yyyy")</span>
             </div>
         </div>
 
         <div class="comparison-grid">
             <section class="info-card">
-                <h2>Empresa receptora</h2>
+                <h2>@L("Empresa receptora", "Empresa receptora", "Receiving company")</h2>
                 <p><strong>@receipt.CompanyName</strong></p>
                 <p class="muted">@receipt.TenantName</p>
-                <p class="muted">Centro legacy @receipt.CompanyLegacyCenterCode</p>
+                <p class="muted">@L($"Centro legacy {receipt.CompanyLegacyCenterCode}", $"Centre legacy {receipt.CompanyLegacyCenterCode}", $"Legacy center {receipt.CompanyLegacyCenterCode}")</p>
             </section>
             <section class="info-card">
-                <h2>Proveedor</h2>
+                <h2>@L("Proveedor", "Proveïdor", "Supplier")</h2>
                 <p><strong>@receipt.SupplierName</strong></p>
                 @if (!string.IsNullOrWhiteSpace(receipt.SupplierTaxId))
                 {
-                    <p class="muted">NIF @receipt.SupplierTaxId</p>
+                    <p class="muted">@L($"NIF {receipt.SupplierTaxId}", $"NIF {receipt.SupplierTaxId}", $"Tax ID {receipt.SupplierTaxId}")</p>
                 }
                 @if (!string.IsNullOrWhiteSpace(SupplierLocation))
                 {
@@ -91,44 +96,44 @@ else
 
         <div class="receipt-detail-grid">
             <section class="info-card">
-                <h2>Cabecera logística</h2>
+                <h2>@L("Cabecera logística", "Capçalera logística", "Logistics header")</h2>
                 <div class="receipt-kv-grid">
                     <div>
-                        <span class="muted">Almacén</span>
+                        <span class="muted">@L("Almacén", "Magatzem", "Warehouse")</span>
                         <strong>@DisplayValue(receipt.Warehouse)</strong>
                     </div>
                     <div>
-                        <span class="muted">Transportista</span>
+                        <span class="muted">@L("Transportista", "Transportista", "Carrier")</span>
                         <strong>@DisplayValue(receipt.Carrier)</strong>
                     </div>
                     <div>
-                        <span class="muted">Referencia proveedor</span>
+                        <span class="muted">@L("Referencia proveedor", "Referència proveïdor", "Supplier reference")</span>
                         <strong>@DisplayValue(receipt.SupplierReference)</strong>
                     </div>
                     <div>
-                        <span class="muted">Matrícula</span>
+                        <span class="muted">@L("Matrícula", "Matrícula", "Vehicle plate")</span>
                         <strong>@DisplayValue(receipt.VehiclePlate)</strong>
                     </div>
                 </div>
             </section>
             <section class="info-card">
-                <h2>Datos de expedición</h2>
+                <h2>@L("Datos de expedición", "Dades d'expedició", "Shipment data")</h2>
                 <div class="receipt-kv-grid">
                     <div>
-                        <span class="muted">Bultos</span>
-                <strong>@(receipt.PackageCount?.ToString() ?? "Sin dato")</strong>
+                        <span class="muted">@L("Bultos", "Paquets", "Packages")</span>
+                <strong>@(receipt.PackageCount?.ToString() ?? L("Sin dato", "Sense dada", "No data"))</strong>
                     </div>
                     <div>
-                        <span class="muted">Peso bruto</span>
-                        <strong>@(receipt.GrossWeightKg.HasValue ? $"{receipt.GrossWeightKg.Value:0.###} kg" : "Sin dato")</strong>
+                        <span class="muted">@L("Peso bruto", "Pes brut", "Gross weight")</span>
+                        <strong>@(receipt.GrossWeightKg.HasValue ? $"{receipt.GrossWeightKg.Value:0.###} kg" : L("Sin dato", "Sense dada", "No data"))</strong>
                     </div>
                     <div>
-                        <span class="muted">Fecha de entrada</span>
+                        <span class="muted">@L("Fecha de entrada", "Data d'entrada", "Receipt date")</span>
                         <strong>@receipt.ReceiptDate.ToString("dd/MM/yyyy")</strong>
                     </div>
                     <div>
-                        <span class="muted">Pedido origen</span>
-                        <strong>@(receipt.OrderNumber > 0 ? receipt.OrderNumber.ToString() : "Sin pedido enlazado")</strong>
+                        <span class="muted">@L("Pedido origen", "Comanda origen", "Source order")</span>
+                        <strong>@(receipt.OrderNumber > 0 ? receipt.OrderNumber.ToString() : L("Sin pedido enlazado", "Sense comanda enllaçada", "No linked order"))</strong>
                     </div>
                 </div>
             </section>
@@ -138,30 +143,30 @@ else
     <div class="card-grid purchase-summary-grid">
         <section class="info-card">
             <h2>@receipt.DisplayNumber</h2>
-            <p>albarán</p>
+            <p>@L("albarán", "albarà", "receipt")</p>
         </section>
         <section class="info-card">
-            <h2>Pedido @receipt.OrderNumber</h2>
+            <h2>@L($"Pedido {receipt.OrderNumber}", $"Comanda {receipt.OrderNumber}", $"Order {receipt.OrderNumber}")</h2>
             <p>@receipt.SupplierName</p>
         </section>
         <section class="info-card">
             <h2>@receipt.ReceiptDate.ToString("dd/MM/yyyy")</h2>
-            <p class="muted">fecha de entrada</p>
+            <p class="muted">@L("fecha de entrada", "data d'entrada", "receipt date")</p>
         </section>
         <section class="info-card accent-card">
             <h2>@receipt.TotalReceivedQuantity.ToString("0.###")</h2>
-            <p class="muted">cantidad recepcionada</p>
+            <p class="muted">@L("cantidad recepcionada", "quantitat recepcionada", "received quantity")</p>
         </section>
     </div>
 
     <section class="panel">
-        <h2>Detalle de líneas</h2>
+        <h2>@L("Detalle de líneas", "Detall de línies", "Line details")</h2>
         <table class="data-table">
             <thead>
                 <tr>
-                    <th>Línea</th>
-                    <th>Descripción</th>
-                    <th>Cantidad</th>
+                    <th>@L("Línea", "Línia", "Line")</th>
+                    <th>@L("Descripción", "Descripció", "Description")</th>
+                    <th>@L("Cantidad", "Quantitat", "Quantity")</th>
                 </tr>
             </thead>
             <tbody>
@@ -180,7 +185,7 @@ else
     @if (!string.IsNullOrWhiteSpace(receipt.Notes))
     {
         <section class="panel">
-            <h2>Notas</h2>
+            <h2>@L("Notas", "Notes", "Notes")</h2>
             <p>@receipt.Notes</p>
         </section>
     }
@@ -188,28 +193,83 @@ else
     <section class="panel">
         <div class="page-header">
             <div>
-                <h2>Movimientos de almacén generados</h2>
-                <p class="muted">Cada línea recepcionada deja ya rastro de entrada en stock.</p>
+                <h2>@L("Facturas de proveedor enlazadas", "Factures de proveïdor enllaçades", "Linked supplier invoices")</h2>
+                <p class="muted">@L("Trazabilidad de esta recepción dentro del circuito de compras.", "Traçabilitat d'aquesta recepció dins del circuit de compres.", "Traceability of this receipt inside the purchase workflow.")</p>
             </div>
-            <div class="quick-links no-print">
-                <a class="secondary-button link-button" href="/almacen/movimientos">Abrir almacén</a>
-            </div>
+            @if (canEdit)
+            {
+                <div class="quick-links no-print">
+                    <a class="secondary-button link-button" href="/compras/facturas/nueva?receiptNumber=@receipt.ReceiptNumber">@L("Crear factura proveedor", "Crear factura proveïdor", "Create supplier invoice")</a>
+                </div>
+            }
         </div>
 
-        @if (stockMovements.Count == 0)
+        @if (linkedInvoices.Count == 0)
         {
-            <p class="muted">Esta recepción todavía no tiene movimientos asociados.</p>
+            <p class="muted">@L("Todavía no hay facturas de proveedor enlazadas a esta recepción.", "Encara no hi ha factures de proveïdor enllaçades a aquesta recepció.", "There are no supplier invoices linked to this receipt yet.")</p>
         }
         else
         {
             <table class="data-table">
                 <thead>
                     <tr>
-                        <th>Almacén</th>
-                        <th>Artículo</th>
-                        <th>Descripción</th>
-                        <th>Cantidad</th>
-                        <th>Proveedor</th>
+                        <th>@L("Factura", "Factura", "Invoice")</th>
+                        <th>@L("Proveedor", "Proveïdor", "Supplier")</th>
+                        <th>@L("Factura proveedor", "Factura proveïdor", "Supplier invoice")</th>
+                        <th>@L("Fecha", "Data", "Date")</th>
+                        <th>@L("Estado", "Estat", "Status")</th>
+                        <th>@L("Total", "Total", "Total")</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var invoice in linkedInvoices)
+                    {
+                        <tr>
+                            <td>@invoice.DisplayNumber</td>
+                            <td>@invoice.SupplierName</td>
+                            <td>@DisplayValue(invoice.SupplierDocumentNumber)</td>
+                            <td>@invoice.DocumentDate.ToString("dd/MM/yyyy")</td>
+                            <td>@FormatInvoiceStatus(invoice.Status)</td>
+                            <td>@invoice.TotalAmount.ToString("0.00") €</td>
+                            <td>
+                                <div class="table-actions">
+                                    <a class="inline-link" href="/compras/facturas/editar/@invoice.InvoiceNumber">@L("Abrir", "Obrir", "Open")</a>
+                                    <a class="inline-link" href="/compras/facturas/@invoice.InvoiceNumber/pdf" target="_blank">PDF</a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </section>
+
+    <section class="panel">
+        <div class="page-header">
+            <div>
+                <h2>@L("Movimientos de almacén generados", "Moviments de magatzem generats", "Generated warehouse movements")</h2>
+                <p class="muted">@L("Cada línea recepcionada deja ya rastro de entrada en stock.", "Cada línia recepcionada deixa ja rastre d'entrada en estoc.", "Each received line already leaves an inbound stock trace.")</p>
+            </div>
+            <div class="quick-links no-print">
+                <a class="secondary-button link-button" href="/almacen/movimientos">@L("Abrir almacén", "Obrir magatzem", "Open warehouse")</a>
+            </div>
+        </div>
+
+        @if (stockMovements.Count == 0)
+        {
+            <p class="muted">@L("Esta recepción todavía no tiene movimientos asociados.", "Aquesta recepció encara no té moviments associats.", "This receipt does not have associated movements yet.")</p>
+        }
+        else
+        {
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>@L("Almacén", "Magatzem", "Warehouse")</th>
+                        <th>@L("Artículo", "Article", "Item")</th>
+                        <th>@L("Descripción", "Descripció", "Description")</th>
+                        <th>@L("Cantidad", "Quantitat", "Quantity")</th>
+                        <th>@L("Proveedor", "Proveïdor", "Supplier")</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -230,13 +290,23 @@ else
 }
 
 @code {
+    private string L(string spanish, string catalan, string english) =>
+        T.CurrentLanguage switch
+        {
+            AppLanguages.Catalan => catalan,
+            AppLanguages.English => english,
+            _ => spanish
+        };
+
     [Parameter]
     public int ReceiptNumber { get; set; }
 
     private Guid? tenantId;
     private Guid? companyId;
+    private bool canEdit;
     private PurchaseOrderReceiptDto? receipt;
     private IReadOnlyCollection<StockMovementListItemDto> stockMovements = [];
+    private IReadOnlyCollection<PurchaseInvoiceListItemDto> linkedInvoices = [];
     private string errorMessage = string.Empty;
     private bool isLegacySyncActive;
     private string syncStatusLabel = string.Empty;
@@ -261,7 +331,7 @@ else
         }
     }
 
-    private static string DisplayValue(string value) => string.IsNullOrWhiteSpace(value) ? "Sin dato" : value;
+    private string DisplayValue(string value) => string.IsNullOrWhiteSpace(value) ? L("Sin dato", "Sense dada", "No data") : value;
 
     protected override async Task OnParametersSetAsync()
     {
@@ -269,6 +339,7 @@ else
         var user = authState.User;
         tenantId = user.GetTenantId();
         companyId = user.GetActiveCompanyId();
+        canEdit = user.IsPlatformAdmin() || user.IsInRole(PlatformRoles.TenantAdmin);
         await LoadSyncStatusAsync();
 
         if (!tenantId.HasValue || !companyId.HasValue)
@@ -283,12 +354,16 @@ else
             stockMovements = receipt is null
                 ? []
                 : await StockQueries.GetByPurchaseReceiptAsync(tenantId.Value, companyId.Value, ReceiptNumber);
+            linkedInvoices = receipt is null
+                ? []
+                : await PurchaseInvoiceQueries.GetInvoicesByReceiptAsync(tenantId.Value, companyId.Value, ReceiptNumber);
         }
         catch (Exception exception)
         {
             errorMessage = exception.Message;
             receipt = null;
             stockMovements = [];
+            linkedInvoices = [];
         }
     }
 
@@ -314,7 +389,16 @@ else
 
         isLegacySyncActive = true;
         syncStatusLabel = status.LastCompletedUtc.HasValue
-            ? $"Última sync: {status.LastCompletedUtc.Value.ToLocalTime():dd/MM/yyyy HH:mm:ss} · Ins: {status.LastInserted} · Act: {status.LastUpdated} · Omi: {status.LastSkipped} · Err: {status.LastErrors}"
-            : $"Estado: {status.LastStatus}";
+            ? $"{L("Última sync:", "Última sync:", "Last sync:")} {status.LastCompletedUtc.Value.ToLocalTime():dd/MM/yyyy HH:mm:ss} · Ins: {status.LastInserted} · Act: {status.LastUpdated} · Omi: {status.LastSkipped} · Err: {status.LastErrors}"
+            : $"{L("Estado:", "Estat:", "Status:")} {status.LastStatus}";
     }
+
+    private string FormatInvoiceStatus(string status) => status switch
+    {
+        PurchaseInvoiceStatuses.Draft => L("Borrador", "Esborrany", "Draft"),
+        PurchaseInvoiceStatuses.Registered => L("Registrada", "Registrada", "Registered"),
+        PurchaseInvoiceStatuses.Paid => L("Pagada", "Pagada", "Paid"),
+        PurchaseInvoiceStatuses.Cancelled => L("Anulada", "Anul·lada", "Cancelled"),
+        _ => string.IsNullOrWhiteSpace(status) ? L("Sin estado", "Sense estat", "No status") : status
+    };
 }

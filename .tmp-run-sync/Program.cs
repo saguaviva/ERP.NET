@@ -2,8 +2,10 @@ using Erp.Application.Companies;
 using Erp.Application.Contexts;
 using Erp.Application.LegacySync;
 using Erp.Infrastructure.MySql.Configuration;
+using Erp.Infrastructure.MySql.Clients;
 using Erp.Infrastructure.MySql.Database;
 using Erp.Infrastructure.MySql.Representatives;
+using Erp.Infrastructure.MySql.Suppliers;
 using Erp.Infrastructure.MySql.Talleres;
 using Erp.Infrastructure.MySql.LegacySync;
 using Erp.Infrastructure.MySql.Fornituras;
@@ -44,7 +46,9 @@ var handlers = new ILegacyModuleSyncHandler[]
     new MySqlFornituraLegacySyncHandler(saasFactory, legacyFactory),
     new MySqlRepresentativeLegacySyncHandler(saasFactory, legacyFactory),
     new MySqlTransportistaLegacySyncHandler(saasFactory, legacyFactory),
-    new MySqlTallerLegacySyncHandler(saasFactory, legacyFactory)
+    new MySqlTallerLegacySyncHandler(saasFactory, legacyFactory),
+    new MySqlClienteLegacySyncHandler(saasFactory, legacyFactory),
+    new MySqlProveedorLegacySyncHandler(saasFactory, legacyFactory)
 };
 var jobRunner = new MySqlLegacySyncJobRunner(saasFactory, checkpointRepository, handlers);
 var syncService = new MySqlLegacySyncService(
@@ -74,7 +78,9 @@ var modules = new[]
     LegacySyncModuleKeys.ArticleFornituras,
     LegacySyncModuleKeys.CrmRepresentatives,
     LegacySyncModuleKeys.CrmCarriers,
-    LegacySyncModuleKeys.CrmWorkshops
+    LegacySyncModuleKeys.CrmWorkshops,
+    LegacySyncModuleKeys.CrmClients,
+    LegacySyncModuleKeys.CrmSuppliers
 };
 
 foreach (var moduleKey in modules)

@@ -35,7 +35,7 @@ else
     {
         <div class="alert">
             CRM / Clientes está en convivencia con legacy para esta empresa.
-            La bandeja de duplicados queda en solo lectura mientras la sincronización mande.
+            La bandeja sigue siendo operativa en la SaaS local. La sync manual solo refresca registros legacy y no pisa tus revisiones ni propuestas locales.
             @if (!string.IsNullOrWhiteSpace(syncStatusLabel))
             {
                 <span>@syncStatusLabel</span>
@@ -120,7 +120,7 @@ else
                             }
                             else
                             {
-                                <span class="muted">Solo lectura</span>
+                                <span class="muted">Sin permiso de edición</span>
                             }
                             <button class="secondary-button" type="button" @onclick="() => ToggleComparisonAsync(pair)">
                                 @(IsComparisonExpanded(pair) ? "Ocultar comparativa" : "Comparar lado a lado")
@@ -269,7 +269,6 @@ else
         canEdit = user.IsInRole(PlatformRoles.TenantAdmin);
 
         await LoadSyncStatusAsync();
-        canEdit = canEdit && !isLegacySyncActive;
 
         await LoadAsync();
     }

@@ -1,0 +1,814 @@
+@page "/articulos/disposiciones/nueva"
+@page "/articulos/disposiciones/editar/{Code:int}"
+@attribute [Authorize(Roles = "TenantAdmin,TenantReader")]
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IAuditLogService AuditLogService
+@inject ILegacySyncService LegacySyncService
+@inject IDisposicionQueries DisposicionQueries
+@inject IDisposicionService DisposicionService
+@inject NavigationManager NavigationManager
+
+<PageTitle>@(Code.HasValue ? $"Editar disposición {Code}" : "Nueva disposición")</PageTitle>
+
+<div class="page-header">
+    <div>
+        <p class="eyebrow">ARTÍCULOS</p>
+        <h1>@(Code.HasValue ? $"Editar disposición {Code}" : "Nueva disposición")</h1>
+        <p class="lead">@(isLegacySyncActive
+            ? "Edición sobre la SaaS local. La importación manual desde legacy refresca solo registros marcados como legacy."
+            : "Alta y edición sobre la réplica local de disposiciones, filtrada por la empresa activa.")</p>
+    </div>
+    <div class="quick-links">
+        <a class="secondary-button link-button" href="/articulos/disposiciones">Volver al listado</a>
+        @if (Code.HasValue)
+        {
+            @if (canEdit && !model.IsCancelled)
+            {
+                <a class="secondary-button link-button" href="@BuildParteAcabadoUrl()">Crear parte de acabado</a>
+            }
+            <a class="secondary-button link-button" href="/articulos/disposiciones/@Code/imprimir" target="_blank" rel="noopener noreferrer">Imprimir ficha</a>
+        }
+    </div>
+</div>
+
+@if (!tenantId.HasValue || !companyId.HasValue)
+{
+    <div class="empty-state">
+        <p>No hay empresa activa seleccionada.</p>
+    </div>
+}
+else
+{
+    @if (!string.IsNullOrWhiteSpace(statusMessage))
+    {
+        <div class="alert @(isError ? "danger" : "success")">@statusMessage</div>
+    }
+
+    @if (isLegacySyncActive)
+    {
+        <div class="alert">
+            Artículos / Disposiciones está en convivencia con legacy para esta empresa.
+            Esta ficha guarda cambios solo en la SaaS local y la sync manual refresca únicamente registros de origen legacy.
+            Guardar una disposición sincronizada la convierte en local.
+            @if (!string.IsNullOrWhiteSpace(syncStatusLabel))
+            {
+                <span>@syncStatusLabel</span>
+            }
+        </div>
+    }
+
+    @if (!canEdit && !Code.HasValue)
+    {
+        <div class="alert">
+            No tienes permisos de edición para crear disposiciones nuevas en esta empresa.
+        </div>
+    }
+
+    <section class="card-grid">
+        <article class="info-card">
+            <p class="eyebrow">Número visible</p>
+            <h2>@VisibleNumber</h2>
+            <p class="muted">Identificador de trabajo usado en la ficha.</p>
+        </article>
+        <article class="info-card">
+            <p class="eyebrow">Origen</p>
+            <h2>@DisplayOrigin</h2>
+            <p class="muted">Los cambios web pasan a origen local.</p>
+        </article>
+        <article class="info-card">
+            <p class="eyebrow">Totales</p>
+            <h2>@model.TotalKilograms.ToString("0.##") kg</h2>
+            <p class="muted">@model.TotalPieces.ToString("0.##") piezas · @model.Lines.Count líneas</p>
+        </article>
+        <article class="info-card">
+            <p class="eyebrow">Estado</p>
+            <h2>@StatusLabel</h2>
+            <p class="muted">Recepción y anulación de la disposición.</p>
+        </article>
+    </section>
+
+    <EditForm Model="model" OnValidSubmit="SaveAsync">
+        <fieldset disabled="@isReadOnly">
+            <div class="form-grid" style="margin-top: 1rem;">
+                <label class="field">
+                    <span>Año / serie</span>
+                    <InputText class="text-input" @bind-Value="model.Year" />
+                </label>
+                <label class="field">
+                    <span>Número</span>
+                    <InputNumber class="text-input" @bind-Value="model.Number" />
+                </label>
+                <label class="field">
+                    <span>Fecha</span>
+                    <InputDate TValue="DateTime?" class="text-input" @bind-Value="model.Date" />
+                </label>
+                <label class="field">
+                    <span>Recepción</span>
+                    <InputDate TValue="DateTime?" class="text-input" @bind-Value="model.ReceptionDate" />
+                </label>
+                <label class="field">
+                    <span>Cliente</span>
+                    <InputNumber class="text-input" @bind-Value="model.ClientCode" />
+                </label>
+                <label class="field wide">
+                    <span>Nombre cliente</span>
+                    <InputText class="text-input" @bind-Value="model.ClientName" disabled />
+                </label>
+                <label class="field">
+                    <span>Acabador</span>
+                    <InputNumber class="text-input" @bind-Value="model.FinisherCode" />
+                </label>
+                <label class="field wide">
+                    <span>Nombre acabador</span>
+                    <InputText class="text-input" @bind-Value="model.FinisherName" disabled />
+                </label>
+                <label class="field">
+                    <span>Código cliente</span>
+                    <InputText class="text-input" @bind-Value="model.ClientReferenceCode" />
+                </label>
+                <label class="field">
+                    <span>Color</span>
+                    <InputText class="text-input" @bind-Value="model.Color" />
+                </label>
+                <label class="field">
+                    <span>Color cliente</span>
+                    <InputText class="text-input" @bind-Value="model.ClientColor" />
+                </label>
+                <label class="field">
+                    <span>Comanda</span>
+                    <InputText class="text-input" @bind-Value="model.OrderReference" />
+                </label>
+                <label class="field checkbox-field">
+                    <span>Recibido</span>
+                    <input type="checkbox" checked="@model.IsReceived" @onchange="OnReceivedChanged" />
+                </label>
+                <label class="field checkbox-field">
+                    <span>Anulada</span>
+                    <input type="checkbox" checked="@model.IsCancelled" @onchange="OnCancelledChanged" />
+                </label>
+                <label class="field wide">
+                    <span>Observaciones</span>
+                    <InputTextArea class="text-input textarea-input" @bind-Value="model.Notes" />
+                </label>
+            </div>
+
+            <section class="panel detail-panel" style="margin-top: 1rem;">
+                <div class="detail-panel-header">
+                    <div>
+                        <h2>Líneas de disposición</h2>
+                        <p class="muted">Tejedor, tejido, piezas, kg, acabado y estado por línea.</p>
+                    </div>
+                    @if (!isReadOnly)
+                    {
+                        <button class="secondary-button" type="button" @onclick="AddLine">Añadir línea</button>
+                    }
+                </div>
+
+                <div class="table-scroll">
+                    <table class="data-table detail-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Descripción</th>
+                                <th>Tejedor</th>
+                                <th>Alb.</th>
+                                <th>Tejido</th>
+                                <th>Composición</th>
+                                <th>Piezas</th>
+                                <th>Total piezas</th>
+                                <th>Kg</th>
+                                <th>Acabado</th>
+                                <th>Ancho</th>
+                                <th>Gramaje</th>
+                                <th>Rdto.</th>
+                                <th>Servido</th>
+                                <th>Dispuesto</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (model.Lines.Count == 0)
+                            {
+                                <tr>
+                                    <td colspan="16" class="muted">No hay líneas cargadas para esta disposición.</td>
+                                </tr>
+                            }
+                            else
+                            {
+                                @foreach (var line in model.Lines.OrderBy(item => item.LineNumber))
+                                {
+                                    <tr @key="line.LineNumber">
+                                        <td>@line.LineNumber</td>
+                                        <td><InputText class="text-input table-input" @bind-Value="line.Description" /></td>
+                                        <td><InputNumber class="text-input table-input" @bind-Value="line.WeaverCode" /></td>
+                                        <td><InputText class="text-input table-input" @bind-Value="line.DeliveryNoteNumber" /></td>
+                                        <td><InputText class="text-input table-input" @bind-Value="line.FabricCode" /></td>
+                                        <td><InputText class="text-input table-input" @bind-Value="line.CompositionText" /></td>
+                                        <td><InputText class="text-input table-input" @bind-Value="line.PiecesText" /></td>
+                                        <td><InputNumber class="text-input table-input" @bind-Value="line.TotalPieces" /></td>
+                                        <td><InputNumber class="text-input table-input" @bind-Value="line.TotalKilograms" disabled="@(line.IsDisposed || line.IsServed)" /></td>
+                                        <td><InputText class="text-input table-input" @bind-Value="line.FinishText" /></td>
+                                        <td><InputText class="text-input table-input" @bind-Value="line.WidthText" /></td>
+                                        <td><InputNumber class="text-input table-input" @bind-Value="line.GramWeight" /></td>
+                                        <td><InputNumber class="text-input table-input" @bind-Value="line.Yield" /></td>
+                                        <td><input type="checkbox" checked="@line.IsServed" @onchange="args => OnServedChanged(line, args)" /></td>
+                                        <td><input type="checkbox" checked="@line.IsDisposed" @onchange="args => OnDisposedChanged(line, args)" /></td>
+                                        <td>
+                                            <div class="inline-action-list">
+                                                @if (!string.IsNullOrWhiteSpace(line.FabricCode))
+                                                {
+                                                    <a class="inline-link" href="@BuildTejidoUrl(line)">Tejido</a>
+                                                    <a class="inline-link" href="@BuildMovementsUrl(line)">Movs.</a>
+                                                }
+                                                @if (!isReadOnly)
+                                                {
+                                                    <button class="danger-link" type="button" @onclick="() => RemoveLine(line.LineNumber)">Quitar</button>
+                                                }
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section class="panel" style="margin-top: 1rem;">
+                <div class="detail-panel-header">
+                    <div>
+                        <h2>Movimientos de stock generados</h2>
+                        <p class="muted">Comparativa entre lo ya guardado y lo que quedará al guardar esta disposición.</p>
+                    </div>
+                </div>
+
+                @if (StockMovementSummaries.Count == 0)
+                {
+                    <p class="muted">Todavía no hay movimientos de stock activos en esta disposición.</p>
+                }
+                else
+                {
+                    <div class="stock-summary-status-grid">
+                        <article class="stock-summary-status-card active">
+                            <strong>@StockMovementSummaries.Count(item => item.Status == StockMovementSummaryStatus.Active)</strong>
+                            <span>Activos</span>
+                        </article>
+                        <article class="stock-summary-status-card pending">
+                            <strong>@StockMovementSummaries.Count(item => item.Status == StockMovementSummaryStatus.Pending)</strong>
+                            <span>Pendientes de guardar</span>
+                        </article>
+                        <article class="stock-summary-status-card reverted">
+                            <strong>@StockMovementSummaries.Count(item => item.Status == StockMovementSummaryStatus.Reverted)</strong>
+                            <span>Revertidos</span>
+                        </article>
+                    </div>
+
+                    <div class="list-block">
+                        @foreach (var movement in StockMovementSummaries)
+                        {
+                            <article class="list-item stock-summary-item @movement.CssClass">
+                                <div class="stock-summary-item-header">
+                                    <strong>@movement.Title</strong>
+                                    <span class="stock-summary-badge @movement.CssClass">@movement.StatusLabel</span>
+                                </div>
+                                <span>@movement.Description</span>
+                            </article>
+                        }
+                    </div>
+                }
+            </section>
+
+            <div class="quick-links" style="margin-top: 1rem;">
+                @if (canEdit)
+                {
+                    <button class="primary-button" type="submit">Guardar disposición</button>
+                }
+                @if (canEdit && Code.HasValue)
+                {
+                    <button class="secondary-button danger-button" type="button" @onclick="DeleteAsync">Eliminar disposición</button>
+                }
+                @if (Code.HasValue)
+                {
+                    <button class="secondary-button" type="button" @onclick="LoadAuditAsync">Recargar historial</button>
+                }
+            </div>
+        </fieldset>
+    </EditForm>
+
+    @if (Code.HasValue)
+    {
+        <section class="panel" style="margin-top: 1rem;">
+            <h2>Historial reciente de la disposición</h2>
+            <div class="list-block">
+                @if (recentAuditLogs.Count == 0)
+                {
+                    <p class="muted">Todavía no hay eventos auditados para esta disposición.</p>
+                }
+                else
+                {
+                    @foreach (var entry in recentAuditLogs)
+                    {
+                        <article class="list-item">
+                            <strong>@entry.Action</strong>
+                            @if (!string.IsNullOrWhiteSpace(entry.Details))
+                            {
+                                <span>@entry.Details</span>
+                            }
+                            <span>@entry.CreatedUtc.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss")</span>
+                        </article>
+                    }
+                }
+            </div>
+        </section>
+    }
+}
+
+@code {
+    [Parameter]
+    public int? Code { get; set; }
+
+    private Guid? tenantId;
+    private Guid? companyId;
+    private bool canEdit;
+    private bool isReadOnly;
+    private DisposicionDetailDto model = new();
+    private DisposicionDetailDto originalModel = new();
+    private string statusMessage = string.Empty;
+    private bool isError;
+    private bool isLegacySyncActive;
+    private string syncStatusLabel = string.Empty;
+    private IReadOnlyCollection<AuditLogEntryDto> recentAuditLogs = [];
+    private enum StockMovementSummaryStatus
+    {
+        Active,
+        Pending,
+        Reverted
+    }
+
+    private sealed record StockMovementSummary(string Title, string Description, StockMovementSummaryStatus Status)
+    {
+        public string StatusLabel => Status switch
+        {
+            StockMovementSummaryStatus.Active => "Activo",
+            StockMovementSummaryStatus.Pending => "Pendiente",
+            StockMovementSummaryStatus.Reverted => "Revertido",
+            _ => string.Empty
+        };
+
+        public string CssClass => Status switch
+        {
+            StockMovementSummaryStatus.Active => "active",
+            StockMovementSummaryStatus.Pending => "pending",
+            StockMovementSummaryStatus.Reverted => "reverted",
+            _ => string.Empty
+        };
+    }
+
+    private string VisibleNumber => FormatVisibleNumber(model.Number, model.Year);
+    private string DisplayOrigin => string.IsNullOrWhiteSpace(model.Origin) ? "local" : model.Origin;
+    private string StatusLabel => model.IsCancelled ? "Anulada" : model.IsReceived ? "Recibida" : "Pendiente";
+    private IReadOnlyList<StockMovementSummary> StockMovementSummaries => BuildStockMovementSummaries();
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        tenantId = user.GetTenantId();
+        companyId = user.GetActiveCompanyId();
+        canEdit = user.IsPlatformAdmin() || user.IsInRole(PlatformRoles.TenantAdmin);
+
+        if (!tenantId.HasValue || !companyId.HasValue)
+        {
+            return;
+        }
+
+        await LoadSyncStatusAsync();
+        isReadOnly = !canEdit;
+
+        if (Code.HasValue)
+        {
+            var detail = await DisposicionQueries.GetByCodeAsync(tenantId.Value, companyId.Value, Code.Value);
+            if (detail is null)
+            {
+                statusMessage = "No se ha encontrado la disposición solicitada.";
+                isError = true;
+                model = new DisposicionDetailDto();
+                originalModel = new DisposicionDetailDto();
+                recentAuditLogs = [];
+                return;
+            }
+
+            model = detail;
+            originalModel = CloneDetail(detail);
+            await LoadAuditAsync();
+        }
+        else
+        {
+            model = new DisposicionDetailDto
+            {
+                Year = DateTime.Today.Year.ToString(),
+                Date = DateTime.Today
+            };
+            originalModel = CloneDetail(model);
+            recentAuditLogs = [];
+        }
+    }
+
+    private async Task SaveAsync()
+    {
+        if (!tenantId.HasValue || !companyId.HasValue)
+        {
+            return;
+        }
+
+        if (isReadOnly)
+        {
+            statusMessage = "No tienes permisos de edición en este tenant.";
+            isError = true;
+            return;
+        }
+
+        try
+        {
+            statusMessage = string.Empty;
+            isError = false;
+
+            var savedCode = await DisposicionService.SaveAsync(new SaveDisposicionCommand
+            {
+                TenantId = tenantId.Value,
+                CompanyId = companyId.Value,
+                Code = Code,
+                Year = model.Year,
+                Number = model.Number,
+                Date = model.Date,
+                ReceptionDate = model.ReceptionDate,
+                FinisherCode = model.FinisherCode,
+                ClientCode = model.ClientCode,
+                ClientReferenceCode = model.ClientReferenceCode,
+                Notes = model.Notes,
+                ClientColor = model.ClientColor,
+                Color = model.Color,
+                OrderReference = model.OrderReference,
+                IsReceived = model.IsReceived,
+                IsCancelled = model.IsCancelled,
+                Lines = model.Lines
+                    .OrderBy(item => item.LineNumber)
+                    .Select(item => new SaveDisposicionLineInput
+                    {
+                        LineNumber = item.LineNumber,
+                        Description = item.Description,
+                        WeaverCode = item.WeaverCode,
+                        DeliveryNoteNumber = item.DeliveryNoteNumber,
+                        FabricCode = item.FabricCode,
+                        CompositionText = item.CompositionText,
+                        PiecesText = item.PiecesText,
+                        TotalPieces = item.TotalPieces,
+                        TotalKilograms = item.TotalKilograms,
+                        FinishText = item.FinishText,
+                        WidthText = item.WidthText,
+                        GramWeight = item.GramWeight,
+                        Yield = item.Yield,
+                        IsServed = item.IsServed,
+                        IsDisposed = item.IsDisposed
+                    })
+                    .ToList()
+            });
+
+            statusMessage = Code.HasValue
+                ? "Disposición actualizada correctamente."
+                : "Disposición creada correctamente.";
+
+            if (!Code.HasValue)
+            {
+                NavigationManager.NavigateTo($"/articulos/disposiciones/editar/{savedCode}", forceLoad: false);
+                return;
+            }
+
+            model.TotalPieces = model.Lines.Sum(item => item.TotalPieces);
+            model.TotalKilograms = model.Lines.Sum(item => item.TotalKilograms);
+            model.Origin = "local";
+            originalModel = CloneDetail(model);
+            await LoadAuditAsync();
+        }
+        catch (Exception exception)
+        {
+            statusMessage = exception.Message;
+            isError = true;
+        }
+    }
+
+    private async Task DeleteAsync()
+    {
+        if (!tenantId.HasValue || !companyId.HasValue || !Code.HasValue)
+        {
+            return;
+        }
+
+        try
+        {
+            await DisposicionService.DeleteAsync(tenantId.Value, companyId.Value, Code.Value);
+            NavigationManager.NavigateTo("/articulos/disposiciones", forceLoad: false);
+        }
+        catch (Exception exception)
+        {
+            statusMessage = exception.Message;
+            isError = true;
+        }
+    }
+
+    private void AddLine()
+    {
+        var nextLine = model.Lines.Count == 0 ? 1 : model.Lines.Max(item => item.LineNumber) + 1;
+        model.Lines.Add(new DisposicionLineDto
+        {
+            LineNumber = nextLine
+        });
+    }
+
+    private void RemoveLine(int lineNumber)
+    {
+        var line = model.Lines.FirstOrDefault(item => item.LineNumber == lineNumber);
+        if (line is null)
+        {
+            return;
+        }
+
+        model.Lines.Remove(line);
+        model.TotalPieces = model.Lines.Sum(item => item.TotalPieces);
+        model.TotalKilograms = model.Lines.Sum(item => item.TotalKilograms);
+    }
+
+    private void OnCancelledChanged(ChangeEventArgs args)
+    {
+        statusMessage = string.Empty;
+        isError = false;
+        model.IsCancelled = args.Value is bool value && value;
+        if (model.IsCancelled)
+        {
+            model.IsReceived = false;
+            model.ReceptionDate = null;
+        }
+    }
+
+    private void OnReceivedChanged(ChangeEventArgs args)
+    {
+        statusMessage = string.Empty;
+        isError = false;
+        var isChecked = args.Value is bool value && value;
+        if (!isChecked)
+        {
+            model.IsReceived = false;
+            model.ReceptionDate = null;
+            return;
+        }
+
+        if (model.Lines.Any(item => !item.IsServed))
+        {
+            model.IsReceived = false;
+            model.ReceptionDate = null;
+            statusMessage = "Para marcar la disposición como recibida, todas las líneas deben estar servidas.";
+            isError = true;
+            return;
+        }
+
+        model.IsReceived = true;
+        model.IsCancelled = false;
+        model.ReceptionDate ??= model.Date ?? DateTime.Today;
+    }
+
+    private void OnDisposedChanged(DisposicionLineDto line, ChangeEventArgs args)
+    {
+        statusMessage = string.Empty;
+        isError = false;
+        line.IsDisposed = args.Value is bool value && value;
+        if (!line.IsDisposed && line.IsServed)
+        {
+            line.IsServed = false;
+        }
+
+        if (model.IsReceived && model.Lines.Any(item => !item.IsServed))
+        {
+            model.IsReceived = false;
+            model.ReceptionDate = null;
+        }
+    }
+
+    private void OnServedChanged(DisposicionLineDto line, ChangeEventArgs args)
+    {
+        statusMessage = string.Empty;
+        isError = false;
+        var isChecked = args.Value is bool value && value;
+        if (isChecked && !line.IsDisposed)
+        {
+            line.IsServed = false;
+            statusMessage = $"Primero debes marcar como dispuesta la línea {line.LineNumber}.";
+            isError = true;
+            return;
+        }
+
+        line.IsServed = isChecked;
+        if (model.IsReceived && model.Lines.Any(item => !item.IsServed))
+        {
+            model.IsReceived = false;
+            model.ReceptionDate = null;
+        }
+    }
+
+    private async Task LoadSyncStatusAsync()
+    {
+        isLegacySyncActive = false;
+        syncStatusLabel = string.Empty;
+        if (!tenantId.HasValue || !companyId.HasValue)
+        {
+            return;
+        }
+
+        var status = (await LegacySyncService.GetModuleStatusesAsync(tenantId.Value))
+            .FirstOrDefault(item =>
+                item.CompanyId == companyId.Value &&
+                string.Equals(item.ModuleKey, LegacySyncModuleKeys.ArticleDispositions, StringComparison.OrdinalIgnoreCase));
+
+        if (status is null || !status.HasSuccessfulSync)
+        {
+            return;
+        }
+
+        isLegacySyncActive = true;
+        syncStatusLabel = status.LastCompletedUtc.HasValue
+            ? $"Última sync: {status.LastCompletedUtc.Value.ToLocalTime():dd/MM/yyyy HH:mm:ss} · Ins: {status.LastInserted} · Act: {status.LastUpdated} · Omi: {status.LastSkipped} · Err: {status.LastErrors}"
+            : $"Estado: {status.LastStatus}";
+    }
+
+    private async Task LoadAuditAsync()
+    {
+        if (!tenantId.HasValue || !Code.HasValue)
+        {
+            recentAuditLogs = [];
+            return;
+        }
+
+        recentAuditLogs = await AuditLogService.GetRecentAsync(
+            limit: 15,
+            tenantId: tenantId.Value,
+            entityName: "Disposicion",
+            entityId: Code.Value.ToString());
+    }
+
+    private string BuildTejidoUrl(DisposicionLineDto line) =>
+        string.IsNullOrWhiteSpace(line.FabricCode)
+            ? string.Empty
+            : $"/articulos/tejidos/editar/{Uri.EscapeDataString(line.FabricCode.Trim())}";
+
+    private string BuildMovementsUrl(DisposicionLineDto line)
+    {
+        if (string.IsNullOrWhiteSpace(line.FabricCode))
+        {
+            return string.Empty;
+        }
+
+        var search = string.IsNullOrWhiteSpace(model.Color)
+            ? line.FabricCode.Trim()
+            : $"{line.FabricCode.Trim()} {model.Color.Trim()}";
+
+        return $"/almacen/movimientos?search={Uri.EscapeDataString(search)}";
+    }
+
+    private string BuildParteAcabadoUrl() =>
+        Code.HasValue ? $"/produccion/acabados/nueva?disposicionCode={Code.Value}" : "/produccion/acabados/nueva";
+
+    private IReadOnlyList<StockMovementSummary> BuildStockMovementSummaries()
+    {
+        var items = new List<StockMovementSummary>();
+        var currentByLine = model.Lines.ToDictionary(item => item.LineNumber);
+        var originalByLine = originalModel.Lines.ToDictionary(item => item.LineNumber);
+        var lineNumbers = currentByLine.Keys
+            .Concat(originalByLine.Keys)
+            .Distinct()
+            .OrderBy(item => item);
+
+        foreach (var lineNumber in lineNumbers)
+        {
+            var hasCurrent = currentByLine.TryGetValue(lineNumber, out var currentLine);
+            var hasOriginal = originalByLine.TryGetValue(lineNumber, out var originalLine);
+
+            var effectiveLine = currentLine ?? originalLine;
+            if (effectiveLine is null || string.IsNullOrWhiteSpace(effectiveLine.FabricCode) || effectiveLine.TotalKilograms <= 0)
+            {
+                continue;
+            }
+
+            var currentColor = string.IsNullOrWhiteSpace(model.Color) ? "sin color" : model.Color.Trim();
+            var originalColor = string.IsNullOrWhiteSpace(originalModel.Color) ? currentColor : originalModel.Color.Trim();
+            var meters = CalculateMeters(effectiveLine.TotalKilograms, effectiveLine.Yield);
+            var currentDisposed = hasCurrent && currentLine!.IsDisposed;
+            var originalDisposed = hasOriginal && originalLine!.IsDisposed;
+            var currentServed = hasCurrent && currentLine!.IsServed;
+            var originalServed = hasOriginal && originalLine!.IsServed;
+
+            if (currentDisposed && originalDisposed)
+            {
+                items.Add(new StockMovementSummary(
+                    $"Línea {lineNumber}: crudo -> dispuesto",
+                    $"Tejido {effectiveLine.FabricCode}: {effectiveLine.TotalKilograms:0.##} kg y {meters:0.##} m ya están en stock dispuesto.",
+                    StockMovementSummaryStatus.Active));
+            }
+
+            if (currentDisposed && !originalDisposed)
+            {
+                items.Add(new StockMovementSummary(
+                    $"Línea {lineNumber}: crudo -> dispuesto",
+                    $"Tejido {effectiveLine.FabricCode}: al guardar se moverán {effectiveLine.TotalKilograms:0.##} kg y {meters:0.##} m a stock dispuesto.",
+                    StockMovementSummaryStatus.Pending));
+            }
+
+            if (!currentDisposed && originalDisposed)
+            {
+                items.Add(new StockMovementSummary(
+                    $"Línea {lineNumber}: crudo -> dispuesto",
+                    $"Tejido {effectiveLine.FabricCode}: al guardar se revertirán {effectiveLine.TotalKilograms:0.##} kg y {meters:0.##} m desde stock dispuesto hacia crudo.",
+                    StockMovementSummaryStatus.Reverted));
+            }
+
+            if (currentServed && originalServed)
+            {
+                items.Add(new StockMovementSummary(
+                    $"Línea {lineNumber}: dispuesto -> color",
+                    $"Tejido {effectiveLine.FabricCode}, color {currentColor}: el movimiento a color ya está activo con {meters:0.##} m.",
+                    StockMovementSummaryStatus.Active));
+            }
+
+            if (currentServed && !originalServed)
+            {
+                items.Add(new StockMovementSummary(
+                    $"Línea {lineNumber}: dispuesto -> color",
+                    $"Tejido {effectiveLine.FabricCode}, color {currentColor}: al guardar se añadirán {meters:0.##} m al stock del color.",
+                    StockMovementSummaryStatus.Pending));
+            }
+
+            if (!currentServed && originalServed)
+            {
+                items.Add(new StockMovementSummary(
+                    $"Línea {lineNumber}: dispuesto -> color",
+                    $"Tejido {effectiveLine.FabricCode}, color {originalColor}: al guardar se revertirán {meters:0.##} m desde el color hacia stock dispuesto.",
+                    StockMovementSummaryStatus.Reverted));
+            }
+        }
+
+        return items;
+    }
+
+    private static decimal CalculateMeters(decimal kilograms, decimal yield)
+    {
+        var effectiveYield = yield == 0 ? 1m : yield;
+        return Math.Round(kilograms * effectiveYield, 2, MidpointRounding.AwayFromZero);
+    }
+
+    private static string FormatVisibleNumber(int number, string year) =>
+        string.IsNullOrWhiteSpace(year) ? number.ToString() : $"{number}-{year}";
+
+    private static DisposicionDetailDto CloneDetail(DisposicionDetailDto source) =>
+        new()
+        {
+            Code = source.Code,
+            CompanyCenterCode = source.CompanyCenterCode,
+            Year = source.Year,
+            Number = source.Number,
+            Date = source.Date,
+            ReceptionDate = source.ReceptionDate,
+            FinisherCode = source.FinisherCode,
+            FinisherName = source.FinisherName,
+            ClientCode = source.ClientCode,
+            ClientName = source.ClientName,
+            ClientReferenceCode = source.ClientReferenceCode,
+            Notes = source.Notes,
+            ClientColor = source.ClientColor,
+            Color = source.Color,
+            TotalPieces = source.TotalPieces,
+            TotalKilograms = source.TotalKilograms,
+            IsReceived = source.IsReceived,
+            IsCancelled = source.IsCancelled,
+            OrderReference = source.OrderReference,
+            Origin = source.Origin,
+            Lines = source.Lines
+                .Select(line => new DisposicionLineDto
+                {
+                    LineNumber = line.LineNumber,
+                    Description = line.Description,
+                    WeaverCode = line.WeaverCode,
+                    WeaverName = line.WeaverName,
+                    DeliveryNoteNumber = line.DeliveryNoteNumber,
+                    FabricCode = line.FabricCode,
+                    CompositionText = line.CompositionText,
+                    PiecesText = line.PiecesText,
+                    TotalPieces = line.TotalPieces,
+                    TotalKilograms = line.TotalKilograms,
+                    FinishText = line.FinishText,
+                    WidthText = line.WidthText,
+                    GramWeight = line.GramWeight,
+                    Yield = line.Yield,
+                    IsServed = line.IsServed,
+                    IsDisposed = line.IsDisposed
+                })
+                .ToList()
+        };
+}

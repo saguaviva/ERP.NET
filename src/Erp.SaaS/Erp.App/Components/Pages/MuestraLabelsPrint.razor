@@ -1,0 +1,106 @@
+@page "/articulos/muestras/impresion/etiquetas/{Code}"
+@page "/articulos/complementos/impresion/etiquetas/{Code}"
+@attribute [Authorize(Roles = "TenantAdmin,TenantReader")]
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IMuestraQueries MuestraQueries
+@inject NavigationManager NavigationManager
+
+<PageTitle>@PageTitleText</PageTitle>
+
+@if (!tenantId.HasValue || !companyId.HasValue)
+{
+    <div class="empty-state">
+        <p>Selecciona una empresa activa para imprimir etiquetas del @moduleSingularLower.</p>
+    </div>
+}
+else if (detail is null)
+{
+    <div class="empty-state">
+        <p>No se ha encontrado el @moduleSingularLower solicitado.</p>
+    </div>
+}
+else
+{
+    <section class="print-sheet-page">
+        <header class="print-sheet-header">
+            <div>
+                <p class="eyebrow">@EyebrowText</p>
+                <h1>@($"{(IsComplementMode ? "Etiquetas complemento" : "Etiquetas muestra")} · {detail.Code}")</h1>
+                <p>@detail.Description</p>
+            </div>
+            <div class="print-sheet-meta">
+                <span>@DisplayClient</span>
+                <span>@($"{detail.Lines.Count} etiquetas")</span>
+            </div>
+        </header>
+
+        <div class="sample-label-grid">
+            @foreach (var line in detail.Lines.OrderBy(item => item.LineNumber))
+            {
+                <article class="sample-label-card">
+                    <span class="sample-label-code">@detail.Code</span>
+                    <strong>@DisplayColor(line)</strong>
+                    <span>@BuildSizeLabel(line)</span>
+                    <span>@DisplayLineDescription(line)</span>
+                    <span>@DisplayLineClient(line)</span>
+                    <span>NC: @DisplayNcCode(line)</span>
+                    <span>Venta: @line.SalePrice.ToString("0.00##")</span>
+                </article>
+            }
+        </div>
+    </section>
+}
+
+@code {
+    [Parameter]
+    public string Code { get; set; } = string.Empty;
+
+    private Guid? tenantId;
+    private Guid? companyId;
+    private MuestraDetailDto? detail;
+    private bool IsComplementMode => NavigationManager.Uri.Contains("/articulos/complementos", StringComparison.OrdinalIgnoreCase);
+    private string moduleSingularLower => IsComplementMode ? "complemento" : "muestra";
+    private string EyebrowText => IsComplementMode ? "ARTÍCULOS / COMPLEMENTOS" : "ARTÍCULOS / MUESTRAS";
+    private string PageTitleText => $"{(IsComplementMode ? "Etiquetas complemento" : "Etiquetas muestra")} {Code}";
+
+    private string DisplayClient => detail is null
+        ? string.Empty
+        : !string.IsNullOrWhiteSpace(detail.ClientName) ? detail.ClientName : $"Cliente {detail.ClientCode}";
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        tenantId = user.GetTenantId();
+        companyId = user.GetActiveCompanyId();
+        if (!tenantId.HasValue || !companyId.HasValue)
+        {
+            detail = null;
+            return;
+        }
+
+        detail = await MuestraQueries.GetByCodeAsync(tenantId.Value, companyId.Value, Uri.UnescapeDataString(Code));
+    }
+
+    private static string BuildSizeLabel(MuestraLineDto line)
+    {
+        var values = new[] { Normalize(line.SizeCode), Normalize(line.SizeHigh), Normalize(line.SizeLow) }
+            .Where(value => !string.IsNullOrWhiteSpace(value))
+            .ToArray();
+        return values.Length == 0 ? "Sin talla" : string.Join(" · ", values);
+    }
+
+    private static string DisplayLineDescription(MuestraLineDto line) =>
+        string.IsNullOrWhiteSpace(line.Description) ? "Sin descripción" : line.Description;
+
+    private static string DisplayColor(MuestraLineDto line) =>
+        string.IsNullOrWhiteSpace(line.Color) ? "Sin color" : line.Color;
+
+    private static string DisplayLineClient(MuestraLineDto line) =>
+        !string.IsNullOrWhiteSpace(line.ClientName) ? line.ClientName : (line.ClientCode > 0 ? $"Cliente {line.ClientCode}" : "-");
+
+    private static string DisplayNcCode(MuestraLineDto line) =>
+        string.IsNullOrWhiteSpace(line.NcCode) ? "-" : line.NcCode;
+
+    private static string Normalize(string? value) => value?.Trim() ?? string.Empty;
+}

@@ -2,14 +2,15 @@
 @attribute [AllowAnonymous]
 @inject ITenantAdminService TenantAdminService
 @inject NavigationManager NavigationManager
+@inject AppText T
 
-<PageTitle>Configuracion inicial</PageTitle>
+<PageTitle>@L("Configuración inicial", "Configuració inicial", "Initial setup")</PageTitle>
 
 <div class="page-header">
     <div>
-        <p class="eyebrow">Primer arranque</p>
-        <h1>Configuracion inicial de la plataforma</h1>
-        <p class="lead">Crea el tenant, sus companies iniciales y el administrador principal sin depender del bootstrap.</p>
+        <p class="eyebrow">@L("Primer arranque", "Primer arrencada", "First run")</p>
+        <h1>@L("Configuración inicial de la plataforma", "Configuració inicial de la plataforma", "Initial platform setup")</h1>
+        <p class="lead">@L("Crea el tenant, sus companies iniciales y el administrador principal sin depender del bootstrap.", "Crea el tenant, les seves companies inicials i l'administrador principal sense dependre del bootstrap.", "Create the tenant, its initial companies and the main administrator without depending on the bootstrap.")</p>
     </div>
 </div>
 
@@ -21,17 +22,17 @@
 @if (!setupStatus.IsDatabaseConfigured)
 {
     <section class="panel">
-        <h2>Base de datos no configurada</h2>
-        <p class="muted">Antes del onboarding debes configurar la conexion MySQL de la aplicacion.</p>
+        <h2>@L("Base de datos no configurada", "Base de dades no configurada", "Database not configured")</h2>
+        <p class="muted">@L("Antes del onboarding debes configurar la conexión MySQL de la aplicación.", "Abans de l'onboarding has de configurar la connexió MySQL de l'aplicació.", "Before onboarding you must configure the application's MySQL connection.")</p>
     </section>
 }
 else if (!setupStatus.CanRunInitialSetup)
 {
     <section class="panel">
-        <h2>Instalacion ya inicializada</h2>
-        <p class="muted">Esta instalacion ya tiene tenant, companies o usuarios creados. Continúa desde el acceso normal o desde plataforma.</p>
+        <h2>@L("Instalación ya inicializada", "Instal·lació ja inicialitzada", "Installation already initialized")</h2>
+        <p class="muted">@L("Esta instalación ya tiene tenant, companies o usuarios creados. Continúa desde el acceso normal o desde plataforma.", "Aquesta instal·lació ja té tenant, companies o usuaris creats. Continua des de l'accés normal o des de plataforma.", "This installation already has a tenant, companies or users created. Continue from the normal login or from the platform area.")</p>
         <div class="quick-links">
-            <a class="primary-button link-button" href="/login">Ir al login</a>
+            <a class="primary-button link-button" href="/login">@L("Ir al login", "Anar al login", "Go to login")</a>
         </div>
     </section>
 }
@@ -41,14 +42,14 @@ else
         <EditForm Model="form" OnValidSubmit="SubmitAsync">
             <div class="admin-grid">
                 <section class="panel">
-                    <h2>Tenant inicial</h2>
+                    <h2>@L("Tenant inicial", "Tenant inicial", "Initial tenant")</h2>
                     <div class="stack">
                         <label class="field">
-                            <span>Nombre del tenant</span>
+                            <span>@L("Nombre del tenant", "Nom del tenant", "Tenant name")</span>
                             <InputText class="text-input" @bind-Value="form.TenantName" />
                         </label>
                         <label class="field">
-                            <span>Slug del tenant</span>
+                            <span>@L("Slug del tenant", "Slug del tenant", "Tenant slug")</span>
                             <InputText class="text-input" @bind-Value="form.TenantSlug" />
                         </label>
                     </div>
@@ -57,10 +58,10 @@ else
                 <section class="panel">
                     <div class="panel-header">
                         <div>
-                            <h2>Companies iniciales</h2>
-                            <p class="muted">Puedes arrancar el tenant con varias companies, por ejemplo `Coespunt (C)` y `Completex (M)`.</p>
+                            <h2>@L("Companies iniciales", "Companies inicials", "Initial companies")</h2>
+                            <p class="muted">@L("Puedes arrancar el tenant con varias companies, por ejemplo `Coespunt (C)` y `Completex (M)`.", "Pots arrencar el tenant amb diverses companies, per exemple `Coespunt (C)` i `Completex (M)`.", "You can start the tenant with several companies, for example `Coespunt (C)` and `Completex (M)`.")</p>
                         </div>
-                        <button class="secondary-button" type="button" @onclick="AddCompany">Añadir company</button>
+                        <button class="secondary-button" type="button" @onclick="AddCompany">@L("Añadir company", "Afegir company", "Add company")</button>
                     </div>
 
                     <div class="stack">
@@ -69,27 +70,27 @@ else
                             var company = form.Companies[index];
                             <section class="panel">
                                 <div class="panel-header">
-                                    <h3>Company @(index + 1)</h3>
+                                    <h3>@L("Company", "Company", "Company") @(index + 1)</h3>
                                     @if (form.Companies.Count > 1)
                                     {
-                                        <button class="secondary-button" type="button" @onclick="() => RemoveCompany(index)">Quitar</button>
+                                        <button class="secondary-button" type="button" @onclick="() => RemoveCompany(index)">@L("Quitar", "Treure", "Remove")</button>
                                     }
                                 </div>
                                 <div class="stack">
                                     <label class="field">
-                                        <span>Nombre de la company</span>
+                                        <span>@L("Nombre de la company", "Nom de la company", "Company name")</span>
                                         <InputText class="text-input" @bind-Value="company.Name" />
                                     </label>
                                     <label class="field">
-                                        <span>Slug de la company</span>
+                                        <span>@L("Slug de la company", "Slug de la company", "Company slug")</span>
                                         <InputText class="text-input" @bind-Value="company.Slug" />
                                     </label>
                                     <label class="field">
-                                        <span>Centro legacy</span>
+                                        <span>@L("Centro legacy", "Centre legacy", "Legacy center")</span>
                                         @if (GetLegacyCentersForCompany(company).Any())
                                         {
                                             <InputSelect class="text-input" @bind-Value="company.LegacyCenterCode">
-                                                <option value="">Selecciona centro legacy</option>
+                                                <option value="">@L("Selecciona centro legacy", "Selecciona centre legacy", "Select legacy center")</option>
                                                 @foreach (var center in GetLegacyCentersForCompany(company))
                                                 {
                                                     <option value="@center.Code">@FormatLegacyCenter(center)</option>
@@ -108,10 +109,10 @@ else
                 </section>
 
                 <section class="panel">
-                    <h2>Administrador inicial</h2>
+                    <h2>@L("Administrador inicial", "Administrador inicial", "Initial administrator")</h2>
                     <div class="stack">
                         <label class="field">
-                            <span>Nombre</span>
+                            <span>@L("Nombre", "Nom", "Name")</span>
                             <InputText class="text-input" @bind-Value="form.AdminDisplayName" />
                         </label>
                         <label class="field">
@@ -119,17 +120,17 @@ else
                             <InputText class="text-input" @bind-Value="form.AdminEmail" />
                         </label>
                         <label class="field">
-                            <span>Contrasena</span>
+                            <span>@L("Contraseña", "Contrasenya", "Password")</span>
                             <InputText class="text-input" type="password" @bind-Value="form.AdminPassword" />
                         </label>
-                        <p class="muted">Este usuario quedará como `PlatformAdmin` y `TenantAdmin` del tenant inicial.</p>
+                        <p class="muted">@L("Este usuario quedará como `PlatformAdmin` y `TenantAdmin` del tenant inicial.", "Aquest usuari quedarà com a `PlatformAdmin` i `TenantAdmin` del tenant inicial.", "This user will be created as `PlatformAdmin` and `TenantAdmin` for the initial tenant.")</p>
                     </div>
                 </section>
             </div>
 
             <div class="form-actions">
-                <button class="primary-button" type="submit">Crear instalacion inicial</button>
-                <a class="secondary-button link-button" href="/login">Volver al login</a>
+                <button class="primary-button" type="submit">@L("Crear instalación inicial", "Crear instal·lació inicial", "Create initial installation")</button>
+                <a class="secondary-button link-button" href="/login">@L("Volver al login", "Tornar al login", "Back to login")</a>
             </div>
         </EditForm>
     </section>
@@ -141,6 +142,14 @@ else
     private InitializePlatformFormModel form = new();
     private string statusMessage = string.Empty;
     private bool isError;
+
+    private string L(string spanish, string catalan, string english) =>
+        T.CurrentLanguage switch
+        {
+            AppLanguages.Catalan => catalan,
+            AppLanguages.English => english,
+            _ => spanish
+        };
 
     protected override async Task OnInitializedAsync()
     {
