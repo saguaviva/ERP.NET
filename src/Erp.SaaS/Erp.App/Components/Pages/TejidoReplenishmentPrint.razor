@@ -3,19 +3,20 @@
 @attribute [Authorize(Roles = "TenantAdmin,TenantReader")]
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject ITejidoQueries TejidoQueries
+@inject AppText T
 
-<PageTitle>Reposición tejido @Code</PageTitle>
+<PageTitle>@($"{L("Reposición tejido", "Reposició teixit", "Fabric replenishment")} {Code}")</PageTitle>
 
 <div class="document-shell">
     <div class="document-toolbar no-print">
-        <a class="secondary-button link-button" href="/articulos/tejidos/editar/@Uri.EscapeDataString(Code)">Volver al tejido</a>
-        <button class="primary-button" type="button" onclick="window.print()">Guardar como PDF / Imprimir</button>
+        <a class="secondary-button link-button" href="/articulos/tejidos/editar/@Uri.EscapeDataString(Code)">@L("Volver al tejido", "Tornar al teixit", "Back to fabric")</a>
+        <button class="primary-button" type="button" onclick="window.print()">@L("Imprimir / guardar PDF", "Imprimir / desar PDF", "Print / save PDF")</button>
     </div>
 
     @if (!tenantId.HasValue || !companyId.HasValue)
     {
         <div class="empty-state document-state">
-            <p>No hay empresa activa seleccionada.</p>
+            <p>@L("No hay empresa activa seleccionada.", "No hi ha cap empresa activa seleccionada.", "There is no active company selected.")</p>
         </div>
     }
     else if (!string.IsNullOrWhiteSpace(errorMessage))
@@ -25,7 +26,7 @@
     else if (tejido is null)
     {
         <div class="empty-state document-state">
-            <p>No se ha encontrado el tejido solicitado.</p>
+            <p>@L("No se ha encontrado el tejido solicitado.", "No s'ha trobat el teixit sol·licitat.", "The requested fabric could not be found.")</p>
         </div>
     }
     else
@@ -33,17 +34,17 @@
         <section class="document-page">
             <header class="document-header">
                 <div>
-                    <p class="eyebrow">Reposició agrupada</p>
+                    <p class="eyebrow">@L("Reposición agrupada", "Reposició agrupada", "Grouped replenishment")</p>
                     <h1>@tejido.Code</h1>
                     <p class="muted">@tejido.Description</p>
                 </div>
                 <div class="document-header-meta">
                     <div>
-                        <span class="muted">Centro</span>
+                        <span class="muted">@L("Centro", "Centre", "Center")</span>
                         <strong>@tejido.CompanyCenterCode</strong>
                     </div>
                     <div>
-                        <span class="muted">Colores</span>
+                        <span class="muted">@L("Colores", "Colors", "Colors")</span>
                         <strong>@rows.Count</strong>
                     </div>
                 </div>
@@ -52,42 +53,42 @@
             <section class="document-section">
                 <div class="document-grid-two">
                     <section class="document-box">
-                        <h2>Resumen</h2>
+                        <h2>@L("Resumen", "Resum", "Summary")</h2>
                         <div class="document-kv-grid">
-                            <div><span class="muted">Metros a reponer</span><strong>@TotalMeters.ToString("0.###") m</strong></div>
-                            <div><span class="muted">Valor estimado</span><strong>@TotalValue.ToString("0.00") €</strong></div>
-                            <div><span class="muted">Colores sin stock</span><strong>@rows.Count(item => item.CurrentStock <= 0m)</strong></div>
-                            <div><span class="muted">Colores bajo mínimo</span><strong>@rows.Count(item => item.CurrentStock > 0m && item.CurrentStock < item.MinimumStock)</strong></div>
+                            <div><span class="muted">@L("Metros a reponer", "Metres a reposar", "Meters to replenish")</span><strong>@TotalMeters.ToUiString("0.###") m</strong></div>
+                            <div><span class="muted">@L("Valor estimado", "Valor estimat", "Estimated value")</span><strong>@TotalValue.ToUiString("0.00") €</strong></div>
+                            <div><span class="muted">@L("Colores sin stock", "Colors sense estoc", "Out-of-stock colors")</span><strong>@rows.Count(item => item.CurrentStock <= 0m)</strong></div>
+                            <div><span class="muted">@L("Colores bajo mínimo", "Colors sota mínim", "Colors below minimum")</span><strong>@rows.Count(item => item.CurrentStock > 0m && item.CurrentStock < item.MinimumStock)</strong></div>
                         </div>
                     </section>
                     <section class="document-box">
-                        <h2>Base de cálculo</h2>
-                        <p>Se propone reponer únicamente los colores cuya cobertura está por debajo del mínimo configurado.</p>
-                        <p>Reposición sugerida = <strong>mínimo - stock actual</strong>.</p>
-                        <p>Valor estimado = <strong>metros a reponer x €/mts.</strong>.</p>
+                        <h2>@L("Base de reposición", "Base de reposició", "Replenishment basis")</h2>
+                        <p>@L("Se propone reponer únicamente los colores cuya cobertura está por debajo del mínimo configurado.", "Es proposa reposar únicament els colors la cobertura dels quals està per sota del mínim configurat.", "Only colors whose coverage falls below the configured minimum are suggested for replenishment.")</p>
+                        <p>@L("Reposición sugerida", "Reposició suggerida", "Suggested replenishment") = <strong>@L("mínimo - stock actual", "mínim - estoc actual", "minimum - current stock")</strong>.</p>
+                        <p>@L("Valor estimado", "Valor estimat", "Estimated value") = <strong>@L("metros a reponer x €/mts.", "metres a reposar x €/mts.", "meters to replenish x €/mts.")</strong>.</p>
                     </section>
                 </div>
             </section>
 
             <section class="document-section">
-                <h2>Detalle de reposición</h2>
+                <h2>@L("Detalle de reposición", "Detall de reposició", "Replenishment detail")</h2>
                 <table class="data-table document-table">
                     <thead>
                         <tr>
-                            <th>Color</th>
-                            <th>Estado</th>
-                            <th>Actual</th>
-                            <th>Mínimo</th>
-                            <th>Falta</th>
+                            <th>@L("Color", "Color", "Color")</th>
+                            <th>@L("Estado", "Estat", "Status")</th>
+                            <th>@L("Actual", "Actual", "Current")</th>
+                            <th>@L("Mínimo", "Mínim", "Minimum")</th>
+                            <th>@L("Falta", "Falta", "Missing")</th>
                             <th>€/Mts.</th>
-                            <th>Valor rep.</th>
+                            <th>@L("Valor rep.", "Valor rep.", "Repl. value")</th>
                         </tr>
                     </thead>
                     <tbody>
                         @if (rows.Count == 0)
                         {
                             <tr>
-                                <td colspan="7" class="table-empty">No hay colores con necesidad de reposición.</td>
+                                <td colspan="7" class="table-empty">@L("No hay colores con necesidad de reposición.", "No hi ha colors amb necessitat de reposició.", "There are no colors needing replenishment.")</td>
                             </tr>
                         }
                         else
@@ -97,11 +98,11 @@
                                 <tr>
                                     <td>@DisplayValue(row.Color)</td>
                                     <td>@GetStatus(row)</td>
-                                    <td>@row.CurrentStock.ToString("0.###")</td>
-                                    <td>@row.MinimumStock.ToString("0.###")</td>
-                                    <td>@GetMissingMeters(row).ToString("0.###")</td>
-                                    <td>@row.MetersPrice.ToString("0.0000")</td>
-                                    <td>@GetEstimatedValue(row).ToString("0.00") €</td>
+                                    <td>@row.CurrentStock.ToUiString("0.###")</td>
+                                    <td>@row.MinimumStock.ToUiString("0.###")</td>
+                                    <td>@GetMissingMeters(row).ToUiString("0.###")</td>
+                                    <td>@row.MetersPrice.ToUiString("0.0000")</td>
+                                    <td>@GetEstimatedValue(row).ToUiString("0.00") €</td>
                                 </tr>
                             }
                         }
@@ -126,6 +127,13 @@
     private IReadOnlyList<TejidoColorDetailDto> rows = [];
     private decimal TotalMeters => rows.Sum(GetMissingMeters);
     private decimal TotalValue => rows.Sum(GetEstimatedValue);
+    private string L(string spanish, string catalan, string english) =>
+        T.CurrentLanguage switch
+        {
+            AppLanguages.Catalan => catalan,
+            AppLanguages.English => english,
+            _ => spanish
+        };
 
     protected override async Task OnParametersSetAsync()
     {
@@ -194,19 +202,19 @@
     private static decimal GetEstimatedValue(TejidoColorDetailDto item) =>
         Math.Round(GetMissingMeters(item) * Math.Max(item.MetersPrice, 0m), 2, MidpointRounding.AwayFromZero);
 
-    private static string GetStatus(TejidoColorDetailDto item)
+    private string GetStatus(TejidoColorDetailDto item)
     {
         if (item.CurrentStock <= 0m)
         {
-            return "Sin stock";
+            return L("Sin stock", "Sense estoc", "Out of stock");
         }
 
         if (item.CurrentStock < item.MinimumStock)
         {
-            return "Bajo mínimo";
+            return L("Bajo mínimo", "Sota mínim", "Below minimum");
         }
 
-        return "En rango";
+        return L("En rango", "En rang", "In range");
     }
 
     private static string DisplayValue(string value) => string.IsNullOrWhiteSpace(value) ? "-" : value;

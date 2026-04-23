@@ -1,0 +1,487 @@
+@page "/ventas/remesas/nueva"
+@page "/ventas/remesas/editar/{RemittanceNumber:int}"
+@attribute [Authorize(Roles = "TenantAdmin,TenantReader")]
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
+@inject ISalesRemittanceQueries SalesRemittanceQueries
+@inject ISalesRemittanceService SalesRemittanceService
+@inject AppText T
+
+<PageTitle>@PageTitleText</PageTitle>
+
+<div class="page-header">
+    <div>
+        <p class="eyebrow">@T["menu.sales"]</p>
+        <h1>@HeaderTitle</h1>
+        <p class="lead">@HeaderLead</p>
+    </div>
+    <div class="quick-links">
+        <a class="secondary-button link-button" href="/ventas/remesas">@L("Volver a remesas", "Tornar a remeses", "Back to remittances")</a>
+        @if (RemittanceNumber.HasValue)
+        {
+            <a class="secondary-button link-button" href="@BuildPrintUrl(RemittanceNumber.Value)" target="_blank" rel="noopener noreferrer">@L("Imprimir", "Imprimir", "Print")</a>
+        }
+        @if (canEdit)
+        {
+            <button class="primary-button" @onclick="SaveAsync" disabled="@(!canEdit || isSaving)">@((isSaving ? L("Guardando...", "Desant...", "Saving...") : L("Guardar remesa", "Desar remesa", "Save remittance")))</button>
+        }
+    </div>
+</div>
+
+@if (!tenantId.HasValue || !companyId.HasValue)
+{
+    <div class="empty-state">
+        <p>@L("Selecciona una empresa activa para trabajar con remesas.", "Selecciona una empresa activa per treballar amb remeses.", "Select an active company to work with remittances.")</p>
+    </div>
+}
+else
+{
+    @if (!string.IsNullOrWhiteSpace(errorMessage))
+    {
+        <div class="alert danger">@errorMessage</div>
+    }
+    @if (!string.IsNullOrWhiteSpace(infoMessage))
+    {
+        <div class="alert">@infoMessage</div>
+    }
+
+    <section class="panel detail-panel">
+        <div class="detail-panel-header">
+            <div>
+                <h2>@L("Cabecera de remesa", "Capçalera de remesa", "Remittance header")</h2>
+                <p class="muted">@L("Configura la remesa y agrupa las facturas pendientes que quieres enviar a cobro.", "Configura la remesa i agrupa les factures pendents que vols enviar a cobrament.", "Configure the remittance and group the outstanding invoices you want to send for collection.")</p>
+            </div>
+        </div>
+
+        @if (isLoading)
+        {
+            <div class="loading-banner">
+                <span class="loading-indicator" aria-hidden="true"></span>
+                <span>@L("Cargando remesa...", "Carregant remesa...", "Loading remittance...")</span>
+            </div>
+        }
+        else
+        {
+            <div class="purchase-summary-grid" style="margin-bottom: 1rem;">
+                <article class="info-card">
+                    <span class="dashboard-metric-label">@L("Facturas", "Factures", "Invoices")</span>
+                    <strong class="dashboard-metric-value">@selectedInvoices.Count</strong>
+                    <span class="dashboard-metric-description">@L("Líneas incluidas en la remesa.", "Línies incloses a la remesa.", "Invoices currently included in the remittance.")</span>
+                </article>
+                <article class="info-card">
+                    <span class="dashboard-metric-label">@L("Clientes", "Clients", "Clients")</span>
+                    <strong class="dashboard-metric-value">@selectedInvoices.Select(item => item.ClientCode).Distinct().Count()</strong>
+                    <span class="dashboard-metric-description">@L("Clientes distintos dentro del envío de cobro.", "Clients diferents dins de l'enviament de cobrament.", "Distinct clients inside this collection batch.")</span>
+                </article>
+                <article class="info-card dashboard-metric-card-warning">
+                    <span class="dashboard-metric-label">@L("Pendiente", "Pendent", "Outstanding")</span>
+                    <strong class="dashboard-metric-value">@selectedInvoices.Sum(item => item.OutstandingAmount).ToUiString("0.00") €</strong>
+                    <span class="dashboard-metric-description">@L("Importe todavía pendiente de cobro.", "Import encara pendent de cobrament.", "Amount still pending collection.")</span>
+                </article>
+            </div>
+
+            <div class="receipt-detail-grid">
+                <label class="field">
+                    <span>@L("Serie", "Sèrie", "Series")</span>
+                    <input class="text-input" @bind="model.RemittanceSeries" disabled="@(!canEdit || isSaving)" />
+                </label>
+                <label class="field">
+                    <span>@L("Fecha remesa", "Data remesa", "Remittance date")</span>
+                    <InputDate class="text-input" @bind-Value="model.RemittanceDate" disabled="@(!canEdit || isSaving)" />
+                </label>
+                <label class="field">
+                    <span>@L("Vencimiento", "Venciment", "Due date")</span>
+                    <InputDate class="text-input" @bind-Value="model.DueDate" disabled="@(!canEdit || isSaving)" />
+                </label>
+                <label class="field">
+                    <span>@L("Estado", "Estat", "Status")</span>
+                    <select class="sidebar-select" @bind="model.Status" disabled="@(!canEdit || isSaving)">
+                        @foreach (var status in SalesRemittanceStatuses.All)
+                        {
+                            <option value="@status">@FormatStatus(status)</option>
+                        }
+                    </select>
+                </label>
+                <label class="field">
+                    <span>@L("Banco / caja", "Banc / caixa", "Bank / cashbox")</span>
+                    <input class="text-input" @bind="model.BankName" disabled="@(!canEdit || isSaving)" />
+                </label>
+                <label class="field" style="grid-column: 1 / -1;">
+                    <span>@L("Notas", "Notes", "Notes")</span>
+                    <textarea class="text-input" rows="3" @bind="model.Notes" disabled="@(!canEdit || isSaving)"></textarea>
+                </label>
+            </div>
+        }
+    </section>
+
+    <section class="panel" style="margin-top: 1rem;">
+        <div class="detail-panel-header">
+            <div>
+                <h2>@L("Añadir facturas", "Afegir factures", "Add invoices")</h2>
+                <p class="muted">@L("Busca facturas pendientes que no estén ligadas a otra remesa activa.", "Busca factures pendents que no estiguin lligades a una altra remesa activa.", "Search outstanding invoices that are not linked to another active remittance.")</p>
+            </div>
+        </div>
+
+        <div class="filter-row">
+            <input class="text-input" @bind="candidateFilter.Search" placeholder="@L("Buscar por factura, cliente o notas", "Buscar per factura, client o notes", "Search by invoice, client or notes")" disabled="@candidateLoading" />
+            <button class="secondary-button" @onclick="SearchCandidatesAsync" disabled="@candidateLoading">@(candidateLoading ? L("Cargando...", "Carregant...", "Loading...") : L("Buscar", "Buscar", "Search"))</button>
+        </div>
+
+        <div class="table-scroll" style="margin-top: 1rem;">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>@L("Factura", "Factura", "Invoice")</th>
+                        <th>@L("Cliente", "Client", "Client")</th>
+                        <th>@L("Fecha", "Data", "Date")</th>
+                        <th>@L("Vencimiento", "Venciment", "Due date")</th>
+                        <th>@L("Pendiente", "Pendent", "Outstanding")</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (candidateLoading)
+                    {
+                        @for (var index = 0; index < 4; index++)
+                        {
+                            <tr class="table-skeleton-row">
+                                <td><span class="skeleton-line short"></span></td>
+                                <td><span class="skeleton-line"></span></td>
+                                <td><span class="skeleton-line short"></span></td>
+                                <td><span class="skeleton-line short"></span></td>
+                                <td><span class="skeleton-line short"></span></td>
+                                <td><span class="skeleton-line short"></span></td>
+                            </tr>
+                        }
+                    }
+                    else if (candidateItems.Count == 0)
+                    {
+                        <tr>
+                            <td colspan="6" class="table-empty">@L("No hay facturas candidatas para este filtro.", "No hi ha factures candidates per a aquest filtre.", "There are no candidate invoices for this filter.")</td>
+                        </tr>
+                    }
+                    else
+                    {
+                        @foreach (var item in candidateItems)
+                        {
+                            var alreadySelected = selectedInvoices.Any(selected => selected.InvoiceNumber == item.InvoiceNumber);
+                            <tr>
+                                <td>@item.DisplayNumber</td>
+                                <td>@item.ClientName</td>
+                                <td>@item.IssueDate.ToString("dd/MM/yyyy")</td>
+                                <td>@(item.DueDate?.ToString("dd/MM/yyyy") ?? "-")</td>
+                                <td>@item.OutstandingAmount.ToUiString("0.00") €</td>
+                                <td>
+                                    @if (alreadySelected)
+                                    {
+                                        <span class="muted">@L("Añadida", "Afegida", "Added")</span>
+                                    }
+                                    else
+                                    {
+                                        <button class="secondary-button" @onclick="() => AddInvoice(item)" disabled="@(!canEdit || isSaving)">@L("Añadir", "Afegir", "Add")</button>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <section class="panel" style="margin-top: 1rem;">
+        <div class="detail-panel-header">
+            <div>
+                <h2>@L("Facturas seleccionadas", "Factures seleccionades", "Selected invoices")</h2>
+                <p class="muted">@L("Estas facturas quedarán ligadas a la remesa guardada.", "Aquestes factures quedaran lligades a la remesa desada.", "These invoices will be linked to the saved remittance.")</p>
+            </div>
+        </div>
+
+        <div class="table-scroll">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>@L("Factura", "Factura", "Invoice")</th>
+                        <th>@L("Cliente", "Client", "Client")</th>
+                        <th>@L("Fecha", "Data", "Date")</th>
+                        <th>@L("Vencimiento", "Venciment", "Due date")</th>
+                        <th>@L("Total", "Total", "Total")</th>
+                        <th>@L("Cobrado", "Cobrat", "Collected")</th>
+                        <th>@L("Pendiente", "Pendent", "Outstanding")</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (selectedInvoices.Count == 0)
+                    {
+                        <tr>
+                            <td colspan="8" class="table-empty">@L("Todavía no has seleccionado facturas para la remesa.", "Encara no has seleccionat factures per a la remesa.", "You have not selected any invoices for the remittance yet.")</td>
+                        </tr>
+                    }
+                    else
+                    {
+                        @foreach (var item in selectedInvoices.OrderBy(invoice => invoice.DueDate ?? invoice.IssueDate).ThenBy(invoice => invoice.InvoiceNumber))
+                        {
+                            <tr>
+                                <td><a class="inline-link" href="/ventas/facturas/@item.InvoiceNumber">@item.DisplayNumber</a></td>
+                                <td>@item.ClientName</td>
+                                <td>@item.IssueDate.ToString("dd/MM/yyyy")</td>
+                                <td>@(item.DueDate?.ToString("dd/MM/yyyy") ?? "-")</td>
+                                <td>@item.TotalAmount.ToUiString("0.00") €</td>
+                                <td>@item.AmountPaid.ToUiString("0.00") €</td>
+                                <td>@item.OutstandingAmount.ToUiString("0.00") €</td>
+                                <td>
+                                    @if (canEdit)
+                                    {
+                                        <button class="secondary-button" @onclick="() => RemoveInvoice(item.InvoiceNumber)" disabled="@isSaving">@L("Quitar", "Treure", "Remove")</button>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </section>
+}
+
+@code {
+    [Parameter]
+    public int? RemittanceNumber { get; set; }
+
+    [SupplyParameterFromQuery(Name = "invoiceNumber")]
+    public int? InvoiceNumberQuery { get; set; }
+
+    private Guid? tenantId;
+    private Guid? companyId;
+    private bool canEdit;
+    private bool isLoading;
+    private bool isSaving;
+    private bool candidateLoading;
+    private string errorMessage = string.Empty;
+    private string infoMessage = string.Empty;
+    private SaveSalesRemittanceCommand model = new() { RemittanceDate = DateTime.Today, Status = SalesRemittanceStatuses.Draft };
+    private SalesRemittanceCandidateFilter candidateFilter = new() { Page = 1, PageSize = 20 };
+    private IReadOnlyCollection<SalesRemittanceCandidateInvoiceDto> candidateItems = [];
+    private List<SalesRemittanceCandidateInvoiceDto> selectedInvoices = [];
+    private int? loadedRemittanceNumber;
+
+    private string PageTitleText => RemittanceNumber.HasValue
+        ? L("Ventas / Remesas / Editar", "Vendes / Remeses / Editar", "Sales / Remittances / Edit")
+        : L("Ventas / Remesas / Nueva", "Vendes / Remeses / Nova", "Sales / Remittances / New");
+    private string HeaderTitle => RemittanceNumber.HasValue
+        ? L($"Remesa {RemittanceNumber.Value}", $"Remesa {RemittanceNumber.Value}", $"Remittance {RemittanceNumber.Value}")
+        : L("Nueva remesa", "Nova remesa", "New remittance");
+    private string HeaderLead => RemittanceNumber.HasValue
+        ? L("Revisa la cabecera, añade o quita facturas y deja lista la remesa para envío o cobro.", "Revisa la capçalera, afegeix o treu factures i deixa llesta la remesa per a enviament o cobrament.", "Review the header, add or remove invoices, and leave the remittance ready for dispatch or collection.")
+        : L("Prepara una remesa nueva agrupando facturas de cliente con saldo pendiente.", "Prepara una remesa nova agrupant factures de client amb saldo pendent.", "Prepare a new remittance by grouping customer invoices with outstanding balances.");
+
+    private string L(string spanish, string catalan, string english) =>
+        T.CurrentLanguage switch
+        {
+            AppLanguages.Catalan => catalan,
+            AppLanguages.English => english,
+            _ => spanish
+        };
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        tenantId = user.GetTenantId();
+        companyId = user.GetActiveCompanyId();
+        canEdit = user.IsPlatformAdmin() || user.IsInRole(PlatformRoles.TenantAdmin);
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await LoadAsync();
+    }
+
+    private async Task LoadAsync()
+    {
+        errorMessage = string.Empty;
+        infoMessage = string.Empty;
+        if (!tenantId.HasValue || !companyId.HasValue)
+        {
+            return;
+        }
+
+        if (loadedRemittanceNumber == RemittanceNumber)
+        {
+            if (!candidateLoading && candidateItems.Count == 0)
+            {
+                await LoadCandidatesAsync();
+            }
+
+            return;
+        }
+
+        isLoading = true;
+        await InvokeAsync(StateHasChanged);
+
+        try
+        {
+            if (RemittanceNumber.HasValue)
+            {
+                var detail = await SalesRemittanceQueries.GetByNumberAsync(tenantId.Value, companyId.Value, RemittanceNumber.Value);
+                if (detail is null)
+                {
+                    errorMessage = L("La remesa solicitada no existe o ya no está disponible.", "La remesa sol·licitada no existeix o ja no està disponible.", "The requested remittance does not exist or is no longer available.");
+                    model = new SaveSalesRemittanceCommand { RemittanceDate = DateTime.Today, Status = SalesRemittanceStatuses.Draft };
+                    selectedInvoices = [];
+                }
+                else
+                {
+                    model = new SaveSalesRemittanceCommand
+                    {
+                        RemittanceNumber = detail.RemittanceNumber,
+                        RemittanceSeries = detail.RemittanceSeries,
+                        RemittanceDate = detail.RemittanceDate,
+                        DueDate = detail.DueDate,
+                        Status = detail.Status,
+                        BankName = detail.BankName,
+                        Notes = detail.Notes
+                    };
+                    selectedInvoices = detail.Invoices.Select(MapCandidateInvoice).ToList();
+                }
+            }
+            else
+            {
+                model = new SaveSalesRemittanceCommand { RemittanceDate = DateTime.Today, Status = SalesRemittanceStatuses.Draft };
+                selectedInvoices = [];
+                if (InvoiceNumberQuery.HasValue && InvoiceNumberQuery.Value > 0)
+                {
+                    var candidate = await SalesRemittanceQueries.GetCandidateInvoiceByNumberAsync(tenantId.Value, companyId.Value, InvoiceNumberQuery.Value);
+                    if (candidate is null)
+                    {
+                        infoMessage = L("La factura indicada no está disponible para una nueva remesa activa.", "La factura indicada no està disponible per a una nova remesa activa.", "The selected invoice is not available for a new active remittance.");
+                    }
+                    else
+                    {
+                        AddInvoice(candidate);
+                    }
+                }
+            }
+
+            await LoadCandidatesAsync();
+            loadedRemittanceNumber = RemittanceNumber;
+        }
+        catch (Exception exception)
+        {
+            errorMessage = exception.Message;
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private async Task LoadCandidatesAsync()
+    {
+        if (!tenantId.HasValue || !companyId.HasValue)
+        {
+            candidateItems = [];
+            return;
+        }
+
+        candidateLoading = true;
+        await InvokeAsync(StateHasChanged);
+        try
+        {
+            var result = await SalesRemittanceQueries.SearchCandidateInvoicesAsync(tenantId.Value, companyId.Value, candidateFilter);
+            candidateItems = result.Items;
+        }
+        catch (Exception exception)
+        {
+            errorMessage = exception.Message;
+            candidateItems = [];
+        }
+        finally
+        {
+            candidateLoading = false;
+        }
+    }
+
+    private async Task SearchCandidatesAsync()
+    {
+        candidateFilter.Page = 1;
+        await LoadCandidatesAsync();
+    }
+
+    private void AddInvoice(SalesRemittanceCandidateInvoiceDto item)
+    {
+        if (selectedInvoices.Any(existing => existing.InvoiceNumber == item.InvoiceNumber))
+        {
+            return;
+        }
+
+        selectedInvoices.Add(item);
+    }
+
+    private void RemoveInvoice(int invoiceNumber)
+    {
+        selectedInvoices.RemoveAll(item => item.InvoiceNumber == invoiceNumber);
+    }
+
+    private async Task SaveAsync()
+    {
+        if (!tenantId.HasValue || !companyId.HasValue || !canEdit)
+        {
+            return;
+        }
+
+        errorMessage = string.Empty;
+        infoMessage = string.Empty;
+        isSaving = true;
+        await InvokeAsync(StateHasChanged);
+
+        try
+        {
+            model.Invoices = selectedInvoices
+                .OrderBy(item => item.DueDate ?? item.IssueDate)
+                .ThenBy(item => item.InvoiceNumber)
+                .Select(item => new SalesRemittanceInvoiceInputDto { InvoiceNumber = item.InvoiceNumber })
+                .ToArray();
+
+            var remittanceNumber = await SalesRemittanceService.SaveAsync(tenantId.Value, companyId.Value, model);
+            NavigationManager.NavigateTo($"/ventas/remesas/editar/{remittanceNumber}", replace: true);
+        }
+        catch (Exception exception)
+        {
+            errorMessage = exception.Message;
+        }
+        finally
+        {
+            isSaving = false;
+        }
+    }
+
+    private static SalesRemittanceCandidateInvoiceDto MapCandidateInvoice(SalesRemittanceInvoiceDto item) =>
+        new()
+        {
+            InvoiceId = item.InvoiceId,
+            InvoiceSeries = item.InvoiceSeries,
+            InvoiceNumber = item.InvoiceNumber,
+            ClientCode = item.ClientCode,
+            ClientName = item.ClientName,
+            IssueDate = item.IssueDate,
+            DueDate = item.DueDate,
+            TotalAmount = item.TotalAmount,
+            AmountPaid = item.AmountPaid,
+            OutstandingAmount = item.OutstandingAmount,
+            PaymentStatus = item.PaymentStatus,
+            Notes = item.Notes
+        };
+
+    private string FormatStatus(string status) => status switch
+    {
+        SalesRemittanceStatuses.Draft => L("Borrador", "Esborrany", "Draft"),
+        SalesRemittanceStatuses.Sent => L("Enviada", "Enviada", "Sent"),
+        SalesRemittanceStatuses.Collected => L("Cobrada", "Cobrada", "Collected"),
+        SalesRemittanceStatuses.Cancelled => L("Anulada", "Anul·lada", "Cancelled"),
+        _ => status
+    };
+
+    private static string BuildPrintUrl(int remittanceNumber) => $"/ventas/remesas/{remittanceNumber}/imprimir";
+}

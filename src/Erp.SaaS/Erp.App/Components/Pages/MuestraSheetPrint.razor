@@ -4,19 +4,20 @@
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject IMuestraQueries MuestraQueries
 @inject NavigationManager NavigationManager
+@inject AppText T
 
 <PageTitle>@PageTitleText</PageTitle>
 
 @if (!tenantId.HasValue || !companyId.HasValue)
 {
     <div class="empty-state">
-        <p>Selecciona una empresa activa para imprimir el @moduleSingularLower.</p>
+        <p>@L($"Selecciona una empresa activa para imprimir el {moduleSingularLower}.", $"Selecciona una empresa activa per imprimir el {moduleSingularLower}.", $"Select an active company to print the {moduleSingularLower}.")</p>
     </div>
 }
 else if (detail is null)
 {
     <div class="empty-state">
-        <p>No se ha encontrado el @moduleSingularLower solicitado.</p>
+        <p>@L($"No se ha encontrado el {moduleSingularLower} solicitado.", $"No s'ha trobat el {moduleSingularLower} sol·licitat.", $"The requested {moduleSingularLower} could not be found.")</p>
     </div>
 }
 else
@@ -30,47 +31,47 @@ else
                 <p>@DisplayReference · @DisplaySeason · @DisplayMachine</p>
             </div>
             <div class="print-sheet-meta">
-                <span>Origen: @DisplayOrigin</span>
-                <span>Líneas: @detail.Lines.Count</span>
-                <span>Colores: @DistinctColorCount</span>
-                <span>Tallas: @DistinctSizeCount</span>
+                <span>@L("Origen", "Origen", "Origin"): @DisplayOrigin</span>
+                <span>@L("Líneas", "Línies", "Lines"): @detail.Lines.Count</span>
+                <span>@L("Colores", "Colors", "Colors"): @DistinctColorCount</span>
+                <span>@L("Tallas", "Talles", "Sizes"): @DistinctSizeCount</span>
             </div>
         </header>
 
         <section class="print-sheet-grid">
             <article>
-                <h2>Ficha comercial</h2>
+                <h2>@L("Ficha comercial", "Fitxa comercial", "Commercial sheet")</h2>
                 <dl class="print-definition-list">
-                    <div><dt>Cliente</dt><dd>@DisplayClient</dd></div>
-                    <div><dt>Máquina</dt><dd>@DisplayMachine</dd></div>
-                    <div><dt>Referencia</dt><dd>@DisplayReference</dd></div>
-                    <div><dt>Temporada</dt><dd>@DisplaySeason</dd></div>
-                    <div><dt>% margen</dt><dd>@detail.MarginPercent.ToString("0.0#")</dd></div>
-                    <div><dt>IVA</dt><dd>@DisplayVat</dd></div>
-                    <div><dt>Precio unidad</dt><dd>@detail.UnitPrice.ToString("0.00##")</dd></div>
-                    <div><dt>Composición</dt><dd>@DisplayComposition</dd></div>
+                    <div><dt>@L("Cliente", "Client", "Customer")</dt><dd>@DisplayClient</dd></div>
+                    <div><dt>@L("Máquina", "Màquina", "Machine")</dt><dd>@DisplayMachine</dd></div>
+                    <div><dt>@L("Referencia", "Referència", "Reference")</dt><dd>@DisplayReference</dd></div>
+                    <div><dt>@L("Temporada", "Temporada", "Season")</dt><dd>@DisplaySeason</dd></div>
+                    <div><dt>@L("% margen", "% marge", "Margin %")</dt><dd>@detail.MarginPercent.ToUiString("0.0#")</dd></div>
+                    <div><dt>@L("IVA", "IVA", "VAT")</dt><dd>@DisplayVat</dd></div>
+                    <div><dt>@L("Precio unidad", "Preu unitat", "Unit price")</dt><dd>@detail.UnitPrice.ToUiString("0.00##")</dd></div>
+                    <div><dt>@L("Composición", "Composició", "Composition")</dt><dd>@DisplayComposition</dd></div>
                 </dl>
             </article>
 
             <article>
-                <h2>Notas</h2>
+                <h2>@L("Notas", "Notes", "Notes")</h2>
                 <div class="print-notes-box">@DisplayNotes</div>
             </article>
         </section>
 
         <section class="panel">
-            <h2>Carta de colores y tallas</h2>
+            <h2>@L("Carta de colores y tallas", "Carta de colors i talles", "Color and size card")</h2>
             <table class="data-table print-data-table">
                 <thead>
                     <tr>
                         <th>#</th>
-                        <th>Talla</th>
-                        <th>Descripción</th>
-                        <th>Color</th>
-                        <th>Cliente</th>
-                        <th>Coste</th>
-                        <th>Venta</th>
-                        <th>NC code</th>
+                        <th>@L("Talla", "Talla", "Size")</th>
+                        <th>@L("Descripción", "Descripció", "Description")</th>
+                        <th>@L("Color", "Color", "Color")</th>
+                        <th>@L("Cliente", "Client", "Customer")</th>
+                        <th>@L("Coste", "Cost", "Cost")</th>
+                        <th>@L("Venta", "Venda", "Sale")</th>
+                        <th>@L("Código NC", "Codi NC", "CN code")</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -82,8 +83,8 @@ else
                             <td>@DisplayLineDescription(line)</td>
                             <td>@DisplayColor(line)</td>
                             <td>@DisplayLineClient(line)</td>
-                            <td>@line.CostPrice.ToString("0.00##")</td>
-                            <td>@line.SalePrice.ToString("0.00##")</td>
+                            <td>@line.CostPrice.ToUiString("0.00##")</td>
+                            <td>@line.SalePrice.ToUiString("0.00##")</td>
                             <td>@DisplayNcCode(line)</td>
                         </tr>
                     }
@@ -101,22 +102,29 @@ else
     private Guid? companyId;
     private MuestraDetailDto? detail;
     private bool IsComplementMode => NavigationManager.Uri.Contains("/articulos/complementos", StringComparison.OrdinalIgnoreCase);
-    private string moduleSingularLower => IsComplementMode ? "complemento" : "muestra";
-    private string EyebrowText => IsComplementMode ? "ARTÍCULOS / COMPLEMENTOS" : "ARTÍCULOS / MUESTRAS";
-    private string PageTitleText => $"{(IsComplementMode ? "Ficha complemento" : "Ficha muestra")} {Code}";
+    private string moduleSingularLower => IsComplementMode ? L("complemento", "complement", "complement") : L("muestra", "mostra", "sample");
+    private string EyebrowText => IsComplementMode ? L("ARTÍCULOS / COMPLEMENTOS", "ARTICLES / COMPLEMENTS", "ARTICLES / COMPLEMENTS") : L("ARTÍCULOS / MUESTRAS", "ARTICLES / MOSTRES", "ARTICLES / SAMPLES");
+    private string PageTitleText => $"{(IsComplementMode ? L("Ficha complemento", "Fitxa complement", "Complement sheet") : L("Ficha muestra", "Fitxa mostra", "Sample sheet"))} {Code}";
+    private string L(string spanish, string catalan, string english) =>
+        T.CurrentLanguage switch
+        {
+            AppLanguages.Catalan => catalan,
+            AppLanguages.English => english,
+            _ => spanish
+        };
 
     private string DisplayClient => detail is null
         ? string.Empty
-        : !string.IsNullOrWhiteSpace(detail.ClientName) ? detail.ClientName : $"Cliente {detail.ClientCode}";
+        : !string.IsNullOrWhiteSpace(detail.ClientName) ? detail.ClientName : $"{L("Cliente", "Client", "Customer")} {detail.ClientCode}";
     private string DisplayMachine => detail is null
         ? string.Empty
-        : !string.IsNullOrWhiteSpace(detail.MachineName) ? detail.MachineName : $"Máquina {detail.MachineCode}";
-    private string DisplayReference => detail is null || string.IsNullOrWhiteSpace(detail.Reference) ? "Sin referencia" : detail.Reference;
-    private string DisplaySeason => detail is null || string.IsNullOrWhiteSpace(detail.Season) ? "Sin temporada" : detail.Season;
+        : !string.IsNullOrWhiteSpace(detail.MachineName) ? detail.MachineName : $"{L("Máquina", "Màquina", "Machine")} {detail.MachineCode}";
+    private string DisplayReference => detail is null || string.IsNullOrWhiteSpace(detail.Reference) ? L("Sin referencia", "Sense referència", "No reference") : detail.Reference;
+    private string DisplaySeason => detail is null || string.IsNullOrWhiteSpace(detail.Season) ? L("Sin temporada", "Sense temporada", "No season") : detail.Season;
     private string DisplayOrigin => detail is null || string.IsNullOrWhiteSpace(detail.Origin) ? "local" : detail.Origin;
     private string DisplayVat => detail is null || string.IsNullOrWhiteSpace(detail.VatCode) ? "-" : detail.VatCode;
-    private string DisplayComposition => detail is null || string.IsNullOrWhiteSpace(detail.Composition) ? "Pendiente" : detail.Composition;
-    private string DisplayNotes => detail is null || string.IsNullOrWhiteSpace(detail.Notes) ? "Sin notas." : detail.Notes;
+    private string DisplayComposition => detail is null || string.IsNullOrWhiteSpace(detail.Composition) ? L("Pendiente", "Pendent", "Pending") : detail.Composition;
+    private string DisplayNotes => detail is null || string.IsNullOrWhiteSpace(detail.Notes) ? L("Sin notas registradas.", "Sense notes registrades.", "No notes recorded.") : detail.Notes;
     private int DistinctColorCount => detail?.Lines.Select(line => Normalize(line.Color)).Where(value => !string.IsNullOrWhiteSpace(value)).Distinct(StringComparer.OrdinalIgnoreCase).Count() ?? 0;
     private int DistinctSizeCount => detail?.Lines.Select(BuildSizeLabel).Where(value => !string.IsNullOrWhiteSpace(value)).Distinct(StringComparer.OrdinalIgnoreCase).Count() ?? 0;
 
@@ -143,14 +151,14 @@ else
         return values.Length == 0 ? "-" : string.Join(" · ", values);
     }
 
-    private static string DisplayLineDescription(MuestraLineDto line) =>
-        string.IsNullOrWhiteSpace(line.Description) ? "Sin descripción" : line.Description;
+    private string DisplayLineDescription(MuestraLineDto line) =>
+        string.IsNullOrWhiteSpace(line.Description) ? L("Sin descripción", "Sense descripció", "No description") : line.Description;
 
     private static string DisplayColor(MuestraLineDto line) =>
         string.IsNullOrWhiteSpace(line.Color) ? "-" : line.Color;
 
-    private static string DisplayLineClient(MuestraLineDto line) =>
-        !string.IsNullOrWhiteSpace(line.ClientName) ? line.ClientName : (line.ClientCode > 0 ? $"Cliente {line.ClientCode}" : "-");
+    private string DisplayLineClient(MuestraLineDto line) =>
+        !string.IsNullOrWhiteSpace(line.ClientName) ? line.ClientName : (line.ClientCode > 0 ? $"{L("Cliente", "Client", "Customer")} {line.ClientCode}" : "-");
 
     private static string DisplayNcCode(MuestraLineDto line) =>
         string.IsNullOrWhiteSpace(line.NcCode) ? "-" : line.NcCode;

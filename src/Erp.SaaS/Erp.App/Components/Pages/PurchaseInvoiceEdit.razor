@@ -7,20 +7,21 @@
 @inject IPurchaseOrderQueries PurchaseOrderQueries
 @inject IProveedorQueries ProveedorQueries
 @inject NavigationManager NavigationManager
+@inject AppText T
 
-<PageTitle>@(InvoiceNumber.HasValue ? $"Factura proveedor {InvoiceNumber}" : "Nueva factura de proveedor")</PageTitle>
+<PageTitle>@(InvoiceNumber.HasValue ? $"{L("Factura proveedor", "Factura proveïdor", "Supplier invoice")} {InvoiceNumber}" : L("Nueva factura de proveedor", "Nova factura de proveïdor", "New supplier invoice"))</PageTitle>
 
 <div class="page-header">
     <div>
-        <p class="eyebrow">Compras</p>
-        <h1>@(InvoiceNumber.HasValue ? $"Factura {InvoiceNumber}" : "Nueva factura de proveedor")</h1>
-        <p class="lead">Factura local de proveedor con trazabilidad hacia recepciones y pedidos de compra.</p>
+        <p class="eyebrow">@L("Compras", "Compres", "Purchasing")</p>
+        <h1>@(InvoiceNumber.HasValue ? $"{L("Factura", "Factura", "Invoice")} {InvoiceNumber}" : L("Nueva factura de proveedor", "Nova factura de proveïdor", "New supplier invoice"))</h1>
+        <p class="lead">@L("Factura local de proveedor con trazabilidad hacia recepciones y pedidos de compra.", "Factura local de proveïdor amb traçabilitat cap a recepcions i comandes de compra.", "Local supplier invoice with traceability back to receipts and purchase orders.")</p>
     </div>
     <div class="quick-links">
-        <a class="secondary-button link-button" href="/compras/facturas">Volver al listado</a>
+        <a class="secondary-button link-button" href="/compras/facturas">@L("Volver al listado", "Tornar al llistat", "Back to list")</a>
         @if (InvoiceNumber.HasValue)
         {
-            <a class="secondary-button link-button" href="/compras/facturas/@InvoiceNumber.Value/pdf" target="_blank">Versión PDF</a>
+            <a class="secondary-button link-button" href="/compras/facturas/@InvoiceNumber.Value/pdf" target="_blank">@L("Versión PDF", "Versió PDF", "PDF version")</a>
         }
     </div>
 </div>
@@ -28,13 +29,13 @@
 @if (!tenantId.HasValue || !companyId.HasValue)
 {
     <div class="empty-state">
-        <p>No hay empresa activa seleccionada.</p>
+        <p>@L("No hay empresa activa seleccionada.", "No hi ha cap empresa activa seleccionada.", "There is no active company selected.")</p>
     </div>
 }
 else if (!canEdit && !InvoiceNumber.HasValue)
 {
     <div class="empty-state">
-        <p>No tienes permisos para crear facturas de proveedor.</p>
+        <p>@L("No tienes permisos para crear facturas de proveedor.", "No tens permisos per crear factures de proveïdor.", "You do not have permission to create supplier invoices.")</p>
     </div>
 }
 else
@@ -47,9 +48,9 @@ else
     <EditForm Model="model" OnValidSubmit="SaveAsync">
         <div class="form-grid">
             <label class="field">
-                <span>Proveedor</span>
+                <span>@L("Proveedor", "Proveïdor", "Supplier")</span>
                 <InputSelect class="text-input" @bind-Value="model.SupplierCode" disabled="@(!canEdit || InvoiceNumber.HasValue && hasReceiptLinks)">
-                    <option value="0">Selecciona proveedor</option>
+                    <option value="0">@L("Selecciona proveedor", "Selecciona proveïdor", "Select supplier")</option>
                     @foreach (var supplier in suppliers)
                     {
                         <option value="@supplier.Code">@supplier.Name (@supplier.Code)</option>
@@ -61,15 +62,15 @@ else
                 }
             </label>
             <label class="field">
-                <span>Fecha documento</span>
+                <span>@L("Fecha documento", "Data document", "Document date")</span>
                 <InputDate class="text-input" @bind-Value="model.DocumentDate" disabled="@(!canEdit)" />
             </label>
             <label class="field">
-                <span>Vencimiento</span>
+                <span>@L("Vencimiento", "Venciment", "Due date")</span>
                 <InputDate class="text-input" @bind-Value="model.DueDate" disabled="@(!canEdit)" />
             </label>
             <label class="field">
-                <span>Estado</span>
+                <span>@L("Estado", "Estat", "Status")</span>
                 <InputSelect class="text-input" @bind-Value="model.Status" disabled="@(!canEdit)">
                     @foreach (var status in PurchaseInvoiceStatuses.All)
                     {
@@ -78,11 +79,11 @@ else
                 </InputSelect>
             </label>
             <label class="field wide">
-                <span>Número factura proveedor</span>
+                <span>@L("Número factura proveedor", "Número factura proveïdor", "Supplier invoice number")</span>
                 <InputText class="text-input" @bind-Value="model.SupplierDocumentNumber" disabled="@(!canEdit)" />
             </label>
             <label class="field wide">
-                <span>Notas</span>
+                <span>@L("Notas", "Notes", "Notes")</span>
                 <InputTextArea class="text-area" @bind-Value="model.Notes" disabled="@(!canEdit)" />
             </label>
         </div>
@@ -90,24 +91,24 @@ else
         <section class="panel">
             <div class="page-header">
                 <div>
-                    <h2>Recepciones enlazadas</h2>
-                    <p class="muted">La factura puede nacer desde una recepción y conserva aquí la trazabilidad documental.</p>
+                    <h2>@L("Recepciones enlazadas", "Recepcions enllaçades", "Linked receipts")</h2>
+                    <p class="muted">@L("La factura puede nacer desde una recepción y conserva aquí la trazabilidad documental.", "La factura pot néixer des d'una recepció i conserva aquí la traçabilitat documental.", "The invoice can originate from a receipt and keeps the document traceability here.")</p>
                 </div>
             </div>
 
             @if (model.Receipts.Count == 0)
             {
-                <p class="muted">No hay recepciones enlazadas. Puedes crear la factura manualmente o partir desde una recepción.</p>
+                <p class="muted">@L("No hay recepciones enlazadas. Puedes crear la factura manualmente o partir desde una recepción.", "No hi ha recepcions enllaçades. Pots crear la factura manualment o partir des d'una recepció.", "There are no linked receipts. You can create the invoice manually or start from a receipt.")</p>
             }
             else
             {
                 <table class="data-table">
                     <thead>
                         <tr>
-                            <th>Entrada</th>
-                            <th>Pedido</th>
-                            <th>Fecha</th>
-                            <th>Cantidad</th>
+                            <th>@L("Entrada", "Entrada", "Receipt")</th>
+                            <th>@L("Pedido", "Comanda", "Order")</th>
+                            <th>@L("Fecha", "Data", "Date")</th>
+                            <th>@L("Cantidad", "Quantitat", "Quantity")</th>
                             <th></th>
                         </tr>
                     </thead>
@@ -118,9 +119,9 @@ else
                                 <td>@receipt.DisplayNumber</td>
                                 <td>@receipt.OrderNumber</td>
                                 <td>@receipt.ReceiptDate.ToString("dd/MM/yyyy")</td>
-                                <td>@receipt.TotalReceivedQuantity.ToString("0.###")</td>
+                                <td>@receipt.TotalReceivedQuantity.ToUiString("0.###")</td>
                                 <td>
-                                    <a class="inline-link" href="/compras/recepciones/@receipt.ReceiptNumber">Abrir recepción</a>
+                                    <a class="inline-link" href="/compras/recepciones/@receipt.ReceiptNumber">@L("Abrir recepción", "Obrir recepció", "Open receipt")</a>
                                 </td>
                             </tr>
                         }
@@ -132,8 +133,8 @@ else
         <section class="panel">
             <div class="page-header">
                 <div>
-                    <h2>Conciliación pedido · recepción · factura</h2>
-                    <p class="muted">Comparativa rápida entre lo pedido, lo recibido y lo que estás facturando, con diferencias de cantidad y precio.</p>
+                    <h2>@L("Conciliación pedido · recepción · factura", "Conciliació comanda · recepció · factura", "Order · receipt · invoice reconciliation")</h2>
+                    <p class="muted">@L("Comparativa rápida entre lo pedido, lo recibido y lo que estás facturando, con diferencias de cantidad y precio.", "Comparativa ràpida entre el que s'ha demanat, rebut i facturat, amb diferències de quantitat i preu.", "Quick comparison between what was ordered, received and invoiced, with quantity and price differences.")</p>
                 </div>
             </div>
 
@@ -144,11 +145,11 @@ else
                     <span>
                         @if (ReconciliationHasDifferences)
                         {
-                            @($"{DifferenceLineCount} líneas con diferencias · Qty {TotalQuantityDifference:0.###} · Precio {TotalPriceDifference:0.0000} · Base {TotalBaseDifference:0.00} €")
+                        @($"{DifferenceLineCount.ToUiString("N0")} {L("líneas con diferencias", "línies amb diferències", "lines with differences")} · Qty {TotalQuantityDifference.ToUiString("0.###")} · {L("Precio", "Preu", "Price")} {TotalPriceDifference.ToUiString("0.0000")} · {L("Base", "Base", "Base")} {TotalBaseDifference.ToUiString("0.00")} €")
                         }
                         else
                         {
-                            @("La factura cuadra con lo recibido y el precio esperado en las líneas conciliables.")
+                            @(L("La factura cuadra con lo recibido y el precio esperado en las líneas conciliables.", "La factura quadra amb el rebut i el preu esperat a les línies conciliables.", "The invoice matches the received quantities and expected price on reconcilable lines."))
                         }
                     </span>
                 </div>
@@ -156,74 +157,74 @@ else
 
             <div class="card-grid purchase-summary-grid purchase-metrics-grid">
                 <article class="info-card">
-                    <h2>@reconciliationRows.Sum(row => row.ReceivedQuantity).ToString("0.###")</h2>
-                    <p class="muted">qty recibida</p>
+                    <h2>@reconciliationRows.Sum(row => row.ReceivedQuantity).ToUiString("0.###")</h2>
+                    <p class="muted">@L("qty recibida", "qty rebuda", "received qty")</p>
                 </article>
                 <article class="info-card">
-                    <h2>@reconciliationRows.Sum(row => row.InvoicedQuantity).ToString("0.###")</h2>
-                    <p class="muted">qty facturada</p>
+                    <h2>@reconciliationRows.Sum(row => row.InvoicedQuantity).ToUiString("0.###")</h2>
+                    <p class="muted">@L("qty facturada", "qty facturada", "invoiced qty")</p>
                 </article>
                 <article class="info-card">
-                    <h2>@reconciliationRows.Sum(row => row.ExpectedBase).ToString("0.00") €</h2>
-                    <p class="muted">base prevista</p>
+                    <h2>@reconciliationRows.Sum(row => row.ExpectedBase).ToUiString("0.00") €</h2>
+                    <p class="muted">@L("base prevista", "base prevista", "expected base")</p>
                 </article>
                 <article class="info-card">
-                    <h2>@reconciliationRows.Sum(row => row.InvoicedBase).ToString("0.00") €</h2>
-                    <p class="muted">base facturada</p>
+                    <h2>@reconciliationRows.Sum(row => row.InvoicedBase).ToUiString("0.00") €</h2>
+                    <p class="muted">@L("base facturada", "base facturada", "invoiced base")</p>
                 </article>
                 <article class="info-card accent-card">
                     <h2>@reconciliationRows.Count(row => row.HasDifference)</h2>
-                    <p class="muted">líneas con diferencia</p>
+                    <p class="muted">@L("líneas con diferencia", "línies amb diferència", "lines with difference")</p>
                 </article>
                 <article class="info-card">
-                    <h2>@TotalBaseDifference.ToString("0.00") €</h2>
-                    <p class="muted">desviación base</p>
+                    <h2>@TotalBaseDifference.ToUiString("0.00") €</h2>
+                    <p class="muted">@L("desviación base", "desviació base", "base deviation")</p>
                 </article>
             </div>
 
             @if (reconciliationRows.Count == 0)
             {
-                <p class="muted">Todavía no hay datos suficientes para conciliar. Enlaza una recepción o marca el origen pedido de las líneas.</p>
+                <p class="muted">@L("Todavía no hay datos suficientes para conciliar. Enlaza una recepción o marca el origen pedido de las líneas.", "Encara no hi ha dades suficients per conciliar. Enllaça una recepció o marca l'origen comanda de les línies.", "There is not enough data yet to reconcile. Link a receipt or mark the source order of the lines.")</p>
             }
             else
             {
                 <table class="data-table">
                     <thead>
                         <tr>
-                            <th>Pedido</th>
-                            <th>Línea</th>
-                            <th>Artículo</th>
-                            <th>Descripción</th>
-                            <th>Estado</th>
-                            <th>Pedida</th>
-                            <th>Recibida</th>
-                            <th>Facturada</th>
-                            <th>Dif. qty</th>
-                            <th>Precio pedido</th>
-                            <th>Precio factura</th>
-                            <th>Dif. precio</th>
-                            <th>Base prevista</th>
-                            <th>Base factura</th>
+                            <th>@L("Pedido", "Comanda", "Order")</th>
+                            <th>@L("Línea", "Línia", "Line")</th>
+                            <th>@L("Artículo", "Article", "Item")</th>
+                            <th>@L("Descripción", "Descripció", "Description")</th>
+                            <th>@L("Estado", "Estat", "Status")</th>
+                            <th>@L("Pedida", "Demanada", "Ordered")</th>
+                            <th>@L("Recibida", "Rebuda", "Received")</th>
+                            <th>@L("Facturada", "Facturada", "Invoiced")</th>
+                            <th>@L("Dif. qty", "Dif. qty", "Qty diff.")</th>
+                            <th>@L("Precio pedido", "Preu comanda", "Order price")</th>
+                            <th>@L("Precio factura", "Preu factura", "Invoice price")</th>
+                            <th>@L("Dif. precio", "Dif. preu", "Price diff.")</th>
+                            <th>@L("Base prevista", "Base prevista", "Expected base")</th>
+                            <th>@L("Base factura", "Base factura", "Invoice base")</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach (var row in reconciliationRows)
                         {
                             <tr class="@row.RowClass">
-                                <td>@(row.OrderNumber?.ToString() ?? "Sin dato")</td>
-                                <td>@(row.OrderLineNumber?.ToString() ?? "Sin dato")</td>
+                                <td>@(row.OrderNumber?.ToString() ?? DisplayValue(null))</td>
+                                <td>@(row.OrderLineNumber?.ToString() ?? DisplayValue(null))</td>
                                 <td>@DisplayValue(row.ItemCode)</td>
                                 <td>@row.Description</td>
-                                <td><span class="status-pill @row.StatusClass">@row.StatusLabel</span></td>
-                                <td>@row.OrderedQuantity.ToString("0.###")</td>
-                                <td>@row.ReceivedQuantity.ToString("0.###")</td>
-                                <td>@row.InvoicedQuantity.ToString("0.###")</td>
-                                <td>@row.QuantityDifference.ToString("0.###")</td>
-                                <td>@row.OrderUnitPrice.ToString("0.0000")</td>
-                                <td>@row.InvoiceUnitPrice.ToString("0.0000")</td>
-                                <td>@row.PriceDifference.ToString("0.0000")</td>
-                                <td>@row.ExpectedBase.ToString("0.00") €</td>
-                                <td>@row.InvoicedBase.ToString("0.00") €</td>
+                                <td><span class="status-pill @row.StatusClass">@FormatReconciliationStatus(row)</span></td>
+                                <td>@row.OrderedQuantity.ToUiString("0.###")</td>
+                                <td>@row.ReceivedQuantity.ToUiString("0.###")</td>
+                                <td>@row.InvoicedQuantity.ToUiString("0.###")</td>
+                                <td>@row.QuantityDifference.ToUiString("0.###")</td>
+                                <td>@row.OrderUnitPrice.ToUiString("0.0000")</td>
+                                <td>@row.InvoiceUnitPrice.ToUiString("0.0000")</td>
+                                <td>@row.PriceDifference.ToUiString("0.0000")</td>
+                                <td>@row.ExpectedBase.ToUiString("0.00") €</td>
+                                <td>@row.InvoicedBase.ToUiString("0.00") €</td>
                             </tr>
                         }
                     </tbody>
@@ -234,12 +235,12 @@ else
         <section class="panel">
             <div class="page-header">
                 <div>
-                    <h2>Líneas de factura</h2>
-                    <p class="muted">Puedes ajustar precios, IVA y descripciones antes de registrar la factura definitiva.</p>
+                    <h2>@L("Líneas de factura", "Línies de factura", "Invoice lines")</h2>
+                    <p class="muted">@L("Puedes ajustar precios, IVA y descripciones antes de registrar la factura definitiva.", "Pots ajustar preus, IVA i descripcions abans de registrar la factura definitiva.", "You can adjust prices, VAT and descriptions before registering the final invoice.")</p>
                 </div>
                 @if (canEdit)
                 {
-                    <button class="secondary-button" type="button" @onclick="AddLine">Añadir línea</button>
+                    <button class="secondary-button" type="button" @onclick="AddLine">@L("Añadir línea", "Afegir línia", "Add line")</button>
                 }
             </div>
 
@@ -249,58 +250,58 @@ else
                     var line = model.Lines[index];
                     <section class="panel line-editor">
                         <div class="panel-header">
-                            <strong>Línea @line.LineNumber</strong>
+                            <strong>@L("Línea", "Línia", "Line") @line.LineNumber</strong>
                             @if (canEdit && model.Lines.Count > 1)
                             {
-                                <button class="secondary-button" type="button" @onclick="() => RemoveLine(index)">Quitar</button>
+                                <button class="secondary-button" type="button" @onclick="() => RemoveLine(index)">@L("Quitar", "Treure", "Remove")</button>
                             }
                         </div>
                         <div class="form-grid">
                             <label class="field">
-                                <span>Artículo</span>
+                                <span>@L("Artículo", "Article", "Item")</span>
                                 <InputText class="text-input" @bind-Value="line.ItemCode" disabled="@(!canEdit)" />
                             </label>
                             <label class="field wide">
-                                <span>Descripción</span>
+                                <span>@L("Descripción", "Descripció", "Description")</span>
                                 <InputText class="text-input" @bind-Value="line.Description" disabled="@(!canEdit)" />
                             </label>
                             <label class="field">
-                                <span>Cantidad</span>
+                                <span>@L("Cantidad", "Quantitat", "Quantity")</span>
                                 <InputNumber class="text-input" @bind-Value="line.Quantity" disabled="@(!canEdit)" />
                             </label>
                             <label class="field">
-                                <span>Unidad</span>
+                                <span>@L("Unidad", "Unitat", "Unit")</span>
                                 <InputText class="text-input" @bind-Value="line.UnitOfMeasure" disabled="@(!canEdit)" />
                             </label>
                             <label class="field">
-                                <span>Precio unitario</span>
+                                <span>@L("Precio unitario", "Preu unitari", "Unit price")</span>
                                 <InputNumber class="text-input" @bind-Value="line.UnitPrice" disabled="@(!canEdit)" />
                             </label>
                             <label class="field">
-                                <span>IVA %</span>
+                                <span>@L("IVA %", "IVA %", "VAT %")</span>
                                 <InputNumber class="text-input" @bind-Value="line.TaxRate" disabled="@(!canEdit)" />
                             </label>
                         </div>
                         <div class="receipt-kv-grid">
                             <div>
-                                <span class="muted">Origen pedido</span>
-                                <strong>@(line.SourceOrderNumber?.ToString() ?? "Sin dato")</strong>
+                                <span class="muted">@L("Origen pedido", "Origen comanda", "Order source")</span>
+                                <strong>@(line.SourceOrderNumber?.ToString() ?? DisplayValue(null))</strong>
                             </div>
                             <div>
-                                <span class="muted">Línea pedido</span>
-                                <strong>@(line.SourceOrderLineNumber?.ToString() ?? "Sin dato")</strong>
+                                <span class="muted">@L("Línea pedido", "Línia comanda", "Order line")</span>
+                                <strong>@(line.SourceOrderLineNumber?.ToString() ?? DisplayValue(null))</strong>
                             </div>
                             <div>
-                                <span class="muted">Origen recepción</span>
-                                <strong>@(line.SourceReceiptNumber?.ToString() ?? "Sin dato")</strong>
+                                <span class="muted">@L("Origen recepción", "Origen recepció", "Receipt source")</span>
+                                <strong>@(line.SourceReceiptNumber?.ToString() ?? DisplayValue(null))</strong>
                             </div>
                             <div>
-                                <span class="muted">Base</span>
-                                <strong>@LineSubtotal(line).ToString("0.00") €</strong>
+                                <span class="muted">@L("Base", "Base", "Base")</span>
+                                <strong>@LineSubtotal(line).ToUiString("0.00") €</strong>
                             </div>
                             <div>
-                                <span class="muted">Total</span>
-                                <strong>@LineTotal(line).ToString("0.00") €</strong>
+                                <span class="muted">@L("Total", "Total", "Total")</span>
+                                <strong>@LineTotal(line).ToUiString("0.00") €</strong>
                             </div>
                         </div>
                     </section>
@@ -309,27 +310,27 @@ else
         </section>
 
         <section class="panel">
-            <h2>Resumen</h2>
+            <h2>@L("Resumen", "Resum", "Summary")</h2>
             <div class="card-grid purchase-summary-grid purchase-metrics-grid">
                 <article class="info-card">
                     <h2>@model.Lines.Count</h2>
-                    <p class="muted">líneas</p>
+                    <p class="muted">@L("líneas", "línies", "lines")</p>
                 </article>
                 <article class="info-card">
                     <h2>@model.Receipts.Count</h2>
-                    <p class="muted">recepciones</p>
+                    <p class="muted">@L("recepciones", "recepcions", "receipts")</p>
                 </article>
                 <article class="info-card">
-                    <h2>@TotalNetAmount.ToString("0.00") €</h2>
-                    <p class="muted">base</p>
+                    <h2>@TotalNetAmount.ToUiString("0.00") €</h2>
+                    <p class="muted">@L("base", "base", "base")</p>
                 </article>
                 <article class="info-card">
-                    <h2>@TotalTaxAmount.ToString("0.00") €</h2>
-                    <p class="muted">IVA</p>
+                    <h2>@TotalTaxAmount.ToUiString("0.00") €</h2>
+                    <p class="muted">@L("IVA", "IVA", "VAT")</p>
                 </article>
                 <article class="info-card accent-card">
-                    <h2>@TotalAmount.ToString("0.00") €</h2>
-                    <p class="muted">total</p>
+                    <h2>@TotalAmount.ToUiString("0.00") €</h2>
+                    <p class="muted">@L("total", "total", "total")</p>
                 </article>
             </div>
         </section>
@@ -339,23 +340,23 @@ else
             <section class="panel">
                 <div class="page-header">
                     <div>
-                        <h2>Pagos proveedor</h2>
-                        <p class="muted">Registro simple de pagos aplicados a esta factura para controlar lo pendiente.</p>
+                        <h2>@L("Pagos proveedor", "Pagaments proveïdor", "Supplier payments")</h2>
+                        <p class="muted">@L("Registro simple de pagos aplicados a esta factura para controlar lo pendiente.", "Registre simple de pagaments aplicats a aquesta factura per controlar el pendent.", "Simple register of payments applied to this invoice to control the outstanding amount.")</p>
                     </div>
                 </div>
 
                 <div class="card-grid purchase-summary-grid purchase-metrics-grid">
                     <article class="info-card">
-                        <h2>@model.AmountPaid.ToString("0.00") €</h2>
-                        <p class="muted">pagado</p>
+                        <h2>@model.AmountPaid.ToUiString("0.00") €</h2>
+                        <p class="muted">@L("pagado", "pagat", "paid")</p>
                     </article>
                     <article class="info-card accent-card">
-                        <h2>@model.OutstandingAmount.ToString("0.00") €</h2>
-                        <p class="muted">pendiente</p>
+                        <h2>@model.OutstandingAmount.ToUiString("0.00") €</h2>
+                        <p class="muted">@L("pendiente", "pendent", "outstanding")</p>
                     </article>
                     <article class="info-card">
-                        <h2>@(model.LastPaymentUtc?.ToLocalTime().ToString("dd/MM/yyyy HH:mm") ?? "Sin pago")</h2>
-                        <p class="muted">último pago</p>
+                        <h2>@(model.LastPaymentUtc?.ToLocalTime().ToString("dd/MM/yyyy HH:mm") ?? L("Sin pago", "Sense pagament", "No payment"))</h2>
+                        <p class="muted">@L("último pago", "últim pagament", "last payment")</p>
                     </article>
                 </div>
 
@@ -363,30 +364,30 @@ else
                 {
                     <div class="form-grid">
                         <label class="field">
-                            <span>Fecha pago</span>
+                            <span>@L("Fecha pago", "Data pagament", "Payment date")</span>
                             <InputDate class="text-input" @bind-Value="paymentModel.PaymentDate" />
                         </label>
                         <label class="field">
-                            <span>Importe</span>
+                            <span>@L("Importe", "Import", "Amount")</span>
                             <InputNumber class="text-input" @bind-Value="paymentModel.Amount" />
                         </label>
                         <label class="field">
-                            <span>Método</span>
+                            <span>@L("Método", "Mètode", "Method")</span>
                             <InputText class="text-input" @bind-Value="paymentModel.Method" />
                         </label>
                         <label class="field">
-                            <span>Referencia</span>
+                            <span>@L("Referencia", "Referència", "Reference")</span>
                             <InputText class="text-input" @bind-Value="paymentModel.Reference" />
                         </label>
                         <label class="field wide">
-                            <span>Notas pago</span>
+                            <span>@L("Notas pago", "Notes pagament", "Payment notes")</span>
                             <InputTextArea class="text-area" @bind-Value="paymentModel.Notes" />
                         </label>
                     </div>
 
                     <div class="quick-links" style="margin-top: 1rem;">
                         <button class="secondary-button" type="button" @onclick="RegisterPaymentAsync" disabled="@isRegisteringPayment">
-                            @(isRegisteringPayment ? "Registrando pago..." : "Registrar pago")
+                            @(isRegisteringPayment ? L("Registrando pago...", "Registrant pagament...", "Registering payment...") : L("Registrar pago", "Registrar pagament", "Register payment"))
                         </button>
                     </div>
                 }
@@ -395,17 +396,17 @@ else
                     <thead>
                         <tr>
                             <th>#</th>
-                            <th>Fecha</th>
-                            <th>Importe</th>
-                            <th>Método</th>
-                            <th>Referencia</th>
-                            <th>Notas</th>
+                            <th>@L("Fecha", "Data", "Date")</th>
+                            <th>@L("Importe", "Import", "Amount")</th>
+                            <th>@L("Método", "Mètode", "Method")</th>
+                            <th>@L("Referencia", "Referència", "Reference")</th>
+                            <th>@L("Notas", "Notes", "Notes")</th>
                         </tr>
                     </thead>
                     <tbody>
                         @if (model.Payments.Count == 0)
                         {
-                            <tr><td colspan="6" class="table-empty">Todavía no hay pagos registrados.</td></tr>
+                            <tr><td colspan="6" class="table-empty">@L("Todavía no hay pagos registrados.", "Encara no hi ha pagaments registrats.", "There are no payments registered yet.")</td></tr>
                         }
                         else
                         {
@@ -414,7 +415,7 @@ else
                                 <tr>
                                     <td>@payment.PaymentNumber</td>
                                     <td>@payment.PaymentDate.ToString("dd/MM/yyyy")</td>
-                                    <td>@payment.Amount.ToString("0.00") €</td>
+                                    <td>@payment.Amount.ToUiString("0.00") €</td>
                                     <td>@DisplayValue(payment.Method)</td>
                                     <td>@DisplayValue(payment.Reference)</td>
                                     <td>@DisplayValue(payment.Notes)</td>
@@ -429,10 +430,10 @@ else
         @if (canEdit)
         {
             <div class="quick-links" style="margin-top: 1rem;">
-                <button class="primary-button" type="submit" disabled="@isSaving">@(isSaving ? "Guardando..." : "Guardar factura")</button>
+                <button class="primary-button" type="submit" disabled="@isSaving">@(isSaving ? L("Guardando...", "Desant...", "Saving...") : L("Guardar factura", "Desar factura", "Save invoice"))</button>
                 @if (InvoiceNumber.HasValue)
                 {
-                    <button class="secondary-button" type="button" @onclick="DeleteAsync" disabled="@isDeleting">@(isDeleting ? "Eliminando..." : "Eliminar")</button>
+                    <button class="secondary-button" type="button" @onclick="DeleteAsync" disabled="@isDeleting">@(isDeleting ? L("Eliminando...", "Eliminant...", "Deleting...") : L("Eliminar", "Eliminar", "Delete"))</button>
                 }
             </div>
         }
@@ -474,11 +475,20 @@ else
     private decimal TotalQuantityDifference => decimal.Round(reconciliationRows.Sum(row => Math.Abs(row.QuantityDifference)), 3, MidpointRounding.AwayFromZero);
     private decimal TotalPriceDifference => decimal.Round(reconciliationRows.Sum(row => Math.Abs(row.PriceDifference)), 4, MidpointRounding.AwayFromZero);
     private decimal TotalBaseDifference => decimal.Round(reconciliationRows.Sum(row => row.BaseDifference), 2, MidpointRounding.AwayFromZero);
-    private string ReconciliationHeadline => ReconciliationHasDifferences ? "Factura con diferencias de conciliación" : "Factura cuadrada";
+    private string ReconciliationHeadline => ReconciliationHasDifferences
+        ? L("Factura con diferencias de conciliación", "Factura amb diferències de conciliació", "Invoice with reconciliation differences")
+        : L("Factura cuadrada", "Factura quadrada", "Reconciled invoice");
 
     private decimal TotalNetAmount => model.Lines.Sum(LineSubtotal);
     private decimal TotalTaxAmount => model.Lines.Sum(line => decimal.Round(LineSubtotal(line) * (line.TaxRate / 100m), 2, MidpointRounding.AwayFromZero));
     private decimal TotalAmount => TotalNetAmount + TotalTaxAmount;
+    private string L(string spanish, string catalan, string english) =>
+        T.CurrentLanguage switch
+        {
+            AppLanguages.Catalan => catalan,
+            AppLanguages.English => english,
+            _ => spanish
+        };
 
     protected override async Task OnParametersSetAsync()
     {
@@ -522,7 +532,7 @@ else
         var invoice = await PurchaseInvoiceQueries.GetInvoiceByNumberAsync(tenantId!.Value, companyId!.Value, InvoiceNumber!.Value);
         if (invoice is null)
         {
-            statusMessage = "No se ha encontrado la factura indicada.";
+            statusMessage = L("No se ha encontrado la factura indicada.", "No s'ha trobat la factura indicada.", "The requested invoice could not be found.");
             isError = true;
             model = new InvoiceFormModel();
             return;
@@ -754,7 +764,7 @@ else
             });
 
             await LoadExistingInvoiceAsync();
-            statusMessage = "Pago registrado correctamente.";
+            statusMessage = L("Pago registrado correctamente.", "Pagament registrat correctament.", "Payment registered successfully.");
         }
         catch (Exception exception)
         {
@@ -906,16 +916,25 @@ else
         return $"{itemCode?.Trim().ToUpperInvariant()}|{description?.Trim().ToUpperInvariant()}";
     }
 
-    private static string FormatStatus(string status) => status switch
+    private string FormatStatus(string status) => status switch
     {
-        PurchaseInvoiceStatuses.Draft => "Borrador",
-        PurchaseInvoiceStatuses.Registered => "Registrada",
-        PurchaseInvoiceStatuses.Paid => "Pagada",
-        PurchaseInvoiceStatuses.Cancelled => "Anulada",
+        PurchaseInvoiceStatuses.Draft => L("Borrador", "Esborrany", "Draft"),
+        PurchaseInvoiceStatuses.Registered => L("Registrada", "Registrada", "Registered"),
+        PurchaseInvoiceStatuses.Paid => L("Pagada", "Pagada", "Paid"),
+        PurchaseInvoiceStatuses.Cancelled => L("Anulada", "Anul·lada", "Cancelled"),
         _ => status
     };
 
-    private static string DisplayValue(string? value) => string.IsNullOrWhiteSpace(value) ? "Sin dato" : value;
+    private string DisplayValue(string? value) => string.IsNullOrWhiteSpace(value) ? L("Sin dato", "Sense dada", "No data") : value;
+
+    private string FormatReconciliationStatus(ReconciliationRowModel row) =>
+        !row.HasDifference
+            ? L("Cuadrada", "Quadrada", "Matched")
+            : row.HasQuantityDifference && row.HasPriceDifference
+                ? L("Qty + precio", "Qty + preu", "Qty + price")
+                : row.HasQuantityDifference
+                    ? L("Dif. qty", "Dif. qty", "Qty diff.")
+                    : L("Dif. precio", "Dif. preu", "Price diff.");
 
     private sealed class InvoiceFormModel
     {

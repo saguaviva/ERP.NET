@@ -172,7 +172,7 @@ else
         }
         else if (CurrentStock.HasValue && string.IsNullOrWhiteSpace(model.Notes))
         {
-            model.Notes = L($"Stock actual previo: {CurrentStock.Value:0.###}", $"Estoc actual previ: {CurrentStock.Value:0.###}", $"Previous current stock: {CurrentStock.Value:0.###}");
+            model.Notes = L($"Stock actual previo: {CurrentStock.Value.ToUiString("0.###")}", $"Estoc actual previ: {CurrentStock.Value.ToUiString("0.###")}", $"Previous current stock: {CurrentStock.Value.ToUiString("0.###")}");
         }
     }
 

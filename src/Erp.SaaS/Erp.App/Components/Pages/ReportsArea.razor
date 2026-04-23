@@ -1,0 +1,683 @@
+@page "/listados/ventas"
+@page "/listados/compras"
+@page "/listados/produccion"
+@page "/listados/almacen"
+@attribute [Authorize(Roles = "TenantAdmin,TenantReader")]
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
+@inject IReportingQueries ReportingQueries
+@inject AppText T
+
+@using Erp.Application.Reporting
+@using System.Globalization
+
+<PageTitle>@PageTitleText</PageTitle>
+
+<div class="page-header">
+    <div>
+        <p class="eyebrow">@L("Listados", "Llistats", "Reports")</p>
+        <h1>@HeaderTitle</h1>
+        <p class="lead">@HeaderLead</p>
+    </div>
+    <div class="quick-links">
+        <a class="secondary-button link-button" href="/listados">@L("Volver a listados", "Tornar a llistats", "Back to reports")</a>
+        <a class="secondary-button link-button" href="@StatisticsRoute">@StatisticsLinkLabel</a>
+        <a class="secondary-button link-button" href="@ExportCsvHref">@L("Exportar CSV", "Exportar CSV", "Export CSV")</a>
+    </div>
+</div>
+
+@if (!tenantId.HasValue || !companyId.HasValue)
+{
+    <div class="empty-state">
+        <p>@L("Selecciona una empresa activa para cargar el listado del área.", "Selecciona una empresa activa per carregar el llistat de l'àrea.", "Select an active company to load the area report.")</p>
+    </div>
+}
+else
+{
+    <section class="panel">
+        <div class="filter-row">
+            <label class="field compact-field">
+                <span>@L("Desde", "Des de", "From")</span>
+                <input class="text-input" type="date" @bind="filter.DateFrom" @bind:format="yyyy-MM-dd" disabled="@isLoading" />
+            </label>
+            <label class="field compact-field">
+                <span>@L("Hasta", "Fins a", "To")</span>
+                <input class="text-input" type="date" @bind="filter.DateTo" @bind:format="yyyy-MM-dd" disabled="@isLoading" />
+            </label>
+            <label class="field compact-field">
+                <span>@L("Tipo documental", "Tipus documental", "Document type")</span>
+                <select class="sidebar-select compact-select" @bind="filter.TypeKey" disabled="@isLoading">
+                    <option value="">@L("Todos", "Tots", "All")</option>
+                    @foreach (var option in AreaTypeOptions)
+                    {
+                        <option value="@option.Key">@option.Label</option>
+                    }
+                </select>
+            </label>
+        </div>
+        <div class="filter-row" style="margin-top:0.85rem;">
+            <input class="text-input" @bind="filter.Search" placeholder="@SearchPlaceholder" disabled="@isLoading" />
+            <button class="secondary-button" @onclick="SearchAsync" disabled="@isLoading">@(isLoading ? L("Cargando...", "Carregant...", "Loading...") : L("Buscar", "Buscar", "Search"))</button>
+        </div>
+        <div class="filter-row results-toolbar" style="margin-top:0.85rem;">
+            <span class="results-summary">@ResultsSummaryText</span>
+            <label class="field compact-field">
+                <span>@L("Tamaño de página", "Mida de pàgina", "Page size")</span>
+                <select class="sidebar-select compact-select" value="@filter.PageSize" @onchange="OnPageSizeChanged" disabled="@isLoading">
+                    <option value="25">25</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                </select>
+            </label>
+        </div>
+    </section>
+
+    @if (!string.IsNullOrWhiteSpace(errorMessage))
+    {
+        <div class="alert danger">@errorMessage</div>
+    }
+
+    <div class="card-grid">
+        @foreach (var card in AreaMetricCards)
+        {
+            <section class="@(card.Accent ? "info-card accent-card" : "info-card")">
+                <h2>@card.Value</h2>
+                <p class="muted">@card.Label</p>
+            </section>
+        }
+    </div>
+
+    <div class="comparison-grid">
+        <section class="panel">
+            <p class="eyebrow">@L("Resumen", "Resum", "Summary")</p>
+            <h2>@L("Por tipo de documento", "Per tipus de document", "By document type")</h2>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>@L("Tipo", "Tipus", "Type")</th>
+                        <th>@L("Cantidad", "Quantitat", "Count")</th>
+                        <th>@L("Importe", "Import", "Amount")</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (TypeSummaries.Count == 0)
+                    {
+                        <tr>
+                            <td colspan="3" class="table-empty">@L("Sin datos para este filtro.", "Sense dades per a aquest filtre.", "No data for this filter.")</td>
+                        </tr>
+                    }
+                    else
+                    {
+                        @foreach (var summary in TypeSummaries)
+                        {
+                            <tr>
+                                <td>@summary.Label</td>
+                                <td>@FormatCount(summary.Count)</td>
+                                <td>@FormatAmount(summary.Amount)</td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </section>
+
+        <section class="panel">
+            <p class="eyebrow">@L("Resumen", "Resum", "Summary")</p>
+            <h2>@L("Por estado", "Per estat", "By status")</h2>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>@L("Estado", "Estat", "Status")</th>
+                        <th>@L("Cantidad", "Quantitat", "Count")</th>
+                        <th>@L("Importe", "Import", "Amount")</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (StatusSummaries.Count == 0)
+                    {
+                        <tr>
+                            <td colspan="3" class="table-empty">@L("Sin datos para este filtro.", "Sense dades per a aquest filtre.", "No data for this filter.")</td>
+                        </tr>
+                    }
+                    else
+                    {
+                        @foreach (var summary in StatusSummaries)
+                        {
+                            <tr>
+                                <td>@summary.Label</td>
+                                <td>@FormatCount(summary.Count)</td>
+                                <td>@FormatAmount(summary.Amount)</td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </section>
+    </div>
+
+    <section class="panel @(isLoading ? "loading-panel" : string.Empty)">
+        @if (isLoading)
+        {
+            <div class="loading-banner">
+                <span class="loading-indicator" aria-hidden="true"></span>
+                <span>@LoadingLabel</span>
+            </div>
+        }
+
+        <div class="table-scroll">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <SortableHeader Label="@L("Fecha", "Data", "Date")" IsActive="@(sortColumn == nameof(OperationalDocumentListItemDto.DocumentDate))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(OperationalDocumentListItemDto.DocumentDate), true))" />
+                        <SortableHeader Label="@L("Tipo", "Tipus", "Type")" IsActive="@(sortColumn == nameof(OperationalDocumentListItemDto.TypeLabel))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(OperationalDocumentListItemDto.TypeLabel)))" />
+                        <SortableHeader Label="@L("Documento", "Document", "Document")" IsActive="@(sortColumn == nameof(OperationalDocumentListItemDto.DocumentDisplay))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(OperationalDocumentListItemDto.DocumentDisplay), true))" />
+                        <SortableHeader Label="@PartyColumnLabel" IsActive="@(sortColumn == nameof(OperationalDocumentListItemDto.PartyName))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(OperationalDocumentListItemDto.PartyName)))" />
+                        <SortableHeader Label="@L("Estado", "Estat", "Status")" IsActive="@(sortColumn == nameof(OperationalDocumentListItemDto.Status))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(OperationalDocumentListItemDto.Status)))" />
+                        <SortableHeader Label="@AmountColumnLabel" IsActive="@(sortColumn == nameof(OperationalDocumentListItemDto.Amount))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(OperationalDocumentListItemDto.Amount), true))" />
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (isLoading)
+                    {
+                        @for (var index = 0; index < 5; index++)
+                        {
+                            <tr class="table-skeleton-row">
+                                <td><span class="skeleton-line short"></span></td>
+                                <td><span class="skeleton-line"></span></td>
+                                <td><span class="skeleton-line short"></span></td>
+                                <td><span class="skeleton-line"></span></td>
+                                <td><span class="skeleton-line short"></span></td>
+                                <td><span class="skeleton-line short"></span></td>
+                                <td><span class="skeleton-line short"></span></td>
+                            </tr>
+                        }
+                    }
+                    else if (items.Count == 0)
+                    {
+                        <tr>
+                            <td colspan="7" class="table-empty">@EmptyTableLabel</td>
+                        </tr>
+                    }
+                    else
+                    {
+                        @foreach (var item in items)
+                        {
+                            <tr>
+                                <td>@item.DocumentDate.ToString("dd/MM/yyyy")</td>
+                                <td>@FormatType(item.TypeKey)</td>
+                                <td>@item.DocumentDisplay</td>
+                                <td>@DisplayValue(item.PartyName)</td>
+                                <td>@DisplayValue(item.Status)</td>
+                                <td>@FormatAmount(item.Amount)</td>
+                                <td><a class="inline-link" href="@item.Route">@L("Abrir", "Obrir", "Open")</a></td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <div class="pagination-bar">
+            <span class="muted">@L($"Página {filter.Page} de {TotalPages}", $"Pàgina {filter.Page} de {TotalPages}", $"Page {filter.Page} of {TotalPages}")</span>
+            <div class="pagination-actions">
+                <button class="secondary-button" @onclick="() => ChangePageAsync(1)" disabled="@(!CanGoPrevious || isLoading)">@L("Primera", "Primera", "First")</button>
+                <button class="secondary-button" @onclick="() => ChangePageAsync(filter.Page - 1)" disabled="@(!CanGoPrevious || isLoading)">@L("Anterior", "Anterior", "Previous")</button>
+                <button class="secondary-button" @onclick="() => ChangePageAsync(filter.Page + 1)" disabled="@(!CanGoNext || isLoading)">@L("Siguiente", "Següent", "Next")</button>
+                <button class="secondary-button" @onclick="() => ChangePageAsync(TotalPages)" disabled="@(!CanGoNext || isLoading)">@L("Última", "Última", "Last")</button>
+            </div>
+        </div>
+    </section>
+}
+
+@code {
+    [SupplyParameterFromQuery(Name = "from")]
+    public DateTime? FromQuery { get; set; }
+
+    [SupplyParameterFromQuery(Name = "to")]
+    public DateTime? ToQuery { get; set; }
+
+    [SupplyParameterFromQuery(Name = "search")]
+    public string? SearchQuery { get; set; }
+
+    [SupplyParameterFromQuery(Name = "type")]
+    public string? TypeQuery { get; set; }
+
+    [SupplyParameterFromQuery(Name = "page")]
+    public int? PageQuery { get; set; }
+
+    [SupplyParameterFromQuery(Name = "pageSize")]
+    public int? PageSizeQuery { get; set; }
+
+    [SupplyParameterFromQuery(Name = "sort")]
+    public string? SortQuery { get; set; }
+
+    [SupplyParameterFromQuery(Name = "desc")]
+    public bool? DescQuery { get; set; }
+
+    private Guid? tenantId;
+    private Guid? companyId;
+    private bool isLoading;
+    private string errorMessage = string.Empty;
+    private int totalCount;
+    private string? lastLoadKey;
+    private string sortColumn = nameof(OperationalDocumentListItemDto.DocumentDate);
+    private bool sortDescending = true;
+    private OperationalDocumentFilter filter = new() { Page = 1, PageSize = 25, SortColumn = nameof(OperationalDocumentListItemDto.DocumentDate), SortDescending = true };
+    private BusinessStatisticsDto stats = new();
+    private IReadOnlyCollection<OperationalDocumentListItemDto> items = [];
+    private AreaDefinition area = AreaDefinition.Empty;
+
+    private int TotalPages => Math.Max(1, (int)Math.Ceiling(totalCount / (double)filter.PageSize));
+    private bool CanGoPrevious => filter.Page > 1;
+    private bool CanGoNext => filter.Page < TotalPages;
+    private int PageStart => totalCount == 0 ? 0 : ((filter.Page - 1) * filter.PageSize) + 1;
+    private int PageEnd => totalCount == 0 ? 0 : Math.Min(filter.Page * filter.PageSize, totalCount);
+    private string PageTitleText => area.Localize(T, "pageTitle");
+    private string HeaderTitle => area.Localize(T, "title");
+    private string HeaderLead => area.Localize(T, "lead");
+    private string StatisticsRoute => area.StatisticsRoute;
+    private string StatisticsLinkLabel => area.Localize(T, "statisticsLink");
+    private string SearchPlaceholder => area.Localize(T, "searchPlaceholder");
+    private string LoadingLabel => area.Localize(T, "loadingLabel");
+    private string EmptyTableLabel => area.Localize(T, "emptyTable");
+    private string PartyColumnLabel => area.Localize(T, "partyColumn");
+    private string AmountColumnLabel => area.Localize(T, "amountColumn");
+    private IReadOnlyList<TypeOption> AreaTypeOptions => area.GetTypeOptions(T);
+    private IReadOnlyList<DocumentSummary> TypeSummaries =>
+        items.GroupBy(item => FormatType(item.TypeKey))
+            .Select(group => new DocumentSummary(group.Key, group.Count(), group.Sum(item => item.Amount)))
+            .OrderByDescending(summary => summary.Count)
+            .ThenBy(summary => summary.Label)
+            .ToArray();
+    private IReadOnlyList<DocumentSummary> StatusSummaries =>
+        items.GroupBy(item => DisplayValue(item.Status))
+            .Select(group => new DocumentSummary(group.Key, group.Count(), group.Sum(item => item.Amount)))
+            .OrderByDescending(summary => summary.Count)
+            .ThenBy(summary => summary.Label)
+            .ToArray();
+    private IReadOnlyList<MetricCard> AreaMetricCards => area.BuildMetricCards(T, stats, totalCount, items);
+    private string ExportCsvHref => NavigationManager.GetUriWithQueryParameters("/listados/compras-ventas-ordenes/export/csv", new Dictionary<string, object?>
+    {
+        ["from"] = filter.DateFrom?.ToString("yyyy-MM-dd"),
+        ["to"] = filter.DateTo?.ToString("yyyy-MM-dd"),
+        ["search"] = string.IsNullOrWhiteSpace(filter.Search) ? null : filter.Search,
+        ["category"] = area.Category,
+        ["type"] = string.IsNullOrWhiteSpace(filter.TypeKey) ? null : filter.TypeKey
+    });
+    private string ResultsSummaryText =>
+        totalCount == 0
+            ? L("Sin resultados", "Sense resultats", "No results")
+            : L($"Mostrando {PageStart.ToUiString("N0")}-{PageEnd.ToUiString("N0")} de {totalCount.ToUiString("N0")} documentos", $"Mostrant {PageStart.ToUiString("N0")}-{PageEnd.ToUiString("N0")} de {totalCount.ToUiString("N0")} documents", $"Showing {PageStart.ToUiString("N0")}-{PageEnd.ToUiString("N0")} of {totalCount.ToUiString("N0")} documents");
+
+    private string L(string spanish, string catalan, string english) =>
+        T.CurrentLanguage switch
+        {
+            AppLanguages.Catalan => catalan,
+            AppLanguages.English => english,
+            _ => spanish
+        };
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        tenantId = user.GetTenantId();
+        companyId = user.GetActiveCompanyId();
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        area = AreaDefinition.FromRoute(NavigationManager.ToBaseRelativePath(NavigationManager.Uri));
+        var loadKey = string.Join("|",
+            area.ReportsRoute,
+            FromQuery?.ToString("yyyy-MM-dd") ?? string.Empty,
+            ToQuery?.ToString("yyyy-MM-dd") ?? string.Empty,
+            SearchQuery ?? string.Empty,
+            TypeQuery ?? string.Empty,
+            PageQuery?.ToString(CultureInfo.InvariantCulture) ?? string.Empty,
+            PageSizeQuery?.ToString(CultureInfo.InvariantCulture) ?? string.Empty,
+            SortQuery ?? string.Empty,
+            DescQuery?.ToString() ?? string.Empty,
+            tenantId?.ToString() ?? string.Empty,
+            companyId?.ToString() ?? string.Empty);
+
+        if (string.Equals(loadKey, lastLoadKey, StringComparison.Ordinal))
+        {
+            return;
+        }
+
+        ApplyQueryState();
+        lastLoadKey = loadKey;
+        await LoadAsync();
+    }
+
+    private void ApplyQueryState()
+    {
+        filter.DateFrom = FromQuery ?? DateTime.Today.AddDays(-30);
+        filter.DateTo = ToQuery ?? DateTime.Today;
+        filter.Search = SearchQuery ?? string.Empty;
+        filter.Category = area.Category;
+        filter.TypeKey = string.IsNullOrWhiteSpace(TypeQuery) ? string.Empty : TypeQuery;
+        filter.Page = Math.Max(PageQuery ?? 1, 1);
+        filter.PageSize = PageSizeQuery is > 0 ? PageSizeQuery.Value : 25;
+        sortColumn = string.IsNullOrWhiteSpace(SortQuery) ? nameof(OperationalDocumentListItemDto.DocumentDate) : SortQuery;
+        sortDescending = DescQuery ?? true;
+    }
+
+    private async Task LoadAsync()
+    {
+        if (!tenantId.HasValue || !companyId.HasValue)
+        {
+            items = [];
+            totalCount = 0;
+            stats = new();
+            return;
+        }
+
+        isLoading = true;
+        errorMessage = string.Empty;
+        try
+        {
+            filter.Category = area.Category;
+            filter.SortColumn = sortColumn;
+            filter.SortDescending = sortDescending;
+            var result = await ReportingQueries.SearchOperationalDocumentsAsync(tenantId.Value, companyId.Value, filter);
+            items = result.Items;
+            totalCount = result.TotalCount;
+            stats = await ReportingQueries.GetBusinessStatisticsAsync(
+                tenantId.Value,
+                companyId.Value,
+                new BusinessStatisticsFilter
+                {
+                    DateFrom = filter.DateFrom,
+                    DateTo = filter.DateTo
+                });
+            await SyncQueryStateAsync();
+        }
+        catch (Exception exception)
+        {
+            errorMessage = exception.Message;
+            items = [];
+            totalCount = 0;
+            stats = new();
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private async Task SearchAsync()
+    {
+        filter.Page = 1;
+        await LoadAsync();
+    }
+
+    private async Task ChangePageAsync(int page)
+    {
+        var newPage = Math.Max(1, Math.Min(page, TotalPages));
+        if (newPage == filter.Page)
+        {
+            return;
+        }
+
+        filter.Page = newPage;
+        await LoadAsync();
+    }
+
+    private async Task SetSortAsync(string column, bool defaultDescending = false)
+    {
+        if (string.Equals(sortColumn, column, StringComparison.Ordinal))
+        {
+            sortDescending = !sortDescending;
+        }
+        else
+        {
+            sortColumn = column;
+            sortDescending = defaultDescending;
+        }
+
+        filter.Page = 1;
+        await LoadAsync();
+    }
+
+    private async Task OnPageSizeChanged(ChangeEventArgs args)
+    {
+        if (!int.TryParse(args.Value?.ToString(), out var pageSize))
+        {
+            return;
+        }
+
+        filter.PageSize = pageSize;
+        filter.Page = 1;
+        await LoadAsync();
+    }
+
+    private async Task SyncQueryStateAsync()
+    {
+        var query = new Dictionary<string, object?>
+        {
+            ["from"] = filter.DateFrom?.ToString("yyyy-MM-dd"),
+            ["to"] = filter.DateTo?.ToString("yyyy-MM-dd"),
+            ["search"] = string.IsNullOrWhiteSpace(filter.Search) ? null : filter.Search,
+            ["type"] = string.IsNullOrWhiteSpace(filter.TypeKey) ? null : filter.TypeKey,
+            ["page"] = filter.Page > 1 ? filter.Page : null,
+            ["pageSize"] = filter.PageSize != 25 ? filter.PageSize : null,
+            ["sort"] = sortColumn != nameof(OperationalDocumentListItemDto.DocumentDate) ? sortColumn : null,
+            ["desc"] = sortDescending ? true : null
+        };
+
+        var target = NavigationManager.GetUriWithQueryParameters(area.ReportsRoute, query);
+        if (!string.Equals(target, NavigationManager.Uri, StringComparison.Ordinal))
+        {
+            NavigationManager.NavigateTo(target, replace: true);
+        }
+
+        await Task.CompletedTask;
+    }
+
+    private string FormatType(string typeKey) =>
+        typeKey switch
+        {
+            "SalesOrder" => L("Pedido venta", "Comanda venda", "Sales order"),
+            "SalesShipment" => L("Albarán venta", "Albarà venda", "Sales shipment"),
+            "SalesInvoice" => L("Factura venta", "Factura venda", "Sales invoice"),
+            "PurchaseOrder" => L("Pedido compra", "Comanda compra", "Purchase order"),
+            "PurchaseReceipt" => L("Recepción compra", "Recepció compra", "Purchase receipt"),
+            "PurchaseInvoice" => L("Factura proveedor", "Factura proveïdor", "Supplier invoice"),
+            "FinishWorkOrder" => L("Orden fabricación", "Ordre fabricació", "Work order"),
+            "SalesRemittance" => L("Remesa cliente", "Remesa client", "Customer remittance"),
+            "StockTransfer" => L("Traspaso almacén", "Traspàs magatzem", "Warehouse transfer"),
+            "StockCount" => L("Inventario", "Inventari", "Stock count"),
+            _ => typeKey
+        };
+
+    private string FormatAmount(decimal amount) =>
+        amount.ToString("N2", CultureInfo.CurrentCulture);
+
+    private string FormatCount(int count) =>
+        count.ToString("N0", CultureInfo.CurrentCulture);
+
+    private static string DisplayValue(string? value) =>
+        string.IsNullOrWhiteSpace(value) ? "-" : value;
+
+    private sealed record DocumentSummary(string Label, int Count, decimal Amount);
+
+    private sealed record MetricCard(string Label, string Value, bool Accent = false);
+
+    private sealed record TypeOption(string Key, string Label);
+
+    private sealed class AreaDefinition
+    {
+        public static readonly AreaDefinition Empty = new("sales");
+
+        private readonly string slug;
+
+        private AreaDefinition(string slug)
+        {
+            this.slug = slug;
+        }
+
+        public string Category =>
+            slug switch
+            {
+                "sales" => "Sales",
+                "purchases" => "Purchases",
+                "production" => "Production",
+                "warehouse" => "Warehouse",
+                _ => "Sales"
+            };
+
+        public string ReportsRoute =>
+            slug switch
+            {
+                "sales" => "/listados/ventas",
+                "purchases" => "/listados/compras",
+                "production" => "/listados/produccion",
+                "warehouse" => "/listados/almacen",
+                _ => "/listados/ventas"
+            };
+
+        public string StatisticsRoute =>
+            slug switch
+            {
+                "sales" => "/estadisticas/ventas",
+                "purchases" => "/estadisticas/compras",
+                "production" => "/estadisticas/produccion",
+                "warehouse" => "/estadisticas/almacen",
+                _ => "/estadisticas/ventas"
+            };
+
+        public static AreaDefinition FromRoute(string route)
+        {
+            var normalized = (route ?? string.Empty).Split('?', '#')[0].Trim('/');
+            return normalized switch
+            {
+                "listados/compras" => new("purchases"),
+                "listados/produccion" => new("production"),
+                "listados/almacen" => new("warehouse"),
+                _ => new("sales")
+            };
+        }
+
+        public string Localize(AppText text, string key) =>
+            (slug, key) switch
+            {
+                ("sales", "pageTitle") => Localize(text, "Listados / Ventas", "Llistats / Vendes", "Reports / Sales"),
+                ("sales", "title") => Localize(text, "Listados de ventas", "Llistats de vendes", "Sales reports"),
+                ("sales", "lead") => Localize(text, "Pedidos, albaranes, facturas y remesas del circuito comercial con una vista única por área.", "Comandes, albarans, factures i remeses del circuit comercial amb una vista única per àrea.", "Orders, shipments, invoices and remittances in a single sales-area view."),
+                ("sales", "statisticsLink") => Localize(text, "Ver estadísticas de ventas", "Veure estadístiques de vendes", "View sales statistics"),
+                ("sales", "searchPlaceholder") => Localize(text, "Buscar por documento, cliente, estado o tipo", "Buscar per document, client, estat o tipus", "Search by document, client, status or type"),
+                ("sales", "loadingLabel") => Localize(text, "Cargando documentos de ventas...", "Carregant documents de vendes...", "Loading sales documents..."),
+                ("sales", "emptyTable") => Localize(text, "No hay documentos de ventas para el filtro actual.", "No hi ha documents de vendes per al filtre actual.", "There are no sales documents for the current filter."),
+                ("sales", "partyColumn") => Localize(text, "Cliente / banco", "Client / banc", "Client / bank"),
+                ("sales", "amountColumn") => Localize(text, "Importe", "Import", "Amount"),
+
+                ("purchases", "pageTitle") => Localize(text, "Listados / Compras", "Llistats / Compres", "Reports / Purchases"),
+                ("purchases", "title") => Localize(text, "Listados de compras", "Llistats de compres", "Purchase reports"),
+                ("purchases", "lead") => Localize(text, "Pedidos, recepciones y facturas proveedor agrupados para seguimiento de aprovisionamiento.", "Comandes, recepcions i factures proveïdor agrupades per al seguiment d'aprovisionament.", "Purchase orders, receipts and supplier invoices grouped for procurement follow-up."),
+                ("purchases", "statisticsLink") => Localize(text, "Ver estadísticas de compras", "Veure estadístiques de compres", "View purchase statistics"),
+                ("purchases", "searchPlaceholder") => Localize(text, "Buscar por documento, proveedor, estado o tipo", "Buscar per document, proveïdor, estat o tipus", "Search by document, supplier, status or type"),
+                ("purchases", "loadingLabel") => Localize(text, "Cargando documentos de compras...", "Carregant documents de compres...", "Loading purchase documents..."),
+                ("purchases", "emptyTable") => Localize(text, "No hay documentos de compras para el filtro actual.", "No hi ha documents de compres per al filtre actual.", "There are no purchase documents for the current filter."),
+                ("purchases", "partyColumn") => Localize(text, "Proveedor", "Proveïdor", "Supplier"),
+                ("purchases", "amountColumn") => Localize(text, "Importe / cantidad", "Import / quantitat", "Amount / quantity"),
+
+                ("production", "pageTitle") => Localize(text, "Listados / Producción", "Llistats / Producció", "Reports / Production"),
+                ("production", "title") => Localize(text, "Listados de producción", "Llistats de producció", "Production reports"),
+                ("production", "lead") => Localize(text, "Órdenes de fabricación y trabajo vivo de planta reunidos en un panel operativo por área.", "Ordres de fabricació i treball viu de planta reunits en un panell operatiu per àrea.", "Work orders and live plant workload gathered in an operational area view."),
+                ("production", "statisticsLink") => Localize(text, "Ver estadísticas de producción", "Veure estadístiques de producció", "View production statistics"),
+                ("production", "searchPlaceholder") => Localize(text, "Buscar por orden, cliente, estado o acabador", "Buscar per ordre, client, estat o acabador", "Search by work order, client, status or finisher"),
+                ("production", "loadingLabel") => Localize(text, "Cargando órdenes de producción...", "Carregant ordres de producció...", "Loading production work orders..."),
+                ("production", "emptyTable") => Localize(text, "No hay órdenes de producción para el filtro actual.", "No hi ha ordres de producció per al filtre actual.", "There are no production orders for the current filter."),
+                ("production", "partyColumn") => Localize(text, "Cliente", "Client", "Client"),
+                ("production", "amountColumn") => Localize(text, "Líneas / volumen", "Línies / volum", "Lines / volume"),
+
+                ("warehouse", "pageTitle") => Localize(text, "Listados / Almacén", "Llistats / Magatzem", "Reports / Warehouse"),
+                ("warehouse", "title") => Localize(text, "Listados de almacén", "Llistats de magatzem", "Warehouse reports"),
+                ("warehouse", "lead") => Localize(text, "Traspasos e inventarios reunidos en una vista documental del trabajo de almacén.", "Traspassos i inventaris reunits en una vista documental del treball de magatzem.", "Transfers and stock counts gathered into a warehouse document view."),
+                ("warehouse", "statisticsLink") => Localize(text, "Ver estadísticas de almacén", "Veure estadístiques de magatzem", "View warehouse statistics"),
+                ("warehouse", "searchPlaceholder") => Localize(text, "Buscar por documento, almacén, estado o ruta", "Buscar per document, magatzem, estat o ruta", "Search by document, warehouse, status or route"),
+                ("warehouse", "loadingLabel") => Localize(text, "Cargando documentos de almacén...", "Carregant documents de magatzem...", "Loading warehouse documents..."),
+                ("warehouse", "emptyTable") => Localize(text, "No hay documentos de almacén para el filtro actual.", "No hi ha documents de magatzem per al filtre actual.", "There are no warehouse documents for the current filter."),
+                ("warehouse", "partyColumn") => Localize(text, "Almacén / ruta", "Magatzem / ruta", "Warehouse / route"),
+                ("warehouse", "amountColumn") => Localize(text, "Cantidad / desviación", "Quantitat / desviació", "Quantity / variance"),
+                _ => string.Empty
+            };
+
+        public IReadOnlyList<TypeOption> GetTypeOptions(AppText text) =>
+            slug switch
+            {
+                "sales" =>
+                [
+                    new("SalesOrder", Localize(text, "Pedido venta", "Comanda venda", "Sales order")),
+                    new("SalesShipment", Localize(text, "Albarán venta", "Albarà venda", "Sales shipment")),
+                    new("SalesInvoice", Localize(text, "Factura venta", "Factura venda", "Sales invoice")),
+                    new("SalesRemittance", Localize(text, "Remesa cliente", "Remesa client", "Customer remittance"))
+                ],
+                "purchases" =>
+                [
+                    new("PurchaseOrder", Localize(text, "Pedido compra", "Comanda compra", "Purchase order")),
+                    new("PurchaseReceipt", Localize(text, "Recepción compra", "Recepció compra", "Purchase receipt")),
+                    new("PurchaseInvoice", Localize(text, "Factura proveedor", "Factura proveïdor", "Supplier invoice"))
+                ],
+                "production" =>
+                [
+                    new("FinishWorkOrder", Localize(text, "Orden fabricación", "Ordre fabricació", "Work order"))
+                ],
+                "warehouse" =>
+                [
+                    new("StockTransfer", Localize(text, "Traspaso almacén", "Traspàs magatzem", "Warehouse transfer")),
+                    new("StockCount", Localize(text, "Inventario", "Inventari", "Stock count"))
+                ],
+                _ => []
+            };
+
+        public IReadOnlyList<MetricCard> BuildMetricCards(AppText text, BusinessStatisticsDto stats, int totalCount, IReadOnlyCollection<OperationalDocumentListItemDto> items) =>
+            slug switch
+            {
+                "sales" =>
+                [
+                    new(Localize(text, "documentos en rango", "documents en rang", "documents in range"), totalCount.ToString("N0", CultureInfo.CurrentCulture)),
+                    new(Localize(text, "pedidos venta", "comandes venda", "sales orders"), stats.SalesOrderCount.ToString("N0", CultureInfo.CurrentCulture)),
+                    new(Localize(text, "albaranes", "albarans", "shipments"), stats.SalesShipmentCount.ToString("N0", CultureInfo.CurrentCulture)),
+                    new(Localize(text, "facturas", "factures", "invoices"), stats.SalesInvoiceCount.ToString("N0", CultureInfo.CurrentCulture)),
+                    new(Localize(text, "pendiente cobro", "pendent cobrament", "outstanding sales"), string.Format(CultureInfo.CurrentCulture, "{0:N2}", stats.SalesOutstandingAmount), true)
+                ],
+                "purchases" =>
+                [
+                    new(Localize(text, "documentos en rango", "documents en rang", "documents in range"), totalCount.ToString("N0", CultureInfo.CurrentCulture)),
+                    new(Localize(text, "pedidos compra", "comandes compra", "purchase orders"), stats.PurchaseOrderCount.ToString("N0", CultureInfo.CurrentCulture)),
+                    new(Localize(text, "recepciones", "recepcions", "receipts"), stats.PurchaseReceiptCount.ToString("N0", CultureInfo.CurrentCulture)),
+                    new(Localize(text, "facturas proveedor", "factures proveïdor", "supplier invoices"), stats.PurchaseInvoiceCount.ToString("N0", CultureInfo.CurrentCulture)),
+                    new(Localize(text, "pendiente pago", "pendent pagament", "outstanding purchases"), string.Format(CultureInfo.CurrentCulture, "{0:N2}", stats.PurchaseOutstandingAmount), true)
+                ],
+                "production" =>
+                [
+                    new(Localize(text, "órdenes en rango", "ordres en rang", "orders in range"), totalCount.ToString("N0", CultureInfo.CurrentCulture)),
+                    new(Localize(text, "órdenes vivas", "ordres vives", "live work orders"), stats.LiveFinishOrders.ToString("N0", CultureInfo.CurrentCulture)),
+                    new(Localize(text, "estados activos", "estats actius", "active statuses"), stats.FinishStatusBreakdown.Count.ToString("N0", CultureInfo.CurrentCulture)),
+                    new(Localize(text, "acabadores visibles", "acabadors visibles", "visible finishers"), stats.TopFinishers.Count.ToString("N0", CultureInfo.CurrentCulture)),
+                    new(Localize(text, "volumen en página", "volum en pàgina", "page volume"), string.Format(CultureInfo.CurrentCulture, "{0:N2}", items.Sum(item => item.Amount)), true)
+                ],
+                "warehouse" =>
+                [
+                    new(Localize(text, "documentos en rango", "documents en rang", "documents in range"), totalCount.ToString("N0", CultureInfo.CurrentCulture)),
+                    new(Localize(text, "posiciones stock", "posicions estoc", "stock positions"), stats.StockPositions.ToString("N0", CultureInfo.CurrentCulture)),
+                    new(Localize(text, "movimientos", "moviments", "movements"), stats.StockMovementsInRange.ToString("N0", CultureInfo.CurrentCulture)),
+                    new(Localize(text, "inventarios borrador", "inventaris esborrany", "draft counts"), stats.DraftCounts.ToString("N0", CultureInfo.CurrentCulture)),
+                    new(Localize(text, "traspasos borrador", "traspassos esborrany", "draft transfers"), stats.DraftTransfers.ToString("N0", CultureInfo.CurrentCulture), true)
+                ],
+                _ => []
+            };
+
+        private static string Localize(AppText text, string spanish, string catalan, string english) =>
+            text.CurrentLanguage switch
+            {
+                AppLanguages.Catalan => catalan,
+                AppLanguages.English => english,
+                _ => spanish
+            };
+    }
+}

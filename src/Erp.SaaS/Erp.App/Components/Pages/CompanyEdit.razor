@@ -1,0 +1,309 @@
+@page "/base-datos/empresas/nueva"
+@page "/base-datos/empresas/editar/{CompanyId:guid}"
+@attribute [Authorize(Roles = "TenantAdmin,PlatformAdmin")]
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
+@inject ITenantAdminService TenantAdminService
+@inject AppText T
+
+<PageTitle>@(isCreateMode ? L("Base / Empresas / Nueva", "Base / Empreses / Nova", "Master data / Companies / New") : L("Base / Empresas / Editar", "Base / Empreses / Editar", "Master data / Companies / Edit"))</PageTitle>
+
+<div class="page-header">
+    <div>
+        <p class="eyebrow">@T["menu.base"]</p>
+        <h1>@(isCreateMode ? L("Nueva empresa", "Nova empresa", "New company") : currentCompany?.Name ?? L("Empresa", "Empresa", "Company"))</h1>
+        <p class="lead">
+            @(isCreateMode
+                ? L("Da de alta una nueva empresa operativa dentro del tenant, con su slug y centro legacy propio.", "Dona d'alta una nova empresa operativa dins del tenant, amb el seu slug i centre legacy propi.", "Create a new operating company inside the tenant with its own slug and legacy center.")
+                : L("Revisa la empresa y, si hace falta, reasigna su centro legacy con control de impacto.", "Revisa l'empresa i, si cal, reassigna el seu centre legacy amb control d'impacte.", "Review the company and, if needed, reassign its legacy center with impact control."))
+        </p>
+    </div>
+    <div class="quick-links">
+        <a class="secondary-button link-button" href="/base-datos/empresas">@L("Volver a empresas", "Tornar a empreses", "Back to companies")</a>
+    </div>
+</div>
+
+@if (!tenantId.HasValue)
+{
+    <div class="empty-state">
+        <p>@L("No hay tenant activo en la sesión.", "No hi ha cap tenant actiu a la sessió.", "There is no active tenant in the session.")</p>
+    </div>
+}
+else
+{
+    @if (!string.IsNullOrWhiteSpace(statusMessage))
+    {
+        <div class="alert @(isError ? "danger" : "success")">@statusMessage</div>
+    }
+
+    @if (!isCreateMode && currentCompany is null && string.IsNullOrWhiteSpace(statusMessage))
+    {
+        <div class="empty-state">
+            <p>@L("La empresa solicitada no existe dentro del tenant actual.", "L'empresa sol·licitada no existeix dins del tenant actual.", "The requested company does not exist in the current tenant.")</p>
+        </div>
+    }
+    else
+    {
+        <section class="panel detail-panel">
+            <div class="detail-panel-header">
+                <div>
+                    <h2>@(isCreateMode ? L("Alta de empresa", "Alta d'empresa", "Company creation") : L("Ficha de empresa", "Fitxa d'empresa", "Company record"))</h2>
+                    <p class="muted">
+                        @(isCreateMode
+                            ? L("Cada empresa del tenant debe usar un centro legacy distinto.", "Cada empresa del tenant ha d'usar un centre legacy diferent.", "Each tenant company must use a different legacy center.")
+                            : L("El cambio de centro legacy se valida con impacto antes de guardarse.", "El canvi de centre legacy es valida amb impacte abans de desar-se.", "Changing the legacy center is validated with impact information before saving."))
+                    </p>
+                </div>
+            </div>
+
+            @if (isLoading)
+            {
+                <div class="loading-banner">
+                    <span class="loading-indicator" aria-hidden="true"></span>
+                    <span>@L("Cargando empresa...", "Carregant empresa...", "Loading company...")</span>
+                </div>
+            }
+            else
+            {
+                <EditForm Model="form" OnValidSubmit="SaveAsync">
+                    <div class="form-grid">
+                        <label class="field">
+                            <span>@L("Nombre", "Nom", "Name")</span>
+                            <InputText class="text-input" @bind-Value="form.Name" disabled="@(!isCreateMode || isSaving)" />
+                        </label>
+                        <label class="field">
+                            <span>@L("Slug", "Slug", "Slug")</span>
+                            <InputText class="text-input" @bind-Value="form.Slug" disabled="@(!isCreateMode || isSaving)" />
+                        </label>
+                        <label class="field">
+                            <span>@L("Centro legacy", "Centre legacy", "Legacy center")</span>
+                            <InputSelect class="text-input" @bind-Value="form.LegacyCenterCode" disabled="@isSaving">
+                                <option value="">@L("Selecciona centro legacy", "Selecciona centre legacy", "Select legacy center")</option>
+                                @foreach (var center in AvailableLegacyCenters)
+                                {
+                                    <option value="@center.Code">@FormatLegacyCenter(center)</option>
+                                }
+                            </InputSelect>
+                        </label>
+                        <label class="field">
+                            <span>@L("Estado", "Estat", "Status")</span>
+                            <input class="text-input" value="@(isCreateMode ? L("Nueva", "Nova", "New") : currentCompany?.IsActive == true ? L("Activa", "Activa", "Active") : L("Inactiva", "Inactiva", "Inactive"))" disabled />
+                        </label>
+                    </div>
+
+                    @if (!isCreateMode && currentCompany is not null)
+                    {
+                        <section class="card-grid" style="margin-top: 1rem;">
+                            <article class="info-card">
+                                <p class="eyebrow">@L("Empresa", "Empresa", "Company")</p>
+                                <h2>@currentCompany.Name</h2>
+                                <p class="muted">@currentCompany.Slug</p>
+                            </article>
+                            <article class="info-card">
+                                <p class="eyebrow">@L("Centro actual", "Centre actual", "Current center")</p>
+                                <h2>@DisplayValue(currentCompany.LegacyCenterCode)</h2>
+                                <p class="muted">@L("Centro legacy hoy enlazado a esta empresa.", "Centre legacy avui enllaçat a aquesta empresa.", "Legacy center currently linked to this company.")</p>
+                            </article>
+                        </section>
+                    }
+
+                    @if (impact is not null && impact.HasUsage && RequiresForceConfirmation)
+                    {
+                        <div class="alert danger" style="margin-top: 1rem;">
+                            <strong>@L("Impacto detectado", "Impacte detectat", "Impact detected")</strong>
+                            <span>@L("Usuarios asignados:", "Usuaris assignats:", "Assigned users:") @impact.AssignedUsersCount</span>
+                            <span>@L("Clientes en centro actual:", "Clients al centre actual:", "Clients in current center:") @impact.ClientCount</span>
+                            <span>@L("Proveedores en centro actual:", "Proveïdors al centre actual:", "Suppliers in current center:") @impact.SupplierCount</span>
+                            <span>@L("Compras en centro actual:", "Compres al centre actual:", "Purchases in current center:") @impact.PurchaseDocumentCount</span>
+                            <span>@L("Ventas en centro actual:", "Vendes al centre actual:", "Sales in current center:") @impact.SalesDocumentCount</span>
+                            <span>@L("Eventos auditados:", "Esdeveniments auditats:", "Audited events:") @impact.AuditEventCount</span>
+                        </div>
+
+                        <label class="checkbox-field" style="margin-top: 0.75rem;">
+                            <input type="checkbox" @bind="form.ForceChange" disabled="@isSaving" />
+                            <span>@L("Confirmo que quiero cambiar el centro legacy aunque esta empresa ya tenga uso real.", "Confirmo que vull canviar el centre legacy encara que aquesta empresa ja tingui ús real.", "I confirm that I want to change the legacy center even though this company already has real usage.")</span>
+                        </label>
+                    }
+
+                    <div class="quick-links" style="margin-top: 1rem;">
+                        <button class="primary-button" type="submit" disabled="@isSaving">@(isSaving ? L("Guardando...", "Desant...", "Saving...") : isCreateMode ? L("Crear empresa", "Crear empresa", "Create company") : L("Guardar centro legacy", "Desar centre legacy", "Save legacy center"))</button>
+                    </div>
+                </EditForm>
+            }
+        </section>
+    }
+}
+
+@code {
+    [Parameter]
+    public Guid? CompanyId { get; set; }
+
+    private Guid? tenantId;
+    private bool isLoading = true;
+    private bool isSaving;
+    private bool isError;
+    private string statusMessage = string.Empty;
+    private CompanySummaryDto? currentCompany;
+    private CompanyLegacyCenterImpactDto? impact;
+    private IReadOnlyCollection<LegacyCenterOptionDto> legacyCenters = [];
+    private CompanyFormModel form = new();
+
+    private bool isCreateMode => !CompanyId.HasValue;
+    private bool RequiresForceConfirmation =>
+        !isCreateMode &&
+        currentCompany is not null &&
+        impact is not null &&
+        impact.HasUsage &&
+        !string.Equals(form.LegacyCenterCode, currentCompany.LegacyCenterCode, StringComparison.OrdinalIgnoreCase);
+
+    private IReadOnlyCollection<LegacyCenterOptionDto> AvailableLegacyCenters =>
+        currentCompany is null
+            ? legacyCenters.Where(center => !center.IsAssigned).OrderBy(center => center.Description).ToArray()
+            : legacyCenters
+                .Where(center => !center.IsAssigned || string.Equals(center.Code, currentCompany.LegacyCenterCode, StringComparison.OrdinalIgnoreCase))
+                .OrderBy(center => center.Description)
+                .ToArray();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        tenantId = authState.User.GetTenantId();
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await LoadAsync();
+    }
+
+    private async Task LoadAsync()
+    {
+        statusMessage = string.Empty;
+        isError = false;
+        isLoading = true;
+
+        if (!tenantId.HasValue)
+        {
+            isLoading = false;
+            return;
+        }
+
+        try
+        {
+            legacyCenters = await TenantAdminService.GetLegacyCentersAsync(tenantId);
+            var companies = await TenantAdminService.GetCompaniesAsync(tenantId);
+            currentCompany = CompanyId.HasValue ? companies.FirstOrDefault(company => company.Id == CompanyId.Value) : null;
+
+            if (isCreateMode)
+            {
+                form = new CompanyFormModel();
+                impact = null;
+            }
+            else if (currentCompany is not null)
+            {
+                form = new CompanyFormModel
+                {
+                    Name = currentCompany.Name,
+                    Slug = currentCompany.Slug,
+                    LegacyCenterCode = currentCompany.LegacyCenterCode
+                };
+                impact = await TenantAdminService.GetCompanyLegacyCenterImpactAsync(currentCompany.Id, currentCompany.TenantId);
+            }
+        }
+        catch (Exception exception)
+        {
+            isError = true;
+            statusMessage = exception.Message;
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private async Task SaveAsync()
+    {
+        if (!tenantId.HasValue)
+        {
+            return;
+        }
+
+        isSaving = true;
+        statusMessage = string.Empty;
+        isError = false;
+
+        try
+        {
+            if (isCreateMode)
+            {
+                var createdCompany = await TenantAdminService.CreateCompanyAsync(new CreateCompanyCommand
+                {
+                    TenantId = tenantId.Value,
+                    Name = form.Name,
+                    Slug = form.Slug,
+                    LegacyCenterCode = form.LegacyCenterCode
+                });
+
+                NavigationManager.NavigateTo($"/base-datos/empresas/editar/{createdCompany.Id}");
+                return;
+            }
+
+            if (currentCompany is null)
+            {
+                throw new InvalidOperationException(L("La empresa solicitada ya no está disponible.", "L'empresa sol·licitada ja no està disponible.", "The requested company is no longer available."));
+            }
+
+            if (RequiresForceConfirmation && !form.ForceChange)
+            {
+                throw new InvalidOperationException(L("Debes confirmar el cambio de centro legacy porque esta empresa ya tiene uso real.", "Has de confirmar el canvi de centre legacy perquè aquesta empresa ja té ús real.", "You must confirm the legacy center change because this company already has real usage."));
+            }
+
+            await TenantAdminService.UpdateCompanyLegacyCenterAsync(new UpdateCompanyLegacyCenterCommand
+            {
+                CompanyId = currentCompany.Id,
+                TenantId = currentCompany.TenantId,
+                LegacyCenterCode = form.LegacyCenterCode,
+                ForceChange = form.ForceChange
+            });
+
+            statusMessage = L("Centro legacy actualizado correctamente.", "Centre legacy actualitzat correctament.", "Legacy center updated successfully.");
+            await LoadAsync();
+        }
+        catch (Exception exception)
+        {
+            isError = true;
+            statusMessage = exception.Message;
+        }
+        finally
+        {
+            isSaving = false;
+        }
+    }
+
+    private string L(string spanish, string catalan, string english) =>
+        T.CurrentLanguage switch
+        {
+            AppLanguages.Catalan => catalan,
+            AppLanguages.English => english,
+            _ => spanish
+        };
+
+    private string FormatLegacyCenter(LegacyCenterOptionDto center)
+    {
+        if (center.IsAssigned && currentCompany is not null && !string.Equals(center.Code, currentCompany.LegacyCenterCode, StringComparison.OrdinalIgnoreCase))
+        {
+            return $"{center.Description} ({center.Code}) · {center.AssignedCompanyName}";
+        }
+
+        return $"{center.Description} ({center.Code})";
+    }
+
+    private static string DisplayValue(string value) => string.IsNullOrWhiteSpace(value) ? "-" : value;
+
+    private sealed class CompanyFormModel
+    {
+        public string Name { get; set; } = string.Empty;
+        public string Slug { get; set; } = string.Empty;
+        public string LegacyCenterCode { get; set; } = string.Empty;
+        public bool ForceChange { get; set; }
+    }
+}

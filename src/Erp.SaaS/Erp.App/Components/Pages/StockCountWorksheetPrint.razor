@@ -3,20 +3,21 @@
 @attribute [Authorize(Roles = "TenantAdmin,TenantReader")]
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject IStockQueries StockQueries
+@inject AppText T
 
-<PageTitle>Hoja de recuento @CountNumber</PageTitle>
+<PageTitle>@($"{L("Hoja de recuento", "Full de recompte", "Count sheet")} {CountNumber}")</PageTitle>
 
 <div class="document-shell">
     <div class="document-toolbar no-print">
-        <a class="secondary-button link-button" href="/almacen/inventarios/editar/@CountNumber">Volver al inventario</a>
-        <a class="secondary-button link-button" href="/almacen/inventarios/@CountNumber/imprimir">Ver ficha completa</a>
-        <button class="primary-button" type="button" onclick="window.print()">Guardar como PDF / Imprimir</button>
+        <a class="secondary-button link-button" href="/almacen/inventarios/editar/@CountNumber">@L("Volver al inventario", "Tornar a l'inventari", "Back to inventory")</a>
+        <a class="secondary-button link-button" href="/almacen/inventarios/@CountNumber/imprimir">@L("Ver ficha completa", "Veure fitxa completa", "View full sheet")</a>
+        <button class="primary-button" type="button" onclick="window.print()">@L("Imprimir / guardar PDF", "Imprimir / desar PDF", "Print / save PDF")</button>
     </div>
 
     @if (!tenantId.HasValue || !companyId.HasValue)
     {
         <div class="empty-state document-state">
-            <p>No hay empresa activa seleccionada.</p>
+            <p>@L("No hay empresa activa seleccionada.", "No hi ha cap empresa activa seleccionada.", "There is no active company selected.")</p>
         </div>
     }
     else if (!string.IsNullOrWhiteSpace(errorMessage))
@@ -26,7 +27,7 @@
     else if (detail is null)
     {
         <div class="empty-state document-state">
-            <p>No se ha encontrado el inventario solicitado.</p>
+            <p>@L("No se ha encontrado el inventario solicitado.", "No s'ha trobat l'inventari sol·licitat.", "The requested inventory could not be found.")</p>
         </div>
     }
     else
@@ -34,18 +35,18 @@
         <section class="document-page count-sheet-page">
             <header class="count-sheet-header">
                 <div>
-                    <p class="eyebrow">Almacén / Inventarios</p>
-                    <h1>Hoja de recuento @detail.CountNumber</h1>
+                    <p class="eyebrow">@L("Almacén / Inventarios", "Magatzem / Inventaris", "Warehouse / Inventories")</p>
+                    <h1>@L("Hoja de recuento", "Full de recompte", "Count sheet") @detail.CountNumber</h1>
                     <p class="muted">
-                        @(detail.IsBlindCount ? "Conteo ciego de planta." : "Hoja de recuento para planta.")
-                        Casillas vacías para anotar el conteo manual.
+                        @(detail.IsBlindCount ? L("Conteo ciego de planta.", "Recompte cec de planta.", "Blind warehouse-floor count.") : L("Hoja de recuento para planta.", "Full de recompte per a planta.", "Count sheet for warehouse floor."))
+                        @L("Casillas vacías para anotar el conteo manual.", "Caselles buides per anotar el recompte manual.", "Empty boxes to write the manual count.")
                     </p>
                 </div>
                 <div class="count-sheet-meta">
-                    <span><strong>Fecha:</strong> @detail.CountDate.ToString("dd/MM/yyyy")</span>
-                    <span><strong>Almacén:</strong> @DisplayValue(detail.Warehouse)</span>
-                    <span><strong>Líneas:</strong> @detail.LineCount</span>
-                    <span><strong>Modo:</strong> @(detail.IsBlindCount ? "Ciego" : "Normal")</span>
+                    <span><strong>@L("Fecha", "Data", "Date"):</strong> @detail.CountDate.ToString("dd/MM/yyyy")</span>
+                    <span><strong>@L("Almacén", "Magatzem", "Warehouse"):</strong> @DisplayValue(detail.Warehouse)</span>
+                    <span><strong>@L("Líneas", "Línies", "Lines"):</strong> @detail.LineCount</span>
+                    <span><strong>@L("Modo", "Mode", "Mode"):</strong> @(detail.IsBlindCount ? L("Ciego", "Cec", "Blind") : L("Normal", "Normal", "Normal"))</span>
                 </div>
             </header>
 
@@ -53,7 +54,7 @@
             {
                 <section class="document-section">
                     <div class="document-box">
-                        <h2>Observaciones</h2>
+                        <h2>@L("Observaciones", "Observacions", "Notes")</h2>
                         <p>@detail.Notes</p>
                     </div>
                 </section>
@@ -64,15 +65,15 @@
                     <thead>
                         <tr>
                             <th>#</th>
-                            <th>Familia</th>
-                            <th>Artículo</th>
-                            <th>Descripción</th>
-                            <th>Color</th>
-                            <th>Unidad</th>
-                            <th>Conteo</th>
-                            <th>Repaso</th>
-                            <th>Final</th>
-                            <th>Observaciones</th>
+                            <th>@L("Familia", "Família", "Family")</th>
+                            <th>@L("Artículo", "Article", "Item")</th>
+                            <th>@L("Descripción", "Descripció", "Description")</th>
+                            <th>@L("Color", "Color", "Color")</th>
+                            <th>@L("Unidad", "Unitat", "Unit")</th>
+                            <th>@L("Conteo", "Recompte", "Count")</th>
+                            <th>@L("Repaso", "Repàs", "Review")</th>
+                            <th>@L("Final", "Final", "Final")</th>
+                            <th>@L("Observaciones", "Observacions", "Notes")</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -106,6 +107,13 @@
     private Guid? companyId;
     private StockCountDetailDto? detail;
     private string errorMessage = string.Empty;
+    private string L(string spanish, string catalan, string english) =>
+        T.CurrentLanguage switch
+        {
+            AppLanguages.Catalan => catalan,
+            AppLanguages.English => english,
+            _ => spanish
+        };
 
     private IEnumerable<StockCountLineDto> OrderedLines =>
         detail is null
@@ -140,12 +148,12 @@
         }
     }
 
-    private static string GetFamilyKey(StockCountLineDto line)
+    private string GetFamilyKey(StockCountLineDto line)
     {
         var code = line.ItemCode?.Trim() ?? string.Empty;
         if (string.IsNullOrWhiteSpace(code))
         {
-            return "Sin familia";
+            return L("Sin familia", "Sense família", "No family");
         }
 
         var separators = new[] { '-', '/', ' ', '_', '.' };

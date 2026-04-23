@@ -5,23 +5,24 @@
 @inject NavigationManager NavigationManager
 @inject IStockQueries StockQueries
 @inject IStockService StockService
+@inject AppText T
 
-<PageTitle>@(CountNumber.HasValue ? $"Inventario {CountNumber}" : "Nuevo inventario")</PageTitle>
+<PageTitle>@(CountNumber.HasValue ? $"{L("Inventario", "Inventari", "Stock count")} {CountNumber}" : L("Nuevo inventario", "Nou inventari", "New stock count"))</PageTitle>
 
 <div class="page-header">
     <div>
-        <p class="eyebrow">Almacén</p>
-        <h1>@(CountNumber.HasValue ? $"Inventario {CountNumber}" : "Nuevo inventario")</h1>
-        <p class="lead">Conteo por almacén con comparación entre stock esperado y contado, y ajuste automático al completar.</p>
+        <p class="eyebrow">@L("Almacén", "Magatzem", "Warehouse")</p>
+        <h1>@(CountNumber.HasValue ? $"{L("Inventario", "Inventari", "Stock count")} {CountNumber}" : L("Nuevo inventario", "Nou inventari", "New stock count"))</h1>
+        <p class="lead">@L("Conteo por almacén con comparación entre stock esperado y contado, y ajuste automático al completar.", "Recompte per magatzem amb comparació entre l'estoc esperat i el comptat, i ajust automàtic en completar.", "Warehouse count comparing expected and counted stock, with automatic adjustment on completion.")</p>
     </div>
     <div class="quick-links">
-        <a class="secondary-button link-button" href="/almacen/inventarios">Volver al listado</a>
-        <a class="secondary-button link-button" href="/almacen/stock-actual">Ver stock actual</a>
-        <a class="secondary-button link-button" href="/almacen/movimientos">Ver movimientos</a>
+        <a class="secondary-button link-button" href="/almacen/inventarios">@L("Volver al listado", "Tornar al llistat", "Back to list")</a>
+        <a class="secondary-button link-button" href="/almacen/stock-actual">@L("Ver stock actual", "Veure estoc actual", "View current stock")</a>
+        <a class="secondary-button link-button" href="/almacen/movimientos">@L("Ver movimientos", "Veure moviments", "View movements")</a>
         @if (CountNumber.HasValue)
         {
-            <a class="secondary-button link-button" href="/almacen/inventarios/@CountNumber.Value/imprimir">Imprimir ficha</a>
-            <a class="secondary-button link-button" href="/almacen/inventarios/@CountNumber.Value/imprimir-recuento">Hoja de recuento</a>
+            <a class="secondary-button link-button" href="/almacen/inventarios/@CountNumber.Value/imprimir">@L("Imprimir ficha", "Imprimir fitxa", "Print sheet")</a>
+            <a class="secondary-button link-button" href="/almacen/inventarios/@CountNumber.Value/imprimir-recuento">@L("Hoja de recuento", "Full de recompte", "Count worksheet")</a>
         }
     </div>
 </div>
@@ -29,13 +30,13 @@
 @if (!tenantId.HasValue || !companyId.HasValue)
 {
     <div class="empty-state">
-        <p>No hay empresa activa seleccionada.</p>
+        <p>@L("No hay empresa activa seleccionada.", "No hi ha cap empresa activa seleccionada.", "There is no active company selected.")</p>
     </div>
 }
 else if (!canEdit && !CountNumber.HasValue)
 {
     <div class="empty-state">
-        <p>No tienes permisos para crear inventarios.</p>
+        <p>@L("No tienes permisos para crear inventarios.", "No tens permisos per crear inventaris.", "You do not have permission to create stock counts.")</p>
     </div>
 }
 else
@@ -47,38 +48,38 @@ else
 
     <section class="card-grid">
         <article class="info-card">
-            <p class="eyebrow">Número</p>
+            <p class="eyebrow">@L("Número", "Número", "Number")</p>
             <h2>@DisplayNumber</h2>
-            <p class="muted">Identificador interno del inventario.</p>
+            <p class="muted">@L("Identificador interno del inventario.", "Identificador intern de l'inventari.", "Internal stock count identifier.")</p>
         </article>
         <article class="info-card">
-            <p class="eyebrow">Estado</p>
+            <p class="eyebrow">@L("Estado", "Estat", "Status")</p>
             <h2>@FormatStatus(model.Status)</h2>
-            <p class="muted">Borrador editable o inventario completado con movimientos generados.</p>
+            <p class="muted">@L("Borrador editable o inventario completado con movimientos generados.", "Esborrany editable o inventari completat amb moviments generats.", "Editable draft or completed count with generated movements.")</p>
         </article>
         <article class="info-card">
-            <p class="eyebrow">Líneas</p>
+            <p class="eyebrow">@L("Líneas", "Línies", "Lines")</p>
             <h2>@model.Lines.Count</h2>
-            <p class="muted">Artículos incluidos en el conteo.</p>
+            <p class="muted">@L("Artículos incluidos en el conteo.", "Articles inclosos al recompte.", "Items included in the count.")</p>
         </article>
         <article class="info-card accent-card">
-            <p class="eyebrow">Diferencia neta</p>
-            <h2>@(IsBlindHidden ? "Oculta" : model.Lines.Sum(GetDifference).ToString("0.###"))</h2>
-            <p class="muted">@(IsBlindHidden ? "El esperado sigue oculto hasta la validación." : "Resultado entre stock esperado y contado.")</p>
+            <p class="eyebrow">@L("Diferencia neta", "Diferència neta", "Net difference")</p>
+            <h2>@(IsBlindHidden ? L("Oculta", "Oculta", "Hidden") : model.Lines.Sum(GetDifference).ToUiString("0.###"))</h2>
+            <p class="muted">@(IsBlindHidden ? L("El esperado sigue oculto hasta la validación.", "L'esperat continua ocult fins a la validació.", "Expected stock remains hidden until validation.") : L("Resultado entre stock esperado y contado.", "Resultat entre l'estoc esperat i el comptat.", "Result between expected and counted stock."))</p>
         </article>
         <article class="info-card">
-            <p class="eyebrow">Modo</p>
-            <h2>@(model.IsBlindCount ? "Conteo ciego" : "Conteo normal")</h2>
+            <p class="eyebrow">@L("Modo", "Mode", "Mode")</p>
+            <h2>@(model.IsBlindCount ? L("Conteo ciego", "Recompte cec", "Blind count") : L("Conteo normal", "Recompte normal", "Normal count"))</h2>
             <p class="muted">
                 @(model.IsBlindCount
-                    ? (model.IsBlindCountRevealed ? "Esperado ya visible para validar." : "Esperado oculto hasta revelar.")
-                    : "El esperado está visible durante todo el conteo.")
+                    ? (model.IsBlindCountRevealed ? L("Esperado ya visible para validar.", "L'esperat ja és visible per validar.", "Expected stock is now visible for validation.") : L("Esperado oculto hasta revelar.", "L'esperat està ocult fins que es reveli.", "Expected stock is hidden until revealed."))
+                    : L("El esperado está visible durante todo el conteo.", "L'esperat és visible durant tot el recompte.", "Expected stock stays visible during the whole count."))
             </p>
         </article>
         <article class="info-card">
-            <p class="eyebrow">Dif. validadas</p>
+            <p class="eyebrow">@L("Dif. validadas", "Dif. validades", "Validated diffs.")</p>
             <h2>@(IsBlindHidden ? "-" : $"{ValidatedDifferenceLinesCount} / {DifferenceLinesCount}")</h2>
-            <p class="muted">@(IsBlindHidden ? "Se habilitan al revelar el esperado." : "Líneas con diferencia ya revisadas.")</p>
+            <p class="muted">@(IsBlindHidden ? L("Se habilitan al revelar el esperado.", "S'habiliten en revelar l'esperat.", "They become available when expected stock is revealed.") : L("Líneas con diferencia ya revisadas.", "Línies amb diferència ja revisades.", "Difference lines already reviewed."))</p>
         </article>
     </section>
 
@@ -86,11 +87,11 @@ else
         <fieldset disabled="@isReadOnly">
             <div class="form-grid" style="margin-top: 1rem;">
                 <label class="field">
-                    <span>Fecha</span>
+                    <span>@L("Fecha", "Data", "Date")</span>
                     <InputDate class="text-input" @bind-Value="model.CountDate" />
                 </label>
                 <label class="field">
-                    <span>Estado</span>
+                    <span>@L("Estado", "Estat", "Status")</span>
                     <InputSelect class="text-input" @bind-Value="model.Status">
                         @foreach (var status in StockCountStatuses.All)
                         {
@@ -99,15 +100,15 @@ else
                     </InputSelect>
                 </label>
                 <label class="field">
-                    <span>Almacén</span>
+                    <span>@L("Almacén", "Magatzem", "Warehouse")</span>
                     <InputText class="text-input" @bind-Value="model.Warehouse" />
                 </label>
                 <label class="field">
-                    <span>Conteo ciego</span>
+                    <span>@L("Conteo ciego", "Recompte cec", "Blind count")</span>
                     <InputCheckbox @bind-Value="model.IsBlindCount" />
                 </label>
                 <label class="field wide">
-                    <span>Notas</span>
+                    <span>@L("Notas", "Notes", "Notes")</span>
                     <InputTextArea class="text-area" @bind-Value="model.Notes" />
                 </label>
             </div>
@@ -117,11 +118,11 @@ else
                 <div class="quick-links" style="margin-top: 1rem;">
                     @if (!model.IsBlindCountRevealed)
                     {
-                        <button class="secondary-button" type="button" @onclick="RevealBlindCount">Mostrar esperado para validación</button>
+                        <button class="secondary-button" type="button" @onclick="RevealBlindCount">@L("Mostrar esperado para validación", "Mostrar esperat per a la validació", "Show expected stock for validation")</button>
                     }
                     else
                     {
-                        <span class="muted">El stock esperado ya está visible para revisar diferencias.</span>
+                        <span class="muted">@L("El stock esperado ya está visible para revisar diferencias.", "L'estoc esperat ja és visible per revisar diferències.", "Expected stock is already visible so you can review differences.")</span>
                     }
                 </div>
             }
@@ -131,21 +132,21 @@ else
                 <section class="panel" style="margin-top: 1rem;">
                     <div class="detail-panel-header">
                         <div>
-                            <h2>Conteo parcial</h2>
-                            <p class="muted">Limita la recarga del stock actual a un artículo, descripción o color concretos.</p>
+                            <h2>@L("Conteo parcial", "Recompte parcial", "Partial count")</h2>
+                            <p class="muted">@L("Limita la recarga del stock actual a un artículo, descripción o color concretos.", "Limita la recàrrega de l'estoc actual a un article, descripció o color concrets.", "Limit the current stock reload to a specific item, description or color.")</p>
                         </div>
                     </div>
                     <div class="form-grid">
                         <label class="field">
-                            <span>Artículo</span>
+                            <span>@L("Artículo", "Article", "Item")</span>
                             <InputText class="text-input" @bind-Value="seedItemCode" />
                         </label>
                         <label class="field">
-                            <span>Descripción contiene</span>
+                            <span>@L("Descripción contiene", "La descripció conté", "Description contains")</span>
                             <InputText class="text-input" @bind-Value="seedDescription" />
                         </label>
                         <label class="field">
-                            <span>Color contiene</span>
+                            <span>@L("Color contiene", "El color conté", "Color contains")</span>
                             <InputText class="text-input" @bind-Value="seedColor" />
                         </label>
                     </div>
@@ -154,15 +155,15 @@ else
                 <section class="panel" style="margin-top: 1rem;">
                     <div class="detail-panel-header">
                         <div>
-                            <h2>Cierre por familia / almacén</h2>
-                            <p class="muted">Agrupa por familia calculada del artículo y valida diferencias de forma masiva antes de completar.</p>
+                            <h2>@L("Cierre por familia / almacén", "Tancament per família / magatzem", "Close by family / warehouse")</h2>
+                            <p class="muted">@L("Agrupa por familia calculada del artículo y valida diferencias de forma masiva antes de completar.", "Agrupa per família calculada de l'article i valida diferències de manera massiva abans de completar.", "Group by calculated item family and validate differences in bulk before completion.")</p>
                         </div>
                         @if (!IsBlindHidden)
                         {
                             <div class="quick-links">
-                                <button class="secondary-button" type="button" @onclick="ValidateVisibleDifferences">Validar visibles</button>
-                                <button class="secondary-button" type="button" @onclick="ValidateAllDifferences">Validar todo</button>
-                                <button class="secondary-button" type="button" @onclick="ClearVisibleValidations">Quitar validación visibles</button>
+                                <button class="secondary-button" type="button" @onclick="ValidateVisibleDifferences">@L("Validar visibles", "Validar visibles", "Validate visible")</button>
+                                <button class="secondary-button" type="button" @onclick="ValidateAllDifferences">@L("Validar todo", "Validar-ho tot", "Validate all")</button>
+                                <button class="secondary-button" type="button" @onclick="ClearVisibleValidations">@L("Quitar validación visibles", "Treure validació visibles", "Clear visible validation")</button>
                             </div>
                         }
                     </div>
@@ -170,16 +171,16 @@ else
                     @if (IsBlindHidden)
                     {
                         <div class="alert warning">
-                            El conteo es ciego. Revela el stock esperado para activar la validación masiva de diferencias por familia.
+                            @L("El conteo es ciego. Revela el stock esperado para activar la validación masiva de diferencias por familia.", "El recompte és cec. Revela l'estoc esperat per activar la validació massiva de diferències per família.", "This is a blind count. Reveal expected stock to enable bulk validation of family differences.")
                         </div>
                     }
                     else
                     {
                         <div class="form-grid">
                             <label class="field">
-                                <span>Familia activa</span>
+                                <span>@L("Familia activa", "Família activa", "Active family")</span>
                                 <InputSelect class="text-input" @bind-Value="activeFamilyFilter">
-                                    <option value="">Todas las familias</option>
+                                    <option value="">@L("Todas las familias", "Totes les famílies", "All families")</option>
                                     @foreach (var summary in FamilySummaries)
                                     {
                                         <option value="@summary.FamilyKey">@summary.DisplayName (@summary.LineCount)</option>
@@ -192,11 +193,11 @@ else
                             <table class="data-table detail-table">
                                 <thead>
                                     <tr>
-                                        <th>Familia</th>
-                                        <th>Líneas</th>
-                                        <th>Con diferencia</th>
-                                        <th>Validadas</th>
-                                        <th>Diferencia neta</th>
+                                        <th>@L("Familia", "Família", "Family")</th>
+                                        <th>@L("Líneas", "Línies", "Lines")</th>
+                                        <th>@L("Con diferencia", "Amb diferència", "With difference")</th>
+                                        <th>@L("Validadas", "Validades", "Validated")</th>
+                                        <th>@L("Diferencia neta", "Diferència neta", "Net difference")</th>
                                         <th></th>
                                     </tr>
                                 </thead>
@@ -208,11 +209,11 @@ else
                                             <td>@summary.LineCount</td>
                                             <td>@summary.DifferenceLineCount</td>
                                             <td>@summary.ValidatedDifferenceLineCount</td>
-                                            <td>@summary.DifferenceTotal.ToString("0.###")</td>
+                                            <td>@summary.DifferenceTotal.ToUiString("0.###")</td>
                                             <td>
                                                 <div class="table-actions">
-                                                    <button class="secondary-button" type="button" @onclick="() => activeFamilyFilter = summary.FamilyKey">Ver</button>
-                                                    <button class="secondary-button" type="button" @onclick="() => ValidateDifferencesForFamily(summary.FamilyKey)">Validar</button>
+                                                    <button class="secondary-button" type="button" @onclick="() => activeFamilyFilter = summary.FamilyKey">@L("Ver", "Veure", "View")</button>
+                                                    <button class="secondary-button" type="button" @onclick="() => ValidateDifferencesForFamily(summary.FamilyKey)">@L("Validar", "Validar", "Validate")</button>
                                                 </div>
                                             </td>
                                         </tr>
@@ -227,14 +228,14 @@ else
             <section class="panel detail-panel" style="margin-top: 1rem;">
                 <div class="detail-panel-header">
                     <div>
-                        <h2>Líneas del inventario</h2>
-                        <p class="muted">Puedes contar desde cero o recargar el stock actual del almacén seleccionado.</p>
+                        <h2>@L("Líneas del inventario", "Línies de l'inventari", "Count lines")</h2>
+                        <p class="muted">@L("Puedes contar desde cero o recargar el stock actual del almacén seleccionado.", "Pots comptar des de zero o recarregar l'estoc actual del magatzem seleccionat.", "You can count from scratch or reload the current stock of the selected warehouse.")</p>
                     </div>
                     @if (!isReadOnly)
                     {
                         <div class="quick-links">
-                            <button class="secondary-button" type="button" @onclick="ReloadSeedLinesAsync">Recargar stock actual</button>
-                            <button class="secondary-button" type="button" @onclick="AddLine">Añadir línea</button>
+                            <button class="secondary-button" type="button" @onclick="ReloadSeedLinesAsync">@L("Recargar stock actual", "Recarregar estoc actual", "Reload current stock")</button>
+                            <button class="secondary-button" type="button" @onclick="AddLine">@L("Añadir línea", "Afegir línia", "Add line")</button>
                         </div>
                     }
                 </div>
@@ -244,24 +245,24 @@ else
                         <thead>
                             <tr>
                                 <th>#</th>
-                                <th>Familia</th>
-                                <th>Artículo</th>
-                                <th>Descripción</th>
-                                <th>Color</th>
-                                <th>Esperado</th>
-                                <th>Contado</th>
-                                <th>Diferencia</th>
-                                <th>Validada</th>
-                                <th>Unidad</th>
-                                <th>Notas</th>
-                                <th>Acciones</th>
+                                <th>@L("Familia", "Família", "Family")</th>
+                                <th>@L("Artículo", "Article", "Item")</th>
+                                <th>@L("Descripción", "Descripció", "Description")</th>
+                                <th>@L("Color", "Color", "Color")</th>
+                                <th>@L("Esperado", "Esperat", "Expected")</th>
+                                <th>@L("Contado", "Comptat", "Counted")</th>
+                                <th>@L("Diferencia", "Diferència", "Difference")</th>
+                                <th>@L("Validada", "Validada", "Validated")</th>
+                                <th>@L("Unidad", "Unitat", "Unit")</th>
+                                <th>@L("Notas", "Notes", "Notes")</th>
+                                <th>@L("Acciones", "Accions", "Actions")</th>
                             </tr>
                         </thead>
                         <tbody>
                             @if (VisibleLines.Count == 0)
                             {
                                 <tr>
-                                    <td colspan="12" class="muted">No hay líneas cargadas para el filtro actual.</td>
+                                    <td colspan="12" class="muted">@L("No hay líneas cargadas para el filtro actual.", "No hi ha línies carregades per al filtre actual.", "There are no lines loaded for the current filter.")</td>
                                 </tr>
                             }
                             else
@@ -278,7 +279,7 @@ else
                                         <td>
                                             @if (IsBlindHidden)
                                             {
-                                                <span class="muted">Oculto</span>
+                                                <span class="muted">@L("Oculto", "Ocult", "Hidden")</span>
                                             }
                                             else
                                             {
@@ -287,16 +288,16 @@ else
                                         </td>
                                         <td><InputNumber class="text-input table-input" @bind-Value="line.CountedQuantity" /></td>
                                         <td>
-                                            <strong>@(IsBlindHidden ? "Oculta" : difference.ToString("0.###"))</strong>
+                                            <strong>@(IsBlindHidden ? L("Oculta", "Oculta", "Hidden") : difference.ToUiString("0.###"))</strong>
                                         </td>
                                         <td>
                                             @if (IsBlindHidden)
                                             {
-                                                <span class="muted">Pend.</span>
+                                                <span class="muted">@L("Pend.", "Pend.", "Pend.")</span>
                                             }
                                             else if (difference == 0m)
                                             {
-                                                <span class="muted">OK</span>
+                                                <span class="muted">@L("OK", "OK", "OK")</span>
                                             }
                                             else
                                             {
@@ -309,11 +310,11 @@ else
                                             <div class="table-actions">
                                                 @if (!string.IsNullOrWhiteSpace(line.ItemDescription))
                                                 {
-                                                    <a class="inline-link" href="@BuildMovementsUrl(line)">Movs.</a>
+                                                    <a class="inline-link" href="@BuildMovementsUrl(line)">@L("Movs.", "Movs.", "Moves")</a>
                                                 }
                                                 @if (!isReadOnly)
                                                 {
-                                                    <button class="secondary-button danger-button" type="button" @onclick="() => RemoveLine(line.LineNumber)">Quitar</button>
+                                                    <button class="secondary-button danger-button" type="button" @onclick="() => RemoveLine(line.LineNumber)">@L("Quitar", "Treure", "Remove")</button>
                                                 }
                                             </div>
                                         </td>
@@ -328,10 +329,10 @@ else
             @if (canEdit)
             {
                 <div class="quick-links" style="margin-top: 1rem;">
-                    <button class="primary-button" type="submit">Guardar</button>
+                    <button class="primary-button" type="submit">@L("Guardar", "Desar", "Save")</button>
                     @if (CountNumber.HasValue && !isReadOnly)
                     {
-                        <button class="secondary-button danger-button" type="button" @onclick="DeleteAsync">Eliminar</button>
+                        <button class="secondary-button danger-button" type="button" @onclick="DeleteAsync">@L("Eliminar", "Eliminar", "Delete")</button>
                     }
                 </div>
             }
@@ -372,7 +373,7 @@ else
         CountDate = DateTime.Today
     };
 
-    private string DisplayNumber => CountNumber?.ToString() ?? "Nuevo";
+    private string DisplayNumber => CountNumber?.ToString() ?? L("Nuevo", "Nou", "New");
     private bool IsBlindHidden => model.IsBlindCount && !model.IsBlindCountRevealed;
     private int DifferenceLinesCount => model.Lines.Count(line => GetDifference(line) != 0m);
     private int ValidatedDifferenceLinesCount => model.Lines.Count(line => GetDifference(line) != 0m && line.IsDifferenceValidated);
@@ -385,12 +386,19 @@ else
         .OrderBy(group => group.Key, StringComparer.OrdinalIgnoreCase)
         .Select(group => new FamilySummaryRow(
             group.Key,
-            group.Key,
+            group.Key == "NO_FAMILY" ? L("Sin familia", "Sense família", "No family") : group.Key,
             group.Count(),
             group.Count(line => GetDifference(line) != 0m),
             group.Count(line => GetDifference(line) != 0m && line.IsDifferenceValidated),
             group.Sum(GetDifference)))
         .ToList();
+    private string L(string spanish, string catalan, string english) =>
+        T.CurrentLanguage switch
+        {
+            AppLanguages.Catalan => catalan,
+            AppLanguages.English => english,
+            _ => spanish
+        };
 
     protected override async Task OnParametersSetAsync()
     {
@@ -417,7 +425,7 @@ else
             var detail = await StockQueries.GetCountByNumberAsync(tenantId.Value, companyId.Value, CountNumber.Value);
             if (detail is null)
             {
-                statusMessage = "No se ha encontrado el inventario solicitado.";
+                statusMessage = L("No se ha encontrado el inventario solicitado.", "No s'ha trobat l'inventari sol·licitat.", "The requested stock count could not be found.");
                 isError = true;
                 model = new StockCountDetailDto();
                 isReadOnly = true;
@@ -478,7 +486,7 @@ else
             var warehouse = model.Warehouse?.Trim() ?? string.Empty;
             if (string.IsNullOrWhiteSpace(warehouse))
             {
-                throw new InvalidOperationException("Indica un almacén antes de recargar el stock actual.");
+                throw new InvalidOperationException(L("Indica un almacén antes de recargar el stock actual.", "Indica un magatzem abans de recarregar l'estoc actual.", "Specify a warehouse before reloading current stock."));
             }
 
             var lines = await StockQueries.GetCountSeedLinesAsync(tenantId.Value, companyId.Value, warehouse);
@@ -488,7 +496,7 @@ else
                 AddLine();
             }
 
-            statusMessage = "Stock actual recargado correctamente.";
+            statusMessage = L("Stock actual recargado correctamente.", "Estoc actual recarregat correctament.", "Current stock reloaded successfully.");
         }
         catch (Exception exception)
         {
@@ -536,7 +544,7 @@ else
     private void RevealBlindCount()
     {
         model.IsBlindCountRevealed = true;
-        statusMessage = "Stock esperado visible. Ya puedes revisar y validar diferencias.";
+        statusMessage = L("Stock esperado visible. Ya puedes revisar y validar diferencias.", "Estoc esperat visible. Ja pots revisar i validar diferències.", "Expected stock is now visible. You can review and validate differences.");
         isError = false;
     }
 
@@ -605,7 +613,7 @@ else
                 return;
             }
 
-            statusMessage = "Inventario guardado correctamente.";
+            statusMessage = L("Inventario guardado correctamente.", "Inventari desat correctament.", "Stock count saved successfully.");
             var detail = await StockQueries.GetCountByNumberAsync(tenantId.Value, companyId.Value, countNumber);
             if (detail is not null)
             {
@@ -685,14 +693,12 @@ else
     private static bool MatchesFamily(StockCountLineDto line, string? familyKey) =>
         string.IsNullOrWhiteSpace(familyKey) || string.Equals(GetFamilyKey(line), familyKey, StringComparison.OrdinalIgnoreCase);
 
-    private static string GetFamilyDisplay(StockCountLineDto line) => GetFamilyKey(line);
-
     private static string GetFamilyKey(StockCountLineDto line)
     {
         var code = line.ItemCode?.Trim() ?? string.Empty;
         if (string.IsNullOrWhiteSpace(code))
         {
-            return "Sin familia";
+            return "NO_FAMILY";
         }
 
         var separators = new[] { '-', '/', ' ', '_', '.' };
@@ -711,13 +717,21 @@ else
     private static decimal GetDifference(StockCountLineDto line) =>
         decimal.Round(line.CountedQuantity - line.ExpectedQuantity, 3, MidpointRounding.AwayFromZero);
 
-    private static string FormatStatus(string status) => status switch
+    private string FormatStatus(string status) => status switch
     {
-        StockCountStatuses.Draft => "Borrador",
-        StockCountStatuses.Completed => "Completado",
-        StockCountStatuses.Cancelled => "Anulado",
+        StockCountStatuses.Draft => L("Borrador", "Esborrany", "Draft"),
+        StockCountStatuses.Completed => L("Completado", "Completat", "Completed"),
+        StockCountStatuses.Cancelled => L("Anulado", "Anul·lat", "Cancelled"),
         _ => status
     };
+
+    private string GetFamilyDisplay(StockCountLineDto line)
+    {
+        var familyKey = GetFamilyKey(line);
+        return familyKey == "NO_FAMILY"
+            ? L("Sin familia", "Sense família", "No family")
+            : familyKey;
+    }
 
     private sealed record FamilySummaryRow(
         string FamilyKey,

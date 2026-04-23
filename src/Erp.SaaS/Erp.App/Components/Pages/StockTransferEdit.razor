@@ -5,32 +5,33 @@
 @inject NavigationManager NavigationManager
 @inject IStockQueries StockQueries
 @inject IStockService StockService
+@inject AppText T
 
-<PageTitle>@(TransferNumber.HasValue ? $"Traspaso {TransferNumber}" : "Nuevo traspaso")</PageTitle>
+<PageTitle>@(TransferNumber.HasValue ? $"{L("Traspaso", "Traspàs", "Transfer")} {TransferNumber}" : L("Nuevo traspaso", "Nou traspàs", "New transfer"))</PageTitle>
 
 <div class="page-header">
     <div>
-        <p class="eyebrow">Almacén</p>
-        <h1>@(TransferNumber.HasValue ? $"Traspaso {TransferNumber}" : "Nuevo traspaso")</h1>
-        <p class="lead">Movimiento interno entre almacenes con salida del origen y entrada automática en el destino al completar.</p>
+        <p class="eyebrow">@L("Almacén", "Magatzem", "Warehouse")</p>
+        <h1>@(TransferNumber.HasValue ? $"{L("Traspaso", "Traspàs", "Transfer")} {TransferNumber}" : L("Nuevo traspaso", "Nou traspàs", "New transfer"))</h1>
+        <p class="lead">@L("Movimiento interno entre almacenes con salida del origen y entrada automática en el destino al completar.", "Moviment intern entre magatzems amb sortida de l'origen i entrada automàtica al destí en completar.", "Internal transfer between warehouses with outbound movement from the source and automatic inbound movement to the destination on completion.")</p>
     </div>
     <div class="quick-links">
-        <a class="secondary-button link-button" href="/almacen/traspasos">Volver al listado</a>
-        <a class="secondary-button link-button" href="/almacen/inventarios">Ver inventarios</a>
-        <a class="secondary-button link-button" href="/almacen/movimientos">Ver movimientos</a>
+        <a class="secondary-button link-button" href="/almacen/traspasos">@L("Volver al listado", "Tornar al llistat", "Back to list")</a>
+        <a class="secondary-button link-button" href="/almacen/inventarios">@L("Ver inventarios", "Veure inventaris", "View counts")</a>
+        <a class="secondary-button link-button" href="/almacen/movimientos">@L("Ver movimientos", "Veure moviments", "View movements")</a>
     </div>
 </div>
 
 @if (!tenantId.HasValue || !companyId.HasValue)
 {
     <div class="empty-state">
-        <p>No hay empresa activa seleccionada.</p>
+        <p>@L("No hay empresa activa seleccionada.", "No hi ha cap empresa activa seleccionada.", "There is no active company selected.")</p>
     </div>
 }
 else if (!canEdit && !TransferNumber.HasValue)
 {
     <div class="empty-state">
-        <p>No tienes permisos para crear traspasos de almacén.</p>
+        <p>@L("No tienes permisos para crear traspasos de almacén.", "No tens permisos per crear traspassos de magatzem.", "You do not have permission to create warehouse transfers.")</p>
     </div>
 }
 else
@@ -42,24 +43,24 @@ else
 
     <section class="card-grid">
         <article class="info-card">
-            <p class="eyebrow">Número</p>
+            <p class="eyebrow">@L("Número", "Número", "Number")</p>
             <h2>@DisplayNumber</h2>
-            <p class="muted">Identificador interno del traspaso.</p>
+            <p class="muted">@L("Identificador interno del traspaso.", "Identificador intern del traspàs.", "Internal transfer identifier.")</p>
         </article>
         <article class="info-card">
-            <p class="eyebrow">Estado</p>
+            <p class="eyebrow">@L("Estado", "Estat", "Status")</p>
             <h2>@FormatStatus(model.Status)</h2>
-            <p class="muted">Borrador editable o completado con movimientos generados.</p>
+            <p class="muted">@L("Borrador editable o completado con movimientos generados.", "Esborrany editable o completat amb moviments generats.", "Editable draft or completed transfer with generated movements.")</p>
         </article>
         <article class="info-card">
-            <p class="eyebrow">Líneas</p>
+            <p class="eyebrow">@L("Líneas", "Línies", "Lines")</p>
             <h2>@model.Lines.Count</h2>
-            <p class="muted">Posiciones incluidas en el traslado.</p>
+            <p class="muted">@L("Posiciones incluidas en el traslado.", "Posicions incloses en el trasllat.", "Positions included in the transfer.")</p>
         </article>
         <article class="info-card accent-card">
-            <p class="eyebrow">Cantidad total</p>
-            <h2>@model.Lines.Sum(line => line.Quantity).ToString("0.###")</h2>
-            <p class="muted">Suma de cantidades de todas las líneas.</p>
+            <p class="eyebrow">@L("Cantidad total", "Quantitat total", "Total quantity")</p>
+            <h2>@model.Lines.Sum(line => line.Quantity).ToUiString("0.###")</h2>
+            <p class="muted">@L("Suma de cantidades de todas las líneas.", "Suma de quantitats de totes les línies.", "Sum of quantities across all lines.")</p>
         </article>
     </section>
 
@@ -67,11 +68,11 @@ else
         <fieldset disabled="@isReadOnly">
             <div class="form-grid" style="margin-top: 1rem;">
                 <label class="field">
-                    <span>Fecha</span>
+                    <span>@L("Fecha", "Data", "Date")</span>
                     <InputDate class="text-input" @bind-Value="model.TransferDate" />
                 </label>
                 <label class="field">
-                    <span>Estado</span>
+                    <span>@L("Estado", "Estat", "Status")</span>
                     <InputSelect class="text-input" @bind-Value="model.Status">
                         @foreach (var status in StockTransferStatuses.All)
                         {
@@ -80,15 +81,15 @@ else
                     </InputSelect>
                 </label>
                 <label class="field">
-                    <span>Almacén origen</span>
+                    <span>@L("Almacén origen", "Magatzem origen", "Source warehouse")</span>
                     <InputText class="text-input" @bind-Value="model.FromWarehouse" />
                 </label>
                 <label class="field">
-                    <span>Almacén destino</span>
+                    <span>@L("Almacén destino", "Magatzem destí", "Destination warehouse")</span>
                     <InputText class="text-input" @bind-Value="model.ToWarehouse" />
                 </label>
                 <label class="field wide">
-                    <span>Notas</span>
+                    <span>@L("Notas", "Notes", "Notes")</span>
                     <InputTextArea class="text-area" @bind-Value="model.Notes" />
                 </label>
             </div>
@@ -96,12 +97,12 @@ else
             <section class="panel detail-panel" style="margin-top: 1rem;">
                 <div class="detail-panel-header">
                     <div>
-                        <h2>Líneas del traspaso</h2>
-                        <p class="muted">Artículo, color, cantidad y unidad a mover entre almacenes.</p>
+                        <h2>@L("Líneas del traspaso", "Línies del traspàs", "Transfer lines")</h2>
+                        <p class="muted">@L("Artículo, color, cantidad y unidad a mover entre almacenes.", "Article, color, quantitat i unitat a moure entre magatzems.", "Item, color, quantity and unit to move between warehouses.")</p>
                     </div>
                     @if (!isReadOnly)
                     {
-                        <button class="secondary-button" type="button" @onclick="AddLine">Añadir línea</button>
+                        <button class="secondary-button" type="button" @onclick="AddLine">@L("Añadir línea", "Afegir línia", "Add line")</button>
                     }
                 </div>
 
@@ -110,20 +111,20 @@ else
                         <thead>
                             <tr>
                                 <th>#</th>
-                                <th>Artículo</th>
-                                <th>Descripción</th>
-                                <th>Color</th>
-                                <th>Cantidad</th>
-                                <th>Unidad</th>
-                                <th>Notas</th>
-                                <th>Acciones</th>
+                                <th>@L("Artículo", "Article", "Item")</th>
+                                <th>@L("Descripción", "Descripció", "Description")</th>
+                                <th>@L("Color", "Color", "Color")</th>
+                                <th>@L("Cantidad", "Quantitat", "Quantity")</th>
+                                <th>@L("Unidad", "Unitat", "Unit")</th>
+                                <th>@L("Notas", "Notes", "Notes")</th>
+                                <th>@L("Acciones", "Accions", "Actions")</th>
                             </tr>
                         </thead>
                         <tbody>
                             @if (model.Lines.Count == 0)
                             {
                                 <tr>
-                                    <td colspan="8" class="muted">No hay líneas cargadas todavía.</td>
+                                    <td colspan="8" class="muted">@L("No hay líneas cargadas todavía.", "Encara no hi ha línies carregades.", "There are no lines loaded yet.")</td>
                                 </tr>
                             }
                             else
@@ -142,12 +143,12 @@ else
                                             <div class="table-actions">
                                                 @if (!string.IsNullOrWhiteSpace(line.ItemDescription))
                                                 {
-                                                    <a class="inline-link" href="@BuildMovementsUrl(line, model.FromWarehouse)">Movs. origen</a>
-                                                    <a class="inline-link" href="@BuildMovementsUrl(line, model.ToWarehouse)">Movs. destino</a>
+                                                    <a class="inline-link" href="@BuildMovementsUrl(line, model.FromWarehouse)">@L("Movs. origen", "Movs. origen", "Source moves")</a>
+                                                    <a class="inline-link" href="@BuildMovementsUrl(line, model.ToWarehouse)">@L("Movs. destino", "Movs. destí", "Destination moves")</a>
                                                 }
                                                 @if (!isReadOnly)
                                                 {
-                                                    <button class="secondary-button danger-button" type="button" @onclick="() => RemoveLine(line.LineNumber)">Quitar</button>
+                                                    <button class="secondary-button danger-button" type="button" @onclick="() => RemoveLine(line.LineNumber)">@L("Quitar", "Treure", "Remove")</button>
                                                 }
                                             </div>
                                         </td>
@@ -162,10 +163,10 @@ else
             @if (canEdit)
             {
                 <div class="quick-links" style="margin-top: 1rem;">
-                    <button class="primary-button" type="submit">Guardar</button>
+                    <button class="primary-button" type="submit">@L("Guardar", "Desar", "Save")</button>
                     @if (TransferNumber.HasValue && !isReadOnly)
                     {
-                        <button class="secondary-button danger-button" type="button" @onclick="DeleteAsync">Eliminar</button>
+                        <button class="secondary-button danger-button" type="button" @onclick="DeleteAsync">@L("Eliminar", "Eliminar", "Delete")</button>
                     }
                 </div>
             }
@@ -204,7 +205,14 @@ else
         TransferDate = DateTime.Today
     };
 
-    private string DisplayNumber => TransferNumber?.ToString() ?? "Nuevo";
+    private string DisplayNumber => TransferNumber?.ToString() ?? L("Nuevo", "Nou", "New");
+    private string L(string spanish, string catalan, string english) =>
+        T.CurrentLanguage switch
+        {
+            AppLanguages.Catalan => catalan,
+            AppLanguages.English => english,
+            _ => spanish
+        };
 
     protected override async Task OnParametersSetAsync()
     {
@@ -224,7 +232,7 @@ else
             var detail = await StockQueries.GetTransferByNumberAsync(tenantId.Value, companyId.Value, TransferNumber.Value);
             if (detail is null)
             {
-                statusMessage = "No se ha encontrado el traspaso solicitado.";
+                statusMessage = L("No se ha encontrado el traspaso solicitado.", "No s'ha trobat el traspàs sol·licitat.", "The requested transfer could not be found.");
                 isError = true;
                 model = new StockTransferDetailDto();
                 isReadOnly = true;
@@ -303,7 +311,7 @@ else
                 return;
             }
 
-            statusMessage = "Traspaso guardado correctamente.";
+            statusMessage = L("Traspaso guardado correctamente.", "Traspàs desat correctament.", "Transfer saved successfully.");
             var detail = await StockQueries.GetTransferByNumberAsync(tenantId.Value, companyId.Value, transferNumber);
             if (detail is not null)
             {
@@ -377,11 +385,11 @@ else
         });
     }
 
-    private static string FormatStatus(string status) => status switch
+    private string FormatStatus(string status) => status switch
     {
-        StockTransferStatuses.Draft => "Borrador",
-        StockTransferStatuses.Completed => "Completado",
-        StockTransferStatuses.Cancelled => "Anulado",
+        StockTransferStatuses.Draft => L("Borrador", "Esborrany", "Draft"),
+        StockTransferStatuses.Completed => L("Completado", "Completat", "Completed"),
+        StockTransferStatuses.Cancelled => L("Anulado", "Anul·lat", "Cancelled"),
         _ => status
     };
 }

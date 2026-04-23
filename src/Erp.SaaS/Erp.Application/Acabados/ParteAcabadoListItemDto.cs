@@ -16,6 +16,7 @@ public sealed class ParteAcabadoListItemDto
     public string SourceSampleKind { get; set; } = string.Empty;
     public string SourceSampleCode { get; set; } = string.Empty;
     public int? SourceSampleLineNumber { get; set; }
+    public string SourceRecordId { get; set; } = string.Empty;
     public string PrimaryFabricCode { get; set; } = string.Empty;
     public string PrimaryFabricDescription { get; set; } = string.Empty;
     public string PrimaryColor { get; set; } = string.Empty;

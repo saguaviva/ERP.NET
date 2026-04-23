@@ -1,0 +1,345 @@
+@page "/base-datos/numeraciones"
+@attribute [Authorize(Roles = "TenantAdmin,TenantReader")]
+@using Erp.Application.Numbering
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IDocumentNumberingQueries DocumentNumberingQueries
+@inject IDocumentNumberingService DocumentNumberingService
+@inject AppText T
+
+<PageTitle>@L("Base / Numeraciones", "Base / Numeracions", "Master data / Numbering")</PageTitle>
+
+<div class="page-header">
+    <div>
+        <p class="eyebrow">@T["menu.base"]</p>
+        <h1>@L("Numeraciones", "Numeracions", "Numbering")</h1>
+        <p class="lead">@L("Controla la siguiente numeración de los documentos SaaS y el bloque especial de disposiciones, siguiendo la lógica del legacy sin tocar la remota.", "Controla la numeració següent dels documents SaaS i el bloc especial de disposicions, seguint la lògica del legacy sense tocar la remota.", "Control the next numbering for SaaS documents and the special disposition block, following the legacy logic without touching the remote system.")</p>
+    </div>
+    <div class="quick-links">
+        @if (canEdit)
+        {
+            <button class="secondary-button" type="button" @onclick="ApplySuggestedValues" disabled="@isLoading">@L("Usar sugerencias actuales", "Usar suggeriments actuals", "Use current suggestions")</button>
+            <button class="primary-button" type="button" @onclick="SaveAsync" disabled="@(isLoading || isSaving)">@(isSaving ? L("Guardando...", "Desant...", "Saving...") : L("Guardar numeraciones", "Desar numeracions", "Save numbering"))</button>
+        }
+    </div>
+</div>
+
+@if (!tenantId.HasValue || !companyId.HasValue)
+{
+    <div class="empty-state">
+        <p>@L("Selecciona una empresa activa para revisar sus numeraciones.", "Selecciona una empresa activa per revisar les seves numeracions.", "Select an active company to review its numbering.")</p>
+    </div>
+}
+else
+{
+    @if (!string.IsNullOrWhiteSpace(statusMessage))
+    {
+        <div class="alert @(isError ? "danger" : "success")">@statusMessage</div>
+    }
+
+    <section class="card-grid">
+        <article class="info-card">
+            <p class="eyebrow">@L("Secuencias activas", "Seqüències actives", "Active sequences")</p>
+            <h2>@model.Sequences.Count(item => item.IsActive)</h2>
+            <p class="muted">@L("Documentos locales que siguen numeración configurada.", "Documents locals que segueixen numeració configurada.", "Local documents following configured numbering.")</p>
+        </article>
+        <article class="info-card">
+            <p class="eyebrow">@L("Disposición", "Disposició", "Disposition")</p>
+            <h2>@($"{model.DispositionYear} · {model.DispositionNextNumber}")</h2>
+            <p class="muted">@L("Año y siguiente número visible de disposición.", "Any i número visible següent de disposició.", "Year and next visible disposition number.")</p>
+        </article>
+        <article class="info-card">
+            <p class="eyebrow">@L("Modo de trabajo", "Mode de treball", "Working mode")</p>
+            <h2>@L("SaaS local", "SaaS local", "Local SaaS")</h2>
+            <p class="muted">@L("Las sugerencias se calculan sobre los documentos ya guardados en la base local.", "Els suggeriments es calculen sobre els documents ja desats a la base local.", "Suggestions are calculated from documents already stored in the local database.")</p>
+        </article>
+    </section>
+
+    <section class="panel detail-panel" style="margin-top: 1rem;">
+        <div class="detail-panel-header">
+            <div>
+                <h2>@L("Numeración de disposiciones", "Numeració de disposicions", "Disposition numbering")</h2>
+                <p class="muted">@L("Equivale al bloque especial del legacy para el visible de disposición.", "Equival al bloc especial del legacy per al visible de disposició.", "Equivalent to the special legacy block for the visible disposition number.")</p>
+            </div>
+        </div>
+
+        @if (isLoading)
+        {
+            <div class="loading-banner">
+                <span class="loading-indicator" aria-hidden="true"></span>
+                <span>@L("Cargando numeraciones...", "Carregant numeracions...", "Loading numbering...")</span>
+            </div>
+        }
+        else
+        {
+            <fieldset disabled="@(!canEdit || isSaving)">
+                <div class="form-grid">
+                    <label class="field">
+                        <span>@L("Año disposiciones", "Any disposicions", "Disposition year")</span>
+                        <InputText class="text-input" @bind-Value="model.DispositionYear" />
+                    </label>
+                    <label class="field">
+                        <span>@L("Siguiente número", "Següent número", "Next number")</span>
+                        <InputNumber class="text-input" @bind-Value="model.DispositionNextNumber" />
+                    </label>
+                    <div class="field wide">
+                        <span>@L("Sugerencia actual", "Suggeriment actual", "Current suggestion")</span>
+                        <div class="inline-action-list">
+                            <span class="muted">@($"{model.SuggestedDispositionYear} · {model.SuggestedDispositionNextNumber}")</span>
+                            @if (canEdit)
+                            {
+                                <button class="secondary-button" type="button" @onclick="ApplySuggestedDisposition">@L("Aplicar", "Aplicar", "Apply")</button>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </fieldset>
+        }
+    </section>
+
+    <section class="panel" style="margin-top: 1rem;">
+        <div class="detail-panel-header">
+            <div>
+                <h2>@L("Secuencias documentales", "Seqüències documentals", "Document sequences")</h2>
+                <p class="muted">@L("Cada fila controla la próxima numeración de un documento local. Si no había configuración, se propone el siguiente valor real detectado en la base.", "Cada fila controla la numeració següent d'un document local. Si no hi havia configuració, es proposa el valor real següent detectat a la base.", "Each row controls the next numbering of a local document. If no configuration existed, the next real value detected in the database is suggested.")</p>
+            </div>
+        </div>
+
+        <div class="table-scroll">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>@L("Numeración de", "Numeració de", "Numbering for")</th>
+                        <th>@L("Serie", "Sèrie", "Series")</th>
+                        <th>@L("Siguiente número", "Següent número", "Next number")</th>
+                        <th>@L("Último reservado", "Últim reservat", "Last reserved")</th>
+                        <th>@L("Sugerencia", "Suggeriment", "Suggestion")</th>
+                        <th>@L("Activa", "Activa", "Active")</th>
+                        <th>@L("Notas", "Notes", "Notes")</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (model.Sequences.Count == 0)
+                    {
+                        <tr>
+                            <td colspan="7" class="table-empty">@L("No hay secuencias configuradas todavía.", "Encara no hi ha seqüències configurades.", "There are no configured sequences yet.")</td>
+                        </tr>
+                    }
+                    else
+                    {
+                        @foreach (var sequence in model.Sequences)
+                        {
+                            <tr @key="sequence.SequenceKey">
+                                <td>
+                                    <div class="table-primary">@GetSequenceLabel(sequence.SequenceKey)</div>
+                                    <div class="table-secondary">@sequence.SequenceKey</div>
+                                </td>
+                                <td>
+                                    <input class="text-input compact-input" @bind="sequence.Series" disabled="@(!canEdit || isSaving)" />
+                                </td>
+                                <td>
+                                    <InputNumber class="text-input compact-input" @bind-Value="sequence.NextNumber" disabled="@(!canEdit || isSaving)" />
+                                </td>
+                                <td>@sequence.LastNumber</td>
+                                <td>
+                                    <div class="inline-action-list">
+                                        <span class="muted">@sequence.SuggestedNextNumber</span>
+                                        @if (canEdit)
+                                        {
+                                            <button class="secondary-button" type="button" @onclick="() => ApplySuggestedSequence(sequence)">@L("Aplicar", "Aplicar", "Apply")</button>
+                                        }
+                                    </div>
+                                </td>
+                                <td>
+                                    <InputCheckbox @bind-Value="sequence.IsActive" disabled="@(!canEdit || isSaving)" />
+                                </td>
+                                <td>
+                                    <input class="text-input compact-input" @bind="sequence.Notes" disabled="@(!canEdit || isSaving)" />
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </section>
+}
+
+@code {
+    private Guid? tenantId;
+    private Guid? companyId;
+    private bool canEdit;
+    private bool isLoading = true;
+    private bool isSaving;
+    private bool isError;
+    private string statusMessage = string.Empty;
+    private NumberingPageModel model = new();
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        tenantId = user.GetTenantId();
+        companyId = user.GetActiveCompanyId();
+        canEdit = user.IsPlatformAdmin() || user.IsInRole(PlatformRoles.TenantAdmin);
+
+        await LoadAsync();
+    }
+
+    private async Task LoadAsync()
+    {
+        statusMessage = string.Empty;
+        isError = false;
+        isLoading = true;
+
+        if (!tenantId.HasValue || !companyId.HasValue)
+        {
+            isLoading = false;
+            return;
+        }
+
+        try
+        {
+            var setup = await DocumentNumberingQueries.GetSetupAsync(tenantId.Value, companyId.Value);
+            model = new NumberingPageModel
+            {
+                DispositionYear = setup.DispositionYear,
+                SuggestedDispositionYear = setup.SuggestedDispositionYear,
+                DispositionNextNumber = setup.DispositionNextNumber,
+                SuggestedDispositionNextNumber = setup.SuggestedDispositionNextNumber,
+                Sequences = setup.Sequences
+                    .OrderBy(item => GetSequenceSortOrder(item.SequenceKey))
+                    .Select(item => new DocumentNumberingSequenceDto
+                    {
+                        SequenceKey = item.SequenceKey,
+                        Series = item.Series,
+                        NextNumber = item.NextNumber,
+                        SuggestedNextNumber = item.SuggestedNextNumber,
+                        LastNumber = item.LastNumber,
+                        IsActive = item.IsActive,
+                        Notes = item.Notes
+                    })
+                    .ToList()
+            };
+        }
+        catch (Exception exception)
+        {
+            isError = true;
+            statusMessage = exception.Message;
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private async Task SaveAsync()
+    {
+        if (!tenantId.HasValue || !companyId.HasValue || !canEdit)
+        {
+            return;
+        }
+
+        isSaving = true;
+        statusMessage = string.Empty;
+        isError = false;
+
+        try
+        {
+            await DocumentNumberingService.SaveSetupAsync(new SaveDocumentNumberingSetupCommand
+            {
+                TenantId = tenantId.Value,
+                CompanyId = companyId.Value,
+                DispositionYear = model.DispositionYear,
+                DispositionNextNumber = Math.Max(1, model.DispositionNextNumber),
+                Sequences = model.Sequences
+                    .Select(item => new SaveDocumentNumberingSequenceInput
+                    {
+                        SequenceKey = item.SequenceKey,
+                        Series = item.Series,
+                        NextNumber = Math.Max(1, item.NextNumber),
+                        IsActive = item.IsActive,
+                        Notes = item.Notes
+                    })
+                    .ToList()
+            });
+
+            statusMessage = L("Numeraciones guardadas correctamente.", "Numeracions desades correctament.", "Numbering saved successfully.");
+            await LoadAsync();
+        }
+        catch (Exception exception)
+        {
+            isError = true;
+            statusMessage = exception.Message;
+        }
+        finally
+        {
+            isSaving = false;
+        }
+    }
+
+    private void ApplySuggestedValues()
+    {
+        ApplySuggestedDisposition();
+        foreach (var sequence in model.Sequences)
+        {
+            sequence.NextNumber = Math.Max(1, sequence.SuggestedNextNumber);
+        }
+    }
+
+    private void ApplySuggestedDisposition()
+    {
+        model.DispositionYear = model.SuggestedDispositionYear;
+        model.DispositionNextNumber = Math.Max(1, model.SuggestedDispositionNextNumber);
+    }
+
+    private static void ApplySuggestedSequence(DocumentNumberingSequenceDto sequence)
+    {
+        sequence.NextNumber = Math.Max(1, sequence.SuggestedNextNumber);
+    }
+
+    private string GetSequenceLabel(string key) => key switch
+    {
+        DocumentNumberingKeys.PurchaseOrder => L("Pedidos de compra", "Comandes de compra", "Purchase orders"),
+        DocumentNumberingKeys.PurchaseReceipt => L("Recepciones de compra", "Recepcions de compra", "Purchase receipts"),
+        DocumentNumberingKeys.PurchaseInvoice => L("Facturas de proveedor", "Factures de proveïdor", "Supplier invoices"),
+        DocumentNumberingKeys.SalesOrder => L("Pedidos de venta", "Comandes de venda", "Sales orders"),
+        DocumentNumberingKeys.SalesShipment => L("Albaranes de venta", "Albarans de venda", "Sales shipments"),
+        DocumentNumberingKeys.SalesInvoiceDraft => L("Borradores de factura", "Esborranys de factura", "Invoice drafts"),
+        DocumentNumberingKeys.SalesInvoice => L("Facturas de cliente", "Factures de client", "Customer invoices"),
+        DocumentNumberingKeys.SalesRemittance => L("Remesas de cliente", "Remeses de client", "Customer remittances"),
+        DocumentNumberingKeys.StockTransfer => L("Traspasos de almacén", "Traspassos de magatzem", "Warehouse transfers"),
+        DocumentNumberingKeys.StockCount => L("Inventarios", "Inventaris", "Stock counts"),
+        DocumentNumberingKeys.FinishWorkOrder => L("Partes de acabado", "Parts d'acabat", "Finish work orders"),
+        _ => key
+    };
+
+    private static int GetSequenceSortOrder(string key)
+    {
+        for (var index = 0; index < DocumentNumberingKeys.OrderedKeys.Count; index++)
+        {
+            if (string.Equals(DocumentNumberingKeys.OrderedKeys[index], key, StringComparison.OrdinalIgnoreCase))
+            {
+                return index;
+            }
+        }
+
+        return int.MaxValue;
+    }
+
+    private string L(string spanish, string catalan, string english) =>
+        T.CurrentLanguage switch
+        {
+            AppLanguages.Catalan => catalan,
+            AppLanguages.English => english,
+            _ => spanish
+        };
+
+    private sealed class NumberingPageModel
+    {
+        public string DispositionYear { get; set; } = string.Empty;
+        public string SuggestedDispositionYear { get; set; } = string.Empty;
+        public int DispositionNextNumber { get; set; }
+        public int SuggestedDispositionNextNumber { get; set; }
+        public List<DocumentNumberingSequenceDto> Sequences { get; set; } = [];
+    }
+}

@@ -7,26 +7,35 @@
 @inject IProveedorQueries ProveedorQueries
 @inject IProveedorService ProveedorService
 @inject NavigationManager NavigationManager
+@inject AppText T
 
-<PageTitle>@(Code.HasValue ? "Editar proveedor" : "Nuevo proveedor")</PageTitle>
+<PageTitle>@(Code.HasValue
+    ? L("Editar proveedor", "Editar proveïdor", "Edit supplier")
+    : L("Nuevo proveedor", "Nou proveïdor", "New supplier"))</PageTitle>
 
 <div class="page-header">
     <div>
-        <p class="eyebrow">Compras</p>
-        <h1>@(Code.HasValue ? $"Editar proveedor {Code}" : "Nuevo proveedor")</h1>
+        <p class="eyebrow">@L("Compras", "Compres", "Purchases")</p>
+        <h1>@(Code.HasValue
+            ? $"{L("Editar proveedor", "Editar proveïdor", "Edit supplier")} {Code}"
+            : L("Nuevo proveedor", "Nou proveïdor", "New supplier"))</h1>
         <p class="lead">@(isLegacySyncActive
-            ? "Alta y edición sobre la réplica SaaS local. La sincronización manual solo refresca los registros que sigan siendo de origen legacy."
-            : "Alta y edición sobre la tabla prove replicada en la SaaS local, filtrada por la empresa activa.")</p>
+            ? L("Alta y edición sobre la réplica SaaS local. La sincronización manual solo refresca los registros que sigan siendo de origen legacy.",
+                "Alta i edició sobre la rèplica SaaS local. La sincronització manual només refresca els registres que continuen sent d'origen legacy.",
+                "Create and edit data on the local SaaS replica. Manual sync only refreshes records that still remain legacy-origin.")
+            : L("Alta y edición sobre la tabla prove replicada en la SaaS local, filtrada por la empresa activa.",
+                "Alta i edició sobre la taula prove replicada a la SaaS local, filtrada per l'empresa activa.",
+                "Create and edit data on the SaaS-local replicated prove table, filtered by the active company."))</p>
     </div>
     <div class="quick-links">
-        <a class="secondary-button link-button" href="/crm/proveedores">Volver al listado</a>
+        <a class="secondary-button link-button" href="/crm/proveedores">@L("Volver al listado", "Tornar al llistat", "Back to list")</a>
     </div>
 </div>
 
 @if (!tenantId.HasValue || !companyId.HasValue)
 {
     <div class="empty-state">
-        <p>No hay empresa activa seleccionada.</p>
+        <p>@L("No hay empresa activa seleccionada.", "No hi ha cap empresa activa seleccionada.", "There is no active company selected.")</p>
     </div>
 }
 else
@@ -39,8 +48,12 @@ else
     @if (isLegacySyncActive)
     {
         <div class="alert">
-            Compras / Proveedores está en convivencia con legacy para esta empresa.
-            Esta ficha sigue siendo editable en local. Si modificas un proveedor importado, pasará a tratarse como registro local y la sync manual ya no lo sobreescribirá.
+            @L("Compras / Proveedores está en convivencia con legacy para esta empresa.",
+                "Compres / Proveïdors està en convivència amb legacy per a aquesta empresa.",
+                "Purchases / Suppliers is running in coexistence with legacy for this company.")
+            @L("Esta ficha sigue siendo editable en local. Si modificas un proveedor importado, pasará a tratarse como registro local y la sync manual ya no lo sobreescribirá.",
+                "Aquesta fitxa continua sent editable en local. Si modifiques un proveïdor importat, passarà a tractar-se com a registre local i la sync manual ja no el sobreescriurà.",
+                "This record remains editable locally. If you modify an imported supplier, it will become a local record and manual sync will no longer overwrite it.")
             @if (!string.IsNullOrWhiteSpace(syncStatusLabel))
             {
                 <span>@syncStatusLabel</span>
@@ -52,48 +65,48 @@ else
         <fieldset>
         <div class="form-grid">
             <label class="field">
-                <span>Nombre</span>
+                <span>@L("Nombre", "Nom", "Name")</span>
                 <InputText class="text-input" @bind-Value="model.Name" />
             </label>
             <label class="field">
-                <span>NIF</span>
+                <span>@L("NIF", "NIF", "Tax ID")</span>
                 <InputText class="text-input" @bind-Value="model.TaxId" />
             </label>
             <label class="field">
-                <span>Contacto</span>
+                <span>@L("Contacto", "Contacte", "Contact")</span>
                 <InputText class="text-input" @bind-Value="model.ContactName" />
             </label>
             <label class="field">
-                <span>Teléfono</span>
+                <span>@L("Teléfono", "Telèfon", "Phone")</span>
                 <InputText class="text-input" @bind-Value="model.Phone" />
             </label>
             <label class="field">
-                <span>Teléfono 2</span>
+                <span>@L("Teléfono 2", "Telèfon 2", "Phone 2")</span>
                 <InputText class="text-input" @bind-Value="model.SecondaryPhone" />
             </label>
             <label class="field">
-                <span>Fax</span>
+                <span>@L("Fax", "Fax", "Fax")</span>
                 <InputText class="text-input" @bind-Value="model.Fax" />
             </label>
             <label class="field checkbox-field">
-                <span>Estado</span>
+                <span>@L("Estado", "Estat", "Status")</span>
                 <label class="checkbox-row">
                     <InputCheckbox @bind-Value="model.IsBlocked" />
-                    <span>Proveedor bloqueado</span>
+                    <span>@L("Proveedor bloqueado", "Proveïdor bloquejat", "Blocked supplier")</span>
                 </label>
             </label>
             <label class="field">
-                <span>Email principal</span>
+                <span>@L("Email principal", "Email principal", "Primary email")</span>
                 <InputText class="text-input" @bind-Value="model.PrimaryEmail" />
             </label>
             <label class="field">
-                <span>Email secundario</span>
+                <span>@L("Email secundario", "Email secundari", "Secondary email")</span>
                 <InputText class="text-input" @bind-Value="model.SecondaryEmail" />
             </label>
             <label class="field">
-                <span>Forma de pago</span>
+                <span>@L("Forma de pago", "Forma de pagament", "Payment method")</span>
                 <InputSelect class="text-input" @bind-Value="model.PaymentMethodCode">
-                    <option value="">Selecciona una forma</option>
+                    <option value="">@L("Selecciona una forma", "Selecciona una forma", "Select a method")</option>
                     @foreach (var option in paymentMethods)
                     {
                         <option value="@option.Code">@option.Name (@option.Code)</option>
@@ -105,9 +118,9 @@ else
                 }
             </label>
             <label class="field">
-                <span>Banco</span>
+                <span>@L("Banco", "Banc", "Bank")</span>
                 <InputSelect class="text-input" @bind-Value="model.BankCode">
-                    <option value="">Selecciona un banco</option>
+                    <option value="">@L("Selecciona un banco", "Selecciona un banc", "Select a bank")</option>
                     @foreach (var option in banks)
                     {
                         <option value="@option.Code">@option.Name (@option.Code)</option>
@@ -115,37 +128,37 @@ else
                 </InputSelect>
             </label>
             <label class="field">
-                <span>Entidad</span>
+                <span>@L("Entidad", "Entitat", "Entity")</span>
                 <InputText class="text-input" @bind-Value="model.BankEntityCode" />
             </label>
             <label class="field">
-                <span>Oficina</span>
+                <span>@L("Oficina", "Oficina", "Office")</span>
                 <InputText class="text-input" @bind-Value="model.BankOfficeCode" />
             </label>
             <label class="field">
-                <span>Dígito control</span>
+                <span>@L("Dígito control", "Dígit control", "Control digit")</span>
                 <InputText class="text-input" @bind-Value="model.BankControlDigit" />
             </label>
             <label class="field">
-                <span>Cuenta</span>
+                <span>@L("Cuenta", "Compte", "Account")</span>
                 <InputText class="text-input" @bind-Value="model.BankAccountNumber" />
             </label>
             <label class="field">
-                <span>Día pago 1</span>
+                <span>@L("Día pago 1", "Dia pagament 1", "Payment day 1")</span>
                 <InputNumber class="text-input" @bind-Value="model.PaymentDay1" />
             </label>
             <label class="field">
-                <span>Día pago 2</span>
+                <span>@L("Día pago 2", "Dia pagament 2", "Payment day 2")</span>
                 <InputNumber class="text-input" @bind-Value="model.PaymentDay2" />
             </label>
             <label class="field">
-                <span>Día pago 3</span>
+                <span>@L("Día pago 3", "Dia pagament 3", "Payment day 3")</span>
                 <InputNumber class="text-input" @bind-Value="model.PaymentDay3" />
             </label>
             <label class="field">
-                <span>IVA</span>
+                <span>@L("IVA", "IVA", "VAT")</span>
                 <InputSelect class="text-input" @bind-Value="model.TaxCode">
-                    <option value="">Selecciona un IVA</option>
+                    <option value="">@L("Selecciona un IVA", "Selecciona un IVA", "Select a VAT rate")</option>
                     @foreach (var option in vatRates)
                     {
                         <option value="@option.Code">@option.Name (@option.Code)</option>
@@ -153,32 +166,32 @@ else
                 </InputSelect>
                 @if (SelectedVatRate is not null)
                 {
-                    <span class="field-hint">IVA @FormatPercent(SelectedVatRate.TaxPercent) · RE @FormatPercent(SelectedVatRate.SurchargePercent)</span>
+                    <span class="field-hint">@L("IVA", "IVA", "VAT") @FormatPercent(SelectedVatRate.TaxPercent) · RE @FormatPercent(SelectedVatRate.SurchargePercent)</span>
                 }
             </label>
             <label class="field">
-                <span>Subcuenta</span>
+                <span>@L("Subcuenta", "Subcompte", "Subaccount")</span>
                 <InputText class="text-input" @bind-Value="model.SubAccount" />
             </label>
             <label class="field checkbox-field">
-                <span>Contabilidad</span>
+                <span>@L("Contabilidad", "Comptabilitat", "Accounting")</span>
                 <label class="checkbox-row">
                     <InputCheckbox @bind-Value="model.TransferToAccounting" />
-                    <span>Marcar para traspaso contable</span>
+                    <span>@L("Marcar para traspaso contable", "Marcar per a traspàs comptable", "Mark for accounting transfer")</span>
                 </label>
             </label>
             <label class="field">
-                <span>IBAN</span>
+                <span>@L("IBAN", "IBAN", "IBAN")</span>
                 <InputText class="text-input" @bind-Value="model.Iban" />
             </label>
             <label class="field">
-                <span>SWIFT</span>
+                <span>@L("SWIFT", "SWIFT", "SWIFT")</span>
                 <InputText class="text-input" @bind-Value="model.Swift" />
             </label>
             <label class="field">
-                <span>Incoterm</span>
+                <span>@L("Incoterm", "Incoterm", "Incoterm")</span>
                 <InputSelect class="text-input" @bind-Value="model.IncotermCode">
-                    <option value="">Selecciona un incoterm</option>
+                    <option value="">@L("Selecciona un incoterm", "Selecciona un incoterm", "Select an incoterm")</option>
                     @foreach (var option in incoterms)
                     {
                         <option value="@option.Code">@option.Name (@option.Code)</option>
@@ -186,41 +199,41 @@ else
                 </InputSelect>
             </label>
             <label class="field wide">
-                <span>Dirección</span>
+                <span>@L("Dirección", "Adreça", "Address")</span>
                 <InputText class="text-input" @bind-Value="model.Address" />
             </label>
             <label class="field">
-                <span>Código postal</span>
+                <span>@L("Código postal", "Codi postal", "Postal code")</span>
                 <InputText class="text-input" @bind-Value="model.PostalCode" />
             </label>
             <label class="field">
-                <span>Ciudad</span>
+                <span>@L("Ciudad", "Ciutat", "City")</span>
                 <InputText class="text-input" @bind-Value="model.City" />
             </label>
             <label class="field">
-                <span>Provincia</span>
+                <span>@L("Provincia", "Província", "Province")</span>
                 <InputText class="text-input" @bind-Value="model.Province" />
             </label>
             <label class="field">
-                <span>País</span>
+                <span>@L("País", "País", "Country")</span>
                 <InputText class="text-input" @bind-Value="model.Country" />
             </label>
             <label class="field wide">
-                <span>Web</span>
+                <span>@L("Web", "Web", "Website")</span>
                 <InputText class="text-input" @bind-Value="model.Website" />
             </label>
             <label class="field wide">
-                <span>Notas</span>
+                <span>@L("Notas", "Notes", "Notes")</span>
                 <InputTextArea class="text-area" @bind-Value="model.Notes" />
             </label>
         </div>
 
         <div class="quick-links" style="margin-top: 1rem;">
-            <button class="primary-button" type="submit">Guardar proveedor</button>
+            <button class="primary-button" type="submit">@L("Guardar proveedor", "Desar proveïdor", "Save supplier")</button>
             @if (Code.HasValue)
             {
-                <button class="secondary-button danger" type="button" @onclick="DeleteAsync">Eliminar proveedor</button>
-                <button class="secondary-button" type="button" @onclick="LoadAuditAsync">Recargar historial</button>
+                <button class="secondary-button danger" type="button" @onclick="DeleteAsync">@L("Eliminar proveedor", "Eliminar proveïdor", "Delete supplier")</button>
+                <button class="secondary-button" type="button" @onclick="LoadAuditAsync">@L("Recargar historial", "Recarregar historial", "Reload history")</button>
             }
         </div>
         </fieldset>
@@ -229,11 +242,11 @@ else
     @if (Code.HasValue)
     {
         <section class="panel" style="margin-top: 1rem;">
-            <h2>Historial reciente del proveedor</h2>
+            <h2>@L("Historial reciente del proveedor", "Historial recent del proveïdor", "Recent supplier history")</h2>
             <div class="list-block">
                 @if (recentAuditLogs.Count == 0)
                 {
-                    <p class="muted">Todavía no hay eventos auditados para este proveedor.</p>
+                    <p class="muted">@L("Todavía no hay eventos auditados para este proveedor.", "Encara no hi ha esdeveniments auditats per a aquest proveïdor.", "There are no audited events for this supplier yet.")</p>
                 }
                 else
                 {
@@ -300,7 +313,7 @@ else
             var detail = await ProveedorQueries.GetByCodeAsync(tenantId.Value, companyId.Value, Code.Value);
             if (detail is null)
             {
-                statusMessage = "No se ha encontrado el proveedor solicitado.";
+                statusMessage = L("No se ha encontrado el proveedor solicitado.", "No s'ha trobat el proveïdor sol·licitat.", "The requested supplier was not found.");
                 isError = true;
                 model = new ProveedorDetailDto();
                 recentAuditLogs = [];
@@ -368,8 +381,8 @@ else
             });
 
             statusMessage = Code.HasValue
-                ? "Proveedor actualizado correctamente."
-                : "Proveedor creado correctamente.";
+                ? L("Proveedor actualizado correctamente.", "Proveïdor actualitzat correctament.", "Supplier updated successfully.")
+                : L("Proveedor creado correctamente.", "Proveïdor creat correctament.", "Supplier created successfully.");
 
             if (!Code.HasValue)
             {
@@ -427,8 +440,8 @@ else
 
         isLegacySyncActive = true;
         syncStatusLabel = status.LastCompletedUtc.HasValue
-            ? $"Última sync: {status.LastCompletedUtc.Value.ToLocalTime():dd/MM/yyyy HH:mm:ss} · Ins: {status.LastInserted} · Act: {status.LastUpdated} · Omi: {status.LastSkipped} · Err: {status.LastErrors}"
-            : $"Estado: {status.LastStatus}";
+            ? $"{L("Última sync", "Última sync", "Last sync")}: {status.LastCompletedUtc.Value.ToLocalTime():dd/MM/yyyy HH:mm:ss} · Ins: {status.LastInserted} · Act: {status.LastUpdated} · Omi: {status.LastSkipped} · Err: {status.LastErrors}"
+            : $"{L("Estado", "Estat", "Status")}: {status.LastStatus}";
     }
 
     private async Task LoadAuditAsync()
@@ -446,30 +459,40 @@ else
             entityId: Code.Value.ToString());
     }
 
-    private static string FormatPaymentMethodSummary(ProveedorCatalogOptionDto option)
+    private string FormatPaymentMethodSummary(ProveedorCatalogOptionDto option)
     {
         var fragments = new List<string>();
 
         if (option.NumberOfPayments.HasValue)
         {
-            fragments.Add($"{option.NumberOfPayments.Value} pagos");
+            fragments.Add($"{option.NumberOfPayments.Value} {L("pagos", "pagaments", "payments")}");
         }
 
         if (option.PaymentDays.HasValue)
         {
-            fragments.Add($"{option.PaymentDays.Value} días");
+            fragments.Add($"{option.PaymentDays.Value} {L("días", "dies", "days")}");
         }
 
         if (option.FirstPaymentDays.HasValue)
         {
-            fragments.Add($"1er vencimiento {option.FirstPaymentDays.Value} días");
+            fragments.Add($"{L("1er vencimiento", "1r venciment", "1st due date")} {option.FirstPaymentDays.Value} {L("días", "dies", "days")}");
         }
 
-        return fragments.Count == 0 ? "Sin detalle legacy adicional." : string.Join(" · ", fragments);
+        return fragments.Count == 0
+            ? L("Sin detalle legacy adicional.", "Sense detall legacy addicional.", "No additional legacy detail.")
+            : string.Join(" · ", fragments);
     }
 
     private static string FormatPercent(decimal? value)
     {
-        return value.HasValue ? $"{value.Value:0.##}%" : "-";
+        return value.HasValue ? $"{value.Value.ToUiString("0.##")}%" : "-";
     }
+
+    private string L(string spanish, string catalan, string english) =>
+        T.CurrentLanguage switch
+        {
+            AppLanguages.Catalan => catalan,
+            AppLanguages.English => english,
+            _ => spanish
+        };
 }

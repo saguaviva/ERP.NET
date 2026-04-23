@@ -1,4 +1,5 @@
 @page "/ventas/pedidos"
+@page "/ventas/pedidos-teixits-mostres"
 @attribute [Authorize(Roles = "TenantAdmin,TenantReader")]
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject NavigationManager NavigationManager
@@ -6,18 +7,18 @@
 @inject ISalesOrderQueries SalesOrderQueries
 @inject AppText T
 
-<PageTitle>@L("Ventas / Pedidos", "Vendes / Comandes", "Sales / Orders")</PageTitle>
+<PageTitle>@PageTitleText</PageTitle>
 
 <div class="page-header">
     <div>
         <p class="eyebrow">@L("Ventas", "Vendes", "Sales")</p>
-        <h1>@L("Pedidos de cliente", "Comandes de client", "Customer orders")</h1>
-        <p class="lead">@L("Listado web de pedidos por empresa activa, con líneas y expediciones enlazadas a stock.", "Llistat web de comandes per empresa activa, amb línies i expedicions enllaçades a estoc.", "Web list of orders for the active company, with lines and shipments linked to stock.")</p>
+        <h1>@PageHeadingText</h1>
+        <p class="lead">@PageLeadText</p>
     </div>
     <div class="quick-links">
         @if (canEdit)
         {
-            <a class="primary-button link-button" href="/ventas/pedidos/nuevo">@L("Nuevo pedido", "Nova comanda", "New order")</a>
+            <a class="primary-button link-button" href="@CreateOrderHref">@CreateOrderText</a>
         }
     </div>
 </div>
@@ -25,7 +26,9 @@
 @if (!tenantId.HasValue || !companyId.HasValue)
 {
     <div class="empty-state">
-        <p>@L("Selecciona una empresa activa para trabajar con pedidos de cliente.", "Selecciona una empresa activa per treballar amb comandes de client.", "Select an active company to work with customer orders.")</p>
+        <p>@(IsTeixitsMostresOrdersRoute
+            ? L("Selecciona una empresa activa para trabajar con pedidos del circuito Teixits-Mostres.", "Selecciona una empresa activa per treballar amb comandes del circuit Teixits-Mostres.", "Select an active company to work with fabric and sample orders.")
+            : L("Selecciona una empresa activa para trabajar con pedidos de cliente.", "Selecciona una empresa activa per treballar amb comandes de client.", "Select an active company to work with customer orders."))</p>
     </div>
 }
 else
@@ -33,7 +36,9 @@ else
     @if (isLegacySyncActive)
     {
         <div class="alert warning">
-            @L("Ventas / Pedidos está en convivencia con legacy para esta empresa. La sync manual refresca solo los pedidos con origen legacy; los nuevos o modificados desde la web quedan como locales.", "Vendes / Comandes està en convivència amb legacy per a aquesta empresa. La sync manual refresca només les comandes amb origen legacy; les noves o modificades des del web queden com a locals.", "Sales / Orders is running in legacy coexistence mode for this company. Manual sync refreshes only legacy-origin orders; new or edited web orders remain local.")
+            @(IsTeixitsMostresOrdersRoute
+                ? L("Ventas / Pedidos Teixits-Mostres reutiliza el pedido comercial general y lo filtra al circuito de tejidos y muestras. La sync manual refresca solo los pedidos con origen legacy; los nuevos o modificados desde la web quedan como locales.", "Vendes / Comandes Teixits-Mostres reutilitza la comanda comercial general i la filtra al circuit de teixits i mostres. La sync manual refresca només les comandes amb origen legacy; les noves o modificades des del web queden com a locals.", "Sales / Fabric & sample orders reuses the standard commercial order and filters it to the fabrics and samples workflow. Manual sync refreshes only legacy-origin orders; new or edited web orders remain local.")
+                : L("Ventas / Pedidos está en convivencia con legacy para esta empresa. La sync manual refresca solo los pedidos con origen legacy; los nuevos o modificados desde la web quedan como locales.", "Vendes / Comandes està en convivència amb legacy per a aquesta empresa. La sync manual refresca només les comandes amb origen legacy; les noves o modificades des del web queden com a locals.", "Sales / Orders is running in legacy coexistence mode for this company. Manual sync refreshes only legacy-origin orders; new or edited web orders remain local."))
             @if (lastSyncUtc.HasValue)
             {
                 <span> @L("Última sync:", "Última sync:", "Last sync:") @lastSyncUtc.Value.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss").</span>
@@ -61,7 +66,9 @@ else
             <span class="results-summary">
                 @(totalCount == 0
                     ? L("Sin resultados", "Sense resultats", "No results")
-                    : L($"Mostrando {PageStart}-{PageEnd} de {totalCount} pedidos", $"Mostrant {PageStart}-{PageEnd} de {totalCount} comandes", $"Showing {PageStart}-{PageEnd} of {totalCount} orders"))
+                    : IsTeixitsMostresOrdersRoute
+                        ? L($"Mostrando {PageStart.ToUiString("N0")}-{PageEnd.ToUiString("N0")} de {totalCount.ToUiString("N0")} pedidos teixits-mostres", $"Mostrant {PageStart.ToUiString("N0")}-{PageEnd.ToUiString("N0")} de {totalCount.ToUiString("N0")} comandes teixits-mostres", $"Showing {PageStart.ToUiString("N0")}-{PageEnd.ToUiString("N0")} of {totalCount.ToUiString("N0")} fabric & sample orders")
+                        : L($"Mostrando {PageStart.ToUiString("N0")}-{PageEnd.ToUiString("N0")} de {totalCount.ToUiString("N0")} pedidos", $"Mostrant {PageStart.ToUiString("N0")}-{PageEnd.ToUiString("N0")} de {totalCount.ToUiString("N0")} comandes", $"Showing {PageStart.ToUiString("N0")}-{PageEnd.ToUiString("N0")} of {totalCount.ToUiString("N0")} orders"))
             </span>
             <label class="field compact-field">
                 <span>@L("Tamaño de página", "Mida de pàgina", "Page size")</span>
@@ -84,7 +91,9 @@ else
         {
             <div class="loading-banner">
                 <span class="loading-indicator" aria-hidden="true"></span>
-                <span>@L("Cargando pedidos de cliente...", "Carregant comandes de client...", "Loading customer orders...")</span>
+                <span>@(IsTeixitsMostresOrdersRoute
+                    ? L("Cargando pedidos teixits-mostres...", "Carregant comandes teixits-mostres...", "Loading fabric & sample orders...")
+                    : L("Cargando pedidos de cliente...", "Carregant comandes de client...", "Loading customer orders..."))</span>
             </div>
         }
 
@@ -124,16 +133,22 @@ else
                         <td colspan="8" class="table-empty">
                             @if (HasActiveFilters)
                             {
-                                <span>@L("No hay pedidos que encajen con los filtros actuales.", "No hi ha comandes que encaixin amb els filtres actuals.", "No orders match the current filters.")</span>
+                                <span>@(IsTeixitsMostresOrdersRoute
+                                    ? L("No hay pedidos teixits-mostres que encajen con los filtros actuales.", "No hi ha comandes teixits-mostres que encaixin amb els filtres actuals.", "No fabric & sample orders match the current filters.")
+                                    : L("No hay pedidos que encajen con los filtros actuales.", "No hi ha comandes que encaixin amb els filtres actuals.", "No orders match the current filters."))</span>
                             }
                             else
                             {
                                 <div class="empty-table-state">
-                                    <strong>@L("Todavía no hay pedidos de cliente en este módulo.", "Encara no hi ha comandes de client en aquest mòdul.", "There are no customer orders in this module yet.")</strong>
-                                    <span>@L("Los pedidos que ves aquí salen del modelo SaaS. Si esta empresa está en convivencia con legacy, primero debes lanzar la sincronización para traer el histórico.", "Les comandes que veus aquí surten del model SaaS. Si aquesta empresa està en convivència amb legacy, primer has de llançar la sincronització per portar l'històric.", "The orders shown here come from the SaaS model. If this company is in legacy coexistence mode, you must run sync first to bring in the history.")</span>
+                                    <strong>@(IsTeixitsMostresOrdersRoute
+                                        ? L("Todavía no hay pedidos teixits-mostres en este módulo.", "Encara no hi ha comandes teixits-mostres en aquest mòdul.", "There are no fabric & sample orders in this module yet.")
+                                        : L("Todavía no hay pedidos de cliente en este módulo.", "Encara no hi ha comandes de client en aquest mòdul.", "There are no customer orders in this module yet."))</strong>
+                                    <span>@(IsTeixitsMostresOrdersRoute
+                                        ? L("Los pedidos que ves aquí salen del circuito SaaS de tejidos y muestras. Si esta empresa está en convivencia con legacy, primero debes lanzar la sincronización para traer el histórico.", "Les comandes que veus aquí surten del circuit SaaS de teixits i mostres. Si aquesta empresa està en convivència amb legacy, primer has de llançar la sincronització per portar l'històric.", "The orders shown here come from the SaaS fabrics and samples workflow. If this company is in legacy coexistence mode, you must run sync first to bring in the history.")
+                                        : L("Los pedidos que ves aquí salen del modelo SaaS. Si esta empresa está en convivencia con legacy, primero debes lanzar la sincronización para traer el histórico.", "Les comandes que veus aquí surten del model SaaS. Si aquesta empresa està en convivència amb legacy, primer has de llançar la sincronització per portar l'històric.", "The orders shown here come from the SaaS model. If this company is in legacy coexistence mode, you must run sync first to bring in the history."))</span>
                                     @if (canEdit)
                                     {
-                                        <a class="primary-button link-button" href="/ventas/pedidos/nuevo">@L("Crear primer pedido", "Crear primera comanda", "Create first order")</a>
+                                        <a class="primary-button link-button" href="@CreateOrderHref">@CreateFirstOrderText</a>
                                     }
                                 </div>
                             }
@@ -163,9 +178,9 @@ else
                                 }
                             </td>
                             <td>@item.LineCount</td>
-                            <td>@item.TotalAmount.ToString("0.00") €</td>
+                            <td>@item.TotalAmount.ToUiString("0.00") €</td>
                             <td>
-                                <a class="inline-link" href="/ventas/pedidos/editar/@item.OrderNumber">@(canEdit ? L("Abrir", "Obrir", "Open") : L("Ver", "Veure", "View"))</a>
+                                <a class="inline-link" href="@BuildOrderHref(item.OrderNumber)">@(canEdit ? L("Abrir", "Obrir", "Open") : L("Ver", "Veure", "View"))</a>
                             </td>
                         </tr>
                     }
@@ -193,6 +208,31 @@ else
             AppLanguages.English => english,
             _ => spanish
         };
+
+    private bool IsTeixitsMostresOrdersRoute =>
+        NavigationManager.ToBaseRelativePath(NavigationManager.Uri).StartsWith("ventas/pedidos-teixits-mostres", StringComparison.OrdinalIgnoreCase);
+
+    private string PageTitleText => IsTeixitsMostresOrdersRoute
+        ? L("Ventas / Pedidos Teixits-Mostres", "Vendes / Comandes Teixits-Mostres", "Sales / Fabric & sample orders")
+        : L("Ventas / Pedidos", "Vendes / Comandes", "Sales / Orders");
+
+    private string PageHeadingText => IsTeixitsMostresOrdersRoute
+        ? L("Pedidos Teixits-Mostres", "Comandes Teixits-Mostres", "Fabric & sample orders")
+        : L("Pedidos de cliente", "Comandes de client", "Customer orders");
+
+    private string PageLeadText => IsTeixitsMostresOrdersRoute
+        ? L("Listado web del circuito comercial de tejidos y muestras, con líneas y expediciones enlazadas a stock.", "Llistat web del circuit comercial de teixits i mostres, amb línies i expedicions enllaçades a estoc.", "Web list for the fabrics and samples commercial workflow, with lines and shipments linked to stock.")
+        : L("Listado web de pedidos por empresa activa, con líneas y expediciones enlazadas a stock.", "Llistat web de comandes per empresa activa, amb línies i expedicions enllaçades a estoc.", "Web list of orders for the active company, with lines and shipments linked to stock.");
+
+    private string CreateOrderHref => IsTeixitsMostresOrdersRoute ? "/ventas/pedidos-teixits-mostres/nuevo" : "/ventas/pedidos/nuevo";
+
+    private string CreateOrderText => IsTeixitsMostresOrdersRoute
+        ? L("Nuevo pedido teixits-mostres", "Nova comanda teixits-mostres", "New fabric & sample order")
+        : L("Nuevo pedido", "Nova comanda", "New order");
+
+    private string CreateFirstOrderText => IsTeixitsMostresOrdersRoute
+        ? L("Crear primer pedido teixits-mostres", "Crear primera comanda teixits-mostres", "Create first fabric & sample order")
+        : L("Crear primer pedido", "Crear primera comanda", "Create first order");
 
     [SupplyParameterFromQuery(Name = "q")]
     public string? SearchQuery { get; set; }
@@ -276,6 +316,7 @@ else
 
         try
         {
+            filter.CatalogScope = IsTeixitsMostresOrdersRoute ? "TeixitsMostres" : string.Empty;
             filter.SortColumn = sortColumn;
             filter.SortDescending = sortDescending;
 
@@ -455,4 +496,9 @@ else
 
         return string.Empty;
     }
+
+    private string BuildOrderHref(int orderNumber) =>
+        IsTeixitsMostresOrdersRoute
+            ? $"/ventas/pedidos-teixits-mostres/editar/{orderNumber}"
+            : $"/ventas/pedidos/editar/{orderNumber}";
 }

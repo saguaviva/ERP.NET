@@ -4,19 +4,20 @@
 @inject ITenantAdminService TenantAdminService
 @inject IAuditLogService AuditLogService
 @inject ILegacySyncService LegacySyncService
+@inject AppText T
 
-<PageTitle>Administración del tenant</PageTitle>
+<PageTitle>@L("Administración del tenant", "Administració del tenant", "Tenant administration")</PageTitle>
 
 <div class="page-header">
     <div>
-        <p class="eyebrow">Tenant Admin</p>
-        <h1>Administración del tenant</h1>
-        <p class="lead">Gestiona companies, usuarios y permisos dentro del tenant activo, sin salir del alcance asignado.</p>
+        <p class="eyebrow">@L("Tenant Admin", "Tenant Admin", "Tenant Admin")</p>
+        <h1>@L("Administración del tenant", "Administració del tenant", "Tenant administration")</h1>
+        <p class="lead">@L("Gestiona companies, usuarios y permisos dentro del tenant activo, sin salir del alcance asignado.", "Gestiona empreses, usuaris i permisos dins del tenant actiu, sense sortir de l'abast assignat.", "Manage companies, users and permissions within the active tenant without leaving the assigned scope.")</p>
     </div>
     <div class="quick-links">
         @if (isPlatformAdmin)
         {
-            <a class="secondary-button link-button" href="/plataforma">Volver a plataforma</a>
+            <a class="secondary-button link-button" href="/plataforma">@L("Volver a plataforma", "Tornar a plataforma", "Back to platform")</a>
         }
     </div>
 </div>
@@ -29,68 +30,68 @@
 @if (!currentTenantId.HasValue)
 {
     <div class="empty-state">
-        <p>Tu sesión no tiene un tenant activo. Vuelve a iniciar sesión o selecciona una empresa válida.</p>
+        <p>@L("Tu sesión no tiene un tenant activo. Vuelve a iniciar sesión o selecciona una empresa válida.", "La teva sessió no té cap tenant actiu. Torna a iniciar sessió o selecciona una empresa vàlida.", "Your session does not have an active tenant. Sign in again or select a valid company.")</p>
     </div>
 }
 else if (currentTenant is null)
 {
     <div class="empty-state">
-        <p>No se ha podido cargar el tenant activo.</p>
+        <p>@L("No se ha podido cargar el tenant activo.", "No s'ha pogut carregar el tenant actiu.", "The active tenant could not be loaded.")</p>
     </div>
 }
 else
 {
     <section class="card-grid">
         <article class="info-card">
-            <p class="eyebrow">Tenant activo</p>
+            <p class="eyebrow">@L("Tenant activo", "Tenant actiu", "Active tenant")</p>
             <h2>@currentTenant.Name</h2>
             <p class="muted">@currentTenant.Slug</p>
         </article>
         <article class="info-card">
-            <p class="eyebrow">Companies</p>
+            <p class="eyebrow">@L("Empresas", "Empreses", "Companies")</p>
             <h2>@companies.Count</h2>
-            <p class="muted">Empresas operativas dentro del tenant.</p>
+            <p class="muted">@L("Empresas operativas dentro del tenant.", "Empreses operatives dins del tenant.", "Operating companies within the tenant.")</p>
         </article>
         <article class="info-card">
-            <p class="eyebrow">Usuarios</p>
+            <p class="eyebrow">@L("Usuarios", "Usuaris", "Users")</p>
             <h2>@users.Count</h2>
-            <p class="muted">Usuarios con acceso al tenant actual.</p>
+            <p class="muted">@L("Usuarios con acceso al tenant actual.", "Usuaris amb accés al tenant actual.", "Users with access to the current tenant.")</p>
         </article>
         <article class="info-card">
-            <p class="eyebrow">Actividad</p>
+            <p class="eyebrow">@L("Actividad", "Activitat", "Activity")</p>
             <h2>@recentAuditLogs.Count</h2>
-            <p class="muted">Eventos recientes del tenant.</p>
+            <p class="muted">@L("Eventos recientes del tenant.", "Esdeveniments recents del tenant.", "Recent tenant events.")</p>
         </article>
     </section>
 
     <section class="panel" style="margin-top: 1rem;">
-        <h2>Comportamiento de módulos</h2>
+        <h2>@L("Comportamiento de módulos", "Comportament de mòduls", "Module behavior")</h2>
         <div class="admin-grid">
             <article class="info-card">
-                <p class="eyebrow">CRM / Clientes</p>
-                <h2>Ámbito de datos</h2>
-                <p class="muted">Decide si el CRM usa una base lógica por company o una base compartida para todo el tenant.</p>
+                <p class="eyebrow">@L("CRM / Clientes", "CRM / Clients", "CRM / Clients")</p>
+                <h2>@L("Ámbito de datos", "Àmbit de dades", "Data scope")</h2>
+                <p class="muted">@L("Decide si el CRM usa una base lógica por company o una base compartida para todo el tenant.", "Decideix si el CRM fa servir una base lògica per empresa o una base compartida per a tot el tenant.", "Choose whether CRM uses a logical database per company or a shared database across the tenant.")</p>
                 <label class="field">
-                    <span>Modo</span>
+                    <span>@L("Modo", "Mode", "Mode")</span>
                     <InputSelect class="text-input" @bind-Value="crmClientsDataScope">
-                        <option value="@TenantModuleDataScopes.Company">Por empresa activa</option>
-                        <option value="@TenantModuleDataScopes.TenantShared">Compartido en todo el tenant</option>
+                        <option value="@TenantModuleDataScopes.Company">@L("Por empresa activa", "Per empresa activa", "Per active company")</option>
+                        <option value="@TenantModuleDataScopes.TenantShared">@L("Compartido en todo el tenant", "Compartit a tot el tenant", "Shared across the tenant")</option>
                     </InputSelect>
                 </label>
                 <p class="muted">
-                    En modo compartido, el listado y la numeración de clientes pasan a ser tenant-wide.
-                    La persistencia física sigue usando el centro legacy de la empresa activa al crear nuevos registros.
+                    @L("En modo compartido, el listado y la numeración de clientes pasan a ser tenant-wide.", "En mode compartit, el llistat i la numeració de clients passen a ser tenant-wide.", "In shared mode, client listing and numbering become tenant-wide.")
+                    @L("La persistencia física sigue usando el centro legacy de la empresa activa al crear nuevos registros.", "La persistència física continua fent servir el centre legacy de l'empresa activa en crear nous registres.", "Physical persistence still uses the active company's legacy center when creating new records.")
                 </p>
-                <button class="primary-button" type="button" @onclick="SaveCrmClientsScopeAsync">Guardar configuración</button>
+                <button class="primary-button" type="button" @onclick="SaveCrmClientsScopeAsync">@L("Guardar configuración", "Desar configuració", "Save settings")</button>
             </article>
             <article class="info-card">
-                <p class="eyebrow">Ventas / Pedidos</p>
-                <h2>Sync legacy</h2>
-                <p class="muted">Mientras este módulo esté en convivencia, la fuente de verdad sigue siendo TEX.NET y la web consume una réplica controlada.</p>
+                <p class="eyebrow">@L("Ventas / Pedidos", "Vendes / Comandes", "Sales / Orders")</p>
+                <h2>@LegacySyncLabel</h2>
+                <p class="muted">@L("Mientras este módulo esté en convivencia, la fuente de verdad sigue siendo TEX.NET y la web consume una réplica controlada.", "Mentre aquest mòdul estigui en convivència, la font de veritat continua sent TEX.NET i la web consumeix una rèplica controlada.", "While this module runs alongside legacy, TEX.NET remains the source of truth and the web consumes a controlled replica.")</p>
                 <label class="field">
-                    <span>Company</span>
+                    <span>@L("Empresa", "Empresa", "Company")</span>
                     <InputSelect class="text-input" @bind-Value="selectedSalesOrdersSyncCompanyId">
-                        <option value="">Todas las companies del tenant</option>
+                        <option value="">@L("Todas las empresas del tenant", "Totes les empreses del tenant", "All tenant companies")</option>
                         @foreach (var company in companies)
                         {
                             <option value="@company.Id.ToString()">@company.Name (@company.LegacyCenterCode)</option>
@@ -98,28 +99,30 @@ else
                     </InputSelect>
                 </label>
                 <button class="primary-button" type="button" @onclick="RunSalesOrdersSyncAsync" disabled="@isRunningSalesOrdersSync">
-                    @(isRunningSalesOrdersSync ? "Sincronizando pedidos..." : "Sincronizar ventas / pedidos")
+                    @(isRunningSalesOrdersSync
+                        ? L("Sincronizando pedidos...", "Sincronitzant comandes...", "Syncing orders...")
+                        : L("Sincronizar ventas / pedidos", "Sincronitzar vendes / comandes", "Sync sales / orders"))
                 </button>
                 <div class="list-block" style="margin-top: 1rem;">
                     @foreach (var status in salesOrdersSyncStatuses)
                     {
                         <article class="list-item">
                             <strong>@status.CompanyName (@status.CompanyLegacyCenterCode)</strong>
-                            <span>@(string.IsNullOrWhiteSpace(status.LastStatus) ? "Sin sincronizar" : status.LastStatus)</span>
-                            <span>@(status.LastCompletedUtc?.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss") ?? "Nunca")</span>
-                            <span>Ins: @status.LastInserted · Act: @status.LastUpdated · Omi: @status.LastSkipped · Err: @status.LastErrors</span>
+                            <span>@(string.IsNullOrWhiteSpace(status.LastStatus) ? L("Sin sincronizar", "Sense sincronitzar", "Not synced") : status.LastStatus)</span>
+                            <span>@(status.LastCompletedUtc?.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss") ?? L("Nunca", "Mai", "Never"))</span>
+                            <span>@FormatSyncCounters(status)</span>
                         </article>
                     }
                 </div>
             </article>
             <article class="info-card">
-                <p class="eyebrow">CRM / Clientes</p>
-                <h2>Sync legacy</h2>
-                <p class="muted">Replica clients y adres desde TEX.NET hacia la SaaS local. La sync manual refresca solo registros con origen legacy y deja intactos los cambios locales.</p>
+                <p class="eyebrow">@L("CRM / Clientes", "CRM / Clients", "CRM / Clients")</p>
+                <h2>@LegacySyncLabel</h2>
+                <p class="muted">@L("Replica clientes y direcciones desde TEX.NET hacia la SaaS local. La sync manual refresca solo registros con origen legacy y deja intactos los cambios locales.", "Replica clients i adreces des de TEX.NET cap a la SaaS local. La sync manual refresca només els registres amb origen legacy i deixa intactes els canvis locals.", "Replicates clients and addresses from TEX.NET into the local SaaS. Manual sync refreshes only legacy-origin records and leaves local changes untouched.")</p>
                 <label class="field">
-                    <span>Company</span>
+                    <span>@CompanyLabel</span>
                     <InputSelect class="text-input" @bind-Value="selectedCrmClientsSyncCompanyId">
-                        <option value="">Todas las companies del tenant</option>
+                        <option value="">@AllTenantCompaniesLabel</option>
                         @foreach (var company in companies)
                         {
                             <option value="@company.Id.ToString()">@company.Name (@company.LegacyCenterCode)</option>
@@ -127,28 +130,28 @@ else
                     </InputSelect>
                 </label>
                 <button class="primary-button" type="button" @onclick="RunCrmClientsSyncAsync" disabled="@isRunningCrmClientsSync">
-                    @(isRunningCrmClientsSync ? "Sincronizando clientes..." : "Sincronizar CRM / clientes")
+                    @(isRunningCrmClientsSync ? L("Sincronizando clientes...", "Sincronitzant clients...", "Syncing clients...") : L("Sincronizar CRM / clientes", "Sincronitzar CRM / clients", "Sync CRM / clients"))
                 </button>
                 <div class="list-block" style="margin-top: 1rem;">
                     @foreach (var status in crmClientsSyncStatuses)
                     {
                         <article class="list-item">
                             <strong>@status.CompanyName (@status.CompanyLegacyCenterCode)</strong>
-                            <span>@(string.IsNullOrWhiteSpace(status.LastStatus) ? "Sin sincronizar" : status.LastStatus)</span>
-                            <span>@(status.LastCompletedUtc?.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss") ?? "Nunca")</span>
-                            <span>Ins: @status.LastInserted · Act: @status.LastUpdated · Omi: @status.LastSkipped · Err: @status.LastErrors</span>
+                            <span>@(string.IsNullOrWhiteSpace(status.LastStatus) ? NotSyncedLabel : status.LastStatus)</span>
+                            <span>@(status.LastCompletedUtc?.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss") ?? NeverLabel)</span>
+                            <span>@FormatSyncCounters(status)</span>
                         </article>
                     }
                 </div>
             </article>
             <article class="info-card">
-                <p class="eyebrow">CRM / Representantes</p>
-                <h2>Sync legacy</h2>
-                <p class="muted">Replica representantes desde TEX.NET hacia la SaaS local. La sync manual refresca solo registros con origen legacy y deja intactos los cambios locales.</p>
+                <p class="eyebrow">@L("CRM / Representantes", "CRM / Representants", "CRM / Representatives")</p>
+                <h2>@LegacySyncLabel</h2>
+                <p class="muted">@L("Replica representantes desde TEX.NET hacia la SaaS local. La sync manual refresca solo registros con origen legacy y deja intactos los cambios locales.", "Replica representants des de TEX.NET cap a la SaaS local. La sync manual refresca només els registres amb origen legacy i deixa intactes els canvis locals.", "Replicates representatives from TEX.NET into the local SaaS. Manual sync refreshes only legacy-origin records and leaves local changes untouched.")</p>
                 <label class="field">
-                    <span>Company</span>
+                    <span>@CompanyLabel</span>
                     <InputSelect class="text-input" @bind-Value="selectedCrmRepresentativesSyncCompanyId">
-                        <option value="">Todas las companies del tenant</option>
+                        <option value="">@AllTenantCompaniesLabel</option>
                         @foreach (var company in companies)
                         {
                             <option value="@company.Id.ToString()">@company.Name (@company.LegacyCenterCode)</option>
@@ -156,28 +159,28 @@ else
                     </InputSelect>
                 </label>
                 <button class="primary-button" type="button" @onclick="RunCrmRepresentativesSyncAsync" disabled="@isRunningCrmRepresentativesSync">
-                    @(isRunningCrmRepresentativesSync ? "Sincronizando representantes..." : "Sincronizar CRM / representantes")
+                    @(isRunningCrmRepresentativesSync ? L("Sincronizando representantes...", "Sincronitzant representants...", "Syncing representatives...") : L("Sincronizar CRM / representantes", "Sincronitzar CRM / representants", "Sync CRM / representatives"))
                 </button>
                 <div class="list-block" style="margin-top: 1rem;">
                     @foreach (var status in crmRepresentativesSyncStatuses)
                     {
                         <article class="list-item">
                             <strong>@status.CompanyName (@status.CompanyLegacyCenterCode)</strong>
-                            <span>@(string.IsNullOrWhiteSpace(status.LastStatus) ? "Sin sincronizar" : status.LastStatus)</span>
-                            <span>@(status.LastCompletedUtc?.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss") ?? "Nunca")</span>
-                            <span>Ins: @status.LastInserted · Act: @status.LastUpdated · Omi: @status.LastSkipped · Err: @status.LastErrors</span>
+                            <span>@(string.IsNullOrWhiteSpace(status.LastStatus) ? NotSyncedLabel : status.LastStatus)</span>
+                            <span>@(status.LastCompletedUtc?.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss") ?? NeverLabel)</span>
+                            <span>@FormatSyncCounters(status)</span>
                         </article>
                     }
                 </div>
             </article>
             <article class="info-card">
-                <p class="eyebrow">CRM / Transportistas</p>
-                <h2>Sync legacy</h2>
-                <p class="muted">Replica transportistas desde TEX.NET hacia la SaaS local. La sync manual refresca solo registros con origen legacy y deja intactos los cambios locales.</p>
+                <p class="eyebrow">@L("CRM / Transportistas", "CRM / Transportistes", "CRM / Carriers")</p>
+                <h2>@LegacySyncLabel</h2>
+                <p class="muted">@L("Replica transportistas desde TEX.NET hacia la SaaS local. La sync manual refresca solo registros con origen legacy y deja intactos los cambios locales.", "Replica transportistes des de TEX.NET cap a la SaaS local. La sync manual refresca només els registres amb origen legacy i deixa intactes els canvis locals.", "Replicates carriers from TEX.NET into the local SaaS. Manual sync refreshes only legacy-origin records and leaves local changes untouched.")</p>
                 <label class="field">
-                    <span>Company</span>
+                    <span>@CompanyLabel</span>
                     <InputSelect class="text-input" @bind-Value="selectedCrmCarriersSyncCompanyId">
-                        <option value="">Todas las companies del tenant</option>
+                        <option value="">@AllTenantCompaniesLabel</option>
                         @foreach (var company in companies)
                         {
                             <option value="@company.Id.ToString()">@company.Name (@company.LegacyCenterCode)</option>
@@ -185,28 +188,28 @@ else
                     </InputSelect>
                 </label>
                 <button class="primary-button" type="button" @onclick="RunCrmCarriersSyncAsync" disabled="@isRunningCrmCarriersSync">
-                    @(isRunningCrmCarriersSync ? "Sincronizando transportistas..." : "Sincronizar CRM / transportistas")
+                    @(isRunningCrmCarriersSync ? L("Sincronizando transportistas...", "Sincronitzant transportistes...", "Syncing carriers...") : L("Sincronizar CRM / transportistas", "Sincronitzar CRM / transportistes", "Sync CRM / carriers"))
                 </button>
                 <div class="list-block" style="margin-top: 1rem;">
                     @foreach (var status in crmCarriersSyncStatuses)
                     {
                         <article class="list-item">
                             <strong>@status.CompanyName (@status.CompanyLegacyCenterCode)</strong>
-                            <span>@(string.IsNullOrWhiteSpace(status.LastStatus) ? "Sin sincronizar" : status.LastStatus)</span>
-                            <span>@(status.LastCompletedUtc?.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss") ?? "Nunca")</span>
-                            <span>Ins: @status.LastInserted · Act: @status.LastUpdated · Omi: @status.LastSkipped · Err: @status.LastErrors</span>
+                            <span>@(string.IsNullOrWhiteSpace(status.LastStatus) ? NotSyncedLabel : status.LastStatus)</span>
+                            <span>@(status.LastCompletedUtc?.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss") ?? NeverLabel)</span>
+                            <span>@FormatSyncCounters(status)</span>
                         </article>
                     }
                 </div>
             </article>
             <article class="info-card">
-                <p class="eyebrow">CRM / Talleres</p>
-                <h2>Sync legacy</h2>
-                <p class="muted">Replica talleres desde TEX.NET hacia la SaaS local. La sync manual refresca solo registros con origen legacy y deja intactos los cambios locales.</p>
+                <p class="eyebrow">@L("CRM / Talleres", "CRM / Tallers", "CRM / Workshops")</p>
+                <h2>@LegacySyncLabel</h2>
+                <p class="muted">@L("Replica talleres desde TEX.NET hacia la SaaS local. La sync manual refresca solo registros con origen legacy y deja intactos los cambios locales.", "Replica tallers des de TEX.NET cap a la SaaS local. La sync manual refresca només els registres amb origen legacy i deixa intactes els canvis locals.", "Replicates workshops from TEX.NET into the local SaaS. Manual sync refreshes only legacy-origin records and leaves local changes untouched.")</p>
                 <label class="field">
-                    <span>Company</span>
+                    <span>@CompanyLabel</span>
                     <InputSelect class="text-input" @bind-Value="selectedCrmWorkshopsSyncCompanyId">
-                        <option value="">Todas las companies del tenant</option>
+                        <option value="">@AllTenantCompaniesLabel</option>
                         @foreach (var company in companies)
                         {
                             <option value="@company.Id.ToString()">@company.Name (@company.LegacyCenterCode)</option>
@@ -214,28 +217,28 @@ else
                     </InputSelect>
                 </label>
                 <button class="primary-button" type="button" @onclick="RunCrmWorkshopsSyncAsync" disabled="@isRunningCrmWorkshopsSync">
-                    @(isRunningCrmWorkshopsSync ? "Sincronizando talleres..." : "Sincronizar CRM / talleres")
+                    @(isRunningCrmWorkshopsSync ? L("Sincronizando talleres...", "Sincronitzant tallers...", "Syncing workshops...") : L("Sincronizar CRM / talleres", "Sincronitzar CRM / tallers", "Sync CRM / workshops"))
                 </button>
                 <div class="list-block" style="margin-top: 1rem;">
                     @foreach (var status in crmWorkshopsSyncStatuses)
                     {
                         <article class="list-item">
                             <strong>@status.CompanyName (@status.CompanyLegacyCenterCode)</strong>
-                            <span>@(string.IsNullOrWhiteSpace(status.LastStatus) ? "Sin sincronizar" : status.LastStatus)</span>
-                            <span>@(status.LastCompletedUtc?.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss") ?? "Nunca")</span>
-                            <span>Ins: @status.LastInserted · Act: @status.LastUpdated · Omi: @status.LastSkipped · Err: @status.LastErrors</span>
+                            <span>@(string.IsNullOrWhiteSpace(status.LastStatus) ? NotSyncedLabel : status.LastStatus)</span>
+                            <span>@(status.LastCompletedUtc?.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss") ?? NeverLabel)</span>
+                            <span>@FormatSyncCounters(status)</span>
                         </article>
                     }
                 </div>
             </article>
             <article class="info-card">
-                <p class="eyebrow">ARTÍCULOS / Fornituras</p>
-                <h2>Sync legacy</h2>
-                <p class="muted">Replica fornituras desde TEX.NET hacia la SaaS local. La sync manual refresca solo registros con origen legacy y deja intactos los cambios locales.</p>
+                <p class="eyebrow">@L("ARTÍCULOS / Fornituras", "ARTICLES / Fornitures", "ARTICLES / Trims")</p>
+                <h2>@LegacySyncLabel</h2>
+                <p class="muted">@L("Replica fornituras desde TEX.NET hacia la SaaS local. La sync manual refresca solo registros con origen legacy y deja intactos los cambios locales.", "Replica fornitures des de TEX.NET cap a la SaaS local. La sync manual refresca només els registres amb origen legacy i deixa intactes els canvis locals.", "Replicates trims from TEX.NET into the local SaaS. Manual sync refreshes only legacy-origin records and leaves local changes untouched.")</p>
                 <label class="field">
-                    <span>Company</span>
+                    <span>@CompanyLabel</span>
                     <InputSelect class="text-input" @bind-Value="selectedArticleForniturasSyncCompanyId">
-                        <option value="">Todas las companies del tenant</option>
+                        <option value="">@AllTenantCompaniesLabel</option>
                         @foreach (var company in companies)
                         {
                             <option value="@company.Id.ToString()">@company.Name (@company.LegacyCenterCode)</option>
@@ -243,28 +246,28 @@ else
                     </InputSelect>
                 </label>
                 <button class="primary-button" type="button" @onclick="RunArticleForniturasSyncAsync" disabled="@isRunningArticleForniturasSync">
-                    @(isRunningArticleForniturasSync ? "Sincronizando fornituras..." : "Sincronizar artículos / fornituras")
+                    @(isRunningArticleForniturasSync ? L("Sincronizando fornituras...", "Sincronitzant fornitures...", "Syncing trims...") : L("Sincronizar artículos / fornituras", "Sincronitzar articles / fornitures", "Sync articles / trims"))
                 </button>
                 <div class="list-block" style="margin-top: 1rem;">
                     @foreach (var status in articleForniturasSyncStatuses)
                     {
                         <article class="list-item">
                             <strong>@status.CompanyName (@status.CompanyLegacyCenterCode)</strong>
-                            <span>@(string.IsNullOrWhiteSpace(status.LastStatus) ? "Sin sincronizar" : status.LastStatus)</span>
-                            <span>@(status.LastCompletedUtc?.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss") ?? "Nunca")</span>
-                            <span>Ins: @status.LastInserted · Act: @status.LastUpdated · Omi: @status.LastSkipped · Err: @status.LastErrors</span>
+                            <span>@(string.IsNullOrWhiteSpace(status.LastStatus) ? NotSyncedLabel : status.LastStatus)</span>
+                            <span>@(status.LastCompletedUtc?.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss") ?? NeverLabel)</span>
+                            <span>@FormatSyncCounters(status)</span>
                         </article>
                     }
                 </div>
             </article>
             <article class="info-card">
-                <p class="eyebrow">ARTÍCULOS / Hilos</p>
-                <h2>Sync legacy</h2>
-                <p class="muted">Replica hilos desde TEX.NET hacia la SaaS local. La sync manual refresca solo registros con origen legacy y deja intactos los cambios locales.</p>
+                <p class="eyebrow">@L("ARTÍCULOS / Hilos", "ARTICLES / Fils", "ARTICLES / Yarns")</p>
+                <h2>@LegacySyncLabel</h2>
+                <p class="muted">@L("Replica hilos desde TEX.NET hacia la SaaS local. La sync manual refresca solo registros con origen legacy y deja intactos los cambios locales.", "Replica fils des de TEX.NET cap a la SaaS local. La sync manual refresca només els registres amb origen legacy i deixa intactes els canvis locals.", "Replicates yarns from TEX.NET into the local SaaS. Manual sync refreshes only legacy-origin records and leaves local changes untouched.")</p>
                 <label class="field">
-                    <span>Company</span>
+                    <span>@CompanyLabel</span>
                     <InputSelect class="text-input" @bind-Value="selectedArticleHilosSyncCompanyId">
-                        <option value="">Todas las companies del tenant</option>
+                        <option value="">@AllTenantCompaniesLabel</option>
                         @foreach (var company in companies)
                         {
                             <option value="@company.Id.ToString()">@company.Name (@company.LegacyCenterCode)</option>
@@ -272,28 +275,28 @@ else
                     </InputSelect>
                 </label>
                 <button class="primary-button" type="button" @onclick="RunArticleHilosSyncAsync" disabled="@isRunningArticleHilosSync">
-                    @(isRunningArticleHilosSync ? "Sincronizando hilos..." : "Sincronizar artículos / hilos")
+                    @(isRunningArticleHilosSync ? L("Sincronizando hilos...", "Sincronitzant fils...", "Syncing yarns...") : L("Sincronizar artículos / hilos", "Sincronitzar articles / fils", "Sync articles / yarns"))
                 </button>
                 <div class="list-block" style="margin-top: 1rem;">
                     @foreach (var status in articleHilosSyncStatuses)
                     {
                         <article class="list-item">
                             <strong>@status.CompanyName (@status.CompanyLegacyCenterCode)</strong>
-                            <span>@(string.IsNullOrWhiteSpace(status.LastStatus) ? "Sin sincronizar" : status.LastStatus)</span>
-                            <span>@(status.LastCompletedUtc?.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss") ?? "Nunca")</span>
-                            <span>Ins: @status.LastInserted · Act: @status.LastUpdated · Omi: @status.LastSkipped · Err: @status.LastErrors</span>
+                            <span>@(string.IsNullOrWhiteSpace(status.LastStatus) ? NotSyncedLabel : status.LastStatus)</span>
+                            <span>@(status.LastCompletedUtc?.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss") ?? NeverLabel)</span>
+                            <span>@FormatSyncCounters(status)</span>
                         </article>
                     }
                 </div>
             </article>
             <article class="info-card">
-                <p class="eyebrow">ARTÍCULOS / Tejidos</p>
-                <h2>Sync legacy</h2>
-                <p class="muted">Replica tejidos desde TEX.NET hacia la SaaS local. La sync manual refresca solo registros con origen legacy y deja intactos los cambios locales.</p>
+                <p class="eyebrow">@L("ARTÍCULOS / Tejidos", "ARTICLES / Teixits", "ARTICLES / Fabrics")</p>
+                <h2>@LegacySyncLabel</h2>
+                <p class="muted">@L("Replica tejidos desde TEX.NET hacia la SaaS local. La sync manual refresca solo registros con origen legacy y deja intactos los cambios locales.", "Replica teixits des de TEX.NET cap a la SaaS local. La sync manual refresca només els registres amb origen legacy i deixa intactes els canvis locals.", "Replicates fabrics from TEX.NET into the local SaaS. Manual sync refreshes only legacy-origin records and leaves local changes untouched.")</p>
                 <label class="field">
-                    <span>Company</span>
+                    <span>@CompanyLabel</span>
                     <InputSelect class="text-input" @bind-Value="selectedArticleTejidosSyncCompanyId">
-                        <option value="">Todas las companies del tenant</option>
+                        <option value="">@AllTenantCompaniesLabel</option>
                         @foreach (var company in companies)
                         {
                             <option value="@company.Id.ToString()">@company.Name (@company.LegacyCenterCode)</option>
@@ -301,28 +304,28 @@ else
                     </InputSelect>
                 </label>
                 <button class="primary-button" type="button" @onclick="RunArticleTejidosSyncAsync" disabled="@isRunningArticleTejidosSync">
-                    @(isRunningArticleTejidosSync ? "Sincronizando tejidos..." : "Sincronizar artículos / tejidos")
+                    @(isRunningArticleTejidosSync ? L("Sincronizando tejidos...", "Sincronitzant teixits...", "Syncing fabrics...") : L("Sincronizar artículos / tejidos", "Sincronitzar articles / teixits", "Sync articles / fabrics"))
                 </button>
                 <div class="list-block" style="margin-top: 1rem;">
                     @foreach (var status in articleTejidosSyncStatuses)
                     {
                         <article class="list-item">
                             <strong>@status.CompanyName (@status.CompanyLegacyCenterCode)</strong>
-                            <span>@(string.IsNullOrWhiteSpace(status.LastStatus) ? "Sin sincronizar" : status.LastStatus)</span>
-                            <span>@(status.LastCompletedUtc?.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss") ?? "Nunca")</span>
-                            <span>Ins: @status.LastInserted · Act: @status.LastUpdated · Omi: @status.LastSkipped · Err: @status.LastErrors</span>
+                            <span>@(string.IsNullOrWhiteSpace(status.LastStatus) ? NotSyncedLabel : status.LastStatus)</span>
+                            <span>@(status.LastCompletedUtc?.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss") ?? NeverLabel)</span>
+                            <span>@FormatSyncCounters(status)</span>
                         </article>
                     }
                 </div>
             </article>
             <article class="info-card">
-                <p class="eyebrow">ARTÍCULOS / Muestras</p>
-                <h2>Sync legacy</h2>
-                <p class="muted">Replica muestras desde TEX.NET hacia la SaaS local. La sync manual refresca solo registros con origen legacy y deja intactos los cambios locales.</p>
+                <p class="eyebrow">@L("ARTÍCULOS / Muestras", "ARTICLES / Mostres", "ARTICLES / Samples")</p>
+                <h2>@LegacySyncLabel</h2>
+                <p class="muted">@L("Replica muestras desde TEX.NET hacia la SaaS local. La sync manual refresca solo registros con origen legacy y deja intactos los cambios locales.", "Replica mostres des de TEX.NET cap a la SaaS local. La sync manual refresca només els registres amb origen legacy i deixa intactes els canvis locals.", "Replicates samples from TEX.NET into the local SaaS. Manual sync refreshes only legacy-origin records and leaves local changes untouched.")</p>
                 <label class="field">
-                    <span>Company</span>
+                    <span>@CompanyLabel</span>
                     <InputSelect class="text-input" @bind-Value="selectedArticleMuestrasSyncCompanyId">
-                        <option value="">Todas las companies del tenant</option>
+                        <option value="">@AllTenantCompaniesLabel</option>
                         @foreach (var company in companies)
                         {
                             <option value="@company.Id.ToString()">@company.Name (@company.LegacyCenterCode)</option>
@@ -330,28 +333,28 @@ else
                     </InputSelect>
                 </label>
                 <button class="primary-button" type="button" @onclick="RunArticleMuestrasSyncAsync" disabled="@isRunningArticleMuestrasSync">
-                    @(isRunningArticleMuestrasSync ? "Sincronizando muestras..." : "Sincronizar artículos / muestras")
+                    @(isRunningArticleMuestrasSync ? L("Sincronizando muestras...", "Sincronitzant mostres...", "Syncing samples...") : L("Sincronizar artículos / muestras", "Sincronitzar articles / mostres", "Sync articles / samples"))
                 </button>
                 <div class="list-block" style="margin-top: 1rem;">
                     @foreach (var status in articleMuestrasSyncStatuses)
                     {
                         <article class="list-item">
                             <strong>@status.CompanyName (@status.CompanyLegacyCenterCode)</strong>
-                            <span>@(string.IsNullOrWhiteSpace(status.LastStatus) ? "Sin sincronizar" : status.LastStatus)</span>
-                            <span>@(status.LastCompletedUtc?.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss") ?? "Nunca")</span>
-                            <span>Ins: @status.LastInserted · Act: @status.LastUpdated · Omi: @status.LastSkipped · Err: @status.LastErrors</span>
+                            <span>@(string.IsNullOrWhiteSpace(status.LastStatus) ? NotSyncedLabel : status.LastStatus)</span>
+                            <span>@(status.LastCompletedUtc?.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss") ?? NeverLabel)</span>
+                            <span>@FormatSyncCounters(status)</span>
                         </article>
                     }
                 </div>
             </article>
             <article class="info-card">
-                <p class="eyebrow">ARTÍCULOS / Models</p>
-                <h2>Sync legacy</h2>
-                <p class="muted">Replica models desde TEX.NET hacia la SaaS local. La sync manual refresca solo registros con origen legacy y deja intactos los cambios locales.</p>
+                <p class="eyebrow">@L("ARTÍCULOS / Models", "ARTICLES / Models", "ARTICLES / Models")</p>
+                <h2>@LegacySyncLabel</h2>
+                <p class="muted">@L("Replica models desde TEX.NET hacia la SaaS local. La sync manual refresca solo registros con origen legacy y deja intactos los cambios locales.", "Replica models des de TEX.NET cap a la SaaS local. La sync manual refresca només els registres amb origen legacy i deixa intactes els canvis locals.", "Replicates models from TEX.NET into the local SaaS. Manual sync refreshes only legacy-origin records and leaves local changes untouched.")</p>
                 <label class="field">
-                    <span>Company</span>
+                    <span>@CompanyLabel</span>
                     <InputSelect class="text-input" @bind-Value="selectedArticleModelsSyncCompanyId">
-                        <option value="">Todas las companies del tenant</option>
+                        <option value="">@AllTenantCompaniesLabel</option>
                         @foreach (var company in companies)
                         {
                             <option value="@company.Id.ToString()">@company.Name (@company.LegacyCenterCode)</option>
@@ -359,28 +362,28 @@ else
                     </InputSelect>
                 </label>
                 <button class="primary-button" type="button" @onclick="RunArticleModelsSyncAsync" disabled="@isRunningArticleModelsSync">
-                    @(isRunningArticleModelsSync ? "Sincronizando models..." : "Sincronizar artículos / models")
+                    @(isRunningArticleModelsSync ? L("Sincronizando models...", "Sincronitzant models...", "Syncing models...") : L("Sincronizar artículos / models", "Sincronitzar articles / models", "Sync articles / models"))
                 </button>
                 <div class="list-block" style="margin-top: 1rem;">
                     @foreach (var status in articleModelsSyncStatuses)
                     {
                         <article class="list-item">
                             <strong>@status.CompanyName (@status.CompanyLegacyCenterCode)</strong>
-                            <span>@(string.IsNullOrWhiteSpace(status.LastStatus) ? "Sin sincronizar" : status.LastStatus)</span>
-                            <span>@(status.LastCompletedUtc?.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss") ?? "Nunca")</span>
-                            <span>Ins: @status.LastInserted · Act: @status.LastUpdated · Omi: @status.LastSkipped · Err: @status.LastErrors</span>
+                            <span>@(string.IsNullOrWhiteSpace(status.LastStatus) ? NotSyncedLabel : status.LastStatus)</span>
+                            <span>@(status.LastCompletedUtc?.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss") ?? NeverLabel)</span>
+                            <span>@FormatSyncCounters(status)</span>
                         </article>
                     }
                 </div>
             </article>
             <article class="info-card">
-                <p class="eyebrow">ARTÍCULOS / Disposiciones</p>
-                <h2>Sync legacy</h2>
-                <p class="muted">Replica disposiciones desde TEX.NET hacia la SaaS local. La sync manual refresca solo registros con origen legacy y deja intactos los cambios locales.</p>
+                <p class="eyebrow">@L("ARTÍCULOS / Disposiciones", "ARTICLES / Disposicions", "ARTICLES / Dispositions")</p>
+                <h2>@LegacySyncLabel</h2>
+                <p class="muted">@L("Replica disposiciones desde TEX.NET hacia la SaaS local. La sync manual refresca solo registros con origen legacy y deja intactos los cambios locales.", "Replica disposicions des de TEX.NET cap a la SaaS local. La sync manual refresca només els registres amb origen legacy i deixa intactes els canvis locals.", "Replicates dispositions from TEX.NET into the local SaaS. Manual sync refreshes only legacy-origin records and leaves local changes untouched.")</p>
                 <label class="field">
-                    <span>Company</span>
+                    <span>@CompanyLabel</span>
                     <InputSelect class="text-input" @bind-Value="selectedArticleDispositionsSyncCompanyId">
-                        <option value="">Todas las companies del tenant</option>
+                        <option value="">@AllTenantCompaniesLabel</option>
                         @foreach (var company in companies)
                         {
                             <option value="@company.Id.ToString()">@company.Name (@company.LegacyCenterCode)</option>
@@ -388,28 +391,28 @@ else
                     </InputSelect>
                 </label>
                 <button class="primary-button" type="button" @onclick="RunArticleDispositionsSyncAsync" disabled="@isRunningArticleDispositionsSync">
-                    @(isRunningArticleDispositionsSync ? "Sincronizando disposiciones..." : "Sincronizar artículos / disposiciones")
+                    @(isRunningArticleDispositionsSync ? L("Sincronizando disposiciones...", "Sincronitzant disposicions...", "Syncing dispositions...") : L("Sincronizar artículos / disposiciones", "Sincronitzar articles / disposicions", "Sync articles / dispositions"))
                 </button>
                 <div class="list-block" style="margin-top: 1rem;">
                     @foreach (var status in articleDispositionsSyncStatuses)
                     {
                         <article class="list-item">
                             <strong>@status.CompanyName (@status.CompanyLegacyCenterCode)</strong>
-                            <span>@(string.IsNullOrWhiteSpace(status.LastStatus) ? "Sin sincronizar" : status.LastStatus)</span>
-                            <span>@(status.LastCompletedUtc?.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss") ?? "Nunca")</span>
-                            <span>Ins: @status.LastInserted · Act: @status.LastUpdated · Omi: @status.LastSkipped · Err: @status.LastErrors</span>
+                            <span>@(string.IsNullOrWhiteSpace(status.LastStatus) ? NotSyncedLabel : status.LastStatus)</span>
+                            <span>@(status.LastCompletedUtc?.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss") ?? NeverLabel)</span>
+                            <span>@FormatSyncCounters(status)</span>
                         </article>
                     }
                 </div>
             </article>
             <article class="info-card">
-                <p class="eyebrow">BASE DE DATOS / Bancs · Caixes</p>
-                <h2>Sync legacy</h2>
-                <p class="muted">Replica bancos y cajas desde TEX.NET hacia la SaaS local. La sync manual refresca solo registros con origen legacy y deja intactos los cambios locales.</p>
+                <p class="eyebrow">@L("BASE DE DATOS / Bancos · Cajas", "BASE DE DADES / Bancs · Caixes", "DATABASE / Banks · Cashboxes")</p>
+                <h2>@LegacySyncLabel</h2>
+                <p class="muted">@L("Replica bancos y cajas desde TEX.NET hacia la SaaS local. La sync manual refresca solo registros con origen legacy y deja intactos los cambios locales.", "Replica bancs i caixes des de TEX.NET cap a la SaaS local. La sync manual refresca només els registres amb origen legacy i deixa intactes els canvis locals.", "Replicates banks and cashboxes from TEX.NET into the local SaaS. Manual sync refreshes only legacy-origin records and leaves local changes untouched.")</p>
                 <label class="field">
-                    <span>Company</span>
+                    <span>@CompanyLabel</span>
                     <InputSelect class="text-input" @bind-Value="selectedBaseBanksCashboxesSyncCompanyId">
-                        <option value="">Todas las companies del tenant</option>
+                        <option value="">@AllTenantCompaniesLabel</option>
                         @foreach (var company in companies)
                         {
                             <option value="@company.Id.ToString()">@company.Name (@company.LegacyCenterCode)</option>
@@ -417,28 +420,28 @@ else
                     </InputSelect>
                 </label>
                 <button class="primary-button" type="button" @onclick="RunBaseBanksCashboxesSyncAsync" disabled="@isRunningBaseBanksCashboxesSync">
-                    @(isRunningBaseBanksCashboxesSync ? "Sincronizando bancos..." : "Sincronizar base de datos / bancos · cajas")
+                    @(isRunningBaseBanksCashboxesSync ? L("Sincronizando bancos...", "Sincronitzant bancs...", "Syncing banks...") : L("Sincronizar base de datos / bancos · cajas", "Sincronitzar base de dades / bancs · caixes", "Sync database / banks · cashboxes"))
                 </button>
                 <div class="list-block" style="margin-top: 1rem;">
                     @foreach (var status in baseBanksCashboxesSyncStatuses)
                     {
                         <article class="list-item">
                             <strong>@status.CompanyName (@status.CompanyLegacyCenterCode)</strong>
-                            <span>@(string.IsNullOrWhiteSpace(status.LastStatus) ? "Sin sincronizar" : status.LastStatus)</span>
-                            <span>@(status.LastCompletedUtc?.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss") ?? "Nunca")</span>
-                            <span>Ins: @status.LastInserted · Act: @status.LastUpdated · Omi: @status.LastSkipped · Err: @status.LastErrors</span>
+                            <span>@(string.IsNullOrWhiteSpace(status.LastStatus) ? NotSyncedLabel : status.LastStatus)</span>
+                            <span>@(status.LastCompletedUtc?.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss") ?? NeverLabel)</span>
+                            <span>@FormatSyncCounters(status)</span>
                         </article>
                     }
                 </div>
             </article>
             <article class="info-card">
-                <p class="eyebrow">BASE DE DATOS / Formes de pagament</p>
-                <h2>Sync legacy</h2>
-                <p class="muted">Replica formas de pago desde TEX.NET hacia la SaaS local. La sync manual refresca solo registros con origen legacy y deja intactos los cambios locales.</p>
+                <p class="eyebrow">@L("BASE DE DATOS / Formas de pago", "BASE DE DADES / Formes de pagament", "DATABASE / Payment methods")</p>
+                <h2>@LegacySyncLabel</h2>
+                <p class="muted">@L("Replica formas de pago desde TEX.NET hacia la SaaS local. La sync manual refresca solo registros con origen legacy y deja intactos los cambios locales.", "Replica formes de pagament des de TEX.NET cap a la SaaS local. La sync manual refresca només els registres amb origen legacy i deixa intactes els canvis locals.", "Replicates payment methods from TEX.NET into the local SaaS. Manual sync refreshes only legacy-origin records and leaves local changes untouched.")</p>
                 <label class="field">
-                    <span>Company</span>
+                    <span>@CompanyLabel</span>
                     <InputSelect class="text-input" @bind-Value="selectedBasePaymentMethodsSyncCompanyId">
-                        <option value="">Todas las companies del tenant</option>
+                        <option value="">@AllTenantCompaniesLabel</option>
                         @foreach (var company in companies)
                         {
                             <option value="@company.Id.ToString()">@company.Name (@company.LegacyCenterCode)</option>
@@ -446,28 +449,28 @@ else
                     </InputSelect>
                 </label>
                 <button class="primary-button" type="button" @onclick="RunBasePaymentMethodsSyncAsync" disabled="@isRunningBasePaymentMethodsSync">
-                    @(isRunningBasePaymentMethodsSync ? "Sincronizando formas de pago..." : "Sincronizar base de datos / formas de pago")
+                    @(isRunningBasePaymentMethodsSync ? L("Sincronizando formas de pago...", "Sincronitzant formes de pagament...", "Syncing payment methods...") : L("Sincronizar base de datos / formas de pago", "Sincronitzar base de dades / formes de pagament", "Sync database / payment methods"))
                 </button>
                 <div class="list-block" style="margin-top: 1rem;">
                     @foreach (var status in basePaymentMethodsSyncStatuses)
                     {
                         <article class="list-item">
                             <strong>@status.CompanyName (@status.CompanyLegacyCenterCode)</strong>
-                            <span>@(string.IsNullOrWhiteSpace(status.LastStatus) ? "Sin sincronizar" : status.LastStatus)</span>
-                            <span>@(status.LastCompletedUtc?.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss") ?? "Nunca")</span>
-                            <span>Ins: @status.LastInserted · Act: @status.LastUpdated · Omi: @status.LastSkipped · Err: @status.LastErrors</span>
+                            <span>@(string.IsNullOrWhiteSpace(status.LastStatus) ? NotSyncedLabel : status.LastStatus)</span>
+                            <span>@(status.LastCompletedUtc?.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss") ?? NeverLabel)</span>
+                            <span>@FormatSyncCounters(status)</span>
                         </article>
                     }
                 </div>
             </article>
             <article class="info-card">
-                <p class="eyebrow">BASE DE DATOS / Operacions</p>
-                <h2>Sync legacy</h2>
-                <p class="muted">Replica operaciones desde TEX.NET hacia la SaaS local. La sync manual refresca solo registros con origen legacy y deja intactos los cambios locales.</p>
+                <p class="eyebrow">@L("BASE DE DATOS / Operaciones", "BASE DE DADES / Operacions", "DATABASE / Operations")</p>
+                <h2>@LegacySyncLabel</h2>
+                <p class="muted">@L("Replica operaciones desde TEX.NET hacia la SaaS local. La sync manual refresca solo registros con origen legacy y deja intactos los cambios locales.", "Replica operacions des de TEX.NET cap a la SaaS local. La sync manual refresca només els registres amb origen legacy i deixa intactes els canvis locals.", "Replicates operations from TEX.NET into the local SaaS. Manual sync refreshes only legacy-origin records and leaves local changes untouched.")</p>
                 <label class="field">
-                    <span>Company</span>
+                    <span>@CompanyLabel</span>
                     <InputSelect class="text-input" @bind-Value="selectedBaseOperationsSyncCompanyId">
-                        <option value="">Todas las companies del tenant</option>
+                        <option value="">@AllTenantCompaniesLabel</option>
                         @foreach (var company in companies)
                         {
                             <option value="@company.Id.ToString()">@company.Name (@company.LegacyCenterCode)</option>
@@ -475,28 +478,28 @@ else
                     </InputSelect>
                 </label>
                 <button class="primary-button" type="button" @onclick="RunBaseOperationsSyncAsync" disabled="@isRunningBaseOperationsSync">
-                    @(isRunningBaseOperationsSync ? "Sincronizando operaciones..." : "Sincronizar base de datos / operacions")
+                    @(isRunningBaseOperationsSync ? L("Sincronizando operaciones...", "Sincronitzant operacions...", "Syncing operations...") : L("Sincronizar base de datos / operaciones", "Sincronitzar base de dades / operacions", "Sync database / operations"))
                 </button>
                 <div class="list-block" style="margin-top: 1rem;">
                     @foreach (var status in baseOperationsSyncStatuses)
                     {
                         <article class="list-item">
                             <strong>@status.CompanyName (@status.CompanyLegacyCenterCode)</strong>
-                            <span>@(string.IsNullOrWhiteSpace(status.LastStatus) ? "Sin sincronizar" : status.LastStatus)</span>
-                            <span>@(status.LastCompletedUtc?.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss") ?? "Nunca")</span>
-                            <span>Ins: @status.LastInserted · Act: @status.LastUpdated · Omi: @status.LastSkipped · Err: @status.LastErrors</span>
+                            <span>@(string.IsNullOrWhiteSpace(status.LastStatus) ? NotSyncedLabel : status.LastStatus)</span>
+                            <span>@(status.LastCompletedUtc?.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss") ?? NeverLabel)</span>
+                            <span>@FormatSyncCounters(status)</span>
                         </article>
                     }
                 </div>
             </article>
             <article class="info-card">
-                <p class="eyebrow">BASE DE DATOS / Màquines</p>
-                <h2>Sync legacy</h2>
-                <p class="muted">Replica máquinas desde TEX.NET hacia la SaaS local. La sync manual refresca solo registros con origen legacy y deja intactos los cambios locales.</p>
+                <p class="eyebrow">@L("BASE DE DATOS / Máquinas", "BASE DE DADES / Màquines", "DATABASE / Machines")</p>
+                <h2>@LegacySyncLabel</h2>
+                <p class="muted">@L("Replica máquinas desde TEX.NET hacia la SaaS local. La sync manual refresca solo registros con origen legacy y deja intactos los cambios locales.", "Replica màquines des de TEX.NET cap a la SaaS local. La sync manual refresca només els registres amb origen legacy i deixa intactes els canvis locals.", "Replicates machines from TEX.NET into the local SaaS. Manual sync refreshes only legacy-origin records and leaves local changes untouched.")</p>
                 <label class="field">
-                    <span>Company</span>
+                    <span>@CompanyLabel</span>
                     <InputSelect class="text-input" @bind-Value="selectedBaseMachinesSyncCompanyId">
-                        <option value="">Todas las companies del tenant</option>
+                        <option value="">@AllTenantCompaniesLabel</option>
                         @foreach (var company in companies)
                         {
                             <option value="@company.Id.ToString()">@company.Name (@company.LegacyCenterCode)</option>
@@ -504,28 +507,28 @@ else
                     </InputSelect>
                 </label>
                 <button class="primary-button" type="button" @onclick="RunBaseMachinesSyncAsync" disabled="@isRunningBaseMachinesSync">
-                    @(isRunningBaseMachinesSync ? "Sincronizando máquinas..." : "Sincronizar base de datos / máquinas")
+                    @(isRunningBaseMachinesSync ? L("Sincronizando máquinas...", "Sincronitzant màquines...", "Syncing machines...") : L("Sincronizar base de datos / máquinas", "Sincronitzar base de dades / màquines", "Sync database / machines"))
                 </button>
                 <div class="list-block" style="margin-top: 1rem;">
                     @foreach (var status in baseMachinesSyncStatuses)
                     {
                         <article class="list-item">
                             <strong>@status.CompanyName (@status.CompanyLegacyCenterCode)</strong>
-                            <span>@(string.IsNullOrWhiteSpace(status.LastStatus) ? "Sin sincronizar" : status.LastStatus)</span>
-                            <span>@(status.LastCompletedUtc?.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss") ?? "Nunca")</span>
-                            <span>Ins: @status.LastInserted · Act: @status.LastUpdated · Omi: @status.LastSkipped · Err: @status.LastErrors</span>
+                            <span>@(string.IsNullOrWhiteSpace(status.LastStatus) ? NotSyncedLabel : status.LastStatus)</span>
+                            <span>@(status.LastCompletedUtc?.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss") ?? NeverLabel)</span>
+                            <span>@FormatSyncCounters(status)</span>
                         </article>
                     }
                 </div>
             </article>
             <article class="info-card">
-                <p class="eyebrow">BASE DE DATOS / Temporades</p>
-                <h2>Sync legacy</h2>
-                <p class="muted">Replica temporadas desde TEX.NET hacia la SaaS local. La sync manual refresca solo registros con origen legacy y deja intactos los cambios locales.</p>
+                <p class="eyebrow">@L("BASE DE DATOS / Temporadas", "BASE DE DADES / Temporades", "DATABASE / Seasons")</p>
+                <h2>@LegacySyncLabel</h2>
+                <p class="muted">@L("Replica temporadas desde TEX.NET hacia la SaaS local. La sync manual refresca solo registros con origen legacy y deja intactos los cambios locales.", "Replica temporades des de TEX.NET cap a la SaaS local. La sync manual refresca només els registres amb origen legacy i deixa intactes els canvis locals.", "Replicates seasons from TEX.NET into the local SaaS. Manual sync refreshes only legacy-origin records and leaves local changes untouched.")</p>
                 <label class="field">
-                    <span>Company</span>
+                    <span>@CompanyLabel</span>
                     <InputSelect class="text-input" @bind-Value="selectedBaseSeasonsSyncCompanyId">
-                        <option value="">Todas las companies del tenant</option>
+                        <option value="">@AllTenantCompaniesLabel</option>
                         @foreach (var company in companies)
                         {
                             <option value="@company.Id.ToString()">@company.Name (@company.LegacyCenterCode)</option>
@@ -533,28 +536,28 @@ else
                     </InputSelect>
                 </label>
                 <button class="primary-button" type="button" @onclick="RunBaseSeasonsSyncAsync" disabled="@isRunningBaseSeasonsSync">
-                    @(isRunningBaseSeasonsSync ? "Sincronizando temporadas..." : "Sincronizar base de datos / temporadas")
+                    @(isRunningBaseSeasonsSync ? L("Sincronizando temporadas...", "Sincronitzant temporades...", "Syncing seasons...") : L("Sincronizar base de datos / temporadas", "Sincronitzar base de dades / temporades", "Sync database / seasons"))
                 </button>
                 <div class="list-block" style="margin-top: 1rem;">
                     @foreach (var status in baseSeasonsSyncStatuses)
                     {
                         <article class="list-item">
                             <strong>@status.CompanyName (@status.CompanyLegacyCenterCode)</strong>
-                            <span>@(string.IsNullOrWhiteSpace(status.LastStatus) ? "Sin sincronizar" : status.LastStatus)</span>
-                            <span>@(status.LastCompletedUtc?.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss") ?? "Nunca")</span>
-                            <span>Ins: @status.LastInserted · Act: @status.LastUpdated · Omi: @status.LastSkipped · Err: @status.LastErrors</span>
+                            <span>@(string.IsNullOrWhiteSpace(status.LastStatus) ? NotSyncedLabel : status.LastStatus)</span>
+                            <span>@(status.LastCompletedUtc?.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss") ?? NeverLabel)</span>
+                            <span>@FormatSyncCounters(status)</span>
                         </article>
                     }
                 </div>
             </article>
             <article class="info-card">
-                <p class="eyebrow">BASE DE DATOS / Tipus d'IVA</p>
-                <h2>Sync legacy</h2>
-                <p class="muted">Replica tipos de IVA desde TEX.NET hacia la SaaS local. La sync manual refresca solo registros con origen legacy y deja intactos los cambios locales.</p>
+                <p class="eyebrow">@L("BASE DE DATOS / Tipos de IVA", "BASE DE DADES / Tipus d'IVA", "DATABASE / VAT types")</p>
+                <h2>@LegacySyncLabel</h2>
+                <p class="muted">@L("Replica tipos de IVA desde TEX.NET hacia la SaaS local. La sync manual refresca solo registros con origen legacy y deja intactos los cambios locales.", "Replica tipus d'IVA des de TEX.NET cap a la SaaS local. La sync manual refresca només els registres amb origen legacy i deixa intactes els canvis locals.", "Replicates VAT types from TEX.NET into the local SaaS. Manual sync refreshes only legacy-origin records and leaves local changes untouched.")</p>
                 <label class="field">
-                    <span>Company</span>
+                    <span>@CompanyLabel</span>
                     <InputSelect class="text-input" @bind-Value="selectedBaseVatTypesSyncCompanyId">
-                        <option value="">Todas las companies del tenant</option>
+                        <option value="">@AllTenantCompaniesLabel</option>
                         @foreach (var company in companies)
                         {
                             <option value="@company.Id.ToString()">@company.Name (@company.LegacyCenterCode)</option>
@@ -562,28 +565,28 @@ else
                     </InputSelect>
                 </label>
                 <button class="primary-button" type="button" @onclick="RunBaseVatTypesSyncAsync" disabled="@isRunningBaseVatTypesSync">
-                    @(isRunningBaseVatTypesSync ? "Sincronizando tipos de IVA..." : "Sincronizar base de datos / tipos de IVA")
+                    @(isRunningBaseVatTypesSync ? L("Sincronizando tipos de IVA...", "Sincronitzant tipus d'IVA...", "Syncing VAT types...") : L("Sincronizar base de datos / tipos de IVA", "Sincronitzar base de dades / tipus d'IVA", "Sync database / VAT types"))
                 </button>
                 <div class="list-block" style="margin-top: 1rem;">
                     @foreach (var status in baseVatTypesSyncStatuses)
                     {
                         <article class="list-item">
                             <strong>@status.CompanyName (@status.CompanyLegacyCenterCode)</strong>
-                            <span>@(string.IsNullOrWhiteSpace(status.LastStatus) ? "Sin sincronizar" : status.LastStatus)</span>
-                            <span>@(status.LastCompletedUtc?.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss") ?? "Nunca")</span>
-                            <span>Ins: @status.LastInserted · Act: @status.LastUpdated · Omi: @status.LastSkipped · Err: @status.LastErrors</span>
+                            <span>@(string.IsNullOrWhiteSpace(status.LastStatus) ? NotSyncedLabel : status.LastStatus)</span>
+                            <span>@(status.LastCompletedUtc?.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss") ?? NeverLabel)</span>
+                            <span>@FormatSyncCounters(status)</span>
                         </article>
                     }
                 </div>
             </article>
             <article class="info-card">
-                <p class="eyebrow">BASE DE DATOS / Incoterms</p>
-                <h2>Sync legacy</h2>
-                <p class="muted">Replica incoterms desde TEX.NET hacia la SaaS local. La sync manual refresca solo registros con origen legacy y deja intactos los cambios locales.</p>
+                <p class="eyebrow">@L("BASE DE DATOS / Incoterms", "BASE DE DADES / Incoterms", "DATABASE / Incoterms")</p>
+                <h2>@LegacySyncLabel</h2>
+                <p class="muted">@L("Replica incoterms desde TEX.NET hacia la SaaS local. La sync manual refresca solo registros con origen legacy y deja intactos los cambios locales.", "Replica incoterms des de TEX.NET cap a la SaaS local. La sync manual refresca només els registres amb origen legacy i deixa intactes els canvis locals.", "Replicates Incoterms from TEX.NET into the local SaaS. Manual sync refreshes only legacy-origin records and leaves local changes untouched.")</p>
                 <label class="field">
-                    <span>Company</span>
+                    <span>@CompanyLabel</span>
                     <InputSelect class="text-input" @bind-Value="selectedBaseIncotermsSyncCompanyId">
-                        <option value="">Todas las companies del tenant</option>
+                        <option value="">@AllTenantCompaniesLabel</option>
                         @foreach (var company in companies)
                         {
                             <option value="@company.Id.ToString()">@company.Name (@company.LegacyCenterCode)</option>
@@ -591,28 +594,28 @@ else
                     </InputSelect>
                 </label>
                 <button class="primary-button" type="button" @onclick="RunBaseIncotermsSyncAsync" disabled="@isRunningBaseIncotermsSync">
-                    @(isRunningBaseIncotermsSync ? "Sincronizando incoterms..." : "Sincronizar base de datos / incoterms")
+                    @(isRunningBaseIncotermsSync ? L("Sincronizando incoterms...", "Sincronitzant incoterms...", "Syncing Incoterms...") : L("Sincronizar base de datos / incoterms", "Sincronitzar base de dades / incoterms", "Sync database / Incoterms"))
                 </button>
                 <div class="list-block" style="margin-top: 1rem;">
                     @foreach (var status in baseIncotermsSyncStatuses)
                     {
                         <article class="list-item">
                             <strong>@status.CompanyName (@status.CompanyLegacyCenterCode)</strong>
-                            <span>@(string.IsNullOrWhiteSpace(status.LastStatus) ? "Sin sincronizar" : status.LastStatus)</span>
-                            <span>@(status.LastCompletedUtc?.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss") ?? "Nunca")</span>
-                            <span>Ins: @status.LastInserted · Act: @status.LastUpdated · Omi: @status.LastSkipped · Err: @status.LastErrors</span>
+                            <span>@(string.IsNullOrWhiteSpace(status.LastStatus) ? NotSyncedLabel : status.LastStatus)</span>
+                            <span>@(status.LastCompletedUtc?.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss") ?? NeverLabel)</span>
+                            <span>@FormatSyncCounters(status)</span>
                         </article>
                     }
                 </div>
             </article>
             <article class="info-card">
-                <p class="eyebrow">Compras / Proveedores</p>
-                <h2>Sync legacy</h2>
-                <p class="muted">Replica proveedores desde TEX.NET hacia la SaaS local. La sync manual refresca solo registros con origen legacy y deja intactos los cambios locales.</p>
+                <p class="eyebrow">@L("Compras / Proveedores", "Compres / Proveïdors", "Purchases / Suppliers")</p>
+                <h2>@LegacySyncLabel</h2>
+                <p class="muted">@L("Replica proveedores desde TEX.NET hacia la SaaS local. La sync manual refresca solo registros con origen legacy y deja intactos los cambios locales.", "Replica proveïdors des de TEX.NET cap a la SaaS local. La sync manual refresca només els registres amb origen legacy i deixa intactes els canvis locals.", "Replicates suppliers from TEX.NET into the local SaaS. Manual sync refreshes only legacy-origin records and leaves local changes untouched.")</p>
                 <label class="field">
-                    <span>Company</span>
+                    <span>@CompanyLabel</span>
                     <InputSelect class="text-input" @bind-Value="selectedCrmSuppliersSyncCompanyId">
-                        <option value="">Todas las companies del tenant</option>
+                        <option value="">@AllTenantCompaniesLabel</option>
                         @foreach (var company in companies)
                         {
                             <option value="@company.Id.ToString()">@company.Name (@company.LegacyCenterCode)</option>
@@ -620,28 +623,28 @@ else
                     </InputSelect>
                 </label>
                 <button class="primary-button" type="button" @onclick="RunCrmSuppliersSyncAsync" disabled="@isRunningCrmSuppliersSync">
-                    @(isRunningCrmSuppliersSync ? "Sincronizando proveedores..." : "Sincronizar compras / proveedores")
+                    @(isRunningCrmSuppliersSync ? L("Sincronizando proveedores...", "Sincronitzant proveïdors...", "Syncing suppliers...") : L("Sincronizar compras / proveedores", "Sincronitzar compres / proveïdors", "Sync purchases / suppliers"))
                 </button>
                 <div class="list-block" style="margin-top: 1rem;">
                     @foreach (var status in crmSuppliersSyncStatuses)
                     {
                         <article class="list-item">
                             <strong>@status.CompanyName (@status.CompanyLegacyCenterCode)</strong>
-                            <span>@(string.IsNullOrWhiteSpace(status.LastStatus) ? "Sin sincronizar" : status.LastStatus)</span>
-                            <span>@(status.LastCompletedUtc?.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss") ?? "Nunca")</span>
-                            <span>Ins: @status.LastInserted · Act: @status.LastUpdated · Omi: @status.LastSkipped · Err: @status.LastErrors</span>
+                            <span>@(string.IsNullOrWhiteSpace(status.LastStatus) ? NotSyncedLabel : status.LastStatus)</span>
+                            <span>@(status.LastCompletedUtc?.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss") ?? NeverLabel)</span>
+                            <span>@FormatSyncCounters(status)</span>
                         </article>
                     }
                 </div>
             </article>
             <article class="info-card">
-                <p class="eyebrow">Compras / Pedidos</p>
-                <h2>Sync legacy</h2>
-                <p class="muted">Replica pedidos de compra desde TEX.NET hacia la SaaS local. La sync manual refresca solo registros con origen legacy y deja intactos los cambios locales.</p>
+                <p class="eyebrow">@L("Compras / Pedidos", "Compres / Comandes", "Purchases / Orders")</p>
+                <h2>@LegacySyncLabel</h2>
+                <p class="muted">@L("Replica pedidos de compra desde TEX.NET hacia la SaaS local. La sync manual refresca solo registros con origen legacy y deja intactos los cambios locales.", "Replica comandes de compra des de TEX.NET cap a la SaaS local. La sync manual refresca només els registres amb origen legacy i deixa intactes els canvis locals.", "Replicates purchase orders from TEX.NET into the local SaaS. Manual sync refreshes only legacy-origin records and leaves local changes untouched.")</p>
                 <label class="field">
-                    <span>Company</span>
+                    <span>@CompanyLabel</span>
                     <InputSelect class="text-input" @bind-Value="selectedPurchaseOrdersSyncCompanyId">
-                        <option value="">Todas las companies del tenant</option>
+                        <option value="">@AllTenantCompaniesLabel</option>
                         @foreach (var company in companies)
                         {
                             <option value="@company.Id.ToString()">@company.Name (@company.LegacyCenterCode)</option>
@@ -649,28 +652,28 @@ else
                     </InputSelect>
                 </label>
                 <button class="primary-button" type="button" @onclick="RunPurchaseOrdersSyncAsync" disabled="@isRunningPurchaseOrdersSync">
-                    @(isRunningPurchaseOrdersSync ? "Sincronizando pedidos de compra..." : "Sincronizar compras / pedidos")
+                    @(isRunningPurchaseOrdersSync ? L("Sincronizando pedidos de compra...", "Sincronitzant comandes de compra...", "Syncing purchase orders...") : L("Sincronizar compras / pedidos", "Sincronitzar compres / comandes", "Sync purchases / orders"))
                 </button>
                 <div class="list-block" style="margin-top: 1rem;">
                     @foreach (var status in purchaseOrdersSyncStatuses)
                     {
                         <article class="list-item">
                             <strong>@status.CompanyName (@status.CompanyLegacyCenterCode)</strong>
-                            <span>@(string.IsNullOrWhiteSpace(status.LastStatus) ? "Sin sincronizar" : status.LastStatus)</span>
-                            <span>@(status.LastCompletedUtc?.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss") ?? "Nunca")</span>
-                            <span>Ins: @status.LastInserted · Act: @status.LastUpdated · Omi: @status.LastSkipped · Err: @status.LastErrors</span>
+                            <span>@(string.IsNullOrWhiteSpace(status.LastStatus) ? NotSyncedLabel : status.LastStatus)</span>
+                            <span>@(status.LastCompletedUtc?.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss") ?? NeverLabel)</span>
+                            <span>@FormatSyncCounters(status)</span>
                         </article>
                     }
                 </div>
             </article>
             <article class="info-card">
-                <p class="eyebrow">Compras / Recepciones</p>
-                <h2>Sync legacy</h2>
-                <p class="muted">Replica albaranes de compra desde TEX.NET hacia la SaaS local. La sync manual refresca solo registros con origen legacy y deja intactos los cambios locales.</p>
+                <p class="eyebrow">@L("Compras / Recepciones", "Compres / Recepcions", "Purchases / Receipts")</p>
+                <h2>@LegacySyncLabel</h2>
+                <p class="muted">@L("Replica albaranes de compra desde TEX.NET hacia la SaaS local. La sync manual refresca solo registros con origen legacy y deja intactos los cambios locales.", "Replica albarans de compra des de TEX.NET cap a la SaaS local. La sync manual refresca només els registres amb origen legacy i deixa intactes els canvis locals.", "Replicates purchase receipts from TEX.NET into the local SaaS. Manual sync refreshes only legacy-origin records and leaves local changes untouched.")</p>
                 <label class="field">
-                    <span>Company</span>
+                    <span>@CompanyLabel</span>
                     <InputSelect class="text-input" @bind-Value="selectedPurchaseReceiptsSyncCompanyId">
-                        <option value="">Todas las companies del tenant</option>
+                        <option value="">@AllTenantCompaniesLabel</option>
                         @foreach (var company in companies)
                         {
                             <option value="@company.Id.ToString()">@company.Name (@company.LegacyCenterCode)</option>
@@ -678,28 +681,28 @@ else
                     </InputSelect>
                 </label>
                 <button class="primary-button" type="button" @onclick="RunPurchaseReceiptsSyncAsync" disabled="@isRunningPurchaseReceiptsSync">
-                    @(isRunningPurchaseReceiptsSync ? "Sincronizando recepciones..." : "Sincronizar compras / recepciones")
+                    @(isRunningPurchaseReceiptsSync ? L("Sincronizando recepciones...", "Sincronitzant recepcions...", "Syncing receipts...") : L("Sincronizar compras / recepciones", "Sincronitzar compres / recepcions", "Sync purchases / receipts"))
                 </button>
                 <div class="list-block" style="margin-top: 1rem;">
                     @foreach (var status in purchaseReceiptsSyncStatuses)
                     {
                         <article class="list-item">
                             <strong>@status.CompanyName (@status.CompanyLegacyCenterCode)</strong>
-                            <span>@(string.IsNullOrWhiteSpace(status.LastStatus) ? "Sin sincronizar" : status.LastStatus)</span>
-                            <span>@(status.LastCompletedUtc?.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss") ?? "Nunca")</span>
-                            <span>Ins: @status.LastInserted · Act: @status.LastUpdated · Omi: @status.LastSkipped · Err: @status.LastErrors</span>
+                            <span>@(string.IsNullOrWhiteSpace(status.LastStatus) ? NotSyncedLabel : status.LastStatus)</span>
+                            <span>@(status.LastCompletedUtc?.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss") ?? NeverLabel)</span>
+                            <span>@FormatSyncCounters(status)</span>
                         </article>
                     }
                 </div>
             </article>
             <article class="info-card">
-                <p class="eyebrow">Almacén / Stock</p>
-                <h2>Sync legacy</h2>
-                <p class="muted">Replica artículos y saldo actual desde TEX.NET hacia la SaaS local. La sync manual refresca el snapshot legacy y los ajustes web se aplican encima en local sin tocar el remoto.</p>
+                <p class="eyebrow">@L("Almacén / Stock", "Magatzem / Estoc", "Warehouse / Stock")</p>
+                <h2>@LegacySyncLabel</h2>
+                <p class="muted">@L("Replica artículos y saldo actual desde TEX.NET hacia la SaaS local. La sync manual refresca el snapshot legacy y los ajustes web se aplican encima en local sin tocar el remoto.", "Replica articles i saldo actual des de TEX.NET cap a la SaaS local. La sync manual refresca l'snapshot legacy i els ajustos web s'apliquen a sobre en local sense tocar el remot.", "Replicates items and current balances from TEX.NET into the local SaaS. Manual sync refreshes the legacy snapshot and web adjustments are applied locally on top without touching the remote source.")</p>
                 <label class="field">
-                    <span>Company</span>
+                    <span>@CompanyLabel</span>
                     <InputSelect class="text-input" @bind-Value="selectedStockItemsSyncCompanyId">
-                        <option value="">Todas las companies del tenant</option>
+                        <option value="">@AllTenantCompaniesLabel</option>
                         @foreach (var company in companies)
                         {
                             <option value="@company.Id.ToString()">@company.Name (@company.LegacyCenterCode)</option>
@@ -707,28 +710,28 @@ else
                     </InputSelect>
                 </label>
                 <button class="primary-button" type="button" @onclick="RunStockItemsSyncAsync" disabled="@isRunningStockItemsSync">
-                    @(isRunningStockItemsSync ? "Sincronizando stock..." : "Sincronizar stock / artículos")
+                    @(isRunningStockItemsSync ? L("Sincronizando stock...", "Sincronitzant estoc...", "Syncing stock...") : L("Sincronizar stock / artículos", "Sincronitzar estoc / articles", "Sync stock / items"))
                 </button>
                 <div class="list-block" style="margin-top: 1rem;">
                     @foreach (var status in stockItemsSyncStatuses)
                     {
                         <article class="list-item">
                             <strong>@status.CompanyName (@status.CompanyLegacyCenterCode)</strong>
-                            <span>@(string.IsNullOrWhiteSpace(status.LastStatus) ? "Sin sincronizar" : status.LastStatus)</span>
-                            <span>@(status.LastCompletedUtc?.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss") ?? "Nunca")</span>
-                            <span>Ins: @status.LastInserted · Act: @status.LastUpdated · Omi: @status.LastSkipped · Err: @status.LastErrors</span>
+                            <span>@(string.IsNullOrWhiteSpace(status.LastStatus) ? NotSyncedLabel : status.LastStatus)</span>
+                            <span>@(status.LastCompletedUtc?.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss") ?? NeverLabel)</span>
+                            <span>@FormatSyncCounters(status)</span>
                         </article>
                     }
                 </div>
             </article>
             <article class="info-card">
-                <p class="eyebrow">Ventas / Albaranes</p>
-                <h2>Sync legacy</h2>
-                <p class="muted">Replica albaranes desde TEX.NET hacia la SaaS local. La sync manual refresca solo registros con origen legacy y deja intactos los cambios locales.</p>
+                <p class="eyebrow">@L("Ventas / Albaranes", "Vendes / Albarans", "Sales / Shipments")</p>
+                <h2>@LegacySyncLabel</h2>
+                <p class="muted">@L("Replica albaranes desde TEX.NET hacia la SaaS local. La sync manual refresca solo registros con origen legacy y deja intactos los cambios locales.", "Replica albarans des de TEX.NET cap a la SaaS local. La sync manual refresca només els registres amb origen legacy i deixa intactes els canvis locals.", "Replicates shipments from TEX.NET into the local SaaS. Manual sync refreshes only legacy-origin records and leaves local changes untouched.")</p>
                 <label class="field">
-                    <span>Company</span>
+                    <span>@CompanyLabel</span>
                     <InputSelect class="text-input" @bind-Value="selectedSalesShipmentsSyncCompanyId">
-                        <option value="">Todas las companies del tenant</option>
+                        <option value="">@AllTenantCompaniesLabel</option>
                         @foreach (var company in companies)
                         {
                             <option value="@company.Id.ToString()">@company.Name (@company.LegacyCenterCode)</option>
@@ -736,28 +739,28 @@ else
                     </InputSelect>
                 </label>
                 <button class="primary-button" type="button" @onclick="RunSalesShipmentsSyncAsync" disabled="@isRunningSalesShipmentsSync">
-                    @(isRunningSalesShipmentsSync ? "Sincronizando albaranes..." : "Sincronizar ventas / albaranes")
+                    @(isRunningSalesShipmentsSync ? L("Sincronizando albaranes...", "Sincronitzant albarans...", "Syncing shipments...") : L("Sincronizar ventas / albaranes", "Sincronitzar vendes / albarans", "Sync sales / shipments"))
                 </button>
                 <div class="list-block" style="margin-top: 1rem;">
                     @foreach (var status in salesShipmentsSyncStatuses)
                     {
                         <article class="list-item">
                             <strong>@status.CompanyName (@status.CompanyLegacyCenterCode)</strong>
-                            <span>@(string.IsNullOrWhiteSpace(status.LastStatus) ? "Sin sincronizar" : status.LastStatus)</span>
-                            <span>@(status.LastCompletedUtc?.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss") ?? "Nunca")</span>
-                            <span>Ins: @status.LastInserted · Act: @status.LastUpdated · Omi: @status.LastSkipped · Err: @status.LastErrors</span>
+                            <span>@(string.IsNullOrWhiteSpace(status.LastStatus) ? NotSyncedLabel : status.LastStatus)</span>
+                            <span>@(status.LastCompletedUtc?.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss") ?? NeverLabel)</span>
+                            <span>@FormatSyncCounters(status)</span>
                         </article>
                     }
                 </div>
             </article>
             <article class="info-card">
-                <p class="eyebrow">Ventas / Facturas</p>
-                <h2>Sync legacy</h2>
-                <p class="muted">Replica facturas desde TEX.NET hacia la SaaS local. La sync manual refresca solo registros con origen legacy y deja intactos los cambios locales, incluidos los cobros web.</p>
+                <p class="eyebrow">@L("Ventas / Facturas", "Vendes / Factures", "Sales / Invoices")</p>
+                <h2>@LegacySyncLabel</h2>
+                <p class="muted">@L("Replica facturas desde TEX.NET hacia la SaaS local. La sync manual refresca solo registros con origen legacy y deja intactos los cambios locales, incluidos los cobros web.", "Replica factures des de TEX.NET cap a la SaaS local. La sync manual refresca només els registres amb origen legacy i deixa intactes els canvis locals, inclosos els cobraments web.", "Replicates invoices from TEX.NET into the local SaaS. Manual sync refreshes only legacy-origin records and leaves local changes untouched, including web payments.")</p>
                 <label class="field">
-                    <span>Company</span>
+                    <span>@CompanyLabel</span>
                     <InputSelect class="text-input" @bind-Value="selectedSalesInvoicesSyncCompanyId">
-                        <option value="">Todas las companies del tenant</option>
+                        <option value="">@AllTenantCompaniesLabel</option>
                         @foreach (var company in companies)
                         {
                             <option value="@company.Id.ToString()">@company.Name (@company.LegacyCenterCode)</option>
@@ -765,16 +768,16 @@ else
                     </InputSelect>
                 </label>
                 <button class="primary-button" type="button" @onclick="RunSalesInvoicesSyncAsync" disabled="@isRunningSalesInvoicesSync">
-                    @(isRunningSalesInvoicesSync ? "Sincronizando facturas..." : "Sincronizar ventas / facturas")
+                    @(isRunningSalesInvoicesSync ? L("Sincronizando facturas...", "Sincronitzant factures...", "Syncing invoices...") : L("Sincronizar ventas / facturas", "Sincronitzar vendes / factures", "Sync sales / invoices"))
                 </button>
                 <div class="list-block" style="margin-top: 1rem;">
                     @foreach (var status in salesInvoicesSyncStatuses)
                     {
                         <article class="list-item">
                             <strong>@status.CompanyName (@status.CompanyLegacyCenterCode)</strong>
-                            <span>@(string.IsNullOrWhiteSpace(status.LastStatus) ? "Sin sincronizar" : status.LastStatus)</span>
-                            <span>@(status.LastCompletedUtc?.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss") ?? "Nunca")</span>
-                            <span>Ins: @status.LastInserted · Act: @status.LastUpdated · Omi: @status.LastSkipped · Err: @status.LastErrors</span>
+                            <span>@(string.IsNullOrWhiteSpace(status.LastStatus) ? NotSyncedLabel : status.LastStatus)</span>
+                            <span>@(status.LastCompletedUtc?.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss") ?? NeverLabel)</span>
+                            <span>@FormatSyncCounters(status)</span>
                         </article>
                     }
                 </div>
@@ -784,23 +787,23 @@ else
 
     <div class="admin-grid">
         <section class="panel">
-            <h2>Nueva company</h2>
+            <h2>@L("Nueva empresa", "Nova empresa", "New company")</h2>
             <EditForm Model="companyForm" OnValidSubmit="CreateCompanyAsync">
                 <div class="stack">
                     <label class="field">
-                        <span>Nombre</span>
+                        <span>@L("Nombre", "Nom", "Name")</span>
                         <InputText class="text-input" @bind-Value="companyForm.Name" />
                     </label>
                     <label class="field">
-                        <span>Slug</span>
+                        <span>@L("Slug", "Slug", "Slug")</span>
                         <InputText class="text-input" @bind-Value="companyForm.Slug" />
                     </label>
                     <label class="field">
-                        <span>Centro legacy</span>
+                        <span>@L("Centro legacy", "Centre legacy", "Legacy center")</span>
                         @if (GetAvailableLegacyCenters().Any())
                         {
                             <InputSelect class="text-input" @bind-Value="companyForm.LegacyCenterCode">
-                                <option value="">Selecciona centro legacy</option>
+                                <option value="">@L("Selecciona centro legacy", "Selecciona centre legacy", "Select legacy center")</option>
                                 @foreach (var center in GetAvailableLegacyCenters())
                                 {
                                     <option value="@center.Code">@FormatLegacyCenter(center)</option>
@@ -812,30 +815,30 @@ else
                             <InputText class="text-input" @bind-Value="companyForm.LegacyCenterCode" />
                         }
                     </label>
-                    <p class="muted">Cada company del tenant debe usar un centro legacy distinto.</p>
-                    <button class="primary-button" type="submit">Crear company</button>
+                    <p class="muted">@L("Cada empresa del tenant debe usar un centro legacy distinto.", "Cada empresa del tenant ha d'usar un centre legacy diferent.", "Each tenant company must use a different legacy center.")</p>
+                    <button class="primary-button" type="submit">@L("Crear empresa", "Crear empresa", "Create company")</button>
                 </div>
             </EditForm>
         </section>
 
         <section class="panel">
-            <h2>Nuevo usuario</h2>
+            <h2>@L("Nuevo usuario", "Nou usuari", "New user")</h2>
             <EditForm Model="userForm" OnValidSubmit="CreateUserAsync">
                 <div class="stack">
                     <label class="field">
-                        <span>Nombre</span>
+                        <span>@L("Nombre", "Nom", "Name")</span>
                         <InputText class="text-input" @bind-Value="userForm.DisplayName" />
                     </label>
                     <label class="field">
-                        <span>Email</span>
+                        <span>@L("Email", "Email", "Email")</span>
                         <InputText class="text-input" @bind-Value="userForm.Email" />
                     </label>
                     <label class="field">
-                        <span>Contraseña</span>
+                        <span>@L("Contraseña", "Contrasenya", "Password")</span>
                         <InputText class="text-input" @bind-Value="userForm.Password" />
                     </label>
                     <div class="field">
-                        <span>Companies</span>
+                        <span>@L("Empresas", "Empreses", "Companies")</span>
                         <div class="checkbox-list">
                             @foreach (var company in companies)
                             {
@@ -847,7 +850,7 @@ else
                         </div>
                     </div>
                     <div class="field">
-                        <span>Roles</span>
+                        <span>@L("Roles", "Rols", "Roles")</span>
                         <div class="checkbox-list">
                             @foreach (var role in TenantRoles)
                             {
@@ -858,17 +861,17 @@ else
                             }
                         </div>
                     </div>
-                    <button class="primary-button" type="submit">Crear usuario</button>
+                    <button class="primary-button" type="submit">@L("Crear usuario", "Crear usuari", "Create user")</button>
                 </div>
             </EditForm>
         </section>
 
         <section class="panel">
-            <h2>Companies del tenant</h2>
+            <h2>@L("Empresas del tenant", "Empreses del tenant", "Tenant companies")</h2>
             <div class="list-block">
                 @if (companies.Count == 0)
                 {
-                    <p class="muted">Todavía no hay companies dadas de alta.</p>
+                    <p class="muted">@L("Todavía no hay empresas dadas de alta.", "Encara no hi ha empreses donades d'alta.", "There are no registered companies yet.")</p>
                 }
                 else
                 {
@@ -877,18 +880,18 @@ else
                         <article class="list-item">
                             <strong>@company.Name</strong>
                             <span>@company.LegacyCenterCode · @company.Slug</span>
-                            <span>@(company.IsActive ? "Activa" : "Inactiva")</span>
+                            <span>@(company.IsActive ? L("Activa", "Activa", "Active") : L("Inactiva", "Inactiva", "Inactive"))</span>
                             <div class="quick-links">
                                 @if (editingCompanyId == company.Id)
                                 {
                                     <button class="secondary-button" type="button" @onclick="() => SaveCompanyLegacyCenterAsync(company)" disabled="@RequiresCompanyChangeConfirmation(company)">
-                                        Guardar centro
+                                        @L("Guardar centro", "Desar centre", "Save center")
                                     </button>
-                                    <button class="secondary-button" type="button" @onclick="CancelCompanyEdit">Cancelar</button>
+                                    <button class="secondary-button" type="button" @onclick="CancelCompanyEdit">@L("Cancelar", "Cancel·lar", "Cancel")</button>
                                 }
                                 else
                                 {
-                                    <button class="secondary-button" type="button" @onclick="() => BeginCompanyEditAsync(company)">Cambiar centro</button>
+                                    <button class="secondary-button" type="button" @onclick="() => BeginCompanyEditAsync(company)">@L("Cambiar centro", "Canviar centre", "Change center")</button>
                                 }
                             </div>
                         </article>
@@ -896,13 +899,13 @@ else
                         @if (editingCompanyId == company.Id)
                         {
                             <article class="list-item">
-                                <strong>Centro legacy para @company.Name</strong>
+                                <strong>@L($"Centro legacy para {company.Name}", $"Centre legacy per a {company.Name}", $"Legacy center for {company.Name}")</strong>
                                 <label class="field">
-                                    <span>Centro legacy</span>
+                                    <span>@L("Centro legacy", "Centre legacy", "Legacy center")</span>
                                     @if (GetLegacyCentersForCompanyEdit(company).Any())
                                     {
                                         <InputSelect class="text-input" @bind-Value="editingCompanyLegacyCenterCode">
-                                            <option value="">Selecciona centro legacy</option>
+                                            <option value="">@L("Selecciona centro legacy", "Selecciona centre legacy", "Select legacy center")</option>
                                             @foreach (var center in GetLegacyCentersForCompanyEdit(company))
                                             {
                                                 <option value="@center.Code">@FormatLegacyCenter(center)</option>
@@ -917,17 +920,17 @@ else
                                 @if (editingCompanyImpact is not null && editingCompanyImpact.HasUsage)
                                 {
                                     <div class="alert danger">
-                                        <strong>Impacto detectado</strong>
-                                        <span>Usuarios asignados: @editingCompanyImpact.AssignedUsersCount</span>
-                                        <span>Clientes en centro actual: @editingCompanyImpact.ClientCount</span>
-                                        <span>Proveedores en centro actual: @editingCompanyImpact.SupplierCount</span>
-                                        <span>Compras en centro actual: @editingCompanyImpact.PurchaseDocumentCount</span>
-                                        <span>Ventas en centro actual: @editingCompanyImpact.SalesDocumentCount</span>
-                                        <span>Eventos auditados: @editingCompanyImpact.AuditEventCount</span>
+                                        <strong>@L("Impacto detectado", "Impacte detectat", "Impact detected")</strong>
+                                        <span>@L("Usuarios asignados:", "Usuaris assignats:", "Assigned users:") @editingCompanyImpact.AssignedUsersCount</span>
+                                        <span>@L("Clientes en centro actual:", "Clients al centre actual:", "Clients in current center:") @editingCompanyImpact.ClientCount</span>
+                                        <span>@L("Proveedores en centro actual:", "Proveïdors al centre actual:", "Suppliers in current center:") @editingCompanyImpact.SupplierCount</span>
+                                        <span>@L("Compras en centro actual:", "Compres al centre actual:", "Purchases in current center:") @editingCompanyImpact.PurchaseDocumentCount</span>
+                                        <span>@L("Ventas en centro actual:", "Vendes al centre actual:", "Sales in current center:") @editingCompanyImpact.SalesDocumentCount</span>
+                                        <span>@L("Eventos auditados:", "Esdeveniments auditats:", "Audited events:") @editingCompanyImpact.AuditEventCount</span>
                                     </div>
                                     <label class="checkbox-field">
                                         <input type="checkbox" @bind="confirmCompanyLegacyCenterChange" />
-                                        <span>Confirmo que quiero cambiar el centro legacy de esta company aunque ya tenga uso real.</span>
+                                        <span>@L("Confirmo que quiero cambiar el centro legacy de esta empresa aunque ya tenga uso real.", "Confirmo que vull canviar el centre legacy d'aquesta empresa encara que ja tingui ús real.", "I confirm that I want to change the legacy center of this company even if it already has real usage.")</span>
                                     </label>
                                 }
                             </article>
@@ -940,11 +943,11 @@ else
 
     <div class="admin-grid">
         <section class="panel">
-            <h2>Usuarios del tenant</h2>
+            <h2>@L("Usuarios del tenant", "Usuaris del tenant", "Tenant users")</h2>
             <div class="list-block">
                 @if (users.Count == 0)
                 {
-                    <p class="muted">Todavía no hay usuarios en este tenant.</p>
+                    <p class="muted">@L("Todavía no hay usuarios en este tenant.", "Encara no hi ha usuaris en aquest tenant.", "There are no users in this tenant yet.")</p>
                 }
                 else
                 {
@@ -953,34 +956,34 @@ else
                         <article class="list-item">
                             <strong>@user.DisplayName</strong>
                             <span>@user.Email</span>
-                            <span>@(user.IsActive ? "Activo" : "Inactivo")</span>
+                            <span>@(user.IsActive ? L("Activo", "Actiu", "Active") : L("Inactivo", "Inactiu", "Inactive"))</span>
                             <span>@FormatUserCompanies(user)</span>
                             <span>@string.Join(", ", user.Roles)</span>
                             <div class="quick-links">
                                 @if (editingUserId == user.Id)
                                 {
-                                    <button class="secondary-button" type="button" @onclick="() => SaveUserAccessAsync(user)">Guardar permisos</button>
-                                    <button class="secondary-button" type="button" @onclick="CancelUserEdit">Cancelar</button>
+                                    <button class="secondary-button" type="button" @onclick="() => SaveUserAccessAsync(user)">@L("Guardar permisos", "Desar permisos", "Save permissions")</button>
+                                    <button class="secondary-button" type="button" @onclick="CancelUserEdit">@L("Cancelar", "Cancel·lar", "Cancel")</button>
                                 }
                                 else
                                 {
-                                    <button class="secondary-button" type="button" @onclick="() => BeginUserEdit(user)">Editar accesos</button>
+                                    <button class="secondary-button" type="button" @onclick="() => BeginUserEdit(user)">@L("Editar accesos", "Editar accessos", "Edit access")</button>
                                 }
 
                                 @if (passwordEditorUserId == user.Id)
                                 {
-                                    <button class="secondary-button" type="button" @onclick="() => SaveUserPasswordAsync(user)">Guardar contraseña</button>
-                                    <button class="secondary-button" type="button" @onclick="CancelPasswordEdit">Cancelar contraseña</button>
+                                    <button class="secondary-button" type="button" @onclick="() => SaveUserPasswordAsync(user)">@L("Guardar contraseña", "Desar contrasenya", "Save password")</button>
+                                    <button class="secondary-button" type="button" @onclick="CancelPasswordEdit">@L("Cancelar contraseña", "Cancel·lar contrasenya", "Cancel password")</button>
                                 }
                                 else
                                 {
-                                    <button class="secondary-button" type="button" @onclick="() => BeginPasswordEdit(user)">Cambiar contraseña</button>
+                                    <button class="secondary-button" type="button" @onclick="() => BeginPasswordEdit(user)">@L("Cambiar contraseña", "Canviar contrasenya", "Change password")</button>
                                 }
 
                                 @if (CanToggleUserActive(user))
                                 {
                                     <button class="secondary-button" type="button" @onclick="() => ToggleUserActiveAsync(user)">
-                                        @(user.IsActive ? "Desactivar" : "Activar")
+                                        @(user.IsActive ? L("Desactivar", "Desactivar", "Deactivate") : L("Activar", "Activar", "Activate"))
                                     </button>
                                 }
                                 else
@@ -993,9 +996,9 @@ else
                         @if (editingUserId == user.Id)
                         {
                             <article class="list-item">
-                                <strong>Editar accesos de @user.DisplayName</strong>
+                                <strong>@L($"Editar accesos de {user.DisplayName}", $"Editar accessos de {user.DisplayName}", $"Edit access for {user.DisplayName}")</strong>
                                 <div class="field">
-                                    <span>Companies</span>
+                                    <span>@L("Empresas", "Empreses", "Companies")</span>
                                     <div class="checkbox-list">
                                         @foreach (var company in companies)
                                         {
@@ -1010,11 +1013,11 @@ else
                                     </div>
                                     @if (IsSelf(user) && !isPlatformAdmin)
                                     {
-                                        <p class="muted">Debes conservar al menos una company y no puedes quitarte la company activa.</p>
+                                        <p class="muted">@L("Debes conservar al menos una empresa y no puedes quitarte la empresa activa.", "Has de conservar almenys una empresa i no et pots treure l'empresa activa.", "You must keep at least one company and you cannot remove your active company.")</p>
                                     }
                                 </div>
                                 <div class="field">
-                                    <span>Roles</span>
+                                    <span>@L("Roles", "Rols", "Roles")</span>
                                     <div class="checkbox-list">
                                         @foreach (var role in TenantRoles)
                                         {
@@ -1029,11 +1032,11 @@ else
                                     </div>
                                     @if (IsSelf(user) && !isPlatformAdmin)
                                     {
-                                        <p class="muted">No puedes quitarte el rol TenantAdmin desde esta pantalla.</p>
+                                        <p class="muted">@L("No puedes quitarte el rol TenantAdmin desde esta pantalla.", "No et pots treure el rol TenantAdmin des d'aquesta pantalla.", "You cannot remove the TenantAdmin role from this screen.")</p>
                                     }
                                     else if (IsLastActiveTenantAdmin(user))
                                     {
-                                        <p class="muted">El tenant debe conservar al menos un TenantAdmin activo.</p>
+                                        <p class="muted">@L("El tenant debe conservar al menos un TenantAdmin activo.", "El tenant ha de conservar almenys un TenantAdmin actiu.", "The tenant must keep at least one active TenantAdmin.")</p>
                                     }
                                 </div>
                             </article>
@@ -1042,12 +1045,12 @@ else
                         @if (passwordEditorUserId == user.Id)
                         {
                             <article class="list-item">
-                                <strong>Nueva contraseña para @user.DisplayName</strong>
+                                <strong>@L($"Nueva contraseña para {user.DisplayName}", $"Nova contrasenya per a {user.DisplayName}", $"New password for {user.DisplayName}")</strong>
                                 <label class="field">
-                                    <span>Contraseña nueva</span>
+                                    <span>@L("Contraseña nueva", "Contrasenya nova", "New password")</span>
                                     <InputText class="text-input" type="password" @bind-Value="passwordEditorValue" />
                                 </label>
-                                <p class="muted">Usa al menos 8 caracteres. El cambio se guarda al pulsar “Guardar contraseña”.</p>
+                                <p class="muted">@L("Usa al menos 8 caracteres. El cambio se guarda al pulsar “Guardar contraseña”.", "Fes servir almenys 8 caràcters. El canvi es desa en prémer “Desar contrasenya”.", "Use at least 8 characters. The change is saved when you click “Save password”.")</p>
                             </article>
                         }
                     }
@@ -1056,11 +1059,11 @@ else
         </section>
 
         <section class="panel">
-            <h2>Actividad reciente</h2>
+            <h2>@L("Actividad reciente", "Activitat recent", "Recent activity")</h2>
             <div class="list-block">
                 @if (recentAuditLogs.Count == 0)
                 {
-                    <p class="muted">Todavía no hay eventos auditados en este tenant.</p>
+                    <p class="muted">@L("Todavía no hay eventos auditados en este tenant.", "Encara no hi ha esdeveniments auditats en aquest tenant.", "There are no audited events in this tenant yet.")</p>
                 }
                 else
                 {
@@ -1082,11 +1085,11 @@ else
         </section>
 
         <section class="panel">
-            <h2>Sincronizaciones legacy recientes</h2>
+            <h2>@L("Sincronizaciones legacy recientes", "Sincronitzacions legacy recents", "Recent legacy syncs")</h2>
             <div class="list-block">
                 @if (recentSyncJobs.Count == 0)
                 {
-                    <p class="muted">Todavía no hay jobs de sincronización registrados para este tenant.</p>
+                    <p class="muted">@L("Todavía no hay trabajos de sincronización registrados para este tenant.", "Encara no hi ha treballs de sincronització registrats per a aquest tenant.", "There are no sync jobs registered for this tenant yet.")</p>
                 }
                 else
                 {
@@ -1098,7 +1101,7 @@ else
                             <span>Ins: @job.RecordsInserted · Act: @job.RecordsUpdated · Omi: @job.RecordsSkipped · Err: @job.ErrorsCount</span>
                             @if (!string.IsNullOrWhiteSpace(job.CheckpointAfter))
                             {
-                                <span>Checkpoint: @job.CheckpointAfter</span>
+                                <span>@L("Checkpoint", "Checkpoint", "Checkpoint"): @job.CheckpointAfter</span>
                             }
                             @if (!string.IsNullOrWhiteSpace(job.Summary))
                             {
@@ -1114,6 +1117,32 @@ else
 }
 
 @code {
+    private string L(string spanish, string catalan, string english) =>
+        T.CurrentLanguage switch
+        {
+            AppLanguages.Catalan => catalan,
+            AppLanguages.English => english,
+            _ => spanish
+        };
+
+    private string BuildSyncCompletedMessage(LegacySyncResultDto result) =>
+        L(
+            $"Sincronización completada. Empresas={result.CompaniesProcessed}, Insertados={result.RecordsInserted}, Actualizados={result.RecordsUpdated}, Omitidos={result.RecordsSkipped}, Errores={result.ErrorsCount}.",
+            $"Sincronització completada. Empreses={result.CompaniesProcessed}, Inserits={result.RecordsInserted}, Actualitzats={result.RecordsUpdated}, Omesos={result.RecordsSkipped}, Errors={result.ErrorsCount}.",
+            $"Sync completed. Companies={result.CompaniesProcessed}, Inserted={result.RecordsInserted}, Updated={result.RecordsUpdated}, Skipped={result.RecordsSkipped}, Errors={result.ErrorsCount}.");
+
+    private string FormatSyncCounters(LegacySyncModuleStatusDto status) =>
+        L(
+            $"Ins.: {status.LastInserted} · Act.: {status.LastUpdated} · Omi.: {status.LastSkipped} · Err.: {status.LastErrors}",
+            $"Ins.: {status.LastInserted} · Act.: {status.LastUpdated} · Omi.: {status.LastSkipped} · Err.: {status.LastErrors}",
+            $"Ins.: {status.LastInserted} · Upd.: {status.LastUpdated} · Skip: {status.LastSkipped} · Err.: {status.LastErrors}");
+
+    private string CompanyLabel => L("Empresa", "Empresa", "Company");
+    private string AllTenantCompaniesLabel => L("Todas las empresas del tenant", "Totes les empreses del tenant", "All tenant companies");
+    private string NotSyncedLabel => L("Sin sincronizar", "Sense sincronitzar", "Not synced");
+    private string NeverLabel => L("Nunca", "Mai", "Never");
+    private string LegacySyncLabel => L("Sync legacy", "Sync legacy", "Legacy sync");
+
     private static readonly string[] TenantRoles = [PlatformRoles.TenantAdmin, PlatformRoles.TenantReader];
 
     private Guid? currentTenantId;
@@ -1762,7 +1791,7 @@ else
                 ModuleKey = LegacySyncModuleKeys.SalesOrders
             });
 
-            statusMessage = $"Sincronización completada. Companies={result.CompaniesProcessed}, Insertados={result.RecordsInserted}, Actualizados={result.RecordsUpdated}, Omitidos={result.RecordsSkipped}, Errores={result.ErrorsCount}.";
+            statusMessage = BuildSyncCompletedMessage(result);
             await ReloadAsync();
         }
         catch (Exception exception)
@@ -1796,7 +1825,7 @@ else
                 ModuleKey = LegacySyncModuleKeys.CrmClients
             });
 
-            statusMessage = $"Sincronización completada. Companies={result.CompaniesProcessed}, Insertados={result.RecordsInserted}, Actualizados={result.RecordsUpdated}, Omitidos={result.RecordsSkipped}, Errores={result.ErrorsCount}.";
+            statusMessage = BuildSyncCompletedMessage(result);
             await ReloadAsync();
         }
         catch (Exception exception)
@@ -1830,7 +1859,7 @@ else
                 ModuleKey = LegacySyncModuleKeys.CrmSuppliers
             });
 
-            statusMessage = $"Sincronización completada. Companies={result.CompaniesProcessed}, Insertados={result.RecordsInserted}, Actualizados={result.RecordsUpdated}, Omitidos={result.RecordsSkipped}, Errores={result.ErrorsCount}.";
+            statusMessage = BuildSyncCompletedMessage(result);
             await ReloadAsync();
         }
         catch (Exception exception)
@@ -1864,7 +1893,7 @@ else
                 ModuleKey = LegacySyncModuleKeys.CrmCarriers
             });
 
-            statusMessage = $"Sincronización completada. Companies={result.CompaniesProcessed}, Insertados={result.RecordsInserted}, Actualizados={result.RecordsUpdated}, Omitidos={result.RecordsSkipped}, Errores={result.ErrorsCount}.";
+            statusMessage = BuildSyncCompletedMessage(result);
             await ReloadAsync();
         }
         catch (Exception exception)
@@ -1898,7 +1927,7 @@ else
                 ModuleKey = LegacySyncModuleKeys.CrmWorkshops
             });
 
-            statusMessage = $"Sincronización completada. Companies={result.CompaniesProcessed}, Insertados={result.RecordsInserted}, Actualizados={result.RecordsUpdated}, Omitidos={result.RecordsSkipped}, Errores={result.ErrorsCount}.";
+            statusMessage = BuildSyncCompletedMessage(result);
             await ReloadAsync();
         }
         catch (Exception exception)
@@ -1932,7 +1961,7 @@ else
                 ModuleKey = LegacySyncModuleKeys.ArticleFornituras
             });
 
-            statusMessage = $"Sincronización completada. Companies={result.CompaniesProcessed}, Insertados={result.RecordsInserted}, Actualizados={result.RecordsUpdated}, Omitidos={result.RecordsSkipped}, Errores={result.ErrorsCount}.";
+            statusMessage = BuildSyncCompletedMessage(result);
             await ReloadAsync();
         }
         catch (Exception exception)
@@ -1966,7 +1995,7 @@ else
                 ModuleKey = LegacySyncModuleKeys.ArticleHilos
             });
 
-            statusMessage = $"Sincronización completada. Companies={result.CompaniesProcessed}, Insertados={result.RecordsInserted}, Actualizados={result.RecordsUpdated}, Omitidos={result.RecordsSkipped}, Errores={result.ErrorsCount}.";
+            statusMessage = BuildSyncCompletedMessage(result);
             await ReloadAsync();
         }
         catch (Exception exception)
@@ -2000,7 +2029,7 @@ else
                 ModuleKey = LegacySyncModuleKeys.ArticleTejidos
             });
 
-            statusMessage = $"Sincronización completada. Companies={result.CompaniesProcessed}, Insertados={result.RecordsInserted}, Actualizados={result.RecordsUpdated}, Omitidos={result.RecordsSkipped}, Errores={result.ErrorsCount}.";
+            statusMessage = BuildSyncCompletedMessage(result);
             await ReloadAsync();
         }
         catch (Exception exception)
@@ -2034,7 +2063,7 @@ else
                 ModuleKey = LegacySyncModuleKeys.ArticleMuestras
             });
 
-            statusMessage = $"Sincronización completada. Companies={result.CompaniesProcessed}, Insertados={result.RecordsInserted}, Actualizados={result.RecordsUpdated}, Omitidos={result.RecordsSkipped}, Errores={result.ErrorsCount}.";
+            statusMessage = BuildSyncCompletedMessage(result);
             await ReloadAsync();
         }
         catch (Exception exception)
@@ -2068,7 +2097,7 @@ else
                 ModuleKey = LegacySyncModuleKeys.ArticleModels
             });
 
-            statusMessage = $"Sincronización completada. Companies={result.CompaniesProcessed}, Insertados={result.RecordsInserted}, Actualizados={result.RecordsUpdated}, Omitidos={result.RecordsSkipped}, Errores={result.ErrorsCount}.";
+            statusMessage = BuildSyncCompletedMessage(result);
             await ReloadAsync();
         }
         catch (Exception exception)
@@ -2102,7 +2131,7 @@ else
                 ModuleKey = LegacySyncModuleKeys.ArticleDispositions
             });
 
-            statusMessage = $"Sincronización completada. Companies={result.CompaniesProcessed}, Insertados={result.RecordsInserted}, Actualizados={result.RecordsUpdated}, Omitidos={result.RecordsSkipped}, Errores={result.ErrorsCount}.";
+            statusMessage = BuildSyncCompletedMessage(result);
             await ReloadAsync();
         }
         catch (Exception exception)
@@ -2136,7 +2165,7 @@ else
                 ModuleKey = LegacySyncModuleKeys.BaseBanksCashboxes
             });
 
-            statusMessage = $"Sincronización completada. Companies={result.CompaniesProcessed}, Insertados={result.RecordsInserted}, Actualizados={result.RecordsUpdated}, Omitidos={result.RecordsSkipped}, Errores={result.ErrorsCount}.";
+            statusMessage = BuildSyncCompletedMessage(result);
             await ReloadAsync();
         }
         catch (Exception exception)
@@ -2170,7 +2199,7 @@ else
                 ModuleKey = LegacySyncModuleKeys.BasePaymentMethods
             });
 
-            statusMessage = $"Sincronización completada. Companies={result.CompaniesProcessed}, Insertados={result.RecordsInserted}, Actualizados={result.RecordsUpdated}, Omitidos={result.RecordsSkipped}, Errores={result.ErrorsCount}.";
+            statusMessage = BuildSyncCompletedMessage(result);
             await ReloadAsync();
         }
         catch (Exception exception)
@@ -2204,7 +2233,7 @@ else
                 ModuleKey = LegacySyncModuleKeys.BaseMachines
             });
 
-            statusMessage = $"Sincronización completada. Companies={result.CompaniesProcessed}, Insertados={result.RecordsInserted}, Actualizados={result.RecordsUpdated}, Omitidos={result.RecordsSkipped}, Errores={result.ErrorsCount}.";
+            statusMessage = BuildSyncCompletedMessage(result);
             await ReloadAsync();
         }
         catch (Exception exception)
@@ -2238,7 +2267,7 @@ else
                 ModuleKey = LegacySyncModuleKeys.BaseOperations
             });
 
-            statusMessage = $"Sincronización completada. Companies={result.CompaniesProcessed}, Insertados={result.RecordsInserted}, Actualizados={result.RecordsUpdated}, Omitidos={result.RecordsSkipped}, Errores={result.ErrorsCount}.";
+            statusMessage = BuildSyncCompletedMessage(result);
             await ReloadAsync();
         }
         catch (Exception exception)
@@ -2272,7 +2301,7 @@ else
                 ModuleKey = LegacySyncModuleKeys.BaseSeasons
             });
 
-            statusMessage = $"Sincronización completada. Companies={result.CompaniesProcessed}, Insertados={result.RecordsInserted}, Actualizados={result.RecordsUpdated}, Omitidos={result.RecordsSkipped}, Errores={result.ErrorsCount}.";
+            statusMessage = BuildSyncCompletedMessage(result);
             await ReloadAsync();
         }
         catch (Exception exception)
@@ -2306,7 +2335,7 @@ else
                 ModuleKey = LegacySyncModuleKeys.BaseVatTypes
             });
 
-            statusMessage = $"Sincronización completada. Companies={result.CompaniesProcessed}, Insertados={result.RecordsInserted}, Actualizados={result.RecordsUpdated}, Omitidos={result.RecordsSkipped}, Errores={result.ErrorsCount}.";
+            statusMessage = BuildSyncCompletedMessage(result);
             await ReloadAsync();
         }
         catch (Exception exception)
@@ -2340,7 +2369,7 @@ else
                 ModuleKey = LegacySyncModuleKeys.BaseIncoterms
             });
 
-            statusMessage = $"Sincronización completada. Companies={result.CompaniesProcessed}, Insertados={result.RecordsInserted}, Actualizados={result.RecordsUpdated}, Omitidos={result.RecordsSkipped}, Errores={result.ErrorsCount}.";
+            statusMessage = BuildSyncCompletedMessage(result);
             await ReloadAsync();
         }
         catch (Exception exception)
@@ -2374,7 +2403,7 @@ else
                 ModuleKey = LegacySyncModuleKeys.CrmRepresentatives
             });
 
-            statusMessage = $"Sincronización completada. Companies={result.CompaniesProcessed}, Insertados={result.RecordsInserted}, Actualizados={result.RecordsUpdated}, Omitidos={result.RecordsSkipped}, Errores={result.ErrorsCount}.";
+            statusMessage = BuildSyncCompletedMessage(result);
             await ReloadAsync();
         }
         catch (Exception exception)
@@ -2408,7 +2437,7 @@ else
                 ModuleKey = LegacySyncModuleKeys.PurchaseOrders
             });
 
-            statusMessage = $"Sincronización completada. Companies={result.CompaniesProcessed}, Insertados={result.RecordsInserted}, Actualizados={result.RecordsUpdated}, Omitidos={result.RecordsSkipped}, Errores={result.ErrorsCount}.";
+            statusMessage = BuildSyncCompletedMessage(result);
             await ReloadAsync();
         }
         catch (Exception exception)
@@ -2442,7 +2471,7 @@ else
                 ModuleKey = LegacySyncModuleKeys.PurchaseReceipts
             });
 
-            statusMessage = $"Sincronización completada. Companies={result.CompaniesProcessed}, Insertados={result.RecordsInserted}, Actualizados={result.RecordsUpdated}, Omitidos={result.RecordsSkipped}, Errores={result.ErrorsCount}.";
+            statusMessage = BuildSyncCompletedMessage(result);
             await ReloadAsync();
         }
         catch (Exception exception)
@@ -2476,7 +2505,7 @@ else
                 ModuleKey = LegacySyncModuleKeys.StockItems
             });
 
-            statusMessage = $"Sincronización completada. Companies={result.CompaniesProcessed}, Insertados={result.RecordsInserted}, Actualizados={result.RecordsUpdated}, Omitidos={result.RecordsSkipped}, Errores={result.ErrorsCount}.";
+            statusMessage = BuildSyncCompletedMessage(result);
             await ReloadAsync();
         }
         catch (Exception exception)
@@ -2510,7 +2539,7 @@ else
                 ModuleKey = LegacySyncModuleKeys.SalesShipments
             });
 
-            statusMessage = $"Sincronización completada. Companies={result.CompaniesProcessed}, Insertados={result.RecordsInserted}, Actualizados={result.RecordsUpdated}, Omitidos={result.RecordsSkipped}, Errores={result.ErrorsCount}.";
+            statusMessage = BuildSyncCompletedMessage(result);
             await ReloadAsync();
         }
         catch (Exception exception)
@@ -2544,7 +2573,7 @@ else
                 ModuleKey = LegacySyncModuleKeys.SalesInvoices
             });
 
-            statusMessage = $"Sincronización completada. Companies={result.CompaniesProcessed}, Insertados={result.RecordsInserted}, Actualizados={result.RecordsUpdated}, Omitidos={result.RecordsSkipped}, Errores={result.ErrorsCount}.";
+            statusMessage = BuildSyncCompletedMessage(result);
             await ReloadAsync();
         }
         catch (Exception exception)

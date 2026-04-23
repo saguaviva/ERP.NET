@@ -1,0 +1,207 @@
+@page "/base-datos/mailing"
+@attribute [Authorize]
+@using Erp.Application.Mailing
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IMailingCampaignQueries MailingQueries
+@inject IMailingCampaignService MailingService
+@inject AppText T
+
+<PageTitle>@L("Base / Mailing", "Base / Mailing", "Master data / Mailing")</PageTitle>
+
+<div class="page-header">
+    <div>
+        <p class="eyebrow">@T["menu.base"]</p>
+        <h1>@L("Mailing", "Mailing", "Mailing")</h1>
+        <p class="lead">@L("Prepara cartas o comunicaciones imprimibles por colectivo, congelando los destinatarios seleccionados en la SaaS local.", "Prepara cartes o comunicacions imprimibles per col·lectiu, congelant els destinataris seleccionats a la SaaS local.", "Prepare printable letters or communications by audience, freezing the selected recipients in the local SaaS.")</p>
+    </div>
+    <div class="quick-links">
+        <a class="primary-button" href="/base-datos/mailing/nuevo">@L("Nuevo mailing", "Nou mailing", "New mailing")</a>
+    </div>
+</div>
+
+@if (!tenantId.HasValue || !companyId.HasValue)
+{
+    <div class="empty-state">
+        <p>@L("Selecciona una empresa activa para trabajar con mailing.", "Selecciona una empresa activa per treballar amb mailing.", "Select an active company to work with mailing.")</p>
+    </div>
+}
+else
+{
+    @if (!string.IsNullOrWhiteSpace(statusMessage))
+    {
+        <div class="alert @(isError ? "danger" : "success")">@statusMessage</div>
+    }
+
+    <section class="panel">
+        <div class="filter-grid">
+            <label class="field">
+                <span>@L("Buscar", "Buscar", "Search")</span>
+                <input class="text-input" @bind="search" />
+            </label>
+            <label class="field">
+                <span>@L("Colectivo", "Col·lectiu", "Audience")</span>
+                <select class="text-input" @bind="sourceType">
+                    <option value="">@L("Todos", "Tots", "All")</option>
+                    @foreach (var option in MailingSourceTypes.OrderedTypes)
+                    {
+                        <option value="@option">@GetSourceLabel(option)</option>
+                    }
+                </select>
+            </label>
+        </div>
+
+        <div class="quick-links" style="margin-top: 1rem;">
+            <button class="secondary-button" type="button" @onclick="LoadAsync">@L("Buscar", "Buscar", "Search")</button>
+        </div>
+    </section>
+
+    <section class="panel" style="margin-top: 1rem;">
+        <div class="detail-panel-header">
+            <div>
+                <h2>@L("Campañas guardadas", "Campanyes desades", "Saved campaigns")</h2>
+                <p class="muted">@L("Cada mailing guarda una foto de los destinatarios para que la impresión no cambie después.", "Cada mailing guarda una foto dels destinataris perquè la impressió no canviï després.", "Each mailing stores a frozen snapshot of the recipients so the printout does not change later.")</p>
+            </div>
+        </div>
+
+        <div class="table-scroll">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>@L("Título", "Títol", "Title")</th>
+                        <th>@L("Colectivo", "Col·lectiu", "Audience")</th>
+                        <th>@L("Modo", "Mode", "Mode")</th>
+                        <th>@L("Destinatarios", "Destinataris", "Recipients")</th>
+                        <th>@L("Actualizado", "Actualitzat", "Updated")</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (isLoading)
+                    {
+                        <tr>
+                            <td colspan="6" class="table-empty">@L("Cargando mailing...", "Carregant mailing...", "Loading mailing...")</td>
+                        </tr>
+                    }
+                    else if (items.Count == 0)
+                    {
+                        <tr>
+                            <td colspan="6" class="table-empty">@L("No hay campañas de mailing con este filtro.", "No hi ha campanyes de mailing amb aquest filtre.", "There are no mailing campaigns matching this filter.")</td>
+                        </tr>
+                    }
+                    else
+                    {
+                        @foreach (var item in items)
+                        {
+                            <tr>
+                                <td>
+                                    <div class="table-primary">@item.Title</div>
+                                </td>
+                                <td>@GetSourceLabel(item.SourceType)</td>
+                                <td>@(item.IncludeAllRecipients ? L("Todos", "Tots", "All recipients") : L("Selección manual", "Selecció manual", "Manual selection"))</td>
+                                <td>@item.RecipientCount</td>
+                                <td>@item.UpdatedUtc.ToLocalTime().ToString("g")</td>
+                                <td class="table-actions">
+                                    <a href="@($"/base-datos/mailing/editar/{item.CampaignId}")">@L("Abrir", "Obrir", "Open")</a>
+                                    <a href="@($"/base-datos/mailing/{item.CampaignId}/imprimir")">@L("Imprimir", "Imprimir", "Print")</a>
+                                    <button class="link-button" type="button" @onclick="() => DeleteAsync(item.CampaignId)">@L("Eliminar", "Eliminar", "Delete")</button>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </section>
+}
+
+@code {
+    private Guid? tenantId;
+    private Guid? companyId;
+    private string search = string.Empty;
+    private string sourceType = string.Empty;
+    private bool isLoading = true;
+    private bool isError;
+    private string statusMessage = string.Empty;
+    private IReadOnlyList<MailingCampaignListItemDto> items = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        tenantId = user.GetTenantId();
+        companyId = user.GetActiveCompanyId();
+        await LoadAsync();
+    }
+
+    private async Task LoadAsync()
+    {
+        statusMessage = string.Empty;
+        isError = false;
+        isLoading = true;
+
+        if (!tenantId.HasValue || !companyId.HasValue)
+        {
+            isLoading = false;
+            return;
+        }
+
+        try
+        {
+            var result = await MailingQueries.SearchAsync(tenantId.Value, companyId.Value, new MailingCampaignFilter
+            {
+                Search = search,
+                SourceType = sourceType,
+                Page = 1,
+                PageSize = 100
+            });
+
+            items = result.Items;
+        }
+        catch (Exception exception)
+        {
+            isError = true;
+            statusMessage = exception.Message;
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private async Task DeleteAsync(Guid campaignId)
+    {
+        if (!tenantId.HasValue || !companyId.HasValue)
+        {
+            return;
+        }
+
+        try
+        {
+            await MailingService.DeleteAsync(tenantId.Value, companyId.Value, campaignId);
+            statusMessage = L("Mailing eliminado.", "Mailing eliminat.", "Mailing deleted.");
+            isError = false;
+            await LoadAsync();
+        }
+        catch (Exception exception)
+        {
+            isError = true;
+            statusMessage = exception.Message;
+        }
+    }
+
+    private string GetSourceLabel(string value) => MailingSourceTypes.Normalize(value) switch
+    {
+        MailingSourceTypes.Suppliers => L("Proveedores", "Proveïdors", "Suppliers"),
+        MailingSourceTypes.Representatives => L("Representantes", "Representants", "Representatives"),
+        MailingSourceTypes.Carriers => L("Transportistas", "Transportistes", "Carriers"),
+        _ => L("Clientes", "Clients", "Clients")
+    };
+
+    private string L(string spanish, string catalan, string english) =>
+        T.CurrentLanguage switch
+        {
+            AppLanguages.Catalan => catalan,
+            AppLanguages.English => english,
+            _ => spanish
+        };
+}

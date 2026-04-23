@@ -11,30 +11,31 @@
 @inject IParteAcabadoQueries ParteAcabadoQueries
 @inject IMuestraService MuestraService
 @inject NavigationManager NavigationManager
+@inject AppText T
 
 <PageTitle>@PageTitleText</PageTitle>
 
 <div class="page-header">
     <div>
-        <p class="eyebrow">ARTÍCULOS</p>
+        <p class="eyebrow">@L("ARTÍCULOS", "ARTICLES", "ARTICLES")</p>
         <h1>@PageTitleText</h1>
         <p class="lead">@(isLegacySyncActive
-            ? "Edición sobre la SaaS local. La importación manual desde legacy refresca solo registros marcados como legacy."
-            : "Alta y edición sobre la tabla mostres replicada en la SaaS local, filtrada por la empresa activa.")</p>
+            ? L("Edición sobre la SaaS local. La importación manual desde legacy refresca solo registros marcados como legacy.", "Edició sobre la SaaS local. La importació manual des de legacy refresca només registres marcats com a legacy.", "Editing on the local SaaS copy. Manual import from legacy refreshes only records marked as legacy.")
+            : L("Alta y edición sobre la tabla mostres replicada en la SaaS local, filtrada por la empresa activa.", "Alta i edició sobre la taula mostres replicada a la SaaS local, filtrada per l'empresa activa.", "Create and edit on the mostres table replicated into the local SaaS, filtered by the active company."))</p>
     </div>
     <div class="quick-links">
-        <a class="secondary-button link-button" href="@BuildListUrl()">Volver al listado</a>
+        <a class="secondary-button link-button" href="@BuildListUrl()">@L("Volver al listado", "Tornar al llistat", "Back to list")</a>
         @if (!string.IsNullOrWhiteSpace(model.Code))
         {
-            <a class="secondary-button link-button" href="@BuildCreateParteFromSampleUrl()">Crear parte acabado</a>
+            <a class="secondary-button link-button" href="@BuildCreateParteFromSampleUrl()">@L("Crear parte acabado", "Crear part d'acabat", "Create finish order")</a>
         }
         @if (model.MachineCode > 0)
         {
-            <a class="secondary-button link-button" href="@BuildAcabadosByMachineUrl(model.MachineCode)">Abrir acabados</a>
+            <a class="secondary-button link-button" href="@BuildAcabadosByMachineUrl(model.MachineCode)">@L("Abrir acabados", "Obrir acabats", "Open finishing")</a>
         }
         @if (!string.IsNullOrWhiteSpace(Code))
         {
-            <a class="secondary-button link-button" href="@BuildSheetPrintUrl()">Imprimir ficha</a>
+            <a class="secondary-button link-button" href="@BuildSheetPrintUrl()">@L("Imprimir ficha", "Imprimir fitxa", "Print sheet")</a>
         }
     </div>
 </div>
@@ -42,7 +43,7 @@
 @if (!tenantId.HasValue || !companyId.HasValue)
 {
     <div class="empty-state">
-        <p>No hay empresa activa seleccionada.</p>
+        <p>@L("No hay empresa activa seleccionada.", "No hi ha cap empresa activa seleccionada.", "There is no active company selected.")</p>
     </div>
 }
 else
@@ -55,11 +56,11 @@ else
     @if (isLegacySyncActive)
     {
         <div class="alert">
-            Artículos / @ModulePluralTitle está en convivencia con legacy para esta empresa.
-            Esta ficha guarda cambios solo en la SaaS local y la sync manual refresca únicamente registros de origen legacy.
+            @L("Artículos", "Articles", "Articles") / @ModulePluralTitle @L("está en convivencia con legacy para esta empresa.", "està en convivència amb legacy per a aquesta empresa.", "is running in coexistence with legacy for this company.")
+            @L("Esta ficha guarda cambios solo en la SaaS local y la sync manual refresca únicamente registros de origen legacy.", "Aquesta fitxa desa canvis només a la SaaS local i la sync manual refresca únicament registres d'origen legacy.", "This sheet saves changes only in the local SaaS and manual sync refreshes only legacy-origin records.")
             @if (IsComplementMode)
             {
-                <span> Este módulo comparte la misma base y la misma sync que Muestras.</span>
+                <span> @L("Este módulo comparte la misma base y la misma sync que Muestras.", "Aquest mòdul comparteix la mateixa base i la mateixa sync que Mostres.", "This module shares the same data base and sync as Samples.")</span>
             }
             @if (!string.IsNullOrWhiteSpace(syncStatusLabel))
             {
@@ -71,7 +72,7 @@ else
     @if (!canEdit && string.IsNullOrWhiteSpace(Code))
     {
         <div class="alert">
-            No tienes permisos de edición para crear @modulePluralLower nuevas en esta empresa.
+            @L($"No tienes permisos de edición para crear {modulePluralLower} nuevas en esta empresa.", $"No tens permisos d'edició per crear {modulePluralLower} noves en aquesta empresa.", $"You do not have edit permissions to create new {modulePluralLower} in this company.")
         </div>
     }
 
@@ -80,13 +81,13 @@ else
         <section class="panel" style="margin-bottom: 1rem;">
             <div class="detail-panel-header">
                 <div>
-                    <h2>Duplicar desde otro complemento</h2>
-                    <p class="muted">Carga un complemento existente como base y conserva el cliente y el código que estés preparando en esta ficha.</p>
+                    <h2>@L("Duplicar desde otro complemento", "Duplicar des d'un altre complement", "Duplicate from another complement")</h2>
+                    <p class="muted">@L("Carga un complemento existente como base y conserva el cliente y el código que estés preparando en esta ficha.", "Carrega un complement existent com a base i conserva el client i el codi que estiguis preparant en aquesta fitxa.", "Load an existing complement as a base and keep the client and code you are preparing in this sheet.")</p>
                 </div>
             </div>
             <div class="filter-row">
-                <input class="text-input" @bind="duplicateSearch" placeholder="Buscar por código, cliente, referencia o descripción" />
-                <button class="secondary-button" type="button" @onclick="SearchDuplicateCandidatesAsync" disabled="@isSearchingDuplicates">@(isSearchingDuplicates ? "Buscando..." : "Buscar base")</button>
+                <input class="text-input" @bind="duplicateSearch" placeholder="@L("Buscar por código, cliente, referencia o descripción", "Buscar per codi, client, referència o descripció", "Search by code, client, reference or description")" />
+                <button class="secondary-button" type="button" @onclick="SearchDuplicateCandidatesAsync" disabled="@isSearchingDuplicates">@(isSearchingDuplicates ? L("Buscando...", "Buscant...", "Searching...") : L("Buscar base", "Buscar base", "Search base"))</button>
             </div>
             @if (duplicateCandidates.Count > 0)
             {
@@ -95,9 +96,9 @@ else
                     {
                         <article class="list-item">
                             <strong>@candidate.Code · @candidate.Description</strong>
-                            <span>@(!string.IsNullOrWhiteSpace(candidate.ClientName) ? candidate.ClientName : $"Cliente {candidate.ClientCode}")</span>
+                            <span>@(!string.IsNullOrWhiteSpace(candidate.ClientName) ? candidate.ClientName : $"{L("Cliente", "Client", "Client")} {candidate.ClientCode}")</span>
                             <span>@candidate.Reference</span>
-                            <button class="secondary-button" type="button" @onclick="() => ApplyDuplicateBaseAsync(candidate.Code, candidate.ClientCode)">Usar base</button>
+                            <button class="secondary-button" type="button" @onclick="() => ApplyDuplicateBaseAsync(candidate.Code, candidate.ClientCode)">@L("Usar base", "Usar base", "Use base")</button>
                         </article>
                     }
                 </div>
@@ -107,22 +108,22 @@ else
 
     <section class="summary-card-grid">
         <article class="summary-card">
-            <span class="summary-card-label">Origen</span>
+            <span class="summary-card-label">@L("Origen", "Origen", "Origin")</span>
             <strong>@DisplayOrigin</strong>
             <span class="summary-card-meta">@($"{model.CompanyCenterCode} · {LineCount} líneas")</span>
         </article>
         <article class="summary-card">
-            <span class="summary-card-label">Carta</span>
-            <strong>@DistinctColorCount colores</strong>
-            <span class="summary-card-meta">@($"{DistinctSizeCount} tallas · {DistinctClientCount} clientes")</span>
+            <span class="summary-card-label">@L("Carta", "Carta", "Card")</span>
+            <strong>@DistinctColorCount @L("colores", "colors", "colors")</strong>
+            <span class="summary-card-meta">@($"{DistinctSizeCount} {L("tallas", "talles", "sizes")} · {DistinctClientCount} {L("clientes", "clients", "clients")}")</span>
         </article>
         <article class="summary-card">
-            <span class="summary-card-label">Venta media</span>
-            <strong>@AverageSalePrice.ToString("0.00##")</strong>
-            <span class="summary-card-meta">@($"Coste {AverageCostPrice.ToString("0.00##")} · margen {AverageMarginPercent.ToString("0.0#")}%")</span>
+            <span class="summary-card-label">@L("Venta media", "Venda mitjana", "Average sale")</span>
+            <strong>@AverageSalePrice.ToUiString("0.00##")</strong>
+            <span class="summary-card-meta">@($"{L("Coste", "Cost", "Cost")} {AverageCostPrice.ToUiString("0.00##")} · {L("margen", "marge", "margin")} {AverageMarginPercent.ToUiString("0.0#")}%")</span>
         </article>
         <article class="summary-card">
-            <span class="summary-card-label">Estado ficha</span>
+            <span class="summary-card-label">@L("Estado ficha", "Estat fitxa", "Sheet status")</span>
             <strong>@FichaStatusLabel</strong>
             <span class="summary-card-meta">@FichaStatusHelp</span>
         </article>
@@ -130,10 +131,10 @@ else
 
     <div class="record-tabs" style="margin-top: 1rem;">
         <button class="record-tab @(activeTab == MuestraTab.Ficha ? "active" : null)" type="button" @onclick="@(() => activeTab = MuestraTab.Ficha)">@ModuleSingularTitle</button>
-        <button class="record-tab @(activeTab == MuestraTab.Carta ? "active" : null)" type="button" @onclick="@(() => activeTab = MuestraTab.Carta)">Carta colores · tallas</button>
-        <button class="record-tab @(activeTab == MuestraTab.Desglose ? "active" : null)" type="button" @onclick="@(() => activeTab = MuestraTab.Desglose)">Desglose color · máquina</button>
-        <button class="record-tab @(activeTab == MuestraTab.Ordenes ? "active" : null)" type="button" @onclick="@(() => activeTab = MuestraTab.Ordenes)">Ordres fabricació</button>
-        <button class="record-tab @(activeTab == MuestraTab.Impresion ? "active" : null)" type="button" @onclick="@(() => activeTab = MuestraTab.Impresion)">Impressió fitxa · etiquetes</button>
+        <button class="record-tab @(activeTab == MuestraTab.Carta ? "active" : null)" type="button" @onclick="@(() => activeTab = MuestraTab.Carta)">@L("Carta colores · tallas", "Carta colors · talles", "Color card · sizes")</button>
+        <button class="record-tab @(activeTab == MuestraTab.Desglose ? "active" : null)" type="button" @onclick="@(() => activeTab = MuestraTab.Desglose)">@L("Desglose color · máquina", "Desglossament color · màquina", "Color · machine breakdown")</button>
+        <button class="record-tab @(activeTab == MuestraTab.Ordenes ? "active" : null)" type="button" @onclick="@(() => activeTab = MuestraTab.Ordenes)">@L("Órdenes fabricación", "Ordres fabricació", "Manufacturing orders")</button>
+        <button class="record-tab @(activeTab == MuestraTab.Impresion ? "active" : null)" type="button" @onclick="@(() => activeTab = MuestraTab.Impresion)">@L("Impresión ficha · etiquetas", "Impressió fitxa · etiquetes", "Sheet print · labels")</button>
     </div>
 
     <EditForm Model="model" OnValidSubmit="SaveAsync">
@@ -144,8 +145,8 @@ else
                     <section class="panel detail-panel">
                         <div class="detail-panel-header">
                             <div>
-                                <h2>Ficha comercial</h2>
-                                <p class="muted">Cabecera principal del @moduleSingularLower, cliente, máquina y datos económicos.</p>
+                                <h2>@L("Ficha comercial", "Fitxa comercial", "Commercial sheet")</h2>
+                                <p class="muted">@L($"Cabecera principal del {moduleSingularLower}, cliente, máquina y datos económicos.", $"Capçalera principal del {moduleSingularLower}, client, màquina i dades econòmiques.", $"Main header of the {moduleSingularLower}, client, machine and economic data.")</p>
                             </div>
                             @if (!string.IsNullOrWhiteSpace(model.Code))
                             {
@@ -155,31 +156,31 @@ else
 
                         <div class="form-grid">
                             <label class="field">
-                                <span>Código</span>
+                                <span>@L("Código", "Codi", "Code")</span>
                                 <InputText class="text-input" @bind-Value="model.Code" disabled="@(!string.IsNullOrWhiteSpace(Code))" />
                             </label>
                             <label class="field wide">
-                                <span>Descripción</span>
+                                <span>@L("Descripción", "Descripció", "Description")</span>
                                 <InputText class="text-input" @bind-Value="model.Description" />
                             </label>
                             <label class="field">
-                                <span>Cliente</span>
+                                <span>@L("Cliente", "Client", "Client")</span>
                                 <InputNumber class="text-input" @bind-Value="model.ClientCode" />
                             </label>
                             <label class="field wide">
-                                <span>Nombre cliente</span>
+                                <span>@L("Nombre cliente", "Nom client", "Client name")</span>
                                 <InputText class="text-input" @bind-Value="model.ClientName" />
                             </label>
                             <label class="field">
-                                <span>Referencia</span>
+                                <span>@L("Referencia", "Referència", "Reference")</span>
                                 <InputText class="text-input" @bind-Value="model.Reference" />
                             </label>
                             <label class="field">
-                                <span>Temporada</span>
+                                <span>@L("Temporada", "Temporada", "Season")</span>
                                 <InputText class="text-input" @bind-Value="model.Season" />
                             </label>
                             <label class="field">
-                                <span>Máquina</span>
+                                <span>@L("Máquina", "Màquina", "Machine")</span>
                                 @if (machineOptions.Count == 0)
                                 {
                                     <InputNumber class="text-input" @bind-Value="model.MachineCode" />
@@ -187,7 +188,7 @@ else
                                 else
                                 {
                                     <select class="text-input" value="@model.MachineCode" @onchange="OnHeaderMachineChanged">
-                                        <option value="0">Selecciona máquina</option>
+                                        <option value="0">@L("Selecciona máquina", "Selecciona màquina", "Select machine")</option>
                                         @foreach (var machine in machineOptions)
                                         {
                                             <option value="@ParseMachineCode(machine.Code)">@FormatMachineOption(machine)</option>
@@ -196,7 +197,7 @@ else
                                 }
                             </label>
                             <label class="field wide">
-                                <span>Nombre máquina</span>
+                                <span>@L("Nombre máquina", "Nom màquina", "Machine name")</span>
                                 @if (machineOptions.Count == 0)
                                 {
                                     <InputText class="text-input" @bind-Value="model.MachineName" />
@@ -207,63 +208,63 @@ else
                                 }
                             </label>
                             <label class="field">
-                                <span>% margen</span>
+                                <span>@L("% margen", "% marge", "% margin")</span>
                                 <InputNumber class="text-input" @bind-Value="model.MarginPercent" />
                             </label>
                             <label class="field">
-                                <span>IVA</span>
+                                <span>@L("IVA", "IVA", "VAT")</span>
                                 <InputText class="text-input" @bind-Value="model.VatCode" />
                             </label>
                             <label class="field">
-                                <span>Precio unidad</span>
+                                <span>@L("Precio unidad", "Preu unitat", "Unit price")</span>
                                 <InputNumber class="text-input" @bind-Value="model.UnitPrice" />
                             </label>
                             <label class="field wide">
-                                <span>Composición</span>
+                                <span>@L("Composición", "Composició", "Composition")</span>
                                 <InputText class="text-input" @bind-Value="model.Composition" />
                             </label>
                         </div>
 
                         <div class="muestra-kpi-strip">
-                            <span class="metric-chip">Colores: <strong>@DistinctColorCount</strong></span>
-                            <span class="metric-chip">Tallas: <strong>@DistinctSizeCount</strong></span>
-                            <span class="metric-chip">Venta total: <strong>@TotalSalePrice.ToString("0.00##")</strong></span>
-                            <span class="metric-chip">Coste total: <strong>@TotalCostPrice.ToString("0.00##")</strong></span>
+                            <span class="metric-chip">@L("Colores", "Colors", "Colors"): <strong>@DistinctColorCount</strong></span>
+                            <span class="metric-chip">@L("Tallas", "Talles", "Sizes"): <strong>@DistinctSizeCount</strong></span>
+                            <span class="metric-chip">@L("Venta total", "Venda total", "Total sale"): <strong>@TotalSalePrice.ToUiString("0.00##")</strong></span>
+                            <span class="metric-chip">@L("Coste total", "Cost total", "Total cost"): <strong>@TotalCostPrice.ToUiString("0.00##")</strong></span>
                         </div>
                     </section>
 
                     <section class="panel detail-panel">
                         <div class="detail-panel-header">
                             <div>
-                                <h2>Notas y resumen</h2>
-                                <p class="muted">Contexto operativo del @moduleSingularLower y lectura rápida de la carta.</p>
+                                <h2>@L("Notas y resumen", "Notes i resum", "Notes and summary")</h2>
+                                <p class="muted">@L($"Contexto operativo del {moduleSingularLower} y lectura rápida de la carta.", $"Context operatiu del {moduleSingularLower} i lectura ràpida de la carta.", $"Operational context of the {moduleSingularLower} and quick reading of the card.")</p>
                             </div>
                         </div>
 
                         <label class="field field-full">
-                            <span>Notas</span>
+                            <span>@L("Notas", "Notes", "Notes")</span>
                             <InputTextArea class="text-input textarea-input muestra-notes-input" @bind-Value="model.Notes" />
                         </label>
 
                         <div class="muestra-overview-list">
                             <article>
-                                <strong>Cliente principal</strong>
+                                <strong>@L("Cliente principal", "Client principal", "Main client")</strong>
                                 <span>@DisplayClient</span>
                             </article>
                             <article>
-                                <strong>Máquina</strong>
+                                <strong>@L("Máquina", "Màquina", "Machine")</strong>
                                 <span>@DisplayMachine</span>
                             </article>
                             <article>
-                                <strong>Colores destacados</strong>
+                                <strong>@L("Colores destacados", "Colors destacats", "Top colors")</strong>
                                 <span>@TopColorsLabel</span>
                             </article>
                             <article>
-                                <strong>Tallas destacadas</strong>
+                                <strong>@L("Tallas destacadas", "Talles destacades", "Top sizes")</strong>
                                 <span>@TopSizesLabel</span>
                             </article>
                             <article>
-                                <strong>Composición</strong>
+                                <strong>@L("Composición", "Composició", "Composition")</strong>
                                 <span>@CompositionLabel</span>
                             </article>
                         </div>
@@ -276,23 +277,23 @@ else
                 <section class="panel detail-panel" style="margin-top: 1rem;">
                     <div class="detail-panel-header">
                         <div>
-                            <h2>Carta de colores y tallas</h2>
-                            <p class="muted">Detalle por color, talla y cliente con coste, venta y NC code.</p>
+                            <h2>@L("Carta de colores y tallas", "Carta de colors i talles", "Color and size card")</h2>
+                            <p class="muted">@L("Detalle por color, talla y cliente con coste, venta y NC code.", "Detall per color, talla i client amb cost, venda i codi NC.", "Detail by color, size and client with cost, sale and NC code.")</p>
                         </div>
                         @if (!isReadOnly)
                         {
                             <div class="quick-links">
-                                <button class="secondary-button" type="button" @onclick="DuplicateSelectedClientAcrossLinesAsync">Copiar cliente cabecera</button>
-                                <button class="secondary-button" type="button" @onclick="AddLine">Añadir línea</button>
+                                <button class="secondary-button" type="button" @onclick="DuplicateSelectedClientAcrossLinesAsync">@L("Copiar cliente cabecera", "Copiar client capçalera", "Copy header client")</button>
+                                <button class="secondary-button" type="button" @onclick="AddLine">@L("Añadir línea", "Afegir línia", "Add line")</button>
                             </div>
                         }
                     </div>
 
                     <div class="muestra-kpi-strip">
-                        <span class="metric-chip">Líneas: <strong>@LineCount</strong></span>
-                        <span class="metric-chip">Colores únicos: <strong>@DistinctColorCount</strong></span>
-                        <span class="metric-chip">Tallas únicas: <strong>@DistinctSizeCount</strong></span>
-                        <span class="metric-chip">Venta media línea: <strong>@AverageSalePrice.ToString("0.00##")</strong></span>
+                        <span class="metric-chip">@L("Líneas", "Línies", "Lines"): <strong>@LineCount</strong></span>
+                        <span class="metric-chip">@L("Colores únicos", "Colors únics", "Unique colors"): <strong>@DistinctColorCount</strong></span>
+                        <span class="metric-chip">@L("Tallas únicas", "Talles úniques", "Unique sizes"): <strong>@DistinctSizeCount</strong></span>
+                        <span class="metric-chip">@L("Venta media línea", "Venda mitjana línia", "Average line sale"): <strong>@AverageSalePrice.ToUiString("0.00##")</strong></span>
                     </div>
 
                     <div class="table-scroll">
@@ -300,25 +301,25 @@ else
                             <thead>
                                 <tr>
                                     <th>#</th>
-                                    <th>Talla</th>
-                                    <th>Talla H</th>
-                                    <th>Talla L</th>
-                                    <th>Descripción</th>
-                                    <th>Color</th>
-                                    <th>Coste</th>
-                                    <th>Venta</th>
-                                    <th>Margen</th>
-                                    <th>Cliente</th>
-                                    <th>Nombre cliente</th>
-                                    <th>NC code</th>
-                                    <th>Acciones</th>
+                                    <th>@L("Talla", "Talla", "Size")</th>
+                                    <th>@L("Talla H", "Talla H", "Size H")</th>
+                                    <th>@L("Talla L", "Talla L", "Size L")</th>
+                                    <th>@L("Descripción", "Descripció", "Description")</th>
+                                    <th>@L("Color", "Color", "Color")</th>
+                                    <th>@L("Coste", "Cost", "Cost")</th>
+                                    <th>@L("Venta", "Venda", "Sale")</th>
+                                    <th>@L("Margen", "Marge", "Margin")</th>
+                                    <th>@L("Cliente", "Client", "Client")</th>
+                                    <th>@L("Nombre cliente", "Nom client", "Client name")</th>
+                                    <th>@L("Código NC", "Codi NC", "CN code")</th>
+                                    <th>@L("Acciones", "Accions", "Actions")</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @if (model.Lines.Count == 0)
                                 {
                                     <tr>
-                                        <td colspan="13" class="muted">No hay detalle cargado para este @moduleSingularLower.</td>
+                                        <td colspan="13" class="muted">@L($"No hay detalle cargado para este {moduleSingularLower}.", $"No hi ha detall carregat per a aquest {moduleSingularLower}.", $"There is no detail loaded for this {moduleSingularLower}.")</td>
                                     </tr>
                                 }
                                 else
@@ -341,14 +342,14 @@ else
                                             <td><InputText class="text-input table-input" @bind-Value="line.ClientName" /></td>
                                             <td><InputText class="text-input table-input" @bind-Value="line.NcCode" /></td>
                                             <td>
-                                                <button class="secondary-button inline-action-button" type="button" @onclick="() => SelectBreakdownLine(line.LineNumber)">Desglose</button>
+                                                <button class="secondary-button inline-action-button" type="button" @onclick="() => SelectBreakdownLine(line.LineNumber)">@L("Desglose", "Desglossament", "Breakdown")</button>
                                                 @if (!string.IsNullOrWhiteSpace(model.Code))
                                                 {
-                                                    <a class="inline-link" href="@BuildCreateParteFromSampleUrl(line.LineNumber)">Parte</a>
+                                                    <a class="inline-link" href="@BuildCreateParteFromSampleUrl(line.LineNumber)">@L("Parte", "Part", "Order")</a>
                                                 }
                                                 @if (!isReadOnly)
                                                 {
-                                                    <button class="danger-link" type="button" @onclick="() => RemoveLine(line.LineNumber)">Quitar</button>
+                                                    <button class="danger-link" type="button" @onclick="() => RemoveLine(line.LineNumber)">@L("Quitar", "Treure", "Remove")</button>
                                                 }
                                             </td>
                                         </tr>
@@ -366,14 +367,14 @@ else
                     <section class="panel detail-panel">
                         <div class="detail-panel-header">
                             <div>
-                                <h2>Selección de color · talla</h2>
-                                <p class="muted">Cada línea de carta puede tener su propia ficha técnica de máquina e hilos.</p>
+                                <h2>@L("Selección de color · talla", "Selecció de color · talla", "Color · size selection")</h2>
+                                <p class="muted">@L("Cada línea de carta puede tener su propia ficha técnica de máquina e hilos.", "Cada línia de carta pot tenir la seva pròpia fitxa tècnica de màquina i fils.", "Each card line can have its own machine and yarn technical sheet.")</p>
                             </div>
                         </div>
 
                         @if (model.Lines.Count == 0)
                         {
-                            <p class="muted">Añade primero alguna línea a la carta de colores para poder trabajar el desglose.</p>
+                            <p class="muted">@L("Añade primero alguna línea a la carta de colores para poder trabajar el desglose.", "Afegeix primer alguna línia a la carta de colors per poder treballar el desglossament.", "Add at least one line to the color card first so you can work on the breakdown.")</p>
                         }
                         else
                         {
@@ -384,7 +385,7 @@ else
                                             type="button"
                                             @onclick="@(() => SelectBreakdownLine(line.LineNumber))">
                                         <strong>@BuildLineTitle(line)</strong>
-                                        <span>@(string.IsNullOrWhiteSpace(line.Color) ? "Sin color" : line.Color)</span>
+                                        <span>@(string.IsNullOrWhiteSpace(line.Color) ? L("Sin color", "Sense color", "No color") : line.Color)</span>
                                         <span>@BuildSizeLabel(line)</span>
                                         <span class="stock-state-badge @(HasBreakdownData(line) ? "ok" : "review")">@GetBreakdownStatusLabel(line)</span>
                                     </button>
@@ -396,28 +397,28 @@ else
                     <section class="panel detail-panel">
                         <div class="detail-panel-header">
                             <div>
-                                <h2>Desglose técnico</h2>
-                                <p class="muted">Cabecera de máquina y detalle de hilos/proveedores para la línea seleccionada.</p>
+                                <h2>@L("Desglose técnico", "Desglossament tècnic", "Technical breakdown")</h2>
+                                <p class="muted">@L("Cabecera de máquina y detalle de hilos/proveedores para la línea seleccionada.", "Capçalera de màquina i detall de fils/proveïdors per a la línia seleccionada.", "Machine header and yarn/supplier detail for the selected line.")</p>
                             </div>
                             @if (SelectedBreakdownLine is not null)
                             {
                                 <div class="quick-links">
                                     @if (!isReadOnly)
                                     {
-                                        <button class="secondary-button" type="button" @onclick="CopySampleMachineIntoBreakdown">Usar máquina cabecera</button>
-                                        <button class="secondary-button" type="button" @onclick="AddBreakdownMaterialLine">Añadir hilo</button>
+                                        <button class="secondary-button" type="button" @onclick="CopySampleMachineIntoBreakdown">@L("Usar máquina cabecera", "Usar màquina capçalera", "Use header machine")</button>
+                                        <button class="secondary-button" type="button" @onclick="AddBreakdownMaterialLine">@L("Añadir hilo", "Afegir fil", "Add yarn")</button>
                                     }
                                     @if (SelectedBreakdown is not null && SelectedBreakdown.MachineCode > 0)
                                     {
-                                        <a class="secondary-button link-button" href="@BuildAcabadosByMachineUrl(SelectedBreakdown.MachineCode, SelectedBreakdown.OperationCode)">Acabados máquina</a>
+                                        <a class="secondary-button link-button" href="@BuildAcabadosByMachineUrl(SelectedBreakdown.MachineCode, SelectedBreakdown.OperationCode)">@L("Acabados máquina", "Acabats màquina", "Machine finishing")</a>
                                     }
                                     @if (!string.IsNullOrWhiteSpace(model.Code))
                                     {
-                                        <a class="secondary-button link-button" href="@BuildCreateParteFromSampleUrl(SelectedBreakdownLine.LineNumber)">Crear parte</a>
+                                        <a class="secondary-button link-button" href="@BuildCreateParteFromSampleUrl(SelectedBreakdownLine.LineNumber)">@L("Crear parte", "Crear part", "Create order")</a>
                                     }
                                     @if (!string.IsNullOrWhiteSpace(Code))
                                     {
-                                        <a class="secondary-button link-button" href="@BuildBreakdownPrintUrl(SelectedBreakdownLine.LineNumber)">Imprimir desglose</a>
+                                        <a class="secondary-button link-button" href="@BuildBreakdownPrintUrl(SelectedBreakdownLine.LineNumber)">@L("Imprimir desglose", "Imprimir desglossament", "Print breakdown")</a>
                                     }
                                 </div>
                             }
@@ -425,42 +426,42 @@ else
 
                         @if (SelectedBreakdownLine is null || SelectedBreakdown is null)
                         {
-                            <p class="muted">Selecciona una línea de carta para abrir su desglose técnico.</p>
+                            <p class="muted">@L("Selecciona una línea de carta para abrir su desglose técnico.", "Selecciona una línia de carta per obrir el seu desglossament tècnic.", "Select a card line to open its technical breakdown.")</p>
                         }
                         else
                         {
                             <div class="muestra-kpi-strip">
-                                <span class="metric-chip">Línea: <strong>@SelectedBreakdownLine.LineNumber</strong></span>
-                                <span class="metric-chip">Materiales: <strong>@SelectedBreakdown.Lines.Count</strong></span>
-                                <span class="metric-chip">Coste hilos: <strong>@BreakdownMaterialTotal.ToString("0.00##")</strong></span>
-                                <span class="metric-chip">Coste máquina: <strong>@BreakdownMachineImport.ToString("0.00##")</strong></span>
-                                <span class="metric-chip">Coste total: <strong>@BreakdownTotalCost.ToString("0.00##")</strong></span>
-                                <span class="metric-chip">Operación: <strong>@DisplaySelectedBreakdownOperation</strong></span>
+                                <span class="metric-chip">@L("Línea", "Línia", "Line"): <strong>@SelectedBreakdownLine.LineNumber</strong></span>
+                                <span class="metric-chip">@L("Materiales", "Materials", "Materials"): <strong>@SelectedBreakdown.Lines.Count</strong></span>
+                                <span class="metric-chip">@L("Coste hilos", "Cost fils", "Yarn cost"): <strong>@BreakdownMaterialTotal.ToUiString("0.00##")</strong></span>
+                                <span class="metric-chip">@L("Coste máquina", "Cost màquina", "Machine cost"): <strong>@BreakdownMachineImport.ToUiString("0.00##")</strong></span>
+                                <span class="metric-chip">@L("Coste total", "Cost total", "Total cost"): <strong>@BreakdownTotalCost.ToUiString("0.00##")</strong></span>
+                                <span class="metric-chip">@L("Operación", "Operació", "Operation"): <strong>@DisplaySelectedBreakdownOperation</strong></span>
                             </div>
 
                             <div class="form-grid" style="margin-top: 1rem;">
                                 <label class="field">
-                                    <span>Cliente</span>
+                                    <span>@L("Cliente", "Client", "Client")</span>
                                     <InputNumber class="text-input" @bind-Value="SelectedBreakdown.ClientCode" />
                                 </label>
                                 <label class="field wide">
-                                    <span>Nombre cliente</span>
+                                    <span>@L("Nombre cliente", "Nom client", "Client name")</span>
                                     <InputText class="text-input" @bind-Value="SelectedBreakdown.ClientName" />
                                 </label>
                                 <label class="field">
-                                    <span>Color muestra</span>
+                                    <span>@L("Color muestra", "Color mostra", "Sample color")</span>
                                     <input class="text-input" value="@DisplayBreakdownColor(SelectedBreakdownLine)" disabled />
                                 </label>
                                 <label class="field">
-                                    <span>Talla</span>
+                                    <span>@L("Talla", "Talla", "Size")</span>
                                     <input class="text-input" value="@BuildSizeLabel(SelectedBreakdownLine)" disabled />
                                 </label>
                                 <label class="field">
-                                    <span>Fecha</span>
+                                    <span>@L("Fecha", "Data", "Date")</span>
                                     <InputDate class="text-input" @bind-Value="SelectedBreakdown.WorkDate" />
                                 </label>
                                 <label class="field">
-                                    <span>Máquina</span>
+                                    <span>@L("Máquina", "Màquina", "Machine")</span>
                                     @if (machineOptions.Count == 0)
                                     {
                                         <InputNumber class="text-input" @bind-Value="SelectedBreakdown.MachineCode" />
@@ -468,7 +469,7 @@ else
                                     else
                                     {
                                         <select class="text-input" value="@SelectedBreakdown.MachineCode" @onchange="OnBreakdownMachineChanged">
-                                            <option value="0">Selecciona máquina</option>
+                                            <option value="0">@L("Selecciona máquina", "Selecciona màquina", "Select machine")</option>
                                             @foreach (var machine in machineOptions)
                                             {
                                                 <option value="@ParseMachineCode(machine.Code)">@FormatMachineOption(machine)</option>
@@ -477,7 +478,7 @@ else
                                     }
                                 </label>
                                 <label class="field wide">
-                                    <span>Nombre máquina</span>
+                                    <span>@L("Nombre máquina", "Nom màquina", "Machine name")</span>
                                     @if (machineOptions.Count == 0)
                                     {
                                         <InputText class="text-input" @bind-Value="SelectedBreakdown.MachineName" />
@@ -488,7 +489,7 @@ else
                                     }
                                 </label>
                                 <label class="field">
-                                    <span>Operación</span>
+                                    <span>@L("Operación", "Operació", "Operation")</span>
                                     @if (operationOptions.Count == 0)
                                     {
                                         <InputNumber class="text-input" @bind-Value="SelectedBreakdown.OperationCode" />
@@ -496,7 +497,7 @@ else
                                     else
                                     {
                                         <select class="text-input" value="@SelectedBreakdown.OperationCode" @onchange="OnBreakdownOperationChanged">
-                                            <option value="0">Selecciona operación</option>
+                                            <option value="0">@L("Selecciona operación", "Selecciona operació", "Select operation")</option>
                                             @foreach (var operation in operationOptions)
                                             {
                                                 <option value="@ParseOperationCode(operation.Code)">@FormatOperationOption(operation)</option>
@@ -505,7 +506,7 @@ else
                                     }
                                 </label>
                                 <label class="field wide">
-                                    <span>Nombre operación</span>
+                                    <span>@L("Nombre operación", "Nom operació", "Operation name")</span>
                                     @if (operationOptions.Count == 0)
                                     {
                                         <InputText class="text-input" @bind-Value="SelectedBreakdown.OperationName" />
@@ -516,35 +517,35 @@ else
                                     }
                                 </label>
                                 <label class="field">
-                                    <span>Agujas</span>
+                                    <span>@L("Agujas", "Agulles", "Needles")</span>
                                     <InputNumber class="text-input" @bind-Value="SelectedBreakdown.Needles" />
                                 </label>
                                 <label class="field">
-                                    <span>Velocidad</span>
+                                    <span>@L("Velocidad", "Velocitat", "Speed")</span>
                                     <InputNumber class="text-input" @bind-Value="SelectedBreakdown.Speed" />
                                 </label>
                                 <label class="field">
-                                    <span>Disco</span>
+                                    <span>@L("Disco", "Disc", "Disk")</span>
                                     <InputText class="text-input" @bind-Value="SelectedBreakdown.Disk" />
                                 </label>
                                 <label class="field">
-                                    <span>Tiempo (min)</span>
+                                    <span>@L("Tiempo (min)", "Temps (min)", "Time (min)")</span>
                                     <InputNumber class="text-input" @bind-Value="SelectedBreakdown.TimeMinutes" />
                                 </label>
                                 <label class="field">
-                                    <span>Precio máquina</span>
+                                    <span>@L("Precio máquina", "Preu màquina", "Machine price")</span>
                                     <InputNumber class="text-input" @bind-Value="SelectedBreakdown.MachineRate" />
                                 </label>
                                 <label class="field">
-                                    <span>Importe máquina</span>
-                                    <input class="text-input" value="@BreakdownMachineImport.ToString("0.00##")" disabled />
+                                    <span>@L("Importe máquina", "Import màquina", "Machine amount")</span>
+                                    <input class="text-input" value="@BreakdownMachineImport.ToUiString("0.00##")" disabled />
                                 </label>
                                 <label class="field wide">
-                                    <span>Cortes</span>
+                                    <span>@L("Cortes", "Talls", "Cuts")</span>
                                     <InputText class="text-input" @bind-Value="SelectedBreakdown.Cuts" />
                                 </label>
                                 <label class="field field-full">
-                                    <span>Notas técnicas</span>
+                                    <span>@L("Notas técnicas", "Notes tècniques", "Technical notes")</span>
                                     <InputTextArea class="text-input textarea-input" @bind-Value="SelectedBreakdown.Notes" />
                                 </label>
                             </div>
@@ -554,17 +555,17 @@ else
                                     <thead>
                                         <tr>
                                             <th>#</th>
-                                            <th>Hilo</th>
-                                            <th>Prove.</th>
-                                            <th>Nombre proveedor</th>
-                                            <th>Color</th>
+                                            <th>@L("Hilo", "Fil", "Yarn")</th>
+                                            <th>@L("Prove.", "Prove.", "Supp.")</th>
+                                            <th>@L("Nombre proveedor", "Nom proveïdor", "Supplier name")</th>
+                                            <th>@L("Color", "Color", "Color")</th>
                                             <th>GH</th>
-                                            <th>Cabos</th>
-                                            <th>Passades</th>
-                                            <th>Grad.</th>
-                                            <th>Consum</th>
-                                            <th>Precio</th>
-                                            <th>Importe</th>
+                                            <th>@L("Cabos", "Caps", "Ends")</th>
+                                            <th>@L("Passades", "Passades", "Passes")</th>
+                                            <th>@L("Grad.", "Grad.", "Grad.")</th>
+                                            <th>@L("Consum", "Consum", "Consumption")</th>
+                                            <th>@L("Precio", "Preu", "Price")</th>
+                                            <th>@L("Importe", "Import", "Amount")</th>
                                             @if (!isReadOnly)
                                             {
                                                 <th></th>
@@ -575,7 +576,7 @@ else
                                         @if (SelectedBreakdown.Lines.Count == 0)
                                         {
                                             <tr>
-                                                <td colspan="@(isReadOnly ? 12 : 13)" class="muted">Todavía no hay materiales cargados para este desglose.</td>
+                                            <td colspan="@(isReadOnly ? 12 : 13)" class="muted">@L("Todavía no hay materiales cargados para este desglose.", "Encara no hi ha materials carregats per a aquest desglossament.", "There are no materials loaded for this breakdown yet.")</td>
                                             </tr>
                                         }
                                         else
@@ -594,11 +595,11 @@ else
                                                     <td><InputNumber class="text-input table-input" @bind-Value="line.Graduation" /></td>
                                                     <td><InputNumber class="text-input table-input" @bind-Value="line.Consumption" /></td>
                                                     <td><InputNumber class="text-input table-input" @bind-Value="line.Price" /></td>
-                                                    <td><input class="text-input table-input" value="@CalculateBreakdownLineImport(line).ToString("0.00##")" disabled /></td>
+                                                    <td><input class="text-input table-input" value="@CalculateBreakdownLineImport(line).ToUiString("0.00##")" disabled /></td>
                                                     @if (!isReadOnly)
                                                     {
                                                         <td>
-                                                            <button class="danger-link" type="button" @onclick="() => RemoveBreakdownMaterialLine(line.LineNumber)">Quitar</button>
+                                                            <button class="danger-link" type="button" @onclick="() => RemoveBreakdownMaterialLine(line.LineNumber)">@L("Quitar", "Treure", "Remove")</button>
                                                         </td>
                                                     }
                                                 </tr>
@@ -622,33 +623,33 @@ else
                             <div class="print-preview-sheet-header">
                                 <strong>@DisplayClient</strong>
                                 <span>@DisplayMachine</span>
-                                <span>@($"Ref. {DisplayReference} · Temp. {DisplaySeason}")</span>
+                                <span>@($"{L("Ref.", "Ref.", "Ref.")} {DisplayReference} · {L("Temp.", "Temp.", "Season")} {DisplaySeason}")</span>
                             </div>
                             <div class="print-preview-kpis">
-                                <span>@($"{LineCount} línies")</span>
-                                <span>@($"{DistinctColorCount} colors")</span>
-                                <span>@($"{DistinctSizeCount} talles")</span>
+                                <span>@($"{LineCount} {L("líneas", "línies", "lines")}")</span>
+                                <span>@($"{DistinctColorCount} {L("colores", "colors", "colors")}")</span>
+                                <span>@($"{DistinctSizeCount} {L("tallas", "talles", "sizes")}")</span>
                             </div>
                             <ul class="print-preview-list">
                                 @foreach (var line in model.Lines.OrderBy(item => item.LineNumber).Take(4))
                                 {
-                                    <li>@($"{BuildLineTitle(line)} · {line.Color} · venda {line.SalePrice:0.00##}")</li>
+<li>@($"{BuildLineTitle(line)} · {line.Color} · {L("venta", "venda", "sale")} {line.SalePrice.ToUiString("0.00##")}")</li>
                                 }
                                 @if (model.Lines.Count > 4)
                                 {
-                                    <li>+@(model.Lines.Count - 4) líneas más</li>
+                                    <li>+@(model.Lines.Count - 4) @L("líneas más", "línies més", "more lines")</li>
                                 }
                             </ul>
                         </div>
                         @if (!string.IsNullOrWhiteSpace(Code))
                         {
-                            <a class="secondary-button link-button" href="@BuildSheetPrintUrl()">Abrir ficha</a>
+                            <a class="secondary-button link-button" href="@BuildSheetPrintUrl()">@L("Abrir ficha", "Obrir fitxa", "Open sheet")</a>
                         }
                     </article>
 
                     <article class="panel print-preview-card">
-                        <p class="eyebrow">Etiquetas @moduleSingularLower</p>
-                        <h3>Selecció per color i talla</h3>
+                        <p class="eyebrow">@L($"Etiquetas {moduleSingularLower}", $"Etiquetes {moduleSingularLower}", $"{ModuleSingularTitle} labels")</p>
+                        <h3>@L("Selección por color y talla", "Selecció per color i talla", "Selection by color and size")</h3>
                         <div class="print-preview-sheet">
                             <div class="print-preview-sheet-header">
                                 <strong>@DisplayCodeAndDescription</strong>
@@ -663,40 +664,40 @@ else
                         </div>
                         @if (!string.IsNullOrWhiteSpace(Code))
                         {
-                            <a class="secondary-button link-button" href="@BuildLabelsPrintUrl()">Abrir etiquetas</a>
+                            <a class="secondary-button link-button" href="@BuildLabelsPrintUrl()">@L("Abrir etiquetas", "Obrir etiquetes", "Open labels")</a>
                         }
                     </article>
 
                     <article class="panel print-preview-card">
-                        <p class="eyebrow">Desglose color · máquina</p>
+                        <p class="eyebrow">@L("Desglose color · máquina", "Desglossament color · màquina", "Color · machine breakdown")</p>
                         <h3>@DisplaySelectedBreakdownTitle</h3>
                         <div class="print-preview-sheet">
                             <div class="print-preview-sheet-header">
                                 <strong>@DisplaySelectedBreakdownMachine</strong>
                                 <span>@DisplaySelectedBreakdownDate</span>
-                                <span>@($"{SelectedBreakdown?.Lines.Count ?? 0} materiales · coste {BreakdownTotalCost.ToString("0.00##")}")</span>
+                                <span>@($"{SelectedBreakdown?.Lines.Count ?? 0} {L("materiales", "materials", "materials")} · {L("coste", "cost", "cost")} {BreakdownTotalCost.ToUiString("0.00##")}")</span>
                             </div>
                             <ul class="print-preview-list">
                                 @if (SelectedBreakdown?.Lines.Count > 0)
                                 {
                                     @foreach (var line in SelectedBreakdown.Lines.OrderBy(item => item.LineNumber).Take(5))
                                     {
-                                        <li>@($"{line.YarnCode} · {line.MaterialColor} · consum {line.Consumption:0.00##} · imp. {CalculateBreakdownLineImport(line):0.00##}")</li>
+<li>@($"{line.YarnCode} · {line.MaterialColor} · {L("consumo", "consum", "consumption")} {line.Consumption.ToUiString("0.00##")} · {L("imp.", "imp.", "amt.")} {CalculateBreakdownLineImport(line).ToUiString("0.00##")}")</li>
                                     }
                                     @if (SelectedBreakdown.Lines.Count > 5)
                                     {
-                                        <li>+@(SelectedBreakdown.Lines.Count - 5) líneas más</li>
+                                        <li>+@(SelectedBreakdown.Lines.Count - 5) @L("líneas más", "línies més", "more lines")</li>
                                     }
                                 }
                                 else
                                 {
-                                    <li>Sin desglose técnico cargado para la línea seleccionada.</li>
+                                    <li>@L("Sin desglose técnico cargado para la línea seleccionada.", "Sense desglossament tècnic carregat per a la línia seleccionada.", "No technical breakdown loaded for the selected line.")</li>
                                 }
                             </ul>
                         </div>
                         @if (!string.IsNullOrWhiteSpace(Code) && SelectedBreakdownLine is not null)
                         {
-                            <a class="secondary-button link-button" href="@BuildBreakdownPrintUrl(SelectedBreakdownLine.LineNumber)">Abrir desglose</a>
+                            <a class="secondary-button link-button" href="@BuildBreakdownPrintUrl(SelectedBreakdownLine.LineNumber)">@L("Abrir desglose", "Obrir desglossament", "Open breakdown")</a>
                         }
                     </article>
                 </section>
@@ -707,54 +708,54 @@ else
                 <section class="panel detail-panel" style="margin-top: 1rem;">
                     <div class="detail-panel-header">
                         <div>
-                            <h2>Órdenes de fabricación relacionadas</h2>
-                            <p class="muted">Seguimiento del circuito histórico de producción enlazado a esta @ModuleSingularTitle.ToLowerInvariant().</p>
+                            <h2>@L("Órdenes de fabricación relacionadas", "Ordres de fabricació relacionades", "Related manufacturing orders")</h2>
+                            <p class="muted">@L($"Seguimiento del circuito histórico de producción enlazado a esta {ModuleSingularTitle.ToLowerInvariant()}.", $"Seguiment del circuit històric de producció enllaçat a aquesta {ModuleSingularTitle.ToLowerInvariant()}.", $"Tracking of the historical production flow linked to this {ModuleSingularTitle.ToLowerInvariant()}.")</p>
                         </div>
                         <div class="quick-links">
                             @if (!string.IsNullOrWhiteSpace(model.Code))
                             {
-                                <a class="secondary-button link-button" href="@BuildCreateParteFromSampleUrl()">Crear orden</a>
-                                <a class="secondary-button link-button" href="@BuildLinkedFinishOrdersUrl()">Abrir en acabados</a>
+                                <a class="secondary-button link-button" href="@BuildCreateParteFromSampleUrl()">@L("Crear orden", "Crear ordre", "Create order")</a>
+                                <a class="secondary-button link-button" href="@BuildLinkedFinishOrdersUrl()">@L("Abrir órdenes", "Obrir ordres", "Open orders")</a>
                             }
                         </div>
                     </div>
 
                     @if (string.IsNullOrWhiteSpace(model.Code))
                     {
-                        <p class="muted">Guarda primero la ficha para poder generar y seguir órdenes de fabricación.</p>
+                        <p class="muted">@L("Guarda primero la ficha para poder generar y seguir órdenes de fabricación.", "Desa primer la fitxa per poder generar i seguir ordres de fabricació.", "Save the sheet first to generate and track manufacturing orders.")</p>
                     }
                     else
                     {
                         <div class="summary-card-grid">
                             <article class="summary-card">
-                                <span class="summary-card-label">Órdenes</span>
+                                <span class="summary-card-label">@L("Órdenes", "Ordres", "Orders")</span>
                                 <strong>@linkedFinishOrders.Count</strong>
-                                <span class="summary-card-meta">Total enlazadas a esta ficha</span>
+                                <span class="summary-card-meta">@L("Total enlazadas a esta ficha", "Total enllaçades a aquesta fitxa", "Total linked to this sheet")</span>
                             </article>
                             <article class="summary-card">
-                                <span class="summary-card-label">Pendientes</span>
+                                <span class="summary-card-label">@L("Pendientes", "Pendents", "Pending")</span>
                                 <strong>@GetLinkedOrderStatusCount(ParteAcabadoStatuses.Pending)</strong>
-                                <span class="summary-card-meta">Aún no iniciadas</span>
+                                <span class="summary-card-meta">@L("Aún no iniciadas", "Encara no iniciades", "Not started yet")</span>
                             </article>
                             <article class="summary-card">
-                                <span class="summary-card-label">En proceso</span>
+                                <span class="summary-card-label">@L("En proceso", "En procés", "In progress")</span>
                                 <strong>@GetLinkedOrderStatusCount(ParteAcabadoStatuses.InProgress)</strong>
-                                <span class="summary-card-meta">Trabajo vivo en planta</span>
+                                <span class="summary-card-meta">@L("Trabajo vivo en planta", "Treball viu a planta", "Live work on the floor")</span>
                             </article>
                             <article class="summary-card">
-                                <span class="summary-card-label">Terminadas</span>
+                                <span class="summary-card-label">@L("Terminadas", "Terminades", "Finished")</span>
                                 <strong>@GetLinkedOrderStatusCount(ParteAcabadoStatuses.Finished)</strong>
-                                <span class="summary-card-meta">Ya cerradas</span>
+                                <span class="summary-card-meta">@L("Ya cerradas", "Ja tancades", "Already closed")</span>
                             </article>
                         </div>
 
                         @if (isLoadingLinkedFinishOrders)
                         {
-                            <p class="muted">Cargando órdenes relacionadas...</p>
+                            <p class="muted">@L("Cargando órdenes relacionadas...", "Carregant ordres relacionades...", "Loading related orders...")</p>
                         }
                         else if (linkedFinishOrders.Count == 0)
                         {
-                            <p class="muted">Todavía no hay órdenes de fabricación ligadas a esta ficha.</p>
+                            <p class="muted">@L("Todavía no hay órdenes de fabricación ligadas a esta ficha.", "Encara no hi ha ordres de fabricació lligades a aquesta fitxa.", "There are no manufacturing orders linked to this sheet yet.")</p>
                         }
                         else
                         {
@@ -762,14 +763,14 @@ else
                                 <table class="data-table">
                                     <thead>
                                         <tr>
-                                            <th>Número</th>
-                                            <th>Fecha</th>
-                                            <th>Estado</th>
-                                            <th>Máquina</th>
-                                            <th>Operación</th>
-                                            <th>Tejido</th>
-                                            <th>Color</th>
-                                            <th>Piezas</th>
+                                            <th>@L("Número", "Número", "Number")</th>
+                                            <th>@L("Fecha", "Data", "Date")</th>
+                                            <th>@L("Estado", "Estat", "Status")</th>
+                                            <th>@L("Máquina", "Màquina", "Machine")</th>
+                                            <th>@L("Operación", "Operació", "Operation")</th>
+                                            <th>@L("Tejido", "Teixit", "Fabric")</th>
+                                            <th>@L("Color", "Color", "Color")</th>
+                                            <th>@L("Piezas", "Peces", "Pieces")</th>
                                             <th>Kg</th>
                                             <th></th>
                                         </tr>
@@ -785,12 +786,12 @@ else
                                                 <td>@GetDisplayText(item.OperationName, item.OperationCode)</td>
                                                 <td>@GetLinkedOrderFabricLabel(item)</td>
                                                 <td>@(string.IsNullOrWhiteSpace(item.PrimaryColor) ? "-" : item.PrimaryColor)</td>
-                                                <td>@item.TotalPieces.ToString("0.##")</td>
-                                                <td>@item.TotalKilograms.ToString("0.##")</td>
+                                                <td>@item.TotalPieces.ToUiString("0.##")</td>
+                                                <td>@item.TotalKilograms.ToUiString("0.##")</td>
                                                 <td>
                                                     <div class="inline-action-list">
-                                                        <a class="inline-link" href="@BuildFinishOrderUrl(item.OrderNumber)">Abrir</a>
-                                                        <a class="inline-link" href="@BuildFinishOrderPrintUrl(item.OrderNumber)" target="_blank" rel="noopener noreferrer">Imprimir</a>
+                                                        <a class="inline-link" href="@BuildFinishOrderUrl(item.OrderNumber)">@L("Abrir", "Obrir", "Open")</a>
+                                                        <a class="inline-link" href="@BuildFinishOrderPrintUrl(item.OrderNumber)" target="_blank" rel="noopener noreferrer">@L("Imprimir", "Imprimir", "Print")</a>
                                                     </div>
                                                 </td>
                                             </tr>
@@ -806,15 +807,15 @@ else
             <div class="quick-links" style="margin-top: 1rem;">
                 @if (canEdit)
                 {
-                    <button class="primary-button" type="submit">Guardar @moduleSingularLower</button>
+                    <button class="primary-button" type="submit">@L("Guardar", "Desar", "Save") @moduleSingularLower</button>
                 }
                 @if (canEdit && !string.IsNullOrWhiteSpace(Code))
                 {
-                    <button class="secondary-button danger-button" type="button" @onclick="DeleteAsync">Eliminar @moduleSingularLower</button>
+                    <button class="secondary-button danger-button" type="button" @onclick="DeleteAsync">@L("Eliminar", "Eliminar", "Delete") @moduleSingularLower</button>
                 }
                 @if (!string.IsNullOrWhiteSpace(Code))
                 {
-                    <button class="secondary-button" type="button" @onclick="LoadAuditAsync">Recargar historial</button>
+                    <button class="secondary-button" type="button" @onclick="LoadAuditAsync">@L("Recargar historial", "Recarregar historial", "Reload history")</button>
                 }
             </div>
         </fieldset>
@@ -823,11 +824,11 @@ else
     @if (!string.IsNullOrWhiteSpace(Code))
     {
         <section class="panel" style="margin-top: 1rem;">
-            <h2>Historial reciente del @moduleSingularLower</h2>
+            <h2>@L($"Historial reciente del {moduleSingularLower}", $"Historial recent del {moduleSingularLower}", $"Recent {moduleSingularLower} history")</h2>
             <div class="list-block">
                 @if (recentAuditLogs.Count == 0)
                 {
-                    <p class="muted">Todavía no hay eventos auditados para este @moduleSingularLower.</p>
+                    <p class="muted">@L($"Todavía no hay eventos auditados para este {moduleSingularLower}.", $"Encara no hi ha esdeveniments auditats per a aquest {moduleSingularLower}.", $"There are no audited events for this {moduleSingularLower} yet.")</p>
                 }
                 else
                 {
@@ -857,10 +858,18 @@ else
     private bool canEdit;
     private bool isReadOnly;
     private bool IsComplementMode => NavigationManager.Uri.Contains("/articulos/complementos", StringComparison.OrdinalIgnoreCase);
-    private string ModulePluralTitle => IsComplementMode ? "Complementos" : "Muestras";
-    private string ModuleSingularTitle => IsComplementMode ? "Complemento" : "Muestra";
-    private string modulePluralLower => IsComplementMode ? "complementos" : "muestras";
-    private string moduleSingularLower => IsComplementMode ? "complemento" : "muestra";
+    private string ModulePluralTitle => IsComplementMode
+        ? L("Complementos", "Complements", "Complements")
+        : L("Muestras", "Mostres", "Samples");
+    private string ModuleSingularTitle => IsComplementMode
+        ? L("Complemento", "Complement", "Complement")
+        : L("Muestra", "Mostra", "Sample");
+    private string modulePluralLower => IsComplementMode
+        ? L("complementos", "complements", "complements")
+        : L("muestras", "mostres", "samples");
+    private string moduleSingularLower => IsComplementMode
+        ? L("complemento", "complement", "complement")
+        : L("muestra", "mostra", "sample");
     private MuestraDetailDto model = new();
     private string duplicateSearch = string.Empty;
     private bool isSearchingDuplicates;
@@ -877,6 +886,13 @@ else
     private bool isLoadingLinkedFinishOrders;
     private MuestraTab activeTab = MuestraTab.Ficha;
     private int selectedBreakdownLineNumber;
+    private string L(string spanish, string catalan, string english) =>
+        T.CurrentLanguage switch
+        {
+            AppLanguages.Catalan => catalan,
+            AppLanguages.English => english,
+            _ => spanish
+        };
 
     private int LineCount => model.Lines.Count;
     private int DistinctColorCount => model.Lines.Select(line => NormalizeToken(line.Color)).Where(value => !string.IsNullOrWhiteSpace(value)).Distinct(StringComparer.OrdinalIgnoreCase).Count();
@@ -894,50 +910,50 @@ else
             .DefaultIfEmpty(model.MarginPercent)
             .Average();
     private string DisplayOrigin => string.IsNullOrWhiteSpace(model.Origin) ? "local" : model.Origin;
-    private string DisplayClient => !string.IsNullOrWhiteSpace(model.ClientName) ? model.ClientName : (model.ClientCode > 0 ? $"Cliente {model.ClientCode}" : "Sin cliente");
-    private string DisplayMachine => !string.IsNullOrWhiteSpace(model.MachineName) ? model.MachineName : (model.MachineCode > 0 ? $"Máquina {model.MachineCode}" : "Sin máquina");
-    private string DisplayReference => string.IsNullOrWhiteSpace(model.Reference) ? "Sin referencia" : model.Reference;
-    private string DisplaySeason => string.IsNullOrWhiteSpace(model.Season) ? "Sin temporada" : model.Season;
+    private string DisplayClient => !string.IsNullOrWhiteSpace(model.ClientName) ? model.ClientName : (model.ClientCode > 0 ? $"{L("Cliente", "Client", "Client")} {model.ClientCode}" : L("Sin cliente", "Sense client", "No client"));
+    private string DisplayMachine => !string.IsNullOrWhiteSpace(model.MachineName) ? model.MachineName : (model.MachineCode > 0 ? $"{L("Máquina", "Màquina", "Machine")} {model.MachineCode}" : L("Sin máquina", "Sense màquina", "No machine"));
+    private string DisplayReference => string.IsNullOrWhiteSpace(model.Reference) ? L("Sin referencia", "Sense referència", "No reference") : model.Reference;
+    private string DisplaySeason => string.IsNullOrWhiteSpace(model.Season) ? L("Sin temporada", "Sense temporada", "No season") : model.Season;
     private string PageTitleText => !string.IsNullOrWhiteSpace(Code)
-        ? $"Editar {moduleSingularLower} {Code}"
-        : $"Nueva {moduleSingularLower}";
-    private string PrintSheetEyebrow => IsComplementMode ? "Fitxa complement" : "Fitxa mostra";
+        ? $"{L("Editar", "Editar", "Edit")} {moduleSingularLower} {Code}"
+        : $"{L("Nueva", "Nova", "New")} {moduleSingularLower}";
+    private string PrintSheetEyebrow => IsComplementMode ? L("Ficha complemento", "Fitxa complement", "Complement sheet") : L("Ficha muestra", "Fitxa mostra", "Sample sheet");
     private string DisplayCodeAndDescription => string.IsNullOrWhiteSpace(model.Code)
-        ? $"Nuevo {moduleSingularLower}"
+        ? $"{L("Nuevo", "Nou", "New")} {moduleSingularLower}"
         : $"{model.Code} · {model.Description}";
-    private string DisplayCompositionPreview => string.IsNullOrWhiteSpace(model.Composition) ? "Composición pendiente" : model.Composition;
+    private string DisplayCompositionPreview => string.IsNullOrWhiteSpace(model.Composition) ? L("Composición pendiente", "Composició pendent", "Pending composition") : model.Composition;
     private string TopColorsLabel => BuildTopList(
         model.Lines.Select(line => NormalizeToken(line.Color)).Where(value => !string.IsNullOrWhiteSpace(value)),
-        "Sin colores");
+        L("Sin colores", "Sense colors", "No colors"));
     private string TopSizesLabel => BuildTopList(
         model.Lines.Select(BuildSizeLabel).Where(value => !string.IsNullOrWhiteSpace(value)),
-        "Sin tallas");
-    private string CompositionLabel => string.IsNullOrWhiteSpace(model.Composition) ? "Pendiente de completar" : model.Composition;
+        L("Sin tallas", "Sense talles", "No sizes"));
+    private string CompositionLabel => string.IsNullOrWhiteSpace(model.Composition) ? L("Pendiente de completar", "Pendent de completar", "Pending completion") : model.Composition;
     private string FichaStatusLabel => model.Lines.Count == 0
-        ? "Pendiente"
+        ? L("Pendiente", "Pendent", "Pending")
         : string.IsNullOrWhiteSpace(model.Description) || string.IsNullOrWhiteSpace(model.ClientName)
-            ? "Incompleta"
-            : "Operativa";
+            ? L("Incompleta", "Incompleta", "Incomplete")
+            : L("Operativa", "Operativa", "Operational");
     private string FichaStatusHelp => model.Lines.Count == 0
-        ? "Falta cargar la carta de colores"
+        ? L("Falta cargar la carta de colores", "Falta carregar la carta de colors", "The color card is still missing")
         : string.IsNullOrWhiteSpace(model.Description) || string.IsNullOrWhiteSpace(model.ClientName)
-            ? "Revisa cabecera y cliente"
-            : "Lista para impresión y trabajo";
+            ? L("Revisa cabecera y cliente", "Revisa capçalera i client", "Review header and client")
+            : L("Lista para impresión y trabajo", "Llesta per a impressió i treball", "Ready for printing and work");
     private MuestraLineDto? SelectedBreakdownLine => model.Lines.OrderBy(item => item.LineNumber).FirstOrDefault(item => item.LineNumber == selectedBreakdownLineNumber);
     private MuestraBreakdownDto? SelectedBreakdown => SelectedBreakdownLine?.Breakdown;
     private decimal BreakdownMaterialTotal => SelectedBreakdown?.Lines.Sum(CalculateBreakdownLineImport) ?? 0m;
     private decimal BreakdownMachineImport => SelectedBreakdown is null ? 0m : Math.Round(SelectedBreakdown.TimeMinutes * SelectedBreakdown.MachineRate, 2);
     private decimal BreakdownTotalCost => BreakdownMaterialTotal + BreakdownMachineImport;
     private string DisplaySelectedBreakdownTitle => SelectedBreakdownLine is null
-        ? "Sin línea seleccionada"
+        ? L("Sin línea seleccionada", "Sense línia seleccionada", "No selected line")
         : $"{BuildLineTitle(SelectedBreakdownLine)} · {DisplayBreakdownColor(SelectedBreakdownLine)}";
     private string DisplaySelectedBreakdownMachine => SelectedBreakdown is null
-        ? "Sin máquina"
-        : !string.IsNullOrWhiteSpace(SelectedBreakdown.MachineName) ? SelectedBreakdown.MachineName : (SelectedBreakdown.MachineCode > 0 ? $"Máquina {SelectedBreakdown.MachineCode}" : "Sin máquina");
+        ? L("Sin máquina", "Sense màquina", "No machine")
+        : !string.IsNullOrWhiteSpace(SelectedBreakdown.MachineName) ? SelectedBreakdown.MachineName : (SelectedBreakdown.MachineCode > 0 ? $"{L("Máquina", "Màquina", "Machine")} {SelectedBreakdown.MachineCode}" : L("Sin máquina", "Sense màquina", "No machine"));
     private string DisplaySelectedBreakdownOperation => SelectedBreakdown is null
-        ? "Sin operación"
-        : !string.IsNullOrWhiteSpace(SelectedBreakdown.OperationName) ? SelectedBreakdown.OperationName : (SelectedBreakdown.OperationCode > 0 ? $"Operación {SelectedBreakdown.OperationCode}" : "Sin operación");
-    private string DisplaySelectedBreakdownDate => SelectedBreakdown?.WorkDate?.ToString("dd/MM/yyyy") ?? "Sin fecha";
+        ? L("Sin operación", "Sense operació", "No operation")
+        : !string.IsNullOrWhiteSpace(SelectedBreakdown.OperationName) ? SelectedBreakdown.OperationName : (SelectedBreakdown.OperationCode > 0 ? $"{L("Operación", "Operació", "Operation")} {SelectedBreakdown.OperationCode}" : L("Sin operación", "Sense operació", "No operation"));
+    private string DisplaySelectedBreakdownDate => SelectedBreakdown?.WorkDate?.ToString("dd/MM/yyyy") ?? L("Sin fecha", "Sense data", "No date");
     private string CurrentSourceSampleKind => IsComplementMode ? ParteAcabadoSourceKinds.Complement : ParteAcabadoSourceKinds.Sample;
 
     protected override async Task OnParametersSetAsync()
@@ -962,7 +978,7 @@ else
             var detail = await MuestraQueries.GetByCodeAsync(tenantId.Value, companyId.Value, Uri.UnescapeDataString(Code));
             if (detail is null)
             {
-                statusMessage = $"No se ha encontrado el {moduleSingularLower} solicitado.";
+                statusMessage = L($"No se ha encontrado el {moduleSingularLower} solicitado.", $"No s'ha trobat el {moduleSingularLower} sol·licitat.", $"The requested {moduleSingularLower} was not found.");
                 isError = true;
                 model = new MuestraDetailDto();
                 recentAuditLogs = [];
@@ -1161,7 +1177,7 @@ else
         var source = await MuestraQueries.GetByIdentityAsync(tenantId.Value, companyId.Value, sourceCode, sourceClientCode);
         if (source is null)
         {
-            statusMessage = "No se ha encontrado el complemento base seleccionado.";
+            statusMessage = L("No se ha encontrado el complemento base seleccionado.", "No s'ha trobat el complement base seleccionat.", "The selected base complement was not found.");
             isError = true;
             return;
         }
@@ -1173,7 +1189,7 @@ else
 
         model = CloneMuestraForDuplication(source, targetCode, targetClientCode, targetClientName, targetCenter);
         EnsureBreakdownState();
-        statusMessage = $"Base cargada desde el complemento {source.Code} del cliente {source.ClientCode}.";
+            statusMessage = $"{L("Base cargada desde el complemento", "Base carregada des del complement", "Base loaded from complement")} {source.Code} {L("del cliente", "del client", "for client")} {source.ClientCode}.";
         isError = false;
     }
 
@@ -1186,7 +1202,7 @@ else
 
         if (isReadOnly)
         {
-            statusMessage = "No tienes permisos de edición en este tenant.";
+            statusMessage = L("No tienes permisos de edición en este tenant.", "No tens permisos d'edició en aquest tenant.", "You do not have edit permissions in this tenant.");
             isError = true;
             return;
         }
@@ -1272,8 +1288,8 @@ else
             });
 
             statusMessage = !string.IsNullOrWhiteSpace(Code)
-                ? $"{ModuleSingularTitle} actualizado correctamente."
-                : $"{ModuleSingularTitle} creado correctamente.";
+            ? $"{ModuleSingularTitle} {L("actualizado correctamente.", "actualitzat correctament.", "updated successfully.")}"
+            : $"{ModuleSingularTitle} {L("creado correctamente.", "creat correctament.", "created successfully.")}";
 
             if (string.IsNullOrWhiteSpace(Code))
             {
@@ -1401,7 +1417,7 @@ else
 
         if (!canEdit)
         {
-            statusMessage = "No tienes permisos de edición en este tenant.";
+            statusMessage = L("No tienes permisos de edición en este tenant.", "No tens permisos d'edició en aquest tenant.", "You do not have edit permissions in this tenant.");
             isError = true;
             return;
         }
@@ -1477,23 +1493,23 @@ else
                 .Select(item => $"{Uri.EscapeDataString(item.Key)}={Uri.EscapeDataString(item.Value!)}"));
 
         return string.IsNullOrWhiteSpace(query)
-            ? "/produccion/acabados/nueva"
-            : $"/produccion/acabados/nueva?{query}";
+            ? "/compras/ordenes-fabricacion-muestras/nueva"
+            : $"/compras/ordenes-fabricacion-muestras/nueva?{query}";
     }
 
     private string BuildLinkedFinishOrdersUrl()
     {
         if (string.IsNullOrWhiteSpace(model.Code))
         {
-            return "/produccion/acabados?live=true";
+            return "/compras/ordenes-fabricacion-muestras?live=true";
         }
 
-        return $"/produccion/acabados?sourceKind={Uri.EscapeDataString(CurrentSourceSampleKind)}&sourceCode={Uri.EscapeDataString(model.Code)}&live=true";
+        return $"/compras/ordenes-fabricacion-muestras?sourceKind={Uri.EscapeDataString(CurrentSourceSampleKind)}&sourceCode={Uri.EscapeDataString(model.Code)}&live=true";
     }
 
-    private static string BuildFinishOrderUrl(int orderNumber) => $"/produccion/acabados/editar/{orderNumber}";
+    private static string BuildFinishOrderUrl(int orderNumber) => $"/compras/ordenes-fabricacion-muestras/editar/{orderNumber}";
 
-    private static string BuildFinishOrderPrintUrl(int orderNumber) => $"/produccion/acabados/{orderNumber}/imprimir";
+    private static string BuildFinishOrderPrintUrl(int orderNumber) => $"/compras/ordenes-fabricacion-muestras/{orderNumber}/imprimir";
 
     private static MuestraDetailDto CloneMuestraForDuplication(
         MuestraDetailDto source,
@@ -1651,14 +1667,14 @@ else
         return Math.Round(margin, 2);
     }
 
-    private static string GetLineMarginLabel(MuestraLineDto line)
+    private string GetLineMarginLabel(MuestraLineDto line)
     {
         if (line.SalePrice <= 0)
         {
-            return "Sin venta";
+            return L("Sin venta", "Sense venda", "No sale");
         }
 
-        return $"{CalculateLineMarginPercent(line):0.0#}%";
+return $"{CalculateLineMarginPercent(line).ToUiString("0.0#")}%";
     }
 
     private static string GetLineMarginBadgeClass(MuestraLineDto line)
@@ -1817,8 +1833,8 @@ else
         return operationOptions.FirstOrDefault(item => ParseOperationCode(item.Code) == operationCode)?.Name ?? string.Empty;
     }
 
-    private static string DisplayBreakdownColor(MuestraLineDto line) =>
-        string.IsNullOrWhiteSpace(line.Color) ? "Sin color" : line.Color;
+    private string DisplayBreakdownColor(MuestraLineDto line) =>
+        string.IsNullOrWhiteSpace(line.Color) ? L("Sin color", "Sense color", "No color") : line.Color;
 
     private static bool HasBreakdownData(MuestraLineDto line)
     {
@@ -1843,8 +1859,8 @@ else
                breakdown.Lines.Count > 0;
     }
 
-    private static string GetBreakdownStatusLabel(MuestraLineDto line) =>
-        HasBreakdownData(line) ? $"{line.Breakdown.Lines.Count} mats." : "Pendiente";
+    private string GetBreakdownStatusLabel(MuestraLineDto line) =>
+        HasBreakdownData(line) ? $"{line.Breakdown.Lines.Count} {L("mats.", "mats.", "mats.")}" : L("Pendiente", "Pendent", "Pending");
 
     private enum MuestraTab
     {
@@ -1867,12 +1883,12 @@ else
     private static string FormatOperationOption(BaseCatalogListItemDto item) =>
         string.IsNullOrWhiteSpace(item.Name) ? item.Code : $"{item.Code} · {item.Name}";
 
-    private static string GetStatusLabel(string status) => status switch
+    private string GetStatusLabel(string status) => status switch
     {
-        ParteAcabadoStatuses.Pending => "Pendiente",
-        ParteAcabadoStatuses.InProgress => "En proceso",
-        ParteAcabadoStatuses.Finished => "Terminado",
-        ParteAcabadoStatuses.Cancelled => "Anulado",
+        ParteAcabadoStatuses.Pending => L("Pendiente", "Pendent", "Pending"),
+        ParteAcabadoStatuses.InProgress => L("En proceso", "En procés", "In progress"),
+        ParteAcabadoStatuses.Finished => L("Terminado", "Terminat", "Finished"),
+        ParteAcabadoStatuses.Cancelled => L("Anulado", "Anul·lat", "Cancelled"),
         _ => status
     };
 

@@ -3,21 +3,26 @@
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject IRepresentativeQueries RepresentativeQueries
 @inject ILegacySyncService LegacySyncService
+@inject AppText T
 
-<PageTitle>CRM / Representantes</PageTitle>
+<PageTitle>@L("CRM / Representantes", "CRM / Representants", "CRM / Representatives")</PageTitle>
 
 <div class="page-header">
     <div>
         <p class="eyebrow">CRM</p>
-        <h1>Representantes</h1>
+        <h1>@L("Representantes", "Representants", "Representatives")</h1>
         <p class="lead">@(isLegacySyncActive
-            ? "Consulta y filtra los representantes de la SaaS local. La importación manual desde legacy refresca solo registros de origen legacy."
-            : "Consulta y filtra los representantes del centro legacy asociado a la empresa activa.")</p>
+            ? L("Consulta y filtra los representantes de la SaaS local. La importación manual desde legacy refresca solo registros de origen legacy.",
+                "Consulta i filtra els representants de la SaaS local. La importació manual des de legacy refresca només registres d'origen legacy.",
+                "Browse and filter representatives in the local SaaS database. Manual legacy import only refreshes legacy-origin records.")
+            : L("Consulta y filtra los representantes del centro legacy asociado a la empresa activa.",
+                "Consulta i filtra els representants del centre legacy associat a l'empresa activa.",
+                "Browse and filter representatives from the legacy center linked to the active company."))</p>
     </div>
     <div class="quick-links">
         @if (canEdit)
         {
-            <a class="primary-button link-button" href="/crm/representantes/nuevo">Nuevo representante</a>
+            <a class="primary-button link-button" href="/crm/representantes/nuevo">@L("Nuevo representante", "Nou representant", "New representative")</a>
         }
     </div>
 </div>
@@ -25,24 +30,24 @@
 @if (!tenantId.HasValue || !companyId.HasValue)
 {
     <div class="empty-state">
-        <p>Selecciona una empresa activa para trabajar con representantes.</p>
+        <p>@L("Selecciona una empresa activa para trabajar con representantes.", "Selecciona una empresa activa per treballar amb representants.", "Select an active company to work with representatives.")</p>
     </div>
 }
 else
 {
     <section class="panel">
         <div class="filter-row">
-            <input class="text-input" @bind="filter.Search" placeholder="Buscar por nombre, NIF, ciudad, email o teléfono" />
-            <button class="secondary-button" @onclick="SearchAsync" disabled="@isLoading">@(isLoading ? "Cargando..." : "Buscar")</button>
+            <input class="text-input" @bind="filter.Search" placeholder="@L("Buscar por nombre, NIF, ciudad, email o teléfono", "Buscar per nom, NIF, ciutat, email o telèfon", "Search by name, tax ID, city, email or phone")" />
+            <button class="secondary-button" @onclick="SearchAsync" disabled="@isLoading">@(isLoading ? L("Cargando...", "Carregant...", "Loading...") : L("Buscar", "Buscar", "Search"))</button>
         </div>
         <div class="filter-row results-toolbar" style="margin-top: 0.85rem;">
             <span class="results-summary">
                 @(totalCount == 0
-                    ? "Sin resultados"
-                    : $"Mostrando {PageStart}-{PageEnd} de {totalCount} representantes")
+                    ? L("Sin resultados", "Sense resultats", "No results")
+                    : string.Format(L("Mostrando {0}-{1} de {2} representantes", "Mostrant {0}-{1} de {2} representants", "Showing {0}-{1} of {2} representatives"), PageStart, PageEnd, totalCount))
             </span>
             <label class="field compact-field">
-                <span>Tamaño de página</span>
+                <span>@L("Tamaño de página", "Mida de pàgina", "Page size")</span>
                 <select class="sidebar-select compact-select" value="@filter.PageSize" @onchange="OnPageSizeChanged" disabled="@isLoading">
                     <option value="25">25</option>
                     <option value="50">50</option>
@@ -60,8 +65,8 @@ else
     @if (isLegacySyncActive)
     {
         <div class="alert">
-            CRM / Representantes está en convivencia con legacy para esta empresa.
-            La web guarda cambios solo en la SaaS local y la sync manual refresca únicamente registros de origen legacy.
+            @L("CRM / Representantes está en convivencia con legacy para esta empresa.", "CRM / Representants està en convivència amb legacy per a aquesta empresa.", "CRM / Representatives is running in coexistence with legacy for this company.")
+            @L("La web guarda cambios solo en la SaaS local y la sync manual refresca únicamente registros de origen legacy.", "La web desa canvis només a la SaaS local i la sync manual refresca únicament registres d'origen legacy.", "The web app saves changes only in the local SaaS database and manual sync only refreshes legacy-origin records.")
             @if (!string.IsNullOrWhiteSpace(syncStatusLabel))
             {
                 <span>@syncStatusLabel</span>
@@ -74,20 +79,20 @@ else
         {
             <div class="loading-banner">
                 <span class="loading-indicator" aria-hidden="true"></span>
-                <span>Cargando representantes...</span>
+                <span>@L("Cargando representantes...", "Carregant representants...", "Loading representatives...")</span>
             </div>
         }
 
         <table class="data-table">
             <thead>
                 <tr>
-                    <SortableHeader Label="Código" IsActive="@(sortColumn == nameof(RepresentativeListItemDto.Code))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(RepresentativeListItemDto.Code), true))" />
-                    <SortableHeader Label="Nombre" IsActive="@(sortColumn == nameof(RepresentativeListItemDto.Name))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(RepresentativeListItemDto.Name)))" />
-                    <SortableHeader Label="Comisión" IsActive="@(sortColumn == nameof(RepresentativeListItemDto.CommissionPercent))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(RepresentativeListItemDto.CommissionPercent), true))" />
-                    <SortableHeader Label="NIF" IsActive="@(sortColumn == nameof(RepresentativeListItemDto.TaxId))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(RepresentativeListItemDto.TaxId)))" />
-                    <SortableHeader Label="Ciudad" IsActive="@(sortColumn == nameof(RepresentativeListItemDto.City))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(RepresentativeListItemDto.City)))" />
+                    <SortableHeader Label="@L("Código", "Codi", "Code")" IsActive="@(sortColumn == nameof(RepresentativeListItemDto.Code))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(RepresentativeListItemDto.Code), true))" />
+                    <SortableHeader Label="@L("Nombre", "Nom", "Name")" IsActive="@(sortColumn == nameof(RepresentativeListItemDto.Name))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(RepresentativeListItemDto.Name)))" />
+                    <SortableHeader Label="@L("Comisión", "Comissió", "Commission")" IsActive="@(sortColumn == nameof(RepresentativeListItemDto.CommissionPercent))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(RepresentativeListItemDto.CommissionPercent), true))" />
+                    <SortableHeader Label="@L("NIF", "NIF", "Tax ID")" IsActive="@(sortColumn == nameof(RepresentativeListItemDto.TaxId))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(RepresentativeListItemDto.TaxId)))" />
+                    <SortableHeader Label="@L("Ciudad", "Ciutat", "City")" IsActive="@(sortColumn == nameof(RepresentativeListItemDto.City))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(RepresentativeListItemDto.City)))" />
                     <SortableHeader Label="Email" IsActive="@(sortColumn == nameof(RepresentativeListItemDto.Email))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(RepresentativeListItemDto.Email)))" />
-                    <SortableHeader Label="Teléfono" IsActive="@(sortColumn == nameof(RepresentativeListItemDto.Phone))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(RepresentativeListItemDto.Phone)))" />
+                    <SortableHeader Label="@L("Teléfono", "Telèfon", "Phone")" IsActive="@(sortColumn == nameof(RepresentativeListItemDto.Phone))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(RepresentativeListItemDto.Phone)))" />
                     <th></th>
                 </tr>
             </thead>
@@ -111,7 +116,7 @@ else
                 else if (items.Count == 0)
                 {
                     <tr>
-                        <td colspan="8" class="table-empty">No hay representantes para mostrar.</td>
+                        <td colspan="8" class="table-empty">@L("No hay representantes para mostrar.", "No hi ha representants per mostrar.", "There are no representatives to display.")</td>
                     </tr>
                 }
                 else
@@ -121,13 +126,13 @@ else
                         <tr>
                             <td>@item.Code</td>
                             <td>@item.Name</td>
-                            <td>@($"{item.CommissionPercent:0.##}%")</td>
+                            <td>@($"{item.CommissionPercent.ToUiString("0.##")}%")</td>
                             <td>@item.TaxId</td>
                             <td>@item.City</td>
                             <td>@item.Email</td>
                             <td>@item.Phone</td>
                             <td>
-                                <a class="inline-link" href="/crm/representantes/editar/@item.Code">@(canEdit ? "Abrir" : "Ver")</a>
+                                <a class="inline-link" href="/crm/representantes/editar/@item.Code">@(canEdit ? L("Abrir", "Obrir", "Open") : L("Ver", "Veure", "View"))</a>
                             </td>
                         </tr>
                     }
@@ -136,12 +141,12 @@ else
         </table>
 
         <div class="pagination-bar">
-            <span class="muted">Página @filter.Page de @TotalPages</span>
+            <span class="muted">@string.Format(L("Página {0} de {1}", "Pàgina {0} de {1}", "Page {0} of {1}"), filter.Page, TotalPages)</span>
             <div class="pagination-actions">
-                <button class="secondary-button" @onclick="() => ChangePageAsync(1)" disabled="@(!CanGoPrevious || isLoading)">Primera</button>
-                <button class="secondary-button" @onclick="() => ChangePageAsync(filter.Page - 1)" disabled="@(!CanGoPrevious || isLoading)">Anterior</button>
-                <button class="secondary-button" @onclick="() => ChangePageAsync(filter.Page + 1)" disabled="@(!CanGoNext || isLoading)">Siguiente</button>
-                <button class="secondary-button" @onclick="() => ChangePageAsync(TotalPages)" disabled="@(!CanGoNext || isLoading)">Última</button>
+                <button class="secondary-button" @onclick="() => ChangePageAsync(1)" disabled="@(!CanGoPrevious || isLoading)">@L("Primera", "Primera", "First")</button>
+                <button class="secondary-button" @onclick="() => ChangePageAsync(filter.Page - 1)" disabled="@(!CanGoPrevious || isLoading)">@L("Anterior", "Anterior", "Previous")</button>
+                <button class="secondary-button" @onclick="() => ChangePageAsync(filter.Page + 1)" disabled="@(!CanGoNext || isLoading)">@L("Siguiente", "Següent", "Next")</button>
+                <button class="secondary-button" @onclick="() => ChangePageAsync(TotalPages)" disabled="@(!CanGoNext || isLoading)">@L("Última", "Última", "Last")</button>
             </div>
         </div>
     </section>
@@ -201,8 +206,8 @@ else
 
         isLegacySyncActive = true;
         syncStatusLabel = status.LastCompletedUtc.HasValue
-            ? $"Última sync: {status.LastCompletedUtc.Value.ToLocalTime():dd/MM/yyyy HH:mm:ss} · Ins: {status.LastInserted} · Act: {status.LastUpdated} · Omi: {status.LastSkipped} · Err: {status.LastErrors}"
-            : $"Estado: {status.LastStatus}";
+            ? $"{L("Última sync", "Última sync", "Last sync")}: {status.LastCompletedUtc.Value.ToLocalTime():dd/MM/yyyy HH:mm:ss} · Ins: {status.LastInserted} · Act: {status.LastUpdated} · Omi: {status.LastSkipped} · Err: {status.LastErrors}"
+            : $"{L("Estado", "Estat", "Status")}: {status.LastStatus}";
     }
 
     private async Task LoadAsync()
@@ -284,4 +289,12 @@ else
         filter.Page = 1;
         await LoadAsync();
     }
+
+    private string L(string spanish, string catalan, string english) =>
+        T.CurrentLanguage switch
+        {
+            AppLanguages.Catalan => catalan,
+            AppLanguages.English => english,
+            _ => spanish
+        };
 }

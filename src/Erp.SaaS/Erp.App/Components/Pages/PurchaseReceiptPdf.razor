@@ -1,21 +1,26 @@
 @page "/compras/recepciones/{ReceiptNumber:int}/pdf"
+@page "/compras/albaranes-entrega-fils/{ReceiptNumber:int}/pdf"
 @layout EmptyLayout
 @attribute [Authorize(Roles = "TenantAdmin,TenantReader")]
 @inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
 @inject IPurchaseOrderQueries PurchaseOrderQueries
+@inject AppText T
 
-<PageTitle>PDF albarán @ReceiptNumber</PageTitle>
+<PageTitle>@(IsYarnReceiptPdfRoute
+    ? $"{L("PDF albarán entrega fils", "PDF albarà entrega fils", "Yarn delivery receipt PDF")} {ReceiptNumber}"
+    : $"{L("PDF albarán", "PDF albarà", "Receipt PDF")} {ReceiptNumber}")</PageTitle>
 
 <div class="document-shell">
     <div class="document-toolbar no-print">
-        <a class="secondary-button link-button" href="/compras/recepciones/@ReceiptNumber">Volver al albarán</a>
-        <button class="primary-button" type="button" onclick="window.print()">Guardar como PDF / Imprimir</button>
+        <a class="secondary-button link-button" href="@ReceiptDetailHref">@(IsYarnReceiptPdfRoute ? L("Volver al albarán entrega fils", "Tornar a l'albarà entrega fils", "Back to yarn delivery receipt") : L("Volver al albarán", "Tornar a l'albarà", "Back to receipt"))</a>
+        <button class="primary-button" type="button" onclick="window.print()">@L("Imprimir / guardar PDF", "Imprimir / desar PDF", "Print / save PDF")</button>
     </div>
 
     @if (!tenantId.HasValue || !companyId.HasValue)
     {
         <div class="empty-state document-state">
-            <p>No hay empresa activa seleccionada.</p>
+            <p>@L("No hay empresa activa seleccionada.", "No hi ha cap empresa activa seleccionada.", "No active company selected.")</p>
         </div>
     }
     else if (!string.IsNullOrWhiteSpace(errorMessage))
@@ -25,7 +30,7 @@
     else if (receipt is null)
     {
         <div class="empty-state document-state">
-            <p>No se ha encontrado la recepción solicitada.</p>
+            <p>@L("No se ha encontrado la recepción solicitada.", "No s'ha trobat la recepció sol·licitada.", "The requested receipt could not be found.")</p>
         </div>
     }
     else
@@ -33,17 +38,17 @@
         <section class="document-page">
             <header class="document-header">
                 <div>
-                    <p class="eyebrow">Albarán de compra</p>
+                    <p class="eyebrow">@(IsYarnReceiptPdfRoute ? L("Albarán entrega de hilo", "Albarà entrega de fils", "Yarn delivery receipt") : L("Albarán de compra", "Albarà de compra", "Purchase receipt"))</p>
                     <h1>@receipt.DisplayNumber</h1>
-                    <p class="muted">Pedido origen @receipt.OrderNumber</p>
+                    <p class="muted">@L("Pedido origen", "Comanda origen", "Source order") @receipt.OrderNumber</p>
                 </div>
                 <div class="document-header-meta">
                     <div>
-                        <span class="muted">Fecha</span>
+                        <span class="muted">@L("Fecha", "Data", "Date")</span>
                         <strong>@receipt.ReceiptDate.ToString("dd/MM/yyyy")</strong>
                     </div>
                     <div>
-                        <span class="muted">Centro</span>
+                        <span class="muted">@L("Centro", "Centre", "Center")</span>
                         <strong>@receipt.CompanyLegacyCenterCode</strong>
                     </div>
                 </div>
@@ -52,17 +57,17 @@
             <section class="document-section">
                 <div class="document-grid-two">
                     <section class="document-box">
-                        <h2>Empresa receptora</h2>
+                        <h2>@L("Empresa receptora", "Empresa receptora", "Receiving company")</h2>
                         <p><strong>@receipt.CompanyName</strong></p>
                         <p class="muted">@receipt.TenantName</p>
-                        <p class="muted">Centro legacy @receipt.CompanyLegacyCenterCode</p>
+                        <p class="muted">@L("Centro legacy", "Centre legacy", "Legacy center") @receipt.CompanyLegacyCenterCode</p>
                     </section>
                     <section class="document-box">
-                        <h2>Proveedor</h2>
+                        <h2>@L("Proveedor", "Proveïdor", "Supplier")</h2>
                         <p><strong>@receipt.SupplierName</strong></p>
                         @if (!string.IsNullOrWhiteSpace(receipt.SupplierTaxId))
                         {
-                            <p class="muted">NIF @receipt.SupplierTaxId</p>
+                            <p class="muted">@L("NIF", "NIF", "Tax ID") @receipt.SupplierTaxId</p>
                         }
                         @if (!string.IsNullOrWhiteSpace(SupplierLocation))
                         {
@@ -75,43 +80,43 @@
             <section class="document-section">
                 <div class="document-grid-two">
                     <section class="document-box">
-                        <h2>Cabecera logística</h2>
+                        <h2>@L("Cabecera logística", "Capçalera logística", "Logistics header")</h2>
                         <div class="document-kv-grid">
                             <div>
-                                <span class="muted">Almacén</span>
+                                <span class="muted">@L("Almacén", "Magatzem", "Warehouse")</span>
                                 <strong>@DisplayValue(receipt.Warehouse)</strong>
                             </div>
                             <div>
-                                <span class="muted">Transportista</span>
+                                <span class="muted">@L("Transportista", "Transportista", "Carrier")</span>
                                 <strong>@DisplayValue(receipt.Carrier)</strong>
                             </div>
                             <div>
-                                <span class="muted">Referencia proveedor</span>
+                                <span class="muted">@L("Referencia proveedor", "Referència proveïdor", "Supplier reference")</span>
                                 <strong>@DisplayValue(receipt.SupplierReference)</strong>
                             </div>
                             <div>
-                                <span class="muted">Matrícula</span>
+                                <span class="muted">@L("Matrícula", "Matrícula", "Vehicle plate")</span>
                                 <strong>@DisplayValue(receipt.VehiclePlate)</strong>
                             </div>
                         </div>
                     </section>
                     <section class="document-box">
-                        <h2>Datos de expedición</h2>
+                        <h2>@L("Datos de expedición", "Dades d'expedició", "Shipping data")</h2>
                         <div class="document-kv-grid">
                             <div>
-                                <span class="muted">Bultos</span>
-                                <strong>@(receipt.PackageCount?.ToString() ?? "Sin dato")</strong>
+                                <span class="muted">@L("Bultos", "Paquets", "Packages")</span>
+                                <strong>@(receipt.PackageCount?.ToString() ?? L("Sin dato", "Sense dada", "No data"))</strong>
                             </div>
                             <div>
-                                <span class="muted">Peso bruto</span>
-                                <strong>@(receipt.GrossWeightKg.HasValue ? $"{receipt.GrossWeightKg.Value:0.###} kg" : "Sin dato")</strong>
+                                <span class="muted">@L("Peso bruto", "Pes brut", "Gross weight")</span>
+                        <strong>@(receipt.GrossWeightKg.HasValue ? $"{receipt.GrossWeightKg.Value.ToUiString("0.###")} kg" : L("Sin dato", "Sense dada", "No data"))</strong>
                             </div>
                             <div>
-                                <span class="muted">Proveedor</span>
+                                <span class="muted">@L("Proveedor", "Proveïdor", "Supplier")</span>
                                 <strong>@receipt.SupplierCode</strong>
                             </div>
                             <div>
-                                <span class="muted">Pedido origen</span>
+                                <span class="muted">@L("Pedido origen", "Comanda origen", "Source order")</span>
                                 <strong>@receipt.OrderNumber</strong>
                             </div>
                         </div>
@@ -120,13 +125,13 @@
             </section>
 
             <section class="document-section">
-                <h2>Detalle de líneas</h2>
+                <h2>@L("Detalle de líneas", "Detall de línies", "Line items")</h2>
                 <table class="data-table document-table">
                     <thead>
                         <tr>
-                            <th>Línea</th>
-                            <th>Descripción</th>
-                            <th>Cantidad</th>
+                            <th>@L("Línea", "Línia", "Line")</th>
+                            <th>@L("Descripción", "Descripció", "Description")</th>
+                            <th>@L("Cantidad", "Quantitat", "Quantity")</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -135,7 +140,7 @@
                             <tr>
                                 <td>@line.LineNumber</td>
                                 <td>@line.Description</td>
-                                <td>@line.ReceivedQuantity.ToString("0.###")</td>
+                                <td>@line.ReceivedQuantity.ToUiString("0.###")</td>
                             </tr>
                         }
                     </tbody>
@@ -145,25 +150,25 @@
             <section class="document-section">
                 <div class="document-grid-two">
                     <section class="document-box">
-                        <h2>Resumen</h2>
+                        <h2>@L("Resumen", "Resum", "Summary")</h2>
                         <div class="document-kv-grid">
                             <div>
-                                <span class="muted">Albarán</span>
+                                <span class="muted">@L("Albarán", "Albarà", "Receipt")</span>
                                 <strong>@receipt.DisplayNumber</strong>
                             </div>
                             <div>
-                                <span class="muted">Fecha</span>
+                                <span class="muted">@L("Fecha", "Data", "Date")</span>
                                 <strong>@receipt.ReceiptDate.ToString("dd/MM/yyyy")</strong>
                             </div>
                             <div>
-                                <span class="muted">Total recepcionado</span>
-                                <strong>@receipt.TotalReceivedQuantity.ToString("0.###")</strong>
+                                <span class="muted">@L("Total recepcionado", "Total recepcionat", "Total received")</span>
+                                <strong>@receipt.TotalReceivedQuantity.ToUiString("0.###")</strong>
                             </div>
                         </div>
                     </section>
                     <section class="document-box">
-                        <h2>Notas</h2>
-                        <p>@(string.IsNullOrWhiteSpace(receipt.Notes) ? "Sin observaciones." : receipt.Notes)</p>
+                        <h2>@L("Notas", "Notes", "Notes")</h2>
+                        <p>@(string.IsNullOrWhiteSpace(receipt.Notes) ? L("Sin observaciones registradas.", "Sense observacions registrades.", "No remarks recorded.") : receipt.Notes)</p>
                     </section>
                 </div>
             </section>
@@ -172,6 +177,14 @@
 </div>
 
 @code {
+    private string L(string spanish, string catalan, string english) =>
+        T.CurrentLanguage switch
+        {
+            AppLanguages.Catalan => catalan,
+            AppLanguages.English => english,
+            _ => spanish
+        };
+
     [Parameter]
     public int ReceiptNumber { get; set; }
 
@@ -179,6 +192,9 @@
     private Guid? companyId;
     private PurchaseOrderReceiptDto? receipt;
     private string errorMessage = string.Empty;
+    private bool IsYarnReceiptPdfRoute => CurrentRelativePath.StartsWith("compras/albaranes-entrega-fils", StringComparison.OrdinalIgnoreCase);
+    private string CurrentRelativePath => NavigationManager.ToBaseRelativePath(NavigationManager.Uri).Split('?', '#')[0];
+    private string ReceiptDetailHref => IsYarnReceiptPdfRoute ? $"/compras/albaranes-entrega-fils/{ReceiptNumber}" : $"/compras/recepciones/{ReceiptNumber}";
 
     private string SupplierLocation
     {
@@ -225,5 +241,5 @@
         }
     }
 
-    private static string DisplayValue(string value) => string.IsNullOrWhiteSpace(value) ? "Sin dato" : value;
+    private string DisplayValue(string value) => string.IsNullOrWhiteSpace(value) ? L("Sin dato", "Sense dada", "No data") : value;
 }

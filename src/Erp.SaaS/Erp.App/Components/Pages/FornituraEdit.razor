@@ -7,26 +7,27 @@
 @inject IFornituraQueries FornituraQueries
 @inject IFornituraService FornituraService
 @inject NavigationManager NavigationManager
+@inject AppText T
 
-<PageTitle>@(!string.IsNullOrWhiteSpace(Code) ? $"Editar fornitura {Code}" : "Nueva fornitura")</PageTitle>
+<PageTitle>@(!string.IsNullOrWhiteSpace(Code) ? L($"Editar fornitura {Code}", $"Editar fornitura {Code}", $"Edit trim {Code}") : L("Nueva fornitura", "Nova fornitura", "New trim"))</PageTitle>
 
 <div class="page-header">
     <div>
-        <p class="eyebrow">ARTÍCULOS</p>
-        <h1>@(!string.IsNullOrWhiteSpace(Code) ? $"Editar fornitura {Code}" : "Nueva fornitura")</h1>
+        <p class="eyebrow">@T["menu.articles"]</p>
+        <h1>@(!string.IsNullOrWhiteSpace(Code) ? L($"Editar fornitura {Code}", $"Editar fornitura {Code}", $"Edit trim {Code}") : L("Nueva fornitura", "Nova fornitura", "New trim"))</h1>
         <p class="lead">@(isLegacySyncActive
-            ? "Edición sobre la SaaS local. La importación manual desde legacy refresca solo registros marcados como legacy."
-            : "Alta y edición sobre la tabla forni replicada en la SaaS local, filtrada por la empresa activa.")</p>
+            ? L("Edición sobre la SaaS local. La importación manual desde legacy refresca solo registros marcados como legacy.", "Edició sobre la SaaS local. La importació manual des de legacy refresca només registres marcats com legacy.", "Editing on the local SaaS. Manual legacy import refreshes only records marked as legacy.")
+            : L("Alta y edición sobre la tabla forni replicada en la SaaS local, filtrada por la empresa activa.", "Alta i edició sobre la taula forni replicada a la SaaS local, filtrada per l'empresa activa.", "Create and edit records on the forni table replicated into the local SaaS, filtered by the active company."))</p>
     </div>
     <div class="quick-links">
-        <a class="secondary-button link-button" href="/articulos/fornituras">Volver al listado</a>
+        <a class="secondary-button link-button" href="/articulos/fornituras">@L("Volver al listado", "Tornar al llistat", "Back to list")</a>
     </div>
 </div>
 
 @if (!tenantId.HasValue || !companyId.HasValue)
 {
     <div class="empty-state">
-        <p>No hay empresa activa seleccionada.</p>
+        <p>@L("No hay empresa activa seleccionada.", "No hi ha cap empresa activa seleccionada.", "No active company is selected.")</p>
     </div>
 }
 else
@@ -39,8 +40,7 @@ else
     @if (isLegacySyncActive)
     {
         <div class="alert">
-            Artículos / Fornituras está en convivencia con legacy para esta empresa.
-            Esta ficha guarda cambios solo en la SaaS local y la sync manual refresca únicamente registros de origen legacy.
+            @L("Artículos / Fornituras está en convivencia con legacy para esta empresa. Esta ficha guarda cambios solo en la SaaS local y la sync manual refresca únicamente registros de origen legacy.", "Articles / Fornitures està en convivència amb legacy per a aquesta empresa. Aquesta fitxa desa canvis només a la SaaS local i la sync manual refresca únicament registres d'origen legacy.", "Articles / Trims is running in legacy coexistence mode for this company. This record saves changes only to the local SaaS and manual sync refreshes legacy-origin records only.")
             @if (!string.IsNullOrWhiteSpace(syncStatusLabel))
             {
                 <span>@syncStatusLabel</span>
@@ -51,7 +51,7 @@ else
     @if (!canEdit && string.IsNullOrWhiteSpace(Code))
     {
         <div class="alert">
-            No tienes permisos de edición para crear fornituras nuevas en esta empresa.
+            @L("No tienes permisos de edición para crear fornituras nuevas en esta empresa.", "No tens permisos d'edició per crear fornitures noves en aquesta empresa.", "You do not have edit permissions to create new trims in this company.")
         </div>
     }
 
@@ -59,39 +59,39 @@ else
         <fieldset disabled="@isReadOnly">
             <div class="form-grid">
                 <label class="field">
-                    <span>Código</span>
+                    <span>@L("Código", "Codi", "Code")</span>
                     <InputText class="text-input" @bind-Value="model.Code" disabled="@(!string.IsNullOrWhiteSpace(Code))" />
                 </label>
                 <label class="field wide">
-                    <span>Descripción</span>
+                    <span>@L("Descripción", "Descripció", "Description")</span>
                     <InputText class="text-input" @bind-Value="model.Description" />
                 </label>
                 <label class="field">
-                    <span>Precio</span>
+                    <span>@L("Precio", "Preu", "Price")</span>
                     <InputNumber class="text-input" @bind-Value="model.UnitPrice" />
                 </label>
                 <label class="field">
-                    <span>Proveedor</span>
+                    <span>@L("Proveedor", "Proveïdor", "Supplier")</span>
                     <InputNumber class="text-input" @bind-Value="model.SupplierCode" />
                 </label>
                 <label class="field">
-                    <span>Referencia proveedor</span>
+                    <span>@L("Referencia proveedor", "Referència proveïdor", "Supplier reference")</span>
                     <InputText class="text-input" @bind-Value="model.SupplierReference" />
                 </label>
                 <label class="field">
-                    <span>Cliente</span>
+                    <span>@L("Cliente", "Client", "Client")</span>
                     <InputNumber class="text-input" @bind-Value="model.ClientCode" />
                 </label>
                 <label class="field">
-                    <span>Modelo</span>
+                    <span>@L("Modelo", "Model", "Model")</span>
                     <InputText class="text-input" @bind-Value="model.Model" />
                 </label>
                 <label class="field">
-                    <span>Serie</span>
+                    <span>@L("Serie", "Sèrie", "Series")</span>
                     <InputText class="text-input" @bind-Value="model.Series" />
                 </label>
                 <label class="field">
-                    <span>Temporada</span>
+                    <span>@L("Temporada", "Temporada", "Season")</span>
                     <InputText class="text-input" @bind-Value="model.Season" />
                 </label>
             </div>
@@ -99,12 +99,12 @@ else
             <section class="panel detail-panel" style="margin-top: 1rem;">
                 <div class="detail-panel-header">
                     <div>
-                        <h2>Detalle de la fornitura</h2>
-                        <p class="muted">Código proveedor, color, medida, precio y stock actual por variante.</p>
+                        <h2>@L("Detalle de la fornitura", "Detall de la fornitura", "Trim detail")</h2>
+                        <p class="muted">@L("Código proveedor, color, medida, precio y stock actual por variante.", "Codi proveïdor, color, mida, preu i estoc actual per variant.", "Supplier code, color, size, price and current stock by variant.")</p>
                     </div>
                     @if (!isReadOnly)
                     {
-                        <button class="secondary-button" type="button" @onclick="AddVariant">Añadir línea</button>
+                        <button class="secondary-button" type="button" @onclick="AddVariant">@L("Añadir línea", "Afegir línia", "Add line")</button>
                     }
                 </div>
 
@@ -112,13 +112,13 @@ else
                     <table class="data-table detail-table fornitura-variants-table">
                         <thead>
                             <tr>
-                                <th>Código proveedor</th>
-                                <th>Color</th>
-                                <th>Medida</th>
-                                <th>Precio</th>
-                                <th>Stock actual</th>
-                                <th>Stock mínimo</th>
-                                <th>Coste</th>
+                                <th>@L("Código proveedor", "Codi proveïdor", "Supplier code")</th>
+                                <th>@L("Color", "Color", "Color")</th>
+                                <th>@L("Medida", "Mesura", "Size")</th>
+                                <th>@L("Precio", "Preu", "Price")</th>
+                                <th>@L("Stock actual", "Estoc actual", "Current stock")</th>
+                                <th>@L("Stock mínimo", "Estoc mínim", "Minimum stock")</th>
+                                <th>@L("Coste", "Cost", "Cost")</th>
                                 @if (!isReadOnly)
                                 {
                                     <th></th>
@@ -129,7 +129,7 @@ else
                             @if (model.Variants.Count == 0)
                             {
                                 <tr>
-                                    <td colspan="@(isReadOnly ? 7 : 8)" class="muted">No hay detalle cargado para esta fornitura.</td>
+                                    <td colspan="@(isReadOnly ? 7 : 8)" class="muted">@L("No hay detalle cargado para esta fornitura.", "No hi ha detall carregat per a aquesta fornitura.", "There is no detail loaded for this trim.")</td>
                                 </tr>
                             }
                             else
@@ -161,7 +161,7 @@ else
                                         @if (!isReadOnly)
                                         {
                                             <td>
-                                                <button class="danger-link" type="button" @onclick="() => RemoveVariant(variant.LineNumber)">Quitar</button>
+                                                <button class="danger-link" type="button" @onclick="() => RemoveVariant(variant.LineNumber)">@L("Quitar", "Treure", "Remove")</button>
                                             </td>
                                         }
                                     </tr>
@@ -175,15 +175,15 @@ else
             <div class="quick-links" style="margin-top: 1rem;">
                 @if (canEdit)
                 {
-                    <button class="primary-button" type="submit">Guardar fornitura</button>
+                    <button class="primary-button" type="submit">@L("Guardar fornitura", "Desar fornitura", "Save trim")</button>
                 }
                 @if (canEdit && !string.IsNullOrWhiteSpace(Code))
                 {
-                    <button class="secondary-button danger-button" type="button" @onclick="DeleteAsync">Eliminar fornitura</button>
+                    <button class="secondary-button danger-button" type="button" @onclick="DeleteAsync">@L("Eliminar fornitura", "Eliminar fornitura", "Delete trim")</button>
                 }
                 @if (!string.IsNullOrWhiteSpace(Code))
                 {
-                    <button class="secondary-button" type="button" @onclick="LoadAuditAsync">Recargar historial</button>
+                    <button class="secondary-button" type="button" @onclick="LoadAuditAsync">@L("Recargar historial", "Recarregar historial", "Reload history")</button>
                 }
             </div>
         </fieldset>
@@ -192,11 +192,11 @@ else
     @if (!string.IsNullOrWhiteSpace(Code))
     {
         <section class="panel" style="margin-top: 1rem;">
-            <h2>Historial reciente de la fornitura</h2>
+            <h2>@L("Historial reciente de la fornitura", "Historial recent de la fornitura", "Recent trim history")</h2>
             <div class="list-block">
                 @if (recentAuditLogs.Count == 0)
                 {
-                    <p class="muted">Todavía no hay eventos auditados para esta fornitura.</p>
+                    <p class="muted">@L("Todavía no hay eventos auditados para esta fornitura.", "Encara no hi ha esdeveniments auditats per a aquesta fornitura.", "There are no audited events for this trim yet.")</p>
                 }
                 else
                 {
@@ -253,7 +253,7 @@ else
             var detail = await FornituraQueries.GetByCodeAsync(tenantId.Value, companyId.Value, Uri.UnescapeDataString(Code));
             if (detail is null)
             {
-                statusMessage = "No se ha encontrado la fornitura solicitada.";
+                statusMessage = L("No se ha encontrado la fornitura solicitada.", "No s'ha trobat la fornitura sol·licitada.", "The requested trim was not found.");
                 isError = true;
                 model = new FornituraDetailDto();
                 recentAuditLogs = [];
@@ -279,7 +279,7 @@ else
 
         if (isReadOnly)
         {
-            statusMessage = "No tienes permisos de edición en este tenant.";
+            statusMessage = L("No tienes permisos de edición en este tenant.", "No tens permisos d'edició en aquest tenant.", "You do not have edit permissions in this tenant.");
             isError = true;
             return;
         }
@@ -320,8 +320,8 @@ else
             });
 
             statusMessage = !string.IsNullOrWhiteSpace(Code)
-                ? "Fornitura actualizada correctamente."
-                : "Fornitura creada correctamente.";
+                ? L("Fornitura actualizada correctamente.", "Fornitura actualitzada correctament.", "Trim updated successfully.")
+                : L("Fornitura creada correctamente.", "Fornitura creada correctament.", "Trim created successfully.");
 
             if (string.IsNullOrWhiteSpace(Code))
             {
@@ -359,8 +359,8 @@ else
 
         isLegacySyncActive = true;
         syncStatusLabel = status.LastCompletedUtc.HasValue
-            ? $"Última sync: {status.LastCompletedUtc.Value.ToLocalTime():dd/MM/yyyy HH:mm:ss} · Ins: {status.LastInserted} · Act: {status.LastUpdated} · Omi: {status.LastSkipped} · Err: {status.LastErrors}"
-            : $"Estado: {status.LastStatus}";
+            ? $"{L("Última sync", "Última sync", "Last sync")}: {status.LastCompletedUtc.Value.ToLocalTime():dd/MM/yyyy HH:mm:ss} · Ins: {status.LastInserted} · Act: {status.LastUpdated} · Omi: {status.LastSkipped} · Err: {status.LastErrors}"
+            : $"{L("Estado", "Estat", "Status")}: {status.LastStatus}";
     }
 
     private async Task LoadAuditAsync()
@@ -414,7 +414,7 @@ else
 
         if (!canEdit)
         {
-            statusMessage = "No tienes permisos de edición en este tenant.";
+            statusMessage = L("No tienes permisos de edición en este tenant.", "No tens permisos d'edició en aquest tenant.", "You do not have edit permissions in this tenant.");
             isError = true;
             return;
         }
@@ -430,4 +430,12 @@ else
             isError = true;
         }
     }
+
+    private string L(string spanish, string catalan, string english) =>
+        T.CurrentLanguage switch
+        {
+            AppLanguages.Catalan => catalan,
+            AppLanguages.English => english,
+            _ => spanish
+        };
 }

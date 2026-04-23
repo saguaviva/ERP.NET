@@ -2,6 +2,7 @@ using System.Security.Claims;
 using System.Globalization;
 using Erp.App.Components;
 using Erp.App.Components.Pages;
+using Erp.App.Formatting;
 using Erp.App.Localization;
 using Erp.App.Security;
 using Erp.Application.Auth;
@@ -10,6 +11,7 @@ using Erp.Application.Companies;
 using Erp.Application.Contexts;
 using Erp.Application.DemoAccess;
 using Erp.Application.Intrastat;
+using Erp.Application.Reporting;
 using Erp.Infrastructure.MySql;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -66,6 +68,20 @@ if (!app.Environment.IsDevelopment())
 app.UseStatusCodePagesWithReExecute("/not-found", createScopeForStatusCodePages: true);
 app.UseHttpsRedirection();
 app.UseRequestLocalization(app.Services.GetRequiredService<IOptions<RequestLocalizationOptions>>().Value);
+app.Use(async (context, next) =>
+{
+    var language = AppDocumentLanguage.UsesDocumentLanguage(context.Request.Path)
+        ? AppDocumentLanguage.GetPreferredLanguage(context.Request, AppLanguages.Normalize(CultureInfo.CurrentUICulture))
+        : AppLanguages.Normalize(CultureInfo.CurrentUICulture);
+
+    var culture = AppNumber.CreateDisplayCulture(new CultureInfo(language));
+    CultureInfo.CurrentCulture = culture;
+    CultureInfo.CurrentUICulture = culture;
+    CultureInfo.DefaultThreadCurrentCulture = culture;
+    CultureInfo.DefaultThreadCurrentUICulture = culture;
+
+    await next();
+});
 app.Use(async (context, next) =>
 {
     var options = context.RequestServices.GetRequiredService<IOptionsMonitor<PreviewAccessOptions>>().CurrentValue;
@@ -250,6 +266,27 @@ app.MapPost("/account/set-language", ([FromForm] SetLanguageForm form, HttpConte
     return Results.Redirect(returnUrl);
 });
 
+app.MapPost("/account/set-output-language", ([FromForm] SetOutputLanguageForm form, HttpContext httpContext) =>
+{
+    var culture = AppLanguages.Normalize(form.Culture);
+    var returnUrl = ResolvePostReturnUrl(httpContext.Request, form.ReturnUrl);
+
+    httpContext.Response.Cookies.Append(
+        AppDocumentLanguage.CookieName,
+        culture,
+        new CookieOptions
+        {
+            HttpOnly = false,
+            IsEssential = true,
+            SameSite = SameSiteMode.Lax,
+            Secure = httpContext.Request.IsHttps,
+            Path = "/",
+            Expires = DateTimeOffset.UtcNow.AddYears(1)
+        });
+
+    return Results.Redirect(returnUrl);
+});
+
 app.MapPost("/account/switch-company", async Task<IResult> (
     HttpContext httpContext,
     [FromForm] SwitchCompanyForm form,
@@ -395,10 +432,11 @@ app.MapGet("/ventas/intrastat/export/{kind}", async Task<IResult> (
     };
 
     var report = await intrastatQueries.GetReportAsync(tenantId.Value, companyId.Value, filter, cancellationToken);
+    var exportLanguage = AppDocumentLanguage.GetPreferredLanguage(httpContext.Request, AppLanguages.Normalize(CultureInfo.CurrentUICulture));
     if (string.Equals(kind, "excel", StringComparison.OrdinalIgnoreCase) ||
         string.Equals(kind, "xlsx", StringComparison.OrdinalIgnoreCase))
     {
-        var workbookPayload = IntrastatExcelExporter.BuildWorkbook(report, filter.Year, filter.Month);
+        var workbookPayload = IntrastatExcelExporter.BuildWorkbook(report, filter.Year, filter.Month, exportLanguage);
         var workbookName = $"intrastat-{filter.Year}-{filter.Month:00}.xlsx";
         return Results.File(
             workbookPayload,
@@ -409,9 +447,101 @@ app.MapGet("/ventas/intrastat/export/{kind}", async Task<IResult> (
     var safeKind = string.Equals(kind, "summary", StringComparison.OrdinalIgnoreCase) ? "summary" : "detail";
     var fileName = $"intrastat-{safeKind}-{filter.Year}-{filter.Month:00}.csv";
     var payload = safeKind == "summary"
-        ? IntrastatCsvExporter.BuildSummaryCsv(report)
-        : IntrastatCsvExporter.BuildDetailCsv(report);
+        ? IntrastatCsvExporter.BuildSummaryCsv(report, exportLanguage)
+        : IntrastatCsvExporter.BuildDetailCsv(report, exportLanguage);
 
+    return Results.File(payload, "text/csv; charset=utf-8", fileName);
+}).RequireAuthorization();
+
+app.MapGet("/listados/compras-ventas-ordenes/export/csv", async Task<IResult> (
+    HttpContext httpContext,
+    [FromQuery] DateTime? from,
+    [FromQuery] DateTime? to,
+    [FromQuery] string? search,
+    [FromQuery] string? category,
+    [FromQuery] string? type,
+    IReportingQueries reportingQueries,
+    CancellationToken cancellationToken) =>
+{
+    if (!(httpContext.User.Identity?.IsAuthenticated ?? false))
+    {
+        return Results.Redirect("/login");
+    }
+
+    var tenantId = httpContext.User.GetTenantId();
+    var companyId = httpContext.User.GetActiveCompanyId();
+    if (!tenantId.HasValue || !companyId.HasValue)
+    {
+        return Results.BadRequest("No hay tenant o empresa activa para exportar listados.");
+    }
+
+    var filter = new OperationalDocumentFilter
+    {
+        DateFrom = from,
+        DateTo = to,
+        Search = search ?? string.Empty,
+        Category = category ?? string.Empty,
+        TypeKey = type ?? string.Empty,
+        Page = 1,
+        PageSize = 50000,
+        SortColumn = nameof(OperationalDocumentListItemDto.DocumentDate),
+        SortDescending = true
+    };
+
+    var result = await reportingQueries.SearchOperationalDocumentsAsync(tenantId.Value, companyId.Value, filter, cancellationToken);
+    var exportLanguage = AppDocumentLanguage.GetPreferredLanguage(httpContext.Request, AppLanguages.Normalize(CultureInfo.CurrentUICulture));
+    var payload = ReportingCsvExporter.BuildOperationalDocumentsCsv(result.Items.ToArray(), exportLanguage);
+    var areaSuffix = (category ?? string.Empty).Trim() switch
+    {
+        "Sales" => "ventas",
+        "Purchases" => "compras",
+        "Production" => "produccion",
+        "Warehouse" => "almacen",
+        "Finance" => "finanzas",
+        _ => "operativos"
+    };
+    var fileName = $"listados-{areaSuffix}-{DateTime.Today:yyyyMMdd}.csv";
+    return Results.File(payload, "text/csv; charset=utf-8", fileName);
+}).RequireAuthorization();
+
+app.MapGet("/estadisticas/export/csv", async Task<IResult> (
+    HttpContext httpContext,
+    [FromQuery] DateTime? from,
+    [FromQuery] DateTime? to,
+    [FromQuery] string? area,
+    IReportingQueries reportingQueries,
+    CancellationToken cancellationToken) =>
+{
+    if (!(httpContext.User.Identity?.IsAuthenticated ?? false))
+    {
+        return Results.Redirect("/login");
+    }
+
+    var tenantId = httpContext.User.GetTenantId();
+    var companyId = httpContext.User.GetActiveCompanyId();
+    if (!tenantId.HasValue || !companyId.HasValue)
+    {
+        return Results.BadRequest("No hay tenant o empresa activa para exportar estadísticas.");
+    }
+
+    var filter = new BusinessStatisticsFilter
+    {
+        DateFrom = from,
+        DateTo = to
+    };
+
+    var stats = await reportingQueries.GetBusinessStatisticsAsync(tenantId.Value, companyId.Value, filter, cancellationToken);
+    var exportLanguage = AppDocumentLanguage.GetPreferredLanguage(httpContext.Request, AppLanguages.Normalize(CultureInfo.CurrentUICulture));
+    var payload = ReportingCsvExporter.BuildStatisticsCsv(stats, exportLanguage, area);
+    var areaSuffix = (area ?? string.Empty).Trim().ToLowerInvariant() switch
+    {
+        "sales" => "ventas",
+        "purchases" => "compras",
+        "production" => "produccion",
+        "warehouse" => "almacen",
+        _ => "global"
+    };
+    var fileName = $"estadisticas-{areaSuffix}-{DateTime.Today:yyyyMMdd}.csv";
     return Results.File(payload, "text/csv; charset=utf-8", fileName);
 }).RequireAuthorization();
 

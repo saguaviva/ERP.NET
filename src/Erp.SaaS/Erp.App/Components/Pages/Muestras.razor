@@ -50,7 +50,7 @@ else
             <span class="results-summary">
             @(totalCount == 0
                 ? L("Sin resultados", "Sense resultats", "No results")
-                : L($"Mostrando {PageStart}-{PageEnd} de {totalCount} {modulePluralLower}", $"Mostrant {PageStart}-{PageEnd} de {totalCount} {modulePluralLower}", $"Showing {PageStart}-{PageEnd} of {totalCount} {modulePluralLower}"))
+                : L($"Mostrando {PageStart.ToUiString("N0")}-{PageEnd.ToUiString("N0")} de {totalCount.ToUiString("N0")} {modulePluralLower}", $"Mostrant {PageStart.ToUiString("N0")}-{PageEnd.ToUiString("N0")} de {totalCount.ToUiString("N0")} {modulePluralLower}", $"Showing {PageStart.ToUiString("N0")}-{PageEnd.ToUiString("N0")} of {totalCount.ToUiString("N0")} {modulePluralLower}"))
             </span>
             <label class="field compact-field">
                 <span>@L("Tamaño de página", "Mida de pàgina", "Page size")</span>
@@ -143,11 +143,18 @@ else
                             <td>@item.Reference</td>
                             <td>@item.Season</td>
                             <td>@(string.IsNullOrWhiteSpace(item.MachineName) ? item.MachineCode.ToString() : item.MachineName)</td>
-                            <td>@item.UnitPrice.ToString("0.00##")</td>
+                            <td>@item.UnitPrice.ToUiString("0.00##")</td>
                             <td>@item.DetailLinesCount</td>
                             <td>@(string.IsNullOrWhiteSpace(item.Origin) ? L("local", "local", "local") : item.Origin)</td>
                             <td>
                                 <a class="inline-link" href="@BuildEditUrl(item.Code)">@(canEdit ? L("Abrir", "Obrir", "Open") : L("Ver", "Veure", "View"))</a>
+                                @if (canEdit)
+                                {
+                                    <span> · </span>
+                                    <a class="inline-link" href="@BuildManufacturingOrderUrl(item)">@L("Crear orden", "Crear ordre", "Create order")</a>
+                                }
+                                <span> · </span>
+                                <a class="inline-link" href="@BuildManufacturingOrdersUrl(item)">@L("Órdenes", "Ordres", "Orders")</a>
                                 @if (item.MachineCode > 0)
                                 {
                                     <span> · </span>
@@ -201,6 +208,7 @@ else
     private bool canEdit;
     private bool isLoading;
     private bool IsComplementMode => NavigationManager.Uri.Contains("/articulos/complementos", StringComparison.OrdinalIgnoreCase);
+    private string CurrentSourceSampleKind => IsComplementMode ? ParteAcabadoSourceKinds.Complement : ParteAcabadoSourceKinds.Sample;
     private string ModulePluralTitle => IsComplementMode ? L("Complementos", "Complements", "Complements") : L("Muestras", "Mostres", "Samples");
     private string modulePluralLower => IsComplementMode ? L("complementos", "complements", "complements") : L("muestras", "mostres", "samples");
     private string moduleSingularLower => IsComplementMode ? L("complemento", "complement", "complement") : L("muestra", "mostra", "sample");
@@ -414,6 +422,12 @@ else
         var basePath = "/articulos/complementos/nueva";
         return $"{basePath}?duplicateCode={Uri.EscapeDataString(item.Code)}&duplicateClient={item.ClientCode}";
     }
+
+    private string BuildManufacturingOrderUrl(MuestraListItemDto item) =>
+        $"/compras/ordenes-fabricacion-muestras/nueva?sampleKind={Uri.EscapeDataString(CurrentSourceSampleKind)}&sampleCode={Uri.EscapeDataString(item.Code)}";
+
+    private string BuildManufacturingOrdersUrl(MuestraListItemDto item) =>
+        $"/compras/ordenes-fabricacion-muestras?sourceKind={Uri.EscapeDataString(CurrentSourceSampleKind)}&sourceCode={Uri.EscapeDataString(item.Code)}&live=true";
 
     private string BuildAcabadosUrl(MuestraListItemDto item) =>
         $"/produccion/acabados?machine={item.MachineCode}&live=true";

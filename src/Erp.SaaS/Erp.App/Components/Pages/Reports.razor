@@ -1,0 +1,333 @@
+@page "/listados"
+@attribute [Authorize(Roles = "TenantAdmin,TenantReader")]
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IReportingQueries ReportingQueries
+@inject AppText T
+
+@using Erp.Application.Reporting
+
+<PageTitle>@L("Listados", "Llistats", "Reports")</PageTitle>
+
+<div class="page-header">
+    <div>
+        <p class="eyebrow">@L("Legacy", "Legacy", "Legacy")</p>
+        <h1>@L("Listados", "Llistats", "Reports")</h1>
+        <p class="lead">@L("Centraliza los listados principales del legacy y deja acceso rápido a maestros, circuitos documentales y reporting operativo.", "Centralitza els llistats principals del legacy i deixa accés ràpid a mestres, circuits documentals i reporting operatiu.", "Centralise the main legacy reports with direct access to masters, document flows and operational reporting.")</p>
+    </div>
+    <div class="quick-links">
+        <a class="secondary-button link-button" href="/alertas">@L("Alertas operativas", "Alertes operatives", "Operational alerts")</a>
+        <a class="secondary-button link-button" href="/listados/compras-ventas-ordenes">@L("Compras / Ventas / Órdenes", "Compres / Vendes / Ordres", "Purchases / Sales / Orders")</a>
+        <a class="secondary-button link-button" href="/estadisticas">@L("Abrir estadísticas", "Obrir estadístiques", "Open statistics")</a>
+        <a class="secondary-button link-button" href="/listados/ventas">@L("Listados por áreas", "Llistats per àrees", "Area reports")</a>
+    </div>
+</div>
+
+@if (!tenantId.HasValue || !companyId.HasValue)
+{
+    <div class="empty-state">
+        <p>@L("Selecciona una empresa activa para cargar los listados y el resumen operativo.", "Selecciona una empresa activa per carregar els llistats i el resum operatiu.", "Select an active company to load reports and the operational overview.")</p>
+    </div>
+}
+else
+{
+    @if (!string.IsNullOrWhiteSpace(errorMessage))
+    {
+        <div class="alert danger">@errorMessage</div>
+    }
+
+    @if (isLoading)
+    {
+        <section class="panel">
+            <div class="loading-banner">
+                <span class="loading-indicator" aria-hidden="true"></span>
+                <span>@L("Cargando listados...", "Carregant llistats...", "Loading reports...")</span>
+            </div>
+        </section>
+    }
+    else
+    {
+        <div class="card-grid">
+            <section class="info-card">
+                <h2>@overview.Clients</h2>
+                <p class="muted">@L("clientes", "clients", "clients")</p>
+            </section>
+            <section class="info-card">
+                <h2>@overview.Suppliers</h2>
+                <p class="muted">@L("proveedores", "proveïdors", "suppliers")</p>
+            </section>
+            <section class="info-card">
+                <h2>@overview.Fabrics</h2>
+                <p class="muted">@L("tejidos", "teixits", "fabrics")</p>
+            </section>
+            <section class="info-card">
+                <h2>@overview.Yarns</h2>
+                <p class="muted">@L("hilos", "fils", "yarns")</p>
+            </section>
+            <section class="info-card">
+                <h2>@overview.Models</h2>
+                <p class="muted">@L("models", "models", "models")</p>
+            </section>
+            <section class="info-card">
+                <h2>@overview.PendingDispositions</h2>
+                <p class="muted">@L("disposiciones pendientes", "disposicions pendents", "pending dispositions")</p>
+            </section>
+            <section class="info-card">
+                <h2>@overview.LiveFinishOrders</h2>
+                <p class="muted">@L("órdenes vivas", "ordres vives", "live work orders")</p>
+            </section>
+            <section class="info-card accent-card">
+                <h2>@overview.SalesDocumentsThisMonth</h2>
+                <p class="muted">@L("documentos de ventas este mes", "documents de vendes aquest mes", "sales documents this month")</p>
+            </section>
+            <section class="info-card accent-card">
+                <h2>@overview.PurchaseDocumentsThisMonth</h2>
+                <p class="muted">@L("documentos de compras este mes", "documents de compres aquest mes", "purchase documents this month")</p>
+            </section>
+            <section class="info-card">
+                <h2>@overview.InventoryPositions</h2>
+                <p class="muted">@L("posiciones de stock", "posicions d'estoc", "stock positions")</p>
+            </section>
+            <section class="info-card">
+                <h2>@overview.InventoryMovesThisMonth</h2>
+                <p class="muted">@L("movimientos este mes", "moviments aquest mes", "movements this month")</p>
+            </section>
+        </div>
+
+        <section class="panel dashboard-section">
+            <div class="dashboard-section-header">
+                <div>
+                    <p class="eyebrow">@L("Actividad", "Activitat", "Activity")</p>
+                    <h2>@L("Documentos recientes", "Documents recents", "Recent documents")</h2>
+                    <p class="lead">@L("Últimos documentos del circuito operativo local para entrar rápido donde hay trabajo real.", "Últims documents del circuit operatiu local per entrar ràpid on hi ha feina real.", "Latest local operational documents so you can jump straight into live work.")</p>
+                </div>
+                <div class="quick-links">
+                    <a class="secondary-button link-button" href="/listados/compras-ventas-ordenes">@L("Abrir listado combinado", "Obrir llistat combinat", "Open combined report")</a>
+                </div>
+            </div>
+
+            <div class="table-scroll">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>@L("Fecha", "Data", "Date")</th>
+                            <th>@L("Categoría", "Categoria", "Category")</th>
+                            <th>@L("Tipo", "Tipus", "Type")</th>
+                            <th>@L("Documento", "Document", "Document")</th>
+                            <th>@L("Tercero", "Tercer", "Counterparty")</th>
+                            <th>@L("Estado", "Estat", "Status")</th>
+                            <th>@L("Importe", "Import", "Amount")</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (recentDocuments.Count == 0)
+                        {
+                            <tr>
+                                <td colspan="8" class="table-empty">@L("Todavía no hay documentos recientes para mostrar.", "Encara no hi ha documents recents per mostrar.", "There are no recent documents to show yet.")</td>
+                            </tr>
+                        }
+                        else
+                        {
+                            @foreach (var recent in recentDocuments)
+                            {
+                                <tr>
+                                    <td>@recent.DocumentDate.ToString("dd/MM/yyyy")</td>
+                                    <td>@FormatCategory(recent.Category)</td>
+                                    <td>@FormatType(recent.TypeKey)</td>
+                                    <td>@recent.DocumentDisplay</td>
+                                    <td>@DisplayValue(recent.PartyName)</td>
+                                    <td>@DisplayValue(recent.Status)</td>
+                                    <td>@recent.Amount.ToUiString("0.00")</td>
+                                    <td><a class="inline-link" href="@recent.Route">@L("Abrir", "Obrir", "Open")</a></td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        @foreach (var reportSection in sections)
+        {
+            <section class="panel dashboard-section">
+                <div class="dashboard-section-header">
+                    <div>
+                        <p class="eyebrow">@reportSection.Kicker</p>
+                        <h2>@reportSection.Title</h2>
+                        <p class="lead">@reportSection.Description</p>
+                    </div>
+                </div>
+
+                <div class="dashboard-actions-grid">
+                    @foreach (var item in reportSection.Items)
+                    {
+                        <a class="dashboard-action-tile" href="@item.Href">
+                            <strong>@item.Title</strong>
+                            <span>@item.Description</span>
+                        </a>
+                    }
+                </div>
+            </section>
+        }
+    }
+}
+
+@code {
+    private Guid? tenantId;
+    private Guid? companyId;
+    private bool isLoading;
+    private string errorMessage = string.Empty;
+    private ReportingOverviewDto overview = new();
+    private IReadOnlyList<ReportSection> sections = [];
+    private IReadOnlyCollection<OperationalDocumentListItemDto> recentDocuments = [];
+
+    private string L(string spanish, string catalan, string english) =>
+        T.CurrentLanguage switch
+        {
+            AppLanguages.Catalan => catalan,
+            AppLanguages.English => english,
+            _ => spanish
+        };
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        tenantId = user.GetTenantId();
+        companyId = user.GetActiveCompanyId();
+        sections = BuildSections();
+        await LoadAsync();
+    }
+
+    private async Task LoadAsync()
+    {
+        if (!tenantId.HasValue || !companyId.HasValue)
+        {
+            return;
+        }
+
+        isLoading = true;
+        errorMessage = string.Empty;
+        try
+        {
+            overview = await ReportingQueries.GetOverviewAsync(tenantId.Value, companyId.Value);
+            var recentResult = await ReportingQueries.SearchOperationalDocumentsAsync(
+                tenantId.Value,
+                companyId.Value,
+                new OperationalDocumentFilter
+                {
+                    Page = 1,
+                    PageSize = 10,
+                    SortColumn = nameof(OperationalDocumentListItemDto.DocumentDate),
+                    SortDescending = true
+                });
+            recentDocuments = recentResult.Items;
+        }
+        catch (Exception exception)
+        {
+            errorMessage = exception.Message;
+            overview = new ReportingOverviewDto();
+            recentDocuments = [];
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private IReadOnlyList<ReportSection> BuildSections() =>
+    [
+        new(
+            L("Por áreas", "Per àrees", "By area"),
+            L("Entrada rápida a reporting operativo y analítico por Ventas, Compras, Producción y Almacén.", "Entrada ràpida a reporting operatiu i analític per Vendes, Compres, Producció i Magatzem.", "Fast entry into operational and analytical reporting by Sales, Purchases, Production and Warehouse."),
+            L("ÁREAS", "ÀREES", "AREAS"),
+            [
+                new(L("Listados ventas", "Llistats vendes", "Sales reports"), L("Pedidos, albaranes, facturas y remesas en una vista de área.", "Comandes, albarans, factures i remeses en una vista d'àrea.", "Orders, shipments, invoices and remittances in one area view."), "/listados/ventas"),
+                new(L("Listados compras", "Llistats compres", "Purchase reports"), L("Pedidos, recepciones y facturas proveedor por circuito de compras.", "Comandes, recepcions i factures proveïdor per circuit de compres.", "Purchase orders, receipts and supplier invoices by purchase flow."), "/listados/compras"),
+                new(L("Listados producción", "Llistats producció", "Production reports"), L("Órdenes de fabricación y trabajo vivo agrupados por producción.", "Ordres de fabricació i treball viu agrupats per producció.", "Work orders and live work grouped under production."), "/listados/produccion"),
+                new(L("Listados almacén", "Llistats magatzem", "Warehouse reports"), L("Traspasos e inventarios en una vista documental de almacén.", "Traspassos i inventaris en una vista documental de magatzem.", "Transfers and counts in a warehouse document view."), "/listados/almacen"),
+                new(L("Estadísticas ventas", "Estadístiques vendes", "Sales statistics"), L("KPIs comerciales y comparativas centradas en ventas.", "KPIs comercials i comparatives centrades en vendes.", "Commercial KPIs and comparisons focused on sales."), "/estadisticas/ventas"),
+                new(L("Estadísticas compras", "Estadístiques compres", "Purchase statistics"), L("KPIs y comparativas del circuito proveedor.", "KPIs i comparatives del circuit proveïdor.", "KPIs and comparisons for the supplier flow."), "/estadisticas/compras"),
+                new(L("Estadísticas producción", "Estadístiques producció", "Production statistics"), L("Carga de planta, estados de fabricación y acabadores.", "Càrrega de planta, estats de fabricació i acabadors.", "Plant load, work-order statuses and finishers."), "/estadisticas/produccion"),
+                new(L("Estadísticas almacén", "Estadístiques magatzem", "Warehouse statistics"), L("Actividad de stock, inventarios, traspasos y almacenes.", "Activitat d'estoc, inventaris, traspassos i magatzems.", "Stock activity, counts, transfers and warehouses."), "/estadisticas/almacen")
+            ]),
+        new(
+            L("CRM", "CRM", "CRM"),
+            L("Maestros comerciales y de relación con terceros.", "Mestres comercials i de relació amb tercers.", "Commercial and relationship master data."),
+            L("CRM", "CRM", "CRM"),
+            [
+                new(L("Listado clientes", "Llistat clients", "Client list"), L("Consulta la base de clientes replicada en la SaaS local.", "Consulta la base de clients replicada a la SaaS local.", "Review the client master replicated in the local SaaS database."), "/crm/clientes"),
+                new(L("Listado proveedores", "Llistat proveïdors", "Supplier list"), L("Accede al maestro de proveedores y su circuito de compras.", "Accedeix al mestre de proveïdors i al seu circuit de compres.", "Open the supplier master and its purchase flow."), "/crm/proveedores"),
+                new(L("Listado talleres", "Llistat tallers", "Workshop list"), L("Consulta talleres y su información operativa.", "Consulta tallers i la seva informació operativa.", "Review workshops and their operational data."), "/crm/talleres"),
+                new(L("Listado transportistas", "Llistat transportistes", "Carrier list"), L("Base de transportistas usada en recepciones y entregas.", "Base de transportistes usada en recepcions i entregues.", "Carrier base used in receipts and deliveries."), "/crm/transportistas"),
+                new(L("Listado representantes", "Llistat representants", "Representative list"), L("Seguimiento de la red comercial activa.", "Seguiment de la xarxa comercial activa.", "Track the active sales network."), "/crm/representantes")
+            ]),
+        new(
+            L("Artículos y base", "Articles i base", "Articles and base"),
+            L("Listados de maestros y catálogos clave del legacy.", "Llistats de mestres i catàlegs clau del legacy.", "Legacy master and catalog listings."),
+            L("MAESTROS", "MESTRES", "MASTERS"),
+            [
+                new(L("Listado tejidos", "Llistat teixits", "Fabric list"), L("Consulta tejidos con filtros, stock y señales de coste.", "Consulta teixits amb filtres, estoc i senyals de cost.", "Browse fabrics with filters, stock and cost signals."), "/articulos/tejidos"),
+                new(L("Listado hilos", "Llistat fils", "Yarn list"), L("Consulta el maestro de hilos y enlaza con compras y stock.", "Consulta el mestre de fils i enllaça amb compres i estoc.", "Browse the yarn master and jump into purchases and stock."), "/articulos/hilos"),
+                new(L("Listado muestras", "Llistat mostres", "Sample list"), L("Visión comercial y técnica de muestras y complementos.", "Visió comercial i tècnica de mostres i complements.", "Commercial and technical view of samples and complements."), "/articulos/muestras"),
+                new(L("Listado models", "Llistat models", "Model list"), L("Escandallos, colores, fornituras y stock de models.", "Escandalls, colors, fornitures i estoc de models.", "Bills of materials, colours, trims and stock for models."), "/articulos/models"),
+                new(L("Listado disposiciones", "Llistat disposicions", "Disposition list"), L("Trabajo pendiente y recibido del circuito de disposiciones.", "Treball pendent i rebut del circuit de disposicions.", "Pending and received work from the disposition flow."), "/articulos/disposiciones"),
+                new(L("Base de datos", "Base de dades", "Base data"), L("Acceso a bancos, operaciones, máquinas, temporadas, IVA e incoterms.", "Accés a bancs, operacions, màquines, temporades, IVA i incoterms.", "Access banks, operations, machines, seasons, VAT and incoterms."), "/base-datos/bancos-cajas")
+            ]),
+        new(
+            L("Compras / Ventas / Órdenes", "Compres / Vendes / Ordres", "Purchases / Sales / Orders"),
+            L("Listados documentales y reporte operativo transversal.", "Llistats documentals i reporting operatiu transversal.", "Document listings and cross-operational reporting."),
+            L("DOCUMENTOS", "DOCUMENTS", "DOCUMENTS"),
+            [
+                new(L("Listado operativo combinado", "Llistat operatiu combinat", "Combined operational list"), L("Mezcla pedidos, albaranes, facturas, órdenes y remesas en una sola vista.", "Barreja comandes, albarans, factures, ordres i remeses en una sola vista.", "Mix orders, shipments, invoices, work orders and remittances in one view."), "/listados/compras-ventas-ordenes"),
+                new(L("Pedidos y ventas", "Comandes i vendes", "Orders and sales"), L("Acceso directo a pedidos, albaranes, facturas y remesas.", "Accés directe a comandes, albarans, factures i remeses.", "Direct access to orders, shipments, invoices and remittances."), "/ventas/pedidos"),
+                new(L("Compras y recepciones", "Compres i recepcions", "Purchases and receipts"), L("Acceso directo a pedidos, recepciones y facturas proveedor.", "Accés directe a comandes, recepcions i factures proveïdor.", "Direct access to purchase orders, receipts and supplier invoices."), "/compras/pedidos"),
+                new(L("Intrastat", "Intrastat", "Intrastat"), L("Listado y exportación del bloque fiscal de ventas UE.", "Llistat i exportació del bloc fiscal de vendes UE.", "Listing and export for the EU sales fiscal block."), "/ventas/intrastat")
+            ]),
+        new(
+            L("Stock y operación", "Estoc i operació", "Stock and operations"),
+            L("Consulta operativa de stock, movimientos e inventarios.", "Consulta operativa d'estoc, moviments i inventaris.", "Operational stock, movement and count views."),
+            L("OPERACIÓN", "OPERACIÓ", "OPERATIONS"),
+            [
+                new(L("Stock actual", "Estoc actual", "Current stock"), L("Vista general de posiciones vivas de almacén.", "Vista general de posicions vives de magatzem.", "Overall view of live warehouse positions."), "/almacen/stock-actual"),
+                new(L("Stock Fils", "Estoc fils", "Yarn stock"), L("Circuito específico de stock y movimientos para hilos.", "Circuit específic d'estoc i moviments per a fils.", "Specific stock and movement flow for yarns."), "/almacen/fils"),
+                new(L("Stock Models", "Estoc models", "Model stock"), L("Circuito específico de stock para models.", "Circuit específic d'estoc per a models.", "Specific stock flow for models."), "/almacen/models"),
+                new(L("Inventarios", "Inventaris", "Counts"), L("Conteos, validación y hojas de recuento.", "Comptatges, validació i fulls de recompte.", "Counts, validation and count sheets."), "/almacen/inventarios"),
+                new(L("Traspasos", "Traspassos", "Transfers"), L("Movimientos entre almacenes con trazabilidad documental.", "Moviments entre magatzems amb traçabilitat documental.", "Inter-warehouse transfers with document traceability."), "/almacen/traspasos"),
+                new(L("Acabados", "Acabats", "Finishing"), L("Vista operativa del trabajo vivo en producción.", "Vista operativa del treball viu en producció.", "Operational view of live production work."), "/produccion/acabados")
+            ])
+    ];
+
+    private sealed record ReportItem(string Title, string Description, string Href);
+
+    private sealed record ReportSection(string Title, string Description, string Kicker, IReadOnlyList<ReportItem> Items);
+
+    private static string DisplayValue(string? value) => string.IsNullOrWhiteSpace(value) ? "-" : value;
+
+    private string FormatCategory(string category) =>
+        category switch
+        {
+            "Sales" => L("Ventas", "Vendes", "Sales"),
+            "Purchases" => L("Compras", "Compres", "Purchases"),
+            "Production" => L("Producción", "Producció", "Production"),
+            "Finance" => L("Finanzas", "Finances", "Finance"),
+            "Warehouse" => L("Almacén", "Magatzem", "Warehouse"),
+            _ => category
+        };
+
+    private string FormatType(string typeKey) =>
+        typeKey switch
+        {
+            "SalesOrder" => L("Pedido venta", "Comanda venda", "Sales order"),
+            "SalesShipment" => L("Albarán venta", "Albarà venda", "Sales shipment"),
+            "SalesInvoice" => L("Factura venta", "Factura venda", "Sales invoice"),
+            "PurchaseOrder" => L("Pedido compra", "Comanda compra", "Purchase order"),
+            "PurchaseReceipt" => L("Recepción compra", "Recepció compra", "Purchase receipt"),
+            "PurchaseInvoice" => L("Factura proveedor", "Factura proveïdor", "Supplier invoice"),
+            "FinishWorkOrder" => L("Orden fabricación", "Ordre fabricació", "Work order"),
+            "SalesRemittance" => L("Remesa cliente", "Remesa client", "Customer remittance"),
+            "StockTransfer" => L("Traspaso almacén", "Traspàs magatzem", "Warehouse transfer"),
+            "StockCount" => L("Inventario", "Inventari", "Stock count"),
+            _ => typeKey
+        };
+}

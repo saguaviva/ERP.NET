@@ -46,7 +46,7 @@ else
             <span class="results-summary">
                 @(totalCount == 0
                     ? L("Sin resultados", "Sense resultats", "No results")
-                    : L($"Mostrando {PageStart}-{PageEnd} de {totalCount} facturas", $"Mostrant {PageStart}-{PageEnd} de {totalCount} factures", $"Showing {PageStart}-{PageEnd} of {totalCount} invoices"))
+                    : L($"Mostrando {PageStart.ToUiString("N0")}-{PageEnd.ToUiString("N0")} de {totalCount.ToUiString("N0")} facturas", $"Mostrant {PageStart.ToUiString("N0")}-{PageEnd.ToUiString("N0")} de {totalCount.ToUiString("N0")} factures", $"Showing {PageStart.ToUiString("N0")}-{PageEnd.ToUiString("N0")} of {totalCount.ToUiString("N0")} invoices"))
             </span>
             <label class="field compact-field">
                 <span>@L("Tamaño de página", "Mida de pàgina", "Page size")</span>
@@ -131,16 +131,16 @@ else
                                 </span>
                                 @if (!item.IsReconciled)
                                 {
-                                    <div class="table-subtitle">@L($"Base {item.ReconciliationDifferenceAmount:0.00} €", $"Base {item.ReconciliationDifferenceAmount:0.00} €", $"Base {item.ReconciliationDifferenceAmount:0.00} €")</div>
+                                                <div class="table-subtitle">@L($"Base {item.ReconciliationDifferenceAmount.ToUiString("0.00")} €", $"Base {item.ReconciliationDifferenceAmount.ToUiString("0.00")} €", $"Base {item.ReconciliationDifferenceAmount.ToUiString("0.00")} €")</div>
                                 }
                             </td>
                             <td>@item.ReceiptCount</td>
                             <td>@item.OrderCount</td>
-                            <td>@item.TotalAmount.ToString("0.00") €</td>
+                            <td>@item.TotalAmount.ToUiString("0.00") €</td>
                             <td>
                                 <div class="table-actions">
                                     <a class="inline-link" href="/compras/facturas/editar/@item.InvoiceNumber">@L("Abrir", "Obrir", "Open")</a>
-                                    <a class="inline-link" href="/compras/facturas/@item.InvoiceNumber/pdf" target="_blank">PDF</a>
+                                <a class="inline-link" href="/compras/facturas/@item.InvoiceNumber/pdf" target="_blank">@L("PDF", "PDF", "PDF")</a>
                                 </div>
                             </td>
                         </tr>

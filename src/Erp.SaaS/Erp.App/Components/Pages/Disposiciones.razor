@@ -50,7 +50,7 @@ else
             <span class="results-summary">
                 @(totalCount == 0
                     ? L("Sin resultados", "Sense resultats", "No results")
-                    : L($"Mostrando {PageStart}-{PageEnd} de {totalCount} disposiciones", $"Mostrant {PageStart}-{PageEnd} de {totalCount} disposicions", $"Showing {PageStart}-{PageEnd} of {totalCount} dispositions"))
+                    : L($"Mostrando {PageStart.ToUiString("N0")}-{PageEnd.ToUiString("N0")} de {totalCount.ToUiString("N0")} disposiciones", $"Mostrant {PageStart.ToUiString("N0")}-{PageEnd.ToUiString("N0")} de {totalCount.ToUiString("N0")} disposicions", $"Showing {PageStart.ToUiString("N0")}-{PageEnd.ToUiString("N0")} of {totalCount.ToUiString("N0")} dispositions"))
             </span>
             <label class="field compact-field">
                 <span>@L("Tamaño de página", "Mida de pàgina", "Page size")</span>
@@ -154,8 +154,8 @@ else
                                         <div class="muted">@item.ClientColor</div>
                                     }
                                 </td>
-                                <td>@item.TotalPieces.ToString("0.##")</td>
-                                <td>@item.TotalKilograms.ToString("0.##")</td>
+                                <td>@item.TotalPieces.ToUiString("0.##")</td>
+                                <td>@item.TotalKilograms.ToUiString("0.##")</td>
                                 <td>
                                     @if (item.IsCancelled)
                                     {

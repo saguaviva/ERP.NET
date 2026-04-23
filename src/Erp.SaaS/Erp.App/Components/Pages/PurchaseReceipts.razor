@@ -1,4 +1,5 @@
 @page "/compras/recepciones"
+@page "/compras/albaranes-entrega-fils"
 @attribute [Authorize(Roles = "TenantAdmin,TenantReader")]
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject NavigationManager NavigationManager
@@ -6,15 +7,23 @@
 @inject IPurchaseOrderQueries PurchaseOrderQueries
 @inject AppText T
 
-<PageTitle>@L("Compras / Recepciones", "Compres / Recepcions", "Purchases / Receipts")</PageTitle>
+<PageTitle>@(IsYarnReceiptsRoute
+    ? L("Compras / Albaranes entrega Fils", "Compres / Albarans entrega Fils", "Purchases / Yarn delivery receipts")
+    : L("Compras / Recepciones", "Compres / Recepcions", "Purchases / Receipts"))</PageTitle>
 
 <div class="page-header">
     <div>
         <p class="eyebrow">@L("Compras", "Compres", "Purchases")</p>
-        <h1>@L("Recepciones", "Recepcions", "Receipts")</h1>
-        <p class="lead">@(isLegacySyncActive
-            ? L("Consulta y filtra las recepciones replicadas en la SaaS local. La sync manual refresca solo las recepciones con origen legacy.", "Consulta i filtra les recepcions replicades a la SaaS local. La sync manual refresca només les recepcions amb origen legacy.", "Browse and filter receipts replicated into the local SaaS. Manual sync only refreshes legacy-origin receipts.")
-            : L("Listado de entradas de mercancía registradas para la empresa activa.", "Llistat d'entrades de mercaderia registrades per a l'empresa activa.", "List of goods receipts recorded for the active company."))</p>
+        <h1>@(IsYarnReceiptsRoute
+            ? L("Albaranes entrega de hilo", "Albarans entrega de fils", "Yarn delivery receipts")
+            : L("Recepciones", "Recepcions", "Receipts"))</h1>
+        <p class="lead">@(IsYarnReceiptsRoute
+            ? (isLegacySyncActive
+                ? L("Consulta y filtra los albaranes de entrega de hilo replicados en la SaaS local. La sync manual refresca solo recepciones con origen legacy y artículo presente en el maestro fil.", "Consulta i filtra els albarans d'entrega de fils replicats a la SaaS local. La sync manual refresca només recepcions amb origen legacy i article present al mestre fil.", "Browse and filter yarn delivery receipts replicated into the local SaaS. Manual sync refreshes only legacy-origin receipts whose item exists in the fil master.")
+                : L("Listado de entradas de hilo registradas para la empresa activa, enlazadas con pedidos y facturas proveedor.", "Llistat d'entrades de fils registrades per a l'empresa activa, enllaçades amb comandes i factures de proveïdor.", "List of yarn receipts recorded for the active company, linked to supplier orders and invoices."))
+            : (isLegacySyncActive
+                ? L("Consulta y filtra las recepciones replicadas en la SaaS local. La sync manual refresca solo las recepciones con origen legacy.", "Consulta i filtra les recepcions replicades a la SaaS local. La sync manual refresca només les recepcions amb origen legacy.", "Browse and filter receipts replicated into the local SaaS. Manual sync only refreshes legacy-origin receipts.")
+                : L("Listado de entradas de mercancía registradas para la empresa activa.", "Llistat d'entrades de mercaderia registrades per a l'empresa activa.", "List of goods receipts recorded for the active company.")))</p>
     </div>
 </div>
 
@@ -35,7 +44,9 @@ else
             <span class="results-summary">
                 @(totalCount == 0
                     ? L("Sin resultados", "Sense resultats", "No results")
-                    : L($"Mostrando {PageStart}-{PageEnd} de {totalCount} recepciones", $"Mostrant {PageStart}-{PageEnd} de {totalCount} recepcions", $"Showing {PageStart}-{PageEnd} of {totalCount} receipts"))
+                    : IsYarnReceiptsRoute
+                        ? L($"Mostrando {PageStart.ToUiString("N0")}-{PageEnd.ToUiString("N0")} de {totalCount.ToUiString("N0")} albaranes entrega de hilo", $"Mostrant {PageStart.ToUiString("N0")}-{PageEnd.ToUiString("N0")} de {totalCount.ToUiString("N0")} albarans entrega de fils", $"Showing {PageStart.ToUiString("N0")}-{PageEnd.ToUiString("N0")} of {totalCount.ToUiString("N0")} yarn delivery receipts")
+                        : L($"Mostrando {PageStart.ToUiString("N0")}-{PageEnd.ToUiString("N0")} de {totalCount.ToUiString("N0")} recepciones", $"Mostrant {PageStart.ToUiString("N0")}-{PageEnd.ToUiString("N0")} de {totalCount.ToUiString("N0")} recepcions", $"Showing {PageStart.ToUiString("N0")}-{PageEnd.ToUiString("N0")} of {totalCount.ToUiString("N0")} receipts"))
             </span>
             <label class="field compact-field">
                 <span>@L("Tamaño de página", "Mida de pàgina", "Page size")</span>
@@ -56,7 +67,9 @@ else
     @if (isLegacySyncActive)
     {
         <div class="alert">
-            @L("Compras / Recepciones está en convivencia con legacy para esta empresa. La sync manual refresca solo las recepciones con origen legacy; cualquier nueva recepción web queda ya como local.", "Compres / Recepcions està en convivència amb legacy per a aquesta empresa. La sync manual refresca només les recepcions amb origen legacy; qualsevol nova recepció web queda ja com a local.", "Purchases / Receipts is running in legacy coexistence mode for this company. Manual sync refreshes only legacy-origin receipts; any new web receipt is already local.")
+            @(IsYarnReceiptsRoute
+                ? L("Compras / Albaranes entrega Fils está en convivencia con legacy para esta empresa. La sync manual refresca solo las recepciones con origen legacy ligadas al maestro de hilos; cualquier nueva recepción web queda ya como local.", "Compres / Albarans entrega Fils està en convivència amb legacy per a aquesta empresa. La sync manual refresca només les recepcions amb origen legacy lligades al mestre de fils; qualsevol nova recepció web queda ja com a local.", "Purchases / Yarn delivery receipts is running in legacy coexistence mode for this company. Manual sync refreshes only legacy-origin receipts linked to the yarn master; any new web receipt is already local.")
+                : L("Compras / Recepciones está en convivencia con legacy para esta empresa. La sync manual refresca solo las recepciones con origen legacy; cualquier nueva recepción web queda ya como local.", "Compres / Recepcions està en convivència amb legacy per a aquesta empresa. La sync manual refresca només les recepcions amb origen legacy; qualsevol nova recepció web queda ja com a local.", "Purchases / Receipts is running in legacy coexistence mode for this company. Manual sync refreshes only legacy-origin receipts; any new web receipt is already local."))
             @if (!string.IsNullOrWhiteSpace(syncStatusLabel))
             {
                 <span>@syncStatusLabel</span>
@@ -69,7 +82,9 @@ else
         {
             <div class="loading-banner">
                 <span class="loading-indicator" aria-hidden="true"></span>
-                <span>@L("Cargando recepciones...", "Carregant recepcions...", "Loading receipts...")</span>
+                <span>@(IsYarnReceiptsRoute
+                    ? L("Cargando albaranes entrega de hilo...", "Carregant albarans entrega de fils...", "Loading yarn delivery receipts...")
+                    : L("Cargando recepciones...", "Carregant recepcions...", "Loading receipts..."))</span>
             </div>
         }
 
@@ -104,7 +119,9 @@ else
                 else if (items.Count == 0)
                 {
                     <tr>
-                        <td colspan="7" class="table-empty">@L("No hay recepciones para mostrar.", "No hi ha recepcions per mostrar.", "There are no receipts to show.")</td>
+                        <td colspan="7" class="table-empty">@(IsYarnReceiptsRoute
+                            ? L("No hay albaranes entrega de hilo para mostrar.", "No hi ha albarans entrega de fils per mostrar.", "There are no yarn delivery receipts to show.")
+                            : L("No hay recepciones para mostrar.", "No hi ha recepcions per mostrar.", "There are no receipts to show."))</td>
                     </tr>
                 }
                 else
@@ -117,15 +134,15 @@ else
                             <td>@item.SupplierName</td>
                             <td>@item.ReceiptDate.ToString("dd/MM/yyyy")</td>
                             <td>@item.LineCount</td>
-                            <td>@item.TotalReceivedQuantity.ToString("0.###")</td>
+                            <td>@item.TotalReceivedQuantity.ToUiString("0.###")</td>
                             <td>
                                 <div class="table-actions">
-                                    <a class="inline-link" href="/compras/recepciones/@item.ReceiptNumber">@L("Ver documento", "Veure document", "View document")</a>
+                                    <a class="inline-link" href="@BuildReceiptDetailHref(item.ReceiptNumber)">@L("Ver documento", "Veure document", "View document")</a>
                                     @if (canEdit)
                                     {
                                         <a class="inline-link" href="/compras/facturas/nueva?receiptNumber=@item.ReceiptNumber">@L("Crear factura", "Crear factura", "Create invoice")</a>
                                     }
-                                    <a class="inline-link" href="/compras/recepciones/@item.ReceiptNumber/pdf" target="_blank">PDF</a>
+                            <a class="inline-link" href="@BuildReceiptPdfHref(item.ReceiptNumber)" target="_blank">@L("PDF", "PDF", "PDF")</a>
                                 </div>
                             </td>
                         </tr>
@@ -182,6 +199,8 @@ else
     private bool isLegacySyncActive;
     private string syncStatusLabel = string.Empty;
     private int totalCount;
+    private bool IsYarnReceiptsRoute => CurrentRelativePath.StartsWith("compras/albaranes-entrega-fils", StringComparison.OrdinalIgnoreCase);
+    private string CurrentRelativePath => NavigationManager.ToBaseRelativePath(NavigationManager.Uri).Split('?', '#')[0];
     private int TotalPages => Math.Max(1, (int)Math.Ceiling(totalCount / (double)filter.PageSize));
     private bool CanGoPrevious => filter.Page > 1;
     private bool CanGoNext => filter.Page < TotalPages;
@@ -316,6 +335,7 @@ else
     private void ApplyQueryState()
     {
         filter.Search = SearchQuery?.Trim() ?? string.Empty;
+        filter.CatalogScope = IsYarnReceiptsRoute ? "Hilos" : string.Empty;
         filter.Page = Math.Max(PageQuery.GetValueOrDefault(1), 1);
         filter.PageSize = PageSizeQuery is 25 or 50 or 100 ? PageSizeQuery.Value : 25;
         sortColumn = NormalizeSortColumn(SortQuery);
@@ -348,4 +368,14 @@ else
         nameof(PurchaseReceiptListItemDto.TotalReceivedQuantity) => nameof(PurchaseReceiptListItemDto.TotalReceivedQuantity),
         _ => nameof(PurchaseReceiptListItemDto.ReceiptNumber)
     };
+
+    private string BuildReceiptDetailHref(int receiptNumber) =>
+        IsYarnReceiptsRoute
+            ? $"/compras/albaranes-entrega-fils/{receiptNumber}"
+            : $"/compras/recepciones/{receiptNumber}";
+
+    private string BuildReceiptPdfHref(int receiptNumber) =>
+        IsYarnReceiptsRoute
+            ? $"/compras/albaranes-entrega-fils/{receiptNumber}/pdf"
+            : $"/compras/recepciones/{receiptNumber}/pdf";
 }

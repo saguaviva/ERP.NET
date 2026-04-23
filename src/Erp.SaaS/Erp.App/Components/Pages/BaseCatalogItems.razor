@@ -2,30 +2,31 @@
 @attribute [Authorize(Roles = "TenantAdmin,TenantReader")]
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject IBaseCatalogQueries BaseCatalogQueries
+@inject AppText T
 
 <PageTitle>@Definition.Title</PageTitle>
 
 <div class="page-header">
     <div>
-        <p class="eyebrow">Base de dades</p>
+        <p class="eyebrow">@L("Base de datos", "Base de dades", "Master data")</p>
         <h1>@Definition.Title</h1>
         <p class="lead">@Definition.Lead</p>
     </div>
     <div class="quick-links">
         @if (canEdit)
         {
-            <a class="primary-button link-button" href="/base-datos/@CatalogKey/nuevo">Nuevo registro</a>
+            <a class="primary-button link-button" href="/base-datos/@CatalogKey/nuevo">@L("Nuevo registro", "Nou registre", "New record")</a>
         }
     </div>
 </div>
 
 @if (!isValidCatalog)
 {
-    <div class="empty-state"><p>El catálogo solicitado no existe.</p></div>
+    <div class="empty-state"><p>@L("El catálogo solicitado no existe.", "El catàleg sol·licitat no existeix.", "The requested catalog does not exist.")</p></div>
 }
 else if (!tenantId.HasValue || !companyId.HasValue)
 {
-    <div class="empty-state"><p>Selecciona una empresa activa para trabajar con este catálogo.</p></div>
+    <div class="empty-state"><p>@L("Selecciona una empresa activa para trabajar con este catálogo.", "Selecciona una empresa activa per treballar amb aquest catàleg.", "Select an active company to work with this catalog.")</p></div>
 }
 else
 {
@@ -34,9 +35,9 @@ else
             <input class="text-input" @bind="filter.Search" placeholder="@Definition.SearchPlaceholder" />
             <label class="inline-checkbox">
                 <input type="checkbox" @bind="filter.IncludeInactive" />
-                <span>Incluir inactivos</span>
+                <span>@L("Incluir inactivos", "Incloure inactius", "Include inactive")</span>
             </label>
-            <button class="secondary-button" @onclick="SearchAsync" disabled="@isLoading">@(isLoading ? "Cargando..." : "Buscar")</button>
+            <button class="secondary-button" @onclick="SearchAsync" disabled="@isLoading">@(isLoading ? L("Cargando...", "Carregant...", "Loading...") : L("Buscar", "Buscar", "Search"))</button>
         </div>
     </section>
 
@@ -71,14 +72,14 @@ else
                     {
                         <th>@Definition.SecondaryNumericLabel</th>
                     }
-                    <th>Estado</th>
+                    <th>@L("Estado", "Estat", "Status")</th>
                     <th></th>
                 </tr>
             </thead>
             <tbody>
                 @if (items.Count == 0)
                 {
-                    <tr><td colspan="@EmptyColSpan" class="table-empty">No hay registros para mostrar.</td></tr>
+                    <tr><td colspan="@EmptyColSpan" class="table-empty">@L("No hay registros para mostrar.", "No hi ha registres per mostrar.", "There are no records to display.")</td></tr>
                 }
                 else
                 {
@@ -107,8 +108,8 @@ else
                             {
                                 <td>@FormatSecondaryNumeric(item.SecondaryNumericValue)</td>
                             }
-                            <td><span class="status-pill @(item.IsActive ? "success" : "warning")">@(item.IsActive ? "Activo" : "Inactivo")</span></td>
-                            <td><a class="inline-link" href="/base-datos/@CatalogKey/editar/@Uri.EscapeDataString(item.Code)">@(canEdit ? "Abrir" : "Ver")</a></td>
+                            <td><span class="status-pill @(item.IsActive ? "success" : "warning")">@(item.IsActive ? L("Activo", "Actiu", "Active") : L("Inactivo", "Inactiu", "Inactive"))</span></td>
+                            <td><a class="inline-link" href="/base-datos/@CatalogKey/editar/@Uri.EscapeDataString(item.Code)">@(canEdit ? L("Abrir", "Obrir", "Open") : L("Ver", "Veure", "View"))</a></td>
                         </tr>
                     }
                 }
@@ -128,11 +129,11 @@ else
     private string errorMessage = string.Empty;
     private BaseCatalogFilter filter = new();
     private IReadOnlyCollection<BaseCatalogListItemDto> items = [];
-    private CatalogDefinition Definition = CatalogDefinitions.Empty;
+    private CatalogDefinition Definition = new("", "Catalog", string.Empty, string.Empty, "Code", string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, "0.##", string.Empty, "0.##", false);
 
     protected override async Task OnParametersSetAsync()
     {
-        Definition = CatalogDefinitions.Get(CatalogKey);
+        Definition = GetDefinition(CatalogKey);
         isValidCatalog = Definition.IsValid;
 
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
@@ -206,20 +207,87 @@ else
     private bool HasSecondaryNumeric => !string.IsNullOrWhiteSpace(Definition.SecondaryNumericLabel);
     private int EmptyColSpan => 4 + (HasDescription ? 1 : 0) + (HasReference ? 1 : 0) + (HasSecondaryReference ? 1 : 0) + (HasNumeric ? 1 : 0) + (HasSecondaryNumeric ? 1 : 0);
 
-    private static class CatalogDefinitions
+    private CatalogDefinition GetDefinition(string key) => key?.Trim().ToLowerInvariant() switch
     {
-        public static readonly CatalogDefinition Empty = new("", "Catálogo", string.Empty, string.Empty, "Código", string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, "0.##", string.Empty, "0.##", false);
+        BaseCatalogKeys.BanksCashboxes => new(key,
+            L("Bancos / Cajas", "Bancs / Caixes", "Banks / Cashboxes"),
+            L("Gestión local de bancos, cajas y cuentas operativas.", "Gestió local de bancs, caixes i comptes operatius.", "Local management of banks, cashboxes and operating accounts."),
+            L("Buscar por código, banco, cuenta, IBAN, SWIFT o notas", "Buscar per codi, banc, compte, IBAN, SWIFT o notes", "Search by code, bank, account, IBAN, SWIFT or notes"),
+            L("Código banco", "Codi banc", "Bank code"),
+            L("Nombre banco", "Nom banc", "Bank name"),
+            L("Núm. cuenta", "Núm. compte", "Account no."),
+            "IBAN",
+            "SWIFT / BIC",
+            string.Empty,
+            "0.##",
+            string.Empty,
+            "0.##"),
+        BaseCatalogKeys.PaymentMethods => new(key,
+            L("Formas de pago", "Formes de pagament", "Payment methods"),
+            L("Métodos y condiciones de pago disponibles en la SaaS local.", "Mètodes i condicions de pagament disponibles a la SaaS local.", "Payment methods and terms available in the local SaaS database."),
+            L("Buscar por código, forma, días o descuento", "Buscar per codi, forma, dies o descompte", "Search by code, method, days or discount"),
+            L("Código forma", "Codi forma", "Method code"),
+            L("Forma pago", "Forma pagament", "Payment method"),
+            L("Descripción operativa", "Descripció operativa", "Operational description"),
+            L("Referencia / tipo", "Referència / tipus", "Reference / type"),
+            string.Empty,
+            L("Días pago", "Dies pagament", "Payment days"),
+            "0",
+            L("Dte. pago %", "Dte. pagament %", "Payment discount %"),
+            "0.##"),
+        BaseCatalogKeys.Operations => new(key,
+            L("Operaciones", "Operacions", "Operations"),
+            L("Catálogo de operaciones de trabajo y proceso, como en el legacy.", "Catàleg d'operacions de treball i procés, com al legacy.", "Catalog of work and process operations, like in legacy."),
+            L("Buscar por código o descripción", "Buscar per codi o descripció", "Search by code or description"),
+            L("Código operación", "Codi operació", "Operation code"),
+            L("Descripción", "Descripció", "Description"),
+            string.Empty, string.Empty, string.Empty, string.Empty, "0", string.Empty, "0.##"),
+        BaseCatalogKeys.Machines => new(key,
+            L("Máquinas", "Màquines", "Machines"),
+            L("Maestro de máquinas con código, descripción y precio operativo.", "Mestre de màquines amb codi, descripció i preu operatiu.", "Machine master data with code, description and operating price."),
+            L("Buscar por código, descripción o precio", "Buscar per codi, descripció o preu", "Search by code, description or price"),
+            L("Código máquina", "Codi màquina", "Machine code"),
+            L("Descripción", "Descripció", "Description"),
+            string.Empty, string.Empty, string.Empty,
+            L("Precio", "Preu", "Price"),
+            "0.00##",
+            string.Empty,
+            "0.##"),
+        BaseCatalogKeys.Seasons => new(key,
+            L("Temporadas", "Temporades", "Seasons"),
+            L("Catálogo simple de temporadas, como en el legacy.", "Catàleg simple de temporades, com al legacy.", "Simple season catalog, like in legacy."),
+            L("Buscar por código o descripción", "Buscar per codi o descripció", "Search by code or description"),
+            L("Temporada", "Temporada", "Season"),
+            L("Descripción", "Descripció", "Description"),
+            string.Empty, string.Empty, string.Empty, string.Empty, "0", string.Empty, "0.##"),
+        BaseCatalogKeys.VatTypes => new(key,
+            L("Tipos de IVA", "Tipus d'IVA", "VAT types"),
+            L("Tipos impositivos para ventas y compras, con IVA y recargo de equivalencia.", "Tipus impositius per a vendes i compres, amb IVA i recàrrec d'equivalència.", "Tax types for sales and purchases, including VAT and surcharge."),
+            L("Buscar por código, descripción, IVA, RE o clave fiscal", "Buscar per codi, descripció, IVA, RE o clau fiscal", "Search by code, description, VAT, surcharge or tax key"),
+            L("Código IVA", "Codi IVA", "VAT code"),
+            L("Descripción", "Descripció", "Description"),
+            L("Descripción operativa", "Descripció operativa", "Operational description"),
+            L("Clave fiscal", "Clau fiscal", "Tax key"),
+            string.Empty,
+            "% IVA",
+            "0.##",
+            "% RE",
+            "0.##"),
+        BaseCatalogKeys.Incoterms => new(key,
+            "Incoterms",
+            L("Condiciones de entrega y responsabilidad comercial.", "Condicions de lliurament i responsabilitat comercial.", "Delivery terms and commercial responsibility."),
+            L("Buscar por nombre o descripción", "Buscar per nom o descripció", "Search by name or description"),
+            L("Nombre", "Nom", "Name"),
+            L("Descripción", "Descripció", "Description"),
+            string.Empty, string.Empty, string.Empty, string.Empty, "0", string.Empty, "0.##"),
+        _ => new("", L("Catálogo", "Catàleg", "Catalog"), string.Empty, string.Empty, L("Código", "Codi", "Code"), string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, "0.##", string.Empty, "0.##", false)
+    };
 
-        public static CatalogDefinition Get(string key) => key?.Trim().ToLowerInvariant() switch
+    private string L(string spanish, string catalan, string english) =>
+        T.CurrentLanguage switch
         {
-            BaseCatalogKeys.BanksCashboxes => new(key, "Bancs / Caixes", "Gestión local de bancos, cajas y cuentas operativas.", "Buscar por código, banco, cuenta, IBAN, SWIFT o notas", "Codi banc", "Nom banc", "Núm. compte", "IBAN", "SWIFT / BIC", string.Empty, "0.##", string.Empty, "0.##"),
-            BaseCatalogKeys.PaymentMethods => new(key, "Formes de pagament", "Métodos y condiciones de pago disponibles en la SaaS local.", "Buscar por código, forma, días o descuento", "Codi forma", "Forma pagament", "Descripción operativa", "Referencia / tipo", string.Empty, "Dies pagament", "0", "Dte. pagament %", "0.##"),
-            BaseCatalogKeys.Operations => new(key, "Operacions", "Catálogo de operaciones de trabajo y proceso, como en el legacy.", "Buscar por código o descripción", "Codi operació", "Descripció", string.Empty, string.Empty, string.Empty, string.Empty, "0", string.Empty, "0.##"),
-            BaseCatalogKeys.Machines => new(key, "Màquines", "Maestro de máquinas con código, descripción y precio operativo.", "Buscar por código, descripción o precio", "Codi màquina", "Descripció", string.Empty, string.Empty, string.Empty, "Preu", "0.00##", string.Empty, "0.##"),
-            BaseCatalogKeys.Seasons => new(key, "Temporades", "Catálogo simple de temporadas, como en el legacy.", "Buscar por código o descripción", "Temporada", "Descripció", string.Empty, string.Empty, string.Empty, string.Empty, "0", string.Empty, "0.##"),
-            BaseCatalogKeys.VatTypes => new(key, "Tipus d'IVA", "Tipos impositivos para ventas y compras, con IVA y recargo de equivalencia.", "Buscar por código, descripción, IVA, RE o clave fiscal", "Codi IVA", "Descripció", "Descripció operativa", "Clau fiscal", string.Empty, "% IVA", "0.##", "% RE", "0.##"),
-            BaseCatalogKeys.Incoterms => new(key, "Incoterms", "Condiciones de entrega y responsabilidad comercial.", "Buscar por nombre o descripción", "Nom", "Descripció", string.Empty, string.Empty, string.Empty, string.Empty, "0", string.Empty, "0.##"),
-            _ => Empty
+            AppLanguages.Catalan => catalan,
+            AppLanguages.English => english,
+            _ => spanish
         };
-    }
 }

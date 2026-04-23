@@ -4,29 +4,36 @@
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject IAuditLogService AuditLogService
 @inject IModeloQueries ModeloQueries
+@inject IParteAcabadoQueries ParteAcabadoQueries
 @inject IModeloService ModeloService
 @inject ILegacySyncService LegacySyncService
 @inject NavigationManager NavigationManager
+@inject AppText T
 
 <PageTitle>@PageTitleText</PageTitle>
 
 <div class="page-header">
     <div>
-        <p class="eyebrow">ARTÍCULOS</p>
+        <p class="eyebrow">@L("ARTÍCULOS", "ARTICLES", "ARTICLES")</p>
         <h1>@PageTitleText</h1>
         <p class="lead">@(isLegacySyncActive
-            ? "Edición sobre la SaaS local. La importación manual desde legacy refresca solo registros marcados como legacy."
-            : "Alta y edición sobre la réplica SaaS de models, aislada por tenant y empresa activa.")</p>
+            ? L("Edición sobre la SaaS local. La importación manual desde legacy refresca solo registros marcados como legacy.", "Edició sobre la SaaS local. La importació manual des de legacy refresca només registres marcats com a legacy.", "Editing on the local SaaS. Manual legacy import only refreshes records marked as legacy.")
+            : L("Alta y edición sobre la réplica SaaS de models, aislada por tenant y empresa activa.", "Alta i edició sobre la rèplica SaaS de models, aïllada per tenant i empresa activa.", "Create and edit on the SaaS model replica, isolated by tenant and active company."))</p>
     </div>
     <div class="quick-links">
-        <a class="secondary-button link-button" href="/articulos/models">Volver al listado</a>
+        <a class="secondary-button link-button" href="/articulos/models">@L("Volver al listado", "Tornar al llistat", "Back to list")</a>
         @if (model.Id != Guid.Empty)
         {
-            <a class="secondary-button link-button" href="@BuildPrintUrl(model.Id)">Imprimir ficha</a>
+            <a class="secondary-button link-button" href="@BuildPrintUrl(model.Id)">@L("Imprimir ficha", "Imprimir fitxa", "Print sheet")</a>
+            <a class="secondary-button link-button" href="@BuildManufacturingOrderUrl(model.Id)">@L("Crear orden fabricación", "Crear ordre fabricació", "Create manufacturing order")</a>
+            @if (!string.IsNullOrWhiteSpace(model.Code))
+            {
+                <a class="secondary-button link-button" href="@BuildManufacturingOrdersUrl(model.Code)">@L("Órdenes fabricación", "Ordres fabricació", "Manufacturing orders")</a>
+            }
         }
         @if (!string.IsNullOrWhiteSpace(model.FabricCode))
         {
-            <a class="secondary-button link-button" href="@BuildTejidoUrl(model.FabricCode)">Abrir tejido</a>
+            <a class="secondary-button link-button" href="@BuildTejidoUrl(model.FabricCode)">@L("Abrir tejido", "Obrir teixit", "Open fabric")</a>
         }
     </div>
 </div>
@@ -34,7 +41,7 @@
 @if (!tenantId.HasValue || !companyId.HasValue)
 {
     <div class="empty-state">
-        <p>No hay empresa activa seleccionada.</p>
+        <p>@L("No hay empresa activa seleccionada.", "No hi ha cap empresa activa seleccionada.", "No active company selected.")</p>
     </div>
 }
 else
@@ -47,8 +54,8 @@ else
     @if (isLegacySyncActive)
     {
         <div class="alert">
-            Artículos / Models está en convivencia con legacy para esta empresa.
-            La ficha guarda cambios solo en la SaaS local y la sync manual refresca únicamente registros de origen legacy.
+            @L("Artículos / Models está en convivencia con legacy para esta empresa.", "Articles / Models està en convivència amb legacy per a aquesta empresa.", "Articles / Models is running alongside legacy for this company.")
+            @L("La ficha guarda cambios solo en la SaaS local y la sync manual refresca únicamente registros de origen legacy.", "La fitxa desa canvis només a la SaaS local i la sync manual refresca únicament registres d'origen legacy.", "This record saves changes only in the local SaaS and manual sync refreshes legacy-origin records only.")
             @if (!string.IsNullOrWhiteSpace(syncStatusLabel))
             {
                 <span>@syncStatusLabel</span>
@@ -59,39 +66,40 @@ else
     @if (!canEdit && string.IsNullOrWhiteSpace(Id))
     {
         <div class="alert">
-            No tienes permisos de edición para crear models en esta empresa.
+            @L("No tienes permisos de edición para crear models en esta empresa.", "No tens permisos d'edició per crear models en aquesta empresa.", "You do not have edit permissions to create models in this company.")
         </div>
     }
 
     <section class="summary-card-grid">
         <article class="summary-card">
-            <span class="summary-card-label">Origen</span>
+            <span class="summary-card-label">@L("Origen", "Origen", "Origin")</span>
             <strong>@DisplayOrigin</strong>
             <span class="summary-card-meta">@($"{model.CompanyCenterCode} · {model.Season} · {model.Series}")</span>
         </article>
         <article class="summary-card">
-            <span class="summary-card-label">Cliente</span>
+            <span class="summary-card-label">@L("Cliente", "Client", "Client")</span>
             <strong>@DisplayClient</strong>
-            <span class="summary-card-meta">@($"Código {model.ClientCode}")</span>
+            <span class="summary-card-meta">@($"{L("Código", "Codi", "Code")} {model.ClientCode}")</span>
         </article>
         <article class="summary-card">
-            <span class="summary-card-label">Detalle</span>
+            <span class="summary-card-label">@L("Detalle", "Detall", "Detail")</span>
             <strong>@($"{model.ScandalloLines.Count} esc. · {model.ColorLines.Count} col.")</strong>
-            <span class="summary-card-meta">@($"{model.FornituraLines.Count} forn. · {model.StockLines.Count} stock")</span>
+            <span class="summary-card-meta">@($"{model.FornituraLines.Count} {L("forn.", "forn.", "trim.")} · {model.StockLines.Count} {L("stock", "stock", "stock")}")</span>
         </article>
         <article class="summary-card">
-            <span class="summary-card-label">Venta final</span>
-            <strong>@model.FinalSalePrice.ToString("0.00##")</strong>
-            <span class="summary-card-meta">@($"Coste {model.CostPrice.ToString("0.00##")} · margen {model.MarginPercent.ToString("0.0#")}%")</span>
+            <span class="summary-card-label">@L("Venta final", "Venda final", "Final sale")</span>
+            <strong>@model.FinalSalePrice.ToUiString("0.00##")</strong>
+            <span class="summary-card-meta">@($"{L("Coste", "Cost", "Cost")} {model.CostPrice.ToUiString("0.00##")} · {L("margen", "marge", "margin")} {model.MarginPercent.ToUiString("0.0#")}%")</span>
         </article>
     </section>
 
     <div class="record-tabs" style="margin-top: 1rem;">
-        <button class="record-tab @(activeTab == ModelTab.Ficha ? "active" : null)" type="button" @onclick="@(() => activeTab = ModelTab.Ficha)">Model</button>
-        <button class="record-tab @(activeTab == ModelTab.Scandallo ? "active" : null)" type="button" @onclick="@(() => activeTab = ModelTab.Scandallo)">Escandall</button>
-        <button class="record-tab @(activeTab == ModelTab.Colores ? "active" : null)" type="button" @onclick="@(() => activeTab = ModelTab.Colores)">Colores</button>
-        <button class="record-tab @(activeTab == ModelTab.Fornituras ? "active" : null)" type="button" @onclick="@(() => activeTab = ModelTab.Fornituras)">Fornitures</button>
-        <button class="record-tab @(activeTab == ModelTab.Stock ? "active" : null)" type="button" @onclick="@(() => activeTab = ModelTab.Stock)">Stock</button>
+        <button class="record-tab @(activeTab == ModelTab.Ficha ? "active" : null)" type="button" @onclick="@(() => activeTab = ModelTab.Ficha)">@L("Model", "Model", "Model")</button>
+        <button class="record-tab @(activeTab == ModelTab.Scandallo ? "active" : null)" type="button" @onclick="@(() => activeTab = ModelTab.Scandallo)">@L("Escandallo", "Escandall", "Bill of materials")</button>
+        <button class="record-tab @(activeTab == ModelTab.Colores ? "active" : null)" type="button" @onclick="@(() => activeTab = ModelTab.Colores)">@L("Colores", "Colors", "Colors")</button>
+        <button class="record-tab @(activeTab == ModelTab.Fornituras ? "active" : null)" type="button" @onclick="@(() => activeTab = ModelTab.Fornituras)">@L("Fornituras", "Fornitures", "Trims")</button>
+        <button class="record-tab @(activeTab == ModelTab.Stock ? "active" : null)" type="button" @onclick="@(() => activeTab = ModelTab.Stock)">@L("Stock", "Stock", "Stock")</button>
+        <button class="record-tab @(activeTab == ModelTab.Ordenes ? "active" : null)" type="button" @onclick="@(() => activeTab = ModelTab.Ordenes)">@L("Órdenes fabricación", "Ordres fabricació", "Manufacturing orders")</button>
     </div>
 
     <EditForm Model="model" OnValidSubmit="SaveAsync">
@@ -102,8 +110,8 @@ else
                     <section class="panel detail-panel">
                         <div class="detail-panel-header">
                             <div>
-                                <h2>Ficha principal</h2>
-                                <p class="muted">Identidad comercial del model, tejido base, cliente y coste/venta.</p>
+                                <h2>@L("Ficha principal", "Fitxa principal", "Main record")</h2>
+                                <p class="muted">@L("Identidad comercial del model, tejido base, cliente y coste/venta.", "Identitat comercial del model, teixit base, client i cost/venda.", "Commercial identity of the model, base fabric, client and cost/sale.")</p>
                             </div>
                             @if (!string.IsNullOrWhiteSpace(model.Code))
                             {
@@ -113,75 +121,75 @@ else
 
                         <div class="form-grid">
                             <label class="field">
-                                <span>Código</span>
+                                <span>@L("Código", "Codi", "Code")</span>
                                 <InputText class="text-input" @bind-Value="model.Code" />
                             </label>
                             <label class="field">
-                                <span>Serie</span>
+                                <span>@L("Serie", "Sèrie", "Series")</span>
                                 <InputText class="text-input" @bind-Value="model.Series" />
                             </label>
                             <label class="field">
-                                <span>Temporada</span>
+                                <span>@L("Temporada", "Temporada", "Season")</span>
                                 <InputText class="text-input" @bind-Value="model.Season" />
                             </label>
                             <label class="field">
-                                <span>Cliente</span>
+                                <span>@L("Cliente", "Client", "Client")</span>
                                 <InputNumber class="text-input" @bind-Value="model.ClientCode" />
                             </label>
                             <label class="field wide">
-                                <span>Nombre cliente</span>
+                                <span>@L("Nombre cliente", "Nom client", "Client name")</span>
                                 <InputText class="text-input" @bind-Value="model.ClientName" />
                             </label>
                             <label class="field wide">
-                                <span>Descripción</span>
+                                <span>@L("Descripción", "Descripció", "Description")</span>
                                 <InputText class="text-input" @bind-Value="model.Description" />
                             </label>
                             <label class="field">
-                                <span>Codi model</span>
+                                <span>@L("Código model", "Codi model", "Model code")</span>
                                 <InputText class="text-input" @bind-Value="model.ModelCode" />
                             </label>
                             <label class="field">
-                                <span>Tejido</span>
+                                <span>@L("Tejido", "Teixit", "Fabric")</span>
                                 <InputText class="text-input" @bind-Value="model.FabricCode" />
                             </label>
                             <label class="field wide">
-                                <span>Nombre tejido</span>
+                                <span>@L("Nombre tejido", "Nom teixit", "Fabric name")</span>
                                 <InputText class="text-input" @bind-Value="model.FabricDescription" />
                             </label>
                             <label class="field">
-                                <span>Proveedor</span>
+                                <span>@L("Proveedor", "Proveïdor", "Supplier")</span>
                                 <InputNumber class="text-input" @bind-Value="model.SupplierCode" />
                             </label>
                             <label class="field wide">
-                                <span>Nombre proveedor</span>
+                                <span>@L("Nombre proveedor", "Nom proveïdor", "Supplier name")</span>
                                 <InputText class="text-input" @bind-Value="model.SupplierName" />
                             </label>
                             <label class="field">
-                                <span>Ample</span>
+                                <span>@L("Ample", "Ample", "Width")</span>
                                 <InputText class="text-input" @bind-Value="model.WidthText" />
                             </label>
                             <label class="field">
-                                <span>Rendiment</span>
+                                <span>@L("Rendiment", "Rendiment", "Yield")</span>
                                 <InputNumber class="text-input" @bind-Value="model.Yield" />
                             </label>
                             <label class="field">
-                                <span>IVA</span>
+                                <span>@L("IVA", "IVA", "VAT")</span>
                                 <InputText class="text-input" @bind-Value="model.VatCode" />
                             </label>
                             <label class="field">
-                                <span>Coste</span>
+                                <span>@L("Coste", "Cost", "Cost")</span>
                                 <InputNumber class="text-input" @bind-Value="model.CostPrice" />
                             </label>
                             <label class="field">
-                                <span>% margen</span>
+                                <span>@L("% margen", "% marge", "% margin")</span>
                                 <InputNumber class="text-input" @bind-Value="model.MarginPercent" />
                             </label>
                             <label class="field">
-                                <span>Venta</span>
+                                <span>@L("Venta", "Venda", "Sale")</span>
                                 <InputNumber class="text-input" @bind-Value="model.SalePrice" />
                             </label>
                             <label class="field">
-                                <span>Venta final</span>
+                                <span>@L("Venta final", "Venda final", "Final sale")</span>
                                 <InputNumber class="text-input" @bind-Value="model.FinalSalePrice" />
                             </label>
                         </div>
@@ -190,66 +198,66 @@ else
                     <section class="panel detail-panel">
                         <div class="detail-panel-header">
                             <div>
-                                <h2>Operaciones y talleres</h2>
-                                <p class="muted">Asignación de tint, acabat, estampación y confección.</p>
+                                <h2>@L("Operaciones y talleres", "Operacions i tallers", "Operations and workshops")</h2>
+                                <p class="muted">@L("Asignación de tint, acabat, estampación y confección.", "Assignació de tint, acabat, estampació i confecció.", "Assignment of dyeing, finishing, printing, and tailoring.")</p>
                             </div>
                         </div>
 
                         <div class="form-grid">
                             <label class="field">
-                                <span>Tint</span>
+                                <span>@L("Tint", "Tint", "Dyeing")</span>
                                 <InputNumber class="text-input" @bind-Value="model.DyeingWorkshopCode" />
                             </label>
                             <label class="field wide">
-                                <span>Nombre tint</span>
+                                <span>@L("Nombre tint", "Nom tint", "Dyeing name")</span>
                                 <InputText class="text-input" @bind-Value="model.DyeingWorkshopName" />
                             </label>
                             <label class="field">
-                                <span>Acabat</span>
+                                <span>@L("Acabat", "Acabat", "Finishing")</span>
                                 <InputNumber class="text-input" @bind-Value="model.FinishingWorkshopCode" />
                             </label>
                             <label class="field wide">
-                                <span>Nombre acabat</span>
+                                <span>@L("Nombre acabat", "Nom acabat", "Finishing name")</span>
                                 <InputText class="text-input" @bind-Value="model.FinishingWorkshopName" />
                             </label>
                             <label class="field">
-                                <span>Estampació</span>
+                                <span>@L("Estampació", "Estampació", "Printing")</span>
                                 <InputNumber class="text-input" @bind-Value="model.PrintingWorkshopCode" />
                             </label>
                             <label class="field wide">
-                                <span>Nombre estampació</span>
+                                <span>@L("Nombre estampació", "Nom estampació", "Printing name")</span>
                                 <InputText class="text-input" @bind-Value="model.PrintingWorkshopName" />
                             </label>
                             <label class="field">
-                                <span>Confecció</span>
+                                <span>@L("Confecció", "Confecció", "Tailoring")</span>
                                 <InputNumber class="text-input" @bind-Value="model.TailoringWorkshopCode" />
                             </label>
                             <label class="field wide">
-                                <span>Nombre confecció</span>
+                                <span>@L("Nombre confecció", "Nom confecció", "Tailoring name")</span>
                                 <InputText class="text-input" @bind-Value="model.TailoringWorkshopName" />
                             </label>
                             <label class="field">
-                                <span>Fornitura</span>
+                                <span>@L("Fornitura", "Fornitura", "Trim summary")</span>
                                 <InputText class="text-input" @bind-Value="model.FornituraSummary" />
                             </label>
                             <label class="field">
-                                <span>Manipulación</span>
+                                <span>@L("Manipulación", "Manipulació", "Handling")</span>
                                 <InputNumber class="text-input" @bind-Value="model.ManipulationPrice" />
                             </label>
                             <label class="field">
-                                <span>Cost estamp 1</span>
+                                <span>@L("Cost estamp 1", "Cost estamp 1", "Print cost 1")</span>
                                 <InputText class="text-input" @bind-Value="model.PrintingCode1" />
                             </label>
                             <label class="field">
-                                <span>Cost estamp 2</span>
+                                <span>@L("Cost estamp 2", "Cost estamp 2", "Print cost 2")</span>
                                 <InputText class="text-input" @bind-Value="model.PrintingCode2" />
                             </label>
                             <label class="field">
-                                <span>Unitats estamp 1</span>
+                                <span>@L("Unitats estamp 1", "Unitats estamp 1", "Print units 1")</span>
                                 <InputNumber class="text-input" @bind-Value="model.PrintingUnits1" />
                             </label>
                             <label class="field">
-                                <span>Unitats estamp 2</span>
+                                <span>@L("Unitats estamp 2", "Unitats estamp 2", "Print units 2")</span>
                                 <InputNumber class="text-input" @bind-Value="model.PrintingUnits2" />
                             </label>
                         </div>
@@ -259,101 +267,101 @@ else
                 <section class="panel detail-panel" style="margin-top: 1rem;">
                     <div class="detail-panel-header">
                         <div>
-                            <h2>Costes secundarios, tallas y notas</h2>
-                            <p class="muted">Bloque económico complementario y tallas de referencia del model.</p>
+                            <h2>@L("Costes secundarios, tallas y notas", "Costos secundaris, talles i notes", "Secondary costs, sizes, and notes")</h2>
+                            <p class="muted">@L("Bloque económico complementario y tallas de referencia del model.", "Bloc econòmic complementari i talles de referència del model.", "Additional cost block and reference sizes for the model.")</p>
                         </div>
                     </div>
 
                     <div class="form-grid">
                         <label class="field">
-                            <span>C estamp</span>
+                            <span>@L("C estamp", "C estamp", "Print ref.")</span>
                             <InputText class="text-input" @bind-Value="model.PrintingCode1" />
                         </label>
                         <label class="field">
-                            <span>C estamp 2</span>
+                            <span>@L("C estamp 2", "C estamp 2", "Print ref. 2")</span>
                             <InputText class="text-input" @bind-Value="model.PrintingCode2" />
                         </label>
                         <label class="field">
-                            <span>N estamp</span>
+                            <span>@L("N estamp", "N estamp", "Print qty")</span>
                             <InputNumber class="text-input" @bind-Value="model.PrintingUnits1" />
                         </label>
                         <label class="field">
-                            <span>N estamp 2</span>
+                            <span>@L("N estamp 2", "N estamp 2", "Print qty 2")</span>
                             <InputNumber class="text-input" @bind-Value="model.PrintingUnits2" />
                         </label>
                         <label class="field">
-                            <span>N confec</span>
+                            <span>@L("Coste confección", "Cost confecció", "Tailoring cost")</span>
                             <InputNumber class="text-input" @bind-Value="model.TailoringPrice" />
                         </label>
                         <label class="field">
-                            <span>N planxa</span>
+                            <span>@L("N planxa", "N planxa", "Plate cost")</span>
                             <InputNumber class="text-input" @bind-Value="model.PlatePrice" />
                         </label>
                         <label class="field">
-                            <span>N repas</span>
+                            <span>@L("N repas", "N repas", "Review cost")</span>
                             <InputNumber class="text-input" @bind-Value="model.ReviewPrice" />
                         </label>
                         <label class="field">
-                            <span>Q trans</span>
+                            <span>@L("Q trans", "Q trans", "Transfer qty")</span>
                             <InputNumber class="text-input" @bind-Value="model.TransferQuantity" />
                         </label>
                         <label class="field">
-                            <span>N trans</span>
+                            <span>@L("N trans", "N trans", "Transfer cost")</span>
                             <InputNumber class="text-input" @bind-Value="model.TransferPrice" />
                         </label>
                         <label class="field">
-                            <span>Q flocat</span>
+                            <span>@L("Q flocat", "Q flocat", "Flocked qty")</span>
                             <InputNumber class="text-input" @bind-Value="model.FlockedQuantity" />
                         </label>
                         <label class="field">
-                            <span>N flocat</span>
+                            <span>@L("N flocat", "N flocat", "Flocked cost")</span>
                             <InputNumber class="text-input" @bind-Value="model.FlockedPrice" />
                         </label>
                         <label class="field">
-                            <span>Q brodat</span>
+                            <span>@L("Q brodat", "Q brodat", "Embroidery qty")</span>
                             <InputNumber class="text-input" @bind-Value="model.EmbroideredQuantity" />
                         </label>
                         <label class="field">
-                            <span>N brodat</span>
+                            <span>@L("N brodat", "N brodat", "Embroidery cost")</span>
                             <InputNumber class="text-input" @bind-Value="model.EmbroideredPrice" />
                         </label>
                         <label class="field">
-                            <span>N estamp</span>
+                            <span>@L("N estamp", "N estamp", "Print cost")</span>
                             <InputNumber class="text-input" @bind-Value="model.PrintingPrice" />
                         </label>
                         <label class="field">
-                            <span>N tint p</span>
+                            <span>@L("N tint p", "N tint p", "Dyeing cost")</span>
                             <InputNumber class="text-input" @bind-Value="model.DyeingPrice" />
                         </label>
                         <label class="field">
-                            <span>N acab p</span>
+                            <span>@L("N acab p", "N acab p", "Finishing cost")</span>
                             <InputNumber class="text-input" @bind-Value="model.FinishingPrice" />
                         </label>
                         <label class="field">
-                            <span>N fornitura</span>
+                            <span>@L("Coste fornitura", "Cost fornitura", "Trim cost")</span>
                             <InputNumber class="text-input" @bind-Value="model.FornituraPrice" />
                         </label>
                         <label class="field">
-                            <span>N pack</span>
+                            <span>@L("Coste pack", "Cost pack", "Packaging cost")</span>
                             <InputNumber class="text-input" @bind-Value="model.PackagingPrice" />
                         </label>
                     </div>
 
                     <div class="form-grid" style="margin-top: 1rem;">
-                        <label class="field"><span>Talla 01</span><InputText class="text-input" @bind-Value="model.Size01" /></label>
-                        <label class="field"><span>Talla 02</span><InputText class="text-input" @bind-Value="model.Size02" /></label>
-                        <label class="field"><span>Talla 03</span><InputText class="text-input" @bind-Value="model.Size03" /></label>
-                        <label class="field"><span>Talla 04</span><InputText class="text-input" @bind-Value="model.Size04" /></label>
-                        <label class="field"><span>Talla 05</span><InputText class="text-input" @bind-Value="model.Size05" /></label>
-                        <label class="field"><span>Talla 06</span><InputText class="text-input" @bind-Value="model.Size06" /></label>
-                        <label class="field"><span>Talla 07</span><InputText class="text-input" @bind-Value="model.Size07" /></label>
-                        <label class="field"><span>Talla 08</span><InputText class="text-input" @bind-Value="model.Size08" /></label>
-                        <label class="field"><span>Talla 09</span><InputText class="text-input" @bind-Value="model.Size09" /></label>
-                        <label class="field"><span>Talla 10</span><InputText class="text-input" @bind-Value="model.Size10" /></label>
+                        <label class="field"><span>@L("Talla 01", "Talla 01", "Size 01")</span><InputText class="text-input" @bind-Value="model.Size01" /></label>
+                        <label class="field"><span>@L("Talla 02", "Talla 02", "Size 02")</span><InputText class="text-input" @bind-Value="model.Size02" /></label>
+                        <label class="field"><span>@L("Talla 03", "Talla 03", "Size 03")</span><InputText class="text-input" @bind-Value="model.Size03" /></label>
+                        <label class="field"><span>@L("Talla 04", "Talla 04", "Size 04")</span><InputText class="text-input" @bind-Value="model.Size04" /></label>
+                        <label class="field"><span>@L("Talla 05", "Talla 05", "Size 05")</span><InputText class="text-input" @bind-Value="model.Size05" /></label>
+                        <label class="field"><span>@L("Talla 06", "Talla 06", "Size 06")</span><InputText class="text-input" @bind-Value="model.Size06" /></label>
+                        <label class="field"><span>@L("Talla 07", "Talla 07", "Size 07")</span><InputText class="text-input" @bind-Value="model.Size07" /></label>
+                        <label class="field"><span>@L("Talla 08", "Talla 08", "Size 08")</span><InputText class="text-input" @bind-Value="model.Size08" /></label>
+                        <label class="field"><span>@L("Talla 09", "Talla 09", "Size 09")</span><InputText class="text-input" @bind-Value="model.Size09" /></label>
+                        <label class="field"><span>@L("Talla 10", "Talla 10", "Size 10")</span><InputText class="text-input" @bind-Value="model.Size10" /></label>
                     </div>
 
                     <label class="field field-full" style="margin-top: 1rem;">
-                        <span>Observaciones</span>
+                        <span>@L("Observaciones", "Observacions", "Observations")</span>
                         <InputTextArea class="text-input textarea-input" @bind-Value="model.Notes" />
                     </label>
                 </section>
@@ -364,12 +372,12 @@ else
                 <section class="panel detail-panel" style="margin-top: 1rem;">
                     <div class="detail-panel-header">
                         <div>
-                            <h2>Escandall del model</h2>
-                            <p class="muted">Tejidos, consumos y coste detallado por línea.</p>
+                            <h2>@L("Escandallo del model", "Escandall del model", "Model bill of materials")</h2>
+                            <p class="muted">@L("Tejidos, consumos y coste detallado por línea.", "Teixits, consums i cost detallat per línia.", "Fabrics, consumption, and detailed cost per line.")</p>
                         </div>
                         @if (!isReadOnly)
                         {
-                            <button class="secondary-button" type="button" @onclick="AddScandalloLine">Añadir línea</button>
+                            <button class="secondary-button" type="button" @onclick="AddScandalloLine">@L("Añadir línea", "Afegir línia", "Add line")</button>
                         }
                     </div>
                     <div class="table-scroll">
@@ -377,18 +385,18 @@ else
                             <thead>
                                 <tr>
                                     <th>#</th>
-                                    <th>Título</th>
-                                    <th>Tejido</th>
-                                    <th>Consum</th>
-                                    <th>Preu</th>
-                                    <th>Cost</th>
+                                    <th>@L("Título", "Títol", "Title")</th>
+                                    <th>@L("Tejido", "Teixit", "Fabric")</th>
+                                    <th>@L("Consum", "Consum", "Consumption")</th>
+                                    <th>@L("Precio", "Preu", "Price")</th>
+                                    <th>@L("Cost", "Cost", "Cost")</th>
                                     <th></th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @if (model.ScandalloLines.Count == 0)
                                 {
-                                    <tr><td colspan="7" class="muted">No hay escandallo cargado.</td></tr>
+                                    <tr><td colspan="7" class="muted">@L("No hay escandallo cargado.", "No hi ha escandall carregat.", "No bill of materials loaded.")</td></tr>
                                 }
                                 else
                                 {
@@ -404,7 +412,7 @@ else
                                             <td>
                                                 @if (!isReadOnly)
                                                 {
-                                                    <button class="secondary-button" type="button" @onclick="() => RemoveScandalloLine(line.LineNumber)">Quitar</button>
+                                                    <button class="secondary-button" type="button" @onclick="() => RemoveScandalloLine(line.LineNumber)">@L("Quitar", "Treure", "Remove")</button>
                                                 }
                                             </td>
                                         </tr>
@@ -421,25 +429,27 @@ else
                 <section class="panel detail-panel" style="margin-top: 1rem;">
                     <div class="detail-panel-header">
                         <div>
-                            <h2>Carta de colores del model</h2>
-                            <p class="muted">Detalle MODCOL y títulos/color tal como llega del legacy.</p>
+                            <h2>@L("Carta de colores del model", "Carta de colors del model", "Model color card")</h2>
+                            <p class="muted">@L("Detalle MODCOL y títulos/color tal como llega del legacy.", "Detall MODCOL i títols/color tal com arriba del legacy.", "MODCOL detail and title/color rows as they arrive from legacy.")</p>
                         </div>
                         @if (!isReadOnly)
                         {
-                            <button class="secondary-button" type="button" @onclick="AddColorLine">Añadir línea</button>
+                            <button class="secondary-button" type="button" @onclick="AddColorLine">@L("Añadir línea", "Afegir línia", "Add line")</button>
                         }
                     </div>
                     @if (HasScandalloPieces)
                     {
                         <div class="alert" style="margin-bottom: 1rem;">
-                            El escandallo define @DistinctScandalloTitles.Count piezas activas. Puedes añadir un color a todas las piezas o completar colores pendientes sin tocar la remota.
+                            @L($"El escandallo define {DistinctScandalloTitles.Count} piezas activas. Puedes añadir un color a todas las piezas o completar colores pendientes sin tocar la remota.",
+                                $"L'escandall defineix {DistinctScandalloTitles.Count} peces actives. Pots afegir un color a totes les peces o completar colors pendents sense tocar la remota.",
+                                $"The bill of materials defines {DistinctScandalloTitles.Count} active pieces. You can add a color to all pieces or complete pending colors without touching the remote source.")
                             @if (MissingColorPieceRowsCount > 0)
                             {
-                                <span>@($" Faltan {MissingColorPieceRowsCount} combinaciones color/pieza por expandir.")</span>
+                                <span>@L($" Faltan {MissingColorPieceRowsCount} combinaciones color/pieza por expandir.", $" Falten {MissingColorPieceRowsCount} combinacions color/peça per expandir.", $" {MissingColorPieceRowsCount} color/piece combinations remain to expand.")</span>
                             }
                             @if (OrphanColorTitleCount > 0)
                             {
-                                <span>@($" Hay {OrphanColorTitleCount} líneas con títulos que ya no existen en el escandallo.")</span>
+                                <span>@L($" Hay {OrphanColorTitleCount} líneas con títulos que ya no existen en el escandallo.", $" Hi ha {OrphanColorTitleCount} línies amb títols que ja no existeixen a l'escandall.", $" There are {OrphanColorTitleCount} lines whose titles no longer exist in the bill of materials.")</span>
                             }
                         </div>
                     }
@@ -447,18 +457,18 @@ else
                     {
                         <div class="form-grid" style="margin-bottom: 1rem;">
                             <label class="field">
-                                <span>Color a añadir</span>
+                                <span>@L("Color a añadir", "Color a afegir", "Color to add")</span>
                                 <InputText class="text-input" @bind-Value="colorToAdd" />
                             </label>
                             <label class="field">
-                                <span>Color a quitar</span>
+                                <span>@L("Color a quitar", "Color a treure", "Color to remove")</span>
                                 <InputText class="text-input" @bind-Value="colorToRemove" />
                             </label>
                         </div>
                         <div class="filter-row" style="margin-bottom: 1rem;">
-                            <button class="secondary-button" type="button" @onclick="AddColorAcrossPieces" disabled="@(!HasScandalloPieces || string.IsNullOrWhiteSpace(colorToAdd))">Añadir color a todas las piezas</button>
-                            <button class="secondary-button" type="button" @onclick="ExpandColorsToScandalloTitles" disabled="@(!HasScandalloPieces || !HasColorCodes)">Expandir colores a piezas actuales</button>
-                            <button class="secondary-button" type="button" @onclick="RemoveColorEverywhere" disabled="@string.IsNullOrWhiteSpace(colorToRemove)">Quitar color del model</button>
+                            <button class="secondary-button" type="button" @onclick="AddColorAcrossPieces" disabled="@(!HasScandalloPieces || string.IsNullOrWhiteSpace(colorToAdd))">@L("Añadir color a todas las piezas", "Afegir color a totes les peces", "Add color to all pieces")</button>
+                            <button class="secondary-button" type="button" @onclick="ExpandColorsToScandalloTitles" disabled="@(!HasScandalloPieces || !HasColorCodes)">@L("Expandir colores a piezas actuales", "Expandir colors a peces actuals", "Expand colors to current pieces")</button>
+                            <button class="secondary-button" type="button" @onclick="RemoveColorEverywhere" disabled="@string.IsNullOrWhiteSpace(colorToRemove)">@L("Quitar color del model", "Treure color del model", "Remove color from model")</button>
                         </div>
                     }
                     <div class="table-scroll">
@@ -467,15 +477,15 @@ else
                                 <tr>
                                     <th>#</th>
                                     <th>MODCOL</th>
-                                    <th>Título</th>
-                                    <th>Título color</th>
+                                    <th>@L("Título", "Títol", "Title")</th>
+                                    <th>@L("Título color", "Títol color", "Color title")</th>
                                     <th></th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @if (model.ColorLines.Count == 0)
                                 {
-                                    <tr><td colspan="5" class="muted">No hay colores cargados.</td></tr>
+                                    <tr><td colspan="5" class="muted">@L("No hay colores cargados.", "No hi ha colors carregats.", "No colors loaded.")</td></tr>
                                 }
                                 else
                                 {
@@ -489,7 +499,7 @@ else
                                             <td>
                                                 @if (!isReadOnly)
                                                 {
-                                                    <button class="secondary-button" type="button" @onclick="() => RemoveColorLine(line.LineNumber)">Quitar</button>
+                                                    <button class="secondary-button" type="button" @onclick="() => RemoveColorLine(line.LineNumber)">@L("Quitar", "Treure", "Remove")</button>
                                                 }
                                             </td>
                                         </tr>
@@ -506,12 +516,12 @@ else
                 <section class="panel detail-panel" style="margin-top: 1rem;">
                     <div class="detail-panel-header">
                         <div>
-                            <h2>Fornitures del model</h2>
-                            <p class="muted">Detalle de fornituras y coste unitario/import.</p>
+                            <h2>@L("Fornituras del modelo", "Fornitures del model", "Model trims")</h2>
+                            <p class="muted">@L("Detalle de fornituras y coste unitario/import.", "Detall de fornitures i cost unitari/import.", "Trim details and unit/import cost.")</p>
                         </div>
                         @if (!isReadOnly)
                         {
-                            <button class="secondary-button" type="button" @onclick="AddFornituraLine">Añadir línea</button>
+                            <button class="secondary-button" type="button" @onclick="AddFornituraLine">@L("Añadir línea", "Afegir línia", "Add line")</button>
                         }
                     </div>
                     <div class="table-scroll">
@@ -519,18 +529,18 @@ else
                             <thead>
                                 <tr>
                                     <th>#</th>
-                                    <th>Fornitura</th>
-                                    <th>Medida</th>
-                                    <th>Unidades</th>
-                                    <th>Preu</th>
-                                    <th>Import</th>
+                                    <th>@L("Fornitura", "Fornitura", "Trim")</th>
+                                    <th>@L("Medida", "Mesura", "Measure")</th>
+                                    <th>@L("Unidades", "Unitats", "Units")</th>
+                                    <th>@L("Precio", "Preu", "Price")</th>
+                                    <th>@L("Import", "Import", "Amount")</th>
                                     <th></th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @if (model.FornituraLines.Count == 0)
                                 {
-                                    <tr><td colspan="7" class="muted">No hay fornituras cargadas.</td></tr>
+                                    <tr><td colspan="7" class="muted">@L("No hay fornituras cargadas.", "No hi ha fornitures carregades.", "No trims loaded.")</td></tr>
                                 }
                                 else
                                 {
@@ -546,7 +556,7 @@ else
                                             <td>
                                                 @if (!isReadOnly)
                                                 {
-                                                    <button class="secondary-button" type="button" @onclick="() => RemoveFornituraLine(line.LineNumber)">Quitar</button>
+                                                    <button class="secondary-button" type="button" @onclick="() => RemoveFornituraLine(line.LineNumber)">@L("Quitar", "Treure", "Remove")</button>
                                                 }
                                             </td>
                                         </tr>
@@ -563,19 +573,19 @@ else
                 <section class="panel detail-panel" style="margin-top: 1rem;">
                     <div class="detail-panel-header">
                         <div>
-                            <h2>Stock del model</h2>
-                            <p class="muted">Distribución por color y cantidades de talla 01 a 10.</p>
+                            <h2>@L("Stock del model", "Stock del model", "Model stock")</h2>
+                            <p class="muted">@L("Distribución por color y cantidades de talla 01 a 10.", "Distribució per color i quantitats de talla 01 a 10.", "Distribution by color and size quantities from 01 to 10.")</p>
                         </div>
                         @if (!isReadOnly)
                         {
-                            <button class="secondary-button" type="button" @onclick="AddStockLine">Añadir línea</button>
+                            <button class="secondary-button" type="button" @onclick="AddStockLine">@L("Añadir línea", "Afegir línia", "Add line")</button>
                         }
                     </div>
                     @if (!isReadOnly)
                     {
                         <div class="filter-row" style="margin-bottom: 1rem;">
-                            <button class="secondary-button" type="button" @onclick="SeedStockFromColors" disabled="@(!HasColorCodes)">Sembrar stock desde colores</button>
-                            <span class="muted">Genera una línea de stock por color distinto del model usando las tallas de cabecera como guía.</span>
+                            <button class="secondary-button" type="button" @onclick="SeedStockFromColors" disabled="@(!HasColorCodes)">@L("Sembrar stock desde colores", "Sembrar stock des de colors", "Seed stock from colors")</button>
+                            <span class="muted">@L("Genera una línea de stock por color distinto del model usando las tallas de cabecera como guía.", "Genera una línia d'estoc per color diferent del model usant les talles de capçalera com a guia.", "Generate one stock row per distinct model color using the header sizes as a guide.")</span>
                         </div>
                     }
                     <div class="table-scroll">
@@ -583,8 +593,8 @@ else
                             <thead>
                                 <tr>
                                     <th>#</th>
-                                    <th>Color</th>
-                                    <th>Talla</th>
+                                    <th>@L("Color", "Color", "Color")</th>
+                                    <th>@L("Talla", "Talla", "Size")</th>
                                     <th>01</th>
                                     <th>02</th>
                                     <th>03</th>
@@ -601,7 +611,7 @@ else
                             <tbody>
                                 @if (model.StockLines.Count == 0)
                                 {
-                                    <tr><td colspan="14" class="muted">No hay stock cargado.</td></tr>
+                                    <tr><td colspan="14" class="muted">@L("No hay stock cargado.", "No hi ha stock carregat.", "No stock loaded.")</td></tr>
                                 }
                                 else
                                 {
@@ -624,7 +634,7 @@ else
                                             <td>
                                                 @if (!isReadOnly)
                                                 {
-                                                    <button class="secondary-button" type="button" @onclick="() => RemoveStockLine(line.LineNumber)">Quitar</button>
+                                                    <button class="secondary-button" type="button" @onclick="() => RemoveStockLine(line.LineNumber)">@L("Quitar", "Treure", "Remove")</button>
                                                 }
                                             </td>
                                         </tr>
@@ -636,18 +646,122 @@ else
                 </section>
             }
 
+            @if (activeTab == ModelTab.Ordenes)
+            {
+                <section class="panel detail-panel" style="margin-top: 1rem;">
+                    <div class="detail-panel-header">
+                        <div>
+                            <h2>@L("Órdenes de fabricación relacionadas", "Ordres de fabricació relacionades", "Related manufacturing orders")</h2>
+                            <p class="muted">@L("Seguimiento del circuito productivo enlazado a este model.", "Seguiment del circuit productiu enllaçat a aquest model.", "Tracking of the production flow linked to this model.")</p>
+                        </div>
+                        <div class="quick-links">
+                            @if (model.Id != Guid.Empty)
+                            {
+                                <a class="secondary-button link-button" href="@BuildManufacturingOrderUrl(model.Id)">@L("Crear orden", "Crear ordre", "Create order")</a>
+                            }
+                            @if (!string.IsNullOrWhiteSpace(model.Code))
+                            {
+                                <a class="secondary-button link-button" href="@BuildLinkedManufacturingOrdersUrl()">@L("Abrir órdenes", "Obrir ordres", "Open orders")</a>
+                            }
+                        </div>
+                    </div>
+
+                    @if (string.IsNullOrWhiteSpace(model.Code))
+                    {
+                        <p class="muted">@L("Guarda primero la ficha para poder generar y seguir órdenes de fabricación.", "Desa primer la fitxa per poder generar i seguir ordres de fabricació.", "Save the sheet first to generate and track manufacturing orders.")</p>
+                    }
+                    else
+                    {
+                        <div class="summary-card-grid">
+                            <article class="summary-card">
+                                <span class="summary-card-label">@L("Órdenes", "Ordres", "Orders")</span>
+                                <strong>@linkedManufacturingOrders.Count</strong>
+                                <span class="summary-card-meta">@L("Total enlazadas a este model", "Total enllaçades a aquest model", "Total linked to this model")</span>
+                            </article>
+                            <article class="summary-card">
+                                <span class="summary-card-label">@L("Pendientes", "Pendents", "Pending")</span>
+                                <strong>@GetLinkedOrderStatusCount(ParteAcabadoStatuses.Pending)</strong>
+                                <span class="summary-card-meta">@L("Aún no iniciadas", "Encara no iniciades", "Not started yet")</span>
+                            </article>
+                            <article class="summary-card">
+                                <span class="summary-card-label">@L("En proceso", "En procés", "In progress")</span>
+                                <strong>@GetLinkedOrderStatusCount(ParteAcabadoStatuses.InProgress)</strong>
+                                <span class="summary-card-meta">@L("Trabajo vivo en planta", "Treball viu a planta", "Live work on the floor")</span>
+                            </article>
+                            <article class="summary-card">
+                                <span class="summary-card-label">@L("Terminadas", "Terminades", "Finished")</span>
+                                <strong>@GetLinkedOrderStatusCount(ParteAcabadoStatuses.Finished)</strong>
+                                <span class="summary-card-meta">@L("Ya cerradas", "Ja tancades", "Already closed")</span>
+                            </article>
+                        </div>
+
+                        @if (isLoadingLinkedManufacturingOrders)
+                        {
+                            <p class="muted">@L("Cargando órdenes relacionadas...", "Carregant ordres relacionades...", "Loading related orders...")</p>
+                        }
+                        else if (linkedManufacturingOrders.Count == 0)
+                        {
+                            <p class="muted">@L("Todavía no hay órdenes de fabricación ligadas a este model.", "Encara no hi ha ordres de fabricació lligades a aquest model.", "There are no manufacturing orders linked to this model yet.")</p>
+                        }
+                        else
+                        {
+                            <div class="table-scroll" style="margin-top: 1rem;">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>@L("Número", "Número", "Number")</th>
+                                            <th>@L("Fecha", "Data", "Date")</th>
+                                            <th>@L("Estado", "Estat", "Status")</th>
+                                            <th>@L("Máquina", "Màquina", "Machine")</th>
+                                            <th>@L("Operación", "Operació", "Operation")</th>
+                                            <th>@L("Tejido", "Teixit", "Fabric")</th>
+                                            <th>@L("Color", "Color", "Color")</th>
+                                            <th>@L("Piezas", "Peces", "Pieces")</th>
+                                            <th>Kg</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var item in linkedManufacturingOrders)
+                                        {
+                                            <tr>
+                                                <td>@item.OrderNumber</td>
+                                                <td>@(item.Date?.ToString("dd/MM/yyyy") ?? "-")</td>
+                                                <td><span class="stock-state-badge @GetLinkedOrderStatusTone(item.Status)">@GetLinkedOrderStatusLabel(item.Status)</span></td>
+                                                <td>@GetLinkedOrderDisplayText(item.MachineName, item.MachineCode)</td>
+                                                <td>@GetLinkedOrderDisplayText(item.OperationName, item.OperationCode)</td>
+                                                <td>@GetLinkedOrderFabricLabel(item)</td>
+                                                <td>@(string.IsNullOrWhiteSpace(item.PrimaryColor) ? "-" : item.PrimaryColor)</td>
+                                                <td>@item.TotalPieces.ToUiString("0.##")</td>
+                                                <td>@item.TotalKilograms.ToUiString("0.##")</td>
+                                                <td>
+                                                    <div class="inline-action-list">
+                                                        <a class="inline-link" href="@BuildFinishOrderUrl(item.OrderNumber)">@L("Abrir", "Obrir", "Open")</a>
+                                                        <a class="inline-link" href="@BuildFinishOrderPrintUrl(item.OrderNumber)" target="_blank" rel="noopener noreferrer">@L("Imprimir", "Imprimir", "Print")</a>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        }
+                    }
+                </section>
+            }
+
             <div class="detail-actions" style="margin-top: 1rem;">
                 @if (canEdit)
                 {
-                    <button class="primary-button" type="submit" disabled="@isLoading">Guardar</button>
+                    <button class="primary-button" type="submit" disabled="@isLoading">@L("Guardar", "Desar", "Save")</button>
                     @if (model.Id != Guid.Empty)
                     {
-                        <button class="secondary-button" type="button" @onclick="DeleteAsync" disabled="@isLoading">Eliminar</button>
+                        <button class="secondary-button" type="button" @onclick="DeleteAsync" disabled="@isLoading">@L("Eliminar", "Eliminar", "Delete")</button>
                     }
                 }
                 @if (model.Id != Guid.Empty)
                 {
-                    <button class="secondary-button" type="button" @onclick="LoadAuditAsync">Recargar historial</button>
+                    <button class="secondary-button" type="button" @onclick="LoadAuditAsync">@L("Recargar historial", "Recarregar historial", "Reload history")</button>
                 }
             </div>
         </fieldset>
@@ -656,11 +770,11 @@ else
     @if (model.Id != Guid.Empty)
     {
         <section class="panel" style="margin-top: 1rem;">
-            <h2>Historial reciente del model</h2>
+            <h2>@L("Historial reciente del model", "Historial recent del model", "Recent model history")</h2>
             <div class="list-block">
                 @if (recentAuditLogs.Count == 0)
                 {
-                    <p class="muted">Todavía no hay eventos auditados para este model.</p>
+                    <p class="muted">@L("Todavía no hay eventos auditados para este model.", "Encara no hi ha esdeveniments auditats per a aquest model.", "There are no audited events for this model yet.")</p>
                 }
                 else
                 {
@@ -686,6 +800,14 @@ else
     [Parameter]
     public string? Id { get; set; }
 
+    private string L(string spanish, string catalan, string english) =>
+        T.CurrentLanguage switch
+        {
+            AppLanguages.Catalan => catalan,
+            AppLanguages.English => english,
+            _ => spanish
+        };
+
     private Guid? tenantId;
     private Guid? companyId;
     private bool canEdit;
@@ -696,14 +818,22 @@ else
     private string statusMessage = string.Empty;
     private ModeloDetailDto model = new();
     private IReadOnlyCollection<AuditLogEntryDto> recentAuditLogs = [];
+    private IReadOnlyCollection<ParteAcabadoListItemDto> linkedManufacturingOrders = [];
+    private bool isLoadingLinkedManufacturingOrders;
     private ModelTab activeTab = ModelTab.Ficha;
     private string colorToAdd = string.Empty;
     private string colorToRemove = string.Empty;
 
-    private string PageTitleText => string.IsNullOrWhiteSpace(Id) ? "Nuevo model" : $"Model · {model.Code}";
+    private string PageTitleText => string.IsNullOrWhiteSpace(Id)
+        ? L("Nuevo model", "Nou model", "New model")
+        : $"Model · {model.Code}";
     private bool isReadOnly => isLoading || !canEdit;
-    private string DisplayOrigin => string.IsNullOrWhiteSpace(model.Origin) ? "local" : model.Origin;
-    private string DisplayClient => string.IsNullOrWhiteSpace(model.ClientName) ? $"Cliente {model.ClientCode}" : model.ClientName;
+    private string DisplayOrigin => string.IsNullOrWhiteSpace(model.Origin)
+        ? L("local", "local", "local")
+        : model.Origin;
+    private string DisplayClient => string.IsNullOrWhiteSpace(model.ClientName)
+        ? $"{L("Cliente", "Client", "Client")} {model.ClientCode}"
+        : model.ClientName;
     private List<string> DistinctScandalloTitles => model.ScandalloLines
         .Select(item => item.Title?.Trim())
         .Where(item => !string.IsNullOrWhiteSpace(item))
@@ -754,16 +884,18 @@ else
         {
             model = new ModeloDetailDto();
             recentAuditLogs = [];
+            linkedManufacturingOrders = [];
             activeTab = ModelTab.Ficha;
             return;
         }
 
         if (!Guid.TryParse(Id, out var idValue))
         {
-            statusMessage = "El identificador del model no es válido.";
+            statusMessage = L("El identificador del model no es válido.", "L'identificador del model no és vàlid.", "The model identifier is not valid.");
             isError = true;
             model = new ModeloDetailDto();
             recentAuditLogs = [];
+            linkedManufacturingOrders = [];
             return;
         }
 
@@ -773,15 +905,17 @@ else
             var detail = await ModeloQueries.GetByIdAsync(tenantId.Value, companyId.Value, idValue);
             if (detail is null)
             {
-                statusMessage = "No se ha encontrado el model solicitado.";
+                statusMessage = L("No se ha encontrado el model solicitado.", "No s'ha trobat el model sol·licitat.", "The requested model could not be found.");
                 isError = true;
                 model = new ModeloDetailDto();
                 recentAuditLogs = [];
+                linkedManufacturingOrders = [];
                 return;
             }
 
             model = detail;
             await LoadAuditAsync();
+            await LoadLinkedManufacturingOrdersAsync();
         }
         catch (Exception exception)
         {
@@ -789,6 +923,7 @@ else
             isError = true;
             model = new ModeloDetailDto();
             recentAuditLogs = [];
+            linkedManufacturingOrders = [];
         }
         finally
         {
@@ -817,7 +952,7 @@ else
 
         isLegacySyncActive = true;
         syncStatusLabel = status.LastCompletedUtc.HasValue
-            ? $"Última sync: {status.LastCompletedUtc.Value.ToLocalTime():dd/MM/yyyy HH:mm:ss} · Ins: {status.LastInserted} · Act: {status.LastUpdated} · Omi: {status.LastSkipped} · Err: {status.LastErrors}"
+            ? $"{L("Última sync", "Última sync", "Last sync")}: {status.LastCompletedUtc.Value.ToLocalTime():dd/MM/yyyy HH:mm:ss} · Ins: {status.LastInserted} · Act: {status.LastUpdated} · Omi: {status.LastSkipped} · Err: {status.LastErrors}"
             : string.Empty;
     }
 
@@ -948,7 +1083,9 @@ else
                     .ToList()
             });
 
-            statusMessage = model.Id == Guid.Empty ? "Model creado correctamente." : "Model actualizado correctamente.";
+            statusMessage = model.Id == Guid.Empty
+                ? L("Model creado correctamente.", "Model creat correctament.", "Model created successfully.")
+                : L("Model actualizado correctamente.", "Model actualitzat correctament.", "Model updated successfully.");
             isError = false;
 
             var targetUrl = $"/articulos/models/editar/{savedId}";
@@ -1008,6 +1145,43 @@ else
             tenantId: tenantId.Value,
             entityName: "article_model",
             entityId: model.Id.ToString());
+    }
+
+    private async Task LoadLinkedManufacturingOrdersAsync()
+    {
+        if (!tenantId.HasValue || !companyId.HasValue || string.IsNullOrWhiteSpace(model.Code))
+        {
+            linkedManufacturingOrders = [];
+            return;
+        }
+
+        isLoadingLinkedManufacturingOrders = true;
+        try
+        {
+            var result = await ParteAcabadoQueries.SearchAsync(tenantId.Value, companyId.Value, new ParteAcabadoFilter
+            {
+                SourceSampleKind = ParteAcabadoSourceKinds.Model,
+                SourceSampleCode = model.Code,
+                ModelWorkflowOnly = true,
+                Page = 1,
+                PageSize = 20,
+                SortColumn = nameof(ParteAcabadoListItemDto.Date),
+                SortDescending = true
+            });
+
+            linkedManufacturingOrders = result.Items
+                .OrderByDescending(item => item.Date ?? DateTime.MinValue)
+                .ThenByDescending(item => item.OrderNumber)
+                .ToArray();
+        }
+        catch
+        {
+            linkedManufacturingOrders = [];
+        }
+        finally
+        {
+            isLoadingLinkedManufacturingOrders = false;
+        }
     }
 
     private void AddScandalloLine()
@@ -1229,6 +1403,50 @@ else
         $"/articulos/tejidos/editar/{Uri.EscapeDataString(fabricCode)}";
 
     private static string BuildPrintUrl(Guid id) => $"/articulos/models/{id}/imprimir";
+    private static string BuildManufacturingOrderUrl(Guid id) => $"/compras/ordenes-fabricacion-models/nueva?modelId={Uri.EscapeDataString(id.ToString())}";
+    private static string BuildManufacturingOrdersUrl(string code) => $"/compras/ordenes-fabricacion-models?sourceKind=model&sourceCode={Uri.EscapeDataString(code)}";
+    private string BuildLinkedManufacturingOrdersUrl() => string.IsNullOrWhiteSpace(model.Code)
+        ? "/compras/ordenes-fabricacion-models"
+        : $"/compras/ordenes-fabricacion-models?sourceKind=model&sourceCode={Uri.EscapeDataString(model.Code)}&live=true";
+    private static string BuildFinishOrderUrl(int orderNumber) => $"/compras/ordenes-fabricacion-models/editar/{orderNumber}";
+    private static string BuildFinishOrderPrintUrl(int orderNumber) => $"/compras/ordenes-fabricacion-models/{orderNumber}/imprimir";
+
+    private int GetLinkedOrderStatusCount(string status) =>
+        linkedManufacturingOrders.Count(item => string.Equals(item.Status, status, StringComparison.OrdinalIgnoreCase));
+
+    private string GetLinkedOrderStatusLabel(string status) => status switch
+    {
+        ParteAcabadoStatuses.Pending => L("Pendiente", "Pendent", "Pending"),
+        ParteAcabadoStatuses.InProgress => L("En proceso", "En procés", "In progress"),
+        ParteAcabadoStatuses.Finished => L("Terminado", "Terminat", "Finished"),
+        ParteAcabadoStatuses.Cancelled => L("Anulado", "Anul·lat", "Cancelled"),
+        _ => status
+    };
+
+    private static string GetLinkedOrderStatusTone(string status) => status switch
+    {
+        ParteAcabadoStatuses.Finished => "ok",
+        ParteAcabadoStatuses.InProgress => "review",
+        ParteAcabadoStatuses.Cancelled => "blocked",
+        _ => "review"
+    };
+
+    private static string GetLinkedOrderDisplayText(string name, int code)
+    {
+        if (!string.IsNullOrWhiteSpace(name))
+        {
+            return name;
+        }
+
+        return code > 0 ? code.ToString() : "-";
+    }
+
+    private static string GetLinkedOrderFabricLabel(ParteAcabadoListItemDto item) =>
+        !string.IsNullOrWhiteSpace(item.PrimaryFabricDescription)
+            ? item.PrimaryFabricDescription
+            : !string.IsNullOrWhiteSpace(item.PrimaryFabricCode)
+                ? item.PrimaryFabricCode
+                : "-";
 
     private enum ModelTab
     {
@@ -1236,6 +1454,7 @@ else
         Scandallo,
         Colores,
         Fornituras,
-        Stock
+        Stock,
+        Ordenes
     }
 }

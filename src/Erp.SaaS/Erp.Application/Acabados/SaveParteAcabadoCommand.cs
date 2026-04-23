@@ -20,6 +20,7 @@ public sealed class SaveParteAcabadoCommand
     public string SourceSampleKind { get; set; } = string.Empty;
     public string SourceSampleCode { get; set; } = string.Empty;
     public int? SourceSampleLineNumber { get; set; }
+    public string SourceRecordId { get; set; } = string.Empty;
     public string Notes { get; set; } = string.Empty;
     public List<SaveParteAcabadoLineInput> Lines { get; set; } = [];
 }

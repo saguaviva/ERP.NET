@@ -1,0 +1,287 @@
+@page "/ventas/remesas"
+@attribute [Authorize(Roles = "TenantAdmin,TenantReader")]
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject ISalesRemittanceQueries SalesRemittanceQueries
+@inject AppText T
+
+<PageTitle>@L("Ventas / Remesas", "Vendes / Remeses", "Sales / Remittances")</PageTitle>
+
+<div class="page-header">
+    <div>
+        <p class="eyebrow">@T["menu.sales"]</p>
+        <h1>@L("Remesas de cliente", "Remeses de client", "Customer remittances")</h1>
+        <p class="lead">@L("Agrupa facturas de cliente pendientes en remesas operativas para envío, cobro y seguimiento financiero.", "Agrupa factures de client pendents en remeses operatives per a enviament, cobrament i seguiment financer.", "Group outstanding customer invoices into operational remittances for dispatch, collection, and financial follow-up.")</p>
+    </div>
+    <div class="quick-links">
+        <a class="secondary-button link-button" href="/ventas/facturas">@L("Ver facturas", "Veure factures", "View invoices")</a>
+        <a class="primary-button link-button" href="/ventas/remesas/nueva">@L("Nueva remesa", "Nova remesa", "New remittance")</a>
+    </div>
+</div>
+
+@if (!tenantId.HasValue || !companyId.HasValue)
+{
+    <div class="empty-state">
+        <p>@L("Selecciona una empresa activa para revisar las remesas de ventas.", "Selecciona una empresa activa per revisar les remeses de venda.", "Select an active company to review sales remittances.")</p>
+    </div>
+}
+else
+{
+    <section class="panel">
+        <div class="filter-row">
+            <input class="text-input" @bind="filter.Search" placeholder="@L("Buscar por remesa, banco o notas", "Buscar per remesa, banc o notes", "Search by remittance, bank or notes")" disabled="@isLoading" />
+            <select class="sidebar-select compact-select" @bind="filter.Status" disabled="@isLoading">
+                <option value="">@L("Todos los estados", "Tots els estats", "All statuses")</option>
+                @foreach (var status in SalesRemittanceStatuses.All)
+                {
+                    <option value="@status">@FormatStatus(status)</option>
+                }
+            </select>
+            <label class="inline-checkbox">
+                <input type="checkbox" @bind="filter.IncludeClosed" disabled="@isLoading" />
+                <span>@L("Incluir cerradas", "Incloure tancades", "Include closed")</span>
+            </label>
+            <button class="secondary-button" @onclick="SearchAsync" disabled="@isLoading">@(isLoading ? L("Cargando...", "Carregant...", "Loading...") : L("Buscar", "Buscar", "Search"))</button>
+        </div>
+        <div class="filter-row results-toolbar" style="margin-top: 0.85rem;">
+            <span class="results-summary">
+                @(totalCount == 0
+                    ? L("Sin resultados", "Sense resultats", "No results")
+                    : L($"Mostrando {PageStart.ToUiString("N0")}-{PageEnd.ToUiString("N0")} de {totalCount.ToUiString("N0")} remesas", $"Mostrant {PageStart.ToUiString("N0")}-{PageEnd.ToUiString("N0")} de {totalCount.ToUiString("N0")} remeses", $"Showing {PageStart.ToUiString("N0")}-{PageEnd.ToUiString("N0")} of {totalCount.ToUiString("N0")} remittances"))
+            </span>
+            <label class="field compact-field">
+                <span>@L("Tamaño de página", "Mida de pàgina", "Page size")</span>
+                <select class="sidebar-select compact-select" value="@filter.PageSize" @onchange="OnPageSizeChanged" disabled="@isLoading">
+                    <option value="25">25</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                </select>
+            </label>
+        </div>
+    </section>
+
+    @if (!string.IsNullOrWhiteSpace(errorMessage))
+    {
+        <div class="alert danger">@errorMessage</div>
+    }
+
+    <section class="panel @(isLoading ? "loading-panel" : string.Empty)">
+        @if (isLoading)
+        {
+            <div class="loading-banner">
+                <span class="loading-indicator" aria-hidden="true"></span>
+                <span>@L("Cargando remesas...", "Carregant remeses...", "Loading remittances...")</span>
+            </div>
+        }
+
+        <div class="table-scroll">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <SortableHeader Label="@L("Remesa", "Remesa", "Remittance")" IsActive="@(sortColumn == nameof(SalesRemittanceListItemDto.RemittanceNumber))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(SalesRemittanceListItemDto.RemittanceNumber), true))" />
+                        <SortableHeader Label="@L("Fecha", "Data", "Date")" IsActive="@(sortColumn == nameof(SalesRemittanceListItemDto.RemittanceDate))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(SalesRemittanceListItemDto.RemittanceDate), true))" />
+                        <SortableHeader Label="@L("Vencimiento", "Venciment", "Due date")" IsActive="@(sortColumn == nameof(SalesRemittanceListItemDto.DueDate))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(SalesRemittanceListItemDto.DueDate), true))" />
+                        <SortableHeader Label="@L("Estado", "Estat", "Status")" IsActive="@(sortColumn == nameof(SalesRemittanceListItemDto.Status))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(SalesRemittanceListItemDto.Status)))" />
+                        <SortableHeader Label="@L("Banco", "Banc", "Bank")" IsActive="@(sortColumn == nameof(SalesRemittanceListItemDto.BankName))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(SalesRemittanceListItemDto.BankName)))" />
+                        <SortableHeader Label="@L("Facturas", "Factures", "Invoices")" IsActive="@(sortColumn == nameof(SalesRemittanceListItemDto.InvoiceCount))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(SalesRemittanceListItemDto.InvoiceCount), true))" />
+                        <th>@L("Clientes", "Clients", "Clients")</th>
+                        <SortableHeader Label="@L("Total", "Total", "Total")" IsActive="@(sortColumn == nameof(SalesRemittanceListItemDto.TotalAmount))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(SalesRemittanceListItemDto.TotalAmount), true))" />
+                        <SortableHeader Label="@L("Pendiente", "Pendent", "Outstanding")" IsActive="@(sortColumn == nameof(SalesRemittanceListItemDto.OutstandingAmount))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(SalesRemittanceListItemDto.OutstandingAmount), true))" />
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (isLoading)
+                    {
+                        @for (var index = 0; index < 5; index++)
+                        {
+                            <tr class="table-skeleton-row">
+                                <td><span class="skeleton-line short"></span></td>
+                                <td><span class="skeleton-line short"></span></td>
+                                <td><span class="skeleton-line short"></span></td>
+                                <td><span class="skeleton-line short"></span></td>
+                                <td><span class="skeleton-line"></span></td>
+                                <td><span class="skeleton-line short"></span></td>
+                                <td><span class="skeleton-line short"></span></td>
+                                <td><span class="skeleton-line short"></span></td>
+                                <td><span class="skeleton-line short"></span></td>
+                                <td><span class="skeleton-line short"></span></td>
+                            </tr>
+                        }
+                    }
+                    else if (items.Count == 0)
+                    {
+                        <tr>
+                            <td colspan="10" class="table-empty">@L("Todavía no hay remesas registradas.", "Encara no hi ha remeses registrades.", "There are no remittances registered yet.")</td>
+                        </tr>
+                    }
+                    else
+                    {
+                        @foreach (var item in items)
+                        {
+                            <tr>
+                                <td>@item.DisplayNumber</td>
+                                <td>@item.RemittanceDate.ToString("dd/MM/yyyy")</td>
+                                <td>@(item.DueDate?.ToString("dd/MM/yyyy") ?? "-")</td>
+                                <td><span class="@GetStatusCss(item.Status)">@FormatStatus(item.Status)</span></td>
+                                <td>@DisplayValue(item.BankName)</td>
+                                <td>@item.InvoiceCount</td>
+                                <td>@item.ClientCount</td>
+                                <td>@item.TotalAmount.ToUiString("0.00") €</td>
+                                <td>@item.OutstandingAmount.ToUiString("0.00") €</td>
+                                <td>
+                                    <div class="table-actions">
+                                        <a class="inline-link" href="/ventas/remesas/editar/@item.RemittanceNumber">@L("Abrir", "Obrir", "Open")</a>
+                                        <a class="inline-link" href="/ventas/remesas/@item.RemittanceNumber/imprimir" target="_blank" rel="noopener noreferrer">@L("Imprimir", "Imprimir", "Print")</a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <div class="pagination-bar">
+            <span class="muted">@L($"Página {filter.Page} de {TotalPages}", $"Pàgina {filter.Page} de {TotalPages}", $"Page {filter.Page} of {TotalPages}")</span>
+            <div class="pagination-actions">
+                <button class="secondary-button" @onclick="() => ChangePageAsync(1)" disabled="@(!CanGoPrevious || isLoading)">@L("Primera", "Primera", "First")</button>
+                <button class="secondary-button" @onclick="() => ChangePageAsync(filter.Page - 1)" disabled="@(!CanGoPrevious || isLoading)">@L("Anterior", "Anterior", "Previous")</button>
+                <button class="secondary-button" @onclick="() => ChangePageAsync(filter.Page + 1)" disabled="@(!CanGoNext || isLoading)">@L("Siguiente", "Següent", "Next")</button>
+                <button class="secondary-button" @onclick="() => ChangePageAsync(TotalPages)" disabled="@(!CanGoNext || isLoading)">@L("Última", "Última", "Last")</button>
+            </div>
+        </div>
+    </section>
+}
+
+@code {
+    private Guid? tenantId;
+    private Guid? companyId;
+    private bool isLoading;
+    private SalesRemittanceFilter filter = new() { Page = 1, PageSize = 25, SortColumn = nameof(SalesRemittanceListItemDto.RemittanceDate), SortDescending = true };
+    private IReadOnlyCollection<SalesRemittanceListItemDto> items = [];
+    private string errorMessage = string.Empty;
+    private string sortColumn = nameof(SalesRemittanceListItemDto.RemittanceDate);
+    private bool sortDescending = true;
+    private int totalCount;
+
+    private int TotalPages => Math.Max(1, (int)Math.Ceiling(totalCount / (double)filter.PageSize));
+    private bool CanGoPrevious => filter.Page > 1;
+    private bool CanGoNext => filter.Page < TotalPages;
+    private int PageStart => totalCount == 0 ? 0 : ((filter.Page - 1) * filter.PageSize) + 1;
+    private int PageEnd => totalCount == 0 ? 0 : Math.Min(filter.Page * filter.PageSize, totalCount);
+
+    private string L(string spanish, string catalan, string english) =>
+        T.CurrentLanguage switch
+        {
+            AppLanguages.Catalan => catalan,
+            AppLanguages.English => english,
+            _ => spanish
+        };
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        tenantId = user.GetTenantId();
+        companyId = user.GetActiveCompanyId();
+        await LoadAsync();
+    }
+
+    private async Task LoadAsync()
+    {
+        errorMessage = string.Empty;
+        if (!tenantId.HasValue || !companyId.HasValue)
+        {
+            items = [];
+            totalCount = 0;
+            return;
+        }
+
+        isLoading = true;
+        await InvokeAsync(StateHasChanged);
+        try
+        {
+            filter.SortColumn = sortColumn;
+            filter.SortDescending = sortDescending;
+            var result = await SalesRemittanceQueries.SearchAsync(tenantId.Value, companyId.Value, filter);
+            items = result.Items;
+            totalCount = result.TotalCount;
+        }
+        catch (Exception exception)
+        {
+            errorMessage = exception.Message;
+            items = [];
+            totalCount = 0;
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private async Task SearchAsync()
+    {
+        filter.Page = 1;
+        await LoadAsync();
+    }
+
+    private async Task SetSortAsync(string column, bool defaultDescending = false)
+    {
+        if (string.Equals(sortColumn, column, StringComparison.Ordinal))
+        {
+            sortDescending = !sortDescending;
+        }
+        else
+        {
+            sortColumn = column;
+            sortDescending = defaultDescending;
+        }
+
+        filter.Page = 1;
+        await LoadAsync();
+    }
+
+    private async Task ChangePageAsync(int page)
+    {
+        var newPage = Math.Max(1, Math.Min(page, TotalPages));
+        if (newPage == filter.Page)
+        {
+            return;
+        }
+
+        filter.Page = newPage;
+        await LoadAsync();
+    }
+
+    private async Task OnPageSizeChanged(ChangeEventArgs args)
+    {
+        if (!int.TryParse(args.Value?.ToString(), out var pageSize))
+        {
+            return;
+        }
+
+        filter.PageSize = pageSize;
+        filter.Page = 1;
+        await LoadAsync();
+    }
+
+    private string FormatStatus(string status) => status switch
+    {
+        SalesRemittanceStatuses.Draft => L("Borrador", "Esborrany", "Draft"),
+        SalesRemittanceStatuses.Sent => L("Enviada", "Enviada", "Sent"),
+        SalesRemittanceStatuses.Collected => L("Cobrada", "Cobrada", "Collected"),
+        SalesRemittanceStatuses.Cancelled => L("Anulada", "Anul·lada", "Cancelled"),
+        _ => status
+    };
+
+    private static string GetStatusCss(string status) => status switch
+    {
+        SalesRemittanceStatuses.Draft => "status-pill status-pill-warning",
+        SalesRemittanceStatuses.Sent => "status-pill",
+        SalesRemittanceStatuses.Collected => "status-pill status-pill-success",
+        SalesRemittanceStatuses.Cancelled => "status-pill status-pill-danger",
+        _ => "status-pill"
+    };
+
+    private static string DisplayValue(string value) => string.IsNullOrWhiteSpace(value) ? "-" : value;
+}

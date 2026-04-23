@@ -1,36 +1,48 @@
 @page "/ventas/facturas/{InvoiceNumber:int}"
+@page "/ventas/facturas-teixits-mostres/{InvoiceNumber:int}"
+@page "/ventas/facturas-models/{InvoiceNumber:int}"
 @attribute [Authorize(Roles = "TenantAdmin,TenantReader")]
 @inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
 @inject ISalesOrderQueries SalesOrderQueries
 @inject ISalesOrderService SalesOrderService
 @inject ILegacySyncService LegacySyncService
+@inject AppText T
 
-<PageTitle>Factura @InvoiceNumber</PageTitle>
+<PageTitle>@($"{L("Factura", "Factura", "Invoice")} {InvoiceNumber}")</PageTitle>
 
 <div class="page-header">
     <div>
-        <p class="eyebrow">Ventas</p>
-        <h1>@(invoice?.DisplayNumber ?? $"Factura {InvoiceNumber}")</h1>
-        <p class="lead">Factura emitida desde un borrador de pre-facturación y vinculada a sus albaranes de origen.</p>
+        <p class="eyebrow">@L("Ventas", "Vendes", "Sales")</p>
+        <h1>@(invoice?.DisplayNumber ?? $"{L("Factura", "Factura", "Invoice")} {InvoiceNumber}")</h1>
+        <p class="lead">@PageLeadText</p>
     </div>
     <div class="quick-links no-print">
-        <a class="secondary-button link-button" href="/ventas/facturas">Volver a facturas</a>
+        <a class="secondary-button link-button" href="@BackToListHref">@BackToListText</a>
         @if (invoice is not null)
         {
+            @if (canEdit && !string.Equals(invoice.Status, SalesInvoiceStatuses.Cancelled, StringComparison.OrdinalIgnoreCase) && invoice.OutstandingAmount > 0)
+            {
+                <a class="secondary-button link-button" href="/ventas/remesas/nueva?invoiceNumber=@invoice.InvoiceNumber">@L("Crear remesa", "Crear remesa", "Create remittance")</a>
+            }
+            @if (IsModelInvoicesRoute)
+            {
+                <a class="secondary-button link-button" href="/articulos/models">@L("Abrir models", "Obrir models", "Open models")</a>
+            }
             @if (!string.Equals(invoice.Origin, SalesOrderOrigins.Legacy, StringComparison.OrdinalIgnoreCase))
             {
-                <a class="secondary-button link-button" href="/ventas/pre-facturacion/borradores/@invoice.DraftNumber">Abrir borrador</a>
+                <a class="secondary-button link-button" href="@BuildDraftDetailHref(invoice.DraftNumber)">@L("Abrir borrador", "Obrir esborrany", "Open draft")</a>
             }
-            <a class="secondary-button link-button" href="/ventas/facturas/@invoice.InvoiceNumber/pdf" target="_blank">Versión PDF</a>
+            <a class="secondary-button link-button" href="@BuildInvoicePdfHref(invoice.InvoiceNumber)" target="_blank">@L("Versión PDF", "Versió PDF", "PDF version")</a>
         }
-        <button class="secondary-button" type="button" onclick="window.print()">Imprimir</button>
+        <button class="secondary-button" type="button" onclick="window.print()">@L("Imprimir", "Imprimir", "Print")</button>
     </div>
 </div>
 
 @if (!tenantId.HasValue || !companyId.HasValue)
 {
     <div class="empty-state">
-        <p>No hay empresa activa seleccionada.</p>
+        <p>@L("No hay empresa activa seleccionada.", "No hi ha cap empresa activa seleccionada.", "There is no active company selected.")</p>
     </div>
 }
 else if (!string.IsNullOrWhiteSpace(errorMessage))
@@ -44,7 +56,7 @@ else if (!string.IsNullOrWhiteSpace(statusMessage))
 else if (invoice is null)
 {
     <div class="empty-state">
-        <p>No se ha encontrado la factura solicitada.</p>
+        <p>@L("No se ha encontrado la factura solicitada.", "No s'ha trobat la factura sol·licitada.", "The requested invoice was not found.")</p>
     </div>
 }
 else
@@ -52,10 +64,20 @@ else
     @if (invoiceSyncStatus?.HasSuccessfulSync == true)
     {
         <div class="alert warning">
-            Ventas / Facturas está en convivencia con legacy para esta empresa. La sync manual refresca solo las facturas con origen legacy; si registras cobros o haces cambios web, esa factura pasa a tratarse como local.
+            @(IsModelInvoicesRoute
+                ? L("Ventas / Facturas Models reutiliza la factura general de ventas y la filtra al circuito de Models. La sync manual refresca solo las facturas con origen legacy; si registras cobros o haces cambios web, esa factura pasa a tratarse como local.",
+                    "Vendes / Factures Models reutilitza la factura general de vendes i la filtra al circuit de Models. La sync manual refresca només les factures amb origen legacy; si registres cobraments o fas canvis web, aquesta factura passa a tractar-se com a local.",
+                    "Sales / Model invoices reuses the standard sales invoice document and filters it to the Models workflow. Manual sync only refreshes legacy-origin invoices; if you register payments or make web changes, that invoice becomes local.")
+                : IsTeixitsMostresInvoicesRoute
+                    ? L("Ventas / Facturas Teixits-Mostres reutiliza la factura general de ventas y la filtra al circuito de tejidos y muestras. La sync manual refresca solo las facturas con origen legacy; si registras cobros o haces cambios web, esa factura pasa a tratarse como local.",
+                        "Vendes / Factures Teixits-Mostres reutilitza la factura general de vendes i la filtra al circuit de teixits i mostres. La sync manual refresca només les factures amb origen legacy; si registres cobraments o fas canvis web, aquesta factura passa a tractar-se com a local.",
+                        "Sales / Fabric & sample invoices reuses the standard sales invoice document and filters it to the fabrics and samples workflow. Manual sync only refreshes legacy-origin invoices; if you register payments or make web changes, that invoice becomes local.")
+                    : L("Ventas / Facturas está en convivencia con legacy para esta empresa. La sync manual refresca solo las facturas con origen legacy; si registras cobros o haces cambios web, esa factura pasa a tratarse como local.",
+                        "Vendes / Factures està en convivència amb legacy per a aquesta empresa. La sync manual refresca només les factures amb origen legacy; si registres cobraments o fas canvis web, aquesta factura passa a tractar-se com a local.",
+                        "Sales / Invoices is running in coexistence with legacy for this company. Manual sync only refreshes legacy-origin invoices; if you register payments or make web changes, that invoice becomes local."))
             @if (invoiceSyncStatus.LastCompletedUtc.HasValue)
             {
-                <span>Última sync: @invoiceSyncStatus.LastCompletedUtc.Value.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss") · Ins: @invoiceSyncStatus.LastInserted · Act: @invoiceSyncStatus.LastUpdated · Omi: @invoiceSyncStatus.LastSkipped · Err: @invoiceSyncStatus.LastErrors</span>
+                <span>@L("Última sync", "Última sync", "Last sync"): @invoiceSyncStatus.LastCompletedUtc.Value.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss") · Ins: @invoiceSyncStatus.LastInserted.ToUiString("N0") · Act: @invoiceSyncStatus.LastUpdated.ToUiString("N0") · Omi: @invoiceSyncStatus.LastSkipped.ToUiString("N0") · Err: @invoiceSyncStatus.LastErrors.ToUiString("N0")</span>
             }
         </div>
     }
@@ -63,33 +85,37 @@ else
     <section class="panel receipt-document">
         <div class="receipt-document-header">
             <div>
-                <p class="eyebrow">Factura de cliente</p>
+                <p class="eyebrow">@(IsModelInvoicesRoute
+                    ? L("Factura Models", "Factura Models", "Model invoice")
+                    : IsTeixitsMostresInvoicesRoute
+                        ? L("Factura Teixits-Mostres", "Factura Teixits-Mostres", "Fabric & sample invoice")
+                        : L("Factura de cliente", "Factura de client", "Customer invoice"))</p>
                 <h2>@invoice.DisplayNumber</h2>
                 <p class="muted">
                     @(string.Equals(invoice.Origin, SalesOrderOrigins.Legacy, StringComparison.OrdinalIgnoreCase)
-                        ? "Factura sincronizada desde legacy"
-                        : $"Borrador origen {invoice.DraftDisplayNumber}")
+                        ? L("Factura sincronizada desde legacy", "Factura sincronitzada des de legacy", "Invoice synced from legacy")
+                        : $"{L("Borrador origen", "Esborrany origen", "Source draft")} {invoice.DraftDisplayNumber}")
                 </p>
             </div>
             <div class="receipt-document-meta">
-                <strong>Fecha</strong>
+                <strong>@L("Fecha", "Data", "Date")</strong>
                 <span>@invoice.IssueDate.ToString("dd/MM/yyyy")</span>
             </div>
         </div>
 
         <div class="comparison-grid">
             <section class="info-card">
-                <h2>Empresa emisora</h2>
+                <h2>@L("Empresa emisora", "Empresa emissora", "Issuing company")</h2>
                 <p><strong>@invoice.CompanyName</strong></p>
                 <p class="muted">@invoice.TenantName</p>
-                <p class="muted">Centro legacy @invoice.CompanyLegacyCenterCode</p>
+                <p class="muted">@L("Centro legacy", "Centre legacy", "Legacy center") @invoice.CompanyLegacyCenterCode</p>
             </section>
             <section class="info-card">
-                <h2>Cliente</h2>
+                <h2>@L("Cliente", "Client", "Client")</h2>
                 <p><strong>@invoice.ClientName</strong></p>
                 @if (!string.IsNullOrWhiteSpace(invoice.ClientTaxId))
                 {
-                    <p class="muted">NIF @invoice.ClientTaxId</p>
+                    <p class="muted">@L("NIF", "NIF", "Tax ID") @invoice.ClientTaxId</p>
                 }
                 @if (!string.IsNullOrWhiteSpace(ClientLocation))
                 {
@@ -100,48 +126,48 @@ else
 
         <div class="receipt-detail-grid">
             <section class="info-card">
-                <h2>Cabecera de facturación</h2>
+                <h2>@L("Cabecera de facturación", "Capçalera de facturació", "Billing header")</h2>
                 <div class="receipt-kv-grid">
                     <div>
-                        <span class="muted">Estado</span>
+                        <span class="muted">@L("Estado", "Estat", "Status")</span>
                         <strong>@FormatInvoiceStatus(invoice.Status)</strong>
                     </div>
                     <div>
-                        <span class="muted">Cobro</span>
+                        <span class="muted">@L("Cobro", "Cobrament", "Payment")</span>
                         <strong>@FormatPaymentStatus(invoice.PaymentStatus, invoice.IsOverdue)</strong>
                     </div>
                     <div>
-                        <span class="muted">Vencimiento</span>
-                        <strong>@(invoice.DueDate?.ToString("dd/MM/yyyy") ?? "Sin dato")</strong>
+                        <span class="muted">@L("Vencimiento", "Venciment", "Due date")</span>
+                        <strong>@(invoice.DueDate?.ToString("dd/MM/yyyy") ?? L("Sin dato", "Sense dada", "No data"))</strong>
                     </div>
                     <div>
-                        <span class="muted">Emitida</span>
+                        <span class="muted">@L("Emitida", "Emesa", "Issued")</span>
                         <strong>@invoice.IssuedUtc.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</strong>
                     </div>
                 </div>
             </section>
             <section class="info-card">
-                <h2>Resumen económico</h2>
+                <h2>@L("Resumen económico", "Resum econòmic", "Financial summary")</h2>
                 <div class="receipt-kv-grid">
                     <div>
-                        <span class="muted">Base</span>
-                        <strong>@invoice.SubtotalAmount.ToString("0.00") €</strong>
+                        <span class="muted">@L("Base", "Base", "Base")</span>
+                        <strong>@invoice.SubtotalAmount.ToUiString("0.00") €</strong>
                     </div>
                     <div>
-                        <span class="muted">IVA</span>
-                        <strong>@invoice.TaxAmount.ToString("0.00") €</strong>
+                        <span class="muted">@L("IVA", "IVA", "VAT")</span>
+                        <strong>@invoice.TaxAmount.ToUiString("0.00") €</strong>
                     </div>
                     <div>
-                        <span class="muted">Total</span>
-                        <strong>@invoice.TotalAmount.ToString("0.00") €</strong>
+                        <span class="muted">@L("Total", "Total", "Total")</span>
+                        <strong>@invoice.TotalAmount.ToUiString("0.00") €</strong>
                     </div>
                     <div>
-                        <span class="muted">Cobrado</span>
-                        <strong>@invoice.AmountPaid.ToString("0.00") €</strong>
+                        <span class="muted">@L("Cobrado", "Cobrat", "Paid")</span>
+                        <strong>@invoice.AmountPaid.ToUiString("0.00") €</strong>
                     </div>
                     <div>
-                        <span class="muted">Pendiente</span>
-                        <strong>@invoice.OutstandingAmount.ToString("0.00") €</strong>
+                        <span class="muted">@L("Pendiente", "Pendent", "Outstanding")</span>
+                        <strong>@invoice.OutstandingAmount.ToUiString("0.00") €</strong>
                     </div>
                 </div>
             </section>
@@ -151,36 +177,36 @@ else
     <section class="panel" style="margin-top: 1rem;">
         <div class="comparison-grid">
             <section class="info-card">
-                <h2>Cobros</h2>
+                <h2>@L("Cobros", "Cobraments", "Payments")</h2>
                 <div class="receipt-kv-grid">
                     <div>
-                        <span class="muted">Estado</span>
+                        <span class="muted">@L("Estado", "Estat", "Status")</span>
                         <strong>@FormatPaymentStatus(invoice.PaymentStatus, invoice.IsOverdue)</strong>
                     </div>
                     <div>
-                        <span class="muted">Último cobro</span>
-                        <strong>@(invoice.LastPaymentUtc?.ToLocalTime().ToString("dd/MM/yyyy HH:mm") ?? "Sin dato")</strong>
+                        <span class="muted">@L("Último cobro", "Últim cobrament", "Last payment")</span>
+                        <strong>@(invoice.LastPaymentUtc?.ToLocalTime().ToString("dd/MM/yyyy HH:mm") ?? L("Sin dato", "Sense dada", "No data"))</strong>
                     </div>
                     <div>
-                        <span class="muted">Pendiente</span>
-                        <strong>@invoice.OutstandingAmount.ToString("0.00") €</strong>
+                        <span class="muted">@L("Pendiente", "Pendent", "Outstanding")</span>
+                        <strong>@invoice.OutstandingAmount.ToUiString("0.00") €</strong>
                     </div>
                 </div>
             </section>
             <section class="info-card">
-                <h2>Contabilidad</h2>
+                <h2>@L("Contabilidad", "Comptabilitat", "Accounting")</h2>
                 <div class="receipt-kv-grid">
                     <div>
-                        <span class="muted">Estado</span>
+                        <span class="muted">@L("Estado", "Estat", "Status")</span>
                         <strong>@FormatAccountingStatus(invoice.AccountingStatus)</strong>
                     </div>
                     <div>
-                        <span class="muted">Referencia</span>
+                        <span class="muted">@L("Referencia", "Referència", "Reference")</span>
                         <strong>@DisplayValue(invoice.AccountingReference)</strong>
                     </div>
                     <div>
-                        <span class="muted">Preparada desde</span>
-                        <strong>@(invoice.AccountingReadyUtc?.ToLocalTime().ToString("dd/MM/yyyy HH:mm") ?? "Sin dato")</strong>
+                        <span class="muted">@L("Preparada desde", "Preparada des de", "Prepared since")</span>
+                        <strong>@(invoice.AccountingReadyUtc?.ToLocalTime().ToString("dd/MM/yyyy HH:mm") ?? L("Sin dato", "Sense dada", "No data"))</strong>
                     </div>
                 </div>
             </section>
@@ -190,54 +216,54 @@ else
     @if (canEdit && !string.Equals(invoice.Status, SalesInvoiceStatuses.Cancelled, StringComparison.OrdinalIgnoreCase) && invoice.OutstandingAmount > 0)
     {
         <section class="panel" style="margin-top: 1rem;">
-            <h2>Registrar cobro</h2>
+            <h2>@L("Registrar cobro", "Registrar cobrament", "Register payment")</h2>
             <div class="form-grid">
                 <label class="field">
-                    <span>Fecha cobro</span>
+                    <span>@L("Fecha cobro", "Data cobrament", "Payment date")</span>
                     <InputDate class="text-input" @bind-Value="paymentForm.PaymentDate" />
                 </label>
                 <label class="field">
-                    <span>Importe</span>
+                    <span>@L("Importe", "Import", "Amount")</span>
                     <InputNumber class="text-input" @bind-Value="paymentForm.Amount" />
                 </label>
                 <label class="field">
-                    <span>Método</span>
+                    <span>@L("Método", "Mètode", "Method")</span>
                     <InputText class="text-input" @bind-Value="paymentForm.Method" />
                 </label>
                 <label class="field">
-                    <span>Referencia</span>
+                    <span>@L("Referencia", "Referència", "Reference")</span>
                     <InputText class="text-input" @bind-Value="paymentForm.Reference" />
                 </label>
                 <label class="field wide">
-                    <span>Notas</span>
+                    <span>@L("Notas", "Notes", "Notes")</span>
                     <InputTextArea class="text-area" @bind-Value="paymentForm.Notes" />
                 </label>
             </div>
             <div class="quick-links">
-                <span class="muted">Pendiente actual: @invoice.OutstandingAmount.ToString("0.00") €</span>
-                <button class="primary-button" type="button" @onclick="RegisterPaymentAsync" disabled="@isSavingPayment">@(isSavingPayment ? "Guardando..." : "Registrar cobro")</button>
+                <span class="muted">@L("Pendiente actual", "Pendent actual", "Current outstanding"): @invoice.OutstandingAmount.ToUiString("0.00") €</span>
+                <button class="primary-button" type="button" @onclick="RegisterPaymentAsync" disabled="@isSavingPayment">@(isSavingPayment ? L("Guardando...", "Desant...", "Saving...") : L("Registrar cobro", "Registrar cobrament", "Register payment"))</button>
             </div>
         </section>
     }
 
     <section class="panel" style="margin-top: 1rem;">
-        <h2>Historial de cobros</h2>
+        <h2>@L("Historial de cobros", "Historial de cobraments", "Payment history")</h2>
         <table class="data-table">
             <thead>
                 <tr>
-                    <th>Cobro</th>
-                    <th>Fecha</th>
-                    <th>Importe</th>
-                    <th>Método</th>
-                    <th>Referencia</th>
-                    <th>Notas</th>
+                    <th>@L("Cobro", "Cobrament", "Payment")</th>
+                    <th>@L("Fecha", "Data", "Date")</th>
+                    <th>@L("Importe", "Import", "Amount")</th>
+                    <th>@L("Método", "Mètode", "Method")</th>
+                    <th>@L("Referencia", "Referència", "Reference")</th>
+                    <th>@L("Notas", "Notes", "Notes")</th>
                 </tr>
             </thead>
             <tbody>
                 @if (invoice.Payments.Count == 0)
                 {
                     <tr>
-                        <td colspan="6" class="table-empty">Todavía no hay cobros registrados.</td>
+                        <td colspan="6" class="table-empty">@L("Todavía no hay cobros registrados.", "Encara no hi ha cobraments registrats.", "There are no payments recorded yet.")</td>
                     </tr>
                 }
                 else
@@ -247,7 +273,7 @@ else
                         <tr>
                             <td>@payment.PaymentNumber</td>
                             <td>@payment.PaymentDate.ToString("dd/MM/yyyy")</td>
-                            <td>@payment.Amount.ToString("0.00") €</td>
+                            <td>@payment.Amount.ToUiString("0.00") €</td>
                             <td>@DisplayValue(payment.Method)</td>
                             <td>@DisplayValue(payment.Reference)</td>
                             <td>@DisplayValue(payment.Notes)</td>
@@ -259,16 +285,16 @@ else
     </section>
 
     <section class="panel" style="margin-top: 1rem;">
-        <h2>Albaranes incluidos</h2>
+        <h2>@L("Albaranes incluidos", "Albarans inclosos", "Included delivery notes")</h2>
         <table class="data-table">
             <thead>
                 <tr>
-                    <th>Albarán</th>
-                    <th>Pedido</th>
-                    <th>Fecha</th>
-                    <th>Almacén</th>
-                    <th>Cantidad</th>
-                    <th>Importe</th>
+                    <th>@L("Albarán", "Albarà", "Delivery note")</th>
+                    <th>@L("Pedido", "Comanda", "Order")</th>
+                    <th>@L("Fecha", "Data", "Date")</th>
+                    <th>@L("Almacén", "Magatzem", "Warehouse")</th>
+                    <th>@L("Cantidad", "Quantitat", "Quantity")</th>
+                    <th>@L("Importe", "Import", "Amount")</th>
                     <th></th>
                 </tr>
             </thead>
@@ -280,9 +306,9 @@ else
                         <td>@shipment.OrderNumber</td>
                         <td>@shipment.ShipmentDate.ToString("dd/MM/yyyy")</td>
                         <td>@DisplayValue(shipment.Warehouse)</td>
-                        <td>@shipment.TotalShippedQuantity.ToString("0.###")</td>
-                        <td>@shipment.EstimatedAmount.ToString("0.00") €</td>
-                        <td><a class="inline-link" href="/ventas/albaranes/@shipment.ShipmentNumber">Abrir albarán</a></td>
+                        <td>@shipment.TotalShippedQuantity.ToUiString("0.###")</td>
+                        <td>@shipment.EstimatedAmount.ToUiString("0.00") €</td>
+                        <td><a class="inline-link" href="@BuildShipmentDetailHref(shipment.ShipmentNumber)">@L("Abrir albarán", "Obrir albarà", "Open delivery note")</a></td>
                     </tr>
                 }
             </tbody>
@@ -290,20 +316,20 @@ else
     </section>
 
     <section class="panel" style="margin-top: 1rem;">
-        <h2>Líneas de la factura</h2>
+        <h2>@L("Líneas de la factura", "Línies de la factura", "Invoice lines")</h2>
         <table class="data-table">
             <thead>
                 <tr>
-                    <th>Línea</th>
-                    <th>Artículo</th>
-                    <th>Descripción</th>
-                    <th>Cantidad</th>
-                    <th>Unidad</th>
-                    <th>Precio</th>
-                    <th>Base</th>
-                    <th>IVA</th>
-                    <th>Total</th>
-                    <th>Origen</th>
+                    <th>@L("Línea", "Línia", "Line")</th>
+                    <th>@L("Artículo", "Article", "Item")</th>
+                    <th>@L("Descripción", "Descripció", "Description")</th>
+                    <th>@L("Cantidad", "Quantitat", "Quantity")</th>
+                    <th>@L("Unidad", "Unitat", "Unit")</th>
+                    <th>@L("Precio", "Preu", "Price")</th>
+                    <th>@L("Base", "Base", "Base")</th>
+                    <th>@L("IVA", "IVA", "VAT")</th>
+                    <th>@L("Total", "Total", "Total")</th>
+                    <th>@L("Origen", "Origen", "Origin")</th>
                 </tr>
             </thead>
             <tbody>
@@ -313,12 +339,12 @@ else
                         <td>@line.LineNumber</td>
                         <td>@DisplayValue(line.ItemCode)</td>
                         <td>@line.Description</td>
-                        <td>@line.Quantity.ToString("0.###")</td>
+                        <td>@line.Quantity.ToUiString("0.###")</td>
                         <td>@DisplayValue(line.UnitOfMeasure)</td>
-                        <td>@line.UnitPrice.ToString("0.0000")</td>
-                        <td>@line.LineSubtotal.ToString("0.00") €</td>
-                        <td>@line.TaxAmount.ToString("0.00") €</td>
-                        <td>@line.LineTotal.ToString("0.00") €</td>
+                        <td>@line.UnitPrice.ToUiString("0.0000")</td>
+                        <td>@line.LineSubtotal.ToUiString("0.00") €</td>
+                        <td>@line.TaxAmount.ToUiString("0.00") €</td>
+                        <td>@line.LineTotal.ToUiString("0.00") €</td>
                         <td>@DisplayValue(line.SourceSummary)</td>
                     </tr>
                 }
@@ -329,7 +355,7 @@ else
     @if (!string.IsNullOrWhiteSpace(invoice.Notes))
     {
         <section class="panel" style="margin-top: 1rem;">
-            <h2>Notas</h2>
+            <h2>@L("Notas", "Notes", "Notes")</h2>
             <p>@invoice.Notes</p>
         </section>
     }
@@ -349,6 +375,28 @@ else
     private bool isSavingPayment;
     private PaymentFormModel paymentForm = new();
     private LegacySyncModuleStatusDto? invoiceSyncStatus;
+    private bool IsModelInvoicesRoute =>
+        NavigationManager.ToBaseRelativePath(NavigationManager.Uri).StartsWith("ventas/facturas-models", StringComparison.OrdinalIgnoreCase);
+    private bool IsTeixitsMostresInvoicesRoute =>
+        NavigationManager.ToBaseRelativePath(NavigationManager.Uri).StartsWith("ventas/facturas-teixits-mostres", StringComparison.OrdinalIgnoreCase);
+
+    private string PageLeadText => IsModelInvoicesRoute
+        ? L("Factura del circuito de Models, vinculada a sus albaranes comerciales asociados y al flujo financiero estándar.", "Factura del circuit de Models, vinculada als seus albarans comercials associats i al flux financer estàndard.", "Invoice from the Models workflow, linked to its associated commercial shipments and the standard financial flow.")
+        : IsTeixitsMostresInvoicesRoute
+            ? L("Factura del circuito de tejidos y muestras, vinculada a su borrador de pre-facturación y a los albaranes comerciales de origen.", "Factura del circuit de teixits i mostres, vinculada al seu esborrany de pre-facturació i als albarans comercials d'origen.", "Invoice from the fabrics and samples workflow, linked to its pre-invoicing draft and source commercial shipments.")
+            : L("Factura emitida desde un borrador de pre-facturación y vinculada a sus albaranes de origen.", "Factura emesa des d'un esborrany de pre-facturació i vinculada als seus albarans d'origen.", "Invoice issued from a pre-invoicing draft and linked to its source delivery notes.");
+
+    private string BackToListHref => IsModelInvoicesRoute
+        ? "/ventas/facturas-models"
+        : IsTeixitsMostresInvoicesRoute
+            ? "/ventas/facturas-teixits-mostres"
+            : "/ventas/facturas";
+
+    private string BackToListText => IsModelInvoicesRoute
+        ? L("Volver a facturas models", "Tornar a factures models", "Back to model invoices")
+        : IsTeixitsMostresInvoicesRoute
+            ? L("Volver a facturas teixits-mostres", "Tornar a factures teixits-mostres", "Back to fabric & sample invoices")
+            : L("Volver a facturas", "Tornar a factures", "Back to invoices");
 
     private string ClientLocation
     {
@@ -435,7 +483,7 @@ else
                 Notes = paymentForm.Notes
             });
 
-            statusMessage = "Cobro registrado correctamente.";
+            statusMessage = L("Cobro registrado correctamente.", "Cobrament registrat correctament.", "Payment registered successfully.");
             paymentForm = new PaymentFormModel();
             invoice = await SalesOrderQueries.GetInvoiceByNumberAsync(tenantId.Value, companyId.Value, InvoiceNumber);
             if (invoice is not null)
@@ -454,30 +502,49 @@ else
         }
     }
 
-    private static string DisplayValue(string value) => string.IsNullOrWhiteSpace(value) ? "Sin dato" : value;
+    private string DisplayValue(string value) => string.IsNullOrWhiteSpace(value) ? L("Sin dato", "Sense dada", "No data") : value;
 
-    private static string FormatInvoiceStatus(string status) => status switch
+    private string BuildInvoicePdfHref(int invoiceNumber) =>
+        IsModelInvoicesRoute
+            ? $"/ventas/facturas-models/{invoiceNumber}/pdf"
+            : IsTeixitsMostresInvoicesRoute
+                ? $"/ventas/facturas-teixits-mostres/{invoiceNumber}/pdf"
+                : $"/ventas/facturas/{invoiceNumber}/pdf";
+
+    private string BuildShipmentDetailHref(int shipmentNumber) =>
+        IsModelInvoicesRoute
+            ? $"/ventas/albaranes-models/{shipmentNumber}"
+            : IsTeixitsMostresInvoicesRoute
+                ? $"/ventas/albaranes-teixits-mostres/{shipmentNumber}"
+                : $"/ventas/albaranes/{shipmentNumber}";
+
+    private string BuildDraftDetailHref(int draftNumber) =>
+        IsTeixitsMostresInvoicesRoute
+            ? $"/ventas/pre-facturacion-teixits-mostres/borradores/{draftNumber}"
+            : $"/ventas/pre-facturacion/borradores/{draftNumber}";
+
+    private string FormatInvoiceStatus(string status) => status switch
     {
-        SalesInvoiceStatuses.Issued => "Emitida",
-        SalesInvoiceStatuses.Cancelled => "Anulada",
+        SalesInvoiceStatuses.Issued => L("Emitida", "Emesa", "Issued"),
+        SalesInvoiceStatuses.Cancelled => L("Anulada", "Anul·lada", "Cancelled"),
         _ => status
     };
 
-    private static string FormatPaymentStatus(string status, bool isOverdue) => status switch
+    private string FormatPaymentStatus(string status, bool isOverdue) => status switch
     {
-        SalesInvoicePaymentStatuses.Pending when isOverdue => "Pendiente vencida",
-        SalesInvoicePaymentStatuses.Pending => "Pendiente",
-        SalesInvoicePaymentStatuses.PartiallyPaid when isOverdue => "Parcial vencida",
-        SalesInvoicePaymentStatuses.PartiallyPaid => "Cobro parcial",
-        SalesInvoicePaymentStatuses.Paid => "Cobrada",
+        SalesInvoicePaymentStatuses.Pending when isOverdue => L("Pendiente vencida", "Pendent vençuda", "Overdue pending"),
+        SalesInvoicePaymentStatuses.Pending => L("Pendiente", "Pendent", "Pending"),
+        SalesInvoicePaymentStatuses.PartiallyPaid when isOverdue => L("Parcial vencida", "Parcial vençuda", "Overdue partial"),
+        SalesInvoicePaymentStatuses.PartiallyPaid => L("Cobro parcial", "Cobrament parcial", "Partial payment"),
+        SalesInvoicePaymentStatuses.Paid => L("Cobrada", "Cobrada", "Paid"),
         _ => status
     };
 
-    private static string FormatAccountingStatus(string status) => status switch
+    private string FormatAccountingStatus(string status) => status switch
     {
-        SalesInvoiceAccountingStatuses.Pending => "Pendiente",
-        SalesInvoiceAccountingStatuses.Ready => "Preparada",
-        SalesInvoiceAccountingStatuses.Exported => "Exportada",
+        SalesInvoiceAccountingStatuses.Pending => L("Pendiente", "Pendent", "Pending"),
+        SalesInvoiceAccountingStatuses.Ready => L("Preparada", "Preparada", "Ready"),
+        SalesInvoiceAccountingStatuses.Exported => L("Exportada", "Exportada", "Exported"),
         _ => status
     };
 
@@ -489,4 +556,12 @@ else
         public string Reference { get; set; } = string.Empty;
         public string Notes { get; set; } = string.Empty;
     }
+
+    private string L(string spanish, string catalan, string english) =>
+        T.CurrentLanguage switch
+        {
+            AppLanguages.Catalan => catalan,
+            AppLanguages.English => english,
+            _ => spanish
+        };
 }

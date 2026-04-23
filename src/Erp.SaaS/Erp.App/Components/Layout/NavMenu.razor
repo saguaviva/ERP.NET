@@ -13,6 +13,7 @@
 </div>
 
 <LanguageSwitcher />
+<DocumentLanguageSwitcher />
 <ThemeSwitcher />
 
 @if (isAuthenticated)
@@ -52,6 +53,9 @@
         <nav class="sidebar-nav">
             <NavLink class="sidebar-link sidebar-link-home" href="/" Match="NavLinkMatch.All">@T["menu.dashboard"]</NavLink>
             <NavLink class="sidebar-link sidebar-link-home" href="/manual">@T["menu.manual"]</NavLink>
+            <NavLink class="sidebar-link sidebar-link-home" href="/alertas">@T["menu.alerts"]</NavLink>
+            <NavLink class="sidebar-link sidebar-link-home" href="/listados">@T["menu.reports"]</NavLink>
+            <NavLink class="sidebar-link sidebar-link-home" href="/estadisticas">@T["menu.statistics"]</NavLink>
 
             @foreach (var navSection in navigationSections)
             {
@@ -220,6 +224,11 @@ else
             ]),
             new("base", T["menu.base"],
             [
+                ..(canManageTenant
+                    ? new[] { new SidebarLink(T["menu.base.companies"], "/base-datos/empresas") }
+                    : []),
+                new(T["menu.base.numbering"], "/base-datos/numeraciones"),
+                new(T["menu.base.mailing"], "/base-datos/mailing"),
                 new(T["menu.base.banks"], "/base-datos/bancos-cajas"),
                 new(T["menu.base.paymentForms"], "/base-datos/formas-pago"),
                 new(T["menu.base.operations"], "/base-datos/operacions"),
@@ -234,22 +243,32 @@ else
             ]),
             new("sales", T["menu.sales"],
             [
-                new(T["menu.sales.orders"], "/ventas/pedidos"),
-                new(T["menu.sales.shipments"], "/ventas/albaranes"),
-                new(T["menu.sales.preinvoicing"], "/ventas/pre-facturacion"),
-                new(T["menu.sales.invoices"], "/ventas/facturas"),
+                new(T["menu.sales.fabricSampleOrders"], "/ventas/pedidos-teixits-mostres"),
+                new(T["menu.sales.fabricSampleShipments"], "/ventas/albaranes-teixits-mostres"),
+                new(T["menu.sales.modelShipments"], "/ventas/albaranes-models"),
+                new(T["menu.sales.fabricSamplePreinvoicing"], "/ventas/pre-facturacion-teixits-mostres"),
+                new(T["menu.sales.fabricSampleInvoices"], "/ventas/facturas-teixits-mostres"),
+                new(T["menu.sales.modelInvoices"], "/ventas/facturas-models"),
+                new(T["menu.sales.remittances"], "/ventas/remesas"),
                 new(T["menu.sales.intrastat"], "/ventas/intrastat")
             ]),
             new("purchases", T["menu.purchases"],
             [
                 new(T["menu.purchases.suppliers"], "/crm/proveedores"),
                 new(T["menu.purchases.orders"], "/compras/pedidos"),
+                new(T["menu.purchases.yarnOrders"], "/compras/comandes-fils"),
+                new(T["menu.purchases.sampleWorkOrders"], "/compras/ordenes-fabricacion-muestras"),
+                new(T["menu.purchases.modelWorkOrders"], "/compras/ordenes-fabricacion-models"),
                 new(T["menu.purchases.receipts"], "/compras/recepciones"),
+                new(T["menu.purchases.yarnReceipts"], "/compras/albaranes-entrega-fils"),
                 new(T["menu.purchases.invoices"], "/compras/facturas")
             ]),
             new("warehouse", T["menu.warehouse"],
             [
                 new(T["menu.warehouse.stock"], "/almacen/stock-actual"),
+                new(T["menu.warehouse.fabrics"], "/almacen/tejidos"),
+                new(T["menu.warehouse.yarns"], "/almacen/fils"),
+                new(T["menu.warehouse.models"], "/almacen/models"),
                 new(T["menu.warehouse.counts"], "/almacen/inventarios"),
                 new(T["menu.warehouse.transfers"], "/almacen/traspasos"),
                 new(T["menu.warehouse.movements"], "/almacen/movimientos"),

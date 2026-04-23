@@ -1,27 +1,29 @@
 @page "/ventas/pre-facturacion/borradores/{DraftNumber:int}"
+@page "/ventas/pre-facturacion-teixits-mostres/borradores/{DraftNumber:int}"
 @attribute [Authorize(Roles = "TenantAdmin,TenantReader")]
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject ISalesOrderQueries SalesOrderQueries
 @inject ISalesOrderService SalesOrderService
 @inject NavigationManager NavigationManager
+@inject AppText T
 
-<PageTitle>Pre-factura @DraftNumber</PageTitle>
+<PageTitle>@L("Pre-factura", "Pre-factura", "Invoice draft") @DraftNumber</PageTitle>
 
 <div class="page-header">
     <div>
-        <p class="eyebrow">Ventas</p>
-        <h1>@(draft?.DisplayNumber ?? $"Pre-factura {DraftNumber}")</h1>
-        <p class="lead">Borrador de factura agrupado desde uno o varios albaranes del mismo cliente.</p>
+        <p class="eyebrow">@L("Ventas", "Vendes", "Sales")</p>
+        <h1>@(draft?.DisplayNumber ?? $"{L("Pre-factura", "Pre-factura", "Invoice draft")} {DraftNumber}")</h1>
+        <p class="lead">@PageLeadText</p>
     </div>
     <div class="quick-links">
-        <a class="secondary-button link-button" href="/ventas/pre-facturacion">Volver a pre-facturación</a>
+        <a class="secondary-button link-button" href="@BackToPreInvoicingHref">@BackToPreInvoicingText</a>
         @if (draft?.InvoiceNumber is int invoiceNumber)
         {
-            <a class="secondary-button link-button" href="/ventas/facturas/@invoiceNumber">Abrir factura</a>
+            <a class="secondary-button link-button" href="@BuildInvoiceDetailHref(invoiceNumber)">@L("Abrir factura", "Obrir factura", "Open invoice")</a>
         }
         @if (canEdit && draft is not null && string.Equals(draft.Status, SalesInvoiceDraftStatuses.Draft, StringComparison.OrdinalIgnoreCase))
         {
-            <button class="primary-button" type="button" @onclick="IssueInvoiceAsync" disabled="@isIssuing">@(isIssuing ? "Emitiendo..." : "Emitir factura")</button>
+            <button class="primary-button" type="button" @onclick="IssueInvoiceAsync" disabled="@isIssuing">@(isIssuing ? L("Emitiendo...", "Emetent...", "Issuing...") : L("Emitir factura", "Emetre factura", "Issue invoice"))</button>
         }
     </div>
 </div>
@@ -29,7 +31,7 @@
 @if (!tenantId.HasValue || !companyId.HasValue)
 {
     <div class="empty-state">
-        <p>No hay empresa activa seleccionada.</p>
+        <p>@L("No hay empresa activa seleccionada.", "No hi ha cap empresa activa seleccionada.", "No active company selected.")</p>
     </div>
 }
 else if (!string.IsNullOrWhiteSpace(errorMessage))
@@ -43,7 +45,7 @@ else if (!string.IsNullOrWhiteSpace(statusMessage))
 else if (draft is null)
 {
     <div class="empty-state">
-        <p>No se ha encontrado el borrador solicitado.</p>
+        <p>@L("No se ha encontrado el borrador solicitado.", "No s'ha trobat l'esborrany sol·licitat.", "The requested draft could not be found.")</p>
     </div>
 }
 else
@@ -51,29 +53,29 @@ else
     <section class="panel receipt-document">
         <div class="receipt-document-header">
             <div>
-                <p class="eyebrow">Pre-facturación</p>
+                <p class="eyebrow">@L("Pre-facturación", "Pre-facturació", "Pre-invoicing")</p>
                 <h2>@draft.DisplayNumber</h2>
-                <p class="muted">@FormatDraftStatus(draft.Status) · @draft.ShipmentCount albaranes</p>
+                <p class="muted">@FormatDraftStatus(draft.Status) · @draft.ShipmentCount @L("albaranes", "albarans", "shipments")</p>
             </div>
             <div class="receipt-document-meta">
-                <strong>Fecha borrador</strong>
+                <strong>@L("Fecha borrador", "Data esborrany", "Draft date")</strong>
                 <span>@draft.IssueDate.ToString("dd/MM/yyyy")</span>
             </div>
         </div>
 
         <div class="comparison-grid">
             <section class="info-card">
-                <h2>Empresa emisora</h2>
+                <h2>@L("Empresa emisora", "Empresa emissora", "Issuing company")</h2>
                 <p><strong>@draft.CompanyName</strong></p>
                 <p class="muted">@draft.TenantName</p>
-                <p class="muted">Centro legacy @draft.CompanyLegacyCenterCode</p>
+                <p class="muted">@L("Centro legacy", "Centre legacy", "Legacy center") @draft.CompanyLegacyCenterCode</p>
             </section>
             <section class="info-card">
-                <h2>Cliente</h2>
+                <h2>@L("Cliente", "Client", "Client")</h2>
                 <p><strong>@draft.ClientName</strong></p>
                 @if (!string.IsNullOrWhiteSpace(draft.ClientTaxId))
                 {
-                    <p class="muted">NIF @draft.ClientTaxId</p>
+                    <p class="muted">@L("NIF", "NIF", "Tax ID") @draft.ClientTaxId</p>
                 }
                 @if (!string.IsNullOrWhiteSpace(ClientLocation))
                 {
@@ -84,40 +86,40 @@ else
 
         <div class="receipt-detail-grid">
             <section class="info-card">
-                <h2>Cabecera de facturación</h2>
+                <h2>@L("Cabecera de facturación", "Capçalera de facturació", "Invoicing header")</h2>
                 <div class="receipt-kv-grid">
                     <div>
-                        <span class="muted">Estado</span>
+                        <span class="muted">@L("Estado", "Estat", "Status")</span>
                         <strong>@FormatDraftStatus(draft.Status)</strong>
                     </div>
                     <div>
-                        <span class="muted">Factura emitida</span>
-                        <strong>@(draft.IssuedInvoiceDisplayNumber ?? "Todavía no emitida")</strong>
+                        <span class="muted">@L("Factura emitida", "Factura emesa", "Issued invoice")</span>
+                        <strong>@(draft.IssuedInvoiceDisplayNumber ?? L("Todavía no emitida", "Encara no emesa", "Not issued yet"))</strong>
                     </div>
                     <div>
-                        <span class="muted">Vencimiento</span>
-                        <strong>@(draft.DueDate?.ToString("dd/MM/yyyy") ?? "Sin dato")</strong>
+                        <span class="muted">@L("Vencimiento", "Venciment", "Due date")</span>
+                        <strong>@(draft.DueDate?.ToString("dd/MM/yyyy") ?? L("Sin dato", "Sense dada", "No data"))</strong>
                     </div>
                     <div>
-                        <span class="muted">Cliente</span>
+                        <span class="muted">@L("Cliente", "Client", "Client")</span>
                         <strong>@draft.ClientCode</strong>
                     </div>
                 </div>
             </section>
             <section class="info-card">
-                <h2>Resumen</h2>
+                <h2>@L("Resumen", "Resum", "Summary")</h2>
                 <div class="receipt-kv-grid">
                     <div>
-                        <span class="muted">Albaranes</span>
+                        <span class="muted">@L("Albaranes", "Albarans", "Shipments")</span>
                         <strong>@draft.ShipmentCount</strong>
                     </div>
                     <div>
-                        <span class="muted">Cantidad total</span>
-                        <strong>@draft.TotalQuantity.ToString("0.###")</strong>
+                        <span class="muted">@L("Cantidad total", "Quantitat total", "Total quantity")</span>
+                        <strong>@draft.TotalQuantity.ToUiString("0.###")</strong>
                     </div>
                     <div>
-                        <span class="muted">Importe total</span>
-                        <strong>@draft.TotalAmount.ToString("0.00") €</strong>
+                        <span class="muted">@L("Importe total", "Import total", "Total amount")</span>
+                        <strong>@draft.TotalAmount.ToUiString("0.00") €</strong>
                     </div>
                 </div>
             </section>
@@ -125,16 +127,16 @@ else
     </section>
 
     <section class="panel" style="margin-top: 1rem;">
-        <h2>Albaranes incluidos</h2>
+        <h2>@L("Albaranes incluidos", "Albarans inclosos", "Included shipments")</h2>
         <table class="data-table">
             <thead>
                 <tr>
-                    <th>Albarán</th>
-                    <th>Pedido</th>
-                    <th>Fecha</th>
-                    <th>Almacén</th>
-                    <th>Cantidad</th>
-                    <th>Importe</th>
+                    <th>@L("Albarán", "Albarà", "Shipment")</th>
+                    <th>@L("Pedido", "Comanda", "Order")</th>
+                    <th>@L("Fecha", "Data", "Date")</th>
+                    <th>@L("Almacén", "Magatzem", "Warehouse")</th>
+                    <th>@L("Cantidad", "Quantitat", "Quantity")</th>
+                    <th>@L("Importe", "Import", "Amount")</th>
                     <th></th>
                 </tr>
             </thead>
@@ -146,9 +148,9 @@ else
                         <td>@shipment.OrderNumber</td>
                         <td>@shipment.ShipmentDate.ToString("dd/MM/yyyy")</td>
                         <td>@DisplayValue(shipment.Warehouse)</td>
-                        <td>@shipment.TotalShippedQuantity.ToString("0.###")</td>
-                        <td>@shipment.EstimatedAmount.ToString("0.00") €</td>
-                        <td><a class="inline-link" href="/ventas/albaranes/@shipment.ShipmentNumber">Abrir albarán</a></td>
+                        <td>@shipment.TotalShippedQuantity.ToUiString("0.###")</td>
+                        <td>@shipment.EstimatedAmount.ToUiString("0.00") €</td>
+                        <td><a class="inline-link" href="@BuildShipmentDetailHref(shipment.ShipmentNumber)">@L("Abrir albarán", "Obrir albarà", "Open shipment")</a></td>
                     </tr>
                 }
             </tbody>
@@ -156,18 +158,18 @@ else
     </section>
 
     <section class="panel" style="margin-top: 1rem;">
-        <h2>Líneas del borrador</h2>
+        <h2>@L("Líneas del borrador", "Línies de l'esborrany", "Draft lines")</h2>
         <table class="data-table">
             <thead>
                 <tr>
-                    <th>Línea</th>
-                    <th>Artículo</th>
-                    <th>Descripción</th>
-                    <th>Cantidad</th>
-                    <th>Unidad</th>
-                    <th>Precio</th>
-                    <th>Total</th>
-                    <th>Origen</th>
+                    <th>@L("Línea", "Línia", "Line")</th>
+                    <th>@L("Artículo", "Article", "Item")</th>
+                    <th>@L("Descripción", "Descripció", "Description")</th>
+                    <th>@L("Cantidad", "Quantitat", "Quantity")</th>
+                    <th>@L("Unidad", "Unitat", "Unit")</th>
+                    <th>@L("Precio", "Preu", "Price")</th>
+                    <th>@L("Total", "Total", "Total")</th>
+                    <th>@L("Origen", "Origen", "Origin")</th>
                 </tr>
             </thead>
             <tbody>
@@ -177,10 +179,10 @@ else
                         <td>@line.LineNumber</td>
                         <td>@DisplayValue(line.ItemCode)</td>
                         <td>@line.Description</td>
-                        <td>@line.Quantity.ToString("0.###")</td>
+                        <td>@line.Quantity.ToUiString("0.###")</td>
                         <td>@DisplayValue(line.UnitOfMeasure)</td>
-                        <td>@line.UnitPrice.ToString("0.0000")</td>
-                        <td>@line.LineTotal.ToString("0.00") €</td>
+                        <td>@line.UnitPrice.ToUiString("0.0000")</td>
+                        <td>@line.LineTotal.ToUiString("0.00") €</td>
                         <td>@DisplayValue(line.SourceSummary)</td>
                     </tr>
                 }
@@ -191,13 +193,21 @@ else
     @if (!string.IsNullOrWhiteSpace(draft.Notes))
     {
         <section class="panel" style="margin-top: 1rem;">
-            <h2>Notas</h2>
+            <h2>@L("Notas", "Notes", "Notes")</h2>
             <p>@draft.Notes</p>
         </section>
     }
 }
 
 @code {
+    private string L(string spanish, string catalan, string english) =>
+        T.CurrentLanguage switch
+        {
+            AppLanguages.Catalan => catalan,
+            AppLanguages.English => english,
+            _ => spanish
+        };
+
     [Parameter]
     public int DraftNumber { get; set; }
 
@@ -209,6 +219,18 @@ else
     private bool isError;
     private bool canEdit;
     private bool isIssuing;
+    private bool IsTeixitsMostresDraftRoute =>
+        NavigationManager.ToBaseRelativePath(NavigationManager.Uri).StartsWith("ventas/pre-facturacion-teixits-mostres", StringComparison.OrdinalIgnoreCase);
+
+    private string PageLeadText => IsTeixitsMostresDraftRoute
+        ? L("Borrador de factura agrupado desde albaranes del circuito de tejidos y muestras para un mismo cliente.", "Esborrany de factura agrupat des d'albarans del circuit de teixits i mostres per a un mateix client.", "Invoice draft grouped from fabrics and samples shipments for the same client.")
+        : L("Borrador de factura agrupado desde uno o varios albaranes del mismo cliente.", "Esborrany de factura agrupat des d'un o diversos albarans del mateix client.", "Invoice draft grouped from one or more shipments for the same client.");
+
+    private string BackToPreInvoicingHref => IsTeixitsMostresDraftRoute ? "/ventas/pre-facturacion-teixits-mostres" : "/ventas/pre-facturacion";
+
+    private string BackToPreInvoicingText => IsTeixitsMostresDraftRoute
+        ? L("Volver a pre-facturación teixits-mostres", "Tornar a pre-facturació teixits-mostres", "Back to fabric & sample pre-invoicing")
+        : L("Volver a pre-facturación", "Tornar a pre-facturació", "Back to pre-invoicing");
 
     private string ClientLocation
     {
@@ -279,7 +301,7 @@ else
                 DraftNumber = DraftNumber
             });
 
-            NavigationManager.NavigateTo($"/ventas/facturas/{invoiceNumber}");
+            NavigationManager.NavigateTo(BuildInvoiceDetailHref(invoiceNumber));
         }
         catch (Exception exception)
         {
@@ -292,11 +314,21 @@ else
         }
     }
 
-    private static string DisplayValue(string value) => string.IsNullOrWhiteSpace(value) ? "Sin dato" : value;
-    private static string FormatDraftStatus(string status) => status switch
+    private string DisplayValue(string value) => string.IsNullOrWhiteSpace(value) ? L("Sin dato", "Sense dada", "No data") : value;
+    private string FormatDraftStatus(string status) => status switch
     {
-        SalesInvoiceDraftStatuses.Draft => "Borrador",
-        SalesInvoiceDraftStatuses.Issued => "Emitido",
+        SalesInvoiceDraftStatuses.Draft => L("Borrador", "Esborrany", "Draft"),
+        SalesInvoiceDraftStatuses.Issued => L("Emitido", "Emès", "Issued"),
         _ => status
     };
+
+    private string BuildShipmentDetailHref(int shipmentNumber) =>
+        IsTeixitsMostresDraftRoute
+            ? $"/ventas/albaranes-teixits-mostres/{shipmentNumber}"
+            : $"/ventas/albaranes/{shipmentNumber}";
+
+    private string BuildInvoiceDetailHref(int invoiceNumber) =>
+        IsTeixitsMostresDraftRoute
+            ? $"/ventas/facturas-teixits-mostres/{invoiceNumber}"
+            : $"/ventas/facturas/{invoiceNumber}";
 }

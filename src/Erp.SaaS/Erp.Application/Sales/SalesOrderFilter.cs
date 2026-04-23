@@ -4,6 +4,7 @@ public sealed class SalesOrderFilter
 {
     public string Search { get; set; } = string.Empty;
     public string Status { get; set; } = string.Empty;
+    public string CatalogScope { get; set; } = string.Empty;
     public bool IncludeClosed { get; set; }
     public int Page { get; set; } = 1;
     public int PageSize { get; set; } = 25;

@@ -3,20 +3,21 @@
 @attribute [Authorize(Roles = "TenantAdmin,TenantReader")]
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject IStockQueries StockQueries
+@inject AppText T
 
-<PageTitle>Inventario @CountNumber</PageTitle>
+<PageTitle>@($"{L("Inventario", "Inventari", "Inventory")} {CountNumber}")</PageTitle>
 
 <div class="document-shell">
     <div class="document-toolbar no-print">
-        <a class="secondary-button link-button" href="/almacen/inventarios/editar/@CountNumber">Volver al inventario</a>
-        <a class="secondary-button link-button" href="/almacen/inventarios/@CountNumber/imprimir-recuento">Hoja de recuento</a>
-        <button class="primary-button" type="button" onclick="window.print()">Guardar como PDF / Imprimir</button>
+        <a class="secondary-button link-button" href="/almacen/inventarios/editar/@CountNumber">@L("Volver al inventario", "Tornar a l'inventari", "Back to inventory")</a>
+        <a class="secondary-button link-button" href="/almacen/inventarios/@CountNumber/imprimir-recuento">@L("Hoja de recuento", "Full de recompte", "Count sheet")</a>
+        <button class="primary-button" type="button" onclick="window.print()">@L("Imprimir / guardar PDF", "Imprimir / desar PDF", "Print / save PDF")</button>
     </div>
 
     @if (!tenantId.HasValue || !companyId.HasValue)
     {
         <div class="empty-state document-state">
-            <p>No hay empresa activa seleccionada.</p>
+            <p>@L("No hay empresa activa seleccionada.", "No hi ha cap empresa activa seleccionada.", "There is no active company selected.")</p>
         </div>
     }
     else if (!string.IsNullOrWhiteSpace(errorMessage))
@@ -26,7 +27,7 @@
     else if (detail is null)
     {
         <div class="empty-state document-state">
-            <p>No se ha encontrado el inventario solicitado.</p>
+            <p>@L("No se ha encontrado el inventario solicitado.", "No s'ha trobat l'inventari sol·licitat.", "The requested inventory could not be found.")</p>
         </div>
     }
     else
@@ -34,21 +35,21 @@
         <section class="document-page">
             <header class="document-header">
                 <div>
-                    <p class="eyebrow">Inventario</p>
+                    <p class="eyebrow">@L("Inventario", "Inventari", "Inventory")</p>
                     <h1>@detail.CountNumber</h1>
-                    <p class="muted">Almacén @DisplayValue(detail.Warehouse) · Estado @GetStatusLabel(detail.Status) · @(detail.IsBlindCount ? "Conteo ciego" : "Conteo normal")</p>
+                    <p class="muted">@L("Almacén", "Magatzem", "Warehouse") @DisplayValue(detail.Warehouse) · @L("Estado", "Estat", "Status") @GetStatusLabel(detail.Status) · @(detail.IsBlindCount ? L("Conteo ciego", "Recompte cec", "Blind count") : L("Conteo normal", "Recompte normal", "Standard count"))</p>
                 </div>
                 <div class="document-header-meta">
                     <div>
-                        <span class="muted">Fecha</span>
+                        <span class="muted">@L("Fecha", "Data", "Date")</span>
                         <strong>@detail.CountDate.ToString("dd/MM/yyyy")</strong>
                     </div>
                     <div>
-                        <span class="muted">Líneas</span>
+                        <span class="muted">@L("Líneas", "Línies", "Lines")</span>
                         <strong>@detail.LineCount</strong>
                     </div>
                     <div>
-                        <span class="muted">Con diferencia</span>
+                        <span class="muted">@L("Con diferencia", "Amb diferència", "With difference")</span>
                         <strong>@detail.DifferenceLineCount</strong>
                     </div>
                 </div>
@@ -57,39 +58,39 @@
             <section class="document-section">
                 <div class="document-grid-two">
                     <section class="document-box">
-                        <h2>Resumen</h2>
+                        <h2>@L("Resumen", "Resum", "Summary")</h2>
                         <div class="document-kv-grid">
-                            <div><span class="muted">Esperado</span><strong>@detail.ExpectedTotalQuantity.ToString("0.###")</strong></div>
-                            <div><span class="muted">Modo</span><strong>@(detail.IsBlindCount ? "Ciego" : "Normal")</strong></div>
-                            <div><span class="muted">Contado</span><strong>@detail.CountedTotalQuantity.ToString("0.###")</strong></div>
-                            <div><span class="muted">Diferencia</span><strong>@(IsBlindHidden ? "Oculta" : detail.DifferenceTotalQuantity.ToString("0.###"))</strong></div>
-                            <div><span class="muted">Origen</span><strong>@DisplayValue(detail.Origin)</strong></div>
-                            <div><span class="muted">Esperado</span><strong>@(IsBlindHidden ? "Oculto" : detail.ExpectedTotalQuantity.ToString("0.###"))</strong></div>
+                            <div><span class="muted">@L("Esperado", "Esperat", "Expected")</span><strong>@detail.ExpectedTotalQuantity.ToUiString("0.###")</strong></div>
+                            <div><span class="muted">@L("Modo", "Mode", "Mode")</span><strong>@(detail.IsBlindCount ? L("Ciego", "Cec", "Blind") : L("Normal", "Normal", "Normal"))</strong></div>
+                            <div><span class="muted">@L("Contado", "Comptat", "Counted")</span><strong>@detail.CountedTotalQuantity.ToUiString("0.###")</strong></div>
+                            <div><span class="muted">@L("Diferencia", "Diferència", "Difference")</span><strong>@(IsBlindHidden ? L("Oculta", "Oculta", "Hidden") : detail.DifferenceTotalQuantity.ToUiString("0.###"))</strong></div>
+                            <div><span class="muted">@L("Origen", "Origen", "Origin")</span><strong>@DisplayValue(detail.Origin)</strong></div>
+                            <div><span class="muted">@L("Esperado", "Esperat", "Expected")</span><strong>@(IsBlindHidden ? L("Oculto", "Ocult", "Hidden") : detail.ExpectedTotalQuantity.ToUiString("0.###"))</strong></div>
                         </div>
                     </section>
                     <section class="document-box">
-                        <h2>Observaciones</h2>
-                        <p>@(string.IsNullOrWhiteSpace(detail.Notes) ? "Sin observaciones." : detail.Notes)</p>
+                        <h2>@L("Observaciones", "Observacions", "Notes")</h2>
+                        <p>@(string.IsNullOrWhiteSpace(detail.Notes) ? L("Sin observaciones registradas.", "Sense observacions registrades.", "No remarks recorded.") : detail.Notes)</p>
                     </section>
                 </div>
             </section>
 
             <section class="document-section">
-                <h2>Detalle de líneas</h2>
+                <h2>@L("Detalle de líneas", "Detall de línies", "Line items")</h2>
                 <table class="data-table document-table">
                     <thead>
                         <tr>
                             <th>#</th>
-                            <th>Familia</th>
-                            <th>Artículo</th>
-                            <th>Descripción</th>
-                            <th>Color</th>
-                            <th>Esperado</th>
-                            <th>Contado</th>
-                            <th>Diferencia</th>
-                            <th>Validada</th>
-                            <th>Unidad</th>
-                            <th>Notas</th>
+                            <th>@L("Familia", "Família", "Family")</th>
+                            <th>@L("Artículo", "Article", "Item")</th>
+                            <th>@L("Descripción", "Descripció", "Description")</th>
+                            <th>@L("Color", "Color", "Color")</th>
+                            <th>@L("Esperado", "Esperat", "Expected")</th>
+                            <th>@L("Contado", "Comptat", "Counted")</th>
+                            <th>@L("Diferencia", "Diferència", "Difference")</th>
+                            <th>@L("Validada", "Validada", "Validated")</th>
+                            <th>@L("Unidad", "Unitat", "Unit")</th>
+                            <th>@L("Notas", "Notes", "Notes")</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -101,10 +102,10 @@
                                 <td>@DisplayValue(line.ItemCode)</td>
                                 <td>@DisplayValue(line.ItemDescription)</td>
                                 <td>@DisplayValue(line.Color)</td>
-                                <td>@(IsBlindHidden ? "Oculto" : line.ExpectedQuantity.ToString("0.###"))</td>
-                                <td>@line.CountedQuantity.ToString("0.###")</td>
-                                <td>@(IsBlindHidden ? "Oculta" : line.DifferenceQuantity.ToString("0.###"))</td>
-                                <td>@(IsBlindHidden ? "-" : (line.DifferenceQuantity == 0m ? "OK" : (line.IsDifferenceValidated ? "Sí" : "No")))</td>
+                                <td>@(IsBlindHidden ? L("Oculto", "Ocult", "Hidden") : line.ExpectedQuantity.ToUiString("0.###"))</td>
+                                <td>@line.CountedQuantity.ToUiString("0.###")</td>
+                                <td>@(IsBlindHidden ? L("Oculta", "Oculta", "Hidden") : line.DifferenceQuantity.ToUiString("0.###"))</td>
+                                <td>@(IsBlindHidden ? "-" : (line.DifferenceQuantity == 0m ? "OK" : (line.IsDifferenceValidated ? L("Sí", "Sí", "Yes") : L("No", "No", "No"))))</td>
                                 <td>@DisplayValue(line.UnitOfMeasure)</td>
                                 <td>@DisplayValue(line.Notes)</td>
                             </tr>
@@ -125,6 +126,13 @@
     private StockCountDetailDto? detail;
     private string errorMessage = string.Empty;
     private bool IsBlindHidden => detail?.IsBlindCount == true && detail.IsBlindCountRevealed == false;
+    private string L(string spanish, string catalan, string english) =>
+        T.CurrentLanguage switch
+        {
+            AppLanguages.Catalan => catalan,
+            AppLanguages.English => english,
+            _ => spanish
+        };
 
     protected override async Task OnParametersSetAsync()
     {
@@ -150,20 +158,20 @@
         }
     }
 
-    private static string GetStatusLabel(string status) => status switch
+    private string GetStatusLabel(string status) => status switch
     {
-        StockCountStatuses.Draft => "Borrador",
-        StockCountStatuses.Completed => "Completado",
-        StockCountStatuses.Cancelled => "Anulado",
+        StockCountStatuses.Draft => L("Borrador", "Esborrany", "Draft"),
+        StockCountStatuses.Completed => L("Completado", "Completat", "Completed"),
+        StockCountStatuses.Cancelled => L("Anulado", "Anul·lat", "Cancelled"),
         _ => status
     };
 
-    private static string GetFamilyKey(StockCountLineDto line)
+    private string GetFamilyKey(StockCountLineDto line)
     {
         var code = line.ItemCode?.Trim() ?? string.Empty;
         if (string.IsNullOrWhiteSpace(code))
         {
-            return "Sin familia";
+            return L("Sin familia", "Sense família", "No family");
         }
 
         var separators = new[] { '-', '/', ' ', '_', '.' };

@@ -1,0 +1,142 @@
+@page "/base-datos/empresas"
+@attribute [Authorize(Roles = "TenantAdmin,PlatformAdmin")]
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject ITenantAdminService TenantAdminService
+@inject AppText T
+
+<PageTitle>@L("Base / Empresas", "Base / Empreses", "Master data / Companies")</PageTitle>
+
+<div class="page-header">
+    <div>
+        <p class="eyebrow">@T["menu.base"]</p>
+        <h1>@L("Empresas", "Empreses", "Companies")</h1>
+        <p class="lead">@L("Maestro multiempresa del tenant, con nombre, slug y centro legacy asignado a cada empresa operativa.", "Mestre multiempresa del tenant, amb nom, slug i centre legacy assignat a cada empresa operativa.", "Tenant-wide company master with name, slug, and legacy center assigned to each operating company.")</p>
+    </div>
+    <div class="quick-links">
+        <a class="secondary-button link-button" href="/administracion">@L("Volver a administración", "Tornar a administració", "Back to administration")</a>
+        <a class="primary-button link-button" href="/base-datos/empresas/nueva">@L("Nueva empresa", "Nova empresa", "New company")</a>
+    </div>
+</div>
+
+@if (!tenantId.HasValue)
+{
+    <div class="empty-state">
+        <p>@L("No hay tenant activo en la sesión.", "No hi ha cap tenant actiu a la sessió.", "There is no active tenant in the session.")</p>
+    </div>
+}
+else
+{
+    @if (!string.IsNullOrWhiteSpace(errorMessage))
+    {
+        <div class="alert danger">@errorMessage</div>
+    }
+
+    <section class="card-grid">
+        <article class="info-card">
+            <p class="eyebrow">@L("Empresas", "Empreses", "Companies")</p>
+            <h2>@companies.Count</h2>
+            <p class="muted">@L("Empresas operativas dentro del tenant actual.", "Empreses operatives dins del tenant actual.", "Operating companies within the current tenant.")</p>
+        </article>
+        <article class="info-card">
+            <p class="eyebrow">@L("Centros asignados", "Centres assignats", "Assigned centers")</p>
+            <h2>@companies.Count(company => !string.IsNullOrWhiteSpace(company.LegacyCenterCode))</h2>
+            <p class="muted">@L("Cada empresa debe trabajar con un centro legacy distinto.", "Cada empresa ha de treballar amb un centre legacy diferent.", "Each company must work with a different legacy center.")</p>
+        </article>
+        <article class="info-card">
+            <p class="eyebrow">@L("Empresas activas", "Empreses actives", "Active companies")</p>
+            <h2>@companies.Count(company => company.IsActive)</h2>
+            <p class="muted">@L("Estado operativo declarado en la base SaaS local.", "Estat operatiu declarat a la base SaaS local.", "Operational state declared in the local SaaS database.")</p>
+        </article>
+    </section>
+
+    <section class="panel" style="margin-top: 1rem;">
+        <div class="filter-row results-toolbar">
+            <span class="results-summary">
+                @(companies.Count == 0
+                    ? L("Sin empresas registradas", "Sense empreses registrades", "No companies registered")
+                    : L($"Mostrando {companies.Count} empresas del tenant", $"Mostrant {companies.Count} empreses del tenant", $"Showing {companies.Count} tenant companies"))
+            </span>
+        </div>
+
+        <div class="table-scroll">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>@L("Nombre", "Nom", "Name")</th>
+                        <th>@L("Slug", "Slug", "Slug")</th>
+                        <th>@L("Centro legacy", "Centre legacy", "Legacy center")</th>
+                        <th>@L("Estado", "Estat", "Status")</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (companies.Count == 0)
+                    {
+                        <tr>
+                            <td colspan="5" class="table-empty">@L("Todavía no hay empresas registradas en este tenant.", "Encara no hi ha empreses registrades en aquest tenant.", "There are no companies registered in this tenant yet.")</td>
+                        </tr>
+                    }
+                    else
+                    {
+                        @foreach (var company in companies.OrderBy(item => item.Name, StringComparer.CurrentCultureIgnoreCase))
+                        {
+                            <tr>
+                                <td>@company.Name</td>
+                                <td>@company.Slug</td>
+                                <td>@DisplayValue(company.LegacyCenterCode)</td>
+                                <td><span class="status-pill @(company.IsActive ? "success" : "warning")">@(company.IsActive ? L("Activa", "Activa", "Active") : L("Inactiva", "Inactiva", "Inactive"))</span></td>
+                                <td>
+                                    <div class="table-actions">
+                                        <a class="inline-link" href="/base-datos/empresas/editar/@company.Id">@L("Abrir", "Obrir", "Open")</a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </section>
+}
+
+@code {
+    private Guid? tenantId;
+    private string errorMessage = string.Empty;
+    private IReadOnlyCollection<CompanySummaryDto> companies = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        tenantId = user.GetTenantId();
+
+        if (tenantId.HasValue)
+        {
+            await LoadAsync();
+        }
+    }
+
+    private async Task LoadAsync()
+    {
+        errorMessage = string.Empty;
+        try
+        {
+            companies = await TenantAdminService.GetCompaniesAsync(tenantId);
+        }
+        catch (Exception exception)
+        {
+            errorMessage = exception.Message;
+            companies = [];
+        }
+    }
+
+    private string L(string spanish, string catalan, string english) =>
+        T.CurrentLanguage switch
+        {
+            AppLanguages.Catalan => catalan,
+            AppLanguages.English => english,
+            _ => spanish
+        };
+
+    private static string DisplayValue(string value) => string.IsNullOrWhiteSpace(value) ? "-" : value;
+}

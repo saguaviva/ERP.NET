@@ -1,35 +1,43 @@
 @page "/compras/recepciones/{ReceiptNumber:int}"
+@page "/compras/albaranes-entrega-fils/{ReceiptNumber:int}"
 @attribute [Authorize(Roles = "TenantAdmin,TenantReader")]
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject ILegacySyncService LegacySyncService
+@inject NavigationManager NavigationManager
 @inject IPurchaseInvoiceQueries PurchaseInvoiceQueries
 @inject IPurchaseOrderQueries PurchaseOrderQueries
 @inject IStockQueries StockQueries
 @inject AppText T
 
-<PageTitle>@L($"Albarán de compra {ReceiptNumber}", $"Albarà de compra {ReceiptNumber}", $"Purchase receipt {ReceiptNumber}")</PageTitle>
+<PageTitle>@(IsYarnReceiptRoute
+    ? L($"Compras / Albaranes entrega Fils / {ReceiptNumber}", $"Compres / Albarans entrega Fils / {ReceiptNumber}", $"Purchases / Yarn delivery receipts / {ReceiptNumber}")
+    : L($"Albarán de compra {ReceiptNumber}", $"Albarà de compra {ReceiptNumber}", $"Purchase receipt {ReceiptNumber}"))</PageTitle>
 
 <div class="page-header">
     <div>
         <p class="eyebrow">@L("Compras", "Compres", "Purchases")</p>
         <h1>@(receipt?.DisplayNumber ?? L($"Entrada {ReceiptNumber}", $"Entrada {ReceiptNumber}", $"Receipt {ReceiptNumber}"))</h1>
-        <p class="lead">@(isLegacySyncActive
-            ? L("Documento replicado desde TEX.NET en la SaaS local. La sync manual refresca solo las recepciones con origen legacy.", "Document replicat des de TEX.NET a la SaaS local. La sync manual refresca només les recepcions amb origen legacy.", "Document replicated from TEX.NET into the local SaaS. Manual sync refreshes only legacy-origin receipts.")
-            : L("Albarán de compra generado desde la recepción del pedido.", "Albarà de compra generat des de la recepció de la comanda.", "Purchase receipt generated from the order receipt."))</p>
+        <p class="lead">@(IsYarnReceiptRoute
+            ? (isLegacySyncActive
+                ? L("Documento de entrada de hilo replicado desde TEX.NET en la SaaS local. La sync manual refresca solo recepciones con origen legacy ligadas al maestro fil.", "Document d'entrada de fils replicat des de TEX.NET a la SaaS local. La sync manual refresca només recepcions amb origen legacy lligades al mestre fil.", "Yarn receipt document replicated from TEX.NET into the local SaaS. Manual sync refreshes only legacy-origin receipts linked to the fil master.")
+                : L("Albarán de entrega de hilo generado desde la recepción del pedido.", "Albarà d'entrega de fils generat des de la recepció de la comanda.", "Yarn delivery receipt generated from the order receipt."))
+            : (isLegacySyncActive
+                ? L("Documento replicado desde TEX.NET en la SaaS local. La sync manual refresca solo las recepciones con origen legacy.", "Document replicat des de TEX.NET a la SaaS local. La sync manual refresca només les recepcions amb origen legacy.", "Document replicated from TEX.NET into the local SaaS. Manual sync refreshes only legacy-origin receipts.")
+                : L("Albarán de compra generado desde la recepción del pedido.", "Albarà de compra generat des de la recepció de la comanda.", "Purchase receipt generated from the order receipt.")))</p>
     </div>
     <div class="quick-links no-print">
-        <a class="secondary-button link-button" href="/compras/recepciones">@L("Volver a recepciones", "Tornar a recepcions", "Back to receipts")</a>
+        <a class="secondary-button link-button" href="@ReceiptsListHref">@(IsYarnReceiptRoute ? L("Volver a albaranes entrega fils", "Tornar a albarans entrega fils", "Back to yarn delivery receipts") : L("Volver a recepciones", "Tornar a recepcions", "Back to receipts"))</a>
         @if (receipt is not null)
         {
             @if (receipt.OrderNumber > 0)
             {
-                <a class="secondary-button link-button" href="/compras/pedidos/editar/@receipt.OrderNumber">@L("Abrir pedido", "Obrir comanda", "Open order")</a>
+                <a class="secondary-button link-button" href="@BuildOrderHref(receipt.OrderNumber)">@L("Abrir pedido", "Obrir comanda", "Open order")</a>
             }
             @if (canEdit)
             {
                 <a class="secondary-button link-button" href="/compras/facturas/nueva?receiptNumber=@receipt.ReceiptNumber">@L("Crear factura proveedor", "Crear factura proveïdor", "Create supplier invoice")</a>
             }
-            <a class="secondary-button link-button" href="/compras/recepciones/@receipt.ReceiptNumber/pdf" target="_blank">@L("Versión PDF", "Versió PDF", "PDF version")</a>
+            <a class="secondary-button link-button" href="@BuildReceiptPdfHref(receipt.ReceiptNumber)" target="_blank">@L("Versión PDF", "Versió PDF", "PDF version")</a>
         }
         <button class="secondary-button" type="button" onclick="window.print()">@L("Imprimir", "Imprimir", "Print")</button>
     </div>
@@ -56,14 +64,16 @@ else
     @if (isLegacySyncActive && !string.IsNullOrWhiteSpace(syncStatusLabel))
     {
         <div class="alert">
-            @L("Compras / Recepciones está en convivencia con legacy para esta empresa. La sync manual refresca solo las recepciones con origen legacy.", "Compres / Recepcions està en convivència amb legacy per a aquesta empresa. La sync manual refresca només les recepcions amb origen legacy.", "Purchases / Receipts is running in legacy coexistence mode for this company. Manual sync refreshes only legacy-origin receipts.") @syncStatusLabel
+            @(IsYarnReceiptRoute
+                ? L("Compras / Albaranes entrega Fils está en convivencia con legacy para esta empresa. La sync manual refresca solo las recepciones con origen legacy ligadas al maestro de hilos.", "Compres / Albarans entrega Fils està en convivència amb legacy per a aquesta empresa. La sync manual refresca només les recepcions amb origen legacy lligades al mestre de fils.", "Purchases / Yarn delivery receipts is running in legacy coexistence mode for this company. Manual sync refreshes only legacy-origin receipts linked to the yarn master.")
+                : L("Compras / Recepciones está en convivencia con legacy para esta empresa. La sync manual refresca solo las recepciones con origen legacy.", "Compres / Recepcions està en convivència amb legacy per a aquesta empresa. La sync manual refresca només les recepcions amb origen legacy.", "Purchases / Receipts is running in legacy coexistence mode for this company. Manual sync refreshes only legacy-origin receipts.")) @syncStatusLabel
         </div>
     }
 
     <section class="panel receipt-document">
         <div class="receipt-document-header">
             <div>
-                <p class="eyebrow">@L("Albarán de compra", "Albarà de compra", "Purchase receipt")</p>
+                <p class="eyebrow">@(IsYarnReceiptRoute ? L("Albarán entrega de hilo", "Albarà entrega de fils", "Yarn delivery receipt") : L("Albarán de compra", "Albarà de compra", "Purchase receipt"))</p>
                 <h2>@receipt.DisplayNumber</h2>
                 <p class="muted">@L($"Pedido origen {receipt.OrderNumber}", $"Comanda origen {receipt.OrderNumber}", $"Source order {receipt.OrderNumber}")</p>
             </div>
@@ -125,7 +135,7 @@ else
                     </div>
                     <div>
                         <span class="muted">@L("Peso bruto", "Pes brut", "Gross weight")</span>
-                        <strong>@(receipt.GrossWeightKg.HasValue ? $"{receipt.GrossWeightKg.Value:0.###} kg" : L("Sin dato", "Sense dada", "No data"))</strong>
+                        <strong>@(receipt.GrossWeightKg.HasValue ? $"{receipt.GrossWeightKg.Value.ToUiString("0.###")} kg" : L("Sin dato", "Sense dada", "No data"))</strong>
                     </div>
                     <div>
                         <span class="muted">@L("Fecha de entrada", "Data d'entrada", "Receipt date")</span>
@@ -154,7 +164,7 @@ else
             <p class="muted">@L("fecha de entrada", "data d'entrada", "receipt date")</p>
         </section>
         <section class="info-card accent-card">
-            <h2>@receipt.TotalReceivedQuantity.ToString("0.###")</h2>
+            <h2>@receipt.TotalReceivedQuantity.ToUiString("0.###")</h2>
             <p class="muted">@L("cantidad recepcionada", "quantitat recepcionada", "received quantity")</p>
         </section>
     </div>
@@ -175,7 +185,7 @@ else
                     <tr>
                         <td>@line.LineNumber</td>
                         <td>@line.Description</td>
-                        <td>@line.ReceivedQuantity.ToString("0.###")</td>
+                        <td>@line.ReceivedQuantity.ToUiString("0.###")</td>
                     </tr>
                 }
             </tbody>
@@ -231,11 +241,11 @@ else
                             <td>@DisplayValue(invoice.SupplierDocumentNumber)</td>
                             <td>@invoice.DocumentDate.ToString("dd/MM/yyyy")</td>
                             <td>@FormatInvoiceStatus(invoice.Status)</td>
-                            <td>@invoice.TotalAmount.ToString("0.00") €</td>
+                            <td>@invoice.TotalAmount.ToUiString("0.00") €</td>
                             <td>
                                 <div class="table-actions">
                                     <a class="inline-link" href="/compras/facturas/editar/@invoice.InvoiceNumber">@L("Abrir", "Obrir", "Open")</a>
-                                    <a class="inline-link" href="/compras/facturas/@invoice.InvoiceNumber/pdf" target="_blank">PDF</a>
+                                <a class="inline-link" href="/compras/facturas/@invoice.InvoiceNumber/pdf" target="_blank">@L("PDF", "PDF", "PDF")</a>
                                 </div>
                             </td>
                         </tr>
@@ -279,7 +289,7 @@ else
                             <td>@DisplayValue(movement.Warehouse)</td>
                             <td>@DisplayValue(movement.ItemCode)</td>
                             <td>@movement.ItemDescription</td>
-                            <td>@movement.Quantity.ToString("0.###") @movement.UnitOfMeasure</td>
+                            <td>@movement.Quantity.ToUiString("0.###") @movement.UnitOfMeasure</td>
                             <td>@DisplayValue(movement.SupplierName)</td>
                         </tr>
                     }
@@ -310,6 +320,9 @@ else
     private string errorMessage = string.Empty;
     private bool isLegacySyncActive;
     private string syncStatusLabel = string.Empty;
+    private bool IsYarnReceiptRoute => CurrentRelativePath.StartsWith("compras/albaranes-entrega-fils", StringComparison.OrdinalIgnoreCase);
+    private string CurrentRelativePath => NavigationManager.ToBaseRelativePath(NavigationManager.Uri).Split('?', '#')[0];
+    private string ReceiptsListHref => IsYarnReceiptRoute ? "/compras/albaranes-entrega-fils" : "/compras/recepciones";
     private string SupplierLocation
     {
         get
@@ -401,4 +414,14 @@ else
         PurchaseInvoiceStatuses.Cancelled => L("Anulada", "Anul·lada", "Cancelled"),
         _ => string.IsNullOrWhiteSpace(status) ? L("Sin estado", "Sense estat", "No status") : status
     };
+
+    private string BuildOrderHref(int orderNumber) =>
+        IsYarnReceiptRoute
+            ? $"/compras/comandes-fils/editar/{orderNumber}"
+            : $"/compras/pedidos/editar/{orderNumber}";
+
+    private string BuildReceiptPdfHref(int receiptNumber) =>
+        IsYarnReceiptRoute
+            ? $"/compras/albaranes-entrega-fils/{receiptNumber}/pdf"
+            : $"/compras/recepciones/{receiptNumber}/pdf";
 }

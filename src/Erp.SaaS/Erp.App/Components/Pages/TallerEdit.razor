@@ -7,26 +7,35 @@
 @inject ITallerQueries TallerQueries
 @inject ITallerService TallerService
 @inject NavigationManager NavigationManager
+@inject AppText T
 
-<PageTitle>@(Code.HasValue ? "Editar taller" : "Nuevo taller")</PageTitle>
+<PageTitle>@(Code.HasValue
+    ? L("Editar taller", "Editar taller", "Edit workshop")
+    : L("Nuevo taller", "Nou taller", "New workshop"))</PageTitle>
 
 <div class="page-header">
     <div>
         <p class="eyebrow">CRM</p>
-        <h1>@(Code.HasValue ? $"Editar taller {Code}" : "Nuevo taller")</h1>
+        <h1>@(Code.HasValue
+            ? $"{L("Editar taller", "Editar taller", "Edit workshop")} {Code}"
+            : L("Nuevo taller", "Nou taller", "New workshop"))</h1>
         <p class="lead">@(isLegacySyncActive
-            ? "Edición sobre la SaaS local. La importación manual desde legacy refresca solo registros marcados como legacy."
-            : "Alta y edición sobre la tabla tallers replicada en la SaaS local, filtrada por la empresa activa.")</p>
+            ? L("Edición sobre la SaaS local. La importación manual desde legacy refresca solo registros marcados como legacy.",
+                "Edició sobre la SaaS local. La importació manual des de legacy refresca només registres marcats com a legacy.",
+                "Editing local SaaS data. Manual legacy import only refreshes records marked as legacy.")
+            : L("Alta y edición sobre la tabla tallers replicada en la SaaS local, filtrada por la empresa activa.",
+                "Alta i edició sobre la taula tallers replicada a la SaaS local, filtrada per l'empresa activa.",
+                "Create and edit data in the SaaS-local replicated tallers table, filtered by the active company."))</p>
     </div>
     <div class="quick-links">
-        <a class="secondary-button link-button" href="/crm/talleres">Volver al listado</a>
+        <a class="secondary-button link-button" href="/crm/talleres">@L("Volver al listado", "Tornar al llistat", "Back to list")</a>
     </div>
 </div>
 
 @if (!tenantId.HasValue || !companyId.HasValue)
 {
     <div class="empty-state">
-        <p>No hay empresa activa seleccionada.</p>
+        <p>@L("No hay empresa activa seleccionada.", "No hi ha cap empresa activa seleccionada.", "There is no active company selected.")</p>
     </div>
 }
 else
@@ -39,8 +48,8 @@ else
     @if (isLegacySyncActive)
     {
         <div class="alert">
-            CRM / Talleres está en convivencia con legacy para esta empresa.
-            Esta ficha guarda cambios solo en la SaaS local y la sync manual refresca únicamente registros de origen legacy.
+            @L("CRM / Talleres está en convivencia con legacy para esta empresa.", "CRM / Tallers està en convivència amb legacy per a aquesta empresa.", "CRM / Workshops is running in coexistence with legacy for this company.")
+            @L("Esta ficha guarda cambios solo en la SaaS local y la sync manual refresca únicamente registros de origen legacy.", "Aquesta fitxa desa canvis només a la SaaS local i la sync manual refresca únicament registres d'origen legacy.", "This record saves changes only in the local SaaS database and manual sync refreshes only legacy-origin records.")
             @if (!string.IsNullOrWhiteSpace(syncStatusLabel))
             {
                 <span>@syncStatusLabel</span>
@@ -51,7 +60,7 @@ else
     @if (!canEdit && !Code.HasValue)
     {
         <div class="alert">
-            No tienes permisos de edición para crear talleres nuevos en esta empresa.
+            @L("No tienes permisos de edición para crear talleres nuevos en esta empresa.", "No tens permisos d'edició per crear tallers nous en aquesta empresa.", "You do not have edit permissions to create new workshops in this company.")
         </div>
     }
 
@@ -59,63 +68,63 @@ else
         <fieldset disabled="@isReadOnly">
             <div class="form-grid">
                 <label class="field">
-                    <span>Nombre</span>
+                    <span>@L("Nombre", "Nom", "Name")</span>
                     <InputText class="text-input" @bind-Value="model.Name" />
                 </label>
                 <label class="field">
-                    <span>NIF</span>
+                    <span>@L("NIF", "NIF", "Tax ID")</span>
                     <InputText class="text-input" @bind-Value="model.TaxId" />
                 </label>
                 <label class="field">
-                    <span>Teléfono</span>
+                    <span>@L("Teléfono", "Telèfon", "Phone")</span>
                     <InputText class="text-input" @bind-Value="model.Phone" />
                 </label>
                 <label class="field">
-                    <span>Teléfono 2</span>
+                    <span>@L("Teléfono 2", "Telèfon 2", "Phone 2")</span>
                     <InputText class="text-input" @bind-Value="model.SecondaryPhone" />
                 </label>
                 <label class="field">
-                    <span>Fax</span>
+                    <span>@L("Fax", "Fax", "Fax")</span>
                     <InputText class="text-input" @bind-Value="model.Fax" />
                 </label>
                 <label class="field">
-                    <span>Email principal</span>
+                    <span>@L("Email principal", "Email principal", "Primary email")</span>
                     <InputText class="text-input" @bind-Value="model.PrimaryEmail" />
                 </label>
                 <label class="field">
-                    <span>Email secundario</span>
+                    <span>@L("Email secundario", "Email secundari", "Secondary email")</span>
                     <InputText class="text-input" @bind-Value="model.SecondaryEmail" />
                 </label>
                 <label class="field wide">
-                    <span>Dirección</span>
+                    <span>@L("Dirección", "Adreça", "Address")</span>
                     <InputText class="text-input" @bind-Value="model.Address" />
                 </label>
                 <label class="field">
-                    <span>Código postal</span>
+                    <span>@L("Código postal", "Codi postal", "Postal code")</span>
                     <InputText class="text-input" @bind-Value="model.PostalCode" />
                 </label>
                 <label class="field">
-                    <span>Ciudad</span>
+                    <span>@L("Ciudad", "Ciutat", "City")</span>
                     <InputText class="text-input" @bind-Value="model.City" />
                 </label>
                 <label class="field">
-                    <span>Provincia</span>
+                    <span>@L("Provincia", "Província", "Province")</span>
                     <InputText class="text-input" @bind-Value="model.Province" />
                 </label>
                 <label class="field">
-                    <span>País</span>
+                    <span>@L("País", "País", "Country")</span>
                     <InputText class="text-input" @bind-Value="model.Country" />
                 </label>
                 <label class="field">
-                    <span>Web</span>
+                    <span>@L("Web", "Web", "Website")</span>
                     <InputText class="text-input" @bind-Value="model.Website" />
                 </label>
                 <label class="field">
-                    <span>Formato</span>
+                    <span>@L("Formato", "Format", "Format")</span>
                     <InputText class="text-input" @bind-Value="model.Format" />
                 </label>
                 <label class="field wide">
-                    <span>Notas</span>
+                    <span>@L("Notas", "Notes", "Notes")</span>
                     <InputTextArea class="text-area" @bind-Value="model.Notes" />
                 </label>
             </div>
@@ -123,15 +132,15 @@ else
             <div class="quick-links" style="margin-top: 1rem;">
                 @if (canEdit)
                 {
-                    <button class="primary-button" type="submit">Guardar taller</button>
+                    <button class="primary-button" type="submit">@L("Guardar taller", "Desar taller", "Save workshop")</button>
                 }
                 @if (canEdit && Code.HasValue)
                 {
-                    <button class="secondary-button danger-button" type="button" @onclick="DeleteAsync">Eliminar taller</button>
+                    <button class="secondary-button danger-button" type="button" @onclick="DeleteAsync">@L("Eliminar taller", "Eliminar taller", "Delete workshop")</button>
                 }
                 @if (Code.HasValue)
                 {
-                    <button class="secondary-button" type="button" @onclick="LoadAuditAsync">Recargar historial</button>
+                    <button class="secondary-button" type="button" @onclick="LoadAuditAsync">@L("Recargar historial", "Recarregar historial", "Reload history")</button>
                 }
             </div>
         </fieldset>
@@ -140,11 +149,11 @@ else
     @if (Code.HasValue)
     {
         <section class="panel" style="margin-top: 1rem;">
-            <h2>Historial reciente del taller</h2>
+            <h2>@L("Historial reciente del taller", "Historial recent del taller", "Recent workshop history")</h2>
             <div class="list-block">
                 @if (recentAuditLogs.Count == 0)
                 {
-                    <p class="muted">Todavía no hay eventos auditados para este taller.</p>
+                    <p class="muted">@L("Todavía no hay eventos auditados para este taller.", "Encara no hi ha esdeveniments auditats per a aquest taller.", "There are no audited events for this workshop yet.")</p>
                 }
                 else
                 {
@@ -201,7 +210,7 @@ else
             var detail = await TallerQueries.GetByCodeAsync(tenantId.Value, companyId.Value, Code.Value);
             if (detail is null)
             {
-                statusMessage = "No se ha encontrado el taller solicitado.";
+                statusMessage = L("No se ha encontrado el taller solicitado.", "No s'ha trobat el taller sol·licitat.", "The requested workshop was not found.");
                 isError = true;
                 model = new TallerDetailDto();
                 recentAuditLogs = [];
@@ -227,7 +236,7 @@ else
 
         if (isReadOnly)
         {
-            statusMessage = "No tienes permisos de edición en este tenant.";
+            statusMessage = L("No tienes permisos de edición en este tenant.", "No tens permisos d'edició en aquest tenant.", "You do not have edit permissions in this tenant.");
             isError = true;
             return;
         }
@@ -260,8 +269,8 @@ else
             });
 
             statusMessage = Code.HasValue
-                ? "Taller actualizado correctamente."
-                : "Taller creado correctamente.";
+                ? L("Taller actualizado correctamente.", "Taller actualitzat correctament.", "Workshop updated successfully.")
+                : L("Taller creado correctamente.", "Taller creat correctament.", "Workshop created successfully.");
 
             if (!Code.HasValue)
             {
@@ -299,8 +308,8 @@ else
 
         isLegacySyncActive = true;
         syncStatusLabel = status.LastCompletedUtc.HasValue
-            ? $"Última sync: {status.LastCompletedUtc.Value.ToLocalTime():dd/MM/yyyy HH:mm:ss} · Ins: {status.LastInserted} · Act: {status.LastUpdated} · Omi: {status.LastSkipped} · Err: {status.LastErrors}"
-            : $"Estado: {status.LastStatus}";
+            ? $"{L("Última sync", "Última sync", "Last sync")}: {status.LastCompletedUtc.Value.ToLocalTime():dd/MM/yyyy HH:mm:ss} · Ins: {status.LastInserted} · Act: {status.LastUpdated} · Omi: {status.LastSkipped} · Err: {status.LastErrors}"
+            : $"{L("Estado", "Estat", "Status")}: {status.LastStatus}";
     }
 
     private async Task LoadAuditAsync()
@@ -327,7 +336,7 @@ else
 
         if (!canEdit)
         {
-            statusMessage = "No tienes permisos de edición en este tenant.";
+            statusMessage = L("No tienes permisos de edición en este tenant.", "No tens permisos d'edició en aquest tenant.", "You do not have edit permissions in this tenant.");
             isError = true;
             return;
         }
@@ -343,4 +352,12 @@ else
             isError = true;
         }
     }
+
+    private string L(string spanish, string catalan, string english) =>
+        T.CurrentLanguage switch
+        {
+            AppLanguages.Catalan => catalan,
+            AppLanguages.English => english,
+            _ => spanish
+        };
 }

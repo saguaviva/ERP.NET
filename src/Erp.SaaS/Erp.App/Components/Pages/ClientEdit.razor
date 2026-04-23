@@ -7,23 +7,32 @@
 @inject IClienteService ClienteService
 @inject ILegacySyncService LegacySyncService
 @inject NavigationManager NavigationManager
+@inject AppText T
 
-<PageTitle>@(Code.HasValue ? "Editar cliente" : "Nuevo cliente")</PageTitle>
+<PageTitle>@(Code.HasValue
+    ? L("Editar cliente", "Editar client", "Edit client")
+    : L("Nuevo cliente", "Nou client", "New client"))</PageTitle>
 
 <div class="page-header">
     <div>
         <p class="eyebrow">CRM</p>
-        <h1>@(Code.HasValue ? $"Editar cliente {Code}" : "Nuevo cliente")</h1>
+        <h1>@(Code.HasValue
+            ? $"{L("Editar cliente", "Editar client", "Edit client")} {Code}"
+            : L("Nuevo cliente", "Nou client", "New client"))</h1>
         <p class="lead">@(isLegacySyncActive
-            ? "Alta y edición sobre la réplica SaaS local. La sincronización manual solo refresca los registros que sigan siendo de origen legacy."
-            : "Alta y edición sobre la tabla clients replicada en la SaaS local, filtrada por la empresa activa.")</p>
+            ? L("Alta y edición sobre la réplica SaaS local. La sincronización manual solo refresca los registros que sigan siendo de origen legacy.",
+                "Alta i edició sobre la rèplica SaaS local. La sincronització manual només refresca els registres que continuen sent d'origen legacy.",
+                "Create and edit data on the local SaaS replica. Manual sync only refreshes records that still remain legacy-origin.")
+            : L("Alta y edición sobre la tabla clients replicada en la SaaS local, filtrada por la empresa activa.",
+                "Alta i edició sobre la taula clients replicada a la SaaS local, filtrada per l'empresa activa.",
+                "Create and edit data on the SaaS-local replicated clients table, filtered by the active company."))</p>
     </div>
 </div>
 
 @if (!tenantId.HasValue || !companyId.HasValue)
 {
     <div class="empty-state">
-        <p>No hay empresa activa seleccionada.</p>
+        <p>@L("No hay empresa activa seleccionada.", "No hi ha cap empresa activa seleccionada.", "There is no active company selected.")</p>
     </div>
 }
 else
@@ -36,8 +45,10 @@ else
     @if (isLegacySyncActive)
     {
         <div class="alert">
-            CRM / Clientes está en convivencia con legacy para esta empresa.
-            Esta ficha sigue siendo editable en local. Si modificas un cliente importado, pasará a tratarse como registro local y la sync manual ya no lo sobreescribirá.
+            @L("CRM / Clientes está en convivencia con legacy para esta empresa.", "CRM / Clients està en convivència amb legacy per a aquesta empresa.", "CRM / Clients is running in coexistence with legacy for this company.")
+            @L("Esta ficha sigue siendo editable en local. Si modificas un cliente importado, pasará a tratarse como registro local y la sync manual ya no lo sobreescribirá.",
+                "Aquesta fitxa continua sent editable en local. Si modifiques un client importat, passarà a tractar-se com a registre local i la sync manual ja no el sobreescriurà.",
+                "This record remains editable locally. If you modify an imported client, it will become a local record and manual sync will no longer overwrite it.")
             @if (!string.IsNullOrWhiteSpace(syncStatusLabel))
             {
                 <span>@syncStatusLabel</span>
@@ -48,16 +59,16 @@ else
     @if (duplicates.Count > 0)
     {
         <section class="panel" style="margin-bottom: 1rem;">
-            <h2>Posibles duplicados</h2>
+            <h2>@L("Posibles duplicados", "Possibles duplicats", "Possible duplicates")</h2>
             <div class="list-block">
                 @foreach (var duplicate in duplicates)
                 {
                     <article class="list-item">
                         <strong>
-                            Cliente @duplicate.Code · @duplicate.Name
+                            @L("Cliente", "Client", "Client") @duplicate.Code · @duplicate.Name
                             @if (duplicate.IsHardConflict)
                             {
-                                <span> · conflicto duro</span>
+                                <span> · @L("conflicto duro", "conflicte dur", "hard conflict")</span>
                             }
                         </strong>
                         <span>@string.Join(", ", duplicate.MatchReasons)</span>
@@ -69,15 +80,15 @@ else
                         @if (Code.HasValue)
                         {
                             <div class="quick-links">
-                                <button class="secondary-button" type="button" @onclick="() => SetDuplicateReviewAsync(duplicate, ClienteDuplicateReviewStatus.Reviewed)">Marcar revisado</button>
-                                <button class="secondary-button" type="button" @onclick="() => SetDuplicateReviewAsync(duplicate, ClienteDuplicateReviewStatus.FalsePositive)">Falso positivo</button>
+                                <button class="secondary-button" type="button" @onclick="() => SetDuplicateReviewAsync(duplicate, ClienteDuplicateReviewStatus.Reviewed)">@L("Marcar revisado", "Marcar revisat", "Mark reviewed")</button>
+                                <button class="secondary-button" type="button" @onclick="() => SetDuplicateReviewAsync(duplicate, ClienteDuplicateReviewStatus.FalsePositive)">@L("Falso positivo", "Fals positiu", "False positive")</button>
                                 @if (!string.IsNullOrWhiteSpace(duplicate.ReviewStatus))
                                 {
-                                    <button class="secondary-button" type="button" @onclick="() => ClearDuplicateReviewAsync(duplicate)">Quitar marca</button>
+                                    <button class="secondary-button" type="button" @onclick="() => ClearDuplicateReviewAsync(duplicate)">@L("Quitar marca", "Treure marca", "Remove mark")</button>
                                 }
                             </div>
                         }
-                        <a class="inline-link" href="/crm/clientes/editar/@duplicate.Code">Abrir cliente</a>
+                        <a class="inline-link" href="/crm/clientes/editar/@duplicate.Code">@L("Abrir cliente", "Obrir client", "Open client")</a>
                     </article>
                 }
             </div>
@@ -88,81 +99,81 @@ else
         <fieldset>
         <div class="form-grid">
             <label class="field">
-                <span>Nombre</span>
+                <span>@L("Nombre", "Nom", "Name")</span>
                 <InputText class="text-input" @bind-Value="model.Name" />
             </label>
             <label class="field">
-                <span>NIF</span>
+                <span>@L("NIF", "NIF", "Tax ID")</span>
                 <InputText class="text-input" @bind-Value="model.TaxId" />
             </label>
             <label class="field">
-                <span>Contacto</span>
+                <span>@L("Contacto", "Contacte", "Contact")</span>
                 <InputText class="text-input" @bind-Value="model.ContactName" />
             </label>
             <label class="field">
-                <span>Teléfono</span>
+                <span>@L("Teléfono", "Telèfon", "Phone")</span>
                 <InputText class="text-input" @bind-Value="model.Phone" />
             </label>
             <label class="field wide">
-                <span>Dirección</span>
+                <span>@L("Dirección", "Adreça", "Address")</span>
                 <InputText class="text-input" @bind-Value="model.Address" />
             </label>
             <label class="field">
-                <span>Código postal</span>
+                <span>@L("Código postal", "Codi postal", "Postal code")</span>
                 <InputText class="text-input" @bind-Value="model.PostalCode" />
             </label>
             <label class="field">
-                <span>Ciudad</span>
+                <span>@L("Ciudad", "Ciutat", "City")</span>
                 <InputText class="text-input" @bind-Value="model.City" />
             </label>
             <label class="field">
-                <span>Provincia</span>
+                <span>@L("Provincia", "Província", "Province")</span>
                 <InputText class="text-input" @bind-Value="model.Province" />
             </label>
             <label class="field">
-                <span>País</span>
+                <span>@L("País", "País", "Country")</span>
                 <InputText class="text-input" @bind-Value="model.Country" />
             </label>
             <label class="field">
-                <span>Email principal</span>
+                <span>@L("Email principal", "Email principal", "Primary email")</span>
                 <InputText class="text-input" @bind-Value="model.PrimaryEmail" />
             </label>
             <label class="field">
-                <span>Email secundario</span>
+                <span>@L("Email secundario", "Email secundari", "Secondary email")</span>
                 <InputText class="text-input" @bind-Value="model.SecondaryEmail" />
             </label>
             <label class="field">
-                <span>Fax</span>
+                <span>@L("Fax", "Fax", "Fax")</span>
                 <InputText class="text-input" @bind-Value="model.Fax" />
             </label>
             <label class="field wide">
-                <span>Web</span>
+                <span>@L("Web", "Web", "Website")</span>
                 <InputText class="text-input" @bind-Value="model.Website" />
             </label>
             <label class="field wide">
-                <span>Notas</span>
+                <span>@L("Notas", "Notes", "Notes")</span>
                 <InputTextArea class="text-area" @bind-Value="model.Notes" />
             </label>
             <label class="checkbox-field">
                 <InputCheckbox @bind-Value="model.IsBlocked" />
-                <span>Cliente bloqueado</span>
+                <span>@L("Cliente bloqueado", "Client bloquejat", "Blocked client")</span>
             </label>
         </div>
 
         <section class="panel" style="margin-bottom: 1rem;">
             <div class="page-header" style="margin-bottom: 1rem;">
                 <div>
-                    <h2>Direcciones secundarias</h2>
-                    <p class="lead">Direcciones de envio y contactos adicionales del cliente.</p>
+                    <h2>@L("Direcciones secundarias", "Adreces secundàries", "Secondary addresses")</h2>
+                    <p class="lead">@L("Direcciones de envio y contactos adicionales del cliente.", "Adreces d'enviament i contactes addicionals del client.", "Shipping addresses and additional client contacts.")</p>
                 </div>
                 <div class="quick-links">
-                    <button class="secondary-button" type="button" @onclick="AddSecondaryAddress">Anadir direccion</button>
+                    <button class="secondary-button" type="button" @onclick="AddSecondaryAddress">@L("Añadir dirección", "Afegir adreça", "Add address")</button>
                 </div>
             </div>
 
             @if (model.SecondaryAddresses.Count == 0)
             {
-                <p class="muted">Todavia no hay direcciones secundarias para este cliente.</p>
+                <p class="muted">@L("Todavía no hay direcciones secundarias para este cliente.", "Encara no hi ha adreces secundàries per a aquest client.", "There are no secondary addresses for this client yet.")</p>
             }
             else
             {
@@ -173,49 +184,49 @@ else
                     <article class="panel comparison-panel" style="margin-bottom: 1rem;">
                         <div class="page-header" style="margin-bottom: 1rem;">
                             <div>
-                                <p class="eyebrow">Direccion secundaria @(index + 1)</p>
+                                <p class="eyebrow">@L("Dirección secundaria", "Adreça secundària", "Secondary address") @(index + 1)</p>
                                 <h2>@GetSecondaryAddressTitle(address, index)</h2>
                             </div>
                             <div class="quick-links">
-                                <button class="secondary-button" type="button" @onclick="() => RemoveSecondaryAddress(index)">Quitar</button>
+                                <button class="secondary-button" type="button" @onclick="() => RemoveSecondaryAddress(index)">@L("Quitar", "Treure", "Remove")</button>
                             </div>
                         </div>
 
                         <div class="form-grid">
                             <label class="field">
-                                <span>Nombre / consignatario</span>
+                                <span>@L("Nombre / consignatario", "Nom / consignatari", "Name / consignee")</span>
                                 <InputText class="text-input" @bind-Value="address.Name" />
                             </label>
                             <label class="field">
-                                <span>Contacto</span>
+                                <span>@L("Contacto", "Contacte", "Contact")</span>
                                 <InputText class="text-input" @bind-Value="address.ContactName" />
                             </label>
                             <label class="field wide">
-                                <span>Direccion</span>
+                                <span>@L("Dirección", "Adreça", "Address")</span>
                                 <InputText class="text-input" @bind-Value="address.Address" />
                             </label>
                             <label class="field">
-                                <span>Codigo postal</span>
+                                <span>@L("Código postal", "Codi postal", "Postal code")</span>
                                 <InputText class="text-input" @bind-Value="address.PostalCode" />
                             </label>
                             <label class="field">
-                                <span>Ciudad</span>
+                                <span>@L("Ciudad", "Ciutat", "City")</span>
                                 <InputText class="text-input" @bind-Value="address.City" />
                             </label>
                             <label class="field">
-                                <span>Provincia</span>
+                                <span>@L("Provincia", "Província", "Province")</span>
                                 <InputText class="text-input" @bind-Value="address.Province" />
                             </label>
                             <label class="field">
-                                <span>Pais</span>
+                                <span>@L("País", "País", "Country")</span>
                                 <InputText class="text-input" @bind-Value="address.Country" />
                             </label>
                             <label class="field">
-                                <span>Telefono</span>
+                                <span>@L("Teléfono", "Telèfon", "Phone")</span>
                                 <InputText class="text-input" @bind-Value="address.Phone" />
                             </label>
                             <label class="field">
-                                <span>Fax</span>
+                                <span>@L("Fax", "Fax", "Fax")</span>
                                 <InputText class="text-input" @bind-Value="address.Fax" />
                             </label>
                         </div>
@@ -227,17 +238,17 @@ else
         <section class="panel" style="margin-bottom: 1rem;">
             <div class="page-header" style="margin-bottom: 1rem;">
                 <div>
-                    <h2>Contactos del cliente</h2>
-                    <p class="lead">Agenda comercial y operativa asociada a este cliente.</p>
+                    <h2>@L("Contactos del cliente", "Contactes del client", "Client contacts")</h2>
+                    <p class="lead">@L("Agenda comercial y operativa asociada a este cliente.", "Agenda comercial i operativa associada a aquest client.", "Commercial and operational agenda linked to this client.")</p>
                 </div>
                 <div class="quick-links">
-                    <button class="secondary-button" type="button" @onclick="AddContact">Anadir contacto</button>
+                    <button class="secondary-button" type="button" @onclick="AddContact">@L("Añadir contacto", "Afegir contacte", "Add contact")</button>
                 </div>
             </div>
 
             @if (model.Contacts.Count == 0)
             {
-                <p class="muted">Todavia no hay contactos adicionales para este cliente.</p>
+                <p class="muted">@L("Todavía no hay contactos adicionales para este cliente.", "Encara no hi ha contactes addicionals per a aquest client.", "There are no additional contacts for this client yet.")</p>
             }
             else
             {
@@ -248,40 +259,40 @@ else
                     <article class="panel comparison-panel" style="margin-bottom: 1rem;">
                         <div class="page-header" style="margin-bottom: 1rem;">
                             <div>
-                                <p class="eyebrow">Contacto @(index + 1)</p>
+                                <p class="eyebrow">@L("Contacto", "Contacte", "Contact") @(index + 1)</p>
                                 <h2>@GetContactTitle(contact, index)</h2>
                             </div>
                             <div class="quick-links">
-                                <button class="secondary-button" type="button" @onclick="() => RemoveContact(index)">Quitar</button>
+                                <button class="secondary-button" type="button" @onclick="() => RemoveContact(index)">@L("Quitar", "Treure", "Remove")</button>
                             </div>
                         </div>
 
                         <div class="form-grid">
                             <label class="field">
-                                <span>Nombre</span>
+                                <span>@L("Nombre", "Nom", "Name")</span>
                                 <InputText class="text-input" @bind-Value="contact.Name" />
                             </label>
                             <label class="field">
-                                <span>Cargo</span>
+                                <span>@L("Cargo", "Càrrec", "Role")</span>
                                 <InputText class="text-input" @bind-Value="contact.Role" />
                             </label>
                             <label class="field">
-                                <span>Email</span>
+                                <span>@L("Email", "Email", "Email")</span>
                                 <InputText class="text-input" @bind-Value="contact.Email" />
                             </label>
                             <label class="field">
-                                <span>Telefono</span>
+                                <span>@L("Telefono", "Telèfon", "Phone")</span>
                                 <InputText class="text-input" @bind-Value="contact.Phone" />
                             </label>
                             <label class="field wide">
-                                <span>Notas</span>
+                                <span>@L("Notas", "Notes", "Notes")</span>
                                 <InputTextArea class="text-area" @bind-Value="contact.Notes" />
                             </label>
                             <label class="checkbox-field">
                                 <InputCheckbox Value="contact.IsPrimary"
                                                ValueChanged="value => SetPrimaryContact(index, value)"
                                                ValueExpression="() => contact.IsPrimary" />
-                                <span>Contacto principal</span>
+                                <span>@L("Contacto principal", "Contacte principal", "Primary contact")</span>
                             </label>
                         </div>
                     </article>
@@ -290,13 +301,13 @@ else
         </section>
 
         <div class="form-actions">
-            <button class="primary-button" type="submit">Guardar</button>
-            <button class="secondary-button" type="button" @onclick="CheckDuplicatesAsync">Comprobar duplicados</button>
+            <button class="primary-button" type="submit">@L("Guardar", "Desar", "Save")</button>
+            <button class="secondary-button" type="button" @onclick="CheckDuplicatesAsync">@L("Comprobar duplicados", "Comprovar duplicats", "Check duplicates")</button>
             @if (Code.HasValue)
             {
-                <button class="secondary-button danger" type="button" @onclick="DeleteAsync">Eliminar cliente</button>
+                <button class="secondary-button danger" type="button" @onclick="DeleteAsync">@L("Eliminar cliente", "Eliminar client", "Delete client")</button>
             }
-            <a class="secondary-button link-button" href="/crm/clientes">Volver al listado</a>
+            <a class="secondary-button link-button" href="/crm/clientes">@L("Volver al listado", "Tornar al llistat", "Back to list")</a>
         </div>
         </fieldset>
     </EditForm>
@@ -304,7 +315,7 @@ else
     @if (auditLogs.Count > 0)
     {
         <section class="panel" style="margin-top: 1rem;">
-            <h2>Historial reciente del cliente</h2>
+            <h2>@L("Historial reciente del cliente", "Historial recent del client", "Recent client history")</h2>
             <div class="list-block">
                 @foreach (var entry in auditLogs)
                 {
@@ -423,7 +434,7 @@ else
 
         if (!tenantId.HasValue || !companyId.HasValue)
         {
-            statusMessage = "No hay empresa activa seleccionada.";
+            statusMessage = L("No hay empresa activa seleccionada.", "No hi ha cap empresa activa seleccionada.", "There is no active company selected.");
             isError = true;
             return;
         }
@@ -486,8 +497,8 @@ else
 
         isLegacySyncActive = true;
         syncStatusLabel = status.LastCompletedUtc.HasValue
-            ? $"Última sync: {status.LastCompletedUtc.Value.ToLocalTime():dd/MM/yyyy HH:mm:ss} · Ins: {status.LastInserted} · Act: {status.LastUpdated} · Omi: {status.LastSkipped} · Err: {status.LastErrors}"
-            : $"Estado: {status.LastStatus}";
+            ? $"{L("Última sync", "Última sync", "Last sync")}: {status.LastCompletedUtc.Value.ToLocalTime():dd/MM/yyyy HH:mm:ss} · Ins: {status.LastInserted} · Act: {status.LastUpdated} · Omi: {status.LastSkipped} · Err: {status.LastErrors}"
+            : $"{L("Estado", "Estat", "Status")}: {status.LastStatus}";
     }
 
     private async Task CheckDuplicatesAsync()
@@ -499,8 +510,8 @@ else
         {
             await LoadDuplicatesAsync();
             statusMessage = duplicates.Count == 0
-                ? "No se han encontrado duplicados relevantes."
-                : "Se han encontrado posibles duplicados. Revísalos antes de guardar.";
+                ? L("No se han encontrado duplicados relevantes.", "No s'han trobat duplicats rellevants.", "No relevant duplicates were found.")
+                : L("Se han encontrado posibles duplicados. Revísalos antes de guardar.", "S'han trobat possibles duplicats. Revisa'ls abans de desar.", "Possible duplicates were found. Review them before saving.");
         }
         catch (Exception exception)
         {
@@ -532,8 +543,8 @@ else
 
             await LoadDuplicatesAsync();
             statusMessage = status == ClienteDuplicateReviewStatus.FalsePositive
-                ? "Duplicado marcado como falso positivo."
-                : "Duplicado marcado como revisado.";
+                ? L("Duplicado marcado como falso positivo.", "Duplicat marcat com a fals positiu.", "Duplicate marked as false positive.")
+                : L("Duplicado marcado como revisado.", "Duplicat marcat com a revisat.", "Duplicate marked as reviewed.");
         }
         catch (Exception exception)
         {
@@ -564,7 +575,7 @@ else
             });
 
             await LoadDuplicatesAsync();
-            statusMessage = "Marca de revisión eliminada.";
+            statusMessage = L("Marca de revisión eliminada.", "Marca de revisió eliminada.", "Review mark removed.");
         }
         catch (Exception exception)
         {
@@ -602,7 +613,7 @@ else
         duplicates = await ClienteQueries.FindDuplicatesAsync(tenantId.Value, companyId.Value, model);
     }
 
-    private static string FormatAuditActor(AuditLogEntryDto entry)
+    private string FormatAuditActor(AuditLogEntryDto entry)
     {
         if (!string.IsNullOrWhiteSpace(entry.ActorDisplayName) && !string.IsNullOrWhiteSpace(entry.ActorEmail))
         {
@@ -619,7 +630,7 @@ else
             return entry.ActorEmail;
         }
 
-        return "Actor no disponible";
+        return L("Actor no disponible", "Actor no disponible", "Actor unavailable");
     }
 
     private static string FirstNonEmpty(params string[] values) =>
@@ -640,7 +651,7 @@ else
         model.SecondaryAddresses.RemoveAt(index);
     }
 
-    private static string GetSecondaryAddressTitle(ClienteSecondaryAddressDto address, int index)
+    private string GetSecondaryAddressTitle(ClienteSecondaryAddressDto address, int index)
     {
         if (!string.IsNullOrWhiteSpace(address.Name))
         {
@@ -652,7 +663,7 @@ else
             return address.Address;
         }
 
-        return $"Direccion {index + 1}";
+        return $"{L("Dirección", "Adreça", "Address")} {index + 1}";
     }
 
     private void AddContact()
@@ -673,7 +684,7 @@ else
         model.Contacts.RemoveAt(index);
     }
 
-    private static string GetContactTitle(ClienteContactDto contact, int index)
+    private string GetContactTitle(ClienteContactDto contact, int index)
     {
         if (!string.IsNullOrWhiteSpace(contact.Name))
         {
@@ -685,7 +696,7 @@ else
             return contact.Email;
         }
 
-        return $"Contacto {index + 1}";
+        return $"{L("Contacto", "Contacte", "Contact")} {index + 1}";
     }
 
     private void SetPrimaryContact(int index, bool isPrimary)
@@ -707,15 +718,15 @@ else
         }
     }
 
-    private static string FormatDuplicateReview(ClienteDuplicateDto duplicate)
+    private string FormatDuplicateReview(ClienteDuplicateDto duplicate)
     {
         var status = string.Equals(duplicate.ReviewStatus, ClienteDuplicateReviewStatus.FalsePositive, StringComparison.OrdinalIgnoreCase)
-            ? "Falso positivo"
-            : "Revisado";
+            ? L("Falso positivo", "Fals positiu", "False positive")
+            : L("Revisado", "Revisat", "Reviewed");
 
         if (duplicate.ReviewUpdatedUtc.HasValue && !string.IsNullOrWhiteSpace(duplicate.ReviewUpdatedBy))
         {
-            return $"{status} por {duplicate.ReviewUpdatedBy} · {duplicate.ReviewUpdatedUtc.Value.ToLocalTime():dd/MM/yyyy HH:mm:ss}";
+            return $"{status} {L("por", "per", "by")} {duplicate.ReviewUpdatedBy} · {duplicate.ReviewUpdatedUtc.Value.ToLocalTime():dd/MM/yyyy HH:mm:ss}";
         }
 
         if (duplicate.ReviewUpdatedUtc.HasValue)
@@ -725,4 +736,12 @@ else
 
         return status;
     }
+
+    private string L(string spanish, string catalan, string english) =>
+        T.CurrentLanguage switch
+        {
+            AppLanguages.Catalan => catalan,
+            AppLanguages.English => english,
+            _ => spanish
+        };
 }

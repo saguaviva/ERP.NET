@@ -7,26 +7,27 @@
 @inject IHiloQueries HiloQueries
 @inject IHiloService HiloService
 @inject NavigationManager NavigationManager
+@inject AppText T
 
-<PageTitle>@(!string.IsNullOrWhiteSpace(Code) ? $"Editar hilo {Code}" : "Nuevo hilo")</PageTitle>
+<PageTitle>@(!string.IsNullOrWhiteSpace(Code) ? L($"Editar hilo {Code}", $"Editar fil {Code}", $"Edit yarn {Code}") : L("Nuevo hilo", "Nou fil", "New yarn"))</PageTitle>
 
 <div class="page-header">
     <div>
-        <p class="eyebrow">ARTÍCULOS</p>
-        <h1>@(!string.IsNullOrWhiteSpace(Code) ? $"Editar hilo {Code}" : "Nuevo hilo")</h1>
+        <p class="eyebrow">@T["menu.articles"]</p>
+        <h1>@(!string.IsNullOrWhiteSpace(Code) ? L($"Editar hilo {Code}", $"Editar fil {Code}", $"Edit yarn {Code}") : L("Nuevo hilo", "Nou fil", "New yarn"))</h1>
         <p class="lead">@(isLegacySyncActive
-            ? "Edición sobre la SaaS local. La importación manual desde legacy refresca solo registros marcados como legacy."
-            : "Alta y edición sobre la tabla fil replicada en la SaaS local, filtrada por la empresa activa.")</p>
+            ? L("Edición sobre la SaaS local. La importación manual desde legacy refresca solo registros marcados como legacy.", "Edició sobre la SaaS local. La importació manual des de legacy refresca només registres marcats com legacy.", "Editing on the local SaaS. Manual legacy import refreshes only records marked as legacy.")
+            : L("Alta y edición sobre la tabla fil replicada en la SaaS local, filtrada por la empresa activa.", "Alta i edició sobre la taula fil replicada a la SaaS local, filtrada per l'empresa activa.", "Create and edit records on the fil table replicated into the local SaaS, filtered by the active company."))</p>
     </div>
     <div class="quick-links">
-        <a class="secondary-button link-button" href="/articulos/hilos">Volver al listado</a>
+        <a class="secondary-button link-button" href="/articulos/hilos">@L("Volver al listado", "Tornar al llistat", "Back to list")</a>
     </div>
 </div>
 
 @if (!tenantId.HasValue || !companyId.HasValue)
 {
     <div class="empty-state">
-        <p>No hay empresa activa seleccionada.</p>
+        <p>@L("No hay empresa activa seleccionada.", "No hi ha cap empresa activa seleccionada.", "No active company is selected.")</p>
     </div>
 }
 else
@@ -39,8 +40,7 @@ else
     @if (isLegacySyncActive)
     {
         <div class="alert">
-            Artículos / Hilos está en convivencia con legacy para esta empresa.
-            Esta ficha guarda cambios solo en la SaaS local y la sync manual refresca únicamente registros de origen legacy.
+            @L("Artículos / Hilos está en convivencia con legacy para esta empresa. Esta ficha guarda cambios solo en la SaaS local y la sync manual refresca únicamente registros de origen legacy.", "Articles / Fils està en convivència amb legacy per a aquesta empresa. Aquesta fitxa desa canvis només a la SaaS local i la sync manual refresca únicament registres d'origen legacy.", "Articles / Yarns is running in legacy coexistence mode for this company. This record saves changes only to the local SaaS and manual sync refreshes legacy-origin records only.")
             @if (!string.IsNullOrWhiteSpace(syncStatusLabel))
             {
                 <span>@syncStatusLabel</span>
@@ -51,7 +51,7 @@ else
     @if (!canEdit && string.IsNullOrWhiteSpace(Code))
     {
         <div class="alert">
-            No tienes permisos de edición para crear hilos nuevos en esta empresa.
+            @L("No tienes permisos de edición para crear hilos nuevos en esta empresa.", "No tens permisos d'edició per crear fils nous en aquesta empresa.", "You do not have edit permissions to create new yarns in this company.")
         </div>
     }
 
@@ -59,31 +59,31 @@ else
         <fieldset disabled="@isReadOnly">
             <div class="form-grid">
                 <label class="field">
-                    <span>Código</span>
+                    <span>@L("Código", "Codi", "Code")</span>
                     <InputText class="text-input" @bind-Value="model.Code" disabled="@(!string.IsNullOrWhiteSpace(Code))" />
                 </label>
                 <label class="field wide">
-                    <span>Descripción</span>
+                    <span>@L("Descripción", "Descripció", "Description")</span>
                     <InputText class="text-input" @bind-Value="model.Description" />
                 </label>
                 <label class="field">
-                    <span>Proveedor</span>
+                    <span>@L("Proveedor", "Proveïdor", "Supplier")</span>
                     <InputNumber class="text-input" @bind-Value="model.SupplierCode" />
                 </label>
                 <label class="field">
-                    <span>Coste</span>
+                    <span>@L("Coste", "Cost", "Cost")</span>
                     <InputNumber class="text-input" @bind-Value="model.CostPrice" />
                 </label>
                 <label class="field">
-                    <span>Precio</span>
+                    <span>@L("Precio", "Preu", "Price")</span>
                     <InputNumber class="text-input" @bind-Value="model.UnitPrice" />
                 </label>
                 <label class="field">
-                    <span>IVA</span>
+                    <span>@L("IVA", "IVA", "VAT")</span>
                     <InputText class="text-input" @bind-Value="model.VatCode" />
                 </label>
                 <label class="field wide">
-                    <span>Notas</span>
+                    <span>@L("Notas", "Notes", "Notes")</span>
                     <InputText class="text-input" @bind-Value="model.Notes" />
                 </label>
             </div>
@@ -91,12 +91,12 @@ else
             <section class="panel detail-panel" style="margin-top: 1rem;">
                 <div class="detail-panel-header">
                     <div>
-                        <h2>Carta de colores</h2>
-                        <p class="muted">Color, stock, coste, precio y metrado del hilo por variante.</p>
+                        <h2>@L("Carta de colores", "Carta de colors", "Color chart")</h2>
+                        <p class="muted">@L("Color, stock, coste, precio y metrado del hilo por variante.", "Color, estoc, cost, preu i metrat del fil per variant.", "Color, stock, cost, price and yardage of the yarn by variant.")</p>
                     </div>
                     @if (!isReadOnly)
                     {
-                        <button class="secondary-button" type="button" @onclick="AddColor">Añadir línea</button>
+                        <button class="secondary-button" type="button" @onclick="AddColor">@L("Añadir línea", "Afegir línia", "Add line")</button>
                     }
                 </div>
 
@@ -104,16 +104,16 @@ else
                     <table class="data-table detail-table">
                         <thead>
                             <tr>
-                                <th>Proveedor</th>
-                                <th>Color</th>
-                                <th>Actual</th>
-                                <th>Mínimo</th>
-                                <th>Precio</th>
-                                <th>Coste</th>
-                                <th>Tintar</th>
-                                <th>Metros</th>
+                                <th>@L("Proveedor", "Proveïdor", "Supplier")</th>
+                                <th>@L("Color", "Color", "Color")</th>
+                                <th>@L("Actual", "Actual", "Current")</th>
+                                <th>@L("Mínimo", "Mínim", "Minimum")</th>
+                                <th>@L("Precio", "Preu", "Price")</th>
+                                <th>@L("Coste", "Cost", "Cost")</th>
+                                <th>@L("Tintar", "Tintar", "Dyeing")</th>
+                                <th>@L("Metros", "Metres", "Meters")</th>
                                 <th>Kg</th>
-                                <th>Notas</th>
+                                <th>@L("Notas", "Notes", "Notes")</th>
                                 @if (!isReadOnly)
                                 {
                                     <th></th>
@@ -124,7 +124,7 @@ else
                             @if (model.Colors.Count == 0)
                             {
                                 <tr>
-                                    <td colspan="@(isReadOnly ? 10 : 11)" class="muted">No hay detalle cargado para este hilo.</td>
+                                    <td colspan="@(isReadOnly ? 10 : 11)" class="muted">@L("No hay detalle cargado para este hilo.", "No hi ha detall carregat per a aquest fil.", "There is no detail loaded for this yarn.")</td>
                                 </tr>
                             }
                             else
@@ -144,7 +144,7 @@ else
                                         <td><InputText class="text-input table-input" @bind-Value="color.Notes" /></td>
                                         @if (!isReadOnly)
                                         {
-                                            <td><button class="danger-link" type="button" @onclick="() => RemoveColor(color.LineNumber)">Quitar</button></td>
+                                            <td><button class="danger-link" type="button" @onclick="() => RemoveColor(color.LineNumber)">@L("Quitar", "Treure", "Remove")</button></td>
                                         }
                                     </tr>
                                 }
@@ -157,15 +157,15 @@ else
             <div class="quick-links" style="margin-top: 1rem;">
                 @if (canEdit)
                 {
-                    <button class="primary-button" type="submit">Guardar hilo</button>
+                    <button class="primary-button" type="submit">@L("Guardar hilo", "Desar fil", "Save yarn")</button>
                 }
                 @if (canEdit && !string.IsNullOrWhiteSpace(Code))
                 {
-                    <button class="secondary-button danger-button" type="button" @onclick="DeleteAsync">Eliminar hilo</button>
+                    <button class="secondary-button danger-button" type="button" @onclick="DeleteAsync">@L("Eliminar hilo", "Eliminar fil", "Delete yarn")</button>
                 }
                 @if (!string.IsNullOrWhiteSpace(Code))
                 {
-                    <button class="secondary-button" type="button" @onclick="LoadAuditAsync">Recargar historial</button>
+                    <button class="secondary-button" type="button" @onclick="LoadAuditAsync">@L("Recargar historial", "Recarregar historial", "Reload history")</button>
                 }
             </div>
         </fieldset>
@@ -174,11 +174,11 @@ else
     @if (!string.IsNullOrWhiteSpace(Code))
     {
         <section class="panel" style="margin-top: 1rem;">
-            <h2>Historial reciente del hilo</h2>
+            <h2>@L("Historial reciente del hilo", "Historial recent del fil", "Recent yarn history")</h2>
             <div class="list-block">
                 @if (recentAuditLogs.Count == 0)
                 {
-                    <p class="muted">Todavía no hay eventos auditados para este hilo.</p>
+                    <p class="muted">@L("Todavía no hay eventos auditados para este hilo.", "Encara no hi ha esdeveniments auditats per a aquest fil.", "There are no audited events for this yarn yet.")</p>
                 }
                 else
                 {
@@ -235,7 +235,7 @@ else
             var detail = await HiloQueries.GetByCodeAsync(tenantId.Value, companyId.Value, Uri.UnescapeDataString(Code));
             if (detail is null)
             {
-                statusMessage = "No se ha encontrado el hilo solicitado.";
+                statusMessage = L("No se ha encontrado el hilo solicitado.", "No s'ha trobat el fil sol·licitat.", "The requested yarn was not found.");
                 isError = true;
                 model = new HiloDetailDto();
                 recentAuditLogs = [];
@@ -261,7 +261,7 @@ else
 
         if (isReadOnly)
         {
-            statusMessage = "No tienes permisos de edición en este tenant.";
+            statusMessage = L("No tienes permisos de edición en este tenant.", "No tens permisos d'edició en aquest tenant.", "You do not have edit permissions in this tenant.");
             isError = true;
             return;
         }
@@ -302,8 +302,8 @@ else
             });
 
             statusMessage = !string.IsNullOrWhiteSpace(Code)
-                ? "Hilo actualizado correctamente."
-                : "Hilo creado correctamente.";
+                ? L("Hilo actualizado correctamente.", "Fil actualitzat correctament.", "Yarn updated successfully.")
+                : L("Hilo creado correctamente.", "Fil creat correctament.", "Yarn created successfully.");
 
             if (string.IsNullOrWhiteSpace(Code))
             {
@@ -341,8 +341,8 @@ else
 
         isLegacySyncActive = true;
         syncStatusLabel = status.LastCompletedUtc.HasValue
-            ? $"Última sync: {status.LastCompletedUtc.Value.ToLocalTime():dd/MM/yyyy HH:mm:ss} · Ins: {status.LastInserted} · Act: {status.LastUpdated} · Omi: {status.LastSkipped} · Err: {status.LastErrors}"
-            : $"Estado: {status.LastStatus}";
+            ? $"{L("Última sync", "Última sync", "Last sync")}: {status.LastCompletedUtc.Value.ToLocalTime():dd/MM/yyyy HH:mm:ss} · Ins: {status.LastInserted} · Act: {status.LastUpdated} · Omi: {status.LastSkipped} · Err: {status.LastErrors}"
+            : $"{L("Estado", "Estat", "Status")}: {status.LastStatus}";
     }
 
     private void AddColor()
@@ -400,4 +400,12 @@ else
             entityName: "Hilo",
             entityId: Uri.UnescapeDataString(Code));
     }
+
+    private string L(string spanish, string catalan, string english) =>
+        T.CurrentLanguage switch
+        {
+            AppLanguages.Catalan => catalan,
+            AppLanguages.English => english,
+            _ => spanish
+        };
 }

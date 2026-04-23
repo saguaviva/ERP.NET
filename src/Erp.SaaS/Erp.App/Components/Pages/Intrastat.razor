@@ -3,27 +3,30 @@
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject NavigationManager NavigationManager
 @inject IIntrastatQueries IntrastatQueries
+@inject AppText T
 
-<PageTitle>Ventas / Intrastat</PageTitle>
+<PageTitle>@L("Ventas / Intrastat", "Vendes / Intrastat", "Sales / Intrastat")</PageTitle>
 
 <div class="page-header">
     <div>
-        <p class="eyebrow">Ventas</p>
-        <h1>Listado Intrastat</h1>
-        <p class="lead">Detalle y matriz mensual de Intrastat con la misma lectura operativa del Excel legacy: pesos, importes, transporte y códigos arancelarios.</p>
+        <p class="eyebrow">@L("Ventas", "Vendes", "Sales")</p>
+        <h1>@L("Listado Intrastat", "Llistat Intrastat", "Intrastat report")</h1>
+        <p class="lead">@L("Detalle y matriz mensual de Intrastat con la misma lectura operativa del Excel legacy: pesos, importes, transporte y códigos arancelarios.",
+            "Detall i matriu mensual d'Intrastat amb la mateixa lectura operativa de l'Excel legacy: pesos, imports, transport i codis aranzelaris.",
+            "Monthly Intrastat detail and matrix with the same operational reading as the legacy Excel: weights, amounts, transport and tariff codes.")</p>
     </div>
     <div class="quick-links">
-        <a class="secondary-button link-button" href="@BuildPrintUrl()" target="_blank">Imprimir</a>
-        <a class="secondary-button link-button" href="@BuildExportUrl("excel")">Excel legacy</a>
-        <a class="secondary-button link-button" href="@BuildExportUrl("detail")">CSV detalle</a>
-        <a class="secondary-button link-button" href="@BuildExportUrl("summary")">CSV matriz</a>
+        <a class="secondary-button link-button" href="@BuildPrintUrl()" target="_blank">@L("Imprimir", "Imprimir", "Print")</a>
+        <a class="secondary-button link-button" href="@BuildExportUrl("excel")">@L("Excel legacy", "Excel legacy", "Legacy Excel")</a>
+        <a class="secondary-button link-button" href="@BuildExportUrl("detail")">@L("CSV detalle", "CSV detall", "Detail CSV")</a>
+        <a class="secondary-button link-button" href="@BuildExportUrl("summary")">@L("CSV matriz", "CSV matriu", "Matrix CSV")</a>
     </div>
 </div>
 
 @if (!tenantId.HasValue || !companyId.HasValue)
 {
     <div class="empty-state">
-        <p>Selecciona una empresa activa para generar Intrastat.</p>
+        <p>@L("Selecciona una empresa activa para generar Intrastat.", "Selecciona una empresa activa per generar Intrastat.", "Select an active company to generate Intrastat.")</p>
     </div>
 }
 else
@@ -31,7 +34,7 @@ else
     <section class="panel">
         <div class="filter-row">
             <label class="field compact-field">
-                <span>Mes</span>
+                <span>@L("Mes", "Mes", "Month")</span>
                 <select class="sidebar-select compact-select" @bind="filter.Month" disabled="@isLoading">
                     @for (var month = 1; month <= 12; month++)
                     {
@@ -40,24 +43,24 @@ else
                 </select>
             </label>
             <label class="field compact-field">
-                <span>Año</span>
+                <span>@L("Año", "Any", "Year")</span>
                 <input class="text-input compact-input" type="number" @bind="filter.Year" disabled="@isLoading" />
             </label>
-            <input class="text-input" @bind="filter.Search" placeholder="Buscar por factura, cliente, VAT, NC code, artículo o descripción" disabled="@isLoading" />
+            <input class="text-input" @bind="filter.Search" placeholder="@L("Buscar por factura, cliente, VAT, NC code, artículo o descripción", "Buscar per factura, client, VAT, NC code, article o descripció", "Search by invoice, client, VAT, NC code, item or description")" disabled="@isLoading" />
             <label class="checkbox-field compact">
                 <input type="checkbox" checked="@filter.OnlyClassified" @onchange="OnOnlyClassifiedChanged" disabled="@isLoading" />
-                <span>Solo clasificadas</span>
+                <span>@L("Solo clasificadas", "Només classificades", "Only classified")</span>
             </label>
-            <button class="secondary-button" @onclick="SearchAsync" disabled="@isLoading">@(isLoading ? "Cargando..." : "Buscar")</button>
+            <button class="secondary-button" @onclick="SearchAsync" disabled="@isLoading">@(isLoading ? L("Cargando...", "Carregant...", "Loading...") : L("Buscar", "Buscar", "Search"))</button>
         </div>
         <div class="filter-row results-toolbar" style="margin-top: 0.85rem;">
             <span class="results-summary">
                 @(totalCount == 0
-                    ? "Sin resultados"
-                    : $"Mostrando {PageStart}-{PageEnd} de {totalCount} líneas Intrastat")
+                    ? L("Sin resultados", "Sense resultats", "No results")
+                    : string.Format(L("Mostrando {0}-{1} de {2} líneas Intrastat", "Mostrant {0}-{1} de {2} línies Intrastat", "Showing {0}-{1} of {2} Intrastat lines"), PageStart, PageEnd, totalCount))
             </span>
             <label class="field compact-field">
-                <span>Tamaño de página</span>
+                <span>@L("Tamaño de página", "Mida de pàgina", "Page size")</span>
                 <select class="sidebar-select compact-select" value="@filter.PageSize" @onchange="OnPageSizeChanged" disabled="@isLoading">
                     <option value="25">25</option>
                     <option value="50">50</option>
@@ -78,40 +81,40 @@ else
 
     <div class="card-grid purchase-summary-grid intrastat-summary-grid">
         <section class="info-card">
-            <h2>@report.TotalWeightKg.ToString("0.00")</h2>
-            <p class="muted">kg total</p>
+            <h2>@report.TotalWeightKg.ToUiString("0.00")</h2>
+            <p class="muted">@L("kg total", "kg total", "total kg")</p>
         </section>
         <section class="info-card">
-            <h2>@report.SalesAmount.ToString("0.00") €</h2>
-            <p class="muted">import venda</p>
+            <h2>@report.SalesAmount.ToUiString("0.00") €</h2>
+            <p class="muted">@L("importe venta", "import venda", "sales amount")</p>
         </section>
         <section class="info-card">
-            <h2>@report.TransportAmount.ToString("0.00") €</h2>
-            <p class="muted">transport</p>
+            <h2>@report.TransportAmount.ToUiString("0.00") €</h2>
+            <p class="muted">@L("transporte", "transport", "transport")</p>
         </section>
         <section class="info-card accent-card">
-            <h2>@report.TotalWithTransportAmount.ToString("0.00") €</h2>
-            <p class="muted">total amb transport</p>
+            <h2>@report.TotalWithTransportAmount.ToUiString("0.00") €</h2>
+            <p class="muted">@L("total con transporte", "total amb transport", "total with transport")</p>
         </section>
         <section class="info-card">
             <h2>@report.CountriesCount</h2>
-            <p class="muted">países UE</p>
+            <p class="muted">@L("países UE", "països UE", "EU countries")</p>
         </section>
         <section class="info-card">
             <h2>@report.ClassifiedLinesCount</h2>
-            <p class="muted">líneas clasificadas</p>
+            <p class="muted">@L("líneas clasificadas", "línies classificades", "classified lines")</p>
         </section>
         <section class="info-card">
             <h2>@report.UnclassifiedLinesCount</h2>
-            <p class="muted">sin NC code</p>
+            <p class="muted">@L("sin NC code", "sense NC code", "without NC code")</p>
         </section>
     </div>
 
     <section class="panel @(isLoading ? "loading-panel" : string.Empty)">
         <div class="page-header">
             <div>
-                <h2>Detalle de facturas</h2>
-                <p class="muted">Lectura tipo legacy: factura, cliente, descripción, composición, talla, peso, importe, VAT y descuento.</p>
+                <h2>@L("Detalle de facturas", "Detall de factures", "Invoice detail")</h2>
+                <p class="muted">@L("Lectura tipo legacy: factura, cliente, descripción, composición, talla, peso, importe, VAT y descuento.", "Lectura tipus legacy: factura, client, descripció, composició, talla, pes, import, VAT i descompte.", "Legacy-style reading: invoice, client, description, composition, size, weight, amount, VAT and discount.")</p>
             </div>
         </div>
 
@@ -119,7 +122,7 @@ else
         {
             <div class="loading-banner">
                 <span class="loading-indicator" aria-hidden="true"></span>
-                <span>Generando detalle Intrastat...</span>
+                <span>@L("Generando detalle Intrastat...", "Generant detall Intrastat...", "Generating Intrastat detail...")</span>
             </div>
         }
 
@@ -127,20 +130,20 @@ else
             <table class="data-table">
                 <thead>
                     <tr>
-                        <SortableHeader Label="Factura" IsActive="@(sortColumn == nameof(IntrastatLineDto.InvoiceNumber))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(IntrastatLineDto.InvoiceNumber), true))" />
-                        <SortableHeader Label="Fecha" IsActive="@(sortColumn == nameof(IntrastatLineDto.IssueDate))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(IntrastatLineDto.IssueDate), true))" />
-                        <SortableHeader Label="Cliente" IsActive="@(sortColumn == nameof(IntrastatLineDto.ClientName))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(IntrastatLineDto.ClientName)))" />
-                        <th>Descripción</th>
-                        <th>Composición</th>
-                        <th>Talla</th>
-                        <SortableHeader Label="Cantidad" IsActive="@(sortColumn == nameof(IntrastatLineDto.Quantity))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(IntrastatLineDto.Quantity), true))" />
-                        <th>Pes unit.</th>
-                        <SortableHeader Label="Pes total/Kgrs" IsActive="@(sortColumn == nameof(IntrastatLineDto.TotalWeightKg))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(IntrastatLineDto.TotalWeightKg), true))" />
-                        <SortableHeader Label="Import" IsActive="@(sortColumn == nameof(IntrastatLineDto.NetAmount))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(IntrastatLineDto.NetAmount), true))" />
-                        <SortableHeader Label="NC code" IsActive="@(sortColumn == nameof(IntrastatLineDto.IntrastatCode))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(IntrastatLineDto.IntrastatCode)))" />
-                        <th>VAT</th>
-                        <th>Dte?</th>
-                        <SortableHeader Label="País" IsActive="@(sortColumn == nameof(IntrastatLineDto.CountryCode))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(IntrastatLineDto.CountryCode)))" />
+                        <SortableHeader Label="@L("Factura", "Factura", "Invoice")" IsActive="@(sortColumn == nameof(IntrastatLineDto.InvoiceNumber))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(IntrastatLineDto.InvoiceNumber), true))" />
+                        <SortableHeader Label="@L("Fecha", "Data", "Date")" IsActive="@(sortColumn == nameof(IntrastatLineDto.IssueDate))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(IntrastatLineDto.IssueDate), true))" />
+                        <SortableHeader Label="@L("Cliente", "Client", "Client")" IsActive="@(sortColumn == nameof(IntrastatLineDto.ClientName))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(IntrastatLineDto.ClientName)))" />
+                        <th>@L("Descripción", "Descripció", "Description")</th>
+                        <th>@L("Composición", "Composició", "Composition")</th>
+                        <th>@L("Talla", "Talla", "Size")</th>
+                        <SortableHeader Label="@L("Cantidad", "Quantitat", "Quantity")" IsActive="@(sortColumn == nameof(IntrastatLineDto.Quantity))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(IntrastatLineDto.Quantity), true))" />
+                        <th>@L("Peso unit.", "Pes unit.", "Unit weight")</th>
+                        <SortableHeader Label="@L("Peso total/Kgrs", "Pes total/Kgrs", "Total weight/Kgs")" IsActive="@(sortColumn == nameof(IntrastatLineDto.TotalWeightKg))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(IntrastatLineDto.TotalWeightKg), true))" />
+                        <SortableHeader Label="@L("Importe", "Import", "Amount")" IsActive="@(sortColumn == nameof(IntrastatLineDto.NetAmount))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(IntrastatLineDto.NetAmount), true))" />
+                        <SortableHeader Label="@L("Código NC", "Codi NC", "CN code")" IsActive="@(sortColumn == nameof(IntrastatLineDto.IntrastatCode))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(IntrastatLineDto.IntrastatCode)))" />
+                        <th>@L("IVA", "IVA", "VAT")</th>
+                        <th>@L("Dte?", "Dte?", "Disc.?")</th>
+                        <SortableHeader Label="@L("País", "País", "Country")" IsActive="@(sortColumn == nameof(IntrastatLineDto.CountryCode))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(IntrastatLineDto.CountryCode)))" />
                     </tr>
                 </thead>
                 <tbody>
@@ -169,7 +172,7 @@ else
                     else if (items.Count == 0)
                     {
                         <tr>
-                            <td colspan="14" class="table-empty">No hay líneas Intrastat para el filtro seleccionado.</td>
+                            <td colspan="14" class="table-empty">@L("No hay líneas Intrastat para el filtro seleccionado.", "No hi ha línies Intrastat per al filtre seleccionat.", "There are no Intrastat lines for the selected filter.")</td>
                         </tr>
                     }
                     else
@@ -193,22 +196,22 @@ else
                                     }
                                     @if (item.IsTransportCharge)
                                     {
-                                        <div class="intrastat-inline-note">Transit and courier charges</div>
+                                        <div class="intrastat-inline-note">@L("Transit and courier charges", "Transit and courier charges", "Transit and courier charges")</div>
                                     }
                                 </td>
                                 <td>@DisplayValue(item.Composition)</td>
                                 <td>@DisplayValue(item.Size)</td>
-                                <td>@item.Quantity.ToString("0.###")</td>
-                                <td>@item.UnitWeight.ToString("0.###")</td>
-                                <td>@item.TotalWeightKg.ToString("0.00")</td>
-                                <td>@item.NetAmount.ToString("0.00") €</td>
+                                <td>@item.Quantity.ToUiString("0.###")</td>
+                                <td>@item.UnitWeight.ToUiString("0.###")</td>
+                                <td>@item.TotalWeightKg.ToUiString("0.00")</td>
+                                <td>@item.NetAmount.ToUiString("0.00") €</td>
                                 <td>
                                     <span class="status-pill @(item.IsClassified ? "badge-info" : "badge-warning")">
-                                        @(item.IsClassified ? item.IntrastatCode : "Sin clasificar")
+                                        @(item.IsClassified ? item.IntrastatCode : L("Sin clasificar", "Sense classificar", "Unclassified"))
                                     </span>
                                 </td>
                                 <td>@DisplayValue(item.ClientTaxId)</td>
-                                <td>@(item.DiscountAmount == 0m ? "-" : $"{item.DiscountAmount:0.00} €")</td>
+                    <td>@(item.DiscountAmount == 0m ? "-" : $"{item.DiscountAmount.ToUiString("0.00")} €")</td>
                                 <td>
                                     <div>@item.CountryCode</div>
                                     <div class="table-subtitle">@item.CountryName</div>
@@ -221,12 +224,12 @@ else
         </div>
 
         <div class="pagination-bar">
-            <span class="muted">Página @filter.Page de @TotalPages</span>
+            <span class="muted">@string.Format(L("Página {0} de {1}", "Pàgina {0} de {1}", "Page {0} of {1}"), filter.Page, TotalPages)</span>
             <div class="pagination-actions">
-                <button class="secondary-button" @onclick="() => ChangePageAsync(1)" disabled="@(!CanGoPrevious || isLoading)">Primera</button>
-                <button class="secondary-button" @onclick="() => ChangePageAsync(filter.Page - 1)" disabled="@(!CanGoPrevious || isLoading)">Anterior</button>
-                <button class="secondary-button" @onclick="() => ChangePageAsync(filter.Page + 1)" disabled="@(!CanGoNext || isLoading)">Siguiente</button>
-                <button class="secondary-button" @onclick="() => ChangePageAsync(TotalPages)" disabled="@(!CanGoNext || isLoading)">Última</button>
+                <button class="secondary-button" @onclick="() => ChangePageAsync(1)" disabled="@(!CanGoPrevious || isLoading)">@L("Primera", "Primera", "First")</button>
+                <button class="secondary-button" @onclick="() => ChangePageAsync(filter.Page - 1)" disabled="@(!CanGoPrevious || isLoading)">@L("Anterior", "Anterior", "Previous")</button>
+                <button class="secondary-button" @onclick="() => ChangePageAsync(filter.Page + 1)" disabled="@(!CanGoNext || isLoading)">@L("Siguiente", "Següent", "Next")</button>
+                <button class="secondary-button" @onclick="() => ChangePageAsync(TotalPages)" disabled="@(!CanGoNext || isLoading)">@L("Última", "Última", "Last")</button>
             </div>
         </div>
     </section>
@@ -234,21 +237,21 @@ else
     <section class="panel">
         <div class="page-header">
             <div>
-                <h2>Matriz Intrastat · Excel legacy</h2>
-                <p class="muted">Matriz fija por país UE y código arancelario, con pesos y facturación como en la hoja agrupada del legacy.</p>
+                <h2>@L("Matriz Intrastat · Excel legacy", "Matriu Intrastat · Excel legacy", "Intrastat matrix · legacy Excel")</h2>
+                <p class="muted">@L("Matriz fija por país UE y código arancelario, con pesos y facturación como en la hoja agrupada del legacy.", "Matriu fixa per país UE i codi aranzelari, amb pesos i facturació com al full agrupat del legacy.", "Fixed matrix by EU country and tariff code, with weights and invoicing like the grouped legacy sheet.")</p>
             </div>
         </div>
         <div class="table-scroll">
             <table class="data-table intrastat-matrix-table">
                 <thead>
                     <tr>
-                        <th rowspan="2">Clients</th>
-                        <th rowspan="2">Ordre alfabètic</th>
-                        <th rowspan="2">Sigles</th>
-                        <th colspan="@report.MatrixNcCodes.Count">Codis arancelaris · PESOS/Kgrs</th>
-                        <th rowspan="2">TOTAL PESOS/Kgrs</th>
-                        <th colspan="@report.MatrixNcCodes.Count">Codis arancelaris · FACTURES€</th>
-                        <th rowspan="2">TOTAL FACTURES€</th>
+                        <th rowspan="2">@L("Clientes", "Clients", "Clients")</th>
+                        <th rowspan="2">@L("Orden alfabético", "Ordre alfabètic", "Alphabetical order")</th>
+                        <th rowspan="2">@L("Siglas", "Sigles", "Code")</th>
+                        <th colspan="@report.MatrixNcCodes.Count">@L("Códigos arancelarios · PESOS/Kgrs", "Codis aranzelaris · PESOS/Kgrs", "Tariff codes · WEIGHTS/Kgs")</th>
+                        <th rowspan="2">@L("TOTAL PESOS/Kgrs", "TOTAL PESOS/Kgrs", "TOTAL WEIGHTS/Kgs")</th>
+                        <th colspan="@report.MatrixNcCodes.Count">@L("Códigos arancelarios · FACTURAS€", "Codis aranzelaris · FACTURES€", "Tariff codes · INVOICES€")</th>
+                        <th rowspan="2">@L("TOTAL FACTURAS€", "TOTAL FACTURES€", "TOTAL INVOICES€")</th>
                     </tr>
                     <tr>
                         @foreach (var ncCode in report.MatrixNcCodes)
@@ -265,7 +268,7 @@ else
                     @if (report.MatrixRows.Count == 0)
                     {
                         <tr>
-                            <td colspan="@(5 + (report.MatrixNcCodes.Count * 2))" class="table-empty">No hay agrupación para este período.</td>
+                            <td colspan="@(5 + (report.MatrixNcCodes.Count * 2))" class="table-empty">@L("No hay agrupación para este período.", "No hi ha agrupació per a aquest període.", "There is no grouping for this period.")</td>
                         </tr>
                     }
                     else
@@ -273,19 +276,19 @@ else
                         @foreach (var matrixRow in report.MatrixRows)
                         {
                             <tr class="@GetMatrixRowClass(matrixRow)">
-                                <td>@(matrixRow.HasClients ? "si" : "no")</td>
+                                <td>@(matrixRow.HasClients ? L("sí", "sí", "yes") : L("no", "no", "no"))</td>
                                 <td>@matrixRow.CountryName</td>
                                 <td>@matrixRow.CountryCode</td>
                                 @foreach (var ncCode in report.MatrixNcCodes)
                                 {
                                     <td class="numeric-cell">@FormatMatrixCell(matrixRow.WeightByNcCode.TryGetValue(ncCode, out var weightValue) ? weightValue : 0m)</td>
                                 }
-                                <td class="numeric-cell">@matrixRow.TotalWeightKg.ToString("0.00")</td>
+                                <td class="numeric-cell">@matrixRow.TotalWeightKg.ToUiString("0.00")</td>
                                 @foreach (var ncCode in report.MatrixNcCodes)
                                 {
                                     <td class="numeric-cell">@FormatMatrixCell(matrixRow.AmountByNcCode.TryGetValue(ncCode, out var amountValue) ? amountValue : 0m)</td>
                                 }
-                                <td class="numeric-cell">@matrixRow.TotalInvoiceAmount.ToString("0.00")</td>
+                                <td class="numeric-cell">@matrixRow.TotalInvoiceAmount.ToUiString("0.00")</td>
                             </tr>
                         }
                     }
@@ -392,7 +395,7 @@ else
         filter.Year = latestPeriod.Year;
         filter.Month = latestPeriod.Month;
         periodAutoSelected = true;
-        periodInfoMessage = $"Mostrando el último período con datos Intrastat: {GetMonthLabel(filter.Month)} {filter.Year}.";
+        periodInfoMessage = string.Format(L("Mostrando el último período con datos Intrastat: {0} {1}.", "Mostrant l'últim període amb dades Intrastat: {0} {1}.", "Showing the latest period with Intrastat data: {0} {1}."), GetMonthLabel(filter.Month), filter.Year);
     }
 
     private async Task LoadAsync()
@@ -419,7 +422,7 @@ else
                 var latestPeriod = await IntrastatQueries.GetLatestPeriodAsync(tenantId.Value, companyId.Value);
                 if (latestPeriod is not null && (latestPeriod.Year != filter.Year || latestPeriod.Month != filter.Month))
                 {
-                    periodInfoMessage = $"No hay líneas Intrastat para {GetMonthLabel(filter.Month)} {filter.Year}. Último período con datos: {GetMonthLabel(latestPeriod.Month)} {latestPeriod.Year}.";
+                    periodInfoMessage = string.Format(L("No hay líneas Intrastat para {0} {1}. Último período con datos: {2} {3}.", "No hi ha línies Intrastat per a {0} {1}. Últim període amb dades: {2} {3}.", "There are no Intrastat lines for {0} {1}. Latest period with data: {2} {3}."), GetMonthLabel(filter.Month), filter.Year, GetMonthLabel(latestPeriod.Month), latestPeriod.Year);
                 }
                 else if (!periodAutoSelected)
                 {
@@ -595,8 +598,16 @@ else
         row.IsDomesticReference ? "intrastat-domestic-row" : string.Empty;
 
     private static string FormatMatrixCell(decimal value) =>
-        value == 0m ? string.Empty : value.ToString("0.00");
+        value == 0m ? string.Empty : value.ToUiString("0.00");
 
     private static string DisplayValue(string value) =>
         string.IsNullOrWhiteSpace(value) ? "-" : value;
+
+    private string L(string spanish, string catalan, string english) =>
+        T.CurrentLanguage switch
+        {
+            AppLanguages.Catalan => catalan,
+            AppLanguages.English => english,
+            _ => spanish
+        };
 }

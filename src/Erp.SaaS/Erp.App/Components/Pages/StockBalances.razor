@@ -1,30 +1,45 @@
 @page "/almacen/stock-actual"
+@page "/almacen/fils"
+@page "/almacen/tejidos"
+@page "/almacen/models"
 @attribute [Authorize(Roles = "TenantAdmin,TenantReader")]
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject NavigationManager NavigationManager
 @inject IStockQueries StockQueries
 @inject AppText T
 
-<PageTitle>@L("Almacén / Stock actual", "Magatzem / Estoc actual", "Warehouse / Current stock")</PageTitle>
+<PageTitle>@PageTitleText</PageTitle>
 
 <div class="page-header">
     <div>
         <p class="eyebrow">@T["menu.warehouse"]</p>
-        <h1>@L("Stock actual", "Estoc actual", "Current stock")</h1>
-        <p class="lead">@L("Saldo calculado por artículo y almacén a partir de los movimientos registrados o de la réplica legacy activa.", "Saldo calculat per article i magatzem a partir dels moviments registrats o de la rèplica legacy activa.", "Balance calculated by item and warehouse from recorded movements or the active legacy replica.")</p>
+        <h1>@PageHeadingText</h1>
+        <p class="lead">@PageLeadText</p>
     </div>
     <div class="quick-links">
+        @if (IsYarnStockRoute)
+        {
+            <a class="secondary-button link-button" href="/articulos/hilos">@L("Ver maestro de hilos", "Veure mestre de fils", "Open yarn master")</a>
+        }
+        else if (IsFabricStockRoute)
+        {
+            <a class="secondary-button link-button" href="/articulos/tejidos">@L("Ver maestro de tejidos", "Veure mestre de teixits", "Open fabrics master")</a>
+        }
+        else if (IsModelStockRoute)
+        {
+            <a class="secondary-button link-button" href="/articulos/models">@L("Ver maestro de models", "Veure mestre de models", "Open model master")</a>
+        }
         <a class="secondary-button link-button" href="/almacen/inventarios">@L("Ver inventarios", "Veure inventaris", "View counts")</a>
         <a class="secondary-button link-button" href="/almacen/traspasos">@L("Ver traspasos", "Veure traspassos", "View transfers")</a>
         <a class="secondary-button link-button" href="/almacen/ajustes">@L("Nuevo ajuste", "Nou ajust", "New adjustment")</a>
-        <a class="secondary-button link-button" href="/almacen/movimientos">@L("Ver movimientos", "Veure moviments", "View movements")</a>
+        <a class="secondary-button link-button" href="@MovementsRoute">@MovementsLinkText</a>
     </div>
 </div>
 
 @if (!tenantId.HasValue || !companyId.HasValue)
 {
     <div class="empty-state">
-        <p>@L("Selecciona una empresa activa para revisar stock.", "Selecciona una empresa activa per revisar estoc.", "Select an active company to review stock.")</p>
+        <p>@NoCompanyText</p>
     </div>
 }
 else
@@ -37,9 +52,7 @@ else
         </div>
         <div class="filter-row results-toolbar" style="margin-top: 0.85rem;">
             <span class="results-summary">
-                @(totalCount == 0
-                    ? L("Sin resultados", "Sense resultats", "No results")
-                    : L($"Mostrando {PageStart}-{PageEnd} de {totalCount} posiciones de stock", $"Mostrant {PageStart}-{PageEnd} de {totalCount} posicions d'estoc", $"Showing {PageStart}-{PageEnd} of {totalCount} stock positions"))
+                @ResultsSummaryText
             </span>
             <label class="field compact-field">
                 <span>@L("Tamaño de página", "Mida de pàgina", "Page size")</span>
@@ -57,7 +70,13 @@ else
         <section class="panel" style="margin-top: 1rem;">
             <p class="eyebrow">@L("Sync legacy", "Sync legacy", "Legacy sync")</p>
             <p class="muted">
-                @L("El stock actual se está leyendo desde la réplica SaaS local sincronizada con TEX.NET. Los ajustes manuales web se aplican encima en local y no modifican el remoto.", "L'estoc actual s'està llegint des de la rèplica SaaS local sincronitzada amb TEX.NET. Els ajustos manuals web s'apliquen per sobre en local i no modifiquen el remot.", "Current stock is being read from the local SaaS replica synchronized with TEX.NET. Manual web adjustments are applied locally on top and do not change the remote source.")
+                @(IsYarnStockRoute
+                    ? L("El stock de fils se está leyendo desde la réplica SaaS local sincronizada con TEX.NET y filtrada por el maestro fil. Los ajustes manuales web se aplican encima en local y no modifican el remoto.", "L'estoc de fils s'està llegint des de la rèplica SaaS local sincronitzada amb TEX.NET i filtrada pel mestre fil. Els ajustos manuals web s'apliquen per sobre en local i no modifiquen el remot.", "Yarn stock is being read from the local SaaS replica synchronized with TEX.NET and filtered by the fil master. Manual web adjustments are applied locally on top and do not change the remote source.")
+                    : IsFabricStockRoute
+                        ? L("El stock de teixits se está leyendo desde la réplica SaaS local sincronizada con TEX.NET y filtrada por el maestro teixits. Los ajustes manuales web se aplican encima en local y no modifican el remoto.", "L'estoc de teixits s'està llegint des de la rèplica SaaS local sincronitzada amb TEX.NET i filtrada pel mestre teixits. Els ajustos manuals web s'apliquen per sobre en local i no modifiquen el remot.", "Fabric stock is being read from the local SaaS replica synchronized with TEX.NET and filtered by the teixits master. Manual web adjustments are applied locally on top and do not change the remote source.")
+                    : IsModelStockRoute
+                        ? L("El stock de models se está leyendo desde la réplica SaaS local sincronizada con TEX.NET y filtrada por el maestro article_models. Los ajustes manuales web se aplican encima en local y no modifican el remoto.", "L'estoc de models s'està llegint des de la rèplica SaaS local sincronitzada amb TEX.NET i filtrada pel mestre article_models. Els ajustos manuals web s'apliquen per sobre en local i no modifiquen el remot.", "Model stock is being read from the local SaaS replica synchronized with TEX.NET and filtered by the article_models master. Manual web adjustments are applied locally on top and do not change the remote source.")
+                    : L("El stock actual se está leyendo desde la réplica SaaS local sincronizada con TEX.NET. Los ajustes manuales web se aplican encima en local y no modifican el remoto.", "L'estoc actual s'està llegint des de la rèplica SaaS local sincronitzada amb TEX.NET. Els ajustos manuals web s'apliquen per sobre en local i no modifiquen el remot.", "Current stock is being read from the local SaaS replica synchronized with TEX.NET. Manual web adjustments are applied locally on top and do not change the remote source."))
                 @L("Última sync:", "Última sync:", "Last sync:") @(legacySyncInfo.LastCompletedUtc?.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss") ?? L("Sin fecha", "Sense data", "No date"))
                 · Ins: @legacySyncInfo.LastInserted · Act: @legacySyncInfo.LastUpdated · Omi: @legacySyncInfo.LastSkipped · Err: @legacySyncInfo.LastErrors
             </p>
@@ -73,15 +92,15 @@ else
     <div class="card-grid purchase-summary-grid">
         <section class="info-card">
             <h2>@totalCount</h2>
-            <p class="muted">@L("posiciones con stock", "posicions amb estoc", "positions with stock")</p>
+            <p class="muted">@PrimaryKpiText</p>
         </section>
         <section class="info-card">
             <h2>@items.Select(item => item.Warehouse).Where(value => !string.IsNullOrWhiteSpace(value)).Distinct(StringComparer.OrdinalIgnoreCase).Count()</h2>
-            <p class="muted">@L("almacenes en página", "magatzems a la pàgina", "warehouses on page")</p>
+            <p class="muted">@SecondaryKpiText</p>
         </section>
         <section class="info-card accent-card">
-            <h2>@items.Sum(item => item.CurrentStock).ToString("0.###")</h2>
-            <p class="muted">@L("unidades netas en página", "unitats netes a la pàgina", "net units on page")</p>
+            <h2>@items.Sum(item => item.CurrentStock).ToUiString("0.###")</h2>
+            <p class="muted">@TertiaryKpiText</p>
         </section>
     </div>
 
@@ -90,7 +109,7 @@ else
         {
             <div class="loading-banner">
                 <span class="loading-indicator" aria-hidden="true"></span>
-                <span>@L("Cargando stock actual...", "Carregant estoc actual...", "Loading current stock...")</span>
+                <span>@LoadingText</span>
             </div>
         }
 
@@ -125,7 +144,7 @@ else
                 else if (items.Count == 0)
                 {
                     <tr>
-                        <td colspan="7" class="table-empty">@L("Todavía no hay stock calculado para mostrar.", "Encara no hi ha estoc calculat per mostrar.", "There is no calculated stock to display yet.")</td>
+                        <td colspan="7" class="table-empty">@EmptyTableText</td>
                     </tr>
                 }
                 else
@@ -136,7 +155,7 @@ else
                             <td>@DisplayValue(item.Warehouse)</td>
                             <td>@DisplayValue(item.ItemCode)</td>
                             <td>@item.ItemDescription</td>
-                            <td><strong>@item.CurrentStock.ToString("0.###") @item.UnitOfMeasure</strong></td>
+                            <td><strong>@item.CurrentStock.ToUiString("0.###") @item.UnitOfMeasure</strong></td>
                             <td>@item.MovementCount</td>
                             <td>@(item.LastMovementDate?.ToString("dd/MM/yyyy") ?? L("Sin dato", "Sense dada", "No data"))</td>
                             <td>
@@ -144,6 +163,7 @@ else
                                     <a class="inline-link" href="@BuildTransferUrl(item)">@L("Traspasar", "Traspassar", "Transfer")</a>
                                     <a class="inline-link" href="@BuildCountUrl(item)">@L("Inventariar", "Inventariar", "Count")</a>
                                     <a class="inline-link" href="@BuildAdjustmentUrl(item)">@L("Ajustar", "Ajustar", "Adjust")</a>
+                                    <a class="inline-link" href="@BuildMovementsUrl(item)">@L("Movs.", "Movs.", "Moves")</a>
                                 </div>
                             </td>
                         </tr>
@@ -193,6 +213,96 @@ else
     private string sortColumn = nameof(StockBalanceListItemDto.Warehouse);
     private bool sortDescending;
     private int totalCount;
+    private bool IsYarnStockRoute => CurrentRelativePath.StartsWith("almacen/fils", StringComparison.OrdinalIgnoreCase);
+    private bool IsFabricStockRoute => CurrentRelativePath.StartsWith("almacen/tejidos", StringComparison.OrdinalIgnoreCase);
+    private bool IsModelStockRoute => CurrentRelativePath.StartsWith("almacen/models", StringComparison.OrdinalIgnoreCase);
+    private string CurrentRelativePath => NavigationManager.ToBaseRelativePath(NavigationManager.Uri).Split('?', '#')[0];
+    private string NoCompanyText => IsYarnStockRoute
+        ? L("Selecciona una empresa activa para revisar stock de hilos.", "Selecciona una empresa activa per revisar estoc de fils.", "Select an active company to review yarn stock.")
+        : IsFabricStockRoute
+            ? L("Selecciona una empresa activa para revisar stock de tejidos.", "Selecciona una empresa activa per revisar estoc de teixits.", "Select an active company to review fabric stock.")
+        : IsModelStockRoute
+            ? L("Selecciona una empresa activa para revisar stock de models.", "Selecciona una empresa activa per revisar estoc de models.", "Select an active company to review model stock.")
+            : L("Selecciona una empresa activa para revisar stock.", "Selecciona una empresa activa per revisar estoc.", "Select an active company to review stock.");
+    private string ResultsSummaryText => totalCount == 0
+        ? L("Sin resultados", "Sense resultats", "No results")
+        : IsYarnStockRoute
+            ? L($"Mostrando {PageStart.ToUiString("N0")}-{PageEnd.ToUiString("N0")} de {totalCount.ToUiString("N0")} posiciones de stock de hilos", $"Mostrant {PageStart.ToUiString("N0")}-{PageEnd.ToUiString("N0")} de {totalCount.ToUiString("N0")} posicions d'estoc de fils", $"Showing {PageStart.ToUiString("N0")}-{PageEnd.ToUiString("N0")} of {totalCount.ToUiString("N0")} yarn stock positions")
+            : IsFabricStockRoute
+                ? L($"Mostrando {PageStart.ToUiString("N0")}-{PageEnd.ToUiString("N0")} de {totalCount.ToUiString("N0")} posiciones de stock de tejidos", $"Mostrant {PageStart.ToUiString("N0")}-{PageEnd.ToUiString("N0")} de {totalCount.ToUiString("N0")} posicions d'estoc de teixits", $"Showing {PageStart.ToUiString("N0")}-{PageEnd.ToUiString("N0")} of {totalCount.ToUiString("N0")} fabric stock positions")
+            : IsModelStockRoute
+                ? L($"Mostrando {PageStart.ToUiString("N0")}-{PageEnd.ToUiString("N0")} de {totalCount.ToUiString("N0")} posiciones de stock models", $"Mostrant {PageStart.ToUiString("N0")}-{PageEnd.ToUiString("N0")} de {totalCount.ToUiString("N0")} posicions d'estoc models", $"Showing {PageStart.ToUiString("N0")}-{PageEnd.ToUiString("N0")} of {totalCount.ToUiString("N0")} model stock positions")
+                : L($"Mostrando {PageStart.ToUiString("N0")}-{PageEnd.ToUiString("N0")} de {totalCount.ToUiString("N0")} posiciones de stock", $"Mostrant {PageStart.ToUiString("N0")}-{PageEnd.ToUiString("N0")} de {totalCount.ToUiString("N0")} posicions d'estoc", $"Showing {PageStart.ToUiString("N0")}-{PageEnd.ToUiString("N0")} of {totalCount.ToUiString("N0")} stock positions");
+    private string PrimaryKpiText => IsYarnStockRoute
+        ? L("posiciones de hilo con stock", "posicions de fil amb estoc", "yarn stock positions")
+        : IsFabricStockRoute
+            ? L("posiciones de tejido con stock", "posicions de teixit amb estoc", "fabric stock positions")
+        : IsModelStockRoute
+            ? L("posiciones models con stock", "posicions models amb estoc", "model stock positions")
+            : L("posiciones con stock", "posicions amb estoc", "positions with stock");
+    private string SecondaryKpiText => IsYarnStockRoute
+        ? L("almacenes con hilos en página", "magatzems amb fils a la pàgina", "warehouses with yarns on page")
+        : IsFabricStockRoute
+            ? L("almacenes con tejidos en página", "magatzems amb teixits a la pàgina", "warehouses with fabrics on page")
+        : IsModelStockRoute
+            ? L("almacenes con models en página", "magatzems amb models a la pàgina", "warehouses with models on page")
+            : L("almacenes en página", "magatzems a la pàgina", "warehouses on page");
+    private string TertiaryKpiText => IsYarnStockRoute
+        ? L("unidades netas de hilo en página", "unitats netes de fil a la pàgina", "net yarn units on page")
+        : IsFabricStockRoute
+            ? L("unidades netas de tejido en página", "unitats netes de teixit a la pàgina", "net fabric units on page")
+        : IsModelStockRoute
+            ? L("unidades netas models en página", "unitats netes models a la pàgina", "net model units on page")
+            : L("unidades netas en página", "unitats netes a la pàgina", "net units on page");
+    private string MovementsRoute => IsYarnStockRoute
+        ? "/almacen/fils/movimientos"
+        : IsFabricStockRoute
+            ? "/almacen/tejidos/movimientos"
+        : IsModelStockRoute
+            ? "/almacen/models/movimientos"
+            : "/almacen/movimientos";
+    private string MovementsLinkText => IsYarnStockRoute
+        ? L("Ver movimientos de hilos", "Veure moviments de fils", "View yarn movements")
+        : IsFabricStockRoute
+            ? L("Ver movimientos de tejidos", "Veure moviments de teixits", "View fabric movements")
+        : IsModelStockRoute
+            ? L("Ver movimientos models", "Veure moviments models", "View model movements")
+            : L("Ver movimientos", "Veure moviments", "View movements");
+    private string LoadingText => IsYarnStockRoute
+        ? L("Cargando stock de hilos...", "Carregant estoc de fils...", "Loading yarn stock...")
+        : IsFabricStockRoute
+            ? L("Cargando stock de tejidos...", "Carregant estoc de teixits...", "Loading fabric stock...")
+        : IsModelStockRoute
+            ? L("Cargando stock models...", "Carregant estoc models...", "Loading model stock...")
+            : L("Cargando stock actual...", "Carregant estoc actual...", "Loading current stock...");
+    private string EmptyTableText => IsYarnStockRoute
+        ? L("Todavía no hay stock de hilos calculado para mostrar.", "Encara no hi ha estoc de fils calculat per mostrar.", "There is no calculated yarn stock to display yet.")
+        : IsFabricStockRoute
+            ? L("Todavía no hay stock de tejidos calculado para mostrar.", "Encara no hi ha estoc de teixits calculat per mostrar.", "There is no calculated fabric stock to display yet.")
+        : IsModelStockRoute
+            ? L("Todavía no hay stock models calculado para mostrar.", "Encara no hi ha estoc models calculat per mostrar.", "There is no calculated model stock to display yet.")
+            : L("Todavía no hay stock calculado para mostrar.", "Encara no hi ha estoc calculat per mostrar.", "There is no calculated stock to display yet.");
+    private string PageTitleText => IsYarnStockRoute
+        ? L("Almacén / Fils", "Magatzem / Fils", "Warehouse / Yarns")
+        : IsFabricStockRoute
+            ? L("Almacén / Teixits", "Magatzem / Teixits", "Warehouse / Fabrics")
+        : IsModelStockRoute
+            ? L("Almacén / Models", "Magatzem / Models", "Warehouse / Models")
+            : L("Almacén / Stock actual", "Magatzem / Estoc actual", "Warehouse / Current stock");
+    private string PageHeadingText => IsYarnStockRoute
+        ? L("Fils", "Fils", "Yarns")
+        : IsFabricStockRoute
+            ? L("Teixits", "Teixits", "Fabrics")
+        : IsModelStockRoute
+            ? L("Stock Models", "Estoc Models", "Model stock")
+            : L("Stock actual", "Estoc actual", "Current stock");
+    private string PageLeadText => IsYarnStockRoute
+        ? L("Consulta el stock de hilos por artículo y almacén, limitado al maestro fil y a los movimientos locales o legacy sincronizados.", "Consulta l'estoc de fils per article i magatzem, limitat al mestre fil i als moviments locals o legacy sincronitzats.", "Review yarn stock by item and warehouse, limited to the fil master and to local or synchronized legacy movements.")
+        : IsFabricStockRoute
+            ? L("Consulta el stock de tejidos por artículo y almacén, limitado al maestro teixits y a los movimientos locales o legacy sincronizados.", "Consulta l'estoc de teixits per article i magatzem, limitat al mestre teixits i als moviments locals o legacy sincronitzats.", "Review fabric stock by item and warehouse, limited to the teixits master and to local or synchronized legacy movements.")
+        : IsModelStockRoute
+            ? L("Consulta el stock de models por artículo y almacén, limitado al maestro article_models y a los movimientos locales o legacy sincronizados.", "Consulta l'estoc de models per article i magatzem, limitat al mestre article_models i als moviments locals o legacy sincronitzats.", "Review model stock by item and warehouse, limited to the article_models master and to local or synchronized legacy movements.")
+            : L("Saldo calculado por artículo y almacén a partir de los movimientos registrados o de la réplica legacy activa.", "Saldo calculat per article i magatzem a partir dels moviments registrats o de la rèplica legacy activa.", "Balance calculated by item and warehouse from recorded movements or the active legacy replica.");
     private int TotalPages => Math.Max(1, (int)Math.Ceiling(totalCount / (double)filter.PageSize));
     private bool CanGoPrevious => filter.Page > 1;
     private bool CanGoNext => filter.Page < TotalPages;
@@ -309,6 +419,13 @@ else
     {
         filter.Search = SearchQuery?.Trim() ?? string.Empty;
         filter.Warehouse = WarehouseQuery?.Trim() ?? string.Empty;
+        filter.CatalogScope = IsYarnStockRoute
+            ? "Hilos"
+            : IsFabricStockRoute
+                ? "Tejidos"
+            : IsModelStockRoute
+                ? "Models"
+                : string.Empty;
         filter.Page = Math.Max(PageQuery.GetValueOrDefault(1), 1);
         filter.PageSize = PageSizeQuery is 25 or 50 or 100 ? PageSizeQuery.Value : 25;
         sortColumn = NormalizeSortColumn(SortQuery);
@@ -369,5 +486,19 @@ else
         var itemCode = Uri.EscapeDataString(item.ItemCode ?? string.Empty);
         var description = Uri.EscapeDataString(item.ItemDescription ?? string.Empty);
         return $"/almacen/inventarios/nuevo?warehouse={warehouse}&itemCode={itemCode}&description={description}";
+    }
+
+    private string BuildMovementsUrl(StockBalanceListItemDto item)
+    {
+        var route = IsYarnStockRoute
+            ? "/almacen/fils/movimientos"
+            : IsFabricStockRoute
+                ? "/almacen/tejidos/movimientos"
+            : IsModelStockRoute
+                ? "/almacen/models/movimientos"
+                : "/almacen/movimientos";
+        var search = Uri.EscapeDataString(item.ItemCode ?? string.Empty);
+        var warehouse = Uri.EscapeDataString(item.Warehouse ?? string.Empty);
+        return $"{route}?search={search}&warehouse={warehouse}";
     }
 }

@@ -400,44 +400,7 @@ public sealed class MySqlIntrastatService : IIntrastatQueries
             await legacyConnection.DisposeAsync();
         }
 
-        var filteredLines = allLines
-            .Where(line => !filter.OnlyClassified || line.IsClassified)
-            .Where(line => MatchesSearch(line, search))
-            .ToList();
-
-        var orderedLines = OrderLines(filteredLines, filter).ToList();
-        var pagedLines = orderedLines
-            .Skip((page - 1) * pageSize)
-            .Take(pageSize)
-            .ToArray();
-
-        var summary = filteredLines
-            .GroupBy(line => new { line.CountryCode, line.CountryName, Code = line.IsClassified ? line.IntrastatCode : "SIN CLASIFICAR" })
-            .Select(group => new IntrastatCountrySummaryDto
-            {
-                CountryCode = group.Key.CountryCode,
-                CountryName = group.Key.CountryName,
-                IntrastatCode = group.Key.Code,
-                LinesCount = group.Count(),
-                TotalQuantity = decimal.Round(group.Sum(item => item.Quantity), 3, MidpointRounding.AwayFromZero),
-                TotalNetAmount = decimal.Round(group.Sum(item => item.NetAmount), 2, MidpointRounding.AwayFromZero),
-                TotalGrossAmount = decimal.Round(group.Sum(item => item.GrossAmount), 2, MidpointRounding.AwayFromZero)
-            })
-            .OrderBy(item => item.CountryCode, StringComparer.OrdinalIgnoreCase)
-            .ThenBy(item => item.IntrastatCode, StringComparer.OrdinalIgnoreCase)
-            .ToArray();
-
-        return new IntrastatReportDto
-        {
-            Items = pagedLines,
-            Summary = summary,
-            TotalCount = filteredLines.Count,
-            CountriesCount = filteredLines.Select(item => item.CountryCode).Distinct(StringComparer.OrdinalIgnoreCase).Count(),
-            ClassifiedLinesCount = filteredLines.Count(item => item.IsClassified),
-            UnclassifiedLinesCount = filteredLines.Count(item => !item.IsClassified),
-            TotalNetAmount = decimal.Round(filteredLines.Sum(item => item.NetAmount), 2, MidpointRounding.AwayFromZero),
-            TotalGrossAmount = decimal.Round(filteredLines.Sum(item => item.GrossAmount), 2, MidpointRounding.AwayFromZero)
-        };
+        return BuildReportFromLines(allLines, filter, search, page, pageSize);
     }
 
     private async Task<IntrastatPeriodDto?> GetLatestLegacyPeriodAsync(Guid tenantId, Guid companyId, CancellationToken cancellationToken)
@@ -446,8 +409,7 @@ public sealed class MySqlIntrastatService : IIntrastatQueries
         var centerCode = await ResolveCompanyCenterCodeAsync(tenantId, companyId, cancellationToken);
 
         await using var connection = await _legacyConnectionFactory.OpenConnectionAsync(cancellationToken);
-        return await TryGetLatestLegacyPeriodAsync(connection, centerCode, useCenterFilter: true, cancellationToken)
-            ?? await TryGetLatestLegacyPeriodAsync(connection, centerCode, useCenterFilter: false, cancellationToken);
+        return await TryGetLatestLegacyPeriodAsync(connection, centerCode, useCenterFilter: true, cancellationToken);
     }
 
     private async Task<IntrastatReportDto> GetLegacyReportAsync(Guid tenantId, Guid companyId, IntrastatFilter filter, CancellationToken cancellationToken)
@@ -463,16 +425,17 @@ public sealed class MySqlIntrastatService : IIntrastatQueries
 
         await using var connection = await _legacyConnectionFactory.OpenConnectionAsync(cancellationToken);
         var allLines = await LoadLegacyLinesAsync(connection, centerCode, safeYear, safeMonth, useCenterFilter: true, cancellationToken);
-        var useFallbackScope = allLines.Count == 0;
-        if (useFallbackScope)
-        {
-            allLines = await LoadLegacyLinesAsync(connection, centerCode, safeYear, safeMonth, useCenterFilter: false, cancellationToken);
-        }
+        var matrixRows = await LoadLegacyMatrixRowsAsync(connection, centerCode, safeYear, safeMonth, useCenterFilter: true, cancellationToken);
+        var hasClientsByCountry = await LoadLegacyCountryAvailabilityAsync(connection, centerCode, useCenterFilter: true, cancellationToken);
 
-        var matrixRows = await LoadLegacyMatrixRowsAsync(connection, centerCode, safeYear, safeMonth, useCenterFilter: !useFallbackScope, cancellationToken);
-        var hasClientsByCountry = await LoadLegacyCountryAvailabilityAsync(connection, centerCode, useCenterFilter: !useFallbackScope, cancellationToken);
-
-        return BuildReportFromLines(allLines, filter, search, page, pageSize, BuildLegacyMatrixRows(matrixRows, hasClientsByCountry));
+        return BuildReportFromLines(
+            allLines,
+            filter,
+            search,
+            page,
+            pageSize,
+            BuildLegacyMatrixRows(matrixRows, hasClientsByCountry),
+            LegacyMatrixNcCodes);
     }
 
     private IntrastatReportDto BuildReportFromLines(
@@ -481,7 +444,8 @@ public sealed class MySqlIntrastatService : IIntrastatQueries
         string search,
         int page,
         int pageSize,
-        IReadOnlyCollection<IntrastatMatrixRowDto>? matrixRows = null)
+        IReadOnlyCollection<IntrastatMatrixRowDto>? matrixRows = null,
+        IReadOnlyCollection<string>? matrixNcCodes = null)
     {
         var filteredLines = allLines
             .Where(line => !filter.OnlyClassified || line.IsClassified)
@@ -510,12 +474,21 @@ public sealed class MySqlIntrastatService : IIntrastatQueries
             .ThenBy(item => item.IntrastatCode, StringComparer.OrdinalIgnoreCase)
             .ToArray();
 
+        var effectiveMatrixRows = matrixRows;
+        var effectiveMatrixNcCodes = matrixNcCodes;
+        if (effectiveMatrixRows is null || effectiveMatrixNcCodes is null)
+        {
+            var dynamicMatrix = BuildMatrixRowsFromLines(filteredLines);
+            effectiveMatrixRows = dynamicMatrix.Rows;
+            effectiveMatrixNcCodes = dynamicMatrix.NcCodes;
+        }
+
         return new IntrastatReportDto
         {
             Items = pagedLines,
             Summary = summary,
-            MatrixRows = matrixRows ?? BuildLegacyMatrixRows(Array.Empty<LegacyMatrixAggregateRow>(), new Dictionary<string, bool>(StringComparer.OrdinalIgnoreCase)),
-            MatrixNcCodes = LegacyMatrixNcCodes,
+            MatrixRows = effectiveMatrixRows,
+            MatrixNcCodes = effectiveMatrixNcCodes,
             TotalCount = filteredLines.Count,
             CountriesCount = filteredLines.Select(item => item.CountryCode).Distinct(StringComparer.OrdinalIgnoreCase).Count(),
             ClassifiedLinesCount = filteredLines.Count(item => item.IsClassified),
@@ -542,7 +515,8 @@ public sealed class MySqlIntrastatService : IIntrastatQueries
                    MONTH(f.DATA) AS month_value
             FROM factur f
             INNER JOIN clients c
-              ON c.CODI = f.CLIENT
+              ON c.CENTRO = f.CENTRO
+             AND c.CODI = f.CLIENT
             WHERE f.DOCUMENT = 'F'
               {(useCenterFilter ? "AND f.CENTRO = @centerCode" : string.Empty)}
               AND LEFT(COALESCE(c.NIF, ''), 2) IN ('AT','BE','BG','CY','CZ','DE','DK','EE','EL','FI','FR','HR','HU','IE','IT','LT','LU','LV','MT','NL','PL','PT','RO','SE','SI','SK')
@@ -598,7 +572,8 @@ public sealed class MySqlIntrastatService : IIntrastatQueries
               ON df.FRA = f.FRA
              AND df.DOCUMENT = f.DOCUMENT
             INNER JOIN clients c
-              ON c.CODI = f.CLIENT
+              ON c.CENTRO = f.CENTRO
+             AND c.CODI = f.CLIENT
             WHERE f.DOCUMENT = 'F'
               {(useCenterFilter ? "AND f.CENTRO = @centerCode" : string.Empty)}
               AND YEAR(f.DATA) = @year
@@ -719,7 +694,8 @@ public sealed class MySqlIntrastatService : IIntrastatQueries
               ON f.FRA = df.FRA
              AND f.DOCUMENT = df.DOCUMENT
             INNER JOIN clients c
-              ON f.CLIENT = c.CODI
+              ON c.CENTRO = f.CENTRO
+             AND f.CLIENT = c.CODI
             WHERE f.DOCUMENT = 'F'
               AND COALESCE(df.DESCRI, '') <> @transportDescription
               {(useCenterFilter ? "AND f.CENTRO = @centerCode" : string.Empty)}
@@ -786,6 +762,53 @@ public sealed class MySqlIntrastatService : IIntrastatQueries
                 };
             })
             .ToArray();
+    }
+
+    private static (IReadOnlyCollection<IntrastatMatrixRowDto> Rows, IReadOnlyCollection<string> NcCodes) BuildMatrixRowsFromLines(
+        IEnumerable<IntrastatLineDto> lines)
+    {
+        var relevantLines = lines
+            .Where(item => item.IsClassified)
+            .Where(item => !item.IsTransportCharge)
+            .Where(item => !string.IsNullOrWhiteSpace(item.CountryCode))
+            .ToList();
+
+        var ncCodes = relevantLines
+            .Select(item => item.IntrastatCode)
+            .Where(code => !string.IsNullOrWhiteSpace(code))
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .OrderBy(code => code, StringComparer.OrdinalIgnoreCase)
+            .ToArray();
+
+        var rows = relevantLines
+            .GroupBy(item => new { item.CountryCode, item.CountryName })
+            .OrderBy(group => group.Key.CountryCode, StringComparer.OrdinalIgnoreCase)
+            .Select(group =>
+            {
+                var weightByCode = ncCodes.ToDictionary(code => code, _ => 0m, StringComparer.OrdinalIgnoreCase);
+                var amountByCode = ncCodes.ToDictionary(code => code, _ => 0m, StringComparer.OrdinalIgnoreCase);
+
+                foreach (var byCode in group.GroupBy(item => item.IntrastatCode, StringComparer.OrdinalIgnoreCase))
+                {
+                    weightByCode[byCode.Key] = decimal.Round(byCode.Sum(item => item.TotalWeightKg), 2, MidpointRounding.AwayFromZero);
+                    amountByCode[byCode.Key] = decimal.Round(byCode.Sum(item => item.NetAmount), 2, MidpointRounding.AwayFromZero);
+                }
+
+                return new IntrastatMatrixRowDto
+                {
+                    CountryCode = group.Key.CountryCode,
+                    CountryName = group.Key.CountryName,
+                    HasClients = true,
+                    IsDomesticReference = string.Equals(group.Key.CountryCode, "ES", StringComparison.OrdinalIgnoreCase),
+                    WeightByNcCode = weightByCode,
+                    AmountByNcCode = amountByCode,
+                    TotalWeightKg = decimal.Round(weightByCode.Values.Sum(), 2, MidpointRounding.AwayFromZero),
+                    TotalInvoiceAmount = decimal.Round(amountByCode.Values.Sum(), 2, MidpointRounding.AwayFromZero)
+                };
+            })
+            .ToArray();
+
+        return (rows, ncCodes);
     }
 
     private static IEnumerable<IntrastatLineDto> OrderLines(IEnumerable<IntrastatLineDto> source, IntrastatFilter filter)

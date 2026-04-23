@@ -1,20 +1,36 @@
 @page "/almacen/movimientos"
+@page "/almacen/fils/movimientos"
+@page "/almacen/tejidos/movimientos"
+@page "/almacen/models/movimientos"
 @attribute [Authorize(Roles = "TenantAdmin,TenantReader")]
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject NavigationManager NavigationManager
 @inject IStockQueries StockQueries
 @inject AppText T
 
-<PageTitle>@L("Almacén / Movimientos", "Magatzem / Moviments", "Warehouse / Movements")</PageTitle>
+<PageTitle>@PageTitleText</PageTitle>
 
 <div class="page-header">
     <div>
-        <p class="eyebrow">@L("Almacén", "Magatzem", "Warehouse")</p>
-        <h1>@L("Movimientos", "Moviments", "Movements")</h1>
-        <p class="lead">@L("Entradas de stock generadas desde recepciones y futuros movimientos de almacén.", "Entrades d'estoc generades des de recepcions i futurs moviments de magatzem.", "Stock entries generated from receipts and future warehouse movements.")</p>
+        <p class="eyebrow">@T["menu.warehouse"]</p>
+        <h1>@PageHeadingText</h1>
+        <p class="lead">@PageLeadText</p>
     </div>
     <div class="quick-links">
-        <a class="secondary-button link-button" href="/almacen/stock-actual">@L("Ver stock actual", "Veure estoc actual", "View current stock")</a>
+        <a class="secondary-button link-button" href="@StockRoute">@StockLinkText</a>
+        @if (IsYarnMovementsRoute)
+        {
+            <a class="secondary-button link-button" href="/articulos/hilos">@L("Ver maestro de hilos", "Veure mestre de fils", "Open yarn master")</a>
+            <a class="secondary-button link-button" href="/compras/albaranes-entrega-fils">@L("Ver albaranes de hilo", "Veure albarans de fils", "View yarn receipts")</a>
+        }
+        else if (IsFabricMovementsRoute)
+        {
+            <a class="secondary-button link-button" href="/articulos/tejidos">@L("Ver maestro de tejidos", "Veure mestre de teixits", "Open fabrics master")</a>
+        }
+        else if (IsModelMovementsRoute)
+        {
+            <a class="secondary-button link-button" href="/articulos/models">@L("Ver maestro de models", "Veure mestre de models", "Open model master")</a>
+        }
         <a class="secondary-button link-button" href="/almacen/inventarios">@L("Ver inventarios", "Veure inventaris", "View inventories")</a>
         <a class="secondary-button link-button" href="/almacen/traspasos">@L("Ver traspasos", "Veure traspassos", "View transfers")</a>
         <a class="secondary-button link-button" href="/almacen/ajustes">@L("Nuevo ajuste", "Nou ajust", "New adjustment")</a>
@@ -24,7 +40,7 @@
 @if (!tenantId.HasValue || !companyId.HasValue)
 {
     <div class="empty-state">
-        <p>@L("Selecciona una empresa activa para revisar movimientos de almacén.", "Selecciona una empresa activa per revisar moviments de magatzem.", "Select an active company to review warehouse movements.")</p>
+        <p>@NoCompanyText</p>
     </div>
 }
 else
@@ -33,13 +49,25 @@ else
         <div class="filter-row">
             <input class="text-input" @bind="filter.Search" placeholder="@L("Buscar por artículo, color, proveedor, referencia, matrícula o documento", "Buscar per article, color, proveïdor, referència, matrícula o document", "Search by item, color, supplier, reference, registration or document")" disabled="@isLoading" />
             <input class="text-input" @bind="filter.Warehouse" placeholder="@L("Almacén", "Magatzem", "Warehouse")" disabled="@isLoading" />
+            <input class="text-input" @bind="filter.SupplierName" placeholder="@L("Proveedor", "Proveïdor", "Supplier")" disabled="@isLoading" />
+        </div>
+        <div class="filter-row" style="margin-top: 0.85rem;">
+            <input class="text-input" @bind="filter.Color" placeholder="@L("Color", "Color", "Color")" disabled="@isLoading" />
+            <label class="field compact-field" style="min-width: 15rem;">
+                <span>@L("Tipo de movimiento", "Tipus de moviment", "Movement type")</span>
+                <select class="sidebar-select compact-select" @bind="filter.MovementType" disabled="@isLoading">
+                    <option value="">@L("Todos", "Tots", "All")</option>
+                    @foreach (var movementTypeOption in MovementTypeOptions)
+                    {
+                        <option value="@movementTypeOption.Value">@movementTypeOption.Label</option>
+                    }
+                </select>
+            </label>
             <button class="secondary-button" @onclick="SearchAsync" disabled="@isLoading">@(isLoading ? L("Cargando...", "Carregant...", "Loading...") : L("Buscar", "Buscar", "Search"))</button>
         </div>
         <div class="filter-row results-toolbar" style="margin-top: 0.85rem;">
             <span class="results-summary">
-                @(totalCount == 0
-                    ? L("Sin resultados", "Sense resultats", "No results")
-                    : L($"Mostrando {PageStart}-{PageEnd} de {totalCount} movimientos", $"Mostrant {PageStart}-{PageEnd} de {totalCount} moviments", $"Showing {PageStart}-{PageEnd} of {totalCount} movements"))
+                @ResultsSummaryText
             </span>
             <label class="field compact-field">
                 <span>@L("Tamaño de página", "Mida de pàgina", "Page size")</span>
@@ -57,8 +85,8 @@ else
         <section class="panel" style="margin-top: 1rem;">
             <p class="eyebrow">@L("Sync legacy", "Sync legacy", "Legacy sync")</p>
             <p class="muted">
-                @L("El saldo actual manda desde TEX.NET y se replica en la SaaS local.", "El saldo actual mana des de TEX.NET i es replica a la SaaS local.", "Current stock is driven from TEX.NET and replicated into the local SaaS.")
-                @L("Esta pantalla sigue mostrando solo los movimientos web registrados en local; sirven como delta sobre el snapshot legacy y no tocan el remoto.", "Aquesta pantalla continua mostrant només els moviments web registrats en local; serveixen com a delta sobre l'snapshot legacy i no toquen el remot.", "This screen still shows only web movements stored locally; they work as a delta over the legacy snapshot and never touch the remote source.")
+                @LegacyLeadText
+                @LegacyDeltaText
                 @L("Última sync:", "Última sync:", "Last sync:") @(legacySyncInfo.LastCompletedUtc?.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss") ?? L("Sin fecha", "Sense data", "No date"))
                 · Ins: @legacySyncInfo.LastInserted · Act: @legacySyncInfo.LastUpdated · Omi: @legacySyncInfo.LastSkipped · Err: @legacySyncInfo.LastErrors
             </p>
@@ -72,25 +100,106 @@ else
 
     <div class="card-grid purchase-summary-grid">
         <section class="info-card">
-            <h2>@totalCount</h2>
-            <p class="muted">@L("movimientos", "moviments", "movements")</p>
+            <h2>@totalCount.ToUiString("N0")</h2>
+            <p class="muted">@PrimaryKpiText</p>
         </section>
         <section class="info-card">
-            <h2>@items.Select(item => item.Warehouse).Where(value => !string.IsNullOrWhiteSpace(value)).Distinct(StringComparer.OrdinalIgnoreCase).Count()</h2>
-            <p class="muted">@L("almacenes en página", "magatzems en pàgina", "warehouses on page")</p>
+            <h2>@items.Select(item => item.SupplierName).Where(value => !string.IsNullOrWhiteSpace(value)).Distinct(StringComparer.OrdinalIgnoreCase).Count().ToUiString("N0")</h2>
+            <p class="muted">@SecondaryKpiText</p>
+        </section>
+        <section class="info-card">
+            <h2>@items.Select(item => item.Color).Where(value => !string.IsNullOrWhiteSpace(value)).Distinct(StringComparer.OrdinalIgnoreCase).Count().ToUiString("N0")</h2>
+            <p class="muted">@ColorKpiText</p>
+        </section>
+        <section class="info-card">
+            <h2>@items.Select(item => item.MovementType).Where(value => !string.IsNullOrWhiteSpace(value)).Distinct(StringComparer.OrdinalIgnoreCase).Count().ToUiString("N0")</h2>
+            <p class="muted">@MovementTypeKpiText</p>
         </section>
         <section class="info-card accent-card">
-            <h2>@items.Sum(item => item.Quantity).ToString("0.###")</h2>
-            <p class="muted">@L("cantidad movida en página", "quantitat moguda en pàgina", "quantity moved on page")</p>
+            <h2>@items.Sum(item => item.Quantity).ToUiString("0.###")</h2>
+            <p class="muted">@TertiaryKpiText</p>
         </section>
     </div>
+
+    @if ((IsYarnMovementsRoute || IsFabricMovementsRoute) && (supplierSummaries.Count > 0 || colorSummaries.Count > 0))
+    {
+        <div class="card-grid purchase-summary-grid">
+            <section class="panel">
+                <p class="eyebrow">@L("Proveedor", "Proveïdor", "Supplier")</p>
+                <h2>@L("Resumen por proveedor", "Resum per proveïdor", "Supplier summary")</h2>
+                <p class="muted">@L("Top del filtro actual por número de movimientos y cantidad acumulada.", "Top del filtre actual per nombre de moviments i quantitat acumulada.", "Current filter top list by movement count and accumulated quantity.")</p>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>@L("Proveedor", "Proveïdor", "Supplier")</th>
+                            <th>@L("Movs.", "Movs.", "Moves")</th>
+                            <th>@L("Cantidad", "Quantitat", "Quantity")</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (supplierSummaries.Count == 0)
+                        {
+                            <tr>
+                                <td colspan="3" class="table-empty">@L("Sin proveedores para este filtro.", "Sense proveïdors per a aquest filtre.", "No suppliers for this filter.")</td>
+                            </tr>
+                        }
+                        else
+                        {
+                            @foreach (var summary in supplierSummaries)
+                            {
+                                <tr>
+                                    <td>@summary.Label</td>
+                                    <td>@summary.MovementCount.ToUiString("N0")</td>
+                                    <td>@summary.Quantity.ToUiString("0.###")</td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </section>
+
+            <section class="panel">
+                <p class="eyebrow">@L("Color", "Color", "Color")</p>
+                <h2>@L("Resumen por color", "Resum per color", "Color summary")</h2>
+                <p class="muted">@L("Top del filtro actual por color para detectar actividad y mezcla operativa.", "Top del filtre actual per color per detectar activitat i barreja operativa.", "Current filter top list by color to detect activity and operational mix.")</p>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>@L("Color", "Color", "Color")</th>
+                            <th>@L("Movs.", "Movs.", "Moves")</th>
+                            <th>@L("Cantidad", "Quantitat", "Quantity")</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (colorSummaries.Count == 0)
+                        {
+                            <tr>
+                                <td colspan="3" class="table-empty">@L("Sin colores para este filtro.", "Sense colors per a aquest filtre.", "No colors for this filter.")</td>
+                            </tr>
+                        }
+                        else
+                        {
+                            @foreach (var summary in colorSummaries)
+                            {
+                                <tr>
+                                    <td>@summary.Label</td>
+                                    <td>@summary.MovementCount.ToUiString("N0")</td>
+                                    <td>@summary.Quantity.ToUiString("0.###")</td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </section>
+        </div>
+    }
 
     <section class="panel @(isLoading ? "loading-panel" : string.Empty)">
         @if (isLoading)
         {
             <div class="loading-banner">
                 <span class="loading-indicator" aria-hidden="true"></span>
-                <span>@L("Cargando movimientos de almacén...", "Carregant moviments de magatzem...", "Loading warehouse movements...")</span>
+                <span>@LoadingText</span>
             </div>
         }
 
@@ -129,7 +238,7 @@ else
                 else if (items.Count == 0)
                 {
                     <tr>
-                        <td colspan="9" class="table-empty">@L("Todavía no hay movimientos de almacén para mostrar.", "Encara no hi ha moviments de magatzem per mostrar.", "There are no warehouse movements to show yet.")</td>
+                        <td colspan="9" class="table-empty">@EmptyTableText</td>
                     </tr>
                 }
                 else
@@ -143,12 +252,12 @@ else
                             <td>@DisplayValue(item.ItemCode)</td>
                             <td>@item.ItemDescription</td>
                             <td>@DisplayValue(item.Color)</td>
-                            <td>@item.Quantity.ToString("0.###") @item.UnitOfMeasure</td>
+                            <td>@item.Quantity.ToUiString("0.###") @item.UnitOfMeasure</td>
                             <td>@DisplayValue(item.SupplierName)</td>
                             <td>
                                 @if (string.Equals(item.SourceDocumentType, "PurchaseReceipt", StringComparison.OrdinalIgnoreCase) && item.SourceDocumentNumber.HasValue)
                                 {
-                                    <a class="inline-link" href="/compras/recepciones/@item.SourceDocumentNumber.Value">@item.SourceDocumentDisplay</a>
+                                    <a class="inline-link" href="@(IsYarnMovementsRoute ? $"/compras/albaranes-entrega-fils/{item.SourceDocumentNumber.Value}" : $"/compras/recepciones/{item.SourceDocumentNumber.Value}")">@item.SourceDocumentDisplay</a>
                                 }
                                 else if ((string.Equals(item.SourceDocumentType, "StockTransferOutbound", StringComparison.OrdinalIgnoreCase) ||
                                           string.Equals(item.SourceDocumentType, "StockTransferInbound", StringComparison.OrdinalIgnoreCase)) && item.SourceDocumentNumber.HasValue)
@@ -197,6 +306,15 @@ else
     [SupplyParameterFromQuery(Name = "warehouse")]
     public string? Warehouse { get; set; }
 
+    [SupplyParameterFromQuery(Name = "supplier")]
+    public string? SupplierQuery { get; set; }
+
+    [SupplyParameterFromQuery(Name = "color")]
+    public string? ColorQuery { get; set; }
+
+    [SupplyParameterFromQuery(Name = "movementType")]
+    public string? MovementTypeQuery { get; set; }
+
     [SupplyParameterFromQuery(Name = "page")]
     public int? PageQuery { get; set; }
 
@@ -214,16 +332,157 @@ else
     private bool isLoading;
     private StockMovementFilter filter = new() { Page = 1, PageSize = 25, SortColumn = nameof(StockMovementListItemDto.MovementDate), SortDescending = true };
     private IReadOnlyCollection<StockMovementListItemDto> items = [];
+    private IReadOnlyCollection<StockMovementGroupSummaryDto> supplierSummaries = [];
+    private IReadOnlyCollection<StockMovementGroupSummaryDto> colorSummaries = [];
     private StockLegacySyncInfoDto legacySyncInfo = new();
     private string errorMessage = string.Empty;
     private string sortColumn = nameof(StockMovementListItemDto.MovementDate);
     private bool sortDescending = true;
     private int totalCount;
+    private IReadOnlyList<MovementTypeOption> MovementTypeOptions =>
+        movementTypeValues.Select(value => new MovementTypeOption(value, FormatMovementType(value))).ToArray();
+    private bool IsYarnMovementsRoute => CurrentRelativePath.StartsWith("almacen/fils/movimientos", StringComparison.OrdinalIgnoreCase);
+    private bool IsFabricMovementsRoute => CurrentRelativePath.StartsWith("almacen/tejidos/movimientos", StringComparison.OrdinalIgnoreCase);
+    private bool IsModelMovementsRoute => CurrentRelativePath.StartsWith("almacen/models/movimientos", StringComparison.OrdinalIgnoreCase);
+    private string CurrentRelativePath => NavigationManager.ToBaseRelativePath(NavigationManager.Uri).Split('?', '#')[0];
+    private string PageTitleText => IsYarnMovementsRoute
+        ? L("Almacén / Movimientos Fils", "Magatzem / Moviments Fils", "Warehouse / Yarn movements")
+        : IsFabricMovementsRoute
+            ? L("Almacén / Movimientos Teixits", "Magatzem / Moviments Teixits", "Warehouse / Fabric movements")
+        : IsModelMovementsRoute
+            ? L("Almacén / Movimientos Models", "Magatzem / Moviments Models", "Warehouse / Model movements")
+            : L("Almacén / Movimientos", "Magatzem / Moviments", "Warehouse / Movements");
+    private string PageHeadingText => IsYarnMovementsRoute
+        ? L("Movimientos Fils", "Moviments Fils", "Yarn movements")
+        : IsFabricMovementsRoute
+            ? L("Movimientos Teixits", "Moviments Teixits", "Fabric movements")
+        : IsModelMovementsRoute
+            ? L("Movimientos Models", "Moviments Models", "Model movements")
+            : L("Movimientos", "Moviments", "Movements");
+    private string PageLeadText => IsYarnMovementsRoute
+        ? L("Entradas y ajustes locales ligados al maestro fil y al circuito específico de hilos.", "Entrades i ajustos locals lligats al mestre fil i al circuit específic de fils.", "Inbound and local adjustments tied to the fil master and the yarn-specific workflow.")
+        : IsFabricMovementsRoute
+            ? L("Entradas, consumos y ajustes locales ligados al maestro teixits y al circuito específico de tejidos.", "Entrades, consums i ajustos locals lligats al mestre teixits i al circuit específic de teixits.", "Inbound, consumption and local adjustments tied to the teixits master and the fabric-specific workflow.")
+        : IsModelMovementsRoute
+            ? L("Entradas y ajustes locales ligados al catálogo de models.", "Entrades i ajustos locals lligats al catàleg de models.", "Inbound and local adjustments tied to the models catalogue.")
+            : L("Entradas de stock generadas desde recepciones y futuros movimientos de almacén.", "Entrades d'estoc generades des de recepcions i futurs moviments de magatzem.", "Stock entries generated from receipts and future warehouse movements.");
+    private string StockRoute => IsYarnMovementsRoute
+        ? "/almacen/fils"
+        : IsFabricMovementsRoute
+            ? "/almacen/tejidos"
+        : IsModelMovementsRoute
+            ? "/almacen/models"
+            : "/almacen/stock-actual";
+    private string StockLinkText => IsYarnMovementsRoute
+        ? L("Ver stock de hilos", "Veure estoc de fils", "View yarn stock")
+        : IsFabricMovementsRoute
+            ? L("Ver stock de tejidos", "Veure estoc de teixits", "View fabric stock")
+        : IsModelMovementsRoute
+            ? L("Ver stock models", "Veure estoc models", "View model stock")
+            : L("Ver stock actual", "Veure estoc actual", "View current stock");
+    private string NoCompanyText => IsYarnMovementsRoute
+        ? L("Selecciona una empresa activa para revisar movimientos de hilos.", "Selecciona una empresa activa per revisar moviments de fils.", "Select an active company to review yarn movements.")
+        : IsFabricMovementsRoute
+            ? L("Selecciona una empresa activa para revisar movimientos de tejidos.", "Selecciona una empresa activa per revisar moviments de teixits.", "Select an active company to review fabric movements.")
+        : IsModelMovementsRoute
+            ? L("Selecciona una empresa activa para revisar movimientos de models.", "Selecciona una empresa activa per revisar moviments de models.", "Select an active company to review model movements.")
+            : L("Selecciona una empresa activa para revisar movimientos de almacén.", "Selecciona una empresa activa per revisar moviments de magatzem.", "Select an active company to review warehouse movements.");
+    private string ResultsSummaryText => totalCount == 0
+        ? L("Sin resultados", "Sense resultats", "No results")
+        : IsYarnMovementsRoute
+            ? L($"Mostrando {PageStart.ToUiString("N0")}-{PageEnd.ToUiString("N0")} de {totalCount.ToUiString("N0")} movimientos de hilos", $"Mostrant {PageStart.ToUiString("N0")}-{PageEnd.ToUiString("N0")} de {totalCount.ToUiString("N0")} moviments de fils", $"Showing {PageStart.ToUiString("N0")}-{PageEnd.ToUiString("N0")} of {totalCount.ToUiString("N0")} yarn movements")
+            : IsFabricMovementsRoute
+                ? L($"Mostrando {PageStart.ToUiString("N0")}-{PageEnd.ToUiString("N0")} de {totalCount.ToUiString("N0")} movimientos de tejidos", $"Mostrant {PageStart.ToUiString("N0")}-{PageEnd.ToUiString("N0")} de {totalCount.ToUiString("N0")} moviments de teixits", $"Showing {PageStart.ToUiString("N0")}-{PageEnd.ToUiString("N0")} of {totalCount.ToUiString("N0")} fabric movements")
+            : IsModelMovementsRoute
+                ? L($"Mostrando {PageStart.ToUiString("N0")}-{PageEnd.ToUiString("N0")} de {totalCount.ToUiString("N0")} movimientos models", $"Mostrant {PageStart.ToUiString("N0")}-{PageEnd.ToUiString("N0")} de {totalCount.ToUiString("N0")} moviments models", $"Showing {PageStart.ToUiString("N0")}-{PageEnd.ToUiString("N0")} of {totalCount.ToUiString("N0")} model movements")
+                : L($"Mostrando {PageStart.ToUiString("N0")}-{PageEnd.ToUiString("N0")} de {totalCount.ToUiString("N0")} movimientos", $"Mostrant {PageStart.ToUiString("N0")}-{PageEnd.ToUiString("N0")} de {totalCount.ToUiString("N0")} moviments", $"Showing {PageStart.ToUiString("N0")}-{PageEnd.ToUiString("N0")} of {totalCount.ToUiString("N0")} movements");
+    private string LegacyLeadText => IsYarnMovementsRoute
+        ? L("El saldo de fils manda desde TEX.NET y se replica en la SaaS local filtrado por el maestro fil. ", "El saldo de fils mana des de TEX.NET i es replica a la SaaS local filtrat pel mestre fil. ", "Yarn stock is driven from TEX.NET and replicated into the local SaaS filtered by the fil master. ")
+        : IsFabricMovementsRoute
+            ? L("El saldo de teixits manda desde TEX.NET y se replica en la SaaS local filtrado por el maestro teixits. ", "El saldo de teixits mana des de TEX.NET i es replica a la SaaS local filtrat pel mestre teixits. ", "Fabric stock is driven from TEX.NET and replicated into the local SaaS filtered by the teixits master. ")
+        : IsModelMovementsRoute
+            ? L("El saldo de models manda desde TEX.NET y se replica en la SaaS local filtrado por article_models. ", "El saldo de models mana des de TEX.NET i es replica a la SaaS local filtrat per article_models. ", "Model stock is driven from TEX.NET and replicated into the local SaaS filtered by article_models. ")
+            : L("El saldo actual manda desde TEX.NET y se replica en la SaaS local. ", "El saldo actual mana des de TEX.NET i es replica a la SaaS local. ", "Current stock is driven from TEX.NET and replicated into the local SaaS. ");
+    private string LegacyDeltaText => IsYarnMovementsRoute
+        ? L("Esta pantalla muestra solo los movimientos web de hilos registrados en local; sirven como delta sobre el snapshot legacy y no tocan el remoto. ", "Aquesta pantalla mostra només els moviments web de fils registrats en local; serveixen com a delta sobre l'snapshot legacy i no toquen el remot. ", "This screen shows only locally stored web yarn movements; they work as a delta over the legacy snapshot and never touch the remote source. ")
+        : IsFabricMovementsRoute
+            ? L("Esta pantalla muestra solo los movimientos web de tejidos registrados en local; sirven como delta sobre el snapshot legacy y no tocan el remoto. ", "Aquesta pantalla mostra només els moviments web de teixits registrats en local; serveixen com a delta sobre l'snapshot legacy i no toquen el remot. ", "This screen shows only locally stored web fabric movements; they work as a delta over the legacy snapshot and never touch the remote source. ")
+        : IsModelMovementsRoute
+            ? L("Esta pantalla muestra solo los movimientos web de models registrados en local; sirven como delta sobre el snapshot legacy y no tocan el remoto. ", "Aquesta pantalla mostra només els moviments web de models registrats en local; serveixen com a delta sobre l'snapshot legacy i no toquen el remot. ", "This screen shows only locally stored web model movements; they work as a delta over the legacy snapshot and never touch the remote source. ")
+            : L("Esta pantalla sigue mostrando solo los movimientos web registrados en local; sirven como delta sobre el snapshot legacy y no tocan el remoto. ", "Aquesta pantalla continua mostrant només els moviments web registrats en local; serveixen com a delta sobre l'snapshot legacy i no toquen el remot. ", "This screen still shows only web movements stored locally; they work as a delta over the legacy snapshot and never touch the remote source. ");
+    private string PrimaryKpiText => IsYarnMovementsRoute
+        ? L("movimientos de hilo", "moviments de fil", "yarn movements")
+        : IsFabricMovementsRoute
+            ? L("movimientos de tejido", "moviments de teixit", "fabric movements")
+        : IsModelMovementsRoute
+            ? L("movimientos models", "moviments models", "model movements")
+            : L("movimientos", "moviments", "movements");
+    private string SecondaryKpiText => IsYarnMovementsRoute
+        ? L("proveedores de hilo en página", "proveïdors de fil a la pàgina", "yarn suppliers on page")
+        : IsFabricMovementsRoute
+            ? L("proveedores de tejido en página", "proveïdors de teixit a la pàgina", "fabric suppliers on page")
+        : IsModelMovementsRoute
+            ? L("proveedores models en página", "proveïdors models a la pàgina", "model suppliers on page")
+            : L("proveedores en página", "proveïdors a la pàgina", "suppliers on page");
+    private string ColorKpiText => IsYarnMovementsRoute
+        ? L("colores de hilo en página", "colors de fil a la pàgina", "yarn colors on page")
+        : IsFabricMovementsRoute
+            ? L("colores de tejido en página", "colors de teixit a la pàgina", "fabric colors on page")
+        : IsModelMovementsRoute
+            ? L("colores models en página", "colors models a la pàgina", "model colors on page")
+            : L("colores en página", "colors a la pàgina", "colors on page");
+    private string MovementTypeKpiText => IsYarnMovementsRoute
+        ? L("tipos de mov. de hilo", "tipus de mov. de fil", "yarn move types")
+        : IsFabricMovementsRoute
+            ? L("tipos de mov. de tejido", "tipus de mov. de teixit", "fabric move types")
+        : IsModelMovementsRoute
+            ? L("tipos de mov. models", "tipus de mov. models", "model move types")
+            : L("tipos de movimiento", "tipus de moviment", "movement types");
+    private string TertiaryKpiText => IsYarnMovementsRoute
+        ? L("cantidad de hilo movida en página", "quantitat de fil moguda a la pàgina", "yarn quantity moved on page")
+        : IsFabricMovementsRoute
+            ? L("cantidad de tejido movida en página", "quantitat de teixit moguda a la pàgina", "fabric quantity moved on page")
+        : IsModelMovementsRoute
+            ? L("cantidad models movida en página", "quantitat models moguda a la pàgina", "model quantity moved on page")
+            : L("cantidad movida en página", "quantitat moguda en pàgina", "quantity moved on page");
+    private string LoadingText => IsYarnMovementsRoute
+        ? L("Cargando movimientos de hilos...", "Carregant moviments de fils...", "Loading yarn movements...")
+        : IsFabricMovementsRoute
+            ? L("Cargando movimientos de tejidos...", "Carregant moviments de teixits...", "Loading fabric movements...")
+        : IsModelMovementsRoute
+            ? L("Cargando movimientos models...", "Carregant moviments models...", "Loading model movements...")
+            : L("Cargando movimientos de almacén...", "Carregant moviments de magatzem...", "Loading warehouse movements...");
+    private string EmptyTableText => IsYarnMovementsRoute
+        ? L("Todavía no hay movimientos de hilos para mostrar.", "Encara no hi ha moviments de fils per mostrar.", "There are no yarn movements to show yet.")
+        : IsFabricMovementsRoute
+            ? L("Todavía no hay movimientos de tejidos para mostrar.", "Encara no hi ha moviments de teixits per mostrar.", "There are no fabric movements to show yet.")
+        : IsModelMovementsRoute
+            ? L("Todavía no hay movimientos models para mostrar.", "Encara no hi ha moviments models per mostrar.", "There are no model movements to show yet.")
+            : L("Todavía no hay movimientos de almacén para mostrar.", "Encara no hi ha moviments de magatzem per mostrar.", "There are no warehouse movements to show yet.");
     private int TotalPages => Math.Max(1, (int)Math.Ceiling(totalCount / (double)filter.PageSize));
     private bool CanGoPrevious => filter.Page > 1;
     private bool CanGoNext => filter.Page < TotalPages;
     private int PageStart => totalCount == 0 ? 0 : ((filter.Page - 1) * filter.PageSize) + 1;
     private int PageEnd => totalCount == 0 ? 0 : Math.Min(filter.Page * filter.PageSize, totalCount);
+    private static readonly IReadOnlyList<string> movementTypeValues =
+    [
+        StockMovementTypes.InboundPurchaseReceipt,
+        StockMovementTypes.InboundManualAdjustment,
+        StockMovementTypes.OutboundManualAdjustment,
+        StockMovementTypes.OutboundSalesShipment,
+        StockMovementTypes.OutboundTextileDispositionRaw,
+        StockMovementTypes.InboundTextileDispositionRaw,
+        StockMovementTypes.OutboundTextileDispositionDisposed,
+        StockMovementTypes.InboundTextileDispositionDisposed,
+        StockMovementTypes.OutboundTextileDispositionColor,
+        StockMovementTypes.InboundTextileDispositionColor,
+        StockMovementTypes.FinishWorkOrderInProgress,
+        StockMovementTypes.FinishWorkOrderFinished,
+        StockMovementTypes.OutboundWarehouseTransfer,
+        StockMovementTypes.InboundWarehouseTransfer,
+        StockMovementTypes.InboundInventoryCountAdjustment,
+        StockMovementTypes.OutboundInventoryCountAdjustment
+    ];
 
     protected override async Task OnParametersSetAsync()
     {
@@ -255,12 +514,16 @@ else
             filter.SortDescending = sortDescending;
             var result = await StockQueries.SearchMovementsAsync(tenantId.Value, companyId.Value, filter);
             items = result.Items;
+            supplierSummaries = result.SupplierSummaries;
+            colorSummaries = result.ColorSummaries;
             totalCount = result.TotalCount;
         }
         catch (Exception exception)
         {
             errorMessage = exception.Message;
             items = [];
+            supplierSummaries = [];
+            colorSummaries = [];
             legacySyncInfo = new StockLegacySyncInfoDto();
             totalCount = 0;
         }
@@ -324,6 +587,16 @@ else
     {
         filter.Search = Search?.Trim() ?? string.Empty;
         filter.Warehouse = Warehouse?.Trim() ?? string.Empty;
+        filter.SupplierName = SupplierQuery?.Trim() ?? string.Empty;
+        filter.Color = ColorQuery?.Trim() ?? string.Empty;
+        filter.MovementType = NormalizeMovementType(MovementTypeQuery);
+        filter.CatalogScope = IsYarnMovementsRoute
+            ? "Hilos"
+            : IsFabricMovementsRoute
+                ? "Tejidos"
+            : IsModelMovementsRoute
+                ? "Models"
+                : string.Empty;
         filter.Page = Math.Max(PageQuery.GetValueOrDefault(1), 1);
         filter.PageSize = PageSizeQuery is 25 or 50 or 100 ? PageSizeQuery.Value : 25;
         sortColumn = NormalizeSortColumn(SortQuery);
@@ -338,6 +611,9 @@ else
         {
             ["search"] = string.IsNullOrWhiteSpace(filter.Search) ? null : filter.Search,
             ["warehouse"] = string.IsNullOrWhiteSpace(filter.Warehouse) ? null : filter.Warehouse,
+            ["supplier"] = string.IsNullOrWhiteSpace(filter.SupplierName) ? null : filter.SupplierName,
+            ["color"] = string.IsNullOrWhiteSpace(filter.Color) ? null : filter.Color,
+            ["movementType"] = string.IsNullOrWhiteSpace(filter.MovementType) ? null : filter.MovementType,
             ["page"] = filter.Page > 1 ? filter.Page : null,
             ["pageSize"] = filter.PageSize != 25 ? filter.PageSize : null,
             ["sort"] = string.Equals(sortColumn, nameof(StockMovementListItemDto.MovementDate), StringComparison.Ordinal) ? null : sortColumn,
@@ -361,6 +637,11 @@ else
         _ => nameof(StockMovementListItemDto.MovementDate)
     };
 
+    private string NormalizeMovementType(string? movementType) =>
+        movementTypeValues.Any(value => string.Equals(value, movementType?.Trim(), StringComparison.Ordinal))
+            ? movementType!.Trim()
+            : string.Empty;
+
     private string FormatMovementType(string movementType) => movementType switch
     {
         StockMovementTypes.InboundPurchaseReceipt => L("Entrada compra", "Entrada compra", "Purchase inbound"),
@@ -383,4 +664,5 @@ else
     };
 
     private string DisplayValue(string value) => string.IsNullOrWhiteSpace(value) ? L("Sin dato", "Sense dada", "No data") : value;
+    private sealed record MovementTypeOption(string Value, string Label);
 }

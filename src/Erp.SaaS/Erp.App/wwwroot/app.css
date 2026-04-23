@@ -63,6 +63,29 @@ html[data-theme="blue-modern"] {
     --surface-soft-strong: rgba(40, 112, 213, 0.12);
 }
 
+html[data-theme="institutional"] {
+    --bg: #eff4f8;
+    --paper: #ffffff;
+    --ink: #1d3553;
+    --muted: #5d7188;
+    --line: #ccd9e5;
+    --brand: #0a6e9d;
+    --brand-deep: #084f73;
+    --accent: #0a6e9d;
+    --success: #2f7b52;
+    --danger: #b84b4b;
+    --shadow: 0 10px 24px rgba(23, 57, 92, 0.08);
+    --radius: 18px;
+    --bg-gradient-start: #f7fafc;
+    --bg-radial: rgba(72, 129, 187, 0.08);
+    --sidebar-bg: rgba(242, 247, 252, 0.98);
+    --sidebar-line: rgba(10, 84, 125, 0.12);
+    --panel-border: rgba(10, 84, 125, 0.12);
+    --surface-soft: rgba(10, 84, 125, 0.08);
+    --surface-soft-strong: rgba(10, 110, 157, 0.13);
+    --content-max-width: 1360px;
+}
+
 html[data-theme="compact"] {
     --shadow: 0 14px 30px rgba(52, 39, 27, 0.06);
     --radius: 14px;
@@ -304,6 +327,28 @@ html[data-theme="blue-modern"] .theme-option.active {
     background: linear-gradient(135deg, #ddeafd, #eef4fb);
 }
 
+.theme-preview-institutional span:nth-child(1) {
+    background: linear-gradient(135deg, #ffffff, #edf4fb);
+}
+
+.theme-preview-institutional span:nth-child(2) {
+    background: linear-gradient(135deg, #0a6e9d, #084f73);
+}
+
+.theme-preview-institutional span:nth-child(3) {
+    background:
+        linear-gradient(
+            180deg,
+            rgba(10, 110, 157, 0.2) 0,
+            rgba(10, 110, 157, 0.2) 24%,
+            transparent 24%,
+            transparent 46%,
+            rgba(8, 79, 115, 0.16) 46%,
+            rgba(8, 79, 115, 0.16) 68%,
+            transparent 68%,
+            transparent 100%);
+}
+
 .theme-preview-compact span:nth-child(1) {
     background: linear-gradient(135deg, #fffdf9, #f0e8dc);
 }
@@ -394,6 +439,116 @@ html[data-theme="blue-modern"] .accent-card {
 
 html[data-theme="blue-modern"] .purchase-reconciliation-warning-row td {
     background: rgba(40, 112, 213, 0.08);
+}
+
+html[data-theme="institutional"] body {
+    background:
+        linear-gradient(180deg, #f8fbfe 0%, #eef4f8 100%);
+}
+
+html[data-theme="institutional"] .shell-sidebar {
+    background:
+        linear-gradient(180deg, rgba(247, 250, 253, 0.98) 0%, rgba(239, 244, 248, 0.98) 100%);
+    border-right-color: rgba(10, 84, 125, 0.14);
+    backdrop-filter: blur(10px);
+}
+
+html[data-theme="institutional"] .sidebar-panel,
+html[data-theme="institutional"] .panel,
+html[data-theme="institutional"] .info-card,
+html[data-theme="institutional"] .auth-panel,
+html[data-theme="institutional"] .dashboard-metric-card,
+html[data-theme="institutional"] .dashboard-action-tile,
+html[data-theme="institutional"] .manual-capture-card {
+    border-color: rgba(10, 84, 125, 0.12);
+    box-shadow: 0 6px 16px rgba(29, 53, 83, 0.06);
+}
+
+html[data-theme="institutional"] .shell-toggle,
+html[data-theme="institutional"] .primary-button,
+html[data-theme="institutional"] .sidebar-button {
+    background: linear-gradient(135deg, #0a6e9d, #084f73);
+    color: #fff;
+    border-color: rgba(8, 79, 115, 0.18);
+    box-shadow: 0 8px 18px rgba(10, 84, 125, 0.16);
+}
+
+html[data-theme="institutional"] .shell-toggle {
+    border-radius: 12px;
+}
+
+html[data-theme="institutional"] .secondary-button,
+html[data-theme="institutional"] .view-toggle,
+html[data-theme="institutional"] .kanban-card-totals span,
+html[data-theme="institutional"] .kanban-empty,
+html[data-theme="institutional"] .comparison-panel {
+    background: rgba(10, 84, 125, 0.08);
+    color: var(--brand-deep);
+}
+
+html[data-theme="institutional"] .sidebar-link-home,
+html[data-theme="institutional"] .theme-dropdown-trigger,
+html[data-theme="institutional"] .theme-option,
+html[data-theme="institutional"] .sidebar-select,
+html[data-theme="institutional"] .text-input,
+html[data-theme="institutional"] .text-area {
+    border-color: rgba(10, 84, 125, 0.14);
+}
+
+html[data-theme="institutional"] .sidebar-group-toggle:hover,
+html[data-theme="institutional"] .sidebar-group-toggle.expanded,
+html[data-theme="institutional"] .sidebar-link.active,
+html[data-theme="institutional"] .sidebar-link:hover {
+    background: rgba(10, 110, 157, 0.1);
+}
+
+html[data-theme="institutional"] .brand-kicker,
+html[data-theme="institutional"] .eyebrow,
+html[data-theme="institutional"] .sidebar-group-title {
+    color: #5c7690;
+}
+
+html[data-theme="institutional"] .shell-toolbar {
+    margin-bottom: 1rem;
+    padding-bottom: 0.55rem;
+    border-bottom: 1px solid rgba(10, 84, 125, 0.12);
+}
+
+html[data-theme="institutional"] .page-header {
+    margin-bottom: 1.1rem;
+}
+
+html[data-theme="institutional"] .page-header h1,
+html[data-theme="institutional"] .panel h2,
+html[data-theme="institutional"] .info-card h2,
+html[data-theme="institutional"] .dashboard-section-header h2 {
+    color: #173a5d;
+}
+
+html[data-theme="institutional"] .status-pill.success {
+    background: rgba(47, 123, 82, 0.12);
+}
+
+html[data-theme="institutional"] .status-pill.warning {
+    background: rgba(185, 137, 41, 0.14);
+}
+
+html[data-theme="institutional"] .status-pill.danger {
+    background: rgba(184, 75, 75, 0.12);
+}
+
+html[data-theme="institutional"] .manual-index-link,
+html[data-theme="institutional"] .manual-capture-topbar,
+html[data-theme="institutional"] .manual-capture-content-header,
+html[data-theme="institutional"] .manual-capture-content-toolbar,
+html[data-theme="institutional"] .manual-capture-content-grid span,
+html[data-theme="institutional"] .manual-capture-content-table span {
+    background: rgba(10, 84, 125, 0.1);
+}
+
+html[data-theme="institutional"] .manual-capture-sidebar {
+    background: linear-gradient(180deg, rgba(10, 110, 157, 0.12), rgba(248, 251, 254, 0.68));
+    border-right-color: rgba(10, 84, 125, 0.12);
 }
 
 html[data-theme="compact"] .brand-block {

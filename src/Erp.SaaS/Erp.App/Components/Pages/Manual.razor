@@ -1,38 +1,39 @@
 @page "/manual"
 @attribute [Authorize]
+@inject AppText T
 
-<PageTitle>Manual de usuario</PageTitle>
+<PageTitle>@L("Manual de usuario", "Manual d'usuari", "User manual")</PageTitle>
 
 <div class="page-header">
     <div>
-        <p class="eyebrow">Ayuda</p>
-        <h1>Manual de usuario</h1>
-        <p class="lead">Guía práctica para moverse por la aplicación, entender cada bloque funcional y saber qué operaciones se pueden hacer hoy en la SaaS.</p>
+        <p class="eyebrow">@L("Ayuda", "Ajuda", "Help")</p>
+        <h1>@L("Manual de usuario", "Manual d'usuari", "User manual")</h1>
+        <p class="lead">@L("Guía práctica para moverse por la aplicación, entender cada bloque funcional y saber qué operaciones se pueden hacer hoy en la SaaS.", "Guia pràctica per moure's per l'aplicació, entendre cada bloc funcional i saber quines operacions es poden fer avui a la SaaS.", "Practical guide to move around the application, understand each functional area, and know what operations can be done today in the SaaS.")</p>
     </div>
     <div class="form-actions no-print">
-        <a class="secondary-button link-button" href="#primeros-pasos">Primeros pasos</a>
-        <a class="primary-button link-button" href="#mapa-funcional">Ver mapa funcional</a>
+        <a class="secondary-button link-button" href="#primeros-pasos">@L("Primeros pasos", "Primers passos", "First steps")</a>
+        <a class="primary-button link-button" href="#mapa-funcional">@L("Ver mapa funcional", "Veure mapa funcional", "View functional map")</a>
     </div>
 </div>
 
 <section class="panel" id="primeros-pasos">
-    <h2>Primeros pasos</h2>
+    <h2>@L("Primeros pasos", "Primers passos", "First steps")</h2>
     <div class="manual-step-grid">
         <article class="info-card">
-            <h3>1. Cambia de empresa</h3>
-            <p>Usa el selector del menú lateral para trabajar con la empresa activa correcta. Toda la navegación y los datos que ves dependen de esa selección.</p>
+            <h3>@L("1. Cambia de empresa", "1. Canvia d'empresa", "1. Change company")</h3>
+            <p>@L("Usa el selector del menú lateral para trabajar con la empresa activa correcta. Toda la navegación y los datos que ves dependen de esa selección.", "Fes servir el selector del menú lateral per treballar amb l'empresa activa correcta. Tota la navegació i les dades que veus depenen d'aquesta selecció.", "Use the side menu selector to work with the correct active company. All navigation and data you see depend on that selection.")</p>
         </article>
         <article class="info-card">
-            <h3>2. Elige tema visual</h3>
-            <p>Puedes cambiar entre los temas `Actual`, `Azul moderno`, `Compacto` y `Ultracompacto`. El sistema recuerda tu elección y también si ocultas el menú lateral.</p>
+            <h3>@L("2. Elige tema visual", "2. Tria tema visual", "2. Choose a visual theme")</h3>
+            <p>@L("Puedes cambiar entre los temas `Actual`, `Azul moderno`, `Compacto` y `Ultracompacto`. El sistema recuerda tu elección y también si ocultas el menú lateral.", "Pots canviar entre els temes `Actual`, `Blau modern`, `Compacte` i `Ultracompacte`. El sistema recorda la teva elecció i també si ocultes el menú lateral.", "You can switch between the `Current`, `Modern blue`, `Compact`, and `Ultracompact` themes. The system remembers your choice and whether you hide the side menu.")</p>
         </article>
         <article class="info-card">
-            <h3>3. Usa el menú por bloques</h3>
-            <p>La navegación está agrupada por `CRM`, `Artículos`, `Base`, `Producción`, `Ventas`, `Compras`, `Almacén` y `Administración`, para localizar antes cada función.</p>
+            <h3>@L("3. Usa el menú por bloques", "3. Fes servir el menú per blocs", "3. Use the menu by sections")</h3>
+            <p>@L("La navegación está agrupada por `CRM`, `Artículos`, `Base`, `Producción`, `Ventas`, `Compras`, `Almacén` y `Administración`, para localizar antes cada función.", "La navegació està agrupada per `CRM`, `Articles`, `Base`, `Producció`, `Vendes`, `Compres`, `Magatzem` i `Administració`, per localitzar abans cada funció.", "Navigation is grouped into `CRM`, `Articles`, `Base`, `Production`, `Sales`, `Purchases`, `Warehouse`, and `Administration` so each function is easier to find.")</p>
         </article>
         <article class="info-card">
-            <h3>4. Aprovecha los listados</h3>
-            <p>Los listados grandes ya recuerdan filtros, orden y paginación en la URL. Si compartes o recargas un enlace, vuelves al mismo contexto de trabajo.</p>
+            <h3>@L("4. Aprovecha los listados", "4. Aprofita els llistats", "4. Make use of the lists")</h3>
+            <p>@L("Los listados grandes ya recuerdan filtros, orden y paginación en la URL. Si compartes o recargas un enlace, vuelves al mismo contexto de trabajo.", "Els llistats grans ja recorden filtres, ordre i paginació a la URL. Si comparteixes o recarregues un enllaç, tornes al mateix context de treball.", "Large lists already remember filters, sort order, and pagination in the URL. If you share or reload a link, you return to the same working context.")</p>
         </article>
     </div>
 </section>
@@ -40,12 +41,12 @@
 <section class="panel" id="mapa-funcional">
     <div class="panel-header">
         <div>
-            <h2>Mapa funcional</h2>
-            <p class="muted">Cada bloque resume qué se puede hacer y desde qué pantallas entrar.</p>
+            <h2>@L("Mapa funcional", "Mapa funcional", "Functional map")</h2>
+            <p class="muted">@L("Cada bloque resume qué se puede hacer y desde qué pantallas entrar.", "Cada bloc resumeix què es pot fer i des de quines pantalles entrar.", "Each area summarizes what can be done and from which screens to access it.")</p>
         </div>
     </div>
 
-    <nav class="manual-index no-print" aria-label="Índice del manual">
+    <nav class="manual-index no-print" aria-label="@L("Índice del manual", "Índex del manual", "Manual index")">
         @foreach (var area in areas)
         {
             <a class="manual-index-link" href="@($"#{area.Id}")">@area.Title</a>
@@ -83,7 +84,7 @@
             <aside class="manual-area-visual">
                 <div class="manual-capture-card">
                     <div class="manual-capture-meta">
-                        <strong>Vista orientativa</strong>
+                        <strong>@L("Vista orientativa", "Vista orientativa", "Illustrative view")</strong>
                         <span>@area.CaptureLabel</span>
                     </div>
                     <div class="manual-capture @($"manual-capture-{area.CaptureKind}")" aria-hidden="true">
@@ -113,7 +114,7 @@
                             </div>
                         </div>
                     </div>
-                    <p class="manual-capture-note">La sección está preparada para sustituir estas vistas por capturas reales de cada pantalla cuando quieras rematar el manual visual definitivo.</p>
+                    <p class="manual-capture-note">@L("La sección está preparada para sustituir estas vistas por capturas reales de cada pantalla cuando quieras rematar el manual visual definitivo.", "La secció està preparada per substituir aquestes vistes per captures reals de cada pantalla quan vulguis rematar el manual visual definitiu.", "This section is ready to replace these views with real screenshots of each screen whenever you want to finish the final visual manual.")</p>
                 </div>
             </aside>
         </div>
@@ -121,140 +122,148 @@
 }
 
 @code {
-    private static IReadOnlyList<ManualArea> areas { get; } =
+    private string L(string spanish, string catalan, string english) =>
+        T.CurrentLanguage switch
+        {
+            AppLanguages.Catalan => catalan,
+            AppLanguages.English => english,
+            _ => spanish
+        };
+
+    private IReadOnlyList<ManualArea> areas =>
     [
         new(
             "crm",
             "CRM",
-            "Gestión de clientes, duplicados, representantes, transportistas y talleres. Es el punto de entrada para mantener datos comerciales y operativos.",
+            L("Gestión de clientes, duplicados, representantes, transportistas y talleres. Es el punto de entrada para mantener datos comerciales y operativos.", "Gestió de clients, duplicats, representants, transportistes i tallers. És el punt d'entrada per mantenir dades comercials i operatives.", "Management of clients, duplicates, representatives, carriers, and workshops. It is the main entry point to maintain commercial and operational data."),
             "CRM",
             "list",
-            "Listados con búsqueda, orden y edición rápida",
+            L("Listados con búsqueda, orden y edición rápida", "Llistats amb cerca, ordre i edició ràpida", "Lists with search, sorting, and quick editing"),
             [
-                new("Clientes", "Alta, edición, deduplicación y navegación rápida al detalle."),
-                new("Representantes y transportistas", "Mantenimiento local con sync legacy sin tocar la base remota."),
-                new("Talleres", "Gestión de talleres y uso posterior en compras, producción y artículos.")
+                new(L("Clientes", "Clients", "Clients"), L("Alta, edición, deduplicación y navegación rápida al detalle.", "Alta, edició, deduplicació i navegació ràpida al detall.", "Create, edit, deduplicate, and navigate quickly to detail.")),
+                new(L("Representantes y transportistas", "Representants i transportistes", "Representatives and carriers"), L("Mantenimiento local con sync legacy sin tocar la base remota.", "Manteniment local amb sync legacy sense tocar la base remota.", "Local maintenance with legacy sync without touching the remote database.")),
+                new(L("Talleres", "Tallers", "Workshops"), L("Gestión de talleres y uso posterior en compras, producción y artículos.", "Gestió de tallers i ús posterior a compres, producció i articles.", "Workshop management and later use in purchases, production, and articles."))
             ],
             [
-                new("Abrir CRM / Clientes", "/crm/clientes"),
-                new("Abrir CRM / Duplicados", "/crm/clientes/duplicados"),
-                new("Abrir CRM / Representantes", "/crm/representantes")
+                new(L("Abrir CRM / Clientes", "Obrir CRM / Clients", "Open CRM / Clients"), "/crm/clientes"),
+                new(L("Abrir CRM / Duplicados", "Obrir CRM / Duplicats", "Open CRM / Duplicates"), "/crm/clientes/duplicados"),
+                new(L("Abrir CRM / Representantes", "Obrir CRM / Representants", "Open CRM / Representatives"), "/crm/representantes")
             ]),
         new(
             "articulos",
-            "Artículos",
-            "Bloque principal para tejidos, hilos, fornituras, models, muestras, complementos y disposiciones. Aquí está gran parte del núcleo funcional heredado del legacy.",
-            "Artículos",
+            L("Artículos", "Articles", "Articles"),
+            L("Bloque principal para tejidos, hilos, fornituras, models, muestras, complementos y disposiciones. Aquí está gran parte del núcleo funcional heredado del legacy.", "Bloc principal per a teixits, fils, fornitures, models, mostres, complements i disposicions. Aquí hi ha gran part del nucli funcional heretat del legacy.", "Main area for fabrics, yarns, trims, models, samples, complements, and dispositions. Much of the functional core inherited from legacy lives here."),
+            L("Artículos", "Articles", "Articles"),
             "detail",
-            "Ficha con pestañas, detalle y ayudas de trabajo",
+            L("Ficha con pestañas, detalle y ayudas de trabajo", "Fitxa amb pestanyes, detall i ajudes de treball", "Record with tabs, detail, and work helpers"),
             [
-                new("Tejidos", "Carta de colores, reposición agrupada, valoración de stock, impresión y acciones rápidas."),
-                new("Muestras y complementos", "Ficha técnica, colores/tallas, impresión y desglose color · máquina."),
-                new("Disposiciones y models", "Trabajo por detalle, stock asociado y soporte de producción.")
+                new(L("Tejidos", "Teixits", "Fabrics"), L("Carta de colores, reposición agrupada, valoración de stock, impresión y acciones rápidas.", "Carta de colors, reposició agrupada, valoració d'estoc, impressió i accions ràpides.", "Color card, grouped replenishment, stock valuation, printing, and quick actions.")),
+                new(L("Muestras y complementos", "Mostres i complements", "Samples and complements"), L("Ficha técnica, colores/tallas, impresión y desglose color · máquina.", "Fitxa tècnica, colors/talles, impressió i desglossament color · màquina.", "Technical sheet, colors/sizes, printing, and color · machine breakdown.")),
+                new(L("Disposiciones y models", "Disposicions i models", "Dispositions and models"), L("Trabajo por detalle, stock asociado y soporte de producción.", "Treball per detall, estoc associat i suport de producció.", "Detail work, linked stock, and production support."))
             ],
             [
-                new("Abrir Artículos / Tejidos", "/articulos/tejidos"),
-                new("Abrir Artículos / Muestras", "/articulos/muestras"),
-                new("Abrir Artículos / Models", "/articulos/models")
+                new(L("Abrir Artículos / Tejidos", "Obrir Articles / Teixits", "Open Articles / Fabrics"), "/articulos/tejidos"),
+                new(L("Abrir Artículos / Muestras", "Obrir Articles / Mostres", "Open Articles / Samples"), "/articulos/muestras"),
+                new(L("Abrir Artículos / Models", "Obrir Articles / Models", "Open Articles / Models"), "/articulos/models")
             ]),
         new(
             "base",
-            "Base",
-            "Catálogos maestros reutilizables por toda la aplicación: formas de pago, tipos de IVA, máquinas, incoterms, temporadas, operaciones y bancos/cajas.",
-            "Base",
+            L("Base", "Base", "Base"),
+            L("Catálogos maestros reutilizables por toda la aplicación: formas de pago, tipos de IVA, máquinas, incoterms, temporadas, operaciones y bancos/cajas.", "Catàlegs mestres reutilitzables per tota l'aplicació: formes de pagament, tipus d'IVA, màquines, incoterms, temporades, operacions i bancs/caixes.", "Reusable master catalogs across the whole application: payment methods, VAT types, machines, Incoterms, seasons, operations, and banks/cashboxes."),
+            L("Base", "Base", "Base"),
             "catalog",
-            "Catálogo maestro con alta y edición directa",
+            L("Catálogo maestro con alta y edición directa", "Catàleg mestre amb alta i edició directa", "Master catalog with direct create and edit"),
             [
-                new("Catálogos editables", "Todos permiten trabajo local y varios ya soportan sync legacy por centro."),
-                new("Campos especializados", "Formas de pago, IVA, bancos y otros ya no son catálogos genéricos, sino pantallas adaptadas."),
-                new("Uso transversal", "Estos valores alimentan compras, ventas, producción y fichas de artículos.")
+                new(L("Catálogos editables", "Catàlegs editables", "Editable catalogs"), L("Todos permiten trabajo local y varios ya soportan sync legacy por centro.", "Tots permeten treball local i diversos ja suporten sync legacy per centre.", "All allow local work, and several already support legacy sync per center.")),
+                new(L("Campos especializados", "Camps especialitzats", "Specialized fields"), L("Formas de pago, IVA, bancos y otros ya no son catálogos genéricos, sino pantallas adaptadas.", "Formes de pagament, IVA, bancs i altres ja no són catàlegs genèrics, sinó pantalles adaptades.", "Payment methods, VAT, banks, and others are no longer generic catalogs but adapted screens.")),
+                new(L("Uso transversal", "Ús transversal", "Cross-functional use"), L("Estos valores alimentan compras, ventas, producción y fichas de artículos.", "Aquests valors alimenten compres, vendes, producció i fitxes d'articles.", "These values feed purchases, sales, production, and article records."))
             ],
             [
-                new("Abrir Base / Operacions", "/base-datos/operacions"),
-                new("Abrir Base / Màquines", "/base-datos/maquinas"),
-                new("Abrir Base / Formes de pagament", "/base-datos/formas-pago")
+                new(L("Abrir Base / Operacions", "Obrir Base / Operacions", "Open Base / Operations"), "/base-datos/operacions"),
+                new(L("Abrir Base / Màquines", "Obrir Base / Màquines", "Open Base / Machines"), "/base-datos/maquinas"),
+                new(L("Abrir Base / Formes de pagament", "Obrir Base / Formes de pagament", "Open Base / Payment methods"), "/base-datos/formas-pago")
             ]),
         new(
             "produccion",
-            "Producción",
-            "Partes de acabado con estado, origen, trazabilidad con muestras y disposiciones, impresión, tablero por estado y trabajo vivo.",
-            "Producción",
+            L("Producción", "Producció", "Production"),
+            L("Partes de acabado con estado, origen, trazabilidad con muestras y disposiciones, impresión, tablero por estado y trabajo vivo.", "Parts d'acabat amb estat, origen, traçabilitat amb mostres i disposicions, impressió, tauler per estat i treball viu.", "Finishing work orders with status, origin, traceability with samples and dispositions, printing, board by status, and live work."),
+            L("Producción", "Producció", "Production"),
             "board",
-            "Tablero operativo por estado",
+            L("Tablero operativo por estado", "Tauler operatiu per estat", "Operational board by status"),
             [
-                new("Partes de acabado", "Alta manual o guiada desde disposiciones y muestras."),
-                new("Trazabilidad", "Enlace a la muestra origen, operación, disposición enlazada y movimientos derivados."),
-                new("Panel operativo", "Listado y tablero con filtros por acabador, máquina y trabajo vivo.")
+                new(L("Partes de acabado", "Parts d'acabat", "Finishing work orders"), L("Alta manual o guiada desde disposiciones y muestras.", "Alta manual o guiada des de disposicions i mostres.", "Manual or guided creation from dispositions and samples.")),
+                new(L("Trazabilidad", "Traçabilitat", "Traceability"), L("Enlace a la muestra origen, operación, disposición enlazada y movimientos derivados.", "Enllaç a la mostra origen, operació, disposició enllaçada i moviments derivats.", "Link to source sample, operation, linked disposition, and derived movements.")),
+                new(L("Panel operativo", "Panell operatiu", "Operational panel"), L("Listado y tablero con filtros por acabador, máquina y trabajo vivo.", "Llistat i tauler amb filtres per acabador, màquina i treball viu.", "List and board with filters by finisher, machine, and live work."))
             ],
             [
-                new("Abrir Producción / Acabados", "/produccion/acabados")
+                new(L("Abrir Producción / Acabados", "Obrir Producció / Acabats", "Open Production / Finishing"), "/produccion/acabados")
             ]),
         new(
             "ventas",
-            "Ventas",
-            "Pedidos, albaranes, pre-facturación, facturas e Intrastat. La navegación ya guarda filtros y el flujo documental está bastante cerrado.",
-            "Ventas",
+            L("Ventas", "Vendes", "Sales"),
+            L("Pedidos, albaranes, pre-facturación, facturas e Intrastat. La navegación ya guarda filtros y el flujo documental está bastante cerrado.", "Comandes, albarans, pre-facturació, factures i Intrastat. La navegació ja desa filtres i el flux documental està força tancat.", "Orders, shipments, pre-invoicing, invoices, and Intrastat. Navigation already preserves filters and the document flow is fairly complete."),
+            L("Ventas", "Vendes", "Sales"),
             "documents",
-            "Circuito documental de ventas",
+            L("Circuito documental de ventas", "Circuit documental de vendes", "Sales document flow"),
             [
-                new("Pedidos y albaranes", "Listados paginados y fichas de documento con continuidad funcional."),
-                new("Pre-facturación y facturas", "Trabajo por borradores, detalle y documentos imprimibles."),
-                new("Intrastat", "Pantalla específica y exportación Excel, aún pendiente de remate fino frente al legacy.")
+                new(L("Pedidos y albaranes", "Comandes i albarans", "Orders and shipments"), L("Listados paginados y fichas de documento con continuidad funcional.", "Llistats paginats i fitxes de document amb continuïtat funcional.", "Paginated lists and document records with functional continuity.")),
+                new(L("Pre-facturación y facturas", "Pre-facturació i factures", "Pre-invoicing and invoices"), L("Trabajo por borradores, detalle y documentos imprimibles.", "Treball per esborranys, detall i documents imprimibles.", "Work with drafts, detail, and printable documents.")),
+                new(L("Intrastat", "Intrastat", "Intrastat"), L("Pantalla específica y exportación Excel, aún pendiente de remate fino frente al legacy.", "Pantalla específica i exportació Excel, encara pendent d'un remat fi davant del legacy.", "Dedicated screen and Excel export, still pending final fine-tuning against legacy."))
             ],
             [
-                new("Abrir Ventas / Pedidos", "/ventas/pedidos"),
-                new("Abrir Ventas / Facturas", "/ventas/facturas"),
-                new("Abrir Ventas / Intrastat", "/ventas/intrastat")
+                new(L("Abrir Ventas / Pedidos", "Obrir Vendes / Comandes", "Open Sales / Orders"), "/ventas/pedidos"),
+                new(L("Abrir Ventas / Facturas", "Obrir Vendes / Factures", "Open Sales / Invoices"), "/ventas/facturas"),
+                new(L("Abrir Ventas / Intrastat", "Obrir Vendes / Intrastat", "Open Sales / Intrastat"), "/ventas/intrastat")
             ]),
         new(
             "compras",
-            "Compras",
-            "Proveedores, pedidos, recepciones y facturas de proveedor con conciliación pedido → recepción → factura y pagos registrados.",
-            "Compras",
+            L("Compras", "Compres", "Purchases"),
+            L("Proveedores, pedidos, recepciones y facturas de proveedor con conciliación pedido → recepción → factura y pagos registrados.", "Proveïdors, comandes, recepcions i factures de proveïdor amb conciliació comanda → recepció → factura i pagaments registrats.", "Suppliers, orders, receipts, and supplier invoices with order → receipt → invoice reconciliation and recorded payments."),
+            L("Compras", "Compres", "Purchases"),
             "reconciliation",
-            "Conciliación y seguimiento de factura",
+            L("Conciliación y seguimiento de factura", "Conciliació i seguiment de factura", "Invoice reconciliation and tracking"),
             [
-                new("Pedidos y recepciones", "Control documental y continuidad con recepciones parciales."),
-                new("Facturas de proveedor", "Líneas conciliadas, diferencias visibles y registro de pagos."),
-                new("PDF y seguimiento", "Documentos imprimibles y estado de factura pendiente/cuadrada.")
+                new(L("Pedidos y recepciones", "Comandes i recepcions", "Orders and receipts"), L("Control documental y continuidad con recepciones parciales.", "Control documental i continuïtat amb recepcions parcials.", "Document control and continuity with partial receipts.")),
+                new(L("Facturas de proveedor", "Factures de proveïdor", "Supplier invoices"), L("Líneas conciliadas, diferencias visibles y registro de pagos.", "Línies conciliades, diferències visibles i registre de pagaments.", "Reconciled lines, visible differences, and payment registry.")),
+                new(L("PDF y seguimiento", "PDF i seguiment", "PDF and tracking"), L("Documentos imprimibles y estado de factura pendiente/cuadrada.", "Documents imprimibles i estat de factura pendent/quadrada.", "Printable documents and pending/reconciled invoice status."))
             ],
             [
-                new("Abrir Compras / Pedidos", "/compras/pedidos"),
-                new("Abrir Compras / Recepciones", "/compras/recepciones"),
-                new("Abrir Compras / Facturas", "/compras/facturas")
+                new(L("Abrir Compras / Pedidos", "Obrir Compres / Comandes", "Open Purchases / Orders"), "/compras/pedidos"),
+                new(L("Abrir Compras / Recepciones", "Obrir Compres / Recepcions", "Open Purchases / Receipts"), "/compras/recepciones"),
+                new(L("Abrir Compras / Facturas", "Obrir Compres / Factures", "Open Purchases / Invoices"), "/compras/facturas")
             ]),
         new(
             "almacen",
-            "Almacén",
-            "Consulta de stock, movimientos, ajustes, traspasos e inventarios con conteo normal o ciego y cierres por familia/almacén.",
-            "Almacén",
+            L("Almacén", "Magatzem", "Warehouse"),
+            L("Consulta de stock, movimientos, ajustes, traspasos e inventarios con conteo normal o ciego y cierres por familia/almacén.", "Consulta d'estoc, moviments, ajustos, traspassos i inventaris amb recompte normal o cec i tancaments per família/magatzem.", "Stock consultation, movements, adjustments, transfers, and inventories with normal or blind counts and closing by family/warehouse."),
+            L("Almacén", "Magatzem", "Warehouse"),
             "stock",
-            "Trabajo operativo de stock e inventarios",
+            L("Trabajo operativo de stock e inventarios", "Treball operatiu d'estoc i inventaris", "Operational stock and inventory work"),
             [
-                new("Stock actual", "Consulta, salto a movimientos, ajustes, traspasos e inventarios parciales."),
-                new("Traspasos", "Movimiento entre almacenes con doble apunte automático."),
-                new("Inventarios", "Conteo, conteo ciego, validación masiva y hojas de recuento de planta.")
+                new(L("Stock actual", "Estoc actual", "Current stock"), L("Consulta, salto a movimientos, ajustes, traspasos e inventarios parciales.", "Consulta, salt a moviments, ajustos, traspassos i inventaris parcials.", "Consultation, jump to movements, adjustments, transfers, and partial inventories.")),
+                new(L("Traspasos", "Traspassos", "Transfers"), L("Movimiento entre almacenes con doble apunte automático.", "Moviment entre magatzems amb doble apunt automàtic.", "Movement between warehouses with automatic double entry.")),
+                new(L("Inventarios", "Inventaris", "Inventories"), L("Conteo, conteo ciego, validación masiva y hojas de recuento de planta.", "Recompte, recompte cec, validació massiva i fulls de recompte de planta.", "Counting, blind counting, mass validation, and warehouse count sheets."))
             ],
             [
-                new("Abrir Almacén / Stock", "/almacen/stock-actual"),
-                new("Abrir Almacén / Inventarios", "/almacen/inventarios"),
-                new("Abrir Almacén / Traspasos", "/almacen/traspasos")
+                new(L("Abrir Almacén / Stock", "Obrir Magatzem / Estoc", "Open Warehouse / Stock"), "/almacen/stock-actual"),
+                new(L("Abrir Almacén / Inventarios", "Obrir Magatzem / Inventaris", "Open Warehouse / Inventories"), "/almacen/inventarios"),
+                new(L("Abrir Almacén / Traspasos", "Obrir Magatzem / Traspassos", "Open Warehouse / Transfers"), "/almacen/traspasos")
             ]),
         new(
             "administracion",
-            "Administración",
-            "Control de módulos sincronizables, ejecución manual de sync legacy, gestión de tenant y accesos de plataforma para quienes tengan permisos.",
-            "Administración",
+            L("Administración", "Administració", "Administration"),
+            L("Control de módulos sincronizables, ejecución manual de sync legacy, gestión de tenant y accesos de plataforma para quienes tengan permisos.", "Control de mòduls sincronitzables, execució manual de sync legacy, gestió de tenant i accessos de plataforma per a qui tingui permisos.", "Control of synchronizable modules, manual legacy sync execution, tenant management, and platform access for those with permission."),
+            L("Administración", "Administració", "Administration"),
             "admin",
-            "Panel de sync y gobierno",
+            L("Panel de sync y gobierno", "Panell de sync i govern", "Sync and governance panel"),
             [
-                new("Sync manual", "Cada módulo muestra estado, última ejecución, inserciones, omitidos y errores."),
-                new("Convivencia controlada", "Se lee del legacy remoto y se escribe solo en la base local SaaS."),
-                new("Gestión de plataforma", "Los administradores pueden abrir el área de plataforma y seguir ampliando configuración.")
+                new(L("Sync manual", "Sync manual", "Manual sync"), L("Cada módulo muestra estado, última ejecución, inserciones, omitidos y errores.", "Cada mòdul mostra estat, última execució, insercions, omesos i errors.", "Each module shows status, latest run, inserts, skips, and errors.")),
+                new(L("Convivencia controlada", "Convivència controlada", "Controlled coexistence"), L("Se lee del legacy remoto y se escribe solo en la base local SaaS.", "Es llegeix del legacy remot i s'escriu només a la base local SaaS.", "Data is read from remote legacy and written only to the local SaaS database.")),
+                new(L("Gestión de plataforma", "Gestió de plataforma", "Platform management"), L("Los administradores pueden abrir el área de plataforma y seguir ampliando configuración.", "Els administradors poden obrir l'àrea de plataforma i continuar ampliant configuració.", "Administrators can open the platform area and continue expanding configuration."))
             ],
             [
-                new("Abrir Administración", "/administracion"),
-                new("Abrir Plataforma", "/plataforma")
+                new(L("Abrir Administración", "Obrir Administració", "Open Administration"), "/administracion"),
+                new(L("Abrir Plataforma", "Obrir Plataforma", "Open Platform"), "/plataforma")
             ])
     ];
 

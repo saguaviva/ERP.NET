@@ -1,27 +1,42 @@
 @page "/ventas/facturas"
+@page "/ventas/facturas-teixits-mostres"
+@page "/ventas/facturas-models"
 @attribute [Authorize(Roles = "TenantAdmin,TenantReader")]
 @inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
 @inject ISalesOrderQueries SalesOrderQueries
 @inject ILegacySyncService LegacySyncService
 @inject AppText T
 
-<PageTitle>@L("Ventas / Facturas", "Vendes / Factures", "Sales / Invoices")</PageTitle>
+<PageTitle>@PageTitleText</PageTitle>
 
 <div class="page-header">
     <div>
         <p class="eyebrow">@T["menu.sales"]</p>
-        <h1>@L("Facturas de cliente", "Factures de client", "Customer invoices")</h1>
-        <p class="lead">@L("Facturas emitidas desde la pre-facturación, con trazabilidad completa hacia borradores y albaranes.", "Factures emeses des de la pre-facturació, amb traçabilitat completa cap a esborranys i albarans.", "Invoices issued from pre-invoicing with full traceability to drafts and shipments.")</p>
+        <h1>@PageHeadingText</h1>
+        <p class="lead">@PageLeadText</p>
     </div>
     <div class="quick-links">
-        <a class="secondary-button link-button" href="/ventas/pre-facturacion">@L("Volver a pre-facturación", "Tornar a pre-facturació", "Back to pre-invoicing")</a>
+        @if (IsModelInvoicesRoute)
+        {
+            <a class="secondary-button link-button" href="/articulos/models">@L("Abrir models", "Obrir models", "Open models")</a>
+        }
+        <a class="secondary-button link-button" href="/ventas/remesas">@L("Ver remesas", "Veure remeses", "View remittances")</a>
+        @if (!IsModelInvoicesRoute)
+        {
+            <a class="secondary-button link-button" href="@PreInvoicingHref">@PreInvoicingText</a>
+        }
     </div>
 </div>
 
 @if (!tenantId.HasValue || !companyId.HasValue)
 {
     <div class="empty-state">
-        <p>@L("Selecciona una empresa activa para revisar las facturas de venta.", "Selecciona una empresa activa per revisar les factures de venda.", "Select an active company to review sales invoices.")</p>
+        <p>@(IsModelInvoicesRoute
+            ? L("Selecciona una empresa activa para revisar las facturas del circuito de Models.", "Selecciona una empresa activa per revisar les factures del circuit de Models.", "Select an active company to review invoices from the Models workflow.")
+            : IsTeixitsMostresInvoicesRoute
+                ? L("Selecciona una empresa activa para revisar las facturas del circuito Teixits-Mostres.", "Selecciona una empresa activa per revisar les factures del circuit Teixits-Mostres.", "Select an active company to review invoices from the fabrics and samples workflow.")
+                : L("Selecciona una empresa activa para revisar las facturas de venta.", "Selecciona una empresa activa per revisar les factures de venda.", "Select an active company to review sales invoices."))</p>
     </div>
 }
 else
@@ -29,10 +44,14 @@ else
     @if (syncStatus?.HasSuccessfulSync == true)
     {
         <div class="alert warning">
-            @L("Ventas / Facturas está en convivencia con legacy para esta empresa. La sync manual refresca solo las facturas con origen legacy; los cobros o cambios registrados en web convierten la factura a local y ya no se pisan.", "Vendes / Factures està en convivència amb legacy per a aquesta empresa. La sync manual refresca només les factures amb origen legacy; els cobraments o canvis registrats al web converteixen la factura a local i ja no es trepitgen.", "Sales / Invoices is running in legacy coexistence mode for this company. Manual sync refreshes only legacy-origin invoices; payments or changes recorded on the web turn the invoice local and it is no longer overwritten.")
+            @(IsModelInvoicesRoute
+                ? L("Ventas / Facturas Models reutiliza la factura general de ventas y la filtra al circuito de Models. La sync manual refresca solo las facturas con origen legacy; los cobros o cambios registrados en web convierten la factura a local y ya no se pisan.", "Vendes / Factures Models reutilitza la factura general de vendes i la filtra al circuit de Models. La sync manual refresca només les factures amb origen legacy; els cobraments o canvis registrats al web converteixen la factura a local i ja no es trepitgen.", "Sales / Model invoices reuses the standard sales invoice document and filters it to the Models workflow. Manual sync refreshes only legacy-origin invoices; payments or changes recorded on the web turn the invoice local and it is no longer overwritten.")
+                : IsTeixitsMostresInvoicesRoute
+                    ? L("Ventas / Facturas Teixits-Mostres reutiliza la factura general de ventas y la filtra al circuito de tejidos y muestras. La sync manual refresca solo las facturas con origen legacy; los cobros o cambios registrados en web convierten la factura a local y ya no se pisan.", "Vendes / Factures Teixits-Mostres reutilitza la factura general de vendes i la filtra al circuit de teixits i mostres. La sync manual refresca només les factures amb origen legacy; els cobraments o canvis registrats al web converteixen la factura a local i ja no es trepitgen.", "Sales / Fabric & sample invoices reuses the standard sales invoice document and filters it to the fabrics and samples workflow. Manual sync refreshes only legacy-origin invoices; payments or changes recorded on the web turn the invoice local and it is no longer overwritten.")
+                    : L("Ventas / Facturas está en convivencia con legacy para esta empresa. La sync manual refresca solo las facturas con origen legacy; los cobros o cambios registrados en web convierten la factura a local y ya no se pisan.", "Vendes / Factures està en convivència amb legacy per a aquesta empresa. La sync manual refresca només les factures amb origen legacy; els cobraments o canvis registrats al web converteixen la factura a local i ja no es trepitgen.", "Sales / Invoices is running in legacy coexistence mode for this company. Manual sync refreshes only legacy-origin invoices; payments or changes recorded on the web turn the invoice local and it is no longer overwritten."))
             @if (syncStatus.LastCompletedUtc.HasValue)
             {
-                <span>@L("Última sync:", "Última sync:", "Last sync:") @syncStatus.LastCompletedUtc.Value.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss") · Ins: @syncStatus.LastInserted · Act: @syncStatus.LastUpdated · Omi: @syncStatus.LastSkipped · Err: @syncStatus.LastErrors</span>
+                <span>@L("Última sync:", "Última sync:", "Last sync:") @syncStatus.LastCompletedUtc.Value.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss") · Ins: @syncStatus.LastInserted.ToUiString("N0") · Act: @syncStatus.LastUpdated.ToUiString("N0") · Omi: @syncStatus.LastSkipped.ToUiString("N0") · Err: @syncStatus.LastErrors.ToUiString("N0")</span>
             }
         </div>
     }
@@ -46,7 +65,11 @@ else
             <span class="results-summary">
                 @(totalCount == 0
                     ? L("Sin resultados", "Sense resultats", "No results")
-                    : L($"Mostrando {PageStart}-{PageEnd} de {totalCount} facturas", $"Mostrant {PageStart}-{PageEnd} de {totalCount} factures", $"Showing {PageStart}-{PageEnd} of {totalCount} invoices"))
+                    : IsModelInvoicesRoute
+                        ? L($"Mostrando {PageStart.ToUiString("N0")}-{PageEnd.ToUiString("N0")} de {totalCount.ToUiString("N0")} facturas models", $"Mostrant {PageStart.ToUiString("N0")}-{PageEnd.ToUiString("N0")} de {totalCount.ToUiString("N0")} factures models", $"Showing {PageStart.ToUiString("N0")}-{PageEnd.ToUiString("N0")} of {totalCount.ToUiString("N0")} model invoices")
+                        : IsTeixitsMostresInvoicesRoute
+                            ? L($"Mostrando {PageStart.ToUiString("N0")}-{PageEnd.ToUiString("N0")} de {totalCount.ToUiString("N0")} facturas teixits-mostres", $"Mostrant {PageStart.ToUiString("N0")}-{PageEnd.ToUiString("N0")} de {totalCount.ToUiString("N0")} factures teixits-mostres", $"Showing {PageStart.ToUiString("N0")}-{PageEnd.ToUiString("N0")} of {totalCount.ToUiString("N0")} fabric & sample invoices")
+                            : L($"Mostrando {PageStart.ToUiString("N0")}-{PageEnd.ToUiString("N0")} de {totalCount.ToUiString("N0")} facturas", $"Mostrant {PageStart.ToUiString("N0")}-{PageEnd.ToUiString("N0")} de {totalCount.ToUiString("N0")} factures", $"Showing {PageStart.ToUiString("N0")}-{PageEnd.ToUiString("N0")} of {totalCount.ToUiString("N0")} invoices"))
             </span>
             <label class="field compact-field">
                 <span>@L("Tamaño de página", "Mida de pàgina", "Page size")</span>
@@ -69,7 +92,11 @@ else
         {
             <div class="loading-banner">
                 <span class="loading-indicator" aria-hidden="true"></span>
-                <span>@L("Cargando facturas de cliente...", "Carregant factures de client...", "Loading customer invoices...")</span>
+                <span>@(IsModelInvoicesRoute
+                    ? L("Cargando facturas models...", "Carregant factures models...", "Loading model invoices...")
+                    : IsTeixitsMostresInvoicesRoute
+                        ? L("Cargando facturas teixits-mostres...", "Carregant factures teixits-mostres...", "Loading fabric & sample invoices...")
+                        : L("Cargando facturas de cliente...", "Carregant factures de client...", "Loading customer invoices..."))</span>
             </div>
         }
 
@@ -113,7 +140,11 @@ else
                     else if (items.Count == 0)
                     {
                         <tr>
-                            <td colspan="11" class="table-empty">@L("Todavía no hay facturas emitidas.", "Encara no hi ha factures emeses.", "There are no issued invoices yet.")</td>
+                            <td colspan="11" class="table-empty">@(IsModelInvoicesRoute
+                                ? L("Todavía no hay facturas models emitidas.", "Encara no hi ha factures models emeses.", "There are no issued model invoices yet.")
+                                : IsTeixitsMostresInvoicesRoute
+                                    ? L("Todavía no hay facturas teixits-mostres emitidas.", "Encara no hi ha factures teixits-mostres emeses.", "There are no issued fabric & sample invoices yet.")
+                                    : L("Todavía no hay facturas emitidas.", "Encara no hi ha factures emeses.", "There are no issued invoices yet."))</td>
                         </tr>
                     }
                     else
@@ -134,14 +165,18 @@ else
                                 <td>@(item.DueDate?.ToString("dd/MM/yyyy") ?? "-")</td>
                                 <td><span class="status-pill @GetInvoiceStatusClass(item.Status)">@FormatInvoiceStatus(item.Status)</span></td>
                                 <td><span class="status-pill @GetPaymentStatusClass(item.PaymentStatus, item.IsOverdue)">@FormatPaymentStatus(item.PaymentStatus, item.IsOverdue)</span></td>
-                                <td>@item.OutstandingAmount.ToString("0.00") €</td>
+                                <td>@item.OutstandingAmount.ToUiString("0.00") €</td>
                                 <td><span class="status-pill @GetAccountingStatusClass(item.AccountingStatus)">@FormatAccountingStatus(item.AccountingStatus)</span></td>
-                                <td>@item.ShipmentCount</td>
-                                <td>@item.TotalAmount.ToString("0.00") €</td>
+                                <td>@item.ShipmentCount.ToUiString("N0")</td>
+                                <td>@item.TotalAmount.ToUiString("0.00") €</td>
                                 <td>
                                     <div class="table-actions">
-                                        <a class="inline-link" href="/ventas/facturas/@item.InvoiceNumber">@L("Abrir", "Obrir", "Open")</a>
-                                        <a class="inline-link" href="/ventas/facturas/@item.InvoiceNumber/pdf" target="_blank">PDF</a>
+                                        <a class="inline-link" href="@BuildInvoiceDetailHref(item.InvoiceNumber)">@L("Abrir", "Obrir", "Open")</a>
+                                        @if (canEdit && !string.Equals(item.Status, SalesInvoiceStatuses.Cancelled, StringComparison.OrdinalIgnoreCase) && item.OutstandingAmount > 0)
+                                        {
+                                            <a class="inline-link" href="/ventas/remesas/nueva?invoiceNumber=@item.InvoiceNumber">@L("Crear remesa", "Crear remesa", "Create remittance")</a>
+                                        }
+                                        <a class="inline-link" href="@BuildInvoicePdfHref(item.InvoiceNumber)" target="_blank">@L("PDF", "PDF", "PDF")</a>
                                     </div>
                                 </td>
                             </tr>
@@ -174,6 +209,36 @@ else
     private string sortColumn = nameof(SalesInvoiceListItemDto.InvoiceNumber);
     private bool sortDescending = true;
     private int totalCount;
+    private bool canEdit;
+    private bool IsModelInvoicesRoute =>
+        NavigationManager.ToBaseRelativePath(NavigationManager.Uri).StartsWith("ventas/facturas-models", StringComparison.OrdinalIgnoreCase);
+    private bool IsTeixitsMostresInvoicesRoute =>
+        NavigationManager.ToBaseRelativePath(NavigationManager.Uri).StartsWith("ventas/facturas-teixits-mostres", StringComparison.OrdinalIgnoreCase);
+
+    private string PageTitleText => IsModelInvoicesRoute
+        ? L("Ventas / Facturas Models", "Vendes / Factures Models", "Sales / Model invoices")
+        : IsTeixitsMostresInvoicesRoute
+            ? L("Ventas / Facturas Teixits-Mostres", "Vendes / Factures Teixits-Mostres", "Sales / Fabric & sample invoices")
+            : L("Ventas / Facturas", "Vendes / Factures", "Sales / Invoices");
+
+    private string PageHeadingText => IsModelInvoicesRoute
+        ? L("Facturas Models", "Factures Models", "Model invoices")
+        : IsTeixitsMostresInvoicesRoute
+            ? L("Facturas Teixits-Mostres", "Factures Teixits-Mostres", "Fabric & sample invoices")
+            : L("Facturas de cliente", "Factures de client", "Customer invoices");
+
+    private string PageLeadText => IsModelInvoicesRoute
+        ? L("Facturas emitidas dentro del circuito de Models, con trazabilidad hacia sus albaranes comerciales asociados.", "Factures emeses dins del circuit de Models, amb traçabilitat cap als seus albarans comercials associats.", "Invoices issued within the Models workflow, with traceability to their linked commercial shipments.")
+        : IsTeixitsMostresInvoicesRoute
+            ? L("Facturas emitidas dentro del circuito de tejidos y muestras, con trazabilidad completa hacia borradores y albaranes asociados.", "Factures emeses dins del circuit de teixits i mostres, amb traçabilitat completa cap a esborranys i albarans associats.", "Invoices issued within the fabrics and samples workflow, with full traceability to related drafts and shipments.")
+            : L("Facturas emitidas desde la pre-facturación, con trazabilidad completa hacia borradores y albaranes.", "Factures emeses des de la pre-facturació, amb traçabilitat completa cap a esborranys i albarans.", "Invoices issued from pre-invoicing with full traceability to drafts and shipments.");
+
+    private string PreInvoicingHref => IsTeixitsMostresInvoicesRoute ? "/ventas/pre-facturacion-teixits-mostres" : "/ventas/pre-facturacion";
+
+    private string PreInvoicingText => IsTeixitsMostresInvoicesRoute
+        ? L("Volver a pre-facturación teixits-mostres", "Tornar a pre-facturació teixits-mostres", "Back to fabric & sample pre-invoicing")
+        : L("Volver a pre-facturación", "Tornar a pre-facturació", "Back to pre-invoicing");
+
     private string L(string spanish, string catalan, string english) =>
         T.CurrentLanguage switch
         {
@@ -193,6 +258,7 @@ else
         var user = authState.User;
         tenantId = user.GetTenantId();
         companyId = user.GetActiveCompanyId();
+        canEdit = user.IsPlatformAdmin() || user.IsInRole(PlatformRoles.TenantAdmin);
         if (tenantId.HasValue && companyId.HasValue)
         {
             syncStatus = (await LegacySyncService.GetModuleStatusesAsync(tenantId.Value))
@@ -218,6 +284,11 @@ else
 
         try
         {
+            filter.CatalogScope = IsModelInvoicesRoute
+                ? "Models"
+                : IsTeixitsMostresInvoicesRoute
+                    ? "TeixitsMostres"
+                    : string.Empty;
             filter.SortColumn = sortColumn;
             filter.SortDescending = sortDescending;
             var result = await SalesOrderQueries.SearchInvoicesAsync(tenantId.Value, companyId.Value, filter);
@@ -326,4 +397,18 @@ else
         SalesInvoiceAccountingStatuses.Ready => "warning",
         _ => "warning"
     };
+
+    private string BuildInvoiceDetailHref(int invoiceNumber) =>
+        IsModelInvoicesRoute
+            ? $"/ventas/facturas-models/{invoiceNumber}"
+            : IsTeixitsMostresInvoicesRoute
+                ? $"/ventas/facturas-teixits-mostres/{invoiceNumber}"
+                : $"/ventas/facturas/{invoiceNumber}";
+
+    private string BuildInvoicePdfHref(int invoiceNumber) =>
+        IsModelInvoicesRoute
+            ? $"/ventas/facturas-models/{invoiceNumber}/pdf"
+            : IsTeixitsMostresInvoicesRoute
+                ? $"/ventas/facturas-teixits-mostres/{invoiceNumber}/pdf"
+                : $"/ventas/facturas/{invoiceNumber}/pdf";
 }

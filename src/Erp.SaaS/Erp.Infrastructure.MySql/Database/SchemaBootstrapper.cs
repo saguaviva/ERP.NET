@@ -40,6 +40,13 @@ public sealed class SchemaBootstrapper : IHostedService
 
         await using var connection = await _connectionFactory.OpenConnectionAsync(cancellationToken);
         await EnsureSchemaAsync(connection, cancellationToken);
+        var clientNameRepairResults = await ClientNameRepair.RunAsync(connection, cancellationToken);
+        var repairedRows = clientNameRepairResults.Sum(item => item.RowsAffected);
+        if (repairedRows > 0)
+        {
+            var summary = string.Join(", ", clientNameRepairResults.Where(item => item.RowsAffected > 0).Select(item => $"{item.Target}={item.RowsAffected}"));
+            _logger.LogInformation("Client name repair applied during bootstrap: {Summary}", summary);
+        }
         await SeedDefaultsAsync(connection, cancellationToken);
     }
 
@@ -181,6 +188,68 @@ public sealed class SchemaBootstrapper : IHostedService
                 updated_utc DATETIME(6) NOT NULL,
                 PRIMARY KEY (tenant_id, company_id, catalog_key, code),
                 KEY ix_base_catalog_items_lookup (tenant_id, company_id, catalog_key, is_deleted, is_active, name)
+            );
+            """,
+            """
+            CREATE TABLE IF NOT EXISTS document_numbering_sequences (
+                tenant_id CHAR(36) NOT NULL,
+                company_id CHAR(36) NOT NULL,
+                sequence_key VARCHAR(60) NOT NULL,
+                series VARCHAR(30) NULL,
+                next_number INT NOT NULL DEFAULT 1,
+                last_number INT NOT NULL DEFAULT 0,
+                is_active TINYINT(1) NOT NULL DEFAULT 1,
+                notes TEXT NULL,
+                created_utc DATETIME(6) NOT NULL,
+                updated_utc DATETIME(6) NOT NULL,
+                PRIMARY KEY (tenant_id, company_id, sequence_key)
+            );
+            """,
+            """
+            CREATE TABLE IF NOT EXISTS document_numbering_disposition_settings (
+                tenant_id CHAR(36) NOT NULL,
+                company_id CHAR(36) NOT NULL,
+                disposition_year VARCHAR(12) NOT NULL,
+                next_number INT NOT NULL DEFAULT 1,
+                created_utc DATETIME(6) NOT NULL,
+                updated_utc DATETIME(6) NOT NULL,
+                PRIMARY KEY (tenant_id, company_id)
+            );
+            """,
+            """
+            CREATE TABLE IF NOT EXISTS mailing_campaigns (
+                campaign_id CHAR(36) NOT NULL PRIMARY KEY,
+                tenant_id CHAR(36) NOT NULL,
+                company_id CHAR(36) NOT NULL,
+                source_type VARCHAR(40) NOT NULL,
+                title VARCHAR(200) NOT NULL,
+                body_text LONGTEXT NOT NULL,
+                notes TEXT NULL,
+                include_all_recipients TINYINT(1) NOT NULL DEFAULT 0,
+                recipient_count INT NOT NULL DEFAULT 0,
+                is_deleted TINYINT(1) NOT NULL DEFAULT 0,
+                created_utc DATETIME(6) NOT NULL,
+                updated_utc DATETIME(6) NOT NULL,
+                KEY ix_mailing_campaigns_lookup (tenant_id, company_id, is_deleted, updated_utc),
+                KEY ix_mailing_campaigns_source (tenant_id, company_id, source_type, is_deleted)
+            );
+            """,
+            """
+            CREATE TABLE IF NOT EXISTS mailing_campaign_recipients (
+                campaign_id CHAR(36) NOT NULL,
+                tenant_id CHAR(36) NOT NULL,
+                company_id CHAR(36) NOT NULL,
+                line_number INT NOT NULL,
+                recipient_code INT NOT NULL,
+                recipient_name VARCHAR(200) NOT NULL,
+                recipient_tax_id VARCHAR(64) NULL,
+                address_line VARCHAR(255) NULL,
+                postal_code VARCHAR(32) NULL,
+                city VARCHAR(120) NULL,
+                province VARCHAR(120) NULL,
+                email VARCHAR(255) NULL,
+                PRIMARY KEY (campaign_id, line_number),
+                KEY ix_mailing_campaign_recipients_lookup (tenant_id, company_id, campaign_id)
             );
             """,
             """
@@ -639,6 +708,7 @@ public sealed class SchemaBootstrapper : IHostedService
                 source_sample_kind VARCHAR(30) NULL,
                 source_sample_code VARCHAR(120) NULL,
                 source_sample_line_number INT NULL,
+                source_record_id CHAR(36) NULL,
                 primary_fabric_code VARCHAR(120) NULL,
                 primary_fabric_description VARCHAR(255) NULL,
                 primary_color VARCHAR(120) NULL,
@@ -1505,6 +1575,58 @@ public sealed class SchemaBootstrapper : IHostedService
                 UNIQUE KEY uq_sales_invoice_payments_number (invoice_id, payment_number),
                 KEY ix_sales_invoice_payments_lookup (tenant_id, company_id, invoice_id, payment_date)
             );
+            """,
+            """
+            CREATE TABLE IF NOT EXISTS sales_remittances (
+                remittance_id CHAR(36) NOT NULL PRIMARY KEY,
+                remittance_series VARCHAR(20) NULL,
+                remittance_number INT NOT NULL,
+                tenant_id CHAR(36) NOT NULL,
+                company_id CHAR(36) NOT NULL,
+                remittance_date DATETIME(6) NOT NULL,
+                due_date DATETIME(6) NULL,
+                status VARCHAR(30) NOT NULL DEFAULT 'Draft',
+                bank_name VARCHAR(160) NULL,
+                invoice_count INT NOT NULL DEFAULT 0,
+                client_count INT NOT NULL DEFAULT 0,
+                total_amount DECIMAL(18,2) NOT NULL DEFAULT 0,
+                collected_amount DECIMAL(18,2) NOT NULL DEFAULT 0,
+                outstanding_amount DECIMAL(18,2) NOT NULL DEFAULT 0,
+                notes TEXT NULL,
+                sent_utc DATETIME(6) NULL,
+                collected_utc DATETIME(6) NULL,
+                origin VARCHAR(20) NOT NULL DEFAULT 'saas',
+                is_deleted TINYINT(1) NOT NULL DEFAULT 0,
+                created_utc DATETIME(6) NOT NULL,
+                updated_utc DATETIME(6) NOT NULL,
+                UNIQUE KEY uq_sales_remittances_number (tenant_id, company_id, remittance_number),
+                KEY ix_sales_remittances_date (tenant_id, company_id, remittance_date),
+                KEY ix_sales_remittances_status (tenant_id, company_id, status)
+            );
+            """,
+            """
+            CREATE TABLE IF NOT EXISTS sales_remittance_invoices (
+                remittance_id CHAR(36) NOT NULL,
+                tenant_id CHAR(36) NOT NULL,
+                company_id CHAR(36) NOT NULL,
+                line_number INT NOT NULL,
+                invoice_id CHAR(36) NOT NULL,
+                invoice_series VARCHAR(20) NULL,
+                invoice_number INT NOT NULL,
+                client_code INT NOT NULL,
+                client_name VARCHAR(200) NOT NULL,
+                issue_date DATETIME(6) NOT NULL,
+                due_date DATETIME(6) NULL,
+                total_amount DECIMAL(18,2) NOT NULL,
+                amount_paid DECIMAL(18,2) NOT NULL DEFAULT 0,
+                outstanding_amount DECIMAL(18,2) NOT NULL DEFAULT 0,
+                payment_status VARCHAR(30) NOT NULL DEFAULT 'Pending',
+                notes TEXT NULL,
+                PRIMARY KEY (remittance_id, line_number),
+                UNIQUE KEY uq_sales_remittance_invoice (remittance_id, invoice_id),
+                KEY ix_sales_remittance_invoices_invoice (tenant_id, company_id, invoice_id),
+                KEY ix_sales_remittance_invoices_lookup (tenant_id, company_id, remittance_id, invoice_number)
+            );
             """
         };
 
@@ -1522,9 +1644,11 @@ public sealed class SchemaBootstrapper : IHostedService
         await EnsurePurchaseOrderReceiptColumnsAsync(connection, cancellationToken);
         await EnsurePurchaseReceiptSyncColumnsAsync(connection, cancellationToken);
         await EnsurePurchaseInvoiceColumnsAsync(connection, cancellationToken);
+        await EnsureReportingDateColumnsAsync(connection, cancellationToken);
         await EnsureFinishWorkOrderMachineColumnsAsync(connection, cancellationToken);
         await EnsureFinishWorkOrderOperationColumnsAsync(connection, cancellationToken);
         await EnsureFinishWorkOrderSampleColumnsAsync(connection, cancellationToken);
+        await EnsureFinishWorkOrderSourceRecordIdColumnAsync(connection, cancellationToken);
         await EnsureMuestraBreakdownOperationColumnsAsync(connection, cancellationToken);
         await EnsureColumnAsync(
             connection,
@@ -2710,6 +2834,70 @@ public sealed class SchemaBootstrapper : IHostedService
         await normalizeCommand.ExecuteNonQueryAsync(cancellationToken);
     }
 
+    private static async Task EnsureReportingDateColumnsAsync(MySqlConnection connection, CancellationToken cancellationToken)
+    {
+        await EnsureColumnAsync(
+            connection,
+            "sales_orders",
+            "document_date",
+            "ALTER TABLE sales_orders ADD COLUMN document_date DATETIME(6) NULL AFTER client_tax_id;",
+            cancellationToken);
+        await EnsureColumnAsync(
+            connection,
+            "purchase_orders",
+            "document_date",
+            "ALTER TABLE purchase_orders ADD COLUMN document_date DATETIME(6) NULL AFTER supplier_tax_id;",
+            cancellationToken);
+        await EnsureColumnAsync(
+            connection,
+            "purchase_invoices",
+            "document_date",
+            "ALTER TABLE purchase_invoices ADD COLUMN document_date DATETIME(6) NULL AFTER supplier_document_number;",
+            cancellationToken);
+        await EnsureColumnAsync(
+            connection,
+            "finish_work_orders",
+            "work_date",
+            "ALTER TABLE finish_work_orders ADD COLUMN work_date DATETIME(6) NULL AFTER order_number;",
+            cancellationToken);
+
+        await using var normalizeSalesOrders = connection.CreateCommand();
+        normalizeSalesOrders.CommandText =
+            """
+            UPDATE sales_orders
+            SET document_date = COALESCE(document_date, requested_date, created_utc, updated_utc, synced_utc, CURRENT_TIMESTAMP(6))
+            WHERE document_date IS NULL;
+            """;
+        await normalizeSalesOrders.ExecuteNonQueryAsync(cancellationToken);
+
+        await using var normalizePurchaseOrders = connection.CreateCommand();
+        normalizePurchaseOrders.CommandText =
+            """
+            UPDATE purchase_orders
+            SET document_date = COALESCE(document_date, expected_date, created_utc, updated_utc, synced_utc, CURRENT_TIMESTAMP(6))
+            WHERE document_date IS NULL;
+            """;
+        await normalizePurchaseOrders.ExecuteNonQueryAsync(cancellationToken);
+
+        await using var normalizePurchaseInvoices = connection.CreateCommand();
+        normalizePurchaseInvoices.CommandText =
+            """
+            UPDATE purchase_invoices
+            SET document_date = COALESCE(document_date, due_date, created_utc, updated_utc, synced_utc, CURRENT_TIMESTAMP(6))
+            WHERE document_date IS NULL;
+            """;
+        await normalizePurchaseInvoices.ExecuteNonQueryAsync(cancellationToken);
+
+        await using var normalizeFinishOrders = connection.CreateCommand();
+        normalizeFinishOrders.CommandText =
+            """
+            UPDATE finish_work_orders
+            SET work_date = COALESCE(work_date, created_utc, updated_utc, synced_utc, CURRENT_TIMESTAMP(6))
+            WHERE work_date IS NULL;
+            """;
+        await normalizeFinishOrders.ExecuteNonQueryAsync(cancellationToken);
+    }
+
     private static async Task EnsureFinishWorkOrderMachineColumnsAsync(MySqlConnection connection, CancellationToken cancellationToken)
     {
         await EnsureColumnAsync(
@@ -2745,6 +2933,16 @@ public sealed class SchemaBootstrapper : IHostedService
             "finish_work_orders",
             "source_sample_line_number",
             "ALTER TABLE finish_work_orders ADD COLUMN source_sample_line_number INT NULL AFTER source_sample_code;",
+            cancellationToken);
+    }
+
+    private static async Task EnsureFinishWorkOrderSourceRecordIdColumnAsync(MySqlConnection connection, CancellationToken cancellationToken)
+    {
+        await EnsureColumnAsync(
+            connection,
+            "finish_work_orders",
+            "source_record_id",
+            "ALTER TABLE finish_work_orders ADD COLUMN source_record_id CHAR(36) NULL AFTER source_sample_line_number;",
             cancellationToken);
     }
 

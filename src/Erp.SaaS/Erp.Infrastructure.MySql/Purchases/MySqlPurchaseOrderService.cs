@@ -2,9 +2,11 @@ using Erp.Application.Auditing;
 using Erp.Application.Companies;
 using Erp.Application.Contexts;
 using Erp.Application.LegacySync;
+using Erp.Application.Numbering;
 using Erp.Application.Purchases;
 using Erp.Domain.Common;
 using Erp.Infrastructure.MySql.Database;
+using Erp.Infrastructure.MySql.Numbering;
 using Erp.Infrastructure.MySql.Support;
 using MySqlConnector;
 
@@ -54,6 +56,7 @@ public sealed class MySqlPurchaseOrderService : IPurchaseOrderQueries, IPurchase
         var search = filter.Search?.Trim() ?? string.Empty;
         var likeSearch = $"%{search}%";
         var status = filter.Status?.Trim() ?? string.Empty;
+        var catalogScope = NormalizeCatalogScope(filter.CatalogScope);
 
         await using var connection = await _connectionFactory.OpenConnectionAsync(cancellationToken);
         var centerCode = await ResolveCompanyCenterCodeAsync(connection, tenantId, companyId, cancellationToken);
@@ -78,6 +81,20 @@ public sealed class MySqlPurchaseOrderService : IPurchaseOrderQueries, IPurchase
                         OR po.status = @status
                       )
                   AND (
+                        @catalogScope <> 'Hilos'
+                        OR EXISTS (
+                            SELECT 1
+                            FROM purchase_order_lines scope_pol
+                            INNER JOIN fil f
+                              ON f.CODI = scope_pol.item_code
+                             AND f.CENTRO = @centerCode
+                             AND COALESCE(f.is_deleted, 0) = 0
+                            WHERE scope_pol.tenant_id = po.tenant_id
+                              AND scope_pol.company_id = po.company_id
+                              AND scope_pol.order_number = po.order_number
+                        )
+                      )
+                  AND (
                         @search = ''
                         OR CAST(po.order_number AS CHAR) LIKE @likeSearch
                         OR COALESCE(NULLIF(po.supplier_name, ''), p.NOM, '') LIKE @likeSearch
@@ -89,6 +106,7 @@ public sealed class MySqlPurchaseOrderService : IPurchaseOrderQueries, IPurchase
             countCommand.Parameters.AddWithValue("@centerCode", centerCode);
             countCommand.Parameters.AddWithValue("@includeClosed", filter.IncludeClosed);
             countCommand.Parameters.AddWithValue("@status", status);
+            countCommand.Parameters.AddWithValue("@catalogScope", catalogScope);
             countCommand.Parameters.AddWithValue("@search", search);
             countCommand.Parameters.AddWithValue("@likeSearch", likeSearch);
 
@@ -133,6 +151,20 @@ public sealed class MySqlPurchaseOrderService : IPurchaseOrderQueries, IPurchase
                         OR po.status = @status
                       )
                   AND (
+                        @catalogScope <> 'Hilos'
+                        OR EXISTS (
+                            SELECT 1
+                            FROM purchase_order_lines scope_pol
+                            INNER JOIN fil f
+                              ON f.CODI = scope_pol.item_code
+                             AND f.CENTRO = @centerCode
+                             AND COALESCE(f.is_deleted, 0) = 0
+                            WHERE scope_pol.tenant_id = po.tenant_id
+                              AND scope_pol.company_id = po.company_id
+                              AND scope_pol.order_number = po.order_number
+                        )
+                      )
+                  AND (
                         @search = ''
                         OR CAST(po.order_number AS CHAR) LIKE @likeSearch
                         OR COALESCE(NULLIF(po.supplier_name, ''), p.NOM, '') LIKE @likeSearch
@@ -147,6 +179,7 @@ public sealed class MySqlPurchaseOrderService : IPurchaseOrderQueries, IPurchase
             command.Parameters.AddWithValue("@centerCode", centerCode);
             command.Parameters.AddWithValue("@includeClosed", filter.IncludeClosed);
             command.Parameters.AddWithValue("@status", status);
+            command.Parameters.AddWithValue("@catalogScope", catalogScope);
             command.Parameters.AddWithValue("@search", search);
             command.Parameters.AddWithValue("@likeSearch", likeSearch);
             command.Parameters.AddWithValue("@limit", pageSize);
@@ -378,7 +411,9 @@ public sealed class MySqlPurchaseOrderService : IPurchaseOrderQueries, IPurchase
         var offset = (page - 1) * pageSize;
         var search = filter.Search?.Trim() ?? string.Empty;
         var likeSearch = $"%{search}%";
+        var catalogScope = NormalizeCatalogScope(filter.CatalogScope);
         await using var connection = await _connectionFactory.OpenConnectionAsync(cancellationToken);
+        var centerCode = await ResolveCompanyCenterCodeAsync(connection, tenantId, companyId, cancellationToken);
         await using (var countCommand = connection.CreateCommand())
         {
             countCommand.CommandText =
@@ -393,6 +428,23 @@ public sealed class MySqlPurchaseOrderService : IPurchaseOrderQueries, IPurchase
                   AND pr.company_id = @companyId
                   AND COALESCE(pr.is_deleted, 0) = 0
                   AND (
+                        @catalogScope <> 'Hilos'
+                        OR EXISTS (
+                            SELECT 1
+                            FROM purchase_order_receipt_lines scope_prl
+                            INNER JOIN purchase_order_lines scope_pol
+                              ON scope_pol.tenant_id = scope_prl.tenant_id
+                             AND scope_pol.company_id = scope_prl.company_id
+                             AND scope_pol.order_number = scope_prl.order_number
+                             AND scope_pol.line_number = scope_prl.line_number
+                            INNER JOIN fil f
+                              ON f.CODI = scope_pol.item_code
+                             AND f.CENTRO = @centerCode
+                             AND COALESCE(f.is_deleted, 0) = 0
+                            WHERE scope_prl.receipt_id = pr.receipt_id
+                        )
+                      )
+                  AND (
                         @search = ''
                         OR CAST(pr.receipt_number AS CHAR) LIKE @likeSearch
                         OR CAST(pr.order_number AS CHAR) LIKE @likeSearch
@@ -405,6 +457,8 @@ public sealed class MySqlPurchaseOrderService : IPurchaseOrderQueries, IPurchase
                 """;
             countCommand.Parameters.AddWithValue("@tenantId", tenantId.ToString());
             countCommand.Parameters.AddWithValue("@companyId", companyId.ToString());
+            countCommand.Parameters.AddWithValue("@centerCode", centerCode);
+            countCommand.Parameters.AddWithValue("@catalogScope", catalogScope);
             countCommand.Parameters.AddWithValue("@search", search);
             countCommand.Parameters.AddWithValue("@likeSearch", likeSearch);
 
@@ -441,6 +495,23 @@ public sealed class MySqlPurchaseOrderService : IPurchaseOrderQueries, IPurchase
                   AND pr.company_id = @companyId
                   AND COALESCE(pr.is_deleted, 0) = 0
                   AND (
+                        @catalogScope <> 'Hilos'
+                        OR EXISTS (
+                            SELECT 1
+                            FROM purchase_order_receipt_lines scope_prl
+                            INNER JOIN purchase_order_lines scope_pol
+                              ON scope_pol.tenant_id = scope_prl.tenant_id
+                             AND scope_pol.company_id = scope_prl.company_id
+                             AND scope_pol.order_number = scope_prl.order_number
+                             AND scope_pol.line_number = scope_prl.line_number
+                            INNER JOIN fil f
+                              ON f.CODI = scope_pol.item_code
+                             AND f.CENTRO = @centerCode
+                             AND COALESCE(f.is_deleted, 0) = 0
+                            WHERE scope_prl.receipt_id = pr.receipt_id
+                        )
+                      )
+                  AND (
                         @search = ''
                         OR CAST(pr.receipt_number AS CHAR) LIKE @likeSearch
                         OR CAST(pr.order_number AS CHAR) LIKE @likeSearch
@@ -456,6 +527,8 @@ public sealed class MySqlPurchaseOrderService : IPurchaseOrderQueries, IPurchase
                 """;
             command.Parameters.AddWithValue("@tenantId", tenantId.ToString());
             command.Parameters.AddWithValue("@companyId", companyId.ToString());
+            command.Parameters.AddWithValue("@centerCode", centerCode);
+            command.Parameters.AddWithValue("@catalogScope", catalogScope);
             command.Parameters.AddWithValue("@search", search);
             command.Parameters.AddWithValue("@likeSearch", likeSearch);
             command.Parameters.AddWithValue("@pageSize", pageSize);
@@ -646,8 +719,8 @@ public sealed class MySqlPurchaseOrderService : IPurchaseOrderQueries, IPurchase
         var existingLineState = previous?.Lines.ToDictionary(line => line.LineNumber) ?? [];
         ValidateAgainstReceivedLines(existingLineState, command);
 
-        var orderNumber = command.OrderNumber ?? await GetNextOrderNumberAsync(connection, command.TenantId, command.CompanyId, cancellationToken);
         await using var transaction = await connection.BeginTransactionAsync(cancellationToken);
+        var orderNumber = command.OrderNumber ?? await GetNextOrderNumberAsync(connection, transaction, command.TenantId, command.CompanyId, cancellationToken);
 
         if (command.OrderNumber.HasValue)
         {
@@ -834,7 +907,7 @@ public sealed class MySqlPurchaseOrderService : IPurchaseOrderQueries, IPurchase
         await using var transaction = await connection.BeginTransactionAsync(cancellationToken);
 
         var receiptId = Guid.NewGuid();
-        var receiptNumber = await GetNextReceiptNumberAsync(connection, command.TenantId, command.CompanyId, cancellationToken);
+        var receiptNumber = await GetNextReceiptNumberAsync(connection, transaction, command.TenantId, command.CompanyId, cancellationToken);
         var receiptSeries = BuildReceiptSeries(currentOrder.CompanyLegacyCenterCode);
         await using (var insertReceiptCommand = connection.CreateCommand())
         {
@@ -1204,41 +1277,31 @@ public sealed class MySqlPurchaseOrderService : IPurchaseOrderQueries, IPurchase
 
     private static async Task<int> GetNextOrderNumberAsync(
         MySqlConnection connection,
+        MySqlTransaction transaction,
         Guid tenantId,
         Guid companyId,
         CancellationToken cancellationToken)
-    {
-        await using var command = connection.CreateCommand();
-        command.CommandText =
-            """
-            SELECT COALESCE(MAX(order_number), 0) + 1
-            FROM purchase_orders
-            WHERE tenant_id = @tenantId
-              AND company_id = @companyId;
-            """;
-        command.Parameters.AddWithValue("@tenantId", tenantId.ToString());
-        command.Parameters.AddWithValue("@companyId", companyId.ToString());
-        return Convert.ToInt32(await command.ExecuteScalarAsync(cancellationToken));
-    }
+        => await DocumentNumberingSqlHelper.ReserveNextNumberAsync(
+            connection,
+            transaction,
+            tenantId,
+            companyId,
+            DocumentNumberingKeys.PurchaseOrder,
+            cancellationToken);
 
     private static async Task<int> GetNextReceiptNumberAsync(
         MySqlConnection connection,
+        MySqlTransaction transaction,
         Guid tenantId,
         Guid companyId,
         CancellationToken cancellationToken)
-    {
-        await using var command = connection.CreateCommand();
-        command.CommandText =
-            """
-            SELECT COALESCE(MAX(receipt_number), 0) + 1
-            FROM purchase_order_receipts
-            WHERE tenant_id = @tenantId
-              AND company_id = @companyId;
-            """;
-        command.Parameters.AddWithValue("@tenantId", tenantId.ToString());
-        command.Parameters.AddWithValue("@companyId", companyId.ToString());
-        return Convert.ToInt32(await command.ExecuteScalarAsync(cancellationToken));
-    }
+        => await DocumentNumberingSqlHelper.ReserveNextNumberAsync(
+            connection,
+            transaction,
+            tenantId,
+            companyId,
+            DocumentNumberingKeys.PurchaseReceipt,
+            cancellationToken);
 
     private async Task AuditAsync(
         PurchaseOrderDetailDto? previous,
@@ -1588,6 +1651,11 @@ public sealed class MySqlPurchaseOrderService : IPurchaseOrderQueries, IPurchase
         var direction = filter.SortDescending ? "DESC" : "ASC";
         return $"ORDER BY {column} {direction}, pr.receipt_number DESC";
     }
+
+    private static string NormalizeCatalogScope(string? catalogScope) =>
+        string.Equals(catalogScope?.Trim(), "Hilos", StringComparison.OrdinalIgnoreCase)
+            ? "Hilos"
+            : string.Empty;
 
     private sealed record SupplierSnapshot(int Code, string Name, string TaxId);
 }

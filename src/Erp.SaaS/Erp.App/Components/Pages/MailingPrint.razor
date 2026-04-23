@@ -1,0 +1,159 @@
+@page "/base-datos/mailing/{CampaignId:guid}/imprimir"
+@attribute [Authorize]
+@using System.Net
+@using Microsoft.AspNetCore.Components
+@using Erp.Application.Mailing
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IMailingCampaignQueries MailingQueries
+@inject AppText T
+
+<PageTitle>@L("Mailing imprimible", "Mailing imprimible", "Printable mailing")</PageTitle>
+
+@if (isLoading)
+{
+    <div class="panel">
+        <div class="loading-banner">
+            <span class="loading-indicator" aria-hidden="true"></span>
+            <span>@L("Cargando mailing...", "Carregant mailing...", "Loading mailing...")</span>
+        </div>
+    </div>
+}
+else if (!string.IsNullOrWhiteSpace(errorMessage))
+{
+    <div class="alert danger">@errorMessage</div>
+}
+else if (campaign is not null)
+{
+    <div class="page-header print-hidden">
+        <div>
+            <p class="eyebrow">@T["menu.base"]</p>
+            <h1>@campaign.Title</h1>
+            <p class="lead">@L("Versión imprimible del mailing con destinatarios congelados en local.", "Versió imprimible del mailing amb destinataris congelats en local.", "Printable mailing version with locally frozen recipients.")</p>
+        </div>
+        <div class="quick-links">
+            <a class="secondary-button" href="@($"/base-datos/mailing/editar/{CampaignId}")">@L("Volver al mailing", "Tornar al mailing", "Back to mailing")</a>
+            <button class="primary-button" type="button" onclick="window.print()">@L("Imprimir / guardar PDF", "Imprimir / desar PDF", "Print / save PDF")</button>
+        </div>
+    </div>
+
+    <section class="panel print-hidden">
+        <div class="card-grid">
+            <article class="info-card">
+                <p class="eyebrow">@L("Colectivo", "Col·lectiu", "Audience")</p>
+                <h2>@GetSourceLabel(campaign.SourceType)</h2>
+            </article>
+            <article class="info-card">
+                <p class="eyebrow">@L("Destinatarios", "Destinataris", "Recipients")</p>
+                <h2>@campaign.Recipients.Count</h2>
+            </article>
+            <article class="info-card">
+                <p class="eyebrow">@L("Modo", "Mode", "Mode")</p>
+                <h2>@(campaign.IncludeAllRecipients ? L("Todos", "Tots", "All") : L("Selección manual", "Selecció manual", "Manual selection"))</h2>
+            </article>
+        </div>
+    </section>
+
+    @foreach (var recipient in campaign.Recipients)
+    {
+        <article class="print-sheet" style="page-break-after: always;">
+            <header class="print-sheet-header">
+                <div>
+                    <p class="eyebrow">@campaign.Title</p>
+                    <h2>@recipient.Name</h2>
+                    <div class="muted">
+                        @if (!string.IsNullOrWhiteSpace(recipient.AddressLine))
+                        {
+                            <div>@recipient.AddressLine</div>
+                        }
+                        <div>@($"{recipient.PostalCode} {recipient.City}".Trim())</div>
+                        @if (!string.IsNullOrWhiteSpace(recipient.Province))
+                        {
+                            <div>@recipient.Province</div>
+                        }
+                        @if (!string.IsNullOrWhiteSpace(recipient.Email))
+                        {
+                            <div>@recipient.Email</div>
+                        }
+                    </div>
+                </div>
+            </header>
+
+            <section class="panel">
+                @((MarkupString)FormatLetterBody(recipient))
+            </section>
+        </article>
+    }
+}
+
+@code {
+    [Parameter] public Guid CampaignId { get; set; }
+
+    private bool isLoading = true;
+    private string errorMessage = string.Empty;
+    private MailingCampaignDetailDto? campaign;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+            var user = authState.User;
+            var tenantId = user.GetTenantId();
+            var companyId = user.GetActiveCompanyId();
+
+            if (!tenantId.HasValue || !companyId.HasValue)
+            {
+                errorMessage = L("Selecciona una empresa activa para imprimir este mailing.", "Selecciona una empresa activa per imprimir aquest mailing.", "Select an active company to print this mailing.");
+                return;
+            }
+
+            campaign = await MailingQueries.GetByIdAsync(tenantId.Value, companyId.Value, CampaignId);
+            if (campaign is null)
+            {
+                errorMessage = L("No se ha encontrado el mailing solicitado.", "No s'ha trobat el mailing sol·licitat.", "The requested mailing could not be found.");
+            }
+        }
+        catch (Exception exception)
+        {
+            errorMessage = exception.Message;
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private string FormatLetterBody(MailingRecipientDto recipient)
+    {
+        var rendered = (campaign?.BodyText ?? string.Empty)
+            .Replace("{Name}", recipient.Name, StringComparison.OrdinalIgnoreCase)
+            .Replace("{TaxId}", recipient.TaxId, StringComparison.OrdinalIgnoreCase)
+            .Replace("{Address}", recipient.AddressLine, StringComparison.OrdinalIgnoreCase)
+            .Replace("{PostalCode}", recipient.PostalCode, StringComparison.OrdinalIgnoreCase)
+            .Replace("{City}", recipient.City, StringComparison.OrdinalIgnoreCase)
+            .Replace("{Province}", recipient.Province, StringComparison.OrdinalIgnoreCase)
+            .Replace("{Email}", recipient.Email, StringComparison.OrdinalIgnoreCase);
+
+        var encodedBody = WebUtility.HtmlEncode(rendered)
+            .Replace(Environment.NewLine, "<br />", StringComparison.Ordinal)
+            .Replace("\n", "<br />", StringComparison.Ordinal);
+
+        return "<div class=\"mailing-letter-body\">" + encodedBody + "</div>";
+    }
+
+    private string GetSourceLabel(string value) => MailingSourceTypes.Normalize(value) switch
+    {
+        MailingSourceTypes.Suppliers => L("Proveedores", "Proveïdors", "Suppliers"),
+        MailingSourceTypes.Representatives => L("Representantes", "Representants", "Representatives"),
+        MailingSourceTypes.Carriers => L("Transportistas", "Transportistes", "Carriers"),
+        _ => L("Clientes", "Clients", "Clients")
+    };
+
+    private string L(string spanish, string catalan, string english) =>
+        T.CurrentLanguage switch
+        {
+            AppLanguages.Catalan => catalan,
+            AppLanguages.English => english,
+            _ => spanish
+        };
+}

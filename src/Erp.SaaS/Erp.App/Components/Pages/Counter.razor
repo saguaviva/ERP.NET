@@ -1,16 +1,25 @@
-﻿@page "/counter"
+@page "/counter"
 @rendermode InteractiveServer
+@inject AppText T
 
-<PageTitle>Counter</PageTitle>
+<PageTitle>@L("Contador", "Comptador", "Counter")</PageTitle>
 
-<h1>Counter</h1>
+<h1>@L("Contador", "Comptador", "Counter")</h1>
 
-<p role="status">Current count: @currentCount</p>
+<p role="status">@L("Cuenta actual", "Compte actual", "Current count"): @currentCount</p>
 
-<button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
+<button class="btn btn-primary" @onclick="IncrementCount">@L("Incrementar", "Incrementar", "Increment")</button>
 
 @code {
     private int currentCount = 0;
+
+    private string L(string spanish, string catalan, string english) =>
+        T.CurrentLanguage switch
+        {
+            AppLanguages.Catalan => catalan,
+            AppLanguages.English => english,
+            _ => spanish
+        };
 
     private void IncrementCount()
     {

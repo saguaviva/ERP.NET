@@ -1,29 +1,35 @@
 @page "/produccion/acabados/nueva"
 @page "/produccion/acabados/editar/{OrderNumber:int}"
+@page "/compras/ordenes-fabricacion-muestras/nueva"
+@page "/compras/ordenes-fabricacion-muestras/editar/{OrderNumber:int}"
+@page "/compras/ordenes-fabricacion-models/nueva"
+@page "/compras/ordenes-fabricacion-models/editar/{OrderNumber:int}"
 @attribute [Authorize(Roles = "TenantAdmin,TenantReader")]
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject IAuditLogService AuditLogService
 @inject IBaseCatalogQueries BaseCatalogQueries
 @inject IDisposicionQueries DisposicionQueries
+@inject IModeloQueries ModeloQueries
 @inject IMuestraQueries MuestraQueries
 @inject IParteAcabadoQueries ParteAcabadoQueries
 @inject IParteAcabadoService ParteAcabadoService
 @inject ITejidoQueries TejidoQueries
 @inject NavigationManager NavigationManager
+@inject AppText T
 
-<PageTitle>@(OrderNumber.HasValue ? $"Editar acabado {OrderNumber}" : "Nueva orden de acabado")</PageTitle>
+<PageTitle>@PageTitleText</PageTitle>
 
 <div class="page-header">
     <div>
-        <p class="eyebrow">PRODUCCIÓN</p>
-        <h1>@(OrderNumber.HasValue ? $"Editar orden de acabado {OrderNumber}" : "Nueva orden de acabado")</h1>
-        <p class="lead">Ficha operativa de acabado con estado, cliente, acabador y líneas de tejido/color.</p>
+        <p class="eyebrow">@HeaderEyebrowText</p>
+        <h1>@HeaderTitleText</h1>
+        <p class="lead">@HeaderLeadText</p>
     </div>
     <div class="quick-links">
-        <a class="secondary-button link-button" href="/produccion/acabados">Volver al listado</a>
+        <a class="secondary-button link-button" href="@BackToListUrl">@L("Volver al listado", "Tornar al llistat", "Back to list")</a>
         @if (OrderNumber.HasValue)
         {
-            <a class="secondary-button link-button" href="/produccion/acabados/@OrderNumber/imprimir" target="_blank" rel="noopener noreferrer">Imprimir ficha</a>
+            <a class="secondary-button link-button" href="@BuildCurrentPrintUrl(OrderNumber.Value)" target="_blank" rel="noopener noreferrer">@L("Imprimir ficha", "Imprimir fitxa", "Print sheet")</a>
         }
     </div>
 </div>
@@ -31,7 +37,7 @@
 @if (!tenantId.HasValue || !companyId.HasValue)
 {
     <div class="empty-state">
-        <p>No hay empresa activa seleccionada.</p>
+        <p>@L("No hay empresa activa seleccionada.", "No hi ha cap empresa activa seleccionada.", "There is no active company selected.")</p>
     </div>
 }
 else
@@ -44,86 +50,86 @@ else
     @if (!canEdit && !OrderNumber.HasValue)
     {
         <div class="alert">
-            No tienes permisos para crear órdenes / partes de acabado nuevas en esta empresa.
+            @L("No tienes permisos para crear órdenes / partes de acabado nuevas en esta empresa.", "No tens permisos per crear ordres / parts d'acabat nous en aquesta empresa.", "You do not have permission to create new finish orders in this company.")
         </div>
     }
 
     <section class="card-grid">
         <article class="info-card">
-            <p class="eyebrow">Número</p>
+            <p class="eyebrow">@L("Número", "Número", "Number")</p>
             <h2>@DisplayNumber</h2>
-            <p class="muted">Identificador de trabajo interno.</p>
+            <p class="muted">@L("Identificador de trabajo interno.", "Identificador de treball intern.", "Internal work identifier.")</p>
         </article>
         <article class="info-card">
-            <p class="eyebrow">Estado</p>
+            <p class="eyebrow">@L("Estado", "Estat", "Status")</p>
             <h2>@GetStatusLabel(model.Status)</h2>
-            <p class="muted">Situación actual del trabajo de acabado.</p>
+            <p class="muted">@L("Situación actual del trabajo de acabado.", "Situació actual del treball d'acabat.", "Current status of the finish order.")</p>
         </article>
         <article class="info-card">
-            <p class="eyebrow">Totales</p>
-            <h2>@model.TotalKilograms.ToString("0.##") kg</h2>
-            <p class="muted">@model.TotalPieces.ToString("0.##") piezas · @model.Lines.Count líneas</p>
+            <p class="eyebrow">@L("Totales", "Totals", "Totals")</p>
+            <h2>@model.TotalKilograms.ToUiString("0.##") kg</h2>
+            <p class="muted">@model.TotalPieces.ToUiString("0.##") @L("piezas", "peces", "pieces") · @model.Lines.Count @L("líneas", "línies", "lines")</p>
         </article>
         <article class="info-card">
-            <p class="eyebrow">Origen</p>
+            <p class="eyebrow">@L("Origen", "Origen", "Origin")</p>
             <h2>@DisplayOrigin</h2>
-            <p class="muted">Todas las altas y cambios se guardan en local.</p>
+            <p class="muted">@L("Todas las altas y cambios se guardan en local.", "Totes les altes i canvis es desen en local.", "All creates and changes are stored locally.")</p>
         </article>
     </section>
 
     <section class="card-grid" style="margin-top: 1rem;">
         <article class="info-card">
-            <p class="eyebrow">Líneas pendientes</p>
+            <p class="eyebrow">@L("Líneas pendientes", "Línies pendents", "Pending lines")</p>
             <h2>@PendingLinesCount</h2>
-            <p class="muted">Todavía sin pasar a proceso.</p>
+            <p class="muted">@L("Todavía sin pasar a proceso.", "Encara sense passar a procés.", "Not yet moved into processing.")</p>
         </article>
         <article class="info-card">
-            <p class="eyebrow">En proceso</p>
+            <p class="eyebrow">@L("En proceso", "En procés", "In progress")</p>
             <h2>@InProgressLinesCount</h2>
-            <p class="muted">Ya dispuestas, pendientes de terminar.</p>
+            <p class="muted">@L("Ya dispuestas, pendientes de terminar.", "Ja disposades, pendents d'acabar.", "Already prepared, waiting to be finished.")</p>
         </article>
         <article class="info-card">
-            <p class="eyebrow">Terminadas</p>
+            <p class="eyebrow">@L("Terminadas", "Acabades", "Finished")</p>
             <h2>@FinishedLinesCount</h2>
-            <p class="muted">Servidas y reflejadas en disposición.</p>
+            <p class="muted">@L("Servidas y reflejadas en disposición.", "Servides i reflectides a disposició.", "Served and reflected on the linked disposition.")</p>
         </article>
         <article class="info-card">
-            <p class="eyebrow">Disposición enlazada</p>
-            <h2>@(string.IsNullOrWhiteSpace(model.DispositionLabel) ? "Sin enlace" : model.DispositionLabel)</h2>
+            <p class="eyebrow">@L("Disposición enlazada", "Disposició enllaçada", "Linked disposition")</p>
+            <h2>@(string.IsNullOrWhiteSpace(model.DispositionLabel) ? L("Sin enlace", "Sense enllaç", "No link") : model.DispositionLabel)</h2>
             <p class="muted">
                 @if (HasLinkedDisposition)
                 {
-                    <a class="inline-link" href="@BuildDispositionUrl()">Abrir disposición</a>
+                    <a class="inline-link" href="@BuildDispositionUrl()">@L("Abrir disposición", "Obrir disposició", "Open disposition")</a>
                 }
                 else
                 {
-                    <span>Sin disposición enlazada.</span>
+                    <span>@L("Sin disposición enlazada.", "Sense disposició enllaçada.", "No linked disposition.")</span>
                 }
             </p>
         </article>
         <article class="info-card">
-            <p class="eyebrow">Muestra origen</p>
+            <p class="eyebrow">@L("Origen enlazado", "Origen enllaçat", "Linked source")</p>
             <h2>@DisplaySourceSample</h2>
             <p class="muted">
                 @if (HasLinkedSample)
                 {
-                    <a class="inline-link" href="@BuildSampleUrl()">Abrir @DisplaySourceKind.ToLowerInvariant()</a>
+                    <a class="inline-link" href="@BuildSampleUrl()">@L("Abrir", "Obrir", "Open") @DisplaySourceKind.ToLowerInvariant()</a>
                 }
                 else
                 {
-                    <span>Sin muestra enlazada.</span>
+                    <span>@L("Sin origen enlazado.", "Sense origen enllaçat.", "No linked source.")</span>
                 }
             </p>
         </article>
         <article class="info-card">
-            <p class="eyebrow">Máquina</p>
+            <p class="eyebrow">@L("Máquina", "Màquina", "Machine")</p>
             <h2>@DisplayMachine</h2>
-            <p class="muted">Referencia principal de máquina para este trabajo de acabado.</p>
+            <p class="muted">@L("Referencia principal de máquina para este trabajo de acabado.", "Referència principal de màquina per a aquest treball d'acabat.", "Main machine reference for this finish order.")</p>
         </article>
         <article class="info-card">
-            <p class="eyebrow">Operación</p>
+            <p class="eyebrow">@L("Operación", "Operació", "Operation")</p>
             <h2>@DisplayOperation</h2>
-            <p class="muted">Proceso principal aplicado a esta orden de acabado.</p>
+            <p class="muted">@L("Proceso principal aplicado a esta orden de acabado.", "Procés principal aplicat a aquesta ordre d'acabat.", "Main process applied to this finish order.")</p>
         </article>
     </section>
 
@@ -131,11 +137,11 @@ else
         <fieldset disabled="@isReadOnly">
             <div class="form-grid" style="margin-top: 1rem;">
                 <label class="field">
-                    <span>Fecha</span>
+                    <span>@L("Fecha", "Data", "Date")</span>
                     <InputDate TValue="DateTime?" class="text-input" @bind-Value="model.Date" />
                 </label>
                 <label class="field">
-                    <span>Estado</span>
+                    <span>@L("Estado", "Estat", "Status")</span>
                     <InputSelect class="text-input" @bind-Value="model.Status">
                         @foreach (var status in ParteAcabadoStatuses.All)
                         {
@@ -144,23 +150,23 @@ else
                     </InputSelect>
                 </label>
                 <label class="field">
-                    <span>Cliente</span>
+                    <span>@L("Cliente", "Client", "Customer")</span>
                     <InputNumber class="text-input" @bind-Value="model.ClientCode" />
                 </label>
                 <label class="field wide">
-                    <span>Nombre cliente</span>
+                    <span>@L("Nombre cliente", "Nom client", "Customer name")</span>
                     <InputText class="text-input" @bind-Value="model.ClientName" />
                 </label>
                 <label class="field">
-                    <span>Acabador</span>
+                    <span>@L("Acabador", "Acabador", "Finisher")</span>
                     <InputNumber class="text-input" @bind-Value="model.FinisherCode" />
                 </label>
                 <label class="field wide">
-                    <span>Nombre acabador</span>
+                    <span>@L("Nombre acabador", "Nom acabador", "Finisher name")</span>
                     <InputText class="text-input" @bind-Value="model.FinisherName" />
                 </label>
                 <label class="field">
-                    <span>Máquina</span>
+                    <span>@L("Máquina", "Màquina", "Machine")</span>
                     @if (machineOptions.Count == 0)
                     {
                         <InputNumber class="text-input" @bind-Value="model.MachineCode" />
@@ -168,7 +174,7 @@ else
                     else
                     {
                         <select class="text-input" value="@model.MachineCode" @onchange="OnMachineChanged">
-                            <option value="0">Selecciona máquina</option>
+                            <option value="0">@L("Selecciona máquina", "Selecciona màquina", "Select machine")</option>
                             @foreach (var machine in machineOptions)
                             {
                                 <option value="@ParseMachineCode(machine.Code)">@FormatMachineOption(machine)</option>
@@ -177,7 +183,7 @@ else
                     }
                 </label>
                 <label class="field wide">
-                    <span>Nombre máquina</span>
+                    <span>@L("Nombre máquina", "Nom màquina", "Machine name")</span>
                     @if (machineOptions.Count == 0)
                     {
                         <InputText class="text-input" @bind-Value="model.MachineName" />
@@ -188,7 +194,7 @@ else
                     }
                 </label>
                 <label class="field">
-                    <span>Operación</span>
+                    <span>@L("Operación", "Operació", "Operation")</span>
                     @if (operationOptions.Count == 0)
                     {
                         <InputNumber class="text-input" @bind-Value="model.OperationCode" />
@@ -196,7 +202,7 @@ else
                     else
                     {
                         <select class="text-input" value="@model.OperationCode" @onchange="OnOperationChanged">
-                            <option value="0">Selecciona operación</option>
+                            <option value="0">@L("Selecciona operación", "Selecciona operació", "Select operation")</option>
                             @foreach (var operation in operationOptions)
                             {
                                 <option value="@ParseOperationCode(operation.Code)">@FormatOperationOption(operation)</option>
@@ -205,7 +211,7 @@ else
                     }
                 </label>
                 <label class="field wide">
-                    <span>Nombre operación</span>
+                    <span>@L("Nombre operación", "Nom operació", "Operation name")</span>
                     @if (operationOptions.Count == 0)
                     {
                         <InputText class="text-input" @bind-Value="model.OperationName" />
@@ -216,31 +222,32 @@ else
                     }
                 </label>
                 <label class="field">
-                    <span>Disposición</span>
+                    <span>@L("Disposición", "Disposició", "Disposition")</span>
                     <InputNumber class="text-input" @bind-Value="model.DispositionCode" />
                 </label>
                 <label class="field wide">
-                    <span>Etiqueta disposición</span>
+                    <span>@L("Etiqueta disposición", "Etiqueta disposició", "Disposition label")</span>
                     <InputText class="text-input" @bind-Value="model.DispositionLabel" />
                 </label>
                 <label class="field">
-                    <span>Tipo origen</span>
+                    <span>@L("Tipo origen", "Tipus origen", "Source type")</span>
                     <InputSelect class="text-input" @bind-Value="model.SourceSampleKind">
-                        <option value="">Sin enlace</option>
-                        <option value="@ParteAcabadoSourceKinds.Sample">Muestra</option>
-                        <option value="@ParteAcabadoSourceKinds.Complement">Complemento</option>
+                        <option value="">@L("Sin enlace", "Sense enllaç", "No link")</option>
+                        <option value="@ParteAcabadoSourceKinds.Sample">@L("Muestra", "Mostra", "Sample")</option>
+                        <option value="@ParteAcabadoSourceKinds.Complement">@L("Complemento", "Complement", "Complement")</option>
+                        <option value="@ParteAcabadoSourceKinds.Model">@L("Model", "Model", "Model")</option>
                     </InputSelect>
                 </label>
                 <label class="field">
-                    <span>Código origen</span>
+                    <span>@L("Código origen", "Codi origen", "Source code")</span>
                     <InputText class="text-input" @bind-Value="model.SourceSampleCode" />
                 </label>
                 <label class="field">
-                    <span>Línea origen</span>
+                    <span>@L("Línea origen", "Línia origen", "Source line")</span>
                     <InputNumber class="text-input" @bind-Value="model.SourceSampleLineNumber" />
                 </label>
                 <label class="field wide">
-                    <span>Notas</span>
+                    <span>@L("Notas", "Notes", "Notes")</span>
                     <InputTextArea class="text-input textarea-input" @bind-Value="model.Notes" />
                 </label>
             </div>
@@ -248,12 +255,12 @@ else
             <section class="panel detail-panel" style="margin-top: 1rem;">
                 <div class="detail-panel-header">
                     <div>
-                        <h2>Líneas del parte</h2>
-                        <p class="muted">Tejido, color, piezas, kg y estado de cada trabajo de acabado.</p>
+                        <h2>@L("Líneas del parte", "Línies del part", "Order lines")</h2>
+                        <p class="muted">@L("Tejido, color, piezas, kg y estado de cada trabajo de acabado.", "Teixit, color, peces, kg i estat de cada treball d'acabat.", "Fabric, color, pieces, kg and status of each finish task.")</p>
                     </div>
                     @if (!isReadOnly)
                     {
-                        <button class="secondary-button" type="button" @onclick="AddLine">Añadir línea</button>
+                        <button class="secondary-button" type="button" @onclick="AddLine">@L("Añadir línea", "Afegir línia", "Add line")</button>
                     }
                 </div>
 
@@ -262,21 +269,21 @@ else
                         <thead>
                             <tr>
                                 <th>#</th>
-                                <th>Tejido</th>
-                                <th>Descripción</th>
-                                <th>Color</th>
+                                <th>@L("Tejido", "Teixit", "Fabric")</th>
+                                <th>@L("Descripción", "Descripció", "Description")</th>
+                                <th>@L("Color", "Color", "Color")</th>
                                 <th>Kg</th>
-                                <th>Piezas</th>
-                                <th>Estado</th>
-                                <th>Notas</th>
-                                <th>Acciones</th>
+                                <th>@L("Piezas", "Peces", "Pieces")</th>
+                                <th>@L("Estado", "Estat", "Status")</th>
+                                <th>@L("Notas", "Notes", "Notes")</th>
+                                <th>@L("Acciones", "Accions", "Actions")</th>
                             </tr>
                         </thead>
                         <tbody>
                             @if (model.Lines.Count == 0)
                             {
                                 <tr>
-                                    <td colspan="9" class="muted">No hay líneas cargadas para este parte de acabado.</td>
+                                    <td colspan="9" class="muted">@L("No hay líneas cargadas para este parte de acabado.", "No hi ha línies carregades per a aquest part d'acabat.", "There are no lines loaded for this finish order.")</td>
                                 </tr>
                             }
                             else
@@ -303,12 +310,12 @@ else
                                             <div class="inline-action-list">
                                                 @if (!string.IsNullOrWhiteSpace(line.FabricCode))
                                                 {
-                                                    <a class="inline-link" href="@BuildTejidoUrl(line)">Tejido</a>
-                                                    <a class="inline-link" href="@BuildMovementsUrl(line)">Movs.</a>
+                                                    <a class="inline-link" href="@BuildTejidoUrl(line)">@L("Tejido", "Teixit", "Fabric")</a>
+                                                    <a class="inline-link" href="@BuildMovementsUrl(line)">@L("Movs.", "Movs.", "Moves")</a>
                                                 }
                                                 @if (!isReadOnly)
                                                 {
-                                                    <button class="danger-link" type="button" @onclick="() => RemoveLine(line.LineNumber)">Quitar</button>
+                                                    <button class="danger-link" type="button" @onclick="() => RemoveLine(line.LineNumber)">@L("Quitar", "Treure", "Remove")</button>
                                                 }
                                             </div>
                                         </td>
@@ -323,15 +330,15 @@ else
             <div class="quick-links" style="margin-top: 1rem;">
                 @if (canEdit)
                 {
-                    <button class="primary-button" type="submit">Guardar parte de acabado</button>
+                    <button class="primary-button" type="submit">@L("Guardar parte de acabado", "Desar part d'acabat", "Save finish order")</button>
                 }
                 @if (canEdit && OrderNumber.HasValue)
                 {
-                    <button class="secondary-button danger-button" type="button" @onclick="DeleteAsync">Eliminar parte</button>
+                    <button class="secondary-button danger-button" type="button" @onclick="DeleteAsync">@L("Eliminar parte", "Eliminar part", "Delete order")</button>
                 }
                 @if (OrderNumber.HasValue)
                 {
-                    <button class="secondary-button" type="button" @onclick="LoadAuditAsync">Recargar historial</button>
+                    <button class="secondary-button" type="button" @onclick="LoadAuditAsync">@L("Recargar historial", "Recarregar historial", "Reload history")</button>
                 }
             </div>
         </fieldset>
@@ -340,11 +347,11 @@ else
     @if (OrderNumber.HasValue)
     {
         <section class="panel" style="margin-top: 1rem;">
-            <h2>Historial reciente del parte de acabado</h2>
+            <h2>@L("Historial reciente del parte de acabado", "Historial recent del part d'acabat", "Recent finish order history")</h2>
             <div class="list-block">
                 @if (recentAuditLogs.Count == 0)
                 {
-                    <p class="muted">Todavía no hay eventos auditados para este parte.</p>
+                    <p class="muted">@L("Todavía no hay eventos auditados para este parte.", "Encara no hi ha esdeveniments auditats per a aquest part.", "There are no audited events yet for this order.")</p>
                 }
                 else
                 {
@@ -377,6 +384,9 @@ else
     [SupplyParameterFromQuery(Name = "sampleKind")]
     public string? SampleKindFromQuery { get; set; }
 
+    [SupplyParameterFromQuery(Name = "modelId")]
+    public string? ModelIdFromQuery { get; set; }
+
     private Guid? tenantId;
     private Guid? companyId;
     private bool canEdit;
@@ -391,24 +401,64 @@ else
     private string? appliedSampleCode;
     private int? appliedSampleLineNumber;
     private string? appliedSampleKind;
+    private string appliedModelId = string.Empty;
+    private string CurrentPath => NavigationManager.ToBaseRelativePath(NavigationManager.Uri).Split('?', '#')[0];
+    private bool IsSampleManufacturingView => CurrentPath.StartsWith("compras/ordenes-fabricacion-muestras", StringComparison.OrdinalIgnoreCase);
+    private bool IsModelManufacturingView => CurrentPath.StartsWith("compras/ordenes-fabricacion-models", StringComparison.OrdinalIgnoreCase);
+    private string HeaderEyebrowText => IsSampleManufacturingView || IsModelManufacturingView
+        ? T["menu.purchases"]
+        : T["menu.production"];
+    private string PageTitleText => OrderNumber.HasValue
+        ? $"{EditOrderLabel} {OrderNumber}"
+        : NewOrderLabel;
+    private string HeaderTitleText => OrderNumber.HasValue
+        ? $"{EditOrderLabel} {OrderNumber}"
+        : NewOrderLabel;
+    private string HeaderLeadText => IsSampleManufacturingView
+        ? L("Ficha operativa de la orden de fabricación nacida desde muestras o complementos, con cliente, máquina, operación y líneas de trabajo.", "Fitxa operativa de l'ordre de fabricació nascuda des de mostres o complements, amb client, màquina, operació i línies de treball.", "Operational manufacturing order created from samples or complements, with client, machine, operation and work lines.")
+        : IsModelManufacturingView
+            ? L("Ficha operativa de la orden de fabricación nacida desde models, con trazabilidad al model origen y sus líneas de producción.", "Fitxa operativa de l'ordre de fabricació nascuda des de models, amb traçabilitat al model origen i les seves línies de producció.", "Operational manufacturing order created from models, with traceability back to the source model and its production lines.")
+            : L("Ficha operativa de acabado con estado, cliente, acabador y líneas de tejido/color.", "Fitxa operativa d'acabat amb estat, client, acabador i línies de teixit/color.", "Operational finish sheet with status, customer, finisher and fabric/color lines.");
+    private string NewOrderLabel => IsSampleManufacturingView
+        ? L("Nueva orden fabricación muestras", "Nova ordre fabricació mostres", "New sample manufacturing order")
+        : IsModelManufacturingView
+            ? L("Nueva orden fabricación models", "Nova ordre fabricació models", "New model manufacturing order")
+            : L("Nueva orden de acabado", "Nova ordre d'acabat", "New finish order");
+    private string EditOrderLabel => IsSampleManufacturingView
+        ? L("Editar orden fabricación muestras", "Editar ordre fabricació mostres", "Edit sample manufacturing order")
+        : IsModelManufacturingView
+            ? L("Editar orden fabricación models", "Editar ordre fabricació models", "Edit model manufacturing order")
+            : L("Editar orden de acabado", "Editar ordre d'acabat", "Edit finish order");
+    private string BackToListUrl => IsSampleManufacturingView
+        ? "/compras/ordenes-fabricacion-muestras"
+        : IsModelManufacturingView
+            ? "/compras/ordenes-fabricacion-models"
+            : "/produccion/acabados";
 
-    private string DisplayNumber => model.OrderNumber > 0 ? model.OrderNumber.ToString() : "Nuevo";
-    private string DisplayOrigin => string.IsNullOrWhiteSpace(model.Origin) ? "local" : model.Origin;
+    private string DisplayNumber => model.OrderNumber > 0 ? model.OrderNumber.ToString() : L("Nuevo", "Nou", "New");
+    private string DisplayOrigin => string.IsNullOrWhiteSpace(model.Origin) ? L("local", "local", "local") : model.Origin;
     private int PendingLinesCount => model.Lines.Count(item => string.Equals(item.Status, ParteAcabadoStatuses.Pending, StringComparison.OrdinalIgnoreCase));
     private int InProgressLinesCount => model.Lines.Count(item => string.Equals(item.Status, ParteAcabadoStatuses.InProgress, StringComparison.OrdinalIgnoreCase));
     private int FinishedLinesCount => model.Lines.Count(item => string.Equals(item.Status, ParteAcabadoStatuses.Finished, StringComparison.OrdinalIgnoreCase));
     private bool HasLinkedDisposition => model.DispositionCode.HasValue && model.DispositionCode.Value > 0;
     private bool HasLinkedSample => !string.IsNullOrWhiteSpace(model.SourceSampleCode);
-    private string DisplaySourceKind => HasLinkedSample ? ParteAcabadoSourceKinds.GetLabel(model.SourceSampleKind) : "Sin enlace";
+    private string DisplaySourceKind => HasLinkedSample ? GetSourceKindLabel(model.SourceSampleKind) : L("Sin enlace", "Sense enllaç", "No link");
     private string DisplaySourceSample => HasLinkedSample
-        ? (model.SourceSampleLineNumber.HasValue ? $"{DisplaySourceKind} {model.SourceSampleCode} · línea {model.SourceSampleLineNumber.Value}" : $"{DisplaySourceKind} {model.SourceSampleCode}")
-        : "Sin enlace";
+        ? (model.SourceSampleLineNumber.HasValue ? $"{DisplaySourceKind} {model.SourceSampleCode} · {L("línea", "línia", "line")} {model.SourceSampleLineNumber.Value}" : $"{DisplaySourceKind} {model.SourceSampleCode}")
+        : L("Sin enlace", "Sense enllaç", "No link");
     private string DisplayMachine => model.MachineCode > 0
         ? (string.IsNullOrWhiteSpace(model.MachineName) ? model.MachineCode.ToString() : $"{model.MachineCode} · {model.MachineName}")
-        : "Sin máquina";
+        : L("Sin máquina", "Sense màquina", "No machine");
     private string DisplayOperation => model.OperationCode > 0
         ? (string.IsNullOrWhiteSpace(model.OperationName) ? model.OperationCode.ToString() : $"{model.OperationCode} · {model.OperationName}")
-        : "Sin operación";
+        : L("Sin operación", "Sense operació", "No operation");
+    private string L(string spanish, string catalan, string english) =>
+        T.CurrentLanguage switch
+        {
+            AppLanguages.Catalan => catalan,
+            AppLanguages.English => english,
+            _ => spanish
+        };
 
     protected override async Task OnParametersSetAsync()
     {
@@ -432,7 +482,7 @@ else
             var detail = await ParteAcabadoQueries.GetByNumberAsync(tenantId.Value, companyId.Value, OrderNumber.Value);
             if (detail is null)
             {
-                statusMessage = "No se ha encontrado la orden / parte de acabado solicitada.";
+                statusMessage = L("No se ha encontrado la orden / parte de acabado solicitada.", "No s'ha trobat l'ordre / part d'acabat sol·licitada.", "The requested finish order could not be found.");
                 isError = true;
                 model = new ParteAcabadoDetailDto { Date = DateTime.Today };
                 recentAuditLogs = [];
@@ -446,11 +496,14 @@ else
 
         model = new ParteAcabadoDetailDto
         {
-                Date = DateTime.Today,
-                Status = ParteAcabadoStatuses.Pending
-            };
+            Date = DateTime.Today,
+            Status = ParteAcabadoStatuses.Pending,
+            Origin = "local"
+        };
+        ApplyWorkflowDefaults();
         recentAuditLogs = [];
         await TryApplySampleBaseAsync();
+        await TryApplyModelBaseAsync();
         await TryApplyDispositionBaseAsync();
     }
 
@@ -463,7 +516,7 @@ else
 
         if (isReadOnly)
         {
-            statusMessage = "No tienes permisos de edición en este tenant.";
+            statusMessage = L("No tienes permisos de edición en este tenant.", "No tens permisos d'edició en aquest tenant.", "You do not have edit permissions in this tenant.");
             isError = true;
             return;
         }
@@ -493,6 +546,7 @@ else
                 SourceSampleKind = model.SourceSampleKind,
                 SourceSampleCode = model.SourceSampleCode,
                 SourceSampleLineNumber = model.SourceSampleLineNumber,
+                SourceRecordId = model.SourceRecordId,
                 Notes = model.Notes,
                 Lines = model.Lines
                     .OrderBy(item => item.LineNumber)
@@ -511,12 +565,12 @@ else
             });
 
             statusMessage = OrderNumber.HasValue
-                ? "Parte de acabado actualizado correctamente."
-                : "Parte de acabado creado correctamente.";
+                ? L("Parte de acabado actualizado correctamente.", "Part d'acabat actualitzat correctament.", "Finish order updated successfully.")
+                : L("Parte de acabado creado correctamente.", "Part d'acabat creat correctament.", "Finish order created successfully.");
 
             if (!OrderNumber.HasValue)
             {
-                NavigationManager.NavigateTo($"/produccion/acabados/editar/{savedOrderNumber}", forceLoad: false);
+                NavigationManager.NavigateTo(BuildCurrentEditUrl(savedOrderNumber), forceLoad: false);
                 return;
             }
 
@@ -543,7 +597,7 @@ else
         try
         {
             await ParteAcabadoService.DeleteAsync(tenantId.Value, companyId.Value, OrderNumber.Value);
-            NavigationManager.NavigateTo("/produccion/acabados", forceLoad: false);
+            NavigationManager.NavigateTo(BackToListUrl, forceLoad: false);
         }
         catch (Exception exception)
         {
@@ -646,13 +700,19 @@ else
             entityId: OrderNumber.Value.ToString());
     }
 
-    private static string GetStatusLabel(string status) => status switch
+    private string GetStatusLabel(string status) => status switch
     {
-        ParteAcabadoStatuses.Pending => "Pendiente",
-        ParteAcabadoStatuses.InProgress => "En proceso",
-        ParteAcabadoStatuses.Finished => "Terminado",
-        ParteAcabadoStatuses.Cancelled => "Anulado",
+        ParteAcabadoStatuses.Pending => L("Pendiente", "Pendent", "Pending"),
+        ParteAcabadoStatuses.InProgress => L("En proceso", "En procés", "In progress"),
+        ParteAcabadoStatuses.Finished => L("Terminado", "Acabat", "Finished"),
+        ParteAcabadoStatuses.Cancelled => L("Anulado", "Anul·lat", "Cancelled"),
         _ => status
+    };
+    private string GetSourceKindLabel(string? sourceKind) => ParteAcabadoSourceKinds.Normalize(sourceKind, hasLinkedSource: true) switch
+    {
+        ParteAcabadoSourceKinds.Complement => L("Complemento", "Complement", "Complement"),
+        ParteAcabadoSourceKinds.Model => L("Model", "Model", "Model"),
+        _ => L("Muestra", "Mostra", "Sample")
     };
 
     private static string BuildTejidoUrl(ParteAcabadoLineDto line) =>
@@ -677,12 +737,54 @@ else
     private string BuildDispositionUrl() =>
         HasLinkedDisposition ? $"/articulos/disposiciones/editar/{model.DispositionCode!.Value}" : "/articulos/disposiciones";
 
-    private string BuildSampleUrl() =>
-        HasLinkedSample ? $"{ParteAcabadoSourceKinds.GetRouteBase(model.SourceSampleKind)}/editar/{Uri.EscapeDataString(model.SourceSampleCode.Trim())}" : "/articulos/muestras";
+    private void ApplyWorkflowDefaults()
+    {
+        if (!string.IsNullOrWhiteSpace(model.SourceSampleKind))
+        {
+            return;
+        }
+
+        if (IsSampleManufacturingView)
+        {
+            model.SourceSampleKind = ParteAcabadoSourceKinds.Sample;
+        }
+        else if (IsModelManufacturingView)
+        {
+            model.SourceSampleKind = ParteAcabadoSourceKinds.Model;
+        }
+    }
+
+    private string BuildCurrentEditUrl(int orderNumber) => IsSampleManufacturingView
+        ? $"/compras/ordenes-fabricacion-muestras/editar/{orderNumber}"
+        : IsModelManufacturingView
+            ? $"/compras/ordenes-fabricacion-models/editar/{orderNumber}"
+            : $"/produccion/acabados/editar/{orderNumber}";
+
+    private string BuildCurrentPrintUrl(int orderNumber) => IsSampleManufacturingView
+        ? $"/compras/ordenes-fabricacion-muestras/{orderNumber}/imprimir"
+        : IsModelManufacturingView
+            ? $"/compras/ordenes-fabricacion-models/{orderNumber}/imprimir"
+            : $"/produccion/acabados/{orderNumber}/imprimir";
+
+    private string BuildSampleUrl()
+    {
+        if (!HasLinkedSample)
+        {
+            return "/articulos/muestras";
+        }
+
+        if (string.Equals(ParteAcabadoSourceKinds.Normalize(model.SourceSampleKind, hasLinkedSource: true), ParteAcabadoSourceKinds.Model, StringComparison.OrdinalIgnoreCase) &&
+            Guid.TryParse(model.SourceRecordId, out var modelId))
+        {
+            return $"/articulos/models/editar/{modelId}";
+        }
+
+        return $"{ParteAcabadoSourceKinds.GetRouteBase(model.SourceSampleKind)}/editar/{Uri.EscapeDataString(model.SourceSampleCode.Trim())}";
+    }
 
     private async Task TryApplyDispositionBaseAsync()
     {
-        if (!tenantId.HasValue || !companyId.HasValue || OrderNumber.HasValue || !DispositionCodeFromQuery.HasValue || !string.IsNullOrWhiteSpace(SampleCodeFromQuery))
+        if (!tenantId.HasValue || !companyId.HasValue || OrderNumber.HasValue || !DispositionCodeFromQuery.HasValue || !string.IsNullOrWhiteSpace(SampleCodeFromQuery) || !string.IsNullOrWhiteSpace(ModelIdFromQuery))
         {
             return;
         }
@@ -695,7 +797,7 @@ else
         var disposition = await DisposicionQueries.GetByCodeAsync(tenantId.Value, companyId.Value, DispositionCodeFromQuery.Value);
         if (disposition is null)
         {
-            statusMessage = "No se ha encontrado la disposición usada como base para el parte de acabado.";
+            statusMessage = L("No se ha encontrado la disposición usada como base para el parte de acabado.", "No s'ha trobat la disposició usada com a base per al part d'acabat.", "The disposition used as the base for the finish order could not be found.");
             isError = true;
             return;
         }
@@ -703,7 +805,7 @@ else
         model = BuildFromDisposition(disposition);
         await InferMachineFromLinesAsync();
         appliedDispositionCode = DispositionCodeFromQuery.Value;
-        statusMessage = $"Parte precargado desde la disposición {FormatDispositionLabel(disposition)}.";
+        statusMessage = L($"Parte precargado desde la disposición {FormatDispositionLabel(disposition)}.", $"Part precarregat des de la disposició {FormatDispositionLabel(disposition)}.", $"Order preloaded from disposition {FormatDispositionLabel(disposition)}.");
         isError = false;
     }
 
@@ -727,7 +829,7 @@ else
         var sample = await MuestraQueries.GetByCodeAsync(tenantId.Value, companyId.Value, sampleCode);
         if (sample is null)
         {
-            statusMessage = "No se ha encontrado la muestra usada como base para el parte de acabado.";
+            statusMessage = L("No se ha encontrado la muestra usada como base para el parte de acabado.", "No s'ha trobat la mostra usada com a base per al part d'acabat.", "The sample used as the base for the finish order could not be found.");
             isError = true;
             return;
         }
@@ -736,9 +838,45 @@ else
         appliedSampleCode = sampleCode;
         appliedSampleLineNumber = sampleLine > 0 ? sampleLine : null;
         appliedSampleKind = sampleKind;
+        var sourceKindLabel = GetSourceKindLabel(sampleKind).ToLowerInvariant();
         statusMessage = sampleLine > 0
-            ? $"Parte precargado desde {ParteAcabadoSourceKinds.GetLabel(sampleKind).ToLowerInvariant()} {sample.Code}, línea {sampleLine}."
-            : $"Parte precargado desde {ParteAcabadoSourceKinds.GetLabel(sampleKind).ToLowerInvariant()} {sample.Code}.";
+            ? L($"Parte precargado desde {sourceKindLabel} {sample.Code}, línea {sampleLine}.", $"Part precarregat des de {sourceKindLabel} {sample.Code}, línia {sampleLine}.", $"Order preloaded from {sourceKindLabel} {sample.Code}, line {sampleLine}.")
+            : L($"Parte precargado desde {sourceKindLabel} {sample.Code}.", $"Part precarregat des de {sourceKindLabel} {sample.Code}.", $"Order preloaded from {sourceKindLabel} {sample.Code}.");
+        isError = false;
+    }
+
+    private async Task TryApplyModelBaseAsync()
+    {
+        if (!tenantId.HasValue || !companyId.HasValue || OrderNumber.HasValue || string.IsNullOrWhiteSpace(ModelIdFromQuery))
+        {
+            return;
+        }
+
+        var modelIdText = ModelIdFromQuery.Trim();
+        if (string.Equals(appliedModelId, modelIdText, StringComparison.OrdinalIgnoreCase))
+        {
+            return;
+        }
+
+        if (!Guid.TryParse(modelIdText, out var modelId))
+        {
+            statusMessage = L("El identificador del model usado como base no es válido.", "L'identificador del model usat com a base no és vàlid.", "The model identifier used as the base is not valid.");
+            isError = true;
+            return;
+        }
+
+        var sourceModel = await ModeloQueries.GetByIdAsync(tenantId.Value, companyId.Value, modelId);
+        if (sourceModel is null)
+        {
+            statusMessage = L("No se ha encontrado el model usado como base para la orden de fabricación.", "No s'ha trobat el model usat com a base per a l'ordre de fabricació.", "The model used as the base for the manufacturing order could not be found.");
+            isError = true;
+            return;
+        }
+
+        model = BuildFromModel(sourceModel);
+        await InferMachineFromLinesAsync();
+        appliedModelId = modelIdText;
+        statusMessage = L($"Parte precargado desde model {sourceModel.Code}.", $"Part precarregat des de model {sourceModel.Code}.", $"Order preloaded from model {sourceModel.Code}.");
         isError = false;
     }
 
@@ -817,7 +955,7 @@ else
         return detail;
     }
 
-    private static ParteAcabadoDetailDto BuildFromSample(MuestraDetailDto sample, int? sampleLineNumber, string sourceSampleKind)
+    private ParteAcabadoDetailDto BuildFromSample(MuestraDetailDto sample, int? sampleLineNumber, string sourceSampleKind)
     {
         var selectedLines = sampleLineNumber.HasValue
             ? sample.Lines.Where(item => item.LineNumber == sampleLineNumber.Value).ToList()
@@ -878,38 +1016,114 @@ else
         return detail;
     }
 
-    private static string BuildSampleNotes(MuestraDetailDto sample, int? sampleLineNumber, MuestraBreakdownDto? breakdown)
+    private ParteAcabadoDetailDto BuildFromModel(ModeloDetailDto sourceModel)
+    {
+        var detail = new ParteAcabadoDetailDto
+        {
+            Date = DateTime.Today,
+            Status = ParteAcabadoStatuses.Pending,
+            ClientCode = sourceModel.ClientCode,
+            ClientName = sourceModel.ClientName,
+            FinisherCode = sourceModel.FinishingWorkshopCode,
+            FinisherName = sourceModel.FinishingWorkshopName,
+            SourceSampleKind = ParteAcabadoSourceKinds.Model,
+            SourceSampleCode = sourceModel.Code,
+            SourceRecordId = sourceModel.Id.ToString(),
+            Notes = BuildModelNotes(sourceModel),
+            Origin = "local"
+        };
+
+        var stockLines = sourceModel.StockLines
+            .OrderBy(item => item.LineNumber)
+            .Select(item => new ParteAcabadoLineDto
+            {
+                LineNumber = item.LineNumber,
+                FabricCode = string.IsNullOrWhiteSpace(sourceModel.FabricCode) ? sourceModel.Code : sourceModel.FabricCode,
+                FabricDescription = string.IsNullOrWhiteSpace(sourceModel.FabricDescription) ? sourceModel.Description : sourceModel.FabricDescription,
+                Color = item.Color,
+                TotalKilograms = 0,
+                TotalPieces = SumStockPieces(item),
+                Status = ParteAcabadoStatuses.Pending,
+                Notes = item.SizeText
+            })
+            .Where(item => !string.IsNullOrWhiteSpace(item.FabricCode) || !string.IsNullOrWhiteSpace(item.FabricDescription))
+            .ToList();
+
+        if (stockLines.Count > 0)
+        {
+            detail.Lines = stockLines;
+        }
+        else
+        {
+            var colorLines = sourceModel.ColorLines
+                .OrderBy(item => item.LineNumber)
+                .Select(item => new ParteAcabadoLineDto
+                {
+                    LineNumber = item.LineNumber,
+                    FabricCode = string.IsNullOrWhiteSpace(sourceModel.FabricCode) ? sourceModel.Code : sourceModel.FabricCode,
+                    FabricDescription = string.IsNullOrWhiteSpace(item.Title) ? (string.IsNullOrWhiteSpace(sourceModel.Description) ? sourceModel.Code : sourceModel.Description) : item.Title,
+                    Color = string.IsNullOrWhiteSpace(item.ColorTitle) ? item.ModelColorCode : item.ColorTitle,
+                    TotalKilograms = 0,
+                    TotalPieces = 0,
+                    Status = ParteAcabadoStatuses.Pending,
+                    Notes = item.ModelColorCode
+                })
+                .ToList();
+
+            detail.Lines = colorLines.Count > 0
+                ? colorLines
+                : new List<ParteAcabadoLineDto>
+                {
+                    new()
+                    {
+                        LineNumber = 1,
+                        FabricCode = string.IsNullOrWhiteSpace(sourceModel.FabricCode) ? sourceModel.Code : sourceModel.FabricCode,
+                        FabricDescription = string.IsNullOrWhiteSpace(sourceModel.Description) ? sourceModel.Code : sourceModel.Description,
+                        Color = string.Empty,
+                        TotalKilograms = 0,
+                        TotalPieces = 0,
+                        Status = ParteAcabadoStatuses.Pending
+                    }
+                };
+        }
+
+        detail.TotalKilograms = detail.Lines.Sum(item => item.TotalKilograms);
+        detail.TotalPieces = detail.Lines.Sum(item => item.TotalPieces);
+        return detail;
+    }
+
+    private string BuildSampleNotes(MuestraDetailDto sample, int? sampleLineNumber, MuestraBreakdownDto? breakdown)
     {
         var notes = new List<string>
         {
-            $"Base muestra: {sample.Code}"
+            $"{L("Base muestra", "Base mostra", "Sample base")}: {sample.Code}"
         };
 
         if (sampleLineNumber.HasValue)
         {
-            notes.Add($"Línea muestra: {sampleLineNumber.Value}");
+            notes.Add($"{L("Línea muestra", "Línia mostra", "Sample line")}: {sampleLineNumber.Value}");
         }
 
         if (!string.IsNullOrWhiteSpace(sample.Reference))
         {
-            notes.Add($"Referencia: {sample.Reference}");
+            notes.Add($"{L("Referencia", "Referència", "Reference")}: {sample.Reference}");
         }
 
         if (!string.IsNullOrWhiteSpace(sample.Season))
         {
-            notes.Add($"Temporada: {sample.Season}");
+            notes.Add($"{L("Temporada", "Temporada", "Season")}: {sample.Season}");
         }
 
         if (breakdown is not null)
         {
             if (!string.IsNullOrWhiteSpace(breakdown.Cuts))
             {
-                notes.Add($"Cortes: {breakdown.Cuts}");
+                notes.Add($"{L("Cortes", "Talls", "Cuts")}: {breakdown.Cuts}");
             }
 
             if (!string.IsNullOrWhiteSpace(breakdown.Notes))
             {
-                notes.Add($"Desglose: {breakdown.Notes}");
+                notes.Add($"{L("Desglose", "Desglossament", "Breakdown")}: {breakdown.Notes}");
             }
         }
 
@@ -921,19 +1135,19 @@ else
         return string.Join(" · ", notes.Where(item => !string.IsNullOrWhiteSpace(item)));
     }
 
-    private static string BuildSampleLineNotes(MuestraLineDto line)
+    private string BuildSampleLineNotes(MuestraLineDto line)
     {
         var notes = new List<string>();
 
         var size = string.Join(" / ", new[] { line.SizeCode, line.SizeHigh, line.SizeLow }.Where(item => !string.IsNullOrWhiteSpace(item)));
         if (!string.IsNullOrWhiteSpace(size))
         {
-            notes.Add($"Talla: {size}");
+            notes.Add($"{L("Talla", "Talla", "Size")}: {size}");
         }
 
         if (line.ClientCode > 0)
         {
-            notes.Add($"Cliente línea: {line.ClientCode}");
+            notes.Add($"{L("Cliente línea", "Client línia", "Line customer")}: {line.ClientCode}");
         }
 
         if (!string.IsNullOrWhiteSpace(line.NcCode))
@@ -943,6 +1157,48 @@ else
 
         return string.Join(" · ", notes);
     }
+
+    private string BuildModelNotes(ModeloDetailDto sourceModel)
+    {
+        var notes = new List<string>
+        {
+            $"{L("Base model", "Base model", "Model base")}: {sourceModel.Code}"
+        };
+
+        if (!string.IsNullOrWhiteSpace(sourceModel.Season))
+        {
+            notes.Add($"{L("Temporada", "Temporada", "Season")}: {sourceModel.Season}");
+        }
+
+        if (!string.IsNullOrWhiteSpace(sourceModel.Series))
+        {
+            notes.Add($"{L("Serie", "Sèrie", "Series")}: {sourceModel.Series}");
+        }
+
+        if (!string.IsNullOrWhiteSpace(sourceModel.Description))
+        {
+            notes.Add(sourceModel.Description);
+        }
+
+        if (!string.IsNullOrWhiteSpace(sourceModel.Notes))
+        {
+            notes.Add(sourceModel.Notes);
+        }
+
+        return string.Join(" · ", notes.Where(item => !string.IsNullOrWhiteSpace(item)));
+    }
+
+    private static decimal SumStockPieces(ModeloStockLineDto line) =>
+        line.SizeQuantity01 +
+        line.SizeQuantity02 +
+        line.SizeQuantity03 +
+        line.SizeQuantity04 +
+        line.SizeQuantity05 +
+        line.SizeQuantity06 +
+        line.SizeQuantity07 +
+        line.SizeQuantity08 +
+        line.SizeQuantity09 +
+        line.SizeQuantity10;
 
     private string ResolveMachineName(int machineCode)
     {

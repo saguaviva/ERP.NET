@@ -19,6 +19,7 @@ public sealed class ParteAcabadoDetailDto
     public string SourceSampleKind { get; set; } = string.Empty;
     public string SourceSampleCode { get; set; } = string.Empty;
     public int? SourceSampleLineNumber { get; set; }
+    public string SourceRecordId { get; set; } = string.Empty;
     public string Notes { get; set; } = string.Empty;
     public decimal TotalKilograms { get; set; }
     public decimal TotalPieces { get; set; }

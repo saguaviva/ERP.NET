@@ -2,9 +2,11 @@ using Erp.Application.Auditing;
 using Erp.Application.Companies;
 using Erp.Application.Contexts;
 using Erp.Application.LegacySync;
+using Erp.Application.Numbering;
 using Erp.Application.Stock;
 using Erp.Domain.Common;
 using Erp.Infrastructure.MySql.Database;
+using Erp.Infrastructure.MySql.Numbering;
 using Erp.Infrastructure.MySql.Support;
 using MySqlConnector;
 
@@ -50,10 +52,19 @@ public sealed class MySqlStockService : IStockQueries, IStockService
 
         var search = filter.Search?.Trim() ?? string.Empty;
         var warehouse = filter.Warehouse?.Trim() ?? string.Empty;
+        var catalogScope = NormalizeCatalogScope(filter.CatalogScope);
+        var supplierName = filter.SupplierName?.Trim() ?? string.Empty;
+        var color = filter.Color?.Trim() ?? string.Empty;
+        var movementType = filter.MovementType?.Trim() ?? string.Empty;
         var likeSearch = $"%{search}%";
+        var likeSupplierName = $"%{supplierName}%";
+        var likeColor = $"%{color}%";
         var pageSize = Math.Clamp(filter.PageSize, 10, 200);
         var page = Math.Max(filter.Page, 1);
         var offset = (page - 1) * pageSize;
+        var centerCode = string.IsNullOrWhiteSpace(catalogScope)
+            ? string.Empty
+            : await ResolveCompanyCenterCodeAsync(tenantId, companyId, cancellationToken);
 
         await using var connection = await _connectionFactory.OpenConnectionAsync(cancellationToken);
         await using (var countCommand = connection.CreateCommand())
@@ -65,8 +76,53 @@ public sealed class MySqlStockService : IStockQueries, IStockService
                 WHERE tenant_id = @tenantId
                   AND company_id = @companyId
                   AND (
+                        @catalogScope = ''
+                        OR (
+                            @catalogScope = 'Hilos'
+                            AND EXISTS (
+                                SELECT 1
+                                FROM fil f
+                                WHERE f.CENTRO = @centerCode
+                                  AND COALESCE(f.is_deleted, 0) = 0
+                                  AND f.CODI = COALESCE(item_code, '')
+                            )
+                        )
+                        OR (
+                            @catalogScope = 'Tejidos'
+                            AND EXISTS (
+                                SELECT 1
+                                FROM teixits t
+                                WHERE t.CENTRO = @centerCode
+                                  AND COALESCE(t.is_deleted, 0) = 0
+                                  AND t.CODI = COALESCE(item_code, '')
+                            )
+                        )
+                        OR (
+                            @catalogScope = 'Models'
+                            AND EXISTS (
+                                SELECT 1
+                                FROM article_models am
+                                WHERE am.CENTRO = @centerCode
+                                  AND COALESCE(am.is_deleted, 0) = 0
+                                  AND am.CODI = COALESCE(item_code, '')
+                            )
+                        )
+                      )
+                  AND (
                         @warehouse = ''
                         OR COALESCE(warehouse, '') = @warehouse
+                      )
+                  AND (
+                        @supplierName = ''
+                        OR COALESCE(supplier_name, '') LIKE @likeSupplierName
+                      )
+                  AND (
+                        @color = ''
+                        OR COALESCE(color, '') LIKE @likeColor
+                      )
+                  AND (
+                        @movementType = ''
+                        OR COALESCE(movement_type, '') = @movementType
                       )
                   AND (
                         @search = ''
@@ -81,7 +137,14 @@ public sealed class MySqlStockService : IStockQueries, IStockService
                 """;
             countCommand.Parameters.AddWithValue("@tenantId", tenantId.ToString());
             countCommand.Parameters.AddWithValue("@companyId", companyId.ToString());
+            countCommand.Parameters.AddWithValue("@catalogScope", catalogScope);
+            countCommand.Parameters.AddWithValue("@centerCode", centerCode);
             countCommand.Parameters.AddWithValue("@warehouse", warehouse);
+            countCommand.Parameters.AddWithValue("@supplierName", supplierName);
+            countCommand.Parameters.AddWithValue("@likeSupplierName", likeSupplierName);
+            countCommand.Parameters.AddWithValue("@color", color);
+            countCommand.Parameters.AddWithValue("@likeColor", likeColor);
+            countCommand.Parameters.AddWithValue("@movementType", movementType);
             countCommand.Parameters.AddWithValue("@search", search);
             countCommand.Parameters.AddWithValue("@likeSearch", likeSearch);
 
@@ -114,8 +177,53 @@ public sealed class MySqlStockService : IStockQueries, IStockService
                 WHERE tenant_id = @tenantId
                   AND company_id = @companyId
                   AND (
+                        @catalogScope = ''
+                        OR (
+                            @catalogScope = 'Hilos'
+                            AND EXISTS (
+                                SELECT 1
+                                FROM fil f
+                                WHERE f.CENTRO = @centerCode
+                                  AND COALESCE(f.is_deleted, 0) = 0
+                                  AND f.CODI = COALESCE(item_code, '')
+                            )
+                        )
+                        OR (
+                            @catalogScope = 'Tejidos'
+                            AND EXISTS (
+                                SELECT 1
+                                FROM teixits t
+                                WHERE t.CENTRO = @centerCode
+                                  AND COALESCE(t.is_deleted, 0) = 0
+                                  AND t.CODI = COALESCE(item_code, '')
+                            )
+                        )
+                        OR (
+                            @catalogScope = 'Models'
+                            AND EXISTS (
+                                SELECT 1
+                                FROM article_models am
+                                WHERE am.CENTRO = @centerCode
+                                  AND COALESCE(am.is_deleted, 0) = 0
+                                  AND am.CODI = COALESCE(item_code, '')
+                            )
+                        )
+                      )
+                  AND (
                         @warehouse = ''
                         OR COALESCE(warehouse, '') = @warehouse
+                      )
+                  AND (
+                        @supplierName = ''
+                        OR COALESCE(supplier_name, '') LIKE @likeSupplierName
+                      )
+                  AND (
+                        @color = ''
+                        OR COALESCE(color, '') LIKE @likeColor
+                      )
+                  AND (
+                        @movementType = ''
+                        OR COALESCE(movement_type, '') = @movementType
                       )
                   AND (
                         @search = ''
@@ -132,16 +240,58 @@ public sealed class MySqlStockService : IStockQueries, IStockService
                 """;
             command.Parameters.AddWithValue("@tenantId", tenantId.ToString());
             command.Parameters.AddWithValue("@companyId", companyId.ToString());
+            command.Parameters.AddWithValue("@catalogScope", catalogScope);
+            command.Parameters.AddWithValue("@centerCode", centerCode);
             command.Parameters.AddWithValue("@warehouse", warehouse);
+            command.Parameters.AddWithValue("@supplierName", supplierName);
+            command.Parameters.AddWithValue("@likeSupplierName", likeSupplierName);
+            command.Parameters.AddWithValue("@color", color);
+            command.Parameters.AddWithValue("@likeColor", likeColor);
+            command.Parameters.AddWithValue("@movementType", movementType);
             command.Parameters.AddWithValue("@search", search);
             command.Parameters.AddWithValue("@likeSearch", likeSearch);
             command.Parameters.AddWithValue("@pageSize", pageSize);
             command.Parameters.AddWithValue("@offset", offset);
 
             var items = await ReadMovementListAsync(command, cancellationToken);
+            var supplierSummaries = await LoadMovementGroupSummaryAsync(
+                connection,
+                tenantId,
+                companyId,
+                catalogScope,
+                centerCode,
+                warehouse,
+                supplierName,
+                color,
+                movementType,
+                search,
+                likeSearch,
+                likeSupplierName,
+                likeColor,
+                "supplier_name",
+                cancellationToken);
+            var colorSummaries = await LoadMovementGroupSummaryAsync(
+                connection,
+                tenantId,
+                companyId,
+                catalogScope,
+                centerCode,
+                warehouse,
+                supplierName,
+                color,
+                movementType,
+                search,
+                likeSearch,
+                likeSupplierName,
+                likeColor,
+                "color",
+                cancellationToken);
+
             return new StockMovementSearchResultDto
             {
                 Items = items,
+                SupplierSummaries = supplierSummaries,
+                ColorSummaries = colorSummaries,
                 TotalCount = totalCount
             };
         }
@@ -208,16 +358,20 @@ public sealed class MySqlStockService : IStockQueries, IStockService
 
         var search = filter.Search?.Trim() ?? string.Empty;
         var warehouse = filter.Warehouse?.Trim() ?? string.Empty;
+        var catalogScope = NormalizeCatalogScope(filter.CatalogScope);
         var likeSearch = $"%{search}%";
         var pageSize = Math.Clamp(filter.PageSize, 10, 200);
         var page = Math.Max(filter.Page, 1);
         var offset = (page - 1) * pageSize;
 
         await using var connection = await _connectionFactory.OpenConnectionAsync(cancellationToken);
+        var centerCode = string.IsNullOrWhiteSpace(catalogScope)
+            ? string.Empty
+            : await ResolveCompanyCenterCodeAsync(tenantId, companyId, cancellationToken);
         var legacySyncInfo = await LoadLegacySyncInfoAsync(connection, tenantId, companyId, cancellationToken);
         if (legacySyncInfo.IsActive)
         {
-            return await SearchLegacyBalancesAsync(connection, tenantId, companyId, filter, search, warehouse, likeSearch, pageSize, offset, cancellationToken);
+            return await SearchLegacyBalancesAsync(connection, tenantId, companyId, filter, search, warehouse, likeSearch, pageSize, offset, centerCode, cancellationToken);
         }
 
         await using (var countCommand = connection.CreateCommand())
@@ -230,6 +384,39 @@ public sealed class MySqlStockService : IStockQueries, IStockService
                     FROM inventory_movements
                     WHERE tenant_id = @tenantId
                       AND company_id = @companyId
+                      AND (
+                            @catalogScope = ''
+                            OR (
+                                @catalogScope = 'Hilos'
+                                AND EXISTS (
+                                    SELECT 1
+                                    FROM fil f
+                                    WHERE f.CENTRO = @centerCode
+                                      AND COALESCE(f.is_deleted, 0) = 0
+                                      AND f.CODI = COALESCE(item_code, '')
+                                )
+                            )
+                            OR (
+                                @catalogScope = 'Tejidos'
+                                AND EXISTS (
+                                    SELECT 1
+                                    FROM teixits t
+                                    WHERE t.CENTRO = @centerCode
+                                      AND COALESCE(t.is_deleted, 0) = 0
+                                      AND t.CODI = COALESCE(item_code, '')
+                                )
+                            )
+                            OR (
+                                @catalogScope = 'Models'
+                                AND EXISTS (
+                                    SELECT 1
+                                    FROM article_models am
+                                    WHERE am.CENTRO = @centerCode
+                                      AND COALESCE(am.is_deleted, 0) = 0
+                                      AND am.CODI = COALESCE(item_code, '')
+                                )
+                            )
+                          )
                       AND (
                             @warehouse = ''
                             OR COALESCE(warehouse, '') = @warehouse
@@ -251,6 +438,8 @@ public sealed class MySqlStockService : IStockQueries, IStockService
                 """;
             countCommand.Parameters.AddWithValue("@tenantId", tenantId.ToString());
             countCommand.Parameters.AddWithValue("@companyId", companyId.ToString());
+            countCommand.Parameters.AddWithValue("@catalogScope", catalogScope);
+            countCommand.Parameters.AddWithValue("@centerCode", centerCode);
             countCommand.Parameters.AddWithValue("@warehouse", warehouse);
             countCommand.Parameters.AddWithValue("@search", search);
             countCommand.Parameters.AddWithValue("@likeSearch", likeSearch);
@@ -281,6 +470,39 @@ public sealed class MySqlStockService : IStockQueries, IStockService
                 WHERE tenant_id = @tenantId
                   AND company_id = @companyId
                   AND (
+                        @catalogScope = ''
+                        OR (
+                            @catalogScope = 'Hilos'
+                            AND EXISTS (
+                                SELECT 1
+                                FROM fil f
+                                WHERE f.CENTRO = @centerCode
+                                  AND COALESCE(f.is_deleted, 0) = 0
+                                  AND f.CODI = COALESCE(item_code, '')
+                            )
+                        )
+                        OR (
+                            @catalogScope = 'Tejidos'
+                            AND EXISTS (
+                                SELECT 1
+                                FROM teixits t
+                                WHERE t.CENTRO = @centerCode
+                                  AND COALESCE(t.is_deleted, 0) = 0
+                                  AND t.CODI = COALESCE(item_code, '')
+                            )
+                        )
+                        OR (
+                            @catalogScope = 'Models'
+                            AND EXISTS (
+                                SELECT 1
+                                FROM article_models am
+                                WHERE am.CENTRO = @centerCode
+                                  AND COALESCE(am.is_deleted, 0) = 0
+                                  AND am.CODI = COALESCE(item_code, '')
+                            )
+                        )
+                      )
+                  AND (
                         @warehouse = ''
                         OR COALESCE(warehouse, '') = @warehouse
                       )
@@ -297,6 +519,8 @@ public sealed class MySqlStockService : IStockQueries, IStockService
                 """;
             command.Parameters.AddWithValue("@tenantId", tenantId.ToString());
             command.Parameters.AddWithValue("@companyId", companyId.ToString());
+            command.Parameters.AddWithValue("@catalogScope", catalogScope);
+            command.Parameters.AddWithValue("@centerCode", centerCode);
             command.Parameters.AddWithValue("@warehouse", warehouse);
             command.Parameters.AddWithValue("@search", search);
             command.Parameters.AddWithValue("@likeSearch", likeSearch);
@@ -1369,8 +1593,10 @@ public sealed class MySqlStockService : IStockQueries, IStockService
         string likeSearch,
         int pageSize,
         int offset,
+        string centerCode,
         CancellationToken cancellationToken)
     {
+        var catalogScope = NormalizeCatalogScope(filter.CatalogScope);
         var balances = new Dictionary<string, StockBalanceListItemDto>(StringComparer.OrdinalIgnoreCase);
 
         await using (var legacyCommand = connection.CreateCommand())
@@ -1388,6 +1614,39 @@ public sealed class MySqlStockService : IStockQueries, IStockService
                 WHERE tenant_id = @tenantId
                   AND company_id = @companyId
                   AND (
+                        @catalogScope = ''
+                        OR (
+                            @catalogScope = 'Hilos'
+                            AND EXISTS (
+                                SELECT 1
+                                FROM fil f
+                                WHERE f.CENTRO = @centerCode
+                                  AND COALESCE(f.is_deleted, 0) = 0
+                                  AND f.CODI = COALESCE(item_code, '')
+                            )
+                        )
+                        OR (
+                            @catalogScope = 'Tejidos'
+                            AND EXISTS (
+                                SELECT 1
+                                FROM teixits t
+                                WHERE t.CENTRO = @centerCode
+                                  AND COALESCE(t.is_deleted, 0) = 0
+                                  AND t.CODI = COALESCE(item_code, '')
+                            )
+                        )
+                        OR (
+                            @catalogScope = 'Models'
+                            AND EXISTS (
+                                SELECT 1
+                                FROM article_models am
+                                WHERE am.CENTRO = @centerCode
+                                  AND COALESCE(am.is_deleted, 0) = 0
+                                  AND am.CODI = COALESCE(item_code, '')
+                            )
+                        )
+                      )
+                  AND (
                         @warehouse = ''
                         OR COALESCE(warehouse, '') = @warehouse
                       )
@@ -1400,6 +1659,8 @@ public sealed class MySqlStockService : IStockQueries, IStockService
                 """;
             legacyCommand.Parameters.AddWithValue("@tenantId", tenantId.ToString());
             legacyCommand.Parameters.AddWithValue("@companyId", companyId.ToString());
+            legacyCommand.Parameters.AddWithValue("@catalogScope", catalogScope);
+            legacyCommand.Parameters.AddWithValue("@centerCode", centerCode);
             legacyCommand.Parameters.AddWithValue("@warehouse", warehouse);
             legacyCommand.Parameters.AddWithValue("@search", search);
             legacyCommand.Parameters.AddWithValue("@likeSearch", likeSearch);
@@ -1443,6 +1704,39 @@ public sealed class MySqlStockService : IStockQueries, IStockService
                 WHERE tenant_id = @tenantId
                   AND company_id = @companyId
                   AND (
+                        @catalogScope = ''
+                        OR (
+                            @catalogScope = 'Hilos'
+                            AND EXISTS (
+                                SELECT 1
+                                FROM fil f
+                                WHERE f.CENTRO = @centerCode
+                                  AND COALESCE(f.is_deleted, 0) = 0
+                                  AND f.CODI = COALESCE(item_code, '')
+                            )
+                        )
+                        OR (
+                            @catalogScope = 'Tejidos'
+                            AND EXISTS (
+                                SELECT 1
+                                FROM teixits t
+                                WHERE t.CENTRO = @centerCode
+                                  AND COALESCE(t.is_deleted, 0) = 0
+                                  AND t.CODI = COALESCE(item_code, '')
+                            )
+                        )
+                        OR (
+                            @catalogScope = 'Models'
+                            AND EXISTS (
+                                SELECT 1
+                                FROM article_models am
+                                WHERE am.CENTRO = @centerCode
+                                  AND COALESCE(am.is_deleted, 0) = 0
+                                  AND am.CODI = COALESCE(item_code, '')
+                            )
+                        )
+                      )
+                  AND (
                         @warehouse = ''
                         OR COALESCE(warehouse, '') = @warehouse
                       )
@@ -1456,6 +1750,8 @@ public sealed class MySqlStockService : IStockQueries, IStockService
                 """;
             movementCommand.Parameters.AddWithValue("@tenantId", tenantId.ToString());
             movementCommand.Parameters.AddWithValue("@companyId", companyId.ToString());
+            movementCommand.Parameters.AddWithValue("@catalogScope", catalogScope);
+            movementCommand.Parameters.AddWithValue("@centerCode", centerCode);
             movementCommand.Parameters.AddWithValue("@warehouse", warehouse);
             movementCommand.Parameters.AddWithValue("@search", search);
             movementCommand.Parameters.AddWithValue("@likeSearch", likeSearch);
@@ -1533,6 +1829,124 @@ public sealed class MySqlStockService : IStockQueries, IStockService
                 SourceDocumentNumber = sourceNumber,
                 SourceDocumentDisplay = BuildSourceDocumentDisplay(sourceType, sourceNumber),
                 Notes = reader.GetStringOrEmpty("notes")
+            });
+        }
+
+        return items;
+    }
+
+    private static async Task<IReadOnlyCollection<StockMovementGroupSummaryDto>> LoadMovementGroupSummaryAsync(
+        MySqlConnection connection,
+        Guid tenantId,
+        Guid companyId,
+        string catalogScope,
+        string centerCode,
+        string warehouse,
+        string supplierName,
+        string color,
+        string movementType,
+        string search,
+        string likeSearch,
+        string likeSupplierName,
+        string likeColor,
+        string groupColumn,
+        CancellationToken cancellationToken)
+    {
+        await using var command = connection.CreateCommand();
+        command.CommandText =
+            $"""
+            SELECT COALESCE({groupColumn}, '') AS group_label,
+                   COUNT(*) AS movement_count,
+                   COALESCE(SUM(quantity), 0) AS total_quantity
+            FROM inventory_movements
+            WHERE tenant_id = @tenantId
+              AND company_id = @companyId
+              AND (
+                    @catalogScope = ''
+                        OR (
+                            @catalogScope = 'Hilos'
+                            AND EXISTS (
+                                SELECT 1
+                                FROM fil f
+                            WHERE f.CENTRO = @centerCode
+                              AND COALESCE(f.is_deleted, 0) = 0
+                                  AND f.CODI = COALESCE(item_code, '')
+                            )
+                        )
+                        OR (
+                            @catalogScope = 'Tejidos'
+                            AND EXISTS (
+                                SELECT 1
+                                FROM teixits t
+                                WHERE t.CENTRO = @centerCode
+                                  AND COALESCE(t.is_deleted, 0) = 0
+                                  AND t.CODI = COALESCE(item_code, '')
+                            )
+                        )
+                        OR (
+                            @catalogScope = 'Models'
+                            AND EXISTS (
+                                SELECT 1
+                                FROM article_models am
+                            WHERE am.CENTRO = @centerCode
+                              AND COALESCE(am.is_deleted, 0) = 0
+                              AND am.CODI = COALESCE(item_code, '')
+                        )
+                    )
+                  )
+              AND (
+                    @warehouse = ''
+                    OR COALESCE(warehouse, '') = @warehouse
+                  )
+              AND (
+                    @supplierName = ''
+                    OR COALESCE(supplier_name, '') LIKE @likeSupplierName
+                  )
+              AND (
+                    @color = ''
+                    OR COALESCE(color, '') LIKE @likeColor
+                  )
+              AND (
+                    @movementType = ''
+                    OR COALESCE(movement_type, '') = @movementType
+                  )
+              AND (
+                    @search = ''
+                    OR COALESCE(item_code, '') LIKE @likeSearch
+                    OR item_description LIKE @likeSearch
+                    OR COALESCE(color, '') LIKE @likeSearch
+                    OR COALESCE(supplier_name, '') LIKE @likeSearch
+                    OR COALESCE(supplier_reference, '') LIKE @likeSearch
+                    OR COALESCE(vehicle_plate, '') LIKE @likeSearch
+                    OR CAST(source_document_number AS CHAR) LIKE @likeSearch
+                  )
+              AND COALESCE({groupColumn}, '') <> ''
+            GROUP BY COALESCE({groupColumn}, '')
+            ORDER BY movement_count DESC, total_quantity DESC, group_label
+            LIMIT 8;
+            """;
+        command.Parameters.AddWithValue("@tenantId", tenantId.ToString());
+        command.Parameters.AddWithValue("@companyId", companyId.ToString());
+        command.Parameters.AddWithValue("@catalogScope", catalogScope);
+        command.Parameters.AddWithValue("@centerCode", centerCode);
+        command.Parameters.AddWithValue("@warehouse", warehouse);
+        command.Parameters.AddWithValue("@supplierName", supplierName);
+        command.Parameters.AddWithValue("@likeSupplierName", likeSupplierName);
+        command.Parameters.AddWithValue("@color", color);
+        command.Parameters.AddWithValue("@likeColor", likeColor);
+        command.Parameters.AddWithValue("@movementType", movementType);
+        command.Parameters.AddWithValue("@search", search);
+        command.Parameters.AddWithValue("@likeSearch", likeSearch);
+
+        var items = new List<StockMovementGroupSummaryDto>();
+        await using var reader = await command.ExecuteReaderAsync(cancellationToken);
+        while (await reader.ReadAsync(cancellationToken))
+        {
+            items.Add(new StockMovementGroupSummaryDto
+            {
+                Label = reader.GetStringOrEmpty("group_label"),
+                MovementCount = reader.GetInt32(reader.GetOrdinal("movement_count")),
+                Quantity = reader.GetDecimal(reader.GetOrdinal("total_quantity"))
             });
         }
 
@@ -1884,20 +2298,13 @@ public sealed class MySqlStockService : IStockQueries, IStockService
         Guid tenantId,
         Guid companyId,
         CancellationToken cancellationToken)
-    {
-        await using var command = connection.CreateCommand();
-        command.Transaction = transaction;
-        command.CommandText =
-            """
-            SELECT COALESCE(MAX(count_number), 0) + 1
-            FROM stock_counts
-            WHERE tenant_id = @tenantId
-              AND company_id = @companyId;
-            """;
-        command.Parameters.AddWithValue("@tenantId", tenantId.ToString());
-        command.Parameters.AddWithValue("@companyId", companyId.ToString());
-        return Convert.ToInt32(await command.ExecuteScalarAsync(cancellationToken));
-    }
+        => await DocumentNumberingSqlHelper.ReserveNextNumberAsync(
+            connection,
+            transaction,
+            tenantId,
+            companyId,
+            DocumentNumberingKeys.StockCount,
+            cancellationToken);
 
     private static async Task DeleteCountLinesAsync(
         MySqlConnection connection,
@@ -2178,20 +2585,13 @@ public sealed class MySqlStockService : IStockQueries, IStockService
         Guid tenantId,
         Guid companyId,
         CancellationToken cancellationToken)
-    {
-        await using var command = connection.CreateCommand();
-        command.Transaction = transaction;
-        command.CommandText =
-            """
-            SELECT COALESCE(MAX(transfer_number), 0) + 1
-            FROM stock_transfers
-            WHERE tenant_id = @tenantId
-              AND company_id = @companyId;
-            """;
-        command.Parameters.AddWithValue("@tenantId", tenantId.ToString());
-        command.Parameters.AddWithValue("@companyId", companyId.ToString());
-        return Convert.ToInt32(await command.ExecuteScalarAsync(cancellationToken));
-    }
+        => await DocumentNumberingSqlHelper.ReserveNextNumberAsync(
+            connection,
+            transaction,
+            tenantId,
+            companyId,
+            DocumentNumberingKeys.StockTransfer,
+            cancellationToken);
 
     private static async Task DeleteTransferLinesAsync(
         MySqlConnection connection,
@@ -2397,6 +2797,18 @@ public sealed class MySqlStockService : IStockQueries, IStockService
         {
             throw new InvalidOperationException("No tienes acceso a la empresa activa.");
         }
+    }
+
+    private async Task<string> ResolveCompanyCenterCodeAsync(Guid tenantId, Guid companyId, CancellationToken cancellationToken)
+    {
+        var allowedCompanies = await _companyAccessService.GetAllowedCompaniesAsync(_currentUserContext.UserId!.Value, tenantId, cancellationToken);
+        var company = allowedCompanies.FirstOrDefault(item => item.CompanyId == companyId);
+        if (company is null || string.IsNullOrWhiteSpace(company.LegacyCenterCode))
+        {
+            throw new InvalidOperationException("La empresa activa no tiene centro legacy configurado.");
+        }
+
+        return company.LegacyCenterCode.Trim().ToUpperInvariant();
     }
 
     private void EnsureWriteAccess()
@@ -2771,6 +3183,15 @@ public sealed class MySqlStockService : IStockQueries, IStockService
 
     private static string BuildLegacyStockBalanceSearchOrderByClause(StockBalanceFilter filter)
         => BuildStockBalanceSearchOrderByClause(filter);
+
+    private static string NormalizeCatalogScope(string? catalogScope) =>
+        catalogScope?.Trim() switch
+        {
+            var scope when string.Equals(scope, "Hilos", StringComparison.OrdinalIgnoreCase) => "Hilos",
+            var scope when string.Equals(scope, "Tejidos", StringComparison.OrdinalIgnoreCase) => "Tejidos",
+            var scope when string.Equals(scope, "Models", StringComparison.OrdinalIgnoreCase) => "Models",
+            _ => string.Empty
+        };
 
     private static object DbValue(string value) => string.IsNullOrWhiteSpace(value) ? DBNull.Value : value;
 }

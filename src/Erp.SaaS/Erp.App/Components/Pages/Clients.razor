@@ -49,7 +49,7 @@ else
             <span class="results-summary">
                 @(totalCount == 0
                     ? L("Sin resultados", "Sense resultats", "No results")
-                    : L($"Mostrando {PageStart}-{PageEnd} de {totalCount} clientes", $"Mostrant {PageStart}-{PageEnd} de {totalCount} clients", $"Showing {PageStart}-{PageEnd} of {totalCount} clients"))
+                    : L($"Mostrando {PageStart.ToUiString("N0")}-{PageEnd.ToUiString("N0")} de {totalCount.ToUiString("N0")} clientes", $"Mostrant {PageStart.ToUiString("N0")}-{PageEnd.ToUiString("N0")} de {totalCount.ToUiString("N0")} clients", $"Showing {PageStart.ToUiString("N0")}-{PageEnd.ToUiString("N0")} of {totalCount.ToUiString("N0")} clients"))
             </span>
             <label class="field compact-field">
                 <span>@L("Tamaño de página", "Mida de pàgina", "Page size")</span>
@@ -94,7 +94,7 @@ else
                         <SortableHeader Label="@L("Código", "Codi", "Code")" IsActive="@(sortColumn == nameof(ClienteListItemDto.Code))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(ClienteListItemDto.Code), true))" />
                         <SortableHeader Label="@L("Nombre", "Nom", "Name")" IsActive="@(sortColumn == nameof(ClienteListItemDto.Name))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(ClienteListItemDto.Name)))" />
                         <SortableHeader Label="@L("Calidad", "Qualitat", "Quality")" IsActive="@(sortColumn == "Quality")" Descending="@sortDescending" OnSort="@(() => SetSortAsync("Quality", true))" />
-                        <SortableHeader Label="NIF" IsActive="@(sortColumn == nameof(ClienteListItemDto.TaxId))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(ClienteListItemDto.TaxId)))" />
+                        <SortableHeader Label="@L("NIF", "NIF", "Tax ID")" IsActive="@(sortColumn == nameof(ClienteListItemDto.TaxId))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(ClienteListItemDto.TaxId)))" />
                         <SortableHeader Label="@L("Ciudad", "Ciutat", "City")" IsActive="@(sortColumn == nameof(ClienteListItemDto.City))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(ClienteListItemDto.City)))" />
                         <SortableHeader Label="Email" IsActive="@(sortColumn == nameof(ClienteListItemDto.Email))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(ClienteListItemDto.Email)))" />
                         <SortableHeader Label="@L("Teléfono", "Telèfon", "Phone")" IsActive="@(sortColumn == nameof(ClienteListItemDto.Phone))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(ClienteListItemDto.Phone)))" />

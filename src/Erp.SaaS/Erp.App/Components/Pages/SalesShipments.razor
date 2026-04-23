@@ -1,4 +1,6 @@
 @page "/ventas/albaranes"
+@page "/ventas/albaranes-teixits-mostres"
+@page "/ventas/albaranes-models"
 @attribute [Authorize(Roles = "TenantAdmin,TenantReader")]
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject NavigationManager NavigationManager
@@ -6,23 +8,34 @@
 @inject ILegacySyncService LegacySyncService
 @inject AppText T
 
-<PageTitle>@L("Ventas / Albaranes", "Vendes / Albarans", "Sales / Shipments")</PageTitle>
+<PageTitle>@PageTitleText</PageTitle>
 
 <div class="page-header">
         <div>
             <p class="eyebrow">@L("Ventas", "Vendes", "Sales")</p>
-            <h1>@L("Albaranes de cliente", "Albarans de client", "Customer shipments")</h1>
-            <p class="lead">@L("Salidas documentales generadas desde pedidos de cliente y listas para el siguiente paso a facturación.", "Sortides documentals generades des de comandes de client i llestes per al següent pas a facturació.", "Document shipments generated from customer orders and ready for the next invoicing step.")</p>
+            <h1>@PageHeadingText</h1>
+            <p class="lead">@PageLeadText</p>
         </div>
         <div class="quick-links">
-            <a class="secondary-button link-button" href="/ventas/pre-facturacion">@L("Abrir pre-facturación", "Obrir pre-facturació", "Open pre-invoicing")</a>
+            @if (IsModelShipmentsRoute)
+            {
+                <a class="secondary-button link-button" href="/articulos/models">@L("Abrir models", "Obrir models", "Open models")</a>
+            }
+            else
+            {
+                <a class="secondary-button link-button" href="@PreInvoicingHref">@PreInvoicingText</a>
+            }
         </div>
     </div>
 
 @if (!tenantId.HasValue || !companyId.HasValue)
 {
     <div class="empty-state">
-        <p>@L("Selecciona una empresa activa para revisar albaranes de venta.", "Selecciona una empresa activa per revisar albarans de venda.", "Select an active company to review sales shipments.")</p>
+        <p>@(IsModelShipmentsRoute
+            ? L("Selecciona una empresa activa para revisar albaranes del circuito de Models.", "Selecciona una empresa activa per revisar albarans del circuit de Models.", "Select an active company to review model shipments.")
+            : IsTeixitsMostresShipmentsRoute
+                ? L("Selecciona una empresa activa para revisar albaranes del circuito Teixits-Mostres.", "Selecciona una empresa activa per revisar albarans del circuit Teixits-Mostres.", "Select an active company to review fabric and sample shipments.")
+                : L("Selecciona una empresa activa para revisar albaranes de venta.", "Selecciona una empresa activa per revisar albarans de venda.", "Select an active company to review sales shipments."))</p>
     </div>
 }
 else
@@ -30,7 +43,11 @@ else
     @if (syncStatus?.HasSuccessfulSync == true)
     {
         <div class="alert warning">
-            @L("Ventas / Albaranes está en convivencia con legacy para esta empresa. La sync manual refresca solo los albaranes con origen legacy; los cambios locales posteriores ya no se sobrescriben.", "Vendes / Albarans està en convivència amb legacy per a aquesta empresa. La sync manual refresca només els albarans amb origen legacy; els canvis locals posteriors ja no se sobreescriuen.", "Sales / Shipments is running in legacy coexistence mode for this company. Manual sync refreshes only legacy-origin shipments; later local changes are no longer overwritten.")
+            @(IsModelShipmentsRoute
+                ? L("Ventas / Albaranes Models reutiliza el documento de albarán general y lo filtra al circuito de Models. La sync manual refresca solo los albaranes con origen legacy; los cambios locales posteriores ya no se sobrescriben.", "Vendes / Albarans Models reutilitza el document d'albarà general i el filtra al circuit de Models. La sync manual refresca només els albarans amb origen legacy; els canvis locals posteriors ja no se sobreescriuen.", "Sales / Model shipments reuses the standard shipment document and filters it to the Models workflow. Manual sync refreshes only legacy-origin shipments; later local changes are no longer overwritten.")
+                : IsTeixitsMostresShipmentsRoute
+                    ? L("Ventas / Albaranes Teixits-Mostres reutiliza el documento de albarán general y lo filtra al circuito de tejidos y muestras. La sync manual refresca solo los albaranes con origen legacy; los cambios locales posteriores ya no se sobrescriben.", "Vendes / Albarans Teixits-Mostres reutilitza el document d'albarà general i el filtra al circuit de teixits i mostres. La sync manual refresca només els albarans amb origen legacy; els canvis locals posteriors ja no se sobreescriuen.", "Sales / Fabric & sample shipments reuses the standard shipment document and filters it to the fabrics and samples workflow. Manual sync refreshes only legacy-origin shipments; later local changes are no longer overwritten.")
+                    : L("Ventas / Albaranes está en convivencia con legacy para esta empresa. La sync manual refresca solo los albaranes con origen legacy; los cambios locales posteriores ya no se sobrescriben.", "Vendes / Albarans està en convivència amb legacy per a aquesta empresa. La sync manual refresca només els albarans amb origen legacy; els canvis locals posteriors ja no se sobreescriuen.", "Sales / Shipments is running in legacy coexistence mode for this company. Manual sync refreshes only legacy-origin shipments; later local changes are no longer overwritten."))
             @if (syncStatus.LastCompletedUtc.HasValue)
             {
                 <span>@L("Última sync:", "Última sync:", "Last sync:") @syncStatus.LastCompletedUtc.Value.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss") · Ins: @syncStatus.LastInserted · Act: @syncStatus.LastUpdated · Omi: @syncStatus.LastSkipped · Err: @syncStatus.LastErrors</span>
@@ -47,7 +64,11 @@ else
             <span class="results-summary">
                 @(totalCount == 0
                     ? L("Sin resultados", "Sense resultats", "No results")
-                    : L($"Mostrando {PageStart}-{PageEnd} de {totalCount} albaranes", $"Mostrant {PageStart}-{PageEnd} de {totalCount} albarans", $"Showing {PageStart}-{PageEnd} of {totalCount} shipments"))
+                    : IsModelShipmentsRoute
+                        ? L($"Mostrando {PageStart.ToUiString("N0")}-{PageEnd.ToUiString("N0")} de {totalCount.ToUiString("N0")} albaranes models", $"Mostrant {PageStart.ToUiString("N0")}-{PageEnd.ToUiString("N0")} de {totalCount.ToUiString("N0")} albarans models", $"Showing {PageStart.ToUiString("N0")}-{PageEnd.ToUiString("N0")} of {totalCount.ToUiString("N0")} model shipments")
+                        : IsTeixitsMostresShipmentsRoute
+                            ? L($"Mostrando {PageStart.ToUiString("N0")}-{PageEnd.ToUiString("N0")} de {totalCount.ToUiString("N0")} albaranes teixits-mostres", $"Mostrant {PageStart.ToUiString("N0")}-{PageEnd.ToUiString("N0")} de {totalCount.ToUiString("N0")} albarans teixits-mostres", $"Showing {PageStart.ToUiString("N0")}-{PageEnd.ToUiString("N0")} of {totalCount.ToUiString("N0")} fabric & sample shipments")
+                            : L($"Mostrando {PageStart.ToUiString("N0")}-{PageEnd.ToUiString("N0")} de {totalCount.ToUiString("N0")} albaranes", $"Mostrant {PageStart.ToUiString("N0")}-{PageEnd.ToUiString("N0")} de {totalCount.ToUiString("N0")} albarans", $"Showing {PageStart.ToUiString("N0")}-{PageEnd.ToUiString("N0")} of {totalCount.ToUiString("N0")} shipments"))
             </span>
             <label class="field compact-field">
                 <span>@L("Tamaño de página", "Mida de pàgina", "Page size")</span>
@@ -70,7 +91,11 @@ else
         {
             <div class="loading-banner">
                 <span class="loading-indicator" aria-hidden="true"></span>
-                <span>@L("Cargando albaranes de cliente...", "Carregant albarans de client...", "Loading customer shipments...")</span>
+                <span>@(IsModelShipmentsRoute
+                    ? L("Cargando albaranes models...", "Carregant albarans models...", "Loading model shipments...")
+                    : IsTeixitsMostresShipmentsRoute
+                        ? L("Cargando albaranes teixits-mostres...", "Carregant albarans teixits-mostres...", "Loading fabric & sample shipments...")
+                        : L("Cargando albaranes de cliente...", "Carregant albarans de client...", "Loading customer shipments..."))</span>
             </div>
         }
 
@@ -107,7 +132,11 @@ else
                 else if (items.Count == 0)
                 {
                     <tr>
-                        <td colspan="8" class="table-empty">@L("No hay albaranes para mostrar.", "No hi ha albarans per mostrar.", "There are no shipments to show.")</td>
+                        <td colspan="8" class="table-empty">@(IsModelShipmentsRoute
+                            ? L("No hay albaranes models para mostrar.", "No hi ha albarans models per mostrar.", "There are no model shipments to show.")
+                            : IsTeixitsMostresShipmentsRoute
+                                ? L("No hay albaranes teixits-mostres para mostrar.", "No hi ha albarans teixits-mostres per mostrar.", "There are no fabric & sample shipments to show.")
+                                : L("No hay albaranes para mostrar.", "No hi ha albarans per mostrar.", "There are no shipments to show."))</td>
                     </tr>
                 }
                 else
@@ -120,7 +149,7 @@ else
                             <td>@item.ClientName</td>
                             <td>@item.ShipmentDate.ToString("dd/MM/yyyy")</td>
                             <td>@DisplayValue(item.Warehouse)</td>
-                            <td>@item.TotalShippedQuantity.ToString("0.###")</td>
+                            <td>@item.TotalShippedQuantity.ToUiString("0.###")</td>
                             <td>
                                 <span class="status-pill @GetInvoiceStatusClass(item.InvoiceStatus)">@FormatInvoiceStatus(item.InvoiceStatus)</span>
                                 @if (!string.IsNullOrWhiteSpace(item.InvoiceDisplayNumber))
@@ -130,11 +159,11 @@ else
                             </td>
                             <td>
                                 <div class="table-actions">
-                                    <a class="inline-link" href="/ventas/albaranes/@item.ShipmentNumber">@L("Ver documento", "Veure document", "View document")</a>
-                                    <a class="inline-link" href="/ventas/albaranes/@item.ShipmentNumber/pdf" target="_blank">PDF</a>
+                                    <a class="inline-link" href="@BuildShipmentDetailHref(item.ShipmentNumber)">@L("Ver documento", "Veure document", "View document")</a>
+                                    <a class="inline-link" href="@BuildShipmentPdfHref(item.ShipmentNumber)" target="_blank">@L("PDF", "PDF", "PDF")</a>
                                     @if (item.InvoiceNumber is int invoiceNumber)
                                     {
-                                        <a class="inline-link" href="/ventas/facturas/@invoiceNumber">@L("Factura", "Factura", "Invoice")</a>
+                                        <a class="inline-link" href="@BuildInvoiceDetailHref(invoiceNumber)">@L("Factura", "Factura", "Invoice")</a>
                                     }
                                 </div>
                             </td>
@@ -164,6 +193,36 @@ else
             AppLanguages.English => english,
             _ => spanish
         };
+
+    private bool IsModelShipmentsRoute =>
+        NavigationManager.ToBaseRelativePath(NavigationManager.Uri).StartsWith("ventas/albaranes-models", StringComparison.OrdinalIgnoreCase);
+
+    private bool IsTeixitsMostresShipmentsRoute =>
+        NavigationManager.ToBaseRelativePath(NavigationManager.Uri).StartsWith("ventas/albaranes-teixits-mostres", StringComparison.OrdinalIgnoreCase);
+
+    private string PageTitleText => IsModelShipmentsRoute
+        ? L("Ventas / Albaranes Models", "Vendes / Albarans Models", "Sales / Model shipments")
+        : IsTeixitsMostresShipmentsRoute
+            ? L("Ventas / Albaranes Teixits-Mostres", "Vendes / Albarans Teixits-Mostres", "Sales / Fabric & sample shipments")
+            : L("Ventas / Albaranes", "Vendes / Albarans", "Sales / Shipments");
+
+    private string PageHeadingText => IsModelShipmentsRoute
+        ? L("Albaranes Models", "Albarans Models", "Model shipments")
+        : IsTeixitsMostresShipmentsRoute
+            ? L("Albaranes Teixits-Mostres", "Albarans Teixits-Mostres", "Fabric & sample shipments")
+            : L("Albaranes de cliente", "Albarans de client", "Customer shipments");
+
+    private string PageLeadText => IsModelShipmentsRoute
+        ? L("Salidas comerciales asociadas al circuito de Models, reutilizando el documento estándar de albarán de ventas.", "Sortides comercials associades al circuit de Models, reutilitzant el document estàndard d'albarà de vendes.", "Commercial shipments tied to the Models workflow, reusing the standard sales shipment document.")
+        : IsTeixitsMostresShipmentsRoute
+            ? L("Salidas comerciales del circuito de tejidos y muestras, listas para el siguiente paso de pre-facturación o factura.", "Sortides comercials del circuit de teixits i mostres, llestes per al següent pas de pre-facturació o factura.", "Commercial shipments for the fabrics and samples workflow, ready for the next pre-invoicing or invoicing step.")
+            : L("Salidas documentales generadas desde pedidos de cliente y listas para el siguiente paso a facturación.", "Sortides documentals generades des de comandes de client i llestes per al següent pas a facturació.", "Document shipments generated from customer orders and ready for the next invoicing step.");
+
+    private string PreInvoicingHref => IsTeixitsMostresShipmentsRoute ? "/ventas/pre-facturacion-teixits-mostres" : "/ventas/pre-facturacion";
+
+    private string PreInvoicingText => IsTeixitsMostresShipmentsRoute
+        ? L("Abrir pre-facturación teixits-mostres", "Obrir pre-facturació teixits-mostres", "Open fabric & sample pre-invoicing")
+        : L("Abrir pre-facturación", "Obrir pre-facturació", "Open pre-invoicing");
 
     [SupplyParameterFromQuery(Name = "q")]
     public string? SearchQuery { get; set; }
@@ -232,6 +291,11 @@ else
 
         try
         {
+            filter.CatalogScope = IsModelShipmentsRoute
+                ? "Models"
+                : IsTeixitsMostresShipmentsRoute
+                    ? "TeixitsMostres"
+                    : string.Empty;
             filter.SortColumn = sortColumn;
             filter.SortDescending = sortDescending;
             var result = await SalesOrderQueries.SearchShipmentsAsync(tenantId.Value, companyId.Value, filter);
@@ -336,6 +400,27 @@ else
         nameof(SalesOrderShipmentDto.InvoiceStatus) => nameof(SalesOrderShipmentDto.InvoiceStatus),
         _ => nameof(SalesOrderShipmentDto.ShipmentNumber)
     };
+
+    private string BuildShipmentDetailHref(int shipmentNumber) =>
+        IsModelShipmentsRoute
+            ? $"/ventas/albaranes-models/{shipmentNumber}"
+            : IsTeixitsMostresShipmentsRoute
+                ? $"/ventas/albaranes-teixits-mostres/{shipmentNumber}"
+                : $"/ventas/albaranes/{shipmentNumber}";
+
+    private string BuildShipmentPdfHref(int shipmentNumber) =>
+        IsModelShipmentsRoute
+            ? $"/ventas/albaranes-models/{shipmentNumber}/pdf"
+            : IsTeixitsMostresShipmentsRoute
+                ? $"/ventas/albaranes-teixits-mostres/{shipmentNumber}/pdf"
+                : $"/ventas/albaranes/{shipmentNumber}/pdf";
+
+    private string BuildInvoiceDetailHref(int invoiceNumber) =>
+        IsModelShipmentsRoute
+            ? $"/ventas/facturas-models/{invoiceNumber}"
+            : IsTeixitsMostresShipmentsRoute
+                ? $"/ventas/facturas-teixits-mostres/{invoiceNumber}"
+                : $"/ventas/facturas/{invoiceNumber}";
 
     private string DisplayValue(string value) => string.IsNullOrWhiteSpace(value) ? L("Sin dato", "Sense dada", "No data") : value;
     private string FormatInvoiceStatus(string status) => status switch

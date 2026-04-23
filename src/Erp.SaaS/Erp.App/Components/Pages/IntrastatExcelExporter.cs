@@ -1,25 +1,28 @@
+using System.Globalization;
 using ClosedXML.Excel;
 using Erp.Application.Intrastat;
+using Erp.App.Localization;
 
 namespace Erp.App.Components.Pages;
 
 internal static class IntrastatExcelExporter
 {
-    public static byte[] BuildWorkbook(IntrastatReportDto report, int year, int month)
+    public static byte[] BuildWorkbook(IntrastatReportDto report, int year, int month, string language)
     {
         using var workbook = new XLWorkbook();
-        BuildDetailSheet(workbook, report, year, month);
-        BuildSummarySheet(workbook, report, year, month);
+        BuildDetailSheet(workbook, report, year, month, language);
+        BuildSummarySheet(workbook, report, year, month, language);
 
         using var stream = new MemoryStream();
         workbook.SaveAs(stream);
         return stream.ToArray();
     }
 
-    private static void BuildDetailSheet(XLWorkbook workbook, IntrastatReportDto report, int year, int month)
+    private static void BuildDetailSheet(XLWorkbook workbook, IntrastatReportDto report, int year, int month, string language)
     {
-        var sheet = workbook.Worksheets.Add("Factures");
-        var title = $"Intrastat detalle - {new DateTime(year, month, 1):MMMM yyyy}";
+        var culture = new CultureInfo(AppLanguages.Normalize(language));
+        var sheet = workbook.Worksheets.Add(L(language, "Detalle", "Detall", "Detail"));
+        var title = $"{L(language, "Intrastat · detalle", "Intrastat · detall", "Intrastat · detail")} - {new DateTime(year, month, 1).ToString("MMMM yyyy", culture)}";
 
         sheet.Cell("A1").Value = title;
         sheet.Range("A1:Q1").Merge();
@@ -29,20 +32,34 @@ internal static class IntrastatExcelExporter
         sheet.Cell("A1").Style.Font.FontColor = XLColor.White;
         sheet.Cell("A1").Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
 
-        sheet.Cell("A2").Value = "Kg total";
+        sheet.Cell("A2").Value = L(language, "Kg total", "Kg total", "Total kg");
         sheet.Cell("B2").Value = report.TotalWeightKg;
-        sheet.Cell("C2").Value = "Import venda";
+        sheet.Cell("C2").Value = L(language, "Importe venta", "Import venda", "Sales amount");
         sheet.Cell("D2").Value = report.SalesAmount;
-        sheet.Cell("E2").Value = "Transport";
+        sheet.Cell("E2").Value = L(language, "Transporte", "Transport", "Transport");
         sheet.Cell("F2").Value = report.TransportAmount;
-        sheet.Cell("G2").Value = "Total amb transport";
+        sheet.Cell("G2").Value = L(language, "Total con transporte", "Total amb transport", "Total incl. transport");
         sheet.Cell("H2").Value = report.TotalWithTransportAmount;
 
         var headers = new[]
         {
-            "Factura", "Fecha", "Cliente", "VAT", "País", "Descripción", "Composición", "Talla",
-            "Artículo", "Cantidad", "Pes unit.", "Pes total/Kgrs", "Import", "NC code",
-            "Dte?", "Transport?", "Origen"
+            L(language, "Factura", "Factura", "Invoice"),
+            L(language, "Fecha", "Data", "Date"),
+            L(language, "Cliente", "Client", "Client"),
+            "VAT",
+            L(language, "País", "País", "Country"),
+            L(language, "Descripción", "Descripció", "Description"),
+            L(language, "Composición", "Composició", "Composition"),
+            L(language, "Talla", "Talla", "Size"),
+            L(language, "Artículo", "Article", "Item"),
+            L(language, "Cantidad", "Quantitat", "Quantity"),
+            L(language, "Peso unit.", "Pes unit.", "Unit weight"),
+            L(language, "Peso total/Kg", "Pes total/Kg", "Total weight/Kg"),
+            L(language, "Importe", "Import", "Amount"),
+            L(language, "Código NC", "Codi NC", "CN code"),
+            L(language, "Dte.?", "Dte.?", "Discount?"),
+            L(language, "Línea transporte?", "Línia transport?", "Transport line?"),
+            L(language, "Origen", "Origen", "Source")
         };
 
         for (var index = 0; index < headers.Length; index++)
@@ -70,7 +87,7 @@ internal static class IntrastatExcelExporter
             sheet.Cell(rowNumber, 13).Value = item.NetAmount;
             sheet.Cell(rowNumber, 14).Value = item.IntrastatCode;
             sheet.Cell(rowNumber, 15).Value = item.DiscountAmount;
-            sheet.Cell(rowNumber, 16).Value = item.IsTransportCharge ? "si" : "no";
+            sheet.Cell(rowNumber, 16).Value = item.IsTransportCharge ? L(language, "si", "sí", "yes") : L(language, "no", "no", "no");
             sheet.Cell(rowNumber, 17).Value = item.Origin;
 
             if (item.IsTransportCharge)
@@ -101,10 +118,11 @@ internal static class IntrastatExcelExporter
         sheet.Column(9).Width = Math.Max(sheet.Column(9).Width, 14);
     }
 
-    private static void BuildSummarySheet(XLWorkbook workbook, IntrastatReportDto report, int year, int month)
+    private static void BuildSummarySheet(XLWorkbook workbook, IntrastatReportDto report, int year, int month, string language)
     {
-        var sheet = workbook.Worksheets.Add("Agrupacio");
-        var title = $"Intrastat agrupació - {new DateTime(year, month, 1):MMMM yyyy}";
+        var culture = new CultureInfo(AppLanguages.Normalize(language));
+        var sheet = workbook.Worksheets.Add(L(language, "Matriz", "Matriu", "Matrix"));
+        var title = $"{L(language, "Intrastat · matriz", "Intrastat · matriu", "Intrastat · matrix")} - {new DateTime(year, month, 1).ToString("MMMM yyyy", culture)}";
         var matrixNcCodes = report.MatrixNcCodes.ToArray();
 
         sheet.Cell("A1").Value = title;
@@ -115,17 +133,17 @@ internal static class IntrastatExcelExporter
         sheet.Cell("A1").Style.Font.FontColor = XLColor.White;
         sheet.Cell("A1").Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
 
-        sheet.Cell("D3").Value = "Codis arancelaris · PESOS/Kgrs";
+        sheet.Cell("D3").Value = L(language, "Códigos arancelarios · PESOS/Kgrs", "Codis aranzelaris · PESOS/Kgrs", "Tariff codes · WEIGHTS/Kgs");
         sheet.Range("D3:I3").Merge();
-        sheet.Cell("K3").Value = "Codis arancelaris · FACTURES€";
+        sheet.Cell("K3").Value = L(language, "Códigos arancelarios · FACTURAS€", "Codis aranzelaris · FACTURES€", "Tariff codes · INVOICES€");
         sheet.Range("K3:P3").Merge();
 
         ApplyGroupHeaderStyle(sheet.Range("D3:I3"));
         ApplyGroupHeaderStyle(sheet.Range("K3:P3"));
 
-        sheet.Cell("A4").Value = "Clients";
-        sheet.Cell("B4").Value = "Ordre alfabètic";
-        sheet.Cell("C4").Value = "Sigles";
+        sheet.Cell("A4").Value = L(language, "Con clientes", "Amb clients", "Has clients");
+        sheet.Cell("B4").Value = L(language, "Orden alfabético", "Ordre alfabètic", "Alphabetical order");
+        sheet.Cell("C4").Value = L(language, "Siglas", "Sigles", "Country code");
 
         for (var index = 0; index < matrixNcCodes.Length; index++)
         {
@@ -133,8 +151,8 @@ internal static class IntrastatExcelExporter
             sheet.Cell(4, 11 + index).Value = matrixNcCodes[index];
         }
 
-        sheet.Cell("J4").Value = "TOTAL PESOS/Kgrs";
-        sheet.Cell("Q4").Value = "TOTAL FACTURES€";
+        sheet.Cell("J4").Value = L(language, "TOTAL PESOS/Kgrs", "TOTAL PESOS/Kgrs", "TOTAL WEIGHTS/Kgs");
+        sheet.Cell("Q4").Value = L(language, "TOTAL FACTURAS€", "TOTAL FACTURES€", "TOTAL INVOICES€");
 
         sheet.Range("A4:Q4").Style.Font.Bold = true;
         sheet.Range("A4:Q4").Style.Fill.BackgroundColor = XLColor.FromHtml("#D9E2F3");
@@ -143,7 +161,7 @@ internal static class IntrastatExcelExporter
         var rowNumber = 5;
         foreach (var row in report.MatrixRows)
         {
-            sheet.Cell(rowNumber, 1).Value = row.HasClients ? "si" : "no";
+            sheet.Cell(rowNumber, 1).Value = row.HasClients ? L(language, "si", "sí", "yes") : L(language, "no", "no", "no");
             sheet.Cell(rowNumber, 2).Value = row.CountryName;
             sheet.Cell(rowNumber, 3).Value = row.CountryCode;
 
@@ -191,4 +209,12 @@ internal static class IntrastatExcelExporter
         range.Style.Fill.BackgroundColor = XLColor.FromHtml("#B4C6E7");
         range.Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
     }
+
+    private static string L(string language, string spanish, string catalan, string english) =>
+        AppLanguages.Normalize(language) switch
+        {
+            AppLanguages.Catalan => catalan,
+            AppLanguages.English => english,
+            _ => spanish
+        };
 }

@@ -1,4 +1,6 @@
 @page "/produccion/acabados"
+@page "/compras/ordenes-fabricacion-muestras"
+@page "/compras/ordenes-fabricacion-models"
 @attribute [Authorize(Roles = "TenantAdmin,TenantReader")]
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject IBaseCatalogQueries BaseCatalogQueries
@@ -6,18 +8,18 @@
 @inject IParteAcabadoQueries ParteAcabadoQueries
 @inject AppText T
 
-<PageTitle>@L("Producción / Acabados", "Producció / Acabats", "Production / Finishing")</PageTitle>
+<PageTitle>@PageTitleText</PageTitle>
 
 <div class="page-header">
     <div>
-        <p class="eyebrow">@T["menu.production"]</p>
-        <h1>@L("Órdenes / Partes de acabado", "Ordres / Parts d'acabat", "Finishing orders / jobs")</h1>
-        <p class="lead">@L("Listado operativo de trabajos de acabado sobre la SaaS local, con cliente, acabador, tejido, color, kg y piezas.", "Llistat operatiu de treballs d'acabat sobre la SaaS local, amb client, acabador, teixit, color, kg i peces.", "Operational list of finishing work in the local SaaS, including client, finisher, fabric, color, kg and pieces.")</p>
+        <p class="eyebrow">@HeaderEyebrowText</p>
+        <h1>@HeaderTitleText</h1>
+        <p class="lead">@HeaderLeadText</p>
     </div>
     <div class="quick-links">
         @if (canEdit)
         {
-            <a class="primary-button link-button" href="/produccion/acabados/nueva">@L("Nueva orden de acabado", "Nova ordre d'acabat", "New finishing order")</a>
+            <a class="primary-button link-button" href="@BuildCreateUrl()">@CreateButtonText</a>
         }
     </div>
 </div>
@@ -79,7 +81,7 @@ else
                 <span class="results-summary">
                     @(totalCount == 0
                         ? L("Sin resultados", "Sense resultats", "No results")
-                        : L($"Mostrando {PageStart}-{PageEnd} de {totalCount} órdenes / partes", $"Mostrant {PageStart}-{PageEnd} de {totalCount} ordres / parts", $"Showing {PageStart}-{PageEnd} of {totalCount} orders / jobs"))
+                        : L($"Mostrando {PageStart.ToUiString("N0")}-{PageEnd.ToUiString("N0")} de {totalCount.ToUiString("N0")} órdenes / partes", $"Mostrant {PageStart.ToUiString("N0")}-{PageEnd.ToUiString("N0")} de {totalCount.ToUiString("N0")} ordres / parts", $"Showing {PageStart.ToUiString("N0")}-{PageEnd.ToUiString("N0")} of {totalCount.ToUiString("N0")} orders / jobs"))
                 </span>
                 <div class="view-toggle" role="tablist" aria-label="@L("Vista de acabados", "Vista d'acabats", "Finishing view")">
                     <button class="@GetViewButtonCss(ListViewMode)" @onclick="() => SetViewMode(ListViewMode)" type="button" aria-pressed="@(viewMode == ListViewMode)">@L("Listado", "Llistat", "List")</button>
@@ -135,7 +137,7 @@ else
                         }
                         else if (columnItems.Count == 0)
                         {
-                            <div class="kanban-empty">@L("Sin órdenes en esta columna.", "Sense ordres en aquesta columna.", "No orders in this column.")</div>
+                            <div class="kanban-empty">@EmptyColumnText</div>
                         }
                         else
                         {
@@ -181,13 +183,13 @@ else
                                             </div>
                                         </dl>
                                         <div class="kanban-card-totals">
-                                            <span>@L($"{item.TotalPieces:0.##} piezas", $"{item.TotalPieces:0.##} peces", $"{item.TotalPieces:0.##} pieces")</span>
-                                            <span>@item.TotalKilograms.ToString("0.##") kg</span>
+                                                <span>@L($"{item.TotalPieces.ToUiString("0.##")} piezas", $"{item.TotalPieces.ToUiString("0.##")} peces", $"{item.TotalPieces.ToUiString("0.##")} pieces")</span>
+                                            <span>@item.TotalKilograms.ToUiString("0.##") kg</span>
                                             <span>@L($"{item.LinesCount} líneas", $"{item.LinesCount} línies", $"{item.LinesCount} lines")</span>
                                         </div>
                                         <div class="inline-action-list">
-                                            <a class="inline-link" href="/produccion/acabados/editar/@item.OrderNumber">@(canEdit ? L("Abrir", "Obrir", "Open") : L("Ver", "Veure", "View"))</a>
-                                            <a class="inline-link" href="/produccion/acabados/@item.OrderNumber/imprimir" target="_blank" rel="noopener noreferrer">@L("Imprimir", "Imprimir", "Print")</a>
+                                            <a class="inline-link" href="@BuildEditUrl(item.OrderNumber)">@(canEdit ? L("Abrir", "Obrir", "Open") : L("Ver", "Veure", "View"))</a>
+                                            <a class="inline-link" href="@BuildPrintUrl(item.OrderNumber)" target="_blank" rel="noopener noreferrer">@L("Imprimir", "Imprimir", "Print")</a>
                                         </div>
                                     </article>
                                 }
@@ -249,7 +251,7 @@ else
                         else if (items.Count == 0)
                         {
                             <tr>
-                                <td colspan="14" class="table-empty">@L("No hay órdenes / partes de acabado para mostrar.", "No hi ha ordres / parts d'acabat per mostrar.", "There are no finishing orders / jobs to display.")</td>
+                                <td colspan="14" class="table-empty">@EmptyTableText</td>
                             </tr>
                         }
                         else
@@ -280,13 +282,13 @@ else
                                         <div>@GetFabricLabel(item)</div>
                                     </td>
                                     <td>@(string.IsNullOrWhiteSpace(item.PrimaryColor) ? "-" : item.PrimaryColor)</td>
-                                    <td>@item.TotalPieces.ToString("0.##")</td>
-                                    <td>@item.TotalKilograms.ToString("0.##")</td>
+                                    <td>@item.TotalPieces.ToUiString("0.##")</td>
+                                    <td>@item.TotalKilograms.ToUiString("0.##")</td>
                                     <td>@item.Origin</td>
                                     <td>
                                         <div class="inline-action-list">
-                                            <a class="inline-link" href="/produccion/acabados/editar/@item.OrderNumber">@(canEdit ? L("Abrir", "Obrir", "Open") : L("Ver", "Veure", "View"))</a>
-                                            <a class="inline-link" href="/produccion/acabados/@item.OrderNumber/imprimir" target="_blank" rel="noopener noreferrer">@L("Imprimir", "Imprimir", "Print")</a>
+                                            <a class="inline-link" href="@BuildEditUrl(item.OrderNumber)">@(canEdit ? L("Abrir", "Obrir", "Open") : L("Ver", "Veure", "View"))</a>
+                                            <a class="inline-link" href="@BuildPrintUrl(item.OrderNumber)" target="_blank" rel="noopener noreferrer">@L("Imprimir", "Imprimir", "Print")</a>
                                         </div>
                                     </td>
                                 </tr>
@@ -362,6 +364,36 @@ else
     private string sortColumn = nameof(ParteAcabadoListItemDto.Date);
     private bool sortDescending = true;
     private int totalCount;
+    private bool IsSampleManufacturingView => CurrentPath.StartsWith("compras/ordenes-fabricacion-muestras", StringComparison.OrdinalIgnoreCase);
+    private bool IsModelManufacturingView => CurrentPath.StartsWith("compras/ordenes-fabricacion-models", StringComparison.OrdinalIgnoreCase);
+    private string CurrentPath => NavigationManager.ToBaseRelativePath(NavigationManager.Uri).Split('?', '#')[0];
+    private string HeaderEyebrowText => IsSampleManufacturingView || IsModelManufacturingView ? T["menu.purchases"] : T["menu.production"];
+    private string PageTitleText => IsSampleManufacturingView
+        ? L("Compras / Órdenes fabricación muestras", "Compres / Ordres fabricació mostres", "Purchases / Sample manufacturing orders")
+        : IsModelManufacturingView
+            ? L("Compras / Órdenes fabricación models", "Compres / Ordres fabricació models", "Purchases / Model manufacturing orders")
+            : L("Producción / Acabados", "Producció / Acabats", "Production / Finishing");
+    private string HeaderTitleText => IsSampleManufacturingView
+        ? L("Órdenes fabricación muestras", "Ordres fabricació mostres", "Sample manufacturing orders")
+        : IsModelManufacturingView
+            ? L("Órdenes fabricación models", "Ordres fabricació models", "Model manufacturing orders")
+            : L("Órdenes / Partes de acabado", "Ordres / Parts d'acabat", "Finishing orders / jobs");
+    private string HeaderLeadText => IsSampleManufacturingView
+        ? L("Listado operativo de órdenes de fabricación nacidas desde muestras y complementos, reutilizando el circuito de acabados.", "Llistat operatiu d'ordres de fabricació nascudes des de mostres i complements, reutilitzant el circuit d'acabats.", "Operational list of manufacturing orders created from samples and complements, reusing the finishing workflow.")
+        : IsModelManufacturingView
+            ? L("Listado operativo de órdenes de fabricación nacidas desde models, con trazabilidad al model origen.", "Llistat operatiu d'ordres de fabricació nascudes des de models, amb traçabilitat al model origen.", "Operational list of manufacturing orders created from models, with traceability back to the source model.")
+            : L("Listado operativo de trabajos de acabado sobre la SaaS local, con cliente, acabador, tejido, color, kg y piezas.", "Llistat operatiu de treballs d'acabat sobre la SaaS local, amb client, acabador, teixit, color, kg i peces.", "Operational list of finishing work in the local SaaS, including client, finisher, fabric, color, kg and pieces.");
+    private string CreateButtonText => IsSampleManufacturingView || IsModelManufacturingView
+        ? L("Nueva orden fabricación", "Nova ordre fabricació", "New manufacturing order")
+        : L("Nueva orden de acabado", "Nova ordre d'acabat", "New finishing order");
+    private string EmptyTableText => IsSampleManufacturingView
+        ? L("No hay órdenes de fabricación de muestras para mostrar.", "No hi ha ordres de fabricació de mostres per mostrar.", "There are no sample manufacturing orders to display.")
+        : IsModelManufacturingView
+            ? L("No hay órdenes de fabricación de models para mostrar.", "No hi ha ordres de fabricació de models per mostrar.", "There are no model manufacturing orders to display.")
+            : L("No hay órdenes / partes de acabado para mostrar.", "No hi ha ordres / parts d'acabat per mostrar.", "There are no finishing orders / jobs to display.");
+    private string EmptyColumnText => IsSampleManufacturingView || IsModelManufacturingView
+        ? L("Sin órdenes en esta columna.", "Sense ordres en aquesta columna.", "No orders in this column.")
+        : L("Sin órdenes en esta columna.", "Sense ordres en aquesta columna.", "No orders in this column.");
     private string L(string spanish, string catalan, string english) =>
         T.CurrentLanguage switch
         {
@@ -563,6 +595,8 @@ else
         filter.SourceSampleKind = ParteAcabadoSourceKinds.Normalize(SourceKindQuery);
         filter.SourceSampleCode = SourceCodeQuery?.Trim() ?? string.Empty;
         filter.LiveOnly = LiveOnlyQuery.GetValueOrDefault();
+        filter.SampleWorkflowOnly = IsSampleManufacturingView;
+        filter.ModelWorkflowOnly = IsModelManufacturingView;
         filter.Page = Math.Max(PageQuery.GetValueOrDefault(1), 1);
         filter.PageSize = PageSizeQuery is 25 or 50 or 100 ? PageSizeQuery.Value : 25;
         sortColumn = NormalizeSortColumn(SortQuery);
@@ -700,7 +734,28 @@ else
     private static string BuildSampleUrl(ParteAcabadoListItemDto item) =>
         string.IsNullOrWhiteSpace(item.SourceSampleCode)
             ? "/articulos/muestras"
-            : $"{ParteAcabadoSourceKinds.GetRouteBase(item.SourceSampleKind)}/editar/{Uri.EscapeDataString(item.SourceSampleCode.Trim())}";
+            : string.Equals(ParteAcabadoSourceKinds.Normalize(item.SourceSampleKind, hasLinkedSource: true), ParteAcabadoSourceKinds.Model, StringComparison.OrdinalIgnoreCase) &&
+              Guid.TryParse(item.SourceRecordId, out var modelId)
+                ? $"/articulos/models/editar/{modelId}"
+                : $"{ParteAcabadoSourceKinds.GetRouteBase(item.SourceSampleKind)}/editar/{Uri.EscapeDataString(item.SourceSampleCode.Trim())}";
+
+    private string BuildCreateUrl() => IsSampleManufacturingView
+        ? "/compras/ordenes-fabricacion-muestras/nueva"
+        : IsModelManufacturingView
+            ? "/compras/ordenes-fabricacion-models/nueva"
+            : "/produccion/acabados/nueva";
+
+    private string BuildEditUrl(int orderNumber) => IsSampleManufacturingView
+        ? $"/compras/ordenes-fabricacion-muestras/editar/{orderNumber}"
+        : IsModelManufacturingView
+            ? $"/compras/ordenes-fabricacion-models/editar/{orderNumber}"
+            : $"/produccion/acabados/editar/{orderNumber}";
+
+    private string BuildPrintUrl(int orderNumber) => IsSampleManufacturingView
+        ? $"/compras/ordenes-fabricacion-muestras/{orderNumber}/imprimir"
+        : IsModelManufacturingView
+            ? $"/compras/ordenes-fabricacion-models/{orderNumber}/imprimir"
+            : $"/produccion/acabados/{orderNumber}/imprimir";
 
     private string GetStatusLabel(string status) => status switch
     {

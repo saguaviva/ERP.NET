@@ -4,21 +4,26 @@
 @inject IModeloQueries ModeloQueries
 @inject ILegacySyncService LegacySyncService
 @inject NavigationManager NavigationManager
+@inject AppText T
 
-<PageTitle>Artículos / Models</PageTitle>
+<PageTitle>@L("Artículos / Models", "Articles / Models", "Articles / Models")</PageTitle>
 
 <div class="page-header">
     <div>
-        <p class="eyebrow">ARTÍCULOS</p>
-        <h1>Models</h1>
+        <p class="eyebrow">@L("ARTÍCULOS", "ARTICLES", "ARTICLES")</p>
+        <h1>@L("Models", "Models", "Models")</h1>
         <p class="lead">@(isLegacySyncActive
-            ? "Consulta y filtra los models replicados en la SaaS local. La sync manual refresca solo registros con origen legacy."
-            : "Consulta y filtra los models del centro legacy asociado a la empresa activa.")</p>
+            ? L("Consulta y filtra los models replicados en la SaaS local. La sync manual refresca solo registros con origen legacy.",
+                "Consulta i filtra els models replicats a la SaaS local. La sync manual refresca només registres amb origen legacy.",
+                "Browse and filter models replicated in the local SaaS database. Manual sync only refreshes legacy-origin records.")
+            : L("Consulta y filtra los models del centro legacy asociado a la empresa activa.",
+                "Consulta i filtra els models del centre legacy associat a l'empresa activa.",
+                "Browse and filter models from the legacy center linked to the active company."))</p>
     </div>
     <div class="quick-links">
         @if (canEdit)
         {
-            <a class="primary-button link-button" href="/articulos/models/nuevo">Nuevo model</a>
+            <a class="primary-button link-button" href="/articulos/models/nuevo">@L("Nuevo model", "Nou model", "New model")</a>
         }
     </div>
 </div>
@@ -26,34 +31,34 @@
 @if (!tenantId.HasValue || !companyId.HasValue)
 {
     <div class="empty-state">
-        <p>Selecciona una empresa activa para trabajar con models.</p>
+        <p>@L("Selecciona una empresa activa para trabajar con models.", "Selecciona una empresa activa per treballar amb models.", "Select an active company to work with models.")</p>
     </div>
 }
 else
 {
     <section class="panel">
         <div class="filter-row">
-            <input class="text-input" @bind="filter.Search" placeholder="Buscar por código, descripción, cliente, tejido o código de model" />
-            <button class="secondary-button" @onclick="SearchAsync" disabled="@isLoading">@(isLoading ? "Cargando..." : "Buscar")</button>
+            <input class="text-input" @bind="filter.Search" placeholder="@L("Buscar por código, descripción, cliente, tejido o código de model", "Buscar per codi, descripció, client, teixit o codi de model", "Search by code, description, client, fabric or model code")" />
+            <button class="secondary-button" @onclick="SearchAsync" disabled="@isLoading">@(isLoading ? L("Cargando...", "Carregant...", "Loading...") : L("Buscar", "Buscar", "Search"))</button>
         </div>
         <div class="form-grid" style="margin-top: 1rem; margin-bottom: 0;">
             <label class="field">
-                <span>Temporada</span>
+                <span>@L("Temporada", "Temporada", "Season")</span>
                 <InputText class="text-input" @bind-Value="filter.Season" />
             </label>
             <label class="field">
-                <span>Serie</span>
+                <span>@L("Serie", "Sèrie", "Series")</span>
                 <InputText class="text-input" @bind-Value="filter.Series" />
             </label>
         </div>
         <div class="filter-row results-toolbar" style="margin-top: 0.85rem;">
             <span class="results-summary">
                 @(totalCount == 0
-                    ? "Sin resultados"
-                    : $"Mostrando {PageStart}-{PageEnd} de {totalCount} models")
+                    ? L("Sin resultados", "Sense resultats", "No results")
+                    : string.Format(L("Mostrando {0}-{1} de {2} models", "Mostrant {0}-{1} de {2} models", "Showing {0}-{1} of {2} models"), PageStart, PageEnd, totalCount))
             </span>
             <label class="field compact-field">
-                <span>Tamaño de página</span>
+                <span>@L("Tamaño de página", "Mida de pàgina", "Page size")</span>
                 <select class="sidebar-select compact-select" value="@filter.PageSize" @onchange="OnPageSizeChanged" disabled="@isLoading">
                     <option value="25">25</option>
                     <option value="50">50</option>
@@ -71,8 +76,8 @@ else
     @if (isLegacySyncActive)
     {
         <div class="alert">
-            Artículos / Models está en convivencia con legacy para esta empresa.
-            La web guarda cambios solo en la SaaS local y la sync manual refresca únicamente registros de origen legacy.
+            @L("Artículos / Models está en convivencia con legacy para esta empresa.", "Articles / Models està en convivència amb legacy per a aquesta empresa.", "Articles / Models is running in coexistence with legacy for this company.")
+            @L("La web guarda cambios solo en la SaaS local y la sync manual refresca únicamente registros de origen legacy.", "La web desa canvis només a la SaaS local i la sync manual refresca únicament registres d'origen legacy.", "The web app saves changes only in the local SaaS database and manual sync only refreshes legacy-origin records.")
             @if (!string.IsNullOrWhiteSpace(syncStatusLabel))
             {
                 <span>@syncStatusLabel</span>
@@ -85,7 +90,7 @@ else
         {
             <div class="loading-banner">
                 <span class="loading-indicator" aria-hidden="true"></span>
-                <span>Cargando models...</span>
+                <span>@L("Cargando models...", "Carregant models...", "Loading models...")</span>
             </div>
         }
 
@@ -93,16 +98,16 @@ else
             <table class="data-table">
                 <thead>
                     <tr>
-                        <SortableHeader Label="Código" IsActive="@(sortColumn == nameof(ModeloListItemDto.Code))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(ModeloListItemDto.Code)))" />
-                        <SortableHeader Label="Descripción" IsActive="@(sortColumn == nameof(ModeloListItemDto.Description))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(ModeloListItemDto.Description)))" />
-                        <SortableHeader Label="Temporada" IsActive="@(sortColumn == nameof(ModeloListItemDto.Season))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(ModeloListItemDto.Season)))" />
-                        <SortableHeader Label="Serie" IsActive="@(sortColumn == nameof(ModeloListItemDto.Series))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(ModeloListItemDto.Series)))" />
-                        <SortableHeader Label="Cliente" IsActive="@(sortColumn == nameof(ModeloListItemDto.ClientName))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(ModeloListItemDto.ClientName)))" />
-                        <SortableHeader Label="Tejido" IsActive="@(sortColumn == nameof(ModeloListItemDto.FabricCode))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(ModeloListItemDto.FabricCode)))" />
-                        <SortableHeader Label="Coste" IsActive="@(sortColumn == nameof(ModeloListItemDto.CostPrice))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(ModeloListItemDto.CostPrice), true))" />
-                        <SortableHeader Label="Venta final" IsActive="@(sortColumn == nameof(ModeloListItemDto.FinalSalePrice))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(ModeloListItemDto.FinalSalePrice), true))" />
-                        <th>Detalle</th>
-                        <SortableHeader Label="Origen" IsActive="@(sortColumn == nameof(ModeloListItemDto.Origin))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(ModeloListItemDto.Origin)))" />
+                        <SortableHeader Label="@L("Código", "Codi", "Code")" IsActive="@(sortColumn == nameof(ModeloListItemDto.Code))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(ModeloListItemDto.Code)))" />
+                        <SortableHeader Label="@L("Descripción", "Descripció", "Description")" IsActive="@(sortColumn == nameof(ModeloListItemDto.Description))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(ModeloListItemDto.Description)))" />
+                        <SortableHeader Label="@L("Temporada", "Temporada", "Season")" IsActive="@(sortColumn == nameof(ModeloListItemDto.Season))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(ModeloListItemDto.Season)))" />
+                        <SortableHeader Label="@L("Serie", "Sèrie", "Series")" IsActive="@(sortColumn == nameof(ModeloListItemDto.Series))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(ModeloListItemDto.Series)))" />
+                        <SortableHeader Label="@L("Cliente", "Client", "Client")" IsActive="@(sortColumn == nameof(ModeloListItemDto.ClientName))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(ModeloListItemDto.ClientName)))" />
+                        <SortableHeader Label="@L("Tejido", "Teixit", "Fabric")" IsActive="@(sortColumn == nameof(ModeloListItemDto.FabricCode))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(ModeloListItemDto.FabricCode)))" />
+                        <SortableHeader Label="@L("Coste", "Cost", "Cost")" IsActive="@(sortColumn == nameof(ModeloListItemDto.CostPrice))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(ModeloListItemDto.CostPrice), true))" />
+                        <SortableHeader Label="@L("Venta final", "Venda final", "Final sale")" IsActive="@(sortColumn == nameof(ModeloListItemDto.FinalSalePrice))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(ModeloListItemDto.FinalSalePrice), true))" />
+                        <th>@L("Detalle", "Detall", "Detail")</th>
+                        <SortableHeader Label="@L("Origen", "Origen", "Origin")" IsActive="@(sortColumn == nameof(ModeloListItemDto.Origin))" Descending="@sortDescending" OnSort="@(() => SetSortAsync(nameof(ModeloListItemDto.Origin)))" />
                         <th></th>
                     </tr>
                 </thead>
@@ -129,7 +134,7 @@ else
                     else if (items.Count == 0)
                     {
                         <tr>
-                            <td colspan="11" class="table-empty">No hay models para mostrar.</td>
+                            <td colspan="11" class="table-empty">@L("No hay models para mostrar.", "No hi ha models per mostrar.", "There are no models to display.")</td>
                         </tr>
                     }
                     else
@@ -152,14 +157,21 @@ else
                                         <a class="inline-link" href="@BuildTejidoUrl(item.FabricCode)">@item.FabricCode</a>
                                     }
                                 </td>
-                                <td>@item.CostPrice.ToString("0.00##")</td>
-                                <td>@item.FinalSalePrice.ToString("0.00##")</td>
-                                <td>@($"{item.ScandalloLinesCount} esc. · {item.ColorsCount} col. · {item.ForniturasCount} forn.")</td>
-                                <td>@(string.IsNullOrWhiteSpace(item.Origin) ? "local" : item.Origin)</td>
+                                <td>@item.CostPrice.ToUiString("0.00##")</td>
+                                <td>@item.FinalSalePrice.ToUiString("0.00##")</td>
+                                <td>@($"{item.ScandalloLinesCount} {L("esc.", "esc.", "bom.")} · {item.ColorsCount} {L("col.", "col.", "col.")} · {item.ForniturasCount} {L("forn.", "forn.", "trim.")}")</td>
+                                <td>@(string.IsNullOrWhiteSpace(item.Origin) ? L("local", "local", "local") : item.Origin)</td>
                                 <td>
-                                    <a class="inline-link" href="@BuildEditUrl(item.Id)">@(canEdit ? "Abrir ficha" : "Ver ficha")</a>
+                                    <a class="inline-link" href="@BuildEditUrl(item.Id)">@(canEdit ? L("Abrir ficha", "Obrir fitxa", "Open record") : L("Ver ficha", "Veure fitxa", "View record"))</a>
                                     <span class="muted"> · </span>
-                                    <a class="inline-link" href="@BuildPrintUrl(item.Id)">Imprimir</a>
+                                    <a class="inline-link" href="@BuildPrintUrl(item.Id)">@L("Imprimir", "Imprimir", "Print")</a>
+                                    @if (canEdit)
+                                    {
+                                        <span class="muted"> · </span>
+                                        <a class="inline-link" href="@BuildManufacturingOrderUrl(item.Id)">@L("Crear orden", "Crear ordre", "Create order")</a>
+                                    }
+                                    <span class="muted"> · </span>
+                                    <a class="inline-link" href="@BuildManufacturingOrdersListUrl(item.Code)">@L("Órdenes", "Ordres", "Orders")</a>
                                 </td>
                             </tr>
                         }
@@ -169,12 +181,12 @@ else
         </div>
 
         <div class="pagination-bar">
-            <span class="muted">Página @filter.Page de @TotalPages</span>
+            <span class="muted">@string.Format(L("Página {0} de {1}", "Pàgina {0} de {1}", "Page {0} of {1}"), filter.Page, TotalPages)</span>
             <div class="pagination-actions">
-                <button class="secondary-button" @onclick="() => ChangePageAsync(1)" disabled="@(!CanGoPrevious || isLoading)">Primera</button>
-                <button class="secondary-button" @onclick="() => ChangePageAsync(filter.Page - 1)" disabled="@(!CanGoPrevious || isLoading)">Anterior</button>
-                <button class="secondary-button" @onclick="() => ChangePageAsync(filter.Page + 1)" disabled="@(!CanGoNext || isLoading)">Siguiente</button>
-                <button class="secondary-button" @onclick="() => ChangePageAsync(TotalPages)" disabled="@(!CanGoNext || isLoading)">Última</button>
+                <button class="secondary-button" @onclick="() => ChangePageAsync(1)" disabled="@(!CanGoPrevious || isLoading)">@L("Primera", "Primera", "First")</button>
+                <button class="secondary-button" @onclick="() => ChangePageAsync(filter.Page - 1)" disabled="@(!CanGoPrevious || isLoading)">@L("Anterior", "Anterior", "Previous")</button>
+                <button class="secondary-button" @onclick="() => ChangePageAsync(filter.Page + 1)" disabled="@(!CanGoNext || isLoading)">@L("Siguiente", "Següent", "Next")</button>
+                <button class="secondary-button" @onclick="() => ChangePageAsync(TotalPages)" disabled="@(!CanGoNext || isLoading)">@L("Última", "Última", "Last")</button>
             </div>
         </div>
     </section>
@@ -258,7 +270,7 @@ else
 
         isLegacySyncActive = true;
         syncStatusLabel = status.LastCompletedUtc.HasValue
-            ? $"Última sync: {status.LastCompletedUtc.Value.ToLocalTime():dd/MM/yyyy HH:mm:ss} · Ins: {status.LastInserted} · Act: {status.LastUpdated} · Omi: {status.LastSkipped} · Err: {status.LastErrors}"
+            ? $"{L("Última sync", "Última sync", "Last sync")}: {status.LastCompletedUtc.Value.ToLocalTime():dd/MM/yyyy HH:mm:ss} · Ins: {status.LastInserted} · Act: {status.LastUpdated} · Omi: {status.LastSkipped} · Err: {status.LastErrors}"
             : string.Empty;
     }
 
@@ -391,7 +403,17 @@ else
 
     private static string BuildEditUrl(Guid id) => $"/articulos/models/editar/{id}";
     private static string BuildPrintUrl(Guid id) => $"/articulos/models/{id}/imprimir";
+    private static string BuildManufacturingOrderUrl(Guid id) => $"/compras/ordenes-fabricacion-models/nueva?modelId={Uri.EscapeDataString(id.ToString())}";
+    private static string BuildManufacturingOrdersListUrl(string code) => $"/compras/ordenes-fabricacion-models?sourceKind=model&sourceCode={Uri.EscapeDataString(code)}";
 
     private static string BuildTejidoUrl(string fabricCode) =>
         $"/articulos/tejidos/editar/{Uri.EscapeDataString(fabricCode)}";
+
+    private string L(string spanish, string catalan, string english) =>
+        T.CurrentLanguage switch
+        {
+            AppLanguages.Catalan => catalan,
+            AppLanguages.English => english,
+            _ => spanish
+        };
 }

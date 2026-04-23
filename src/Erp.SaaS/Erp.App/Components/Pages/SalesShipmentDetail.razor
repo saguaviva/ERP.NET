@@ -1,36 +1,47 @@
 @page "/ventas/albaranes/{ShipmentNumber:int}"
+@page "/ventas/albaranes-teixits-mostres/{ShipmentNumber:int}"
+@page "/ventas/albaranes-models/{ShipmentNumber:int}"
 @attribute [Authorize(Roles = "TenantAdmin,TenantReader")]
 @inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
+@inject AppText T
 @inject ISalesOrderQueries SalesOrderQueries
 
-<PageTitle>Albarán de venta @ShipmentNumber</PageTitle>
+<PageTitle>@PageTitleText</PageTitle>
 
 <div class="page-header">
     <div>
-        <p class="eyebrow">Ventas</p>
-        <h1>@(shipment?.DisplayNumber ?? $"Salida {ShipmentNumber}")</h1>
-        <p class="lead">Albarán de cliente generado desde la expedición del pedido.</p>
+        <p class="eyebrow">@L("Ventas", "Vendes", "Sales")</p>
+        <h1>@(shipment?.DisplayNumber ?? L($"Salida {ShipmentNumber}", $"Sortida {ShipmentNumber}", $"Shipment {ShipmentNumber}"))</h1>
+        <p class="lead">@PageLeadText</p>
     </div>
     <div class="quick-links no-print">
-        <a class="secondary-button link-button" href="/ventas/albaranes">Volver a albaranes</a>
-        <a class="secondary-button link-button" href="/ventas/pre-facturacion">Abrir pre-facturación</a>
+        <a class="secondary-button link-button" href="@BackToListHref">@BackToListText</a>
+        @if (IsModelShipmentsRoute)
+        {
+            <a class="secondary-button link-button" href="/articulos/models">@L("Abrir models", "Obrir models", "Open models")</a>
+        }
+        else
+        {
+            <a class="secondary-button link-button" href="@PreInvoicingHref">@PreInvoicingText</a>
+        }
         @if (shipment is not null)
         {
-            <a class="secondary-button link-button" href="/ventas/pedidos/editar/@shipment.OrderNumber">Abrir pedido</a>
-            <a class="secondary-button link-button" href="/ventas/albaranes/@shipment.ShipmentNumber/pdf" target="_blank">Versión PDF</a>
+            <a class="secondary-button link-button" href="@BuildOrderHref(shipment.OrderNumber)">@L("Abrir pedido", "Obrir comanda", "Open order")</a>
+            <a class="secondary-button link-button" href="@BuildShipmentPdfHref(shipment.ShipmentNumber)" target="_blank">@L("Versión PDF", "Versió PDF", "PDF version")</a>
             @if (shipment.InvoiceNumber is int invoiceNumber)
             {
-                <a class="secondary-button link-button" href="/ventas/facturas/@invoiceNumber">Abrir factura</a>
+                <a class="secondary-button link-button" href="@BuildInvoiceDetailHref(invoiceNumber)">@L("Abrir factura", "Obrir factura", "Open invoice")</a>
             }
         }
-        <button class="secondary-button" type="button" onclick="window.print()">Imprimir</button>
+        <button class="secondary-button" type="button" onclick="window.print()">@L("Imprimir", "Imprimir", "Print")</button>
     </div>
 </div>
 
 @if (!tenantId.HasValue || !companyId.HasValue)
 {
     <div class="empty-state">
-        <p>No hay empresa activa seleccionada.</p>
+        <p>@L("No hay empresa activa seleccionada.", "No hi ha cap empresa activa seleccionada.", "There is no active company selected.")</p>
     </div>
 }
 else if (!string.IsNullOrWhiteSpace(errorMessage))
@@ -40,7 +51,7 @@ else if (!string.IsNullOrWhiteSpace(errorMessage))
 else if (shipment is null)
 {
     <div class="empty-state">
-        <p>No se ha encontrado el albarán solicitado.</p>
+        <p>@L("No se ha encontrado el albarán solicitado.", "No s'ha trobat l'albarà sol·licitat.", "The requested shipment could not be found.")</p>
     </div>
 }
 else
@@ -48,29 +59,29 @@ else
     <section class="panel receipt-document">
         <div class="receipt-document-header">
             <div>
-                <p class="eyebrow">Albarán de cliente</p>
+                <p class="eyebrow">@DocumentEyebrowText</p>
                 <h2>@shipment.DisplayNumber</h2>
-                <p class="muted">Pedido origen @shipment.OrderNumber</p>
+                <p class="muted">@L($"Pedido origen {shipment.OrderNumber}", $"Comanda origen {shipment.OrderNumber}", $"Source order {shipment.OrderNumber}")</p>
             </div>
             <div class="receipt-document-meta">
-                <strong>Fecha</strong>
+                <strong>@L("Fecha", "Data", "Date")</strong>
                 <span>@shipment.ShipmentDate.ToString("dd/MM/yyyy")</span>
             </div>
         </div>
 
         <div class="comparison-grid">
             <section class="info-card">
-                <h2>Empresa expedidora</h2>
+                <h2>@L("Empresa expedidora", "Empresa expedidora", "Shipping company")</h2>
                 <p><strong>@shipment.CompanyName</strong></p>
                 <p class="muted">@shipment.TenantName</p>
-                <p class="muted">Centro legacy @shipment.CompanyLegacyCenterCode</p>
+                <p class="muted">@L($"Centro legacy {shipment.CompanyLegacyCenterCode}", $"Centre legacy {shipment.CompanyLegacyCenterCode}", $"Legacy center {shipment.CompanyLegacyCenterCode}")</p>
             </section>
             <section class="info-card">
-                <h2>Cliente</h2>
+                <h2>@L("Cliente", "Client", "Customer")</h2>
                 <p><strong>@shipment.ClientName</strong></p>
                 @if (!string.IsNullOrWhiteSpace(shipment.ClientTaxId))
                 {
-                    <p class="muted">NIF @shipment.ClientTaxId</p>
+                    <p class="muted">@L($"NIF {shipment.ClientTaxId}", $"NIF {shipment.ClientTaxId}", $"Tax ID {shipment.ClientTaxId}")</p>
                 }
                 @if (!string.IsNullOrWhiteSpace(ClientLocation))
                 {
@@ -81,36 +92,36 @@ else
 
         <div class="receipt-detail-grid">
             <section class="info-card">
-                <h2>Cabecera logística</h2>
+                <h2>@L("Cabecera logística", "Capçalera logística", "Logistics header")</h2>
                 <div class="receipt-kv-grid">
                     <div>
-                        <span class="muted">Almacén</span>
+                        <span class="muted">@L("Almacén", "Magatzem", "Warehouse")</span>
                         <strong>@DisplayValue(shipment.Warehouse)</strong>
                     </div>
                     <div>
-                        <span class="muted">Fecha salida</span>
+                        <span class="muted">@L("Fecha salida", "Data de sortida", "Shipment date")</span>
                         <strong>@shipment.ShipmentDate.ToString("dd/MM/yyyy")</strong>
                     </div>
                     <div>
-                        <span class="muted">Pedido origen</span>
+                        <span class="muted">@L("Pedido origen", "Comanda origen", "Source order")</span>
                         <strong>@shipment.OrderNumber</strong>
                     </div>
                 </div>
             </section>
             <section class="info-card">
-                <h2>Preparado para facturación</h2>
+                <h2>@L("Preparado para facturación", "Preparat per a facturació", "Ready for invoicing")</h2>
                 <div class="receipt-kv-grid">
                     <div>
-                        <span class="muted">Estado</span>
+                        <span class="muted">@L("Estado", "Estat", "Status")</span>
                         <strong>@FormatInvoiceStatus(shipment.InvoiceStatus)</strong>
                     </div>
                     <div>
-                        <span class="muted">Referencia factura</span>
+                        <span class="muted">@L("Referencia factura", "Referència factura", "Invoice reference")</span>
                         <strong>@(shipment.InvoiceDisplayNumber ?? DisplayValue(shipment.InvoiceReference))</strong>
                     </div>
                     <div>
-                        <span class="muted">Listo desde</span>
-                        <strong>@(shipment.InvoiceReadyUtc?.ToLocalTime().ToString("dd/MM/yyyy HH:mm") ?? "Sin dato")</strong>
+                        <span class="muted">@L("Listo desde", "A punt des de", "Ready since")</span>
+                        <strong>@(shipment.InvoiceReadyUtc?.ToLocalTime().ToString("dd/MM/yyyy HH:mm") ?? L("Sin dato", "Sense dada", "No data"))</strong>
                     </div>
                 </div>
             </section>
@@ -120,30 +131,30 @@ else
     <div class="card-grid purchase-summary-grid">
         <section class="info-card">
             <h2>@shipment.DisplayNumber</h2>
-            <p>albarán</p>
+            <p>@L("albarán", "albarà", "shipment")</p>
         </section>
         <section class="info-card">
-            <h2>Pedido @shipment.OrderNumber</h2>
+            <h2>@L($"Pedido {shipment.OrderNumber}", $"Comanda {shipment.OrderNumber}", $"Order {shipment.OrderNumber}")</h2>
             <p>@shipment.ClientName</p>
         </section>
         <section class="info-card">
             <h2>@shipment.ShipmentDate.ToString("dd/MM/yyyy")</h2>
-            <p class="muted">fecha de salida</p>
+            <p class="muted">@L("fecha de salida", "data de sortida", "shipment date")</p>
         </section>
         <section class="info-card accent-card">
-            <h2>@shipment.TotalShippedQuantity.ToString("0.###")</h2>
-            <p class="muted">cantidad expedida</p>
+            <h2>@shipment.TotalShippedQuantity.ToUiString("0.###")</h2>
+            <p class="muted">@L("cantidad expedida", "quantitat expedida", "shipped quantity")</p>
         </section>
     </div>
 
     <section class="panel">
-        <h2>Detalle de líneas</h2>
+        <h2>@L("Detalle de líneas", "Detall de línies", "Line details")</h2>
         <table class="data-table">
             <thead>
                 <tr>
-                    <th>Línea</th>
-                    <th>Descripción</th>
-                    <th>Cantidad</th>
+                    <th>@L("Línea", "Línia", "Line")</th>
+                    <th>@L("Descripción", "Descripció", "Description")</th>
+                    <th>@L("Cantidad", "Quantitat", "Quantity")</th>
                 </tr>
             </thead>
             <tbody>
@@ -152,7 +163,7 @@ else
                     <tr>
                         <td>@line.LineNumber</td>
                         <td>@line.Description</td>
-                        <td>@line.ShippedQuantity.ToString("0.###")</td>
+                        <td>@line.ShippedQuantity.ToUiString("0.###")</td>
                     </tr>
                 }
             </tbody>
@@ -162,7 +173,7 @@ else
     @if (!string.IsNullOrWhiteSpace(shipment.Notes))
     {
         <section class="panel">
-            <h2>Notas</h2>
+            <h2>@L("Notas", "Notes", "Notes")</h2>
             <p>@shipment.Notes</p>
         </section>
     }
@@ -176,6 +187,47 @@ else
     private Guid? companyId;
     private SalesOrderShipmentDto? shipment;
     private string errorMessage = string.Empty;
+    private string PageTitleText => IsModelShipmentsRoute
+        ? L($"Albarán Models {ShipmentNumber}", $"Albarà Models {ShipmentNumber}", $"Model shipment {ShipmentNumber}")
+        : IsTeixitsMostresShipmentsRoute
+            ? L($"Albarán Teixits-Mostres {ShipmentNumber}", $"Albarà Teixits-Mostres {ShipmentNumber}", $"Fabric & sample shipment {ShipmentNumber}")
+            : L($"Albarán de venta {ShipmentNumber}", $"Albarà de venda {ShipmentNumber}", $"Sales shipment {ShipmentNumber}");
+
+    private bool IsModelShipmentsRoute =>
+        NavigationManager.ToBaseRelativePath(NavigationManager.Uri).StartsWith("ventas/albaranes-models", StringComparison.OrdinalIgnoreCase);
+
+    private bool IsTeixitsMostresShipmentsRoute =>
+        NavigationManager.ToBaseRelativePath(NavigationManager.Uri).StartsWith("ventas/albaranes-teixits-mostres", StringComparison.OrdinalIgnoreCase);
+
+    private string PageLeadText => IsModelShipmentsRoute
+        ? L("Albarán del circuito de Models reutilizando la expedición estándar de ventas.", "Albarà del circuit de Models reutilitzant l'expedició estàndard de vendes.", "Shipment within the Models workflow, reusing the standard sales dispatch document.")
+        : IsTeixitsMostresShipmentsRoute
+            ? L("Albarán del circuito Teixits-Mostres generado desde la expedición del pedido comercial.", "Albarà del circuit Teixits-Mostres generat des de l'expedició de la comanda comercial.", "Shipment from the fabric and sample workflow, generated from the commercial order dispatch.")
+            : L("Albarán de cliente generado desde la expedición del pedido.", "Albarà de client generat des de l'expedició de la comanda.", "Customer shipment created from the sales order fulfillment.");
+
+    private string DocumentEyebrowText => IsModelShipmentsRoute
+        ? L("Albarán Models", "Albarà Models", "Model shipment")
+        : IsTeixitsMostresShipmentsRoute
+            ? L("Albarán Teixits-Mostres", "Albarà Teixits-Mostres", "Fabric & sample shipment")
+            : L("Albarán de cliente", "Albarà de client", "Customer shipment");
+
+    private string BackToListHref => IsModelShipmentsRoute
+        ? "/ventas/albaranes-models"
+        : IsTeixitsMostresShipmentsRoute
+            ? "/ventas/albaranes-teixits-mostres"
+            : "/ventas/albaranes";
+
+    private string BackToListText => IsModelShipmentsRoute
+        ? L("Volver a albaranes models", "Tornar als albarans models", "Back to model shipments")
+        : IsTeixitsMostresShipmentsRoute
+            ? L("Volver a albaranes teixits-mostres", "Tornar als albarans teixits-mostres", "Back to fabric & sample shipments")
+            : L("Volver a albaranes", "Tornar als albarans", "Back to shipments");
+
+    private string PreInvoicingHref => IsTeixitsMostresShipmentsRoute ? "/ventas/pre-facturacion-teixits-mostres" : "/ventas/pre-facturacion";
+
+    private string PreInvoicingText => IsTeixitsMostresShipmentsRoute
+        ? L("Abrir pre-facturación teixits-mostres", "Obrir pre-facturació teixits-mostres", "Open fabric & sample pre-invoicing")
+        : L("Abrir pre-facturación", "Obrir pre-facturació", "Open pre-invoicing");
 
     private string ClientLocation
     {
@@ -222,12 +274,39 @@ else
         }
     }
 
-    private static string DisplayValue(string value) => string.IsNullOrWhiteSpace(value) ? "Sin dato" : value;
-    private static string FormatInvoiceStatus(string status) => status switch
+    private string L(string spanish, string catalan, string english) =>
+        T.CurrentLanguage switch
+        {
+            AppLanguages.Catalan => catalan,
+            AppLanguages.English => english,
+            _ => spanish
+        };
+
+    private string DisplayValue(string value) => string.IsNullOrWhiteSpace(value) ? L("Sin dato", "Sense dada", "No data") : value;
+    private string BuildShipmentPdfHref(int shipmentNumber) =>
+        IsModelShipmentsRoute
+            ? $"/ventas/albaranes-models/{shipmentNumber}/pdf"
+            : IsTeixitsMostresShipmentsRoute
+                ? $"/ventas/albaranes-teixits-mostres/{shipmentNumber}/pdf"
+                : $"/ventas/albaranes/{shipmentNumber}/pdf";
+
+    private string BuildInvoiceDetailHref(int invoiceNumber) =>
+        IsModelShipmentsRoute
+            ? $"/ventas/facturas-models/{invoiceNumber}"
+            : IsTeixitsMostresShipmentsRoute
+                ? $"/ventas/facturas-teixits-mostres/{invoiceNumber}"
+                : $"/ventas/facturas/{invoiceNumber}";
+
+    private string BuildOrderHref(int orderNumber) =>
+        IsTeixitsMostresShipmentsRoute
+            ? $"/ventas/pedidos-teixits-mostres/editar/{orderNumber}"
+            : $"/ventas/pedidos/editar/{orderNumber}";
+
+    private string FormatInvoiceStatus(string status) => status switch
     {
-        "Pending" => "Pendiente de facturar",
-        "Drafted" => "En borrador de factura",
-        "Invoiced" => "Facturado",
+        "Pending" => L("Pendiente de facturar", "Pendent de facturar", "Pending invoicing"),
+        "Drafted" => L("En borrador de factura", "En esborrany de factura", "In invoice draft"),
+        "Invoiced" => L("Facturado", "Facturat", "Invoiced"),
         _ => status
     };
 }

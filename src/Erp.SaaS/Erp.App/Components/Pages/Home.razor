@@ -13,6 +13,7 @@
 @inject IDisposicionQueries DisposicionQueries
 @inject IParteAcabadoQueries ParteAcabadoQueries
 @inject ISalesOrderQueries SalesOrderQueries
+@inject ISalesRemittanceQueries SalesRemittanceQueries
 @inject IPurchaseOrderQueries PurchaseOrderQueries
 @inject IPurchaseInvoiceQueries PurchaseInvoiceQueries
 @inject IStockQueries StockQueries
@@ -228,18 +229,43 @@ else
             result => result.TotalCount,
             () => failedMetricLoads++);
 
+        var sampleWorkOrdersTask = SafeCountAsync(
+            () => ParteAcabadoQueries.SearchAsync(currentTenantId, currentCompanyId, new ParteAcabadoFilter { SampleWorkflowOnly = true, Page = 1, PageSize = 1 }),
+            result => result.TotalCount,
+            () => failedMetricLoads++);
+
+        var modelWorkOrdersTask = SafeCountAsync(
+            () => ParteAcabadoQueries.SearchAsync(currentTenantId, currentCompanyId, new ParteAcabadoFilter { ModelWorkflowOnly = true, Page = 1, PageSize = 1 }),
+            result => result.TotalCount,
+            () => failedMetricLoads++);
+
         var openSalesOrdersTask = SafeCountAsync(
-            () => SalesOrderQueries.SearchAsync(currentTenantId, currentCompanyId, new SalesOrderFilter { IncludeClosed = false, Page = 1, PageSize = 1 }),
+            () => SalesOrderQueries.SearchAsync(currentTenantId, currentCompanyId, new SalesOrderFilter { CatalogScope = "TeixitsMostres", IncludeClosed = false, Page = 1, PageSize = 1 }),
             result => result.TotalCount,
             () => failedMetricLoads++);
 
         var pendingShipmentTask = SafeCountAsync(
-            () => SalesOrderQueries.SearchPendingShipmentsAsync(currentTenantId, currentCompanyId, new SalesPreInvoiceFilter { Page = 1, PageSize = 1 }),
+            () => SalesOrderQueries.SearchPendingShipmentsAsync(currentTenantId, currentCompanyId, new SalesPreInvoiceFilter { CatalogScope = "TeixitsMostres", Page = 1, PageSize = 1 }),
+            result => result.TotalCount,
+            () => failedMetricLoads++);
+
+        var modelShipmentsTask = SafeCountAsync(
+            () => SalesOrderQueries.SearchShipmentsAsync(currentTenantId, currentCompanyId, new SalesOrderFilter { CatalogScope = "Models", Page = 1, PageSize = 1 }),
             result => result.TotalCount,
             () => failedMetricLoads++);
 
         var salesInvoicesTask = SafeCountAsync(
-            () => SalesOrderQueries.SearchInvoicesAsync(currentTenantId, currentCompanyId, new SalesPreInvoiceFilter { Page = 1, PageSize = 1 }),
+            () => SalesOrderQueries.SearchInvoicesAsync(currentTenantId, currentCompanyId, new SalesPreInvoiceFilter { CatalogScope = "TeixitsMostres", Page = 1, PageSize = 1 }),
+            result => result.TotalCount,
+            () => failedMetricLoads++);
+
+        var modelInvoicesTask = SafeCountAsync(
+            () => SalesOrderQueries.SearchInvoicesAsync(currentTenantId, currentCompanyId, new SalesPreInvoiceFilter { CatalogScope = "Models", Page = 1, PageSize = 1 }),
+            result => result.TotalCount,
+            () => failedMetricLoads++);
+
+        var remittancesTask = SafeCountAsync(
+            () => SalesRemittanceQueries.SearchAsync(currentTenantId, currentCompanyId, new SalesRemittanceFilter { IncludeClosed = false, Page = 1, PageSize = 1 }),
             result => result.TotalCount,
             () => failedMetricLoads++);
 
@@ -248,8 +274,18 @@ else
             result => result.TotalCount,
             () => failedMetricLoads++);
 
+        var yarnOrdersTask = SafeCountAsync(
+            () => PurchaseOrderQueries.SearchAsync(currentTenantId, currentCompanyId, new PurchaseOrderFilter { CatalogScope = "Hilos", IncludeClosed = false, Page = 1, PageSize = 1 }),
+            result => result.TotalCount,
+            () => failedMetricLoads++);
+
         var receiptsTask = SafeCountAsync(
             () => PurchaseOrderQueries.SearchReceiptsAsync(currentTenantId, currentCompanyId, new PurchaseReceiptFilter { Page = 1, PageSize = 1 }),
+            result => result.TotalCount,
+            () => failedMetricLoads++);
+
+        var yarnReceiptsTask = SafeCountAsync(
+            () => PurchaseOrderQueries.SearchReceiptsAsync(currentTenantId, currentCompanyId, new PurchaseReceiptFilter { CatalogScope = "Hilos", Page = 1, PageSize = 1 }),
             result => result.TotalCount,
             () => failedMetricLoads++);
 
@@ -260,6 +296,21 @@ else
 
         var stockBalancesTask = SafeCountAsync(
             () => StockQueries.SearchBalancesAsync(currentTenantId, currentCompanyId, new StockBalanceFilter { Page = 1, PageSize = 1 }),
+            result => result.TotalCount,
+            () => failedMetricLoads++);
+
+        var modelStockTask = SafeCountAsync(
+            () => StockQueries.SearchBalancesAsync(currentTenantId, currentCompanyId, new StockBalanceFilter { CatalogScope = "Models", Page = 1, PageSize = 1 }),
+            result => result.TotalCount,
+            () => failedMetricLoads++);
+
+        var yarnStockTask = SafeCountAsync(
+            () => StockQueries.SearchBalancesAsync(currentTenantId, currentCompanyId, new StockBalanceFilter { CatalogScope = "Hilos", Page = 1, PageSize = 1 }),
+            result => result.TotalCount,
+            () => failedMetricLoads++);
+
+        var fabricStockTask = SafeCountAsync(
+            () => StockQueries.SearchBalancesAsync(currentTenantId, currentCompanyId, new StockBalanceFilter { CatalogScope = "Tejidos", Page = 1, PageSize = 1 }),
             result => result.TotalCount,
             () => failedMetricLoads++);
 
@@ -289,13 +340,23 @@ else
             muestrasTask,
             pendingDispositionsTask,
             liveFinishOrdersTask,
+            sampleWorkOrdersTask,
+            modelWorkOrdersTask,
             openSalesOrdersTask,
             pendingShipmentTask,
+            modelShipmentsTask,
             salesInvoicesTask,
+            modelInvoicesTask,
+            remittancesTask,
             openPurchaseOrdersTask,
+            yarnOrdersTask,
             receiptsTask,
+            yarnReceiptsTask,
             registeredPurchaseInvoicesTask,
             stockBalancesTask,
+            modelStockTask,
+            yarnStockTask,
+            fabricStockTask,
             stockMovementsTask,
             draftCountsTask,
             draftTransfersTask,
@@ -330,7 +391,12 @@ else
                 T["home.operations.kicker"],
                 [
                     new(T["home.operations.finishOrders"], FormatCount(liveFinishOrdersTask.Result), T["home.operations.finishOrders.desc"], "/produccion/acabados?live=true&view=board", T["home.operations.openFinishOrders"], "warning"),
+                    new(T["home.operations.sampleWorkOrders"], FormatCount(sampleWorkOrdersTask.Result), T["home.operations.sampleWorkOrders.desc"], "/compras/ordenes-fabricacion-muestras?live=true", T["home.operations.openSampleWorkOrders"]),
+                    new(T["home.operations.modelWorkOrders"], FormatCount(modelWorkOrdersTask.Result), T["home.operations.modelWorkOrders.desc"], "/compras/ordenes-fabricacion-models?live=true", T["home.operations.openModelWorkOrders"]),
                     new(T["home.operations.stockPositions"], FormatCount(stockBalancesTask.Result), T["home.operations.stockPositions.desc"], "/almacen/stock-actual", T["home.operations.openStock"]),
+                    new(T["home.operations.fabricStock"], FormatCount(fabricStockTask.Result), T["home.operations.fabricStock.desc"], "/almacen/tejidos", T["home.operations.openFabricStock"], "info"),
+                    new(T["home.operations.yarnStock"], FormatCount(yarnStockTask.Result), T["home.operations.yarnStock.desc"], "/almacen/fils", T["home.operations.openYarnStock"], "info"),
+                    new(T["home.operations.modelStock"], FormatCount(modelStockTask.Result), T["home.operations.modelStock.desc"], "/almacen/models", T["home.operations.openModelStock"], "info"),
                     new(T["home.operations.stockMovements"], FormatCount(stockMovementsTask.Result), T["home.operations.stockMovements.desc"], "/almacen/movimientos", T["home.operations.openMovements"]),
                     new(T["home.operations.draftCounts"], FormatCount(draftCountsTask.Result), T["home.operations.draftCounts.desc"], "/almacen/inventarios", T["home.operations.openCounts"], "warning"),
                     new(T["home.operations.draftTransfers"], FormatCount(draftTransfersTask.Result), T["home.operations.draftTransfers.desc"], "/almacen/traspasos", T["home.operations.openTransfers"], "warning")
@@ -340,11 +406,16 @@ else
                 T["home.commercial.description"],
                 T["home.commercial.kicker"],
                 [
-                    new(T["home.commercial.salesOrders"], FormatCount(openSalesOrdersTask.Result), T["home.commercial.salesOrders.desc"], "/ventas/pedidos", T["home.commercial.openSalesOrders"]),
-                    new(T["home.commercial.pendingShipments"], FormatCount(pendingShipmentTask.Result), T["home.commercial.pendingShipments.desc"], "/ventas/pre-facturacion", T["home.commercial.openPreinvoicing"]),
-                    new(T["home.commercial.salesInvoices"], FormatCount(salesInvoicesTask.Result), T["home.commercial.salesInvoices.desc"], "/ventas/facturas", T["home.commercial.openSalesInvoices"]),
+                    new(T["home.commercial.fabricSampleOrders"], FormatCount(openSalesOrdersTask.Result), T["home.commercial.fabricSampleOrders.desc"], "/ventas/pedidos-teixits-mostres", T["home.commercial.openFabricSampleOrders"]),
+                    new(T["home.commercial.fabricSamplePendingShipments"], FormatCount(pendingShipmentTask.Result), T["home.commercial.fabricSamplePendingShipments.desc"], "/ventas/pre-facturacion-teixits-mostres", T["home.commercial.openFabricSamplePreinvoicing"]),
+                    new(T["home.commercial.modelShipments"], FormatCount(modelShipmentsTask.Result), T["home.commercial.modelShipments.desc"], "/ventas/albaranes-models", T["home.commercial.openModelShipments"], "info"),
+                    new(T["home.commercial.fabricSampleInvoices"], FormatCount(salesInvoicesTask.Result), T["home.commercial.fabricSampleInvoices.desc"], "/ventas/facturas-teixits-mostres", T["home.commercial.openFabricSampleInvoices"]),
+                    new(T["home.commercial.modelInvoices"], FormatCount(modelInvoicesTask.Result), T["home.commercial.modelInvoices.desc"], "/ventas/facturas-models", T["home.commercial.openModelInvoices"], "info"),
+                    new(T["home.commercial.remittances"], FormatCount(remittancesTask.Result), T["home.commercial.remittances.desc"], "/ventas/remesas", T["home.commercial.openRemittances"], "info"),
                     new(T["home.commercial.purchaseOrders"], FormatCount(openPurchaseOrdersTask.Result), T["home.commercial.purchaseOrders.desc"], "/compras/pedidos", T["home.commercial.openPurchaseOrders"]),
+                    new(T["home.commercial.yarnOrders"], FormatCount(yarnOrdersTask.Result), T["home.commercial.yarnOrders.desc"], "/compras/comandes-fils", T["home.commercial.openYarnOrders"], "info"),
                     new(T["home.commercial.receipts"], FormatCount(receiptsTask.Result), T["home.commercial.receipts.desc"], "/compras/recepciones", T["home.commercial.openReceipts"]),
+                    new(T["home.commercial.yarnReceipts"], FormatCount(yarnReceiptsTask.Result), T["home.commercial.yarnReceipts.desc"], "/compras/albaranes-entrega-fils", T["home.commercial.openYarnReceipts"], "info"),
                     new(T["home.commercial.purchaseInvoices"], FormatCount(registeredPurchaseInvoicesTask.Result), T["home.commercial.purchaseInvoices.desc"], "/compras/facturas", T["home.commercial.openPurchaseInvoices"], "warning")
                 ])
         ];
@@ -433,12 +504,27 @@ else
             new(T["shortcut.samples.title"], T["shortcut.samples.description"], "/articulos/muestras"),
             new(T["shortcut.dispositions.title"], T["shortcut.dispositions.description"], "/articulos/disposiciones"),
             new(T["shortcut.finishing.title"], T["shortcut.finishing.description"], "/produccion/acabados"),
+            new(T["shortcut.sampleWorkOrders.title"], T["shortcut.sampleWorkOrders.description"], "/compras/ordenes-fabricacion-muestras"),
+            new(T["shortcut.modelWorkOrders.title"], T["shortcut.modelWorkOrders.description"], "/compras/ordenes-fabricacion-models"),
+            new(T["shortcut.modelShipments.title"], T["shortcut.modelShipments.description"], "/ventas/albaranes-models"),
+            new(T["shortcut.modelInvoices.title"], T["shortcut.modelInvoices.description"], "/ventas/facturas-models"),
+            new(T["shortcut.remittances.title"], T["shortcut.remittances.description"], "/ventas/remesas"),
             new(T["shortcut.purchaseInvoices.title"], T["shortcut.purchaseInvoices.description"], "/compras/facturas"),
-            new(T["shortcut.counts.title"], T["shortcut.counts.description"], "/almacen/inventarios")
+            new(T["shortcut.yarnOrders.title"], T["shortcut.yarnOrders.description"], "/compras/comandes-fils"),
+            new(T["shortcut.yarnReceipts.title"], T["shortcut.yarnReceipts.description"], "/compras/albaranes-entrega-fils"),
+            new(T["shortcut.fabricStock.title"], T["shortcut.fabricStock.description"], "/almacen/tejidos"),
+            new(T["shortcut.yarnStock.title"], T["shortcut.yarnStock.description"], "/almacen/fils"),
+            new(T["shortcut.modelStock.title"], T["shortcut.modelStock.description"], "/almacen/models"),
+            new(T["shortcut.counts.title"], T["shortcut.counts.description"], "/almacen/inventarios"),
+            new(T["shortcut.alerts.title"], T["shortcut.alerts.description"], "/alertas"),
+            new(T["shortcut.reports.title"], T["shortcut.reports.description"], "/listados"),
+            new(T["shortcut.statistics.title"], T["shortcut.statistics.description"], "/estadisticas")
         };
 
         if (canManageTenant)
         {
+            items.Add(new(T["shortcut.numbering.title"], T["shortcut.numbering.description"], "/base-datos/numeraciones"));
+            items.Add(new(T["shortcut.mailing.title"], T["shortcut.mailing.description"], "/base-datos/mailing"));
             items.Add(new(T["shortcut.admin.title"], T["shortcut.admin.description"], "/administracion"));
         }
 
@@ -453,6 +539,6 @@ else
 
     private sealed record DashboardSyncSummary(int TotalModules, int HealthyModules, int WarningModules, string LastSyncLabel)
     {
-        public static DashboardSyncSummary Empty { get; } = new(0, 0, 0, "Sin datos de sync");
+        public static DashboardSyncSummary Empty { get; } = new(0, 0, 0, string.Empty);
     }
 }

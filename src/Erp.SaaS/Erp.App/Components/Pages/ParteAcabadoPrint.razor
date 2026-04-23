@@ -1,21 +1,25 @@
 @page "/produccion/acabados/{OrderNumber:int}/imprimir"
+@page "/compras/ordenes-fabricacion-muestras/{OrderNumber:int}/imprimir"
+@page "/compras/ordenes-fabricacion-models/{OrderNumber:int}/imprimir"
 @layout EmptyLayout
 @attribute [Authorize(Roles = "TenantAdmin,TenantReader")]
 @inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
 @inject IParteAcabadoQueries ParteAcabadoQueries
+@inject AppText T
 
-<PageTitle>Parte de acabado @OrderNumber</PageTitle>
+<PageTitle>@PageTitleText</PageTitle>
 
 <div class="document-shell">
     <div class="document-toolbar no-print">
-        <a class="secondary-button link-button" href="/produccion/acabados/editar/@OrderNumber">Volver al parte</a>
-        <button class="primary-button" type="button" onclick="window.print()">Guardar como PDF / Imprimir</button>
+        <a class="secondary-button link-button" href="@BackToEditUrl">@BackToEditText</a>
+        <button class="primary-button" type="button" onclick="window.print()">@L("Imprimir / guardar PDF", "Imprimir / desar PDF", "Print / save PDF")</button>
     </div>
 
     @if (!tenantId.HasValue || !companyId.HasValue)
     {
         <div class="empty-state document-state">
-            <p>No hay empresa activa seleccionada.</p>
+            <p>@L("No hay empresa activa seleccionada.", "No hi ha cap empresa activa seleccionada.", "There is no active company selected.")</p>
         </div>
     }
     else if (!string.IsNullOrWhiteSpace(errorMessage))
@@ -25,7 +29,7 @@
     else if (detail is null)
     {
         <div class="empty-state document-state">
-            <p>No se ha encontrado el parte de acabado solicitado.</p>
+            <p>@L("No se ha encontrado el parte de acabado solicitado.", "No s'ha trobat el part d'acabat sol·licitat.", "The requested finish order could not be found.")</p>
         </div>
     }
     else
@@ -33,21 +37,21 @@
         <section class="document-page">
             <header class="document-header">
                 <div>
-                    <p class="eyebrow">Parte de acabado</p>
+                    <p class="eyebrow">@DocumentTitle</p>
                     <h1>@detail.OrderNumber</h1>
-                    <p class="muted">Cliente @DisplayClient · Acabador @DisplayFinisher · Máquina @DisplayMachine</p>
+                    <p class="muted">@L("Cliente", "Client", "Customer") @DisplayClient · @L("Acabador", "Acabador", "Finisher") @DisplayFinisher · @L("Máquina", "Màquina", "Machine") @DisplayMachine</p>
                 </div>
                 <div class="document-header-meta">
                     <div>
-                        <span class="muted">Fecha</span>
+                        <span class="muted">@L("Fecha", "Data", "Date")</span>
                         <strong>@FormatDate(detail.Date)</strong>
                     </div>
                     <div>
-                        <span class="muted">Estado</span>
+                        <span class="muted">@L("Estado", "Estat", "Status")</span>
                         <strong>@GetStatusLabel(detail.Status)</strong>
                     </div>
                     <div>
-                        <span class="muted">Origen</span>
+                        <span class="muted">@L("Origen", "Origen", "Origin")</span>
                         <strong>@DisplayValue(detail.Origin)</strong>
                     </div>
                 </div>
@@ -56,44 +60,44 @@
             <section class="document-section">
                 <div class="document-grid-two">
                     <section class="document-box">
-                        <h2>Cabecera</h2>
+                        <h2>@L("Cabecera", "Capçalera", "Header")</h2>
                         <div class="document-kv-grid">
-                            <div><span class="muted">Cliente</span><strong>@DisplayClient</strong></div>
-                            <div><span class="muted">Acabador</span><strong>@DisplayFinisher</strong></div>
-                            <div><span class="muted">Máquina</span><strong>@DisplayMachine</strong></div>
-                            <div><span class="muted">Operación</span><strong>@DisplayOperation</strong></div>
-                            <div><span class="muted">Disposición</span><strong>@DisplayDisposition</strong></div>
-                            <div><span class="muted">Origen técnico</span><strong>@DisplaySourceSample</strong></div>
-                            <div><span class="muted">Centro</span><strong>@DisplayValue(detail.CompanyCenterCode)</strong></div>
+                            <div><span class="muted">@L("Cliente", "Client", "Customer")</span><strong>@DisplayClient</strong></div>
+                            <div><span class="muted">@L("Acabador", "Acabador", "Finisher")</span><strong>@DisplayFinisher</strong></div>
+                            <div><span class="muted">@L("Máquina", "Màquina", "Machine")</span><strong>@DisplayMachine</strong></div>
+                            <div><span class="muted">@L("Operación", "Operació", "Operation")</span><strong>@DisplayOperation</strong></div>
+                            <div><span class="muted">@L("Disposición", "Disposició", "Disposition")</span><strong>@DisplayDisposition</strong></div>
+                            <div><span class="muted">@L("Origen técnico", "Origen tècnic", "Technical source")</span><strong>@DisplaySourceSample</strong></div>
+                            <div><span class="muted">@L("Centro", "Centre", "Center")</span><strong>@DisplayValue(detail.CompanyCenterCode)</strong></div>
                         </div>
                     </section>
                     <section class="document-box">
-                        <h2>Resumen de avance</h2>
+                        <h2>@L("Resumen de avance", "Resum d'avanç", "Progress summary")</h2>
                         <div class="document-kv-grid">
-                            <div><span class="muted">Pendientes</span><strong>@PendingLinesCount</strong></div>
-                            <div><span class="muted">En proceso</span><strong>@InProgressLinesCount</strong></div>
-                            <div><span class="muted">Terminadas</span><strong>@FinishedLinesCount</strong></div>
-                            <div><span class="muted">Kg totales</span><strong>@detail.TotalKilograms.ToString("0.##")</strong></div>
-                            <div><span class="muted">Piezas totales</span><strong>@detail.TotalPieces.ToString("0.##")</strong></div>
-                            <div><span class="muted">Líneas</span><strong>@detail.Lines.Count</strong></div>
+                            <div><span class="muted">@L("Pendientes", "Pendents", "Pending")</span><strong>@PendingLinesCount</strong></div>
+                            <div><span class="muted">@L("En proceso", "En procés", "In progress")</span><strong>@InProgressLinesCount</strong></div>
+                            <div><span class="muted">@L("Terminadas", "Acabades", "Finished")</span><strong>@FinishedLinesCount</strong></div>
+                            <div><span class="muted">@L("Kg totales", "Kg totals", "Total kg")</span><strong>@detail.TotalKilograms.ToUiString("0.##")</strong></div>
+                            <div><span class="muted">@L("Piezas totales", "Peces totals", "Total pieces")</span><strong>@detail.TotalPieces.ToUiString("0.##")</strong></div>
+                            <div><span class="muted">@L("Líneas", "Línies", "Lines")</span><strong>@detail.Lines.Count</strong></div>
                         </div>
                     </section>
                 </div>
             </section>
 
             <section class="document-section">
-                <h2>Detalle de líneas</h2>
+                <h2>@L("Detalle de líneas", "Detall de línies", "Line items")</h2>
                 <table class="data-table document-table">
                     <thead>
                         <tr>
                             <th>#</th>
-                            <th>Tejido</th>
-                            <th>Descripción</th>
-                            <th>Color</th>
+                            <th>@L("Tejido", "Teixit", "Fabric")</th>
+                            <th>@L("Descripción", "Descripció", "Description")</th>
+                            <th>@L("Color", "Color", "Color")</th>
                             <th>Kg</th>
-                            <th>Piezas</th>
-                            <th>Estado</th>
-                            <th>Notas</th>
+                            <th>@L("Piezas", "Peces", "Pieces")</th>
+                            <th>@L("Estado", "Estat", "Status")</th>
+                            <th>@L("Notas", "Notes", "Notes")</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -104,8 +108,8 @@
                                 <td>@DisplayValue(line.FabricCode)</td>
                                 <td>@DisplayValue(line.FabricDescription)</td>
                                 <td>@DisplayValue(line.Color)</td>
-                                <td>@line.TotalKilograms.ToString("0.##")</td>
-                                <td>@line.TotalPieces.ToString("0.##")</td>
+                                <td>@line.TotalKilograms.ToUiString("0.##")</td>
+                                <td>@line.TotalPieces.ToUiString("0.##")</td>
                                 <td>@GetStatusLabel(line.Status)</td>
                                 <td>@DisplayValue(line.Notes)</td>
                             </tr>
@@ -117,15 +121,15 @@
             <section class="document-section">
                 <div class="document-grid-two">
                     <section class="document-box">
-                        <h2>Observaciones</h2>
-                        <p>@(string.IsNullOrWhiteSpace(detail.Notes) ? "Sin observaciones." : detail.Notes)</p>
+                        <h2>@L("Observaciones", "Observacions", "Notes")</h2>
+                        <p>@(string.IsNullOrWhiteSpace(detail.Notes) ? L("Sin observaciones registradas.", "Sense observacions registrades.", "No remarks recorded.") : detail.Notes)</p>
                     </section>
                     <section class="document-box">
-                        <h2>Trazabilidad operativa</h2>
+                        <h2>@L("Trazabilidad operativa", "Traçabilitat operativa", "Operational traceability")</h2>
                         <ul class="document-list">
-                            <li>Las líneas en proceso quedan reflejadas en la disposición como dispuestas.</li>
-                            <li>Las líneas terminadas quedan reflejadas en la disposición como servidas.</li>
-                            <li>El stock registra avance en proceso y terminado en almacenes lógicos.</li>
+                            <li>@L("Las líneas en proceso quedan reflejadas en la disposición como dispuestas.", "Les línies en procés queden reflectides a la disposició com a disposades.", "Lines in progress are reflected on the disposition as prepared.")</li>
+                            <li>@L("Las líneas terminadas quedan reflejadas en la disposición como servidas.", "Les línies acabades queden reflectides a la disposició com a servides.", "Finished lines are reflected on the disposition as served.")</li>
+                            <li>@L("El stock registra avance en proceso y terminado en almacenes lógicos.", "L'estoc registra avanç en procés i acabat a magatzems lògics.", "Stock records progress and finished moves in logical warehouses.")</li>
                         </ul>
                     </section>
                 </div>
@@ -142,6 +146,30 @@
     private Guid? companyId;
     private ParteAcabadoDetailDto? detail;
     private string errorMessage = string.Empty;
+    private string CurrentPath => NavigationManager.ToBaseRelativePath(NavigationManager.Uri).Split('?', '#')[0];
+    private bool IsSampleManufacturingView => CurrentPath.StartsWith("compras/ordenes-fabricacion-muestras", StringComparison.OrdinalIgnoreCase);
+    private bool IsModelManufacturingView => CurrentPath.StartsWith("compras/ordenes-fabricacion-models", StringComparison.OrdinalIgnoreCase);
+    private string PageTitleText => $"{DocumentTitle} {OrderNumber}";
+    private string DocumentTitle => IsSampleManufacturingView
+        ? L("Orden fabricación muestras", "Ordre fabricació mostres", "Sample manufacturing order")
+        : IsModelManufacturingView
+            ? L("Orden fabricación models", "Ordre fabricació models", "Model manufacturing order")
+            : L("Parte de acabado", "Part d'acabat", "Finish order");
+    private string BackToEditText => IsSampleManufacturingView || IsModelManufacturingView
+        ? L("Volver a la orden", "Tornar a l'ordre", "Back to order")
+        : L("Volver al parte", "Tornar al part", "Back to order");
+    private string BackToEditUrl => IsSampleManufacturingView
+        ? $"/compras/ordenes-fabricacion-muestras/editar/{OrderNumber}"
+        : IsModelManufacturingView
+            ? $"/compras/ordenes-fabricacion-models/editar/{OrderNumber}"
+            : $"/produccion/acabados/editar/{OrderNumber}";
+    private string L(string spanish, string catalan, string english) =>
+        T.CurrentLanguage switch
+        {
+            AppLanguages.Catalan => catalan,
+            AppLanguages.English => english,
+            _ => spanish
+        };
 
     private string DisplayClient => detail is null ? "-" : string.IsNullOrWhiteSpace(detail.ClientName) ? (detail.ClientCode > 0 ? detail.ClientCode.ToString() : "-") : $"{detail.ClientCode} · {detail.ClientName}";
     private string DisplayFinisher => detail is null ? "-" : string.IsNullOrWhiteSpace(detail.FinisherName) ? (detail.FinisherCode > 0 ? detail.FinisherCode.ToString() : "-") : $"{detail.FinisherCode} · {detail.FinisherName}";
@@ -153,8 +181,8 @@
         : string.IsNullOrWhiteSpace(detail.SourceSampleCode)
             ? "-"
             : detail.SourceSampleLineNumber.HasValue
-                ? $"{ParteAcabadoSourceKinds.GetLabel(detail.SourceSampleKind)} {detail.SourceSampleCode} · línea {detail.SourceSampleLineNumber.Value}"
-                : $"{ParteAcabadoSourceKinds.GetLabel(detail.SourceSampleKind)} {detail.SourceSampleCode}";
+                ? $"{GetSourceKindLabel(detail.SourceSampleKind)} {detail.SourceSampleCode} · {L("línea", "línia", "line")} {detail.SourceSampleLineNumber.Value}"
+                : $"{GetSourceKindLabel(detail.SourceSampleKind)} {detail.SourceSampleCode}";
     private int PendingLinesCount => detail?.Lines.Count(item => string.Equals(item.Status, ParteAcabadoStatuses.Pending, StringComparison.OrdinalIgnoreCase)) ?? 0;
     private int InProgressLinesCount => detail?.Lines.Count(item => string.Equals(item.Status, ParteAcabadoStatuses.InProgress, StringComparison.OrdinalIgnoreCase)) ?? 0;
     private int FinishedLinesCount => detail?.Lines.Count(item => string.Equals(item.Status, ParteAcabadoStatuses.Finished, StringComparison.OrdinalIgnoreCase)) ?? 0;
@@ -183,13 +211,20 @@
         }
     }
 
-    private static string GetStatusLabel(string status) => status switch
+    private string GetStatusLabel(string status) => status switch
     {
-        ParteAcabadoStatuses.Pending => "Pendiente",
-        ParteAcabadoStatuses.InProgress => "En proceso",
-        ParteAcabadoStatuses.Finished => "Terminado",
-        ParteAcabadoStatuses.Cancelled => "Anulado",
+        ParteAcabadoStatuses.Pending => L("Pendiente", "Pendent", "Pending"),
+        ParteAcabadoStatuses.InProgress => L("En proceso", "En procés", "In progress"),
+        ParteAcabadoStatuses.Finished => L("Terminado", "Acabat", "Finished"),
+        ParteAcabadoStatuses.Cancelled => L("Anulado", "Anul·lat", "Cancelled"),
         _ => status
+    };
+
+    private string GetSourceKindLabel(string? sourceKind) => ParteAcabadoSourceKinds.Normalize(sourceKind, hasLinkedSource: true) switch
+    {
+        ParteAcabadoSourceKinds.Complement => L("Complemento", "Complement", "Complement"),
+        ParteAcabadoSourceKinds.Model => L("Model", "Model", "Model"),
+        _ => L("Muestra", "Mostra", "Sample")
     };
 
     private static string DisplayValue(string? value) => string.IsNullOrWhiteSpace(value) ? "-" : value;

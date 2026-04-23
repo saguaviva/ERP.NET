@@ -5,14 +5,15 @@
 @inject ILeadCaptureService LeadCaptureService
 @inject IDemoAccessService DemoAccessService
 @inject IAuditLogService AuditLogService
+@inject AppText T
 
-<PageTitle>Plataforma</PageTitle>
+<PageTitle>@L("Plataforma", "Plataforma", "Platform")</PageTitle>
 
 <div class="page-header">
     <div>
-        <p class="eyebrow">Platform Admin</p>
-        <h1>Tenants, companies y usuarios</h1>
-        <p class="lead">Backoffice inicial para alta manual, pricing asistido y gobierno multiempresa.</p>
+        <p class="eyebrow">@L("Platform Admin", "Platform Admin", "Platform Admin")</p>
+        <h1>@L("Tenants, empresas y usuarios", "Tenants, empreses i usuaris", "Tenants, companies, and users")</h1>
+        <p class="lead">@L("Backoffice inicial para alta manual, pricing asistido y gobierno multiempresa.", "Backoffice inicial per a alta manual, pricing assistit i govern multiempresa.", "Initial back office for manual onboarding, assisted pricing, and multi-company governance.")</p>
     </div>
 </div>
 
@@ -23,46 +24,46 @@
 
 <div class="admin-grid">
     <section class="panel">
-        <h2>Nuevo tenant</h2>
+        <h2>@L("Nuevo tenant", "Nou tenant", "New tenant")</h2>
         <EditForm Model="tenantForm" OnValidSubmit="CreateTenantAsync">
             <div class="stack">
                 <label class="field">
-                    <span>Nombre</span>
+                    <span>@L("Nombre", "Nom", "Name")</span>
                     <InputText class="text-input" @bind-Value="tenantForm.Name" />
                 </label>
                 <label class="field">
-                    <span>Slug</span>
+                    <span>@L("Slug", "Slug", "Slug")</span>
                     <InputText class="text-input" @bind-Value="tenantForm.Slug" />
                 </label>
                 <div class="field">
-                    <span>Companies iniciales</span>
+                    <span>@L("Empresas iniciales", "Empreses inicials", "Initial companies")</span>
                     <div class="stack">
                         @for (var index = 0; index < tenantForm.InitialCompanies.Count; index++)
                         {
                             var company = tenantForm.InitialCompanies[index];
                             <section class="panel">
                                 <div class="panel-header">
-                                    <strong>Company @(index + 1)</strong>
+                                    <strong>@L($"Empresa {index + 1}", $"Empresa {index + 1}", $"Company {index + 1}")</strong>
                                     @if (tenantForm.InitialCompanies.Count > 1)
                                     {
-                                        <button class="secondary-button" type="button" @onclick="() => RemoveTenantInitialCompany(index)">Quitar</button>
+                                        <button class="secondary-button" type="button" @onclick="() => RemoveTenantInitialCompany(index)">@L("Quitar", "Treure", "Remove")</button>
                                     }
                                 </div>
                                 <div class="stack">
                                     <label class="field">
-                                        <span>Nombre</span>
+                                        <span>@L("Nombre", "Nom", "Name")</span>
                                         <InputText class="text-input" @bind-Value="company.Name" />
                                     </label>
                                     <label class="field">
-                                        <span>Slug</span>
+                                        <span>@L("Slug", "Slug", "Slug")</span>
                                         <InputText class="text-input" @bind-Value="company.Slug" />
                                     </label>
                                     <label class="field">
-                                        <span>Centro legacy</span>
+                                        <span>@L("Centro legacy", "Centre legacy", "Legacy center")</span>
                                         @if (GetLegacyCentersForTenantInitialCompany(company).Any())
                                         {
                                             <InputSelect class="text-input" @bind-Value="company.LegacyCenterCode">
-                                                <option value="">Selecciona centro legacy</option>
+                                                <option value="">@L("Selecciona centro legacy", "Selecciona centre legacy", "Select legacy center")</option>
                                                 @foreach (var center in GetLegacyCentersForTenantInitialCompany(company))
                                                 {
                                                     <option value="@center.Code">@FormatLegacyCenter(center)</option>
@@ -78,22 +79,22 @@
                             </section>
                         }
                     </div>
-                    <button class="secondary-button" type="button" @onclick="AddTenantInitialCompany">Añadir company inicial</button>
-                    <p class="muted">Opcional, pero muy útil para arrancar un grupo empresarial con varios centros de una vez.</p>
+                    <button class="secondary-button" type="button" @onclick="AddTenantInitialCompany">@L("Añadir empresa inicial", "Afegir empresa inicial", "Add initial company")</button>
+                    <p class="muted">@L("Opcional, pero muy útil para arrancar un grupo empresarial con varios centros de una vez.", "Opcional, però molt útil per arrencar un grup empresarial amb diversos centres d'una vegada.", "Optional, but very useful to bootstrap a business group with several centers at once.")</p>
                 </div>
-                <button class="primary-button" type="submit">Crear tenant</button>
+                <button class="primary-button" type="submit">@L("Crear tenant", "Crear tenant", "Create tenant")</button>
             </div>
         </EditForm>
     </section>
 
     <section class="panel">
-        <h2>Nueva company</h2>
+        <h2>@L("Nueva empresa", "Nova empresa", "New company")</h2>
         <EditForm Model="companyForm" OnValidSubmit="CreateCompanyAsync">
             <div class="stack">
                 <label class="field">
-                    <span>Tenant</span>
+                    <span>@L("Tenant", "Tenant", "Tenant")</span>
                     <InputSelect class="text-input" @bind-Value="companyForm.TenantId" @onchange="OnCompanyTenantChanged">
-                        <option value="">Selecciona tenant</option>
+                        <option value="">@L("Selecciona tenant", "Selecciona tenant", "Select tenant")</option>
                         @foreach (var tenant in tenants)
                         {
                             <option value="@tenant.Id">@tenant.Name</option>
@@ -101,19 +102,19 @@
                     </InputSelect>
                 </label>
                 <label class="field">
-                    <span>Nombre</span>
+                    <span>@L("Nombre", "Nom", "Name")</span>
                     <InputText class="text-input" @bind-Value="companyForm.Name" />
                 </label>
                 <label class="field">
-                    <span>Slug</span>
+                    <span>@L("Slug", "Slug", "Slug")</span>
                     <InputText class="text-input" @bind-Value="companyForm.Slug" />
                 </label>
                 <label class="field">
-                    <span>Centro legacy</span>
+                    <span>@L("Centro legacy", "Centre legacy", "Legacy center")</span>
                     @if (GetAvailableLegacyCentersForSelectedTenant().Any())
                     {
                         <InputSelect class="text-input" @bind-Value="companyForm.LegacyCenterCode">
-                            <option value="">Selecciona centro legacy</option>
+                            <option value="">@L("Selecciona centro legacy", "Selecciona centre legacy", "Select legacy center")</option>
                             @foreach (var center in GetAvailableLegacyCentersForSelectedTenant())
                             {
                                 <option value="@center.Code">@FormatLegacyCenter(center)</option>
@@ -125,20 +126,20 @@
                         <InputText class="text-input" @bind-Value="companyForm.LegacyCenterCode" />
                     }
                 </label>
-                <p class="muted">Cada company del mismo tenant debe usar un centro legacy distinto. Si no aparecen centros, puedes escribir el codi manualmente.</p>
-                <button class="primary-button" type="submit">Crear company</button>
+                <p class="muted">@L("Cada empresa del mismo tenant debe usar un centro legacy distinto. Si no aparecen centros, puedes escribir el código manualmente.", "Cada empresa del mateix tenant ha d'usar un centre legacy diferent. Si no apareixen centres, pots escriure el codi manualment.", "Each company in the same tenant must use a different legacy center. If no centers appear, you can type the code manually.")</p>
+                <button class="primary-button" type="submit">@L("Crear empresa", "Crear empresa", "Create company")</button>
             </div>
         </EditForm>
     </section>
 
     <section class="panel">
-        <h2>Nuevo usuario</h2>
+        <h2>@L("Nuevo usuario", "Nou usuari", "New user")</h2>
         <EditForm Model="userForm" OnValidSubmit="CreateUserAsync">
             <div class="stack">
                 <label class="field">
-                    <span>Tenant</span>
+                    <span>@L("Tenant", "Tenant", "Tenant")</span>
                     <InputSelect class="text-input" @bind-Value="userForm.TenantId" @onchange="OnUserTenantChanged">
-                        <option value="">Selecciona tenant</option>
+                        <option value="">@L("Selecciona tenant", "Selecciona tenant", "Select tenant")</option>
                         @foreach (var tenant in tenants)
                         {
                             <option value="@tenant.Id">@tenant.Name</option>
@@ -146,19 +147,19 @@
                     </InputSelect>
                 </label>
                 <label class="field">
-                    <span>Nombre</span>
+                    <span>@L("Nombre", "Nom", "Name")</span>
                     <InputText class="text-input" @bind-Value="userForm.DisplayName" />
                 </label>
                 <label class="field">
-                    <span>Email</span>
+                        <span>@L("Email", "Email", "Email")</span>
                     <InputText class="text-input" @bind-Value="userForm.Email" />
                 </label>
                 <label class="field">
-                    <span>Contraseña</span>
+                    <span>@L("Contraseña", "Contrasenya", "Password")</span>
                     <InputText class="text-input" @bind-Value="userForm.Password" />
                 </label>
                 <div class="field">
-                    <span>Companies</span>
+                    <span>@L("Empresas", "Empreses", "Companies")</span>
                     <div class="checkbox-list">
                         @foreach (var company in GetCompaniesForUserTenant())
                         {
@@ -170,7 +171,7 @@
                     </div>
                 </div>
                 <div class="field">
-                    <span>Roles</span>
+                    <span>@L("Roles", "Rols", "Roles")</span>
                     <div class="checkbox-list">
                         @foreach (var role in PlatformRoles.All.Where(role => role != PlatformRoles.PlatformAdmin))
                         {
@@ -181,17 +182,17 @@
                         }
                     </div>
                 </div>
-                <button class="primary-button" type="submit">Crear usuario</button>
+                <button class="primary-button" type="submit">@L("Crear usuario", "Crear usuari", "Create user")</button>
             </div>
         </EditForm>
     </section>
 
     <section class="panel">
-        <h2>Leads recientes</h2>
+        <h2>@L("Leads recientes", "Leads recents", "Recent leads")</h2>
         <div class="list-block">
             @if (recentLeads.Count == 0)
             {
-                <p class="muted">Todavía no hay leads registrados.</p>
+                <p class="muted">@L("Todavía no hay leads registrados.", "Encara no hi ha leads registrats.", "There are no leads registered yet.")</p>
             }
             else
             {
@@ -210,11 +211,11 @@
 
 <div class="admin-grid">
     <section class="panel">
-        <h2>Solicitudes de acceso demo</h2>
+        <h2>@L("Solicitudes de acceso demo", "Sol·licituds d'accés demo", "Demo access requests")</h2>
         <div class="list-block">
             @if (recentDemoAccessRequests.Count == 0)
             {
-                <p class="muted">Todavía no hay solicitudes de acceso a demo.</p>
+                <p class="muted">@L("Todavía no hay solicitudes de acceso a demo.", "Encara no hi ha sol·licituds d'accés a demo.", "There are no demo access requests yet.")</p>
             }
             else
             {
@@ -223,17 +224,17 @@
                     <article class="list-item">
                         <strong>@request.CompanyName</strong>
                         <span>@request.ContactName · @request.Email</span>
-                        <span>@request.RequestedUsers usuarios · Estado @request.Status</span>
+                        <span>@L($"{request.RequestedUsers} usuarios · Estado {request.Status}", $"{request.RequestedUsers} usuaris · Estat {request.Status}", $"{request.RequestedUsers} users · Status {request.Status}")</span>
                         @if (request.RequestedTesterEmails.Length > 0)
                         {
-                            <span>Testers pedidos: @string.Join(", ", request.RequestedTesterEmails)</span>
+                            <span>@L("Testers pedidos", "Testers demanats", "Requested testers"): @string.Join(", ", request.RequestedTesterEmails)</span>
                         }
                         @if (!string.IsNullOrWhiteSpace(request.Message))
                         {
                             <span>@request.Message</span>
                         }
                         <div class="quick-links">
-                            <button class="secondary-button" type="button" @onclick="() => CreateInvitesFromRequestAsync(request)">Invitar emails solicitados</button>
+                            <button class="secondary-button" type="button" @onclick="() => CreateInvitesFromRequestAsync(request)">@L("Invitar emails solicitados", "Convidar emails sol·licitats", "Invite requested emails")</button>
                         </div>
                     </article>
                 }
@@ -242,33 +243,33 @@
     </section>
 
     <section class="panel">
-        <h2>Invitaciones demo</h2>
+        <h2>@L("Invitaciones demo", "Invitacions demo", "Demo invites")</h2>
         <EditForm Model="demoInviteForm" OnValidSubmit="CreateManualPreviewInviteAsync">
             <div class="stack">
                 <label class="field">
-                    <span>Email</span>
+                        <span>@L("Email", "Email", "Email")</span>
                     <InputText class="text-input" @bind-Value="demoInviteForm.Email" />
                 </label>
                 <label class="field">
-                    <span>Nombre</span>
+                    <span>@L("Nombre", "Nom", "Name")</span>
                     <InputText class="text-input" @bind-Value="demoInviteForm.DisplayName" />
                 </label>
                 <label class="field">
-                    <span>Empresa o grupo</span>
+                    <span>@L("Empresa o grupo", "Empresa o grup", "Company or group")</span>
                     <InputText class="text-input" @bind-Value="demoInviteForm.CompanyName" />
                 </label>
                 <label class="field">
-                    <span>Notas</span>
+                    <span>@L("Notas", "Notes", "Notes")</span>
                     <InputTextArea class="text-area" @bind-Value="demoInviteForm.Notes" />
                 </label>
-                <button class="primary-button" type="submit">Crear invitación</button>
+                <button class="primary-button" type="submit">@L("Crear invitación", "Crear invitació", "Create invite")</button>
             </div>
         </EditForm>
 
         <div class="list-block">
             @if (previewInvites.Count == 0)
             {
-                <p class="muted">Todavía no hay invitaciones creadas.</p>
+                <p class="muted">@L("Todavía no hay invitaciones creadas.", "Encara no hi ha invitacions creades.", "There are no invites created yet.")</p>
             }
             else
             {
@@ -276,16 +277,16 @@
                 {
                     <article class="list-item">
                         <strong>@invite.Email</strong>
-                        <span>@(string.IsNullOrWhiteSpace(invite.DisplayName) ? "Sin nombre" : invite.DisplayName)</span>
-                        <span>@(string.IsNullOrWhiteSpace(invite.CompanyName) ? "Sin empresa" : invite.CompanyName)</span>
-                        <span class="status-pill @(invite.IsActive ? "success" : "warning")">@(invite.IsActive ? "Activa" : "Pausada")</span>
+                        <span>@(string.IsNullOrWhiteSpace(invite.DisplayName) ? L("Sin nombre", "Sense nom", "No name") : invite.DisplayName)</span>
+                        <span>@(string.IsNullOrWhiteSpace(invite.CompanyName) ? L("Sin empresa", "Sense empresa", "No company") : invite.CompanyName)</span>
+                        <span class="status-pill @(invite.IsActive ? "success" : "warning")">@(invite.IsActive ? L("Activa", "Activa", "Active") : L("Pausada", "Pausada", "Paused"))</span>
                         @if (!string.IsNullOrWhiteSpace(invite.Notes))
                         {
                             <span>@invite.Notes</span>
                         }
                         <div class="quick-links">
                             <button class="secondary-button" type="button" @onclick="() => TogglePreviewInviteActiveAsync(invite)">
-                                @(invite.IsActive ? "Desactivar" : "Reactivar")
+                                @(invite.IsActive ? L("Desactivar", "Desactivar", "Deactivate") : L("Reactivar", "Reactivar", "Reactivate"))
                             </button>
                         </div>
                     </article>
@@ -297,7 +298,7 @@
 
 <div class="admin-grid">
     <section class="panel">
-        <h2>Tenants</h2>
+        <h2>@L("Tenants", "Tenants", "Tenants")</h2>
         <div class="list-block">
             @foreach (var tenant in tenants)
             {
@@ -310,25 +311,25 @@
     </section>
 
     <section class="panel">
-        <h2>Companies</h2>
+        <h2>@L("Empresas", "Empreses", "Companies")</h2>
         <div class="list-block">
             @foreach (var company in companies)
             {
                 <article class="list-item">
                     <strong>@company.Name</strong>
                     <span>@GetTenantName(company.TenantId) · @company.LegacyCenterCode · @company.Slug</span>
-                    <span>@(company.IsActive ? "Activa" : "Inactiva")</span>
+                    <span>@(company.IsActive ? L("Activa", "Activa", "Active") : L("Inactiva", "Inactiva", "Inactive"))</span>
                     <div class="quick-links">
                         @if (editingCompanyId == company.Id)
                         {
                             <button class="secondary-button" type="button" @onclick="() => SaveCompanyLegacyCenterAsync(company)" disabled="@RequiresCompanyChangeConfirmation(company)">
-                                Guardar centro
+                                @L("Guardar centro", "Desar centre", "Save center")
                             </button>
-                            <button class="secondary-button" type="button" @onclick="CancelCompanyEdit">Cancelar</button>
+                            <button class="secondary-button" type="button" @onclick="CancelCompanyEdit">@L("Cancelar", "Cancel·lar", "Cancel")</button>
                         }
                         else
                         {
-                            <button class="secondary-button" type="button" @onclick="() => BeginCompanyEditAsync(company)">Cambiar centro</button>
+                            <button class="secondary-button" type="button" @onclick="() => BeginCompanyEditAsync(company)">@L("Cambiar centro", "Canviar centre", "Change center")</button>
                         }
                     </div>
                 </article>
@@ -336,13 +337,13 @@
                 @if (editingCompanyId == company.Id)
                 {
                     <article class="list-item">
-                        <strong>Centro legacy para @company.Name</strong>
+                        <strong>@L($"Centro legacy para {company.Name}", $"Centre legacy per a {company.Name}", $"Legacy center for {company.Name}")</strong>
                         <label class="field">
-                            <span>Centro legacy</span>
+                            <span>@L("Centro legacy", "Centre legacy", "Legacy center")</span>
                             @if (GetLegacyCentersForCompanyEdit(company).Any())
                             {
                                 <InputSelect class="text-input" @bind-Value="editingCompanyLegacyCenterCode">
-                                    <option value="">Selecciona centro legacy</option>
+                                    <option value="">@L("Selecciona centro legacy", "Selecciona centre legacy", "Select legacy center")</option>
                                     @foreach (var center in GetLegacyCentersForCompanyEdit(company))
                                     {
                                         <option value="@center.Code">@FormatLegacyCenter(center)</option>
@@ -354,21 +355,21 @@
                                 <InputText class="text-input" @bind-Value="editingCompanyLegacyCenterCode" />
                             }
                         </label>
-                        <p class="muted">El cambio afecta al centro legacy que usará esta company en los módulos migrados.</p>
+                        <p class="muted">@L("El cambio afecta al centro legacy que usará esta empresa en los módulos migrados.", "El canvi afecta el centre legacy que farà servir aquesta empresa als mòduls migrats.", "This change affects the legacy center this company will use in migrated modules.")</p>
                         @if (editingCompanyImpact is not null && editingCompanyImpact.HasUsage)
                         {
                             <div class="alert danger">
-                                <strong>Impacto detectado</strong>
-                                <span>Usuarios asignados: @editingCompanyImpact.AssignedUsersCount</span>
-                                <span>Clientes en centro actual: @editingCompanyImpact.ClientCount</span>
-                                <span>Proveedores en centro actual: @editingCompanyImpact.SupplierCount</span>
-                                <span>Compras en centro actual: @editingCompanyImpact.PurchaseDocumentCount</span>
-                                <span>Ventas en centro actual: @editingCompanyImpact.SalesDocumentCount</span>
-                                <span>Eventos auditados: @editingCompanyImpact.AuditEventCount</span>
+                                <strong>@L("Impacto detectado", "Impacte detectat", "Impact detected")</strong>
+                                <span>@L("Usuarios asignados", "Usuaris assignats", "Assigned users"): @editingCompanyImpact.AssignedUsersCount</span>
+                                <span>@L("Clientes en centro actual", "Clients al centre actual", "Clients in current center"): @editingCompanyImpact.ClientCount</span>
+                                <span>@L("Proveedores en centro actual", "Proveïdors al centre actual", "Suppliers in current center"): @editingCompanyImpact.SupplierCount</span>
+                                <span>@L("Compras en centro actual", "Compres al centre actual", "Purchases in current center"): @editingCompanyImpact.PurchaseDocumentCount</span>
+                                <span>@L("Ventas en centro actual", "Vendes al centre actual", "Sales in current center"): @editingCompanyImpact.SalesDocumentCount</span>
+                                <span>@L("Eventos auditados", "Esdeveniments auditats", "Audited events"): @editingCompanyImpact.AuditEventCount</span>
                             </div>
                             <label class="checkbox-field">
                                 <input type="checkbox" @bind="confirmCompanyLegacyCenterChange" />
-                                <span>Confirmo que quiero cambiar el centro legacy de esta company aunque ya tenga uso real.</span>
+                                <span>@L("Confirmo que quiero cambiar el centro legacy de esta empresa aunque ya tenga uso real.", "Confirmo que vull canviar el centre legacy d'aquesta empresa encara que ja tingui ús real.", "I confirm that I want to change the legacy center of this company even if it already has real usage.")</span>
                             </label>
                         }
                     </article>
@@ -378,14 +379,14 @@
     </section>
 
     <section class="panel">
-        <h2>Usuarios</h2>
+        <h2>@L("Usuarios", "Usuaris", "Users")</h2>
         <div class="list-block">
             @foreach (var user in users)
             {
                 <article class="list-item">
                     <strong>@user.DisplayName</strong>
                     <span>@user.Email</span>
-                    <span>@(user.IsActive ? "Activo" : "Inactivo")</span>
+                    <span>@(user.IsActive ? L("Activo", "Actiu", "Active") : L("Inactivo", "Inactiu", "Inactive"))</span>
                     <span>@GetTenantName(user.TenantId)</span>
                     <span>@FormatUserCompanies(user)</span>
                     <span>@string.Join(", ", user.Roles)</span>
@@ -394,27 +395,27 @@
                         {
                             @if (editingUserId == user.Id)
                             {
-                                <button class="secondary-button" type="button" @onclick="() => SaveUserAccessAsync(user)">Guardar permisos</button>
-                                <button class="secondary-button" type="button" @onclick="CancelUserEdit">Cancelar</button>
+                                <button class="secondary-button" type="button" @onclick="() => SaveUserAccessAsync(user)">@L("Guardar permisos", "Desar permisos", "Save permissions")</button>
+                                <button class="secondary-button" type="button" @onclick="CancelUserEdit">@L("Cancelar", "Cancel·lar", "Cancel")</button>
                             }
                             else
                             {
-                                <button class="secondary-button" type="button" @onclick="() => BeginUserEdit(user)">Editar accesos</button>
+                                <button class="secondary-button" type="button" @onclick="() => BeginUserEdit(user)">@L("Editar accesos", "Editar accessos", "Edit access")</button>
                             }
                         }
 
                         @if (passwordEditorUserId == user.Id)
                         {
-                            <button class="secondary-button" type="button" @onclick="() => SaveUserPasswordAsync(user)">Guardar contraseña</button>
-                            <button class="secondary-button" type="button" @onclick="CancelPasswordEdit">Cancelar contraseña</button>
+                            <button class="secondary-button" type="button" @onclick="() => SaveUserPasswordAsync(user)">@L("Guardar contraseña", "Desar contrasenya", "Save password")</button>
+                            <button class="secondary-button" type="button" @onclick="CancelPasswordEdit">@L("Cancelar contraseña", "Cancel·lar contrasenya", "Cancel password")</button>
                         }
                         else
                         {
-                            <button class="secondary-button" type="button" @onclick="() => BeginPasswordEdit(user)">Cambiar contraseña</button>
+                            <button class="secondary-button" type="button" @onclick="() => BeginPasswordEdit(user)">@L("Cambiar contraseña", "Canviar contrasenya", "Change password")</button>
                         }
 
                         <button class="secondary-button" type="button" @onclick="() => ToggleUserActiveAsync(user)">
-                            @(user.IsActive ? "Desactivar" : "Activar")
+                            @(user.IsActive ? L("Desactivar", "Desactivar", "Deactivate") : L("Activar", "Activar", "Activate"))
                         </button>
                     </div>
                 </article>
@@ -422,9 +423,9 @@
                 @if (editingUserId == user.Id && user.TenantId.HasValue)
                 {
                     <article class="list-item">
-                        <strong>Editar accesos de @user.DisplayName</strong>
+                        <strong>@L($"Editar accesos de {user.DisplayName}", $"Editar accessos de {user.DisplayName}", $"Edit access for {user.DisplayName}")</strong>
                         <div class="field">
-                            <span>Companies</span>
+                            <span>@L("Empresas", "Empreses", "Companies")</span>
                             <div class="checkbox-list">
                                 @foreach (var company in GetCompaniesForTenant(user.TenantId.Value))
                                 {
@@ -436,7 +437,7 @@
                             </div>
                         </div>
                         <div class="field">
-                            <span>Roles</span>
+                            <span>@L("Roles", "Rols", "Roles")</span>
                             <div class="checkbox-list">
                                 @foreach (var role in PlatformRoles.All.Where(role => role != PlatformRoles.PlatformAdmin))
                                 {
@@ -453,12 +454,12 @@
                 @if (passwordEditorUserId == user.Id)
                 {
                     <article class="list-item">
-                        <strong>Nueva contraseña para @user.DisplayName</strong>
+                        <strong>@L($"Nueva contraseña para {user.DisplayName}", $"Nova contrasenya per a {user.DisplayName}", $"New password for {user.DisplayName}")</strong>
                         <label class="field">
-                            <span>Contraseña nueva</span>
+                            <span>@L("Contraseña nueva", "Contrasenya nova", "New password")</span>
                             <InputText class="text-input" type="password" @bind-Value="passwordEditorValue" />
                         </label>
-                        <p class="muted">Usa al menos 8 caracteres. El cambio se guarda al pulsar “Guardar contraseña”.</p>
+                        <p class="muted">@L("Usa al menos 8 caracteres. El cambio se guarda al pulsar “Guardar contraseña”.", "Fes servir almenys 8 caràcters. El canvi es desa en prémer “Desar contrasenya”.", "Use at least 8 characters. The change is saved when you click “Save password”.")</p>
                     </article>
                 }
             }
@@ -467,11 +468,11 @@
 </div>
 
 <section class="panel">
-    <h2>Actividad reciente</h2>
+    <h2>@L("Actividad reciente", "Activitat recent", "Recent activity")</h2>
     <div class="list-block">
         @if (recentAuditLogs.Count == 0)
         {
-            <p class="muted">Todavía no hay eventos auditados.</p>
+            <p class="muted">@L("Todavía no hay eventos auditados.", "Encara no hi ha esdeveniments auditats.", "There are no audited events yet.")</p>
         }
         else
         {
@@ -493,6 +494,14 @@
 </section>
 
 @code {
+    private string L(string spanish, string catalan, string english) =>
+        T.CurrentLanguage switch
+        {
+            AppLanguages.Catalan => catalan,
+            AppLanguages.English => english,
+            _ => spanish
+        };
+
     private Guid? currentUserId;
     private IReadOnlyCollection<TenantSummaryDto> tenants = [];
     private IReadOnlyCollection<CompanySummaryDto> companies = [];
@@ -561,7 +570,7 @@
             userForm = new UserFormModel { TenantId = tenant.Id };
             await ReloadAsync();
             await LoadLegacyCentersAsync(tenant.Id, selectFirstAvailable: true);
-        }, "Tenant creado correctamente.");
+        }, L("Tenant creado correctamente.", "Tenant creat correctament.", "Tenant created successfully."));
     }
 
     private async Task CreateCompanyAsync()
@@ -581,7 +590,7 @@
             userForm.TenantId = tenantId;
             await ReloadAsync();
             await LoadLegacyCentersAsync(tenantId, selectFirstAvailable: true);
-        }, "Company creada correctamente.");
+        }, L("Empresa creada correctamente.", "Empresa creada correctament.", "Company created successfully."));
     }
 
     private async Task CreateUserAsync()
@@ -599,7 +608,7 @@
             });
             userForm = new UserFormModel();
             await ReloadAsync();
-        }, "Usuario creado correctamente.");
+        }, L("Usuario creado correctamente.", "Usuari creat correctament.", "User created successfully."));
     }
 
     private Task OnUserTenantChanged(ChangeEventArgs _)
@@ -655,17 +664,17 @@
     {
         if (!tenantId.HasValue)
         {
-            return "Plataforma";
+            return L("Plataforma", "Plataforma", "Platform");
         }
 
-        return tenants.FirstOrDefault(tenant => tenant.Id == tenantId.Value)?.Name ?? "Tenant desconocido";
+        return tenants.FirstOrDefault(tenant => tenant.Id == tenantId.Value)?.Name ?? L("Tenant desconocido", "Tenant desconegut", "Unknown tenant");
     }
 
     private string FormatUserCompanies(UserSummaryDto user)
     {
         if (!user.TenantId.HasValue)
         {
-            return "Sin company";
+            return L("Sin empresa", "Sense empresa", "No company");
         }
 
         var names = companies
@@ -673,10 +682,10 @@
             .Select(company => $"{company.Name} ({company.LegacyCenterCode})")
             .ToArray();
 
-        return names.Length == 0 ? "Sin companies asignadas" : string.Join(", ", names);
+        return names.Length == 0 ? L("Sin empresas asignadas", "Sense empreses assignades", "No assigned companies") : string.Join(", ", names);
     }
 
-    private static string FormatAuditActor(AuditLogEntryDto entry)
+    private string FormatAuditActor(AuditLogEntryDto entry)
     {
         if (!string.IsNullOrWhiteSpace(entry.ActorDisplayName) && !string.IsNullOrWhiteSpace(entry.ActorEmail))
         {
@@ -693,10 +702,10 @@
             return entry.ActorEmail;
         }
 
-        return "Actor no disponible";
+        return L("Actor no disponible", "Actor no disponible", "Actor unavailable");
     }
 
-    private static string FormatAuditScope(AuditLogEntryDto entry)
+    private string FormatAuditScope(AuditLogEntryDto entry)
     {
         var scopeParts = new List<string>();
 
@@ -715,7 +724,7 @@
             scopeParts.Add($"Id={entry.EntityId}");
         }
 
-        return scopeParts.Count == 0 ? "Sin alcance" : string.Join(" · ", scopeParts);
+        return scopeParts.Count == 0 ? L("Sin alcance", "Sense abast", "No scope") : string.Join(" · ", scopeParts);
     }
 
     private void ToggleCompany(Guid companyId, object? value)
@@ -781,7 +790,7 @@
 
             CancelUserEdit();
             await ReloadAsync();
-        }, "Accesos del usuario actualizados correctamente.");
+        }, L("Accesos del usuario actualizados correctamente.", "Accessos de l'usuari actualitzats correctament.", "User access updated successfully."));
     }
 
     private void ToggleEditingCompany(Guid companyId, object? value)
@@ -831,7 +840,7 @@
             });
 
             CancelPasswordEdit();
-        }, "Contraseña actualizada correctamente.");
+        }, L("Contraseña actualizada correctamente.", "Contrasenya actualitzada correctament.", "Password updated successfully."));
     }
 
     private async Task ToggleUserActiveAsync(UserSummaryDto user)
@@ -855,7 +864,7 @@
             }
 
             await ReloadAsync();
-        }, user.IsActive ? "Usuario desactivado correctamente." : "Usuario activado correctamente.");
+        }, user.IsActive ? L("Usuario desactivado correctamente.", "Usuari desactivat correctament.", "User deactivated successfully.") : L("Usuario activado correctamente.", "Usuari activat correctament.", "User activated successfully."));
     }
 
     private async Task CreateManualPreviewInviteAsync()
@@ -873,7 +882,7 @@
 
             demoInviteForm = new DemoInviteFormModel();
             await ReloadAsync();
-        }, "Invitación de demo creada correctamente.");
+        }, L("Invitación de demo creada correctamente.", "Invitació de demo creada correctament.", "Demo invite created successfully."));
     }
 
     private async Task CreateInvitesFromRequestAsync(DemoAccessRequestSummaryDto request)
@@ -887,7 +896,7 @@
             });
 
             await ReloadAsync();
-        }, "Acceso de demo concedido a los emails solicitados.");
+        }, L("Acceso de demo concedido a los emails solicitados.", "Accés de demo concedit als emails sol·licitats.", "Demo access granted to the requested emails."));
     }
 
     private async Task TogglePreviewInviteActiveAsync(PreviewInviteSummaryDto invite)
@@ -902,7 +911,7 @@
             });
 
             await ReloadAsync();
-        }, invite.IsActive ? "Invitación de demo desactivada." : "Invitación de demo reactivada.");
+        }, invite.IsActive ? L("Invitación de demo desactivada.", "Invitació de demo desactivada.", "Demo invite deactivated.") : L("Invitación de demo reactivada.", "Invitació de demo reactivada.", "Demo invite reactivated."));
     }
 
     private async Task LoadLegacyCentersAsync(Guid tenantId, bool selectFirstAvailable)
@@ -948,7 +957,7 @@
 
             CancelCompanyEdit();
             await ReloadAsync();
-        }, "Centro legacy actualizado correctamente.");
+        }, L("Centro legacy actualizado correctamente.", "Centre legacy actualitzat correctament.", "Legacy center updated successfully."));
     }
 
     private bool RequiresCompanyChangeConfirmation(CompanySummaryDto company)

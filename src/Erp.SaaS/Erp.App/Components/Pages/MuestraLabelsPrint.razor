@@ -4,19 +4,20 @@
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject IMuestraQueries MuestraQueries
 @inject NavigationManager NavigationManager
+@inject AppText T
 
 <PageTitle>@PageTitleText</PageTitle>
 
 @if (!tenantId.HasValue || !companyId.HasValue)
 {
     <div class="empty-state">
-        <p>Selecciona una empresa activa para imprimir etiquetas del @moduleSingularLower.</p>
+        <p>@L($"Selecciona una empresa activa para imprimir etiquetas del {moduleSingularLower}.", $"Selecciona una empresa activa per imprimir etiquetes del {moduleSingularLower}.", $"Select an active company to print labels for the {moduleSingularLower}.")</p>
     </div>
 }
 else if (detail is null)
 {
     <div class="empty-state">
-        <p>No se ha encontrado el @moduleSingularLower solicitado.</p>
+        <p>@L($"No se ha encontrado el {moduleSingularLower} solicitado.", $"No s'ha trobat el {moduleSingularLower} sol·licitat.", $"The requested {moduleSingularLower} could not be found.")</p>
     </div>
 }
 else
@@ -25,12 +26,12 @@ else
         <header class="print-sheet-header">
             <div>
                 <p class="eyebrow">@EyebrowText</p>
-                <h1>@($"{(IsComplementMode ? "Etiquetas complemento" : "Etiquetas muestra")} · {detail.Code}")</h1>
+                <h1>@($"{(IsComplementMode ? L("Etiquetas complemento", "Etiquetes complement", "Complement labels") : L("Etiquetas muestra", "Etiquetes mostra", "Sample labels"))} · {detail.Code}")</h1>
                 <p>@detail.Description</p>
             </div>
             <div class="print-sheet-meta">
                 <span>@DisplayClient</span>
-                <span>@($"{detail.Lines.Count} etiquetas")</span>
+                <span>@($"{detail.Lines.Count} {L("etiquetas", "etiquetes", "labels")}")</span>
             </div>
         </header>
 
@@ -44,7 +45,7 @@ else
                     <span>@DisplayLineDescription(line)</span>
                     <span>@DisplayLineClient(line)</span>
                     <span>NC: @DisplayNcCode(line)</span>
-                    <span>Venta: @line.SalePrice.ToString("0.00##")</span>
+                    <span>@L("Venta", "Venda", "Sale"): @line.SalePrice.ToUiString("0.00##")</span>
                 </article>
             }
         </div>
@@ -59,13 +60,20 @@ else
     private Guid? companyId;
     private MuestraDetailDto? detail;
     private bool IsComplementMode => NavigationManager.Uri.Contains("/articulos/complementos", StringComparison.OrdinalIgnoreCase);
-    private string moduleSingularLower => IsComplementMode ? "complemento" : "muestra";
-    private string EyebrowText => IsComplementMode ? "ARTÍCULOS / COMPLEMENTOS" : "ARTÍCULOS / MUESTRAS";
-    private string PageTitleText => $"{(IsComplementMode ? "Etiquetas complemento" : "Etiquetas muestra")} {Code}";
+    private string moduleSingularLower => IsComplementMode ? L("complemento", "complement", "complement") : L("muestra", "mostra", "sample");
+    private string EyebrowText => IsComplementMode ? L("ARTÍCULOS / COMPLEMENTOS", "ARTICLES / COMPLEMENTS", "ARTICLES / COMPLEMENTS") : L("ARTÍCULOS / MUESTRAS", "ARTICLES / MOSTRES", "ARTICLES / SAMPLES");
+    private string PageTitleText => $"{(IsComplementMode ? L("Etiquetas complemento", "Etiquetes complement", "Complement labels") : L("Etiquetas muestra", "Etiquetes mostra", "Sample labels"))} {Code}";
+    private string L(string spanish, string catalan, string english) =>
+        T.CurrentLanguage switch
+        {
+            AppLanguages.Catalan => catalan,
+            AppLanguages.English => english,
+            _ => spanish
+        };
 
     private string DisplayClient => detail is null
         ? string.Empty
-        : !string.IsNullOrWhiteSpace(detail.ClientName) ? detail.ClientName : $"Cliente {detail.ClientCode}";
+        : !string.IsNullOrWhiteSpace(detail.ClientName) ? detail.ClientName : $"{L("Cliente", "Client", "Customer")} {detail.ClientCode}";
 
     protected override async Task OnParametersSetAsync()
     {
@@ -82,22 +90,22 @@ else
         detail = await MuestraQueries.GetByCodeAsync(tenantId.Value, companyId.Value, Uri.UnescapeDataString(Code));
     }
 
-    private static string BuildSizeLabel(MuestraLineDto line)
+    private string BuildSizeLabel(MuestraLineDto line)
     {
         var values = new[] { Normalize(line.SizeCode), Normalize(line.SizeHigh), Normalize(line.SizeLow) }
             .Where(value => !string.IsNullOrWhiteSpace(value))
             .ToArray();
-        return values.Length == 0 ? "Sin talla" : string.Join(" · ", values);
+        return values.Length == 0 ? L("Sin talla", "Sense talla", "No size") : string.Join(" · ", values);
     }
 
-    private static string DisplayLineDescription(MuestraLineDto line) =>
-        string.IsNullOrWhiteSpace(line.Description) ? "Sin descripción" : line.Description;
+    private string DisplayLineDescription(MuestraLineDto line) =>
+        string.IsNullOrWhiteSpace(line.Description) ? L("Sin descripción", "Sense descripció", "No description") : line.Description;
 
-    private static string DisplayColor(MuestraLineDto line) =>
-        string.IsNullOrWhiteSpace(line.Color) ? "Sin color" : line.Color;
+    private string DisplayColor(MuestraLineDto line) =>
+        string.IsNullOrWhiteSpace(line.Color) ? L("Sin color", "Sense color", "No color") : line.Color;
 
-    private static string DisplayLineClient(MuestraLineDto line) =>
-        !string.IsNullOrWhiteSpace(line.ClientName) ? line.ClientName : (line.ClientCode > 0 ? $"Cliente {line.ClientCode}" : "-");
+    private string DisplayLineClient(MuestraLineDto line) =>
+        !string.IsNullOrWhiteSpace(line.ClientName) ? line.ClientName : (line.ClientCode > 0 ? $"{L("Cliente", "Client", "Customer")} {line.ClientCode}" : "-");
 
     private static string DisplayNcCode(MuestraLineDto line) =>
         string.IsNullOrWhiteSpace(line.NcCode) ? "-" : line.NcCode;

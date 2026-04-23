@@ -7,26 +7,27 @@
 @inject IDisposicionQueries DisposicionQueries
 @inject IDisposicionService DisposicionService
 @inject NavigationManager NavigationManager
+@inject AppText T
 
-<PageTitle>@(Code.HasValue ? $"Editar disposición {Code}" : "Nueva disposición")</PageTitle>
+<PageTitle>@(Code.HasValue ? $"{L("Editar disposición", "Editar disposició", "Edit disposition")} {Code}" : L("Nueva disposición", "Nova disposició", "New disposition"))</PageTitle>
 
 <div class="page-header">
     <div>
-        <p class="eyebrow">ARTÍCULOS</p>
-        <h1>@(Code.HasValue ? $"Editar disposición {Code}" : "Nueva disposición")</h1>
+        <p class="eyebrow">@L("ARTÍCULOS", "ARTICLES", "ARTICLES")</p>
+        <h1>@(Code.HasValue ? $"{L("Editar disposición", "Editar disposició", "Edit disposition")} {Code}" : L("Nueva disposición", "Nova disposició", "New disposition"))</h1>
         <p class="lead">@(isLegacySyncActive
-            ? "Edición sobre la SaaS local. La importación manual desde legacy refresca solo registros marcados como legacy."
-            : "Alta y edición sobre la réplica local de disposiciones, filtrada por la empresa activa.")</p>
+            ? L("Edición sobre la SaaS local. La importación manual desde legacy refresca solo registros marcados como legacy.", "Edició sobre la SaaS local. La importació manual des de legacy refresca només registres marcats com a legacy.", "Editing on the local SaaS copy. Manual import from legacy refreshes only records marked as legacy.")
+            : L("Alta y edición sobre la réplica local de disposiciones, filtrada por la empresa activa.", "Alta i edició sobre la rèplica local de disposicions, filtrada per l'empresa activa.", "Create and edit on the local dispositions replica, filtered by the active company."))</p>
     </div>
     <div class="quick-links">
-        <a class="secondary-button link-button" href="/articulos/disposiciones">Volver al listado</a>
+        <a class="secondary-button link-button" href="/articulos/disposiciones">@L("Volver al listado", "Tornar al llistat", "Back to list")</a>
         @if (Code.HasValue)
         {
             @if (canEdit && !model.IsCancelled)
             {
-                <a class="secondary-button link-button" href="@BuildParteAcabadoUrl()">Crear parte de acabado</a>
+                <a class="secondary-button link-button" href="@BuildParteAcabadoUrl()">@L("Crear parte de acabado", "Crear part d'acabat", "Create finish order")</a>
             }
-            <a class="secondary-button link-button" href="/articulos/disposiciones/@Code/imprimir" target="_blank" rel="noopener noreferrer">Imprimir ficha</a>
+            <a class="secondary-button link-button" href="/articulos/disposiciones/@Code/imprimir" target="_blank" rel="noopener noreferrer">@L("Imprimir ficha", "Imprimir fitxa", "Print sheet")</a>
         }
     </div>
 </div>
@@ -34,7 +35,7 @@
 @if (!tenantId.HasValue || !companyId.HasValue)
 {
     <div class="empty-state">
-        <p>No hay empresa activa seleccionada.</p>
+        <p>@L("No hay empresa activa seleccionada.", "No hi ha cap empresa activa seleccionada.", "There is no active company selected.")</p>
     </div>
 }
 else
@@ -47,9 +48,9 @@ else
     @if (isLegacySyncActive)
     {
         <div class="alert">
-            Artículos / Disposiciones está en convivencia con legacy para esta empresa.
-            Esta ficha guarda cambios solo en la SaaS local y la sync manual refresca únicamente registros de origen legacy.
-            Guardar una disposición sincronizada la convierte en local.
+            @L("Artículos / Disposiciones está en convivencia con legacy para esta empresa.", "Articles / Disposicions està en convivència amb legacy per a aquesta empresa.", "Articles / Dispositions is running in coexistence with legacy for this company.")
+            @L("Esta ficha guarda cambios solo en la SaaS local y la sync manual refresca únicamente registros de origen legacy.", "Aquesta fitxa desa canvis només a la SaaS local i la sync manual refresca únicament registres d'origen legacy.", "This sheet saves changes only in the local SaaS and manual sync refreshes only legacy-origin records.")
+            @L("Guardar una disposición sincronizada la convierte en local.", "Desar una disposició sincronitzada la converteix en local.", "Saving a synced disposition converts it to local.")
             @if (!string.IsNullOrWhiteSpace(syncStatusLabel))
             {
                 <span>@syncStatusLabel</span>
@@ -60,30 +61,30 @@ else
     @if (!canEdit && !Code.HasValue)
     {
         <div class="alert">
-            No tienes permisos de edición para crear disposiciones nuevas en esta empresa.
+            @L("No tienes permisos de edición para crear disposiciones nuevas en esta empresa.", "No tens permisos d'edició per crear disposicions noves en aquesta empresa.", "You do not have edit permissions to create new dispositions in this company.")
         </div>
     }
 
     <section class="card-grid">
         <article class="info-card">
-            <p class="eyebrow">Número visible</p>
+            <p class="eyebrow">@L("Número visible", "Número visible", "Visible number")</p>
             <h2>@VisibleNumber</h2>
-            <p class="muted">Identificador de trabajo usado en la ficha.</p>
+            <p class="muted">@L("Identificador de trabajo usado en la ficha.", "Identificador de treball usat a la fitxa.", "Work identifier used on this sheet.")</p>
         </article>
         <article class="info-card">
-            <p class="eyebrow">Origen</p>
+            <p class="eyebrow">@L("Origen", "Origen", "Origin")</p>
             <h2>@DisplayOrigin</h2>
-            <p class="muted">Los cambios web pasan a origen local.</p>
+            <p class="muted">@L("Los cambios web pasan a origen local.", "Els canvis web passen a origen local.", "Web changes become local origin.")</p>
         </article>
         <article class="info-card">
-            <p class="eyebrow">Totales</p>
-            <h2>@model.TotalKilograms.ToString("0.##") kg</h2>
-            <p class="muted">@model.TotalPieces.ToString("0.##") piezas · @model.Lines.Count líneas</p>
+            <p class="eyebrow">@L("Totales", "Totals", "Totals")</p>
+            <h2>@model.TotalKilograms.ToUiString("0.##") kg</h2>
+            <p class="muted">@model.TotalPieces.ToUiString("0.##") @L("piezas", "peces", "pieces") · @model.Lines.Count @L("líneas", "línies", "lines")</p>
         </article>
         <article class="info-card">
-            <p class="eyebrow">Estado</p>
+            <p class="eyebrow">@L("Estado", "Estat", "Status")</p>
             <h2>@StatusLabel</h2>
-            <p class="muted">Recepción y anulación de la disposición.</p>
+            <p class="muted">@L("Recepción y anulación de la disposición.", "Recepció i anul·lació de la disposició.", "Receipt and cancellation status of the disposition.")</p>
         </article>
     </section>
 
@@ -91,63 +92,63 @@ else
         <fieldset disabled="@isReadOnly">
             <div class="form-grid" style="margin-top: 1rem;">
                 <label class="field">
-                    <span>Año / serie</span>
+                    <span>@L("Año / serie", "Any / sèrie", "Year / series")</span>
                     <InputText class="text-input" @bind-Value="model.Year" />
                 </label>
                 <label class="field">
-                    <span>Número</span>
+                    <span>@L("Número", "Número", "Number")</span>
                     <InputNumber class="text-input" @bind-Value="model.Number" />
                 </label>
                 <label class="field">
-                    <span>Fecha</span>
+                    <span>@L("Fecha", "Data", "Date")</span>
                     <InputDate TValue="DateTime?" class="text-input" @bind-Value="model.Date" />
                 </label>
                 <label class="field">
-                    <span>Recepción</span>
+                    <span>@L("Recepción", "Recepció", "Receipt")</span>
                     <InputDate TValue="DateTime?" class="text-input" @bind-Value="model.ReceptionDate" />
                 </label>
                 <label class="field">
-                    <span>Cliente</span>
+                    <span>@L("Cliente", "Client", "Customer")</span>
                     <InputNumber class="text-input" @bind-Value="model.ClientCode" />
                 </label>
                 <label class="field wide">
-                    <span>Nombre cliente</span>
+                    <span>@L("Nombre cliente", "Nom client", "Customer name")</span>
                     <InputText class="text-input" @bind-Value="model.ClientName" disabled />
                 </label>
                 <label class="field">
-                    <span>Acabador</span>
+                    <span>@L("Acabador", "Acabador", "Finisher")</span>
                     <InputNumber class="text-input" @bind-Value="model.FinisherCode" />
                 </label>
                 <label class="field wide">
-                    <span>Nombre acabador</span>
+                    <span>@L("Nombre acabador", "Nom acabador", "Finisher name")</span>
                     <InputText class="text-input" @bind-Value="model.FinisherName" disabled />
                 </label>
                 <label class="field">
-                    <span>Código cliente</span>
+                    <span>@L("Código cliente", "Codi client", "Customer code")</span>
                     <InputText class="text-input" @bind-Value="model.ClientReferenceCode" />
                 </label>
                 <label class="field">
-                    <span>Color</span>
+                    <span>@L("Color", "Color", "Color")</span>
                     <InputText class="text-input" @bind-Value="model.Color" />
                 </label>
                 <label class="field">
-                    <span>Color cliente</span>
+                    <span>@L("Color cliente", "Color client", "Customer color")</span>
                     <InputText class="text-input" @bind-Value="model.ClientColor" />
                 </label>
                 <label class="field">
-                    <span>Comanda</span>
+                    <span>@L("Comanda", "Comanda", "Order ref.")</span>
                     <InputText class="text-input" @bind-Value="model.OrderReference" />
                 </label>
                 <label class="field checkbox-field">
-                    <span>Recibido</span>
+                    <span>@L("Recibido", "Rebut", "Received")</span>
                     <input type="checkbox" checked="@model.IsReceived" @onchange="OnReceivedChanged" />
                 </label>
                 <label class="field checkbox-field">
-                    <span>Anulada</span>
+                    <span>@L("Anulada", "Anul·lada", "Cancelled")</span>
                     <input type="checkbox" checked="@model.IsCancelled" @onchange="OnCancelledChanged" />
                 </label>
                 <label class="field wide">
-                    <span>Observaciones</span>
+                    <span>@L("Observaciones", "Observacions", "Notes")</span>
                     <InputTextArea class="text-input textarea-input" @bind-Value="model.Notes" />
                 </label>
             </div>
@@ -155,12 +156,12 @@ else
             <section class="panel detail-panel" style="margin-top: 1rem;">
                 <div class="detail-panel-header">
                     <div>
-                        <h2>Líneas de disposición</h2>
-                        <p class="muted">Tejedor, tejido, piezas, kg, acabado y estado por línea.</p>
+                        <h2>@L("Líneas de disposición", "Línies de disposició", "Disposition lines")</h2>
+                        <p class="muted">@L("Tejedor, tejido, piezas, kg, acabado y estado por línea.", "Teixidor, teixit, peces, kg, acabat i estat per línia.", "Weaver, fabric, pieces, kg, finish and status per line.")</p>
                     </div>
                     @if (!isReadOnly)
                     {
-                        <button class="secondary-button" type="button" @onclick="AddLine">Añadir línea</button>
+                        <button class="secondary-button" type="button" @onclick="AddLine">@L("Añadir línea", "Afegir línia", "Add line")</button>
                     }
                 </div>
 
@@ -169,28 +170,28 @@ else
                         <thead>
                             <tr>
                                 <th>#</th>
-                                <th>Descripción</th>
-                                <th>Tejedor</th>
-                                <th>Alb.</th>
-                                <th>Tejido</th>
-                                <th>Composición</th>
-                                <th>Piezas</th>
-                                <th>Total piezas</th>
+                                <th>@L("Descripción", "Descripció", "Description")</th>
+                                <th>@L("Tejedor", "Teixidor", "Weaver")</th>
+                                <th>@L("Alb.", "Alb.", "Ship.")</th>
+                                <th>@L("Tejido", "Teixit", "Fabric")</th>
+                                <th>@L("Composición", "Composició", "Composition")</th>
+                                <th>@L("Piezas", "Peces", "Pieces")</th>
+                                <th>@L("Total piezas", "Total peces", "Total pieces")</th>
                                 <th>Kg</th>
-                                <th>Acabado</th>
-                                <th>Ancho</th>
-                                <th>Gramaje</th>
-                                <th>Rdto.</th>
-                                <th>Servido</th>
-                                <th>Dispuesto</th>
-                                <th>Acciones</th>
+                                <th>@L("Acabado", "Acabat", "Finish")</th>
+                                <th>@L("Ancho", "Ample", "Width")</th>
+                                <th>@L("Gramaje", "Gramatge", "Weight")</th>
+                                <th>@L("Rdto.", "Rdt.", "Yield")</th>
+                                <th>@L("Servido", "Servit", "Served")</th>
+                                <th>@L("Dispuesto", "Disposat", "Prepared")</th>
+                                <th>@L("Acciones", "Accions", "Actions")</th>
                             </tr>
                         </thead>
                         <tbody>
                             @if (model.Lines.Count == 0)
                             {
                                 <tr>
-                                    <td colspan="16" class="muted">No hay líneas cargadas para esta disposición.</td>
+                                    <td colspan="16" class="muted">@L("No hay líneas cargadas para esta disposición.", "No hi ha línies carregades per a aquesta disposició.", "There are no lines loaded for this disposition.")</td>
                                 </tr>
                             }
                             else
@@ -217,12 +218,12 @@ else
                                             <div class="inline-action-list">
                                                 @if (!string.IsNullOrWhiteSpace(line.FabricCode))
                                                 {
-                                                    <a class="inline-link" href="@BuildTejidoUrl(line)">Tejido</a>
-                                                    <a class="inline-link" href="@BuildMovementsUrl(line)">Movs.</a>
+                                                    <a class="inline-link" href="@BuildTejidoUrl(line)">@L("Tejido", "Teixit", "Fabric")</a>
+                                                    <a class="inline-link" href="@BuildMovementsUrl(line)">@L("Movs.", "Movs.", "Moves")</a>
                                                 }
                                                 @if (!isReadOnly)
                                                 {
-                                                    <button class="danger-link" type="button" @onclick="() => RemoveLine(line.LineNumber)">Quitar</button>
+                                                    <button class="danger-link" type="button" @onclick="() => RemoveLine(line.LineNumber)">@L("Quitar", "Treure", "Remove")</button>
                                                 }
                                             </div>
                                         </td>
@@ -237,29 +238,29 @@ else
             <section class="panel" style="margin-top: 1rem;">
                 <div class="detail-panel-header">
                     <div>
-                        <h2>Movimientos de stock generados</h2>
-                        <p class="muted">Comparativa entre lo ya guardado y lo que quedará al guardar esta disposición.</p>
+                        <h2>@L("Movimientos de stock generados", "Moviments d'estoc generats", "Generated stock movements")</h2>
+                        <p class="muted">@L("Comparativa entre lo ya guardado y lo que quedará al guardar esta disposición.", "Comparativa entre allò ja desat i el que quedarà en desar aquesta disposició.", "Comparison between what is already saved and what will remain after saving this disposition.")</p>
                     </div>
                 </div>
 
                 @if (StockMovementSummaries.Count == 0)
                 {
-                    <p class="muted">Todavía no hay movimientos de stock activos en esta disposición.</p>
+                    <p class="muted">@L("Todavía no hay movimientos de stock activos en esta disposición.", "Encara no hi ha moviments d'estoc actius en aquesta disposició.", "There are no active stock movements yet for this disposition.")</p>
                 }
                 else
                 {
                     <div class="stock-summary-status-grid">
                         <article class="stock-summary-status-card active">
                             <strong>@StockMovementSummaries.Count(item => item.Status == StockMovementSummaryStatus.Active)</strong>
-                            <span>Activos</span>
+                            <span>@L("Activos", "Actius", "Active")</span>
                         </article>
                         <article class="stock-summary-status-card pending">
                             <strong>@StockMovementSummaries.Count(item => item.Status == StockMovementSummaryStatus.Pending)</strong>
-                            <span>Pendientes de guardar</span>
+                            <span>@L("Pendientes de guardar", "Pendents de desar", "Pending save")</span>
                         </article>
                         <article class="stock-summary-status-card reverted">
                             <strong>@StockMovementSummaries.Count(item => item.Status == StockMovementSummaryStatus.Reverted)</strong>
-                            <span>Revertidos</span>
+                            <span>@L("Revertidos", "Revertits", "Reverted")</span>
                         </article>
                     </div>
 
@@ -269,7 +270,7 @@ else
                             <article class="list-item stock-summary-item @movement.CssClass">
                                 <div class="stock-summary-item-header">
                                     <strong>@movement.Title</strong>
-                                    <span class="stock-summary-badge @movement.CssClass">@movement.StatusLabel</span>
+                                    <span class="stock-summary-badge @movement.CssClass">@GetStockMovementStatusLabel(movement.Status)</span>
                                 </div>
                                 <span>@movement.Description</span>
                             </article>
@@ -281,15 +282,15 @@ else
             <div class="quick-links" style="margin-top: 1rem;">
                 @if (canEdit)
                 {
-                    <button class="primary-button" type="submit">Guardar disposición</button>
+                    <button class="primary-button" type="submit">@L("Guardar disposición", "Desar disposició", "Save disposition")</button>
                 }
                 @if (canEdit && Code.HasValue)
                 {
-                    <button class="secondary-button danger-button" type="button" @onclick="DeleteAsync">Eliminar disposición</button>
+                    <button class="secondary-button danger-button" type="button" @onclick="DeleteAsync">@L("Eliminar disposición", "Eliminar disposició", "Delete disposition")</button>
                 }
                 @if (Code.HasValue)
                 {
-                    <button class="secondary-button" type="button" @onclick="LoadAuditAsync">Recargar historial</button>
+                    <button class="secondary-button" type="button" @onclick="LoadAuditAsync">@L("Recargar historial", "Recarregar historial", "Reload history")</button>
                 }
             </div>
         </fieldset>
@@ -298,11 +299,11 @@ else
     @if (Code.HasValue)
     {
         <section class="panel" style="margin-top: 1rem;">
-            <h2>Historial reciente de la disposición</h2>
+            <h2>@L("Historial reciente de la disposición", "Historial recent de la disposició", "Recent disposition history")</h2>
             <div class="list-block">
                 @if (recentAuditLogs.Count == 0)
                 {
-                    <p class="muted">Todavía no hay eventos auditados para esta disposición.</p>
+                    <p class="muted">@L("Todavía no hay eventos auditados para esta disposición.", "Encara no hi ha esdeveniments auditats per a aquesta disposició.", "There are no audited events yet for this disposition.")</p>
                 }
                 else
                 {
@@ -347,14 +348,6 @@ else
 
     private sealed record StockMovementSummary(string Title, string Description, StockMovementSummaryStatus Status)
     {
-        public string StatusLabel => Status switch
-        {
-            StockMovementSummaryStatus.Active => "Activo",
-            StockMovementSummaryStatus.Pending => "Pendiente",
-            StockMovementSummaryStatus.Reverted => "Revertido",
-            _ => string.Empty
-        };
-
         public string CssClass => Status switch
         {
             StockMovementSummaryStatus.Active => "active",
@@ -365,9 +358,23 @@ else
     }
 
     private string VisibleNumber => FormatVisibleNumber(model.Number, model.Year);
-    private string DisplayOrigin => string.IsNullOrWhiteSpace(model.Origin) ? "local" : model.Origin;
-    private string StatusLabel => model.IsCancelled ? "Anulada" : model.IsReceived ? "Recibida" : "Pendiente";
+    private string DisplayOrigin => string.IsNullOrWhiteSpace(model.Origin) ? L("local", "local", "local") : model.Origin;
+    private string StatusLabel => model.IsCancelled ? L("Anulada", "Anul·lada", "Cancelled") : model.IsReceived ? L("Recibida", "Rebuda", "Received") : L("Pendiente", "Pendent", "Pending");
     private IReadOnlyList<StockMovementSummary> StockMovementSummaries => BuildStockMovementSummaries();
+    private string GetStockMovementStatusLabel(StockMovementSummaryStatus status) => status switch
+    {
+        StockMovementSummaryStatus.Active => L("Activo", "Actiu", "Active"),
+        StockMovementSummaryStatus.Pending => L("Pendiente", "Pendent", "Pending"),
+        StockMovementSummaryStatus.Reverted => L("Revertido", "Revertit", "Reverted"),
+        _ => string.Empty
+    };
+    private string L(string spanish, string catalan, string english) =>
+        T.CurrentLanguage switch
+        {
+            AppLanguages.Catalan => catalan,
+            AppLanguages.English => english,
+            _ => spanish
+        };
 
     protected override async Task OnParametersSetAsync()
     {
@@ -390,7 +397,7 @@ else
             var detail = await DisposicionQueries.GetByCodeAsync(tenantId.Value, companyId.Value, Code.Value);
             if (detail is null)
             {
-                statusMessage = "No se ha encontrado la disposición solicitada.";
+                statusMessage = L("No se ha encontrado la disposición solicitada.", "No s'ha trobat la disposició sol·licitada.", "The requested disposition could not be found.");
                 isError = true;
                 model = new DisposicionDetailDto();
                 originalModel = new DisposicionDetailDto();
@@ -423,7 +430,7 @@ else
 
         if (isReadOnly)
         {
-            statusMessage = "No tienes permisos de edición en este tenant.";
+            statusMessage = L("No tienes permisos de edición en este tenant.", "No tens permisos d'edició en aquest tenant.", "You do not have edit permissions in this tenant.");
             isError = true;
             return;
         }
@@ -475,8 +482,8 @@ else
             });
 
             statusMessage = Code.HasValue
-                ? "Disposición actualizada correctamente."
-                : "Disposición creada correctamente.";
+                ? L("Disposición actualizada correctamente.", "Disposició actualitzada correctament.", "Disposition updated successfully.")
+                : L("Disposición creada correctamente.", "Disposició creada correctament.", "Disposition created successfully.");
 
             if (!Code.HasValue)
             {
@@ -566,7 +573,7 @@ else
         {
             model.IsReceived = false;
             model.ReceptionDate = null;
-            statusMessage = "Para marcar la disposición como recibida, todas las líneas deben estar servidas.";
+            statusMessage = L("Para marcar la disposición como recibida, todas las líneas deben estar servidas.", "Per marcar la disposició com a rebuda, totes les línies han d'estar servides.", "To mark the disposition as received, all lines must be served.");
             isError = true;
             return;
         }
@@ -601,7 +608,7 @@ else
         if (isChecked && !line.IsDisposed)
         {
             line.IsServed = false;
-            statusMessage = $"Primero debes marcar como dispuesta la línea {line.LineNumber}.";
+            statusMessage = L($"Primero debes marcar como dispuesta la línea {line.LineNumber}.", $"Primer has de marcar com a disposada la línia {line.LineNumber}.", $"You must first mark line {line.LineNumber} as prepared.");
             isError = true;
             return;
         }
@@ -635,8 +642,8 @@ else
 
         isLegacySyncActive = true;
         syncStatusLabel = status.LastCompletedUtc.HasValue
-            ? $"Última sync: {status.LastCompletedUtc.Value.ToLocalTime():dd/MM/yyyy HH:mm:ss} · Ins: {status.LastInserted} · Act: {status.LastUpdated} · Omi: {status.LastSkipped} · Err: {status.LastErrors}"
-            : $"Estado: {status.LastStatus}";
+            ? $"{L("Última sync", "Última sync", "Last sync")}: {status.LastCompletedUtc.Value.ToLocalTime():dd/MM/yyyy HH:mm:ss} · Ins: {status.LastInserted} · Act: {status.LastUpdated} · Omi: {status.LastSkipped} · Err: {status.LastErrors}"
+            : $"{L("Estado", "Estat", "Status")}: {status.LastStatus}";
     }
 
     private async Task LoadAuditAsync()
@@ -697,7 +704,7 @@ else
                 continue;
             }
 
-            var currentColor = string.IsNullOrWhiteSpace(model.Color) ? "sin color" : model.Color.Trim();
+            var currentColor = string.IsNullOrWhiteSpace(model.Color) ? L("sin color", "sense color", "no color") : model.Color.Trim();
             var originalColor = string.IsNullOrWhiteSpace(originalModel.Color) ? currentColor : originalModel.Color.Trim();
             var meters = CalculateMeters(effectiveLine.TotalKilograms, effectiveLine.Yield);
             var currentDisposed = hasCurrent && currentLine!.IsDisposed;
@@ -708,48 +715,48 @@ else
             if (currentDisposed && originalDisposed)
             {
                 items.Add(new StockMovementSummary(
-                    $"Línea {lineNumber}: crudo -> dispuesto",
-                    $"Tejido {effectiveLine.FabricCode}: {effectiveLine.TotalKilograms:0.##} kg y {meters:0.##} m ya están en stock dispuesto.",
+                    L($"Línea {lineNumber}: crudo -> dispuesto", $"Línia {lineNumber}: cru -> disposat", $"Line {lineNumber}: raw -> prepared"),
+                    L($"Tejido {effectiveLine.FabricCode}: {effectiveLine.TotalKilograms.ToUiString("0.##")} kg y {meters.ToUiString("0.##")} m ya están en stock dispuesto.", $"Teixit {effectiveLine.FabricCode}: {effectiveLine.TotalKilograms.ToUiString("0.##")} kg i {meters.ToUiString("0.##")} m ja són a l'estoc disposat.", $"Fabric {effectiveLine.FabricCode}: {effectiveLine.TotalKilograms.ToUiString("0.##")} kg and {meters.ToUiString("0.##")} m are already in prepared stock."),
                     StockMovementSummaryStatus.Active));
             }
 
             if (currentDisposed && !originalDisposed)
             {
                 items.Add(new StockMovementSummary(
-                    $"Línea {lineNumber}: crudo -> dispuesto",
-                    $"Tejido {effectiveLine.FabricCode}: al guardar se moverán {effectiveLine.TotalKilograms:0.##} kg y {meters:0.##} m a stock dispuesto.",
+                    L($"Línea {lineNumber}: crudo -> dispuesto", $"Línia {lineNumber}: cru -> disposat", $"Line {lineNumber}: raw -> prepared"),
+                    L($"Tejido {effectiveLine.FabricCode}: al guardar se moverán {effectiveLine.TotalKilograms.ToUiString("0.##")} kg y {meters.ToUiString("0.##")} m a stock dispuesto.", $"Teixit {effectiveLine.FabricCode}: en desar es mouran {effectiveLine.TotalKilograms.ToUiString("0.##")} kg i {meters.ToUiString("0.##")} m a l'estoc disposat.", $"Fabric {effectiveLine.FabricCode}: saving will move {effectiveLine.TotalKilograms.ToUiString("0.##")} kg and {meters.ToUiString("0.##")} m into prepared stock."),
                     StockMovementSummaryStatus.Pending));
             }
 
             if (!currentDisposed && originalDisposed)
             {
                 items.Add(new StockMovementSummary(
-                    $"Línea {lineNumber}: crudo -> dispuesto",
-                    $"Tejido {effectiveLine.FabricCode}: al guardar se revertirán {effectiveLine.TotalKilograms:0.##} kg y {meters:0.##} m desde stock dispuesto hacia crudo.",
+                    L($"Línea {lineNumber}: crudo -> dispuesto", $"Línia {lineNumber}: cru -> disposat", $"Line {lineNumber}: raw -> prepared"),
+                    L($"Tejido {effectiveLine.FabricCode}: al guardar se revertirán {effectiveLine.TotalKilograms.ToUiString("0.##")} kg y {meters.ToUiString("0.##")} m desde stock dispuesto hacia crudo.", $"Teixit {effectiveLine.FabricCode}: en desar es revertiran {effectiveLine.TotalKilograms.ToUiString("0.##")} kg i {meters.ToUiString("0.##")} m des de l'estoc disposat cap al cru.", $"Fabric {effectiveLine.FabricCode}: saving will revert {effectiveLine.TotalKilograms.ToUiString("0.##")} kg and {meters.ToUiString("0.##")} m from prepared stock back to raw."),
                     StockMovementSummaryStatus.Reverted));
             }
 
             if (currentServed && originalServed)
             {
                 items.Add(new StockMovementSummary(
-                    $"Línea {lineNumber}: dispuesto -> color",
-                    $"Tejido {effectiveLine.FabricCode}, color {currentColor}: el movimiento a color ya está activo con {meters:0.##} m.",
+                    L($"Línea {lineNumber}: dispuesto -> color", $"Línia {lineNumber}: disposat -> color", $"Line {lineNumber}: prepared -> color"),
+                    L($"Tejido {effectiveLine.FabricCode}, color {currentColor}: el movimiento a color ya está activo con {meters.ToUiString("0.##")} m.", $"Teixit {effectiveLine.FabricCode}, color {currentColor}: el moviment a color ja és actiu amb {meters.ToUiString("0.##")} m.", $"Fabric {effectiveLine.FabricCode}, color {currentColor}: the move to color is already active with {meters.ToUiString("0.##")} m."),
                     StockMovementSummaryStatus.Active));
             }
 
             if (currentServed && !originalServed)
             {
                 items.Add(new StockMovementSummary(
-                    $"Línea {lineNumber}: dispuesto -> color",
-                    $"Tejido {effectiveLine.FabricCode}, color {currentColor}: al guardar se añadirán {meters:0.##} m al stock del color.",
+                    L($"Línea {lineNumber}: dispuesto -> color", $"Línia {lineNumber}: disposat -> color", $"Line {lineNumber}: prepared -> color"),
+                    L($"Tejido {effectiveLine.FabricCode}, color {currentColor}: al guardar se añadirán {meters.ToUiString("0.##")} m al stock del color.", $"Teixit {effectiveLine.FabricCode}, color {currentColor}: en desar s'afegiran {meters.ToUiString("0.##")} m a l'estoc del color.", $"Fabric {effectiveLine.FabricCode}, color {currentColor}: saving will add {meters.ToUiString("0.##")} m to the color stock."),
                     StockMovementSummaryStatus.Pending));
             }
 
             if (!currentServed && originalServed)
             {
                 items.Add(new StockMovementSummary(
-                    $"Línea {lineNumber}: dispuesto -> color",
-                    $"Tejido {effectiveLine.FabricCode}, color {originalColor}: al guardar se revertirán {meters:0.##} m desde el color hacia stock dispuesto.",
+                    L($"Línea {lineNumber}: dispuesto -> color", $"Línia {lineNumber}: disposat -> color", $"Line {lineNumber}: prepared -> color"),
+                    L($"Tejido {effectiveLine.FabricCode}, color {originalColor}: al guardar se revertirán {meters.ToUiString("0.##")} m desde el color hacia stock dispuesto.", $"Teixit {effectiveLine.FabricCode}, color {originalColor}: en desar es revertiran {meters.ToUiString("0.##")} m des del color cap a l'estoc disposat.", $"Fabric {effectiveLine.FabricCode}, color {originalColor}: saving will revert {meters.ToUiString("0.##")} m from the color back to prepared stock."),
                     StockMovementSummaryStatus.Reverted));
             }
         }

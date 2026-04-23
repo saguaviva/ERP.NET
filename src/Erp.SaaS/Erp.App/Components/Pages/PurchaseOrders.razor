@@ -1,4 +1,5 @@
 @page "/compras/pedidos"
+@page "/compras/comandes-fils"
 @attribute [Authorize(Roles = "TenantAdmin,TenantReader")]
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject NavigationManager NavigationManager
@@ -6,20 +7,28 @@
 @inject IPurchaseOrderQueries PurchaseOrderQueries
 @inject AppText T
 
-<PageTitle>@L("Compras / Pedidos", "Compres / Comandes", "Purchases / Orders")</PageTitle>
+<PageTitle>@(IsYarnOrdersRoute
+    ? L("Compras / Comandes Fils", "Compres / Comandes Fils", "Purchases / Yarn orders")
+    : L("Compras / Pedidos", "Compres / Comandes", "Purchases / Orders"))</PageTitle>
 
 <div class="page-header">
     <div>
         <p class="eyebrow">@L("Compras", "Compres", "Purchases")</p>
-        <h1>@L("Pedidos a proveedor", "Comandes a proveïdor", "Supplier orders")</h1>
-        <p class="lead">@(isLegacySyncActive
-            ? L("Consulta y filtra los pedidos replicados en la SaaS local. La sync manual refresca solo los pedidos con origen legacy.", "Consulta i filtra les comandes replicades a la SaaS local. La sync manual refresca només les comandes amb origen legacy.", "Browse and filter orders replicated into the local SaaS. Manual sync only refreshes legacy-origin orders.")
-            : L("Listado web de pedidos por empresa activa, con estados, líneas y trazabilidad básica.", "Llistat web de comandes per empresa activa, amb estats, línies i traçabilitat bàsica.", "Web list of orders for the active company, with statuses, lines and basic traceability."))</p>
+        <h1>@(IsYarnOrdersRoute
+            ? L("Pedidos de hilo", "Comandes de fils", "Yarn orders")
+            : L("Pedidos a proveedor", "Comandes a proveïdor", "Supplier orders"))</h1>
+        <p class="lead">@(IsYarnOrdersRoute
+            ? (isLegacySyncActive
+                ? L("Consulta y filtra las compras de hilos replicadas en la SaaS local. La sync manual refresca solo pedidos con origen legacy y artículo presente en el maestro de hilos.", "Consulta i filtra les compres de fils replicades a la SaaS local. La sync manual refresca només comandes amb origen legacy i article present al mestre de fils.", "Browse and filter yarn purchases replicated into the local SaaS. Manual sync refreshes only legacy-origin orders whose item exists in the yarn master.")
+                : L("Listado de pedidos centrado en compras de hilos, enlazado con el maestro fil y con trazabilidad de recepción.", "Llistat de comandes centrat en compres de fils, enllaçat amb el mestre fil i amb traçabilitat de recepció.", "Order list focused on yarn purchases, linked to the fil master and receipt traceability."))
+            : (isLegacySyncActive
+                ? L("Consulta y filtra los pedidos replicados en la SaaS local. La sync manual refresca solo los pedidos con origen legacy.", "Consulta i filtra les comandes replicades a la SaaS local. La sync manual refresca només les comandes amb origen legacy.", "Browse and filter orders replicated into the local SaaS. Manual sync only refreshes legacy-origin orders.")
+                : L("Listado web de pedidos por empresa activa, con estados, líneas y trazabilidad básica.", "Llistat web de comandes per empresa activa, amb estats, línies i traçabilitat bàsica.", "Web list of orders for the active company, with statuses, lines and basic traceability.")))</p>
     </div>
     <div class="quick-links">
         @if (canEdit)
         {
-            <a class="primary-button link-button" href="/compras/pedidos/nuevo">@L("Nuevo pedido", "Nova comanda", "New order")</a>
+            <a class="primary-button link-button" href="@NewOrderHref">@(IsYarnOrdersRoute ? L("Nuevo pedido de hilo", "Nova comanda de fils", "New yarn order") : L("Nuevo pedido", "Nova comanda", "New order"))</a>
         }
     </div>
 </div>
@@ -52,7 +61,9 @@ else
             <span class="results-summary">
                 @(totalCount == 0
                     ? L("Sin resultados", "Sense resultats", "No results")
-                    : L($"Mostrando {PageStart}-{PageEnd} de {totalCount} pedidos", $"Mostrant {PageStart}-{PageEnd} de {totalCount} comandes", $"Showing {PageStart}-{PageEnd} of {totalCount} orders"))
+                    : IsYarnOrdersRoute
+                        ? L($"Mostrando {PageStart.ToUiString("N0")}-{PageEnd.ToUiString("N0")} de {totalCount.ToUiString("N0")} pedidos de hilo", $"Mostrant {PageStart.ToUiString("N0")}-{PageEnd.ToUiString("N0")} de {totalCount.ToUiString("N0")} comandes de fils", $"Showing {PageStart.ToUiString("N0")}-{PageEnd.ToUiString("N0")} of {totalCount.ToUiString("N0")} yarn orders")
+                        : L($"Mostrando {PageStart.ToUiString("N0")}-{PageEnd.ToUiString("N0")} de {totalCount.ToUiString("N0")} pedidos", $"Mostrant {PageStart.ToUiString("N0")}-{PageEnd.ToUiString("N0")} de {totalCount.ToUiString("N0")} comandes", $"Showing {PageStart.ToUiString("N0")}-{PageEnd.ToUiString("N0")} of {totalCount.ToUiString("N0")} orders"))
             </span>
             <label class="field compact-field">
                 <span>@L("Tamaño de página", "Mida de pàgina", "Page size")</span>
@@ -71,9 +82,11 @@ else
     }
 
     @if (isLegacySyncActive)
-    {
+        {
         <div class="alert">
-            @L("Compras / Pedidos está en convivencia con legacy para esta empresa. La sync manual refresca solo los pedidos con origen legacy; los nuevos o modificados desde la web quedan como locales.", "Compres / Comandes està en convivència amb legacy per a aquesta empresa. La sync manual refresca només les comandes amb origen legacy; les noves o modificades des del web queden com a locals.", "Purchases / Orders is running in legacy coexistence mode for this company. Manual sync refreshes only legacy-origin orders; new or edited web orders remain local.")
+            @(IsYarnOrdersRoute
+                ? L("Compras / Comandes Fils está en convivencia con legacy para esta empresa. La sync manual refresca solo pedidos de origen legacy ligados al maestro de hilos; los nuevos o modificados desde la web quedan como locales.", "Compres / Comandes Fils està en convivència amb legacy per a aquesta empresa. La sync manual refresca només comandes d'origen legacy lligades al mestre de fils; les noves o modificades des del web queden com a locals.", "Purchases / Yarn orders is running in legacy coexistence mode for this company. Manual sync refreshes only legacy-origin orders linked to the yarn master; new or edited web orders remain local.")
+                : L("Compras / Pedidos está en convivencia con legacy para esta empresa. La sync manual refresca solo los pedidos con origen legacy; los nuevos o modificados desde la web quedan como locales.", "Compres / Comandes està en convivència amb legacy per a aquesta empresa. La sync manual refresca només les comandes amb origen legacy; les noves o modificades des del web queden com a locals.", "Purchases / Orders is running in legacy coexistence mode for this company. Manual sync refreshes only legacy-origin orders; new or edited web orders remain local."))
             @if (!string.IsNullOrWhiteSpace(syncStatusLabel))
             {
                 <span>@syncStatusLabel</span>
@@ -86,7 +99,9 @@ else
         {
             <div class="loading-banner">
                 <span class="loading-indicator" aria-hidden="true"></span>
-                <span>@L("Cargando pedidos de compra...", "Carregant comandes de compra...", "Loading purchase orders...")</span>
+                <span>@(IsYarnOrdersRoute
+                    ? L("Cargando pedidos de hilo...", "Carregant comandes de fils...", "Loading yarn orders...")
+                    : L("Cargando pedidos de compra...", "Carregant comandes de compra...", "Loading purchase orders..."))</span>
             </div>
         }
 
@@ -123,7 +138,9 @@ else
                 else if (items.Count == 0)
                 {
                     <tr>
-                        <td colspan="8" class="table-empty">@L("No hay pedidos para mostrar.", "No hi ha comandes per mostrar.", "There are no orders to show.")</td>
+                        <td colspan="8" class="table-empty">@(IsYarnOrdersRoute
+                            ? L("No hay pedidos de hilo para mostrar.", "No hi ha comandes de fils per mostrar.", "There are no yarn orders to show.")
+                            : L("No hay pedidos para mostrar.", "No hi ha comandes per mostrar.", "There are no orders to show."))</td>
                     </tr>
                 }
                 else
@@ -137,9 +154,9 @@ else
                             <td>@(item.ExpectedDate?.ToString("dd/MM/yyyy") ?? "-")</td>
                             <td><span class="status-pill @GetStatusClass(item.Status)">@FormatStatus(item.Status)</span></td>
                             <td>@item.LineCount</td>
-                            <td>@item.TotalAmount.ToString("0.00") €</td>
+                            <td>@item.TotalAmount.ToUiString("0.00") €</td>
                             <td>
-                                <a class="inline-link" href="/compras/pedidos/editar/@item.OrderNumber">@(canEdit ? L("Abrir", "Obrir", "Open") : L("Ver", "Veure", "View"))</a>
+                                <a class="inline-link" href="@BuildOrderDetailHref(item.OrderNumber)">@(canEdit ? L("Abrir", "Obrir", "Open") : L("Ver", "Veure", "View"))</a>
                             </td>
                         </tr>
                     }
@@ -201,6 +218,9 @@ else
     private bool isLegacySyncActive;
     private string syncStatusLabel = string.Empty;
     private int totalCount;
+    private bool IsYarnOrdersRoute => CurrentRelativePath.StartsWith("compras/comandes-fils", StringComparison.OrdinalIgnoreCase);
+    private string NewOrderHref => IsYarnOrdersRoute ? "/compras/comandes-fils/nuevo" : "/compras/pedidos/nuevo";
+    private string CurrentRelativePath => NavigationManager.ToBaseRelativePath(NavigationManager.Uri).Split('?', '#')[0];
     private int TotalPages => Math.Max(1, (int)Math.Ceiling(totalCount / (double)filter.PageSize));
     private bool CanGoPrevious => filter.Page > 1;
     private bool CanGoNext => filter.Page < TotalPages;
@@ -337,6 +357,7 @@ else
     {
         filter.Search = SearchQuery?.Trim() ?? string.Empty;
         filter.Status = NormalizeStatus(StatusQuery);
+        filter.CatalogScope = IsYarnOrdersRoute ? "Hilos" : string.Empty;
         filter.IncludeClosed = ClosedQuery.GetValueOrDefault();
         filter.Page = Math.Max(PageQuery.GetValueOrDefault(1), 1);
         filter.PageSize = PageSizeQuery is 25 or 50 or 100 ? PageSizeQuery.Value : 25;
@@ -394,6 +415,11 @@ else
         PurchaseOrderStatuses.Cancelled => L("Cancelado", "Cancel·lada", "Cancelled"),
         _ => status
     };
+
+    private string BuildOrderDetailHref(int orderNumber) =>
+        IsYarnOrdersRoute
+            ? $"/compras/comandes-fils/editar/{orderNumber}"
+            : $"/compras/pedidos/editar/{orderNumber}";
 
     private static string GetStatusClass(string status) => status switch
     {

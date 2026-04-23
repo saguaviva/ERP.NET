@@ -5,27 +5,30 @@
 @inject IBaseCatalogQueries BaseCatalogQueries
 @inject IBaseCatalogService BaseCatalogService
 @inject NavigationManager NavigationManager
+@inject AppText T
 
-<PageTitle>@($"{Definition.Title} · {(string.IsNullOrWhiteSpace(Code) ? "Nuevo" : "Editar")}")</PageTitle>
+<PageTitle>@($"{Definition.Title} · {(string.IsNullOrWhiteSpace(Code) ? L("Nuevo", "Nou", "New") : L("Editar", "Editar", "Edit"))}")</PageTitle>
 
 <div class="page-header">
     <div>
-        <p class="eyebrow">Base de dades</p>
-        <h1>@(string.IsNullOrWhiteSpace(Code) ? $"Nuevo {Definition.Title}" : $"Editar {Definition.Title}: {Code}")</h1>
+        <p class="eyebrow">@L("Base de datos", "Base de dades", "Master data")</p>
+        <h1>@(string.IsNullOrWhiteSpace(Code)
+            ? $"{L("Nuevo", "Nou", "New")} {Definition.Title}"
+            : $"{L("Editar", "Editar", "Edit")} {Definition.Title}: {Code}")</h1>
         <p class="lead">@Definition.Lead</p>
     </div>
     <div class="quick-links">
-        <a class="secondary-button link-button" href="/base-datos/@CatalogKey">Volver al listado</a>
+        <a class="secondary-button link-button" href="/base-datos/@CatalogKey">@L("Volver al listado", "Tornar al llistat", "Back to list")</a>
     </div>
 </div>
 
 @if (!isValidCatalog)
 {
-    <div class="empty-state"><p>El catálogo solicitado no existe.</p></div>
+    <div class="empty-state"><p>@L("El catálogo solicitado no existe.", "El catàleg sol·licitat no existeix.", "The requested catalog does not exist.")</p></div>
 }
 else if (!tenantId.HasValue || !companyId.HasValue)
 {
-    <div class="empty-state"><p>No hay empresa activa seleccionada.</p></div>
+    <div class="empty-state"><p>@L("No hay empresa activa seleccionada.", "No hi ha cap empresa activa seleccionada.", "There is no active company selected.")</p></div>
 }
 else
 {
@@ -82,10 +85,10 @@ else
                 }
                 <label class="field checkbox-field">
                     <InputCheckbox @bind-Value="model.IsActive" />
-                    <span>Activo</span>
+                    <span>@L("Activo", "Actiu", "Active")</span>
                 </label>
                 <label class="field wide">
-                    <span>Notas</span>
+                    <span>@L("Notas", "Notes", "Notes")</span>
                     <InputTextArea class="text-area" @bind-Value="model.Notes" />
                 </label>
             </div>
@@ -93,11 +96,11 @@ else
             <div class="quick-links" style="margin-top: 1rem;">
                 @if (canEdit)
                 {
-                    <button class="primary-button" type="submit">Guardar</button>
+                    <button class="primary-button" type="submit">@L("Guardar", "Desar", "Save")</button>
                 }
                 @if (canEdit && !string.IsNullOrWhiteSpace(Code))
                 {
-                    <button class="secondary-button danger-button" type="button" @onclick="DeleteAsync">Eliminar</button>
+                    <button class="secondary-button danger-button" type="button" @onclick="DeleteAsync">@L("Eliminar", "Eliminar", "Delete")</button>
                 }
             </div>
         </fieldset>
@@ -115,12 +118,12 @@ else
     private bool isValidCatalog;
     private string statusMessage = string.Empty;
     private bool isError;
-    private CatalogDefinition Definition = CatalogDefinitions.Empty;
+    private CatalogDefinition Definition = new("", "Catalog", string.Empty, "Code", string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, false);
     private BaseCatalogDetailDto model = new();
 
     protected override async Task OnParametersSetAsync()
     {
-        Definition = CatalogDefinitions.Get(CatalogKey);
+        Definition = GetDefinition(CatalogKey);
         isValidCatalog = Definition.IsValid;
 
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
@@ -140,7 +143,7 @@ else
             var detail = await BaseCatalogQueries.GetByCodeAsync(tenantId.Value, companyId.Value, CatalogKey, Code);
             if (detail is null)
             {
-                statusMessage = "No se ha encontrado el registro solicitado.";
+                statusMessage = L("No se ha encontrado el registro solicitado.", "No s'ha trobat el registre sol·licitat.", "The requested record was not found.");
                 isError = true;
                 model = new BaseCatalogDetailDto { CatalogKey = CatalogKey };
                 return;
@@ -192,7 +195,7 @@ else
                 return;
             }
 
-            statusMessage = "Registro guardado correctamente.";
+            statusMessage = L("Registro guardado correctamente.", "Registre desat correctament.", "Record saved successfully.");
         }
         catch (Exception exception)
         {
@@ -239,20 +242,23 @@ else
         string SecondaryNumericLabel,
         bool IsValid = true);
 
-    private static class CatalogDefinitions
+    private CatalogDefinition GetDefinition(string key) => key?.Trim().ToLowerInvariant() switch
     {
-        public static readonly CatalogDefinition Empty = new("", "Catálogo", string.Empty, "Código", string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, false);
+        BaseCatalogKeys.BanksCashboxes => new(key, L("Bancos / Cajas", "Bancs / Caixes", "Banks / Cashboxes"), L("Gestión local de bancos, cajas y cuentas operativas.", "Gestió local de bancs, caixes i comptes operatius.", "Local management of banks, cashboxes and operating accounts."), L("Código banco", "Codi banc", "Bank code"), L("Nombre banco", "Nom banc", "Bank name"), L("Núm. cuenta", "Núm. compte", "Account no."), "IBAN", "SWIFT / BIC", string.Empty, string.Empty),
+        BaseCatalogKeys.PaymentMethods => new(key, L("Formas de pago", "Formes de pagament", "Payment methods"), L("Métodos y condiciones de pago disponibles en la SaaS local.", "Mètodes i condicions de pagament disponibles a la SaaS local.", "Payment methods and terms available in the local SaaS database."), L("Código forma", "Codi forma", "Method code"), L("Forma pago", "Forma pagament", "Payment method"), L("Descripción operativa", "Descripció operativa", "Operational description"), L("Referencia / tipo", "Referència / tipus", "Reference / type"), string.Empty, L("Días pago", "Dies pagament", "Payment days"), L("Dte. pago %", "Dte. pagament %", "Payment discount %")),
+        BaseCatalogKeys.Operations => new(key, L("Operaciones", "Operacions", "Operations"), L("Catálogo de operaciones de trabajo y proceso, como en el legacy.", "Catàleg d'operacions de treball i procés, com al legacy.", "Catalog of work and process operations, like in legacy."), L("Código operación", "Codi operació", "Operation code"), L("Descripción", "Descripció", "Description"), string.Empty, string.Empty, string.Empty, string.Empty, string.Empty),
+        BaseCatalogKeys.Machines => new(key, L("Máquinas", "Màquines", "Machines"), L("Maestro de máquinas con código, descripción y precio operativo.", "Mestre de màquines amb codi, descripció i preu operatiu.", "Machine master data with code, description and operating price."), L("Código máquina", "Codi màquina", "Machine code"), L("Descripción", "Descripció", "Description"), string.Empty, string.Empty, string.Empty, L("Precio", "Preu", "Price"), string.Empty),
+        BaseCatalogKeys.Seasons => new(key, L("Temporadas", "Temporades", "Seasons"), L("Catálogo simple de temporadas, como en el legacy.", "Catàleg simple de temporades, com al legacy.", "Simple season catalog, like in legacy."), L("Temporada", "Temporada", "Season"), L("Descripción", "Descripció", "Description"), string.Empty, string.Empty, string.Empty, string.Empty, string.Empty),
+        BaseCatalogKeys.VatTypes => new(key, L("Tipos de IVA", "Tipus d'IVA", "VAT types"), L("Tipos impositivos para ventas y compras, con IVA y recargo de equivalencia.", "Tipus impositius per a vendes i compres, amb IVA i recàrrec d'equivalència.", "Tax types for sales and purchases, including VAT and surcharge."), L("Código IVA", "Codi IVA", "VAT code"), L("Descripción", "Descripció", "Description"), L("Descripción operativa", "Descripció operativa", "Operational description"), L("Clave fiscal", "Clau fiscal", "Tax key"), string.Empty, "% IVA", "% RE"),
+        BaseCatalogKeys.Incoterms => new(key, "Incoterms", L("Condiciones de entrega y responsabilidad comercial, como en el legacy.", "Condicions de lliurament i responsabilitat comercial, com al legacy.", "Delivery terms and commercial responsibility, like in legacy."), L("Nombre", "Nom", "Name"), L("Descripción", "Descripció", "Description"), string.Empty, string.Empty, string.Empty, string.Empty, string.Empty),
+        _ => new("", L("Catálogo", "Catàleg", "Catalog"), string.Empty, L("Código", "Codi", "Code"), string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, false)
+    };
 
-        public static CatalogDefinition Get(string key) => key?.Trim().ToLowerInvariant() switch
+    private string L(string spanish, string catalan, string english) =>
+        T.CurrentLanguage switch
         {
-            BaseCatalogKeys.BanksCashboxes => new(key, "Bancs / Caixes", "Gestión local de bancos, cajas y cuentas operativas.", "Codi banc", "Nom banc", "Núm. compte", "IBAN", "SWIFT / BIC", string.Empty, string.Empty),
-            BaseCatalogKeys.PaymentMethods => new(key, "Formes de pagament", "Métodos y condiciones de pago disponibles en la SaaS local.", "Codi forma", "Forma pagament", "Descripción operativa", "Referencia / tipo", string.Empty, "Dies pagament", "Dte. pagament %"),
-            BaseCatalogKeys.Operations => new(key, "Operacions", "Catálogo de operaciones de trabajo y proceso, como en el legacy.", "Codi operació", "Descripció", string.Empty, string.Empty, string.Empty, string.Empty, string.Empty),
-            BaseCatalogKeys.Machines => new(key, "Màquines", "Maestro de máquinas con código, descripción y precio operativo.", "Codi màquina", "Descripció", string.Empty, string.Empty, string.Empty, "Preu", string.Empty),
-            BaseCatalogKeys.Seasons => new(key, "Temporades", "Catálogo simple de temporadas, como en el legacy.", "Temporada", "Descripció", string.Empty, string.Empty, string.Empty, string.Empty, string.Empty),
-            BaseCatalogKeys.VatTypes => new(key, "Tipus d'IVA", "Tipos impositivos para ventas y compras, con IVA y recargo de equivalencia.", "Codi IVA", "Descripció", "Descripció operativa", "Clau fiscal", string.Empty, "% IVA", "% RE"),
-            BaseCatalogKeys.Incoterms => new(key, "Incoterms", "Condiciones de entrega y responsabilidad comercial, como en el legacy.", "Nom", "Descripció", string.Empty, string.Empty, string.Empty, string.Empty, string.Empty),
-            _ => Empty
+            AppLanguages.Catalan => catalan,
+            AppLanguages.English => english,
+            _ => spanish
         };
-    }
 }

@@ -1,21 +1,25 @@
 @page "/ventas/facturas/{InvoiceNumber:int}/pdf"
+@page "/ventas/facturas-teixits-mostres/{InvoiceNumber:int}/pdf"
+@page "/ventas/facturas-models/{InvoiceNumber:int}/pdf"
 @layout EmptyLayout
 @attribute [Authorize(Roles = "TenantAdmin,TenantReader")]
 @inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
 @inject ISalesOrderQueries SalesOrderQueries
+@inject AppText T
 
-<PageTitle>PDF factura @InvoiceNumber</PageTitle>
+<PageTitle>@PageTitleText</PageTitle>
 
 <div class="document-shell">
     <div class="document-toolbar no-print">
-        <a class="secondary-button link-button" href="/ventas/facturas/@InvoiceNumber">Volver a la factura</a>
-        <button class="primary-button" type="button" onclick="window.print()">Guardar como PDF / Imprimir</button>
+        <a class="secondary-button link-button" href="@BackToDocumentHref">@BackToDocumentText</a>
+        <button class="primary-button" type="button" onclick="window.print()">@L("Imprimir / guardar PDF", "Imprimir / desar PDF", "Print / save PDF")</button>
     </div>
 
     @if (!tenantId.HasValue || !companyId.HasValue)
     {
         <div class="empty-state document-state">
-            <p>No hay empresa activa seleccionada.</p>
+            <p>@L("No hay empresa activa seleccionada.", "No hi ha cap empresa activa seleccionada.", "No active company selected.")</p>
         </div>
     }
     else if (!string.IsNullOrWhiteSpace(errorMessage))
@@ -25,7 +29,7 @@
     else if (invoice is null)
     {
         <div class="empty-state document-state">
-            <p>No se ha encontrado la factura solicitada.</p>
+            <p>@L("No se ha encontrado la factura solicitada.", "No s'ha trobat la factura sol·licitada.", "The requested invoice could not be found.")</p>
         </div>
     }
     else
@@ -33,17 +37,17 @@
         <section class="document-page">
             <header class="document-header">
                 <div>
-                    <p class="eyebrow">Factura de cliente</p>
+                    <p class="eyebrow">@DocumentEyebrowText</p>
                     <h1>@invoice.DisplayNumber</h1>
-                    <p class="muted">Borrador origen @invoice.DraftDisplayNumber</p>
+                    <p class="muted">@L("Borrador origen", "Esborrany origen", "Source draft") @invoice.DraftDisplayNumber</p>
                 </div>
                 <div class="document-header-meta">
                     <div>
-                        <span class="muted">Fecha</span>
+                        <span class="muted">@L("Fecha", "Data", "Date")</span>
                         <strong>@invoice.IssueDate.ToString("dd/MM/yyyy")</strong>
                     </div>
                     <div>
-                        <span class="muted">Centro</span>
+                        <span class="muted">@L("Centro", "Centre", "Center")</span>
                         <strong>@invoice.CompanyLegacyCenterCode</strong>
                     </div>
                 </div>
@@ -52,17 +56,17 @@
             <section class="document-section">
                 <div class="document-grid-two">
                     <section class="document-box">
-                        <h2>Empresa emisora</h2>
+                        <h2>@L("Empresa emisora", "Empresa emissora", "Issuing company")</h2>
                         <p><strong>@invoice.CompanyName</strong></p>
                         <p class="muted">@invoice.TenantName</p>
-                        <p class="muted">Centro legacy @invoice.CompanyLegacyCenterCode</p>
+                        <p class="muted">@L("Centro legacy", "Centre legacy", "Legacy center") @invoice.CompanyLegacyCenterCode</p>
                     </section>
                     <section class="document-box">
-                        <h2>Cliente</h2>
+                        <h2>@L("Cliente", "Client", "Client")</h2>
                         <p><strong>@invoice.ClientName</strong></p>
                         @if (!string.IsNullOrWhiteSpace(invoice.ClientTaxId))
                         {
-                            <p class="muted">NIF @invoice.ClientTaxId</p>
+                            <p class="muted">@L("NIF", "NIF", "Tax ID") @invoice.ClientTaxId</p>
                         }
                         @if (!string.IsNullOrWhiteSpace(ClientLocation))
                         {
@@ -75,48 +79,48 @@
             <section class="document-section">
                 <div class="document-grid-two">
                     <section class="document-box">
-                        <h2>Cabecera</h2>
+                        <h2>@L("Cabecera", "Capçalera", "Header")</h2>
                         <div class="document-kv-grid">
                             <div>
-                                <span class="muted">Estado</span>
+                                <span class="muted">@L("Estado", "Estat", "Status")</span>
                                 <strong>@FormatInvoiceStatus(invoice.Status)</strong>
                             </div>
                             <div>
-                                <span class="muted">Cobro</span>
+                                <span class="muted">@L("Cobro", "Cobrament", "Payment")</span>
                                 <strong>@FormatPaymentStatus(invoice.PaymentStatus, invoice.IsOverdue)</strong>
                             </div>
                             <div>
-                                <span class="muted">Vencimiento</span>
-                                <strong>@(invoice.DueDate?.ToString("dd/MM/yyyy") ?? "Sin dato")</strong>
+                                <span class="muted">@L("Vencimiento", "Venciment", "Due date")</span>
+                                <strong>@(invoice.DueDate?.ToString("dd/MM/yyyy") ?? L("Sin dato", "Sense dada", "No data"))</strong>
                             </div>
                             <div>
-                                <span class="muted">Emitida</span>
+                                <span class="muted">@L("Emitida", "Emesa", "Issued")</span>
                                 <strong>@invoice.IssuedUtc.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</strong>
                             </div>
                         </div>
                     </section>
                     <section class="document-box">
-                        <h2>Resumen económico</h2>
+                        <h2>@L("Resumen económico", "Resum econòmic", "Financial summary")</h2>
                         <div class="document-kv-grid">
                             <div>
-                                <span class="muted">Base</span>
-                                <strong>@invoice.SubtotalAmount.ToString("0.00") €</strong>
+                                <span class="muted">@L("Base", "Base", "Base")</span>
+                                <strong>@invoice.SubtotalAmount.ToUiString("0.00") €</strong>
                             </div>
                             <div>
-                                <span class="muted">IVA</span>
-                                <strong>@invoice.TaxAmount.ToString("0.00") €</strong>
+                                <span class="muted">@L("IVA", "IVA", "VAT")</span>
+                                <strong>@invoice.TaxAmount.ToUiString("0.00") €</strong>
                             </div>
                             <div>
-                                <span class="muted">Total</span>
-                                <strong>@invoice.TotalAmount.ToString("0.00") €</strong>
+                                <span class="muted">@L("Total", "Total", "Total")</span>
+                                <strong>@invoice.TotalAmount.ToUiString("0.00") €</strong>
                             </div>
                             <div>
-                                <span class="muted">Cobrado</span>
-                                <strong>@invoice.AmountPaid.ToString("0.00") €</strong>
+                                <span class="muted">@L("Cobrado", "Cobrat", "Collected")</span>
+                                <strong>@invoice.AmountPaid.ToUiString("0.00") €</strong>
                             </div>
                             <div>
-                                <span class="muted">Pendiente</span>
-                                <strong>@invoice.OutstandingAmount.ToString("0.00") €</strong>
+                                <span class="muted">@L("Pendiente", "Pendent", "Pending")</span>
+                                <strong>@invoice.OutstandingAmount.ToUiString("0.00") €</strong>
                             </div>
                         </div>
                     </section>
@@ -124,34 +128,34 @@
             </section>
 
             <section class="document-section">
-                <h2>Detalle de líneas</h2>
+                <h2>@L("Detalle de líneas", "Detall de línies", "Line items")</h2>
                 <table class="data-table document-table">
                     <thead>
                         <tr>
-                            <th>Línea</th>
-                            <th>Artículo</th>
-                            <th>Descripción</th>
-                            <th>Cantidad</th>
-                            <th>Unidad</th>
-                            <th>Precio</th>
-                            <th>Base</th>
-                            <th>IVA</th>
-                            <th>Total</th>
+                            <th>@L("Línea", "Línia", "Line")</th>
+                            <th>@L("Artículo", "Article", "Item")</th>
+                            <th>@L("Descripción", "Descripció", "Description")</th>
+                            <th>@L("Cantidad", "Quantitat", "Quantity")</th>
+                            <th>@L("Unidad", "Unitat", "Unit")</th>
+                            <th>@L("Precio", "Preu", "Price")</th>
+                            <th>@L("Base", "Base", "Base")</th>
+                            <th>@L("IVA", "IVA", "VAT")</th>
+                            <th>@L("Total", "Total", "Total")</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach (var line in invoice.Lines)
                         {
                             <tr>
-                                <td>@line.LineNumber</td>
+                                <td>@line.LineNumber.ToUiString("N0")</td>
                                 <td>@DisplayValue(line.ItemCode)</td>
                                 <td>@line.Description</td>
-                                <td>@line.Quantity.ToString("0.###")</td>
+                                <td>@line.Quantity.ToUiString("0.###")</td>
                                 <td>@DisplayValue(line.UnitOfMeasure)</td>
-                                <td>@line.UnitPrice.ToString("0.0000")</td>
-                                <td>@line.LineSubtotal.ToString("0.00") €</td>
-                                <td>@line.TaxAmount.ToString("0.00") €</td>
-                                <td>@line.LineTotal.ToString("0.00") €</td>
+                                <td>@line.UnitPrice.ToUiString("0.0000")</td>
+                                <td>@line.LineSubtotal.ToUiString("0.00") €</td>
+                                <td>@line.TaxAmount.ToUiString("0.00") €</td>
+                                <td>@line.LineTotal.ToUiString("0.00") €</td>
                             </tr>
                         }
                     </tbody>
@@ -161,17 +165,17 @@
             <section class="document-section">
                 <div class="document-grid-two">
                     <section class="document-box">
-                        <h2>Albaranes incluidos</h2>
+                        <h2>@L("Albaranes incluidos", "Albarans inclosos", "Included shipments")</h2>
                         <ul class="document-list">
                             @foreach (var shipment in invoice.Shipments)
                             {
-                                <li>@shipment.DisplayNumber · Pedido @shipment.OrderNumber · @shipment.EstimatedAmount.ToString("0.00") €</li>
+                                <li>@shipment.DisplayNumber · @L("Pedido", "Comanda", "Order") @shipment.OrderNumber.ToUiString("N0") · @shipment.EstimatedAmount.ToUiString("0.00") €</li>
                             }
                         </ul>
                     </section>
                     <section class="document-box">
-                        <h2>Notas</h2>
-                        <p>@(string.IsNullOrWhiteSpace(invoice.Notes) ? "Sin observaciones." : invoice.Notes)</p>
+                        <h2>@L("Notas", "Notes", "Notes")</h2>
+                        <p>@(string.IsNullOrWhiteSpace(invoice.Notes) ? L("Sin observaciones registradas.", "Sense observacions registrades.", "No remarks recorded.") : invoice.Notes)</p>
                     </section>
                 </div>
             </section>
@@ -179,24 +183,24 @@
             @if (invoice.Payments.Count > 0)
             {
                 <section class="document-section">
-                    <h2>Cobros registrados</h2>
+                    <h2>@L("Cobros registrados", "Cobraments registrats", "Recorded payments")</h2>
                     <table class="data-table document-table">
                         <thead>
                             <tr>
-                                <th>Cobro</th>
-                                <th>Fecha</th>
-                                <th>Importe</th>
-                                <th>Método</th>
-                                <th>Referencia</th>
+                                <th>@L("Cobro", "Cobrament", "Payment")</th>
+                                <th>@L("Fecha", "Data", "Date")</th>
+                                <th>@L("Importe", "Import", "Amount")</th>
+                                <th>@L("Método", "Mètode", "Method")</th>
+                                <th>@L("Referencia", "Referència", "Reference")</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach (var payment in invoice.Payments)
                             {
                                 <tr>
-                                    <td>@payment.PaymentNumber</td>
+                                    <td>@payment.PaymentNumber.ToUiString("N0")</td>
                                     <td>@payment.PaymentDate.ToString("dd/MM/yyyy")</td>
-                                    <td>@payment.Amount.ToString("0.00") €</td>
+                                    <td>@payment.Amount.ToUiString("0.00") €</td>
                                     <td>@DisplayValue(payment.Method)</td>
                                     <td>@DisplayValue(payment.Reference)</td>
                                 </tr>
@@ -210,6 +214,14 @@
 </div>
 
 @code {
+    private string L(string spanish, string catalan, string english) =>
+        T.CurrentLanguage switch
+        {
+            AppLanguages.Catalan => catalan,
+            AppLanguages.English => english,
+            _ => spanish
+        };
+
     [Parameter]
     public int InvoiceNumber { get; set; }
 
@@ -217,6 +229,34 @@
     private Guid? companyId;
     private SalesInvoiceDto? invoice;
     private string errorMessage = string.Empty;
+    private bool IsModelInvoicesRoute =>
+        NavigationManager.ToBaseRelativePath(NavigationManager.Uri).StartsWith("ventas/facturas-models", StringComparison.OrdinalIgnoreCase);
+    private bool IsTeixitsMostresInvoicesRoute =>
+        NavigationManager.ToBaseRelativePath(NavigationManager.Uri).StartsWith("ventas/facturas-teixits-mostres", StringComparison.OrdinalIgnoreCase);
+
+    private string PageTitleText => IsModelInvoicesRoute
+        ? $"{L("PDF factura models", "PDF factura models", "Model invoice PDF")} {InvoiceNumber}"
+        : IsTeixitsMostresInvoicesRoute
+            ? $"{L("PDF factura teixits-mostres", "PDF factura teixits-mostres", "Fabric & sample invoice PDF")} {InvoiceNumber}"
+            : $"{L("PDF factura", "PDF factura", "Invoice PDF")} {InvoiceNumber}";
+
+    private string DocumentEyebrowText => IsModelInvoicesRoute
+        ? L("Factura Models", "Factura Models", "Model invoice")
+        : IsTeixitsMostresInvoicesRoute
+            ? L("Factura Teixits-Mostres", "Factura Teixits-Mostres", "Fabric & sample invoice")
+            : L("Factura de cliente", "Factura de client", "Customer invoice");
+
+    private string BackToDocumentHref => IsModelInvoicesRoute
+        ? $"/ventas/facturas-models/{InvoiceNumber}"
+        : IsTeixitsMostresInvoicesRoute
+            ? $"/ventas/facturas-teixits-mostres/{InvoiceNumber}"
+            : $"/ventas/facturas/{InvoiceNumber}";
+
+    private string BackToDocumentText => IsModelInvoicesRoute
+        ? L("Volver a la factura models", "Tornar a la factura models", "Back to model invoice")
+        : IsTeixitsMostresInvoicesRoute
+            ? L("Volver a la factura teixits-mostres", "Tornar a la factura teixits-mostres", "Back to fabric & sample invoice")
+            : L("Volver a la factura", "Tornar a la factura", "Back to invoice");
 
     private string ClientLocation
     {
@@ -263,22 +303,22 @@
         }
     }
 
-    private static string DisplayValue(string value) => string.IsNullOrWhiteSpace(value) ? "Sin dato" : value;
+    private string DisplayValue(string value) => string.IsNullOrWhiteSpace(value) ? L("Sin dato", "Sense dada", "No data") : value;
 
-    private static string FormatInvoiceStatus(string status) => status switch
+    private string FormatInvoiceStatus(string status) => status switch
     {
-        SalesInvoiceStatuses.Issued => "Emitida",
-        SalesInvoiceStatuses.Cancelled => "Anulada",
+        SalesInvoiceStatuses.Issued => L("Emitida", "Emesa", "Issued"),
+        SalesInvoiceStatuses.Cancelled => L("Anulada", "Anul·lada", "Cancelled"),
         _ => status
     };
 
-    private static string FormatPaymentStatus(string status, bool isOverdue) => status switch
+    private string FormatPaymentStatus(string status, bool isOverdue) => status switch
     {
-        SalesInvoicePaymentStatuses.Pending when isOverdue => "Pendiente vencida",
-        SalesInvoicePaymentStatuses.Pending => "Pendiente",
-        SalesInvoicePaymentStatuses.PartiallyPaid when isOverdue => "Cobro parcial vencido",
-        SalesInvoicePaymentStatuses.PartiallyPaid => "Cobro parcial",
-        SalesInvoicePaymentStatuses.Paid => "Cobrada",
+        SalesInvoicePaymentStatuses.Pending when isOverdue => L("Pendiente vencida", "Pendent vençuda", "Overdue pending"),
+        SalesInvoicePaymentStatuses.Pending => L("Pendiente", "Pendent", "Pending"),
+        SalesInvoicePaymentStatuses.PartiallyPaid when isOverdue => L("Cobro parcial vencido", "Cobrament parcial vençut", "Overdue partial payment"),
+        SalesInvoicePaymentStatuses.PartiallyPaid => L("Cobro parcial", "Cobrament parcial", "Partial payment"),
+        SalesInvoicePaymentStatuses.Paid => L("Cobrada", "Cobrada", "Paid"),
         _ => status
     };
 }

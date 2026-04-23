@@ -8,26 +8,27 @@
 @inject ITejidoQueries TejidoQueries
 @inject ITejidoService TejidoService
 @inject NavigationManager NavigationManager
+@inject AppText T
 
-<PageTitle>@(!string.IsNullOrWhiteSpace(Code) ? $"Editar tejido {Code}" : "Nuevo tejido")</PageTitle>
+<PageTitle>@(!string.IsNullOrWhiteSpace(Code) ? $"{L("Editar tejido", "Editar teixit", "Edit fabric")} {Code}" : L("Nuevo tejido", "Nou teixit", "New fabric"))</PageTitle>
 
 <div class="page-header">
     <div>
-        <p class="eyebrow">ARTÍCULOS</p>
-        <h1>@(!string.IsNullOrWhiteSpace(Code) ? $"Ficha tejido {Code}" : "Nuevo tejido")</h1>
+        <p class="eyebrow">@L("ARTÍCULOS", "ARTICLES", "ARTICLES")</p>
+        <h1>@(!string.IsNullOrWhiteSpace(Code) ? $"{L("Ficha tejido", "Fitxa teixit", "Fabric sheet")} {Code}" : L("Nuevo tejido", "Nou teixit", "New fabric"))</h1>
         <p class="lead">@(isLegacySyncActive
-            ? "Edición sobre la SaaS local. La importación manual desde legacy refresca solo registros marcados como legacy."
-            : "Alta y edición sobre la réplica local de tejidos, filtrada por la empresa activa.")</p>
+            ? L("Edición sobre la SaaS local. La importación manual desde legacy refresca solo registros marcados como legacy.", "Edició sobre la SaaS local. La importació manual des de legacy refresca només registres marcats com a legacy.", "Editing on the local SaaS copy. Manual import from legacy refreshes only records marked as legacy.")
+            : L("Alta y edición sobre la réplica local de tejidos, filtrada por la empresa activa.", "Alta i edició sobre la rèplica local de teixits, filtrada per l'empresa activa.", "Create and edit on the local fabrics replica, filtered by the active company."))</p>
     </div>
     <div class="quick-links">
-        <a class="secondary-button link-button" href="/articulos/tejidos">Volver al listado</a>
+        <a class="secondary-button link-button" href="/articulos/tejidos">@L("Volver al listado", "Tornar al llistat", "Back to list")</a>
     </div>
 </div>
 
 @if (!tenantId.HasValue || !companyId.HasValue)
 {
     <div class="empty-state">
-        <p>No hay empresa activa seleccionada.</p>
+        <p>@L("No hay empresa activa seleccionada.", "No hi ha cap empresa activa seleccionada.", "There is no active company selected.")</p>
     </div>
 }
 else
@@ -40,8 +41,8 @@ else
     @if (isLegacySyncActive)
     {
         <div class="alert">
-            Artículos / Tejidos está en convivencia con legacy para esta empresa.
-            Esta ficha guarda cambios solo en la SaaS local y la sync manual refresca únicamente registros de origen legacy.
+            @L("Artículos / Tejidos está en convivencia con legacy para esta empresa.", "Articles / Teixits està en convivència amb legacy per a aquesta empresa.", "Articles / Fabrics is running in coexistence with legacy for this company.")
+            @L("Esta ficha guarda cambios solo en la SaaS local y la sync manual refresca únicamente registros de origen legacy.", "Aquesta fitxa desa canvis només a la SaaS local i la sync manual refresca únicament registres d'origen legacy.", "This sheet saves changes only in the local SaaS and manual sync refreshes only legacy-origin records.")
             @if (!string.IsNullOrWhiteSpace(syncStatusLabel))
             {
                 <span>@syncStatusLabel</span>
@@ -52,40 +53,40 @@ else
     @if (!canEdit && string.IsNullOrWhiteSpace(Code))
     {
         <div class="alert">
-            No tienes permisos de edición para crear tejidos nuevos en esta empresa.
+            @L("No tienes permisos de edición para crear tejidos nuevos en esta empresa.", "No tens permisos d'edició per crear teixits nous en aquesta empresa.", "You do not have edit permissions to create new fabrics in this company.")
         </div>
     }
 
     <section class="card-grid tejido-metrics-grid">
         <article class="info-card">
-            <p class="eyebrow">Origen</p>
-            <h2>@(string.IsNullOrWhiteSpace(Code) ? "Nuevo tejido" : model.Code)</h2>
+            <p class="eyebrow">@L("Origen", "Origen", "Origin")</p>
+            <h2>@(string.IsNullOrWhiteSpace(Code) ? L("Nuevo tejido", "Nou teixit", "New fabric") : model.Code)</h2>
             <p class="muted">@DisplayOrigin</p>
         </article>
         <article class="info-card">
-            <p class="eyebrow">Detalle</p>
-            <h2>@ColorsCount colores</h2>
-            <p class="muted">@CompositionCount composiciones · @FinishesCount acabados</p>
+            <p class="eyebrow">@L("Detalle", "Detall", "Detail")</p>
+            <h2>@ColorsCount @L("colores", "colors", "colors")</h2>
+            <p class="muted">@CompositionCount @L("composiciones", "composicions", "compositions") · @FinishesCount @L("acabados", "acabats", "finishes")</p>
         </article>
         <article class="info-card">
-            <p class="eyebrow">Composición</p>
+            <p class="eyebrow">@L("Composición", "Composició", "Composition")</p>
             <h2>@CompositionPercentageTotal%</h2>
-            <p class="muted">Total declarado en escandallo</p>
+            <p class="muted">@L("Total declarado en escandallo", "Total declarat a l'escandall", "Total declared in the breakdown")</p>
         </article>
         <article class="info-card">
-            <p class="eyebrow">Stock disponible</p>
-            <h2>@model.AvailableStockMeters.ToString("0.###") m</h2>
-            <p class="muted">@model.AvailableStockKilograms.ToString("0.###") kg</p>
+            <p class="eyebrow">@L("Stock disponible", "Estoc disponible", "Available stock")</p>
+            <h2>@model.AvailableStockMeters.ToUiString("0.###") m</h2>
+            <p class="muted">@model.AvailableStockKilograms.ToUiString("0.###") kg</p>
         </article>
     </section>
 
     <EditForm Model="model" OnValidSubmit="SaveAsync">
         <fieldset disabled="@isReadOnly">
             <div class="module-tabs" style="margin-top: 1rem;">
-                <button class="module-tab @(activeTab == TejidoTab.Teixit ? "active" : null)" type="button" @onclick="@(() => SetTab(TejidoTab.Teixit))">Teixit</button>
-                <button class="module-tab @(activeTab == TejidoTab.Escandall ? "active" : null)" type="button" @onclick="@(() => SetTab(TejidoTab.Escandall))">Escandall Teixit</button>
-                <button class="module-tab @(activeTab == TejidoTab.Impresion ? "active" : null)" type="button" @onclick="@(() => SetTab(TejidoTab.Impresion))">Impressió Fitxa · Etiquetes</button>
-                <button class="module-tab @(activeTab == TejidoTab.Valoracion ? "active" : null)" type="button" @onclick="@(() => SetTab(TejidoTab.Valoracion))">Valoració Stock</button>
+                <button class="module-tab @(activeTab == TejidoTab.Teixit ? "active" : null)" type="button" @onclick="@(() => SetTab(TejidoTab.Teixit))">@L("Tejido", "Teixit", "Fabric")</button>
+                <button class="module-tab @(activeTab == TejidoTab.Escandall ? "active" : null)" type="button" @onclick="@(() => SetTab(TejidoTab.Escandall))">@L("Escandallo tejido", "Escandall teixit", "Fabric breakdown")</button>
+                <button class="module-tab @(activeTab == TejidoTab.Impresion ? "active" : null)" type="button" @onclick="@(() => SetTab(TejidoTab.Impresion))">@L("Impresión ficha · etiquetas", "Impressió fitxa · etiquetes", "Sheet print · labels")</button>
+                <button class="module-tab @(activeTab == TejidoTab.Valoracion ? "active" : null)" type="button" @onclick="@(() => SetTab(TejidoTab.Valoracion))">@L("Valoración stock", "Valoració estoc", "Stock valuation")</button>
             </div>
 
             @switch (activeTab)
@@ -107,15 +108,15 @@ else
             <div class="quick-links" style="margin-top: 1rem;">
                 @if (canEdit)
                 {
-                    <button class="primary-button" type="submit">Guardar tejido</button>
+                    <button class="primary-button" type="submit">@L("Guardar tejido", "Desar teixit", "Save fabric")</button>
                 }
                 @if (canEdit && !string.IsNullOrWhiteSpace(Code))
                 {
-                    <button class="secondary-button danger-button" type="button" @onclick="DeleteAsync">Eliminar tejido</button>
+                    <button class="secondary-button danger-button" type="button" @onclick="DeleteAsync">@L("Eliminar tejido", "Eliminar teixit", "Delete fabric")</button>
                 }
                 @if (!string.IsNullOrWhiteSpace(Code))
                 {
-                    <button class="secondary-button" type="button" @onclick="LoadAuditAsync">Recargar historial</button>
+                    <button class="secondary-button" type="button" @onclick="LoadAuditAsync">@L("Recargar historial", "Recarregar historial", "Reload history")</button>
                 }
             </div>
         </fieldset>
@@ -124,11 +125,11 @@ else
     @if (!string.IsNullOrWhiteSpace(Code))
     {
         <section class="panel" style="margin-top: 1rem;">
-            <h2>Historial reciente del tejido</h2>
+            <h2>@L("Historial reciente del tejido", "Historial recent del teixit", "Recent fabric history")</h2>
             <div class="list-block">
                 @if (recentAuditLogs.Count == 0)
                 {
-                    <p class="muted">Todavía no hay eventos auditados para este tejido.</p>
+                    <p class="muted">@L("Todavía no hay eventos auditados para este tejido.", "Encara no hi ha esdeveniments auditats per a aquest teixit.", "There are no audited events for this fabric yet.")</p>
                 }
                 else
                 {
@@ -199,7 +200,9 @@ else
     private int ColorsWithoutMinimumCount => model.Colors.Count(item => item.MinimumStock <= 0m);
     private int CompositionPercentageTotal => model.Composition.Sum(item => Math.Max(item.Percentage, 0));
     private decimal CompositionPercentageGap => 100m - CompositionPercentageTotal;
-    private string DisplayOrigin => string.IsNullOrWhiteSpace(model.Code) ? "Pendiente de guardar" : $"Origen {(string.IsNullOrWhiteSpace(Code) ? "local" : "local/legacy")} · centro {model.CompanyCenterCode}";
+    private string DisplayOrigin => string.IsNullOrWhiteSpace(model.Code)
+        ? L("Pendiente de guardar", "Pendent de desar", "Pending save")
+        : $"{L("Origen", "Origen", "Origin")} {(string.IsNullOrWhiteSpace(Code) ? "local" : "local/legacy")} · {L("centro", "centre", "center")} {model.CompanyCenterCode}";
     private decimal NormalizedWidthMeters => ResolveWidthMeters(model.Width2, model.WidthText);
     private decimal LinearMeterWeight => Math.Round(model.GramWeight * Math.Max(NormalizedWidthMeters, 0m) * (model.IsTubular ? 2m : 1m), 3, MidpointRounding.AwayFromZero);
     private decimal RawStockValue => Math.Round(model.RawStockKilograms * model.RawCost, 2, MidpointRounding.AwayFromZero);
@@ -232,10 +235,21 @@ else
         ? string.Empty
         : $"/articulos/tejidos/{Uri.EscapeDataString(model.Code)}/reposicion?lines={Uri.EscapeDataString(string.Join(",", SelectedReplenishmentCandidates.Select(item => item.LineNumber)))}";
     private IReadOnlyList<TejidoValuationRow> ValuationRows => BuildValuationRows();
-    private string CompositionStatusLabel => CompositionPercentageTotal == 100 ? "Completa" : CompositionPercentageTotal < 100 ? "Incompleta" : "Excedida";
+    private string CompositionStatusLabel => CompositionPercentageTotal == 100
+        ? L("Completa", "Completa", "Complete")
+        : CompositionPercentageTotal < 100
+            ? L("Incompleta", "Incompleta", "Incomplete")
+            : L("Excedida", "Excedida", "Exceeded");
     private string FinishSummarySuggested => string.Join(" · ", model.Finishes.OrderBy(item => item.Order).ThenBy(item => item.LineNumber).Select(item => item.FinishCode).Where(item => !string.IsNullOrWhiteSpace(item)).Distinct(StringComparer.OrdinalIgnoreCase));
     private string CompositionTextSuggested => string.Join(" + ", model.Composition.OrderBy(item => item.LineNumber).Where(item => item.Percentage > 0 || !string.IsNullOrWhiteSpace(item.ComponentCode)).Select(item => $"{item.Percentage}% {item.ComponentCode}".Trim()).Where(item => !string.IsNullOrWhiteSpace(item)));
     private string EffectiveLabelMode => NormalizeLabelMode(labelMode);
+    private string L(string spanish, string catalan, string english) =>
+        T.CurrentLanguage switch
+        {
+            AppLanguages.Catalan => catalan,
+            AppLanguages.English => english,
+            _ => spanish
+        };
 
     protected override async Task OnParametersSetAsync()
     {
@@ -259,7 +273,7 @@ else
             var detail = await TejidoQueries.GetByCodeAsync(tenantId.Value, companyId.Value, Uri.UnescapeDataString(Code));
             if (detail is null)
             {
-                statusMessage = "No se ha encontrado el tejido solicitado.";
+                statusMessage = L("No se ha encontrado el tejido solicitado.", "No s'ha trobat el teixit sol·licitat.", "The requested fabric was not found.");
                 isError = true;
                 model = new TejidoDetailDto();
                 recentAuditLogs = [];
@@ -310,7 +324,7 @@ else
 
         if (isReadOnly)
         {
-            statusMessage = "No tienes permisos de edición en este tenant.";
+            statusMessage = L("No tienes permisos de edición en este tenant.", "No tens permisos d'edició en aquest tenant.", "You do not have edit permissions in this tenant.");
             isError = true;
             return;
         }
@@ -387,8 +401,8 @@ else
             });
 
             statusMessage = !string.IsNullOrWhiteSpace(Code)
-                ? "Tejido actualizado correctamente."
-                : "Tejido creado correctamente.";
+                ? L("Tejido actualizado correctamente.", "Teixit actualitzat correctament.", "Fabric updated successfully.")
+                : L("Tejido creado correctamente.", "Teixit creat correctament.", "Fabric created successfully.");
 
             if (string.IsNullOrWhiteSpace(Code))
             {
@@ -427,7 +441,7 @@ else
         isLegacySyncActive = true;
         syncStatusLabel = status.LastCompletedUtc.HasValue
             ? $"Última sync: {status.LastCompletedUtc.Value.ToLocalTime():dd/MM/yyyy HH:mm:ss} · Ins: {status.LastInserted} · Act: {status.LastUpdated} · Omi: {status.LastSkipped} · Err: {status.LastErrors}"
-            : $"Estado: {status.LastStatus}";
+            : $"{L("Estado", "Estat", "Status")}: {status.LastStatus}";
     }
 
     private void AddColor()
@@ -608,61 +622,61 @@ else
             <div>
                 <div class="detail-panel-header">
                     <div>
-                        <h2>Teixit</h2>
-                        <p class="muted">Ficha principal, stock y carta de colores del tejido.</p>
+                        <h2>@L("Tejido", "Teixit", "Fabric")</h2>
+                        <p class="muted">@L("Ficha principal, stock y carta de colores del tejido.", "Fitxa principal, estoc i carta de colors del teixit.", "Main sheet, stock and color card for the fabric.")</p>
                     </div>
                 </div>
                 <div class="form-grid">
                     <label class="field">
-                        <span>Codi teixit</span>
+                        <span>@L("Código tejido", "Codi teixit", "Fabric code")</span>
                         <InputText class="text-input" @bind-Value="model.Code" disabled="@(!string.IsNullOrWhiteSpace(Code))" />
                     </label>
                     <label class="field wide">
-                        <span>Descripció</span>
+                        <span>@L("Descripción", "Descripció", "Description")</span>
                         <InputText class="text-input" @bind-Value="model.Description" />
                     </label>
                     <label class="field">
-                        <span>Gramatge gr/m2</span>
+                        <span>@L("Gramaje gr/m2", "Gramatge gr/m2", "Weight gr/m2")</span>
                         <InputNumber class="text-input" @bind-Value="model.GramWeight" @bind-Value:after="RecalculateColorPrices" />
                     </label>
                     <label class="field">
-                        <span>Metre lineal</span>
-                        <input class="text-input" value="@LinearMeterWeight.ToString("0.###")" disabled />
+                        <span>@L("Metro lineal", "Metre lineal", "Linear meter")</span>
+                        <input class="text-input" value="@LinearMeterWeight.ToUiString("0.###")" disabled />
                     </label>
                     <label class="field wide">
-                        <span>Nro de fil</span>
+                        <span>@L("Nº de hilo", "Nre. de fil", "Yarn detail")</span>
                         <InputText class="text-input" @bind-Value="model.CompositionText" />
                     </label>
                     <label class="field">
-                        <span>NC code</span>
+                        <span>@L("Código NC", "Codi NC", "CN code")</span>
                         <InputText class="text-input" @bind-Value="model.VatCode" />
                     </label>
                     <label class="field wide">
-                        <span>Composició resum</span>
+                        <span>@L("Composición resumen", "Composició resum", "Composition summary")</span>
                         <InputText class="text-input" @bind-Value="model.FinishSummary" />
                     </label>
                     <label class="field">
-                        <span>Ample</span>
+                        <span>@L("Ancho", "Ample", "Width")</span>
                         <InputText class="text-input" @bind-Value="model.WidthText" />
                     </label>
                     <label class="field">
-                        <span>Ample nou</span>
+                        <span>@L("Ancho nuevo", "Ample nou", "New width")</span>
                         <InputNumber class="text-input" @bind-Value="model.Width2" @bind-Value:after="RecalculateColorPrices" />
                     </label>
                     <label class="field checkbox-field">
                         <InputCheckbox @bind-Value="model.IsTubular" @bind-Value:after="RecalculateColorPrices" />
-                        <span>Tubular</span>
+                        <span>@L("Tubular", "Tubular", "Tubular")</span>
                     </label>
                     <label class="field">
-                        <span>Rendiment</span>
+                        <span>@L("Rendimiento", "Rendiment", "Yield")</span>
                         <InputNumber class="text-input" @bind-Value="model.Yield" @bind-Value:after="RecalculateColorPrices" />
                     </label>
                     <label class="field">
-                        <span>% marge</span>
+                        <span>@L("% margen", "% marge", "% margin")</span>
                         <InputNumber class="text-input" @bind-Value="model.Margin" @bind-Value:after="RecalculateColorPrices" />
                     </label>
                     <label class="field">
-                        <span>Màquina</span>
+                        <span>@L("Máquina", "Màquina", "Machine")</span>
                         @if (machineOptions.Count == 0)
                         {
                             <InputNumber class="text-input" @bind-Value="model.MachineCode" />
@@ -670,7 +684,7 @@ else
                         else
                         {
                             <InputSelect class="text-input" @bind-Value="model.MachineCode">
-                                <option value="0">Selecciona máquina</option>
+                                <option value="0">@L("Selecciona máquina", "Selecciona màquina", "Select machine")</option>
                                 @foreach (var machine in machineOptions)
                                 {
                                     <option value="@ParseMachineCode(machine.Code)">@FormatMachineOption(machine)</option>
@@ -679,53 +693,53 @@ else
                         }
                     </label>
                     <label class="field">
-                        <span>Preu metre</span>
+                        <span>@L("Precio metro", "Preu metre", "Price per meter")</span>
                         <InputNumber class="text-input" @bind-Value="model.PricePerMeter" />
                     </label>
                     <label class="field">
-                        <span>Preu quilo</span>
+                        <span>@L("Precio kilo", "Preu quilo", "Price per kilogram")</span>
                         <InputNumber class="text-input" @bind-Value="model.PricePerKilogram" />
                     </label>
                     <label class="field">
-                        <span>Preu model</span>
+                        <span>@L("Precio model", "Preu model", "Sample price")</span>
                         <InputNumber class="text-input" @bind-Value="model.SamplePrice" />
                     </label>
                 </div>
             </div>
             <label class="field tejido-notes-area">
-                <span>Notes</span>
+                <span>@L("Notas", "Notes", "Notes")</span>
                 <InputTextArea class="text-area" @bind-Value="model.Notes" />
             </label>
         </div>
 
         <div class="tejido-stock-grid" style="margin-top: 1rem;">
             <article class="info-card stock-card raw">
-                <p class="eyebrow">Stock cru</p>
-                <h3>@model.RawStockKilograms.ToString("0.###") kg</h3>
-                <p class="muted">@model.RawStockMeters.ToString("0.###") metres · valor @RawStockValue.ToString("0.00") €</p>
+                <p class="eyebrow">@L("Stock crudo", "Estoc cru", "Raw stock")</p>
+                <h3>@model.RawStockKilograms.ToUiString("0.###") kg</h3>
+                <p class="muted">@model.RawStockMeters.ToUiString("0.###") @L("metros", "metres", "meters") · @L("valor", "valor", "value") @RawStockValue.ToUiString("0.00") €</p>
             </article>
             <article class="info-card stock-card finished">
-                <p class="eyebrow">Stock disposat / color</p>
-                <h3>@model.AvailableStockKilograms.ToString("0.###") kg</h3>
-                <p class="muted">@TotalColorMeters.ToString("0.###") metres · valor @FinishedStockValue.ToString("0.00") €</p>
+                <p class="eyebrow">@L("Stock dispuesto / color", "Estoc disposat / color", "Prepared stock / color")</p>
+                <h3>@model.AvailableStockKilograms.ToUiString("0.###") kg</h3>
+                <p class="muted">@TotalColorMeters.ToUiString("0.###") @L("metros", "metres", "meters") · @L("valor", "valor", "value") @FinishedStockValue.ToUiString("0.00") €</p>
             </article>
         </div>
 
         <div class="tejido-color-signal-grid" style="margin-top: 1rem;">
             <article class="info-card stock-signal-card warning">
-                <p class="eyebrow">Colores bajo mínimo</p>
+                <p class="eyebrow">@L("Colores bajo mínimo", "Colors sota mínim", "Colors below minimum")</p>
                 <h3>@ColorsBelowMinimumCount</h3>
-                <p class="muted">Necesitan reposición o revisión de stock.</p>
+                <p class="muted">@L("Necesitan reposición o revisión de stock.", "Necessiten reposició o revisió d'estoc.", "They need replenishment or stock review.")</p>
             </article>
             <article class="info-card stock-signal-card danger">
-                <p class="eyebrow">Colores sin stock</p>
+                <p class="eyebrow">@L("Colores sin stock", "Colors sense estoc", "Colors without stock")</p>
                 <h3>@ColorsWithoutStockCount</h3>
-                <p class="muted">No tienen metros disponibles ahora mismo.</p>
+                <p class="muted">@L("No tienen metros disponibles ahora mismo.", "No tenen metres disponibles ara mateix.", "They have no meters available right now.")</p>
             </article>
             <article class="info-card stock-signal-card success">
-                <p class="eyebrow">Colores en rango</p>
+                <p class="eyebrow">@L("Colores en rango", "Colors en rang", "Healthy colors")</p>
                 <h3>@ColorsHealthyCount</h3>
-                <p class="muted">Cumplen mínimo y tienen stock disponible.</p>
+                <p class="muted">@L("Cumplen mínimo y tienen stock disponible.", "Compleixen mínim i tenen estoc disponible.", "They meet the minimum and have available stock.")</p>
             </article>
         </div>
 
@@ -735,39 +749,39 @@ else
     private RenderFragment RenderEscandalloTab() => @<section class="panel" style="margin-top: 1rem;">
         <div class="detail-panel-header">
             <div>
-                <h2>Escandall Teixit</h2>
-                <p class="muted">Costes del circuito productivo, composición y acabados del tejido.</p>
+                <h2>@L("Escandallo tejido", "Escandall teixit", "Fabric breakdown")</h2>
+                <p class="muted">@L("Costes del circuito productivo, composición y acabados del tejido.", "Costos del circuit productiu, composició i acabats del teixit.", "Costs for the production flow, composition and finishes of the fabric.")</p>
             </div>
         </div>
 
         <div class="tejido-cost-grid">
             <article class="info-card">
-                <p class="eyebrow">Material</p>
-                <h3>@model.MaterialCost.ToString("0.0000")</h3>
-                <p class="muted">Coste base de hilo / materia prima</p>
+                <p class="eyebrow">@L("Material", "Material", "Material")</p>
+                <h3>@model.MaterialCost.ToUiString("0.0000")</h3>
+                <p class="muted">@L("Coste base de hilo / materia prima", "Cost base de fil / matèria primera", "Base yarn / raw material cost")</p>
             </article>
             <article class="info-card">
-                <p class="eyebrow">Tejedor</p>
+                <p class="eyebrow">@L("Tejedor", "Teixidor", "Weaver")</p>
                 <h3>@DisplayValue(model.WeaverCode)</h3>
-                <p class="muted">Coste @model.WeavingCost.ToString("0.0000")</p>
+                <p class="muted">@L("Coste", "Cost", "Cost") @model.WeavingCost.ToUiString("0.0000")</p>
             </article>
             <article class="info-card">
-                <p class="eyebrow">Estampador</p>
+                <p class="eyebrow">@L("Estampador", "Estampador", "Printer")</p>
                 <h3>@DisplayValue(model.PrinterCode)</h3>
-                <p class="muted">Coste @model.PrintingCost.ToString("0.0000")</p>
+                <p class="muted">@L("Coste", "Cost", "Cost") @model.PrintingCost.ToUiString("0.0000")</p>
             </article>
             <article class="info-card">
-                <p class="eyebrow">Acabador</p>
+                <p class="eyebrow">@L("Acabador", "Acabador", "Finisher")</p>
                 <h3>@DisplayValue(model.FinisherCode)</h3>
-                <p class="muted">Coste @model.FinishingCost.ToString("0.0000")</p>
+                <p class="muted">@L("Coste", "Cost", "Cost") @model.FinishingCost.ToUiString("0.0000")</p>
             </article>
             <article class="info-card">
-                <p class="eyebrow">Coste cru</p>
-                <h3>@model.RawCost.ToString("0.0000")</h3>
-                <p class="muted">Base usada para valoración y colores</p>
+                <p class="eyebrow">@L("Coste crudo", "Cost cru", "Raw cost")</p>
+                <h3>@model.RawCost.ToUiString("0.0000")</h3>
+                <p class="muted">@L("Base usada para valoración y colores", "Base usada per a valoració i colors", "Base used for valuation and colors")</p>
             </article>
             <article class="info-card">
-                <p class="eyebrow">Composición</p>
+                <p class="eyebrow">@L("Composición", "Composició", "Composition")</p>
                 <h3>@CompositionStatusLabel</h3>
                 <p class="muted">@CompositionPercentageTotal% · gap @CompositionPercentageGap.ToString("+0;-0;0")%</p>
             </article>
@@ -775,60 +789,60 @@ else
 
         <div class="form-grid" style="margin-top: 1rem;">
             <label class="field">
-                <span>Coste material</span>
+                <span>@L("Coste material", "Cost material", "Material cost")</span>
                 <InputNumber class="text-input" @bind-Value="model.MaterialCost" @bind-Value:after="RecalculateColorPrices" />
             </label>
             <label class="field">
-                <span>Tejedor</span>
+                <span>@L("Tejedor", "Teixidor", "Weaver")</span>
                 <InputNumber class="text-input" @bind-Value="model.WeaverCode" />
             </label>
             <label class="field">
-                <span>Coste tejer</span>
+                <span>@L("Coste tejer", "Cost teixir", "Weaving cost")</span>
                 <InputNumber class="text-input" @bind-Value="model.WeavingCost" />
             </label>
             <label class="field">
-                <span>Estampador</span>
+                <span>@L("Estampador", "Estampador", "Printer")</span>
                 <InputNumber class="text-input" @bind-Value="model.PrinterCode" />
             </label>
             <label class="field">
-                <span>Coste estampar</span>
+                <span>@L("Coste estampar", "Cost estampar", "Printing cost")</span>
                 <InputNumber class="text-input" @bind-Value="model.PrintingCost" />
             </label>
             <label class="field">
-                <span>Acabador</span>
+                <span>@L("Acabador", "Acabador", "Finisher")</span>
                 <InputNumber class="text-input" @bind-Value="model.FinisherCode" />
             </label>
             <label class="field wide">
-                <span>Resumen acabados</span>
+                <span>@L("Resumen acabados", "Resum acabats", "Finish summary")</span>
                 <InputText class="text-input" @bind-Value="model.FinishSummary" />
             </label>
             <label class="field">
-                <span>Coste acabats</span>
+                <span>@L("Coste acabados", "Cost acabats", "Finishing cost")</span>
                 <InputNumber class="text-input" @bind-Value="model.FinishingCost" />
             </label>
             <label class="field">
-                <span>Coste cru</span>
+                <span>@L("Coste crudo", "Cost cru", "Raw cost")</span>
                 <InputNumber class="text-input" @bind-Value="model.RawCost" @bind-Value:after="RecalculateColorPrices" />
             </label>
         </div>
 
         <div class="quick-links" style="margin-top: 1rem;">
-            <button class="secondary-button" type="button" @onclick="RecalculateColorPrices">Recalcular precios de colores</button>
-            <button class="secondary-button" type="button" @onclick="ApplySuggestedCompositionText">Autocompletar composición texto</button>
-            <button class="secondary-button" type="button" @onclick="ApplySuggestedFinishSummary">Autocompletar resumen acabados</button>
+            <button class="secondary-button" type="button" @onclick="RecalculateColorPrices">@L("Recalcular precios de colores", "Recalcular preus de colors", "Recalculate color prices")</button>
+            <button class="secondary-button" type="button" @onclick="ApplySuggestedCompositionText">@L("Autocompletar composición texto", "Autocompletar composició text", "Autocomplete composition text")</button>
+            <button class="secondary-button" type="button" @onclick="ApplySuggestedFinishSummary">@L("Autocompletar resumen acabados", "Autocompletar resum acabats", "Autocomplete finish summary")</button>
         </div>
 
         @if (CompositionPercentageTotal != 100)
         {
             <div class="alert" style="margin-top: 1rem;">
-                El escandallo de composición suma <strong>@CompositionPercentageTotal%</strong>.
+                @L("El escandallo de composición suma", "L'escandall de composició suma", "The composition breakdown totals") <strong>@CompositionPercentageTotal%</strong>.
                 @if (CompositionPercentageTotal < 100)
                 {
-                    <span> Faltan @Math.Abs(CompositionPercentageGap)% para llegar a 100%.</span>
+                    <span> @L("Faltan", "Falten", "Missing") @Math.Abs(CompositionPercentageGap)% @L("para llegar a 100%.", "per arribar al 100%.", "to reach 100%.")</span>
                 }
                 else
                 {
-                    <span> Sobran @(Math.Abs(CompositionPercentageGap))% sobre el 100%.</span>
+                    <span> @L("Sobran", "Sobren", "Excess") @(Math.Abs(CompositionPercentageGap))% @L("sobre el 100%.", "sobre el 100%.", "over 100%.")</span>
                 }
             </div>
         }
@@ -840,67 +854,67 @@ else
     private RenderFragment RenderImpresionTab() => @<section class="panel" style="margin-top: 1rem;">
         <div class="detail-panel-header">
             <div>
-                <h2>Impressió Fitxa · Etiquetes</h2>
-                <p class="muted">Previsualiza la ficha, las etiquetas y la valoración antes de abrir cada documento.</p>
+                <h2>@L("Impresión ficha · etiquetas", "Impressió fitxa · etiquetes", "Sheet print · labels")</h2>
+                <p class="muted">@L("Previsualiza la ficha, las etiquetas y la valoración antes de abrir cada documento.", "Previsualitza la fitxa, les etiquetes i la valoració abans d'obrir cada document.", "Preview the sheet, labels and valuation before opening each document.")</p>
             </div>
         </div>
 
         @if (string.IsNullOrWhiteSpace(model.Code))
         {
             <div class="alert">
-                Guarda primero el tejido para poder generar la ficha técnica, las etiquetas y la valoración imprimible.
+                @L("Guarda primero el tejido para poder generar la ficha técnica, las etiquetas y la valoración imprimible.", "Desa primer el teixit per poder generar la fitxa tècnica, les etiquetes i la valoració imprimible.", "Save the fabric first to generate the technical sheet, labels and printable valuation.")
             </div>
         }
         else
         {
             <div class="impression-preview-grid">
                 <article class="panel print-preview-card">
-                    <p class="eyebrow">Fitxa tècnica</p>
-                    <h3>@model.Code · Fitxa completa</h3>
-                    <p class="muted">Incluye cabecera, costes, stock, carta de colores, composición y acabados.</p>
+                    <p class="eyebrow">@L("Ficha técnica", "Fitxa tècnica", "Technical sheet")</p>
+                    <h3>@model.Code · @L("Ficha completa", "Fitxa completa", "Full sheet")</h3>
+                    <p class="muted">@L("Incluye cabecera, costes, stock, carta de colores, composición y acabados.", "Inclou capçalera, costos, estoc, carta de colors, composició i acabats.", "Includes header, costs, stock, color card, composition and finishes.")</p>
                     <div class="print-preview-sheet">
                         <div class="print-preview-sheet-header">
                             <strong>@model.Code</strong>
                             <span>@DisplayValue(model.Description)</span>
                         </div>
                         <div class="print-preview-kpis">
-                            <span>@model.GramWeight.ToString("0.###") gr/m2</span>
+                            <span>@model.GramWeight.ToUiString("0.###") gr/m2</span>
                             <span>@DisplayValue(model.WidthText)</span>
-                            <span>@(model.IsTubular ? "Tubular" : "Plano")</span>
-                            <span>@ColorsCount colores</span>
+                            <span>@(model.IsTubular ? L("Tubular", "Tubular", "Tubular") : L("Plano", "Pla", "Flat"))</span>
+                            <span>@ColorsCount @L("colores", "colors", "colors")</span>
                         </div>
                         <ul class="document-list print-preview-list">
-                            <li>Composición texto: @DisplayValue(model.CompositionText)</li>
-                            <li>Escandallo: @CompositionCount composiciones · @FinishesCount acabados</li>
-                            <li>Stock: @model.AvailableStockMeters.ToString("0.###") m · @model.AvailableStockKilograms.ToString("0.###") kg</li>
+                            <li>@L("Composición texto", "Composició text", "Composition text"): @DisplayValue(model.CompositionText)</li>
+                            <li>@L("Escandallo", "Escandall", "Breakdown"): @CompositionCount @L("composiciones", "composicions", "compositions") · @FinishesCount @L("acabados", "acabats", "finishes")</li>
+                            <li>@L("Stock", "Estoc", "Stock"): @model.AvailableStockMeters.ToUiString("0.###") m · @model.AvailableStockKilograms.ToUiString("0.###") kg</li>
                         </ul>
                     </div>
                     <div class="quick-links" style="margin-top: 0.85rem;">
-                        <a class="primary-button link-button" href="@TechnicalSheetUrl" target="_blank">Abrir ficha imprimible</a>
+                        <a class="primary-button link-button" href="@TechnicalSheetUrl" target="_blank">@L("Abrir ficha imprimible", "Obrir fitxa imprimible", "Open printable sheet")</a>
                     </div>
                 </article>
                 <article class="panel print-preview-card">
-                    <p class="eyebrow">Etiquetes</p>
+                    <p class="eyebrow">@L("Etiquetas", "Etiquetes", "Labels")</p>
                     <h3>@Math.Max(labelCount, 1) uds. · @GetLabelModeDisplayName(EffectiveLabelMode)</h3>
                     <p class="muted">@GetLabelModeDescription(EffectiveLabelMode)</p>
                     <div class="form-grid" style="margin-top: 0.75rem;">
                         <label class="field">
-                            <span>Nº etiquetas</span>
+                            <span>@L("Nº etiquetas", "Nre. etiquetes", "Label count")</span>
                             <InputNumber class="text-input" @bind-Value="labelCount" />
                         </label>
                         <label class="field">
-                            <span>Formato</span>
+                            <span>@L("Formato", "Format", "Format")</span>
                             <InputSelect class="text-input" @bind-Value="labelMode">
-                                <option value="standard">Estándar</option>
-                                <option value="compact">Compacta</option>
-                                <option value="warehouse">Almacén</option>
+                                <option value="standard">@L("Estándar", "Estàndard", "Standard")</option>
+                                <option value="compact">@L("Compacta", "Compacta", "Compact")</option>
+                                <option value="warehouse">@L("Almacén", "Magatzem", "Warehouse")</option>
                             </InputSelect>
                         </label>
                     </div>
                     <div class="inline-action-list" style="margin-top: 0.35rem;">
-                        <button class="secondary-button @(EffectiveLabelMode == "standard" ? "active-filter-chip" : null)" type="button" @onclick="@(() => SelectLabelMode("standard"))">Estándar</button>
-                        <button class="secondary-button @(EffectiveLabelMode == "compact" ? "active-filter-chip" : null)" type="button" @onclick="@(() => SelectLabelMode("compact"))">Compacta</button>
-                        <button class="secondary-button @(EffectiveLabelMode == "warehouse" ? "active-filter-chip" : null)" type="button" @onclick="@(() => SelectLabelMode("warehouse"))">Almacén</button>
+                        <button class="secondary-button @(EffectiveLabelMode == "standard" ? "active-filter-chip" : null)" type="button" @onclick="@(() => SelectLabelMode("standard"))">@L("Estándar", "Estàndard", "Standard")</button>
+                        <button class="secondary-button @(EffectiveLabelMode == "compact" ? "active-filter-chip" : null)" type="button" @onclick="@(() => SelectLabelMode("compact"))">@L("Compacta", "Compacta", "Compact")</button>
+                        <button class="secondary-button @(EffectiveLabelMode == "warehouse" ? "active-filter-chip" : null)" type="button" @onclick="@(() => SelectLabelMode("warehouse"))">@L("Almacén", "Magatzem", "Warehouse")</button>
                     </div>
                     <div class="labels-grid labels-grid-preview" style="margin-top: 1rem;">
                         @for (var previewIndex = 0; previewIndex < Math.Min(Math.Max(labelCount, 1), 2); previewIndex++)
@@ -909,62 +923,62 @@ else
                         }
                     </div>
                     <div class="quick-links" style="margin-top: 0.85rem;">
-                        <button class="secondary-button" type="button" @onclick="OpenLabelsPrint">Abrir etiquetas</button>
+                        <button class="secondary-button" type="button" @onclick="OpenLabelsPrint">@L("Abrir etiquetas", "Obrir etiquetes", "Open labels")</button>
                     </div>
                 </article>
                 <article class="panel print-preview-card">
-                    <p class="eyebrow">Valoració stock</p>
-                    <h3>@TotalStockValue.ToString("0.00") €</h3>
-                    <p class="muted">Resumen económico del stock cru y del stock por color, con alertas y ranking.</p>
+                    <p class="eyebrow">@L("Valoración stock", "Valoració estoc", "Stock valuation")</p>
+                    <h3>@TotalStockValue.ToUiString("0.00") €</h3>
+                    <p class="muted">@L("Resumen económico del stock crudo y del stock por color, con alertas y ranking.", "Resum econòmic de l'estoc cru i de l'estoc per color, amb alertes i rànquing.", "Economic summary of raw stock and stock by color, with alerts and ranking.")</p>
                     <div class="print-preview-sheet">
                         <div class="print-preview-kpis">
-                            <span>Stock cru @RawStockValue.ToString("0.00") €</span>
-                            <span>Stock color @FinishedStockValue.ToString("0.00") €</span>
-                            <span>Cobertura @CoveragePercentage.ToString("0.#")%</span>
+                            <span>@L("Stock crudo", "Estoc cru", "Raw stock") @RawStockValue.ToUiString("0.00") €</span>
+                            <span>@L("Stock color", "Estoc color", "Color stock") @FinishedStockValue.ToUiString("0.00") €</span>
+                            <span>@L("Cobertura", "Cobertura", "Coverage") @CoveragePercentage.ToUiString("0.#")%</span>
                         </div>
                         <ul class="document-list print-preview-list">
-                            <li>@ValuationHealthyCount colores en rango</li>
-                            <li>@ValuationBelowMinimumCount colores bajo mínimo</li>
-                            <li>@ValuationWithoutStockCount colores sin stock</li>
+                            <li>@ValuationHealthyCount @L("colores en rango", "colors en rang", "colors in range")</li>
+                            <li>@ValuationBelowMinimumCount @L("colores bajo mínimo", "colors sota mínim", "colors below minimum")</li>
+                            <li>@ValuationWithoutStockCount @L("colores sin stock", "colors sense estoc", "colors without stock")</li>
                             @if (TopValuationRows.Count > 0)
                             {
-                                <li>Top valor: @TopValuationRows[0].Color · @TopValuationRows[0].EstimatedValue.ToString("0.00") €</li>
+                                <li>@L("Top valor", "Top valor", "Top value"): @TopValuationRows[0].Color · @TopValuationRows[0].EstimatedValue.ToUiString("0.00") €</li>
                             }
                         </ul>
                     </div>
                     <div class="quick-links" style="margin-top: 0.85rem;">
-                        <a class="secondary-button link-button" href="@ValuationSheetUrl" target="_blank">Abrir valoración</a>
+                        <a class="secondary-button link-button" href="@ValuationSheetUrl" target="_blank">@L("Abrir valoración", "Obrir valoració", "Open valuation")</a>
                     </div>
                 </article>
                 <article class="panel print-preview-card">
-                    <p class="eyebrow">Reposició</p>
-                    <h3>@SelectedReplenishmentMeters.ToString("0.###") m</h3>
-                    <p class="muted">Hoja agrupada con los colores seleccionados para reponer y su valor estimado.</p>
+                    <p class="eyebrow">@L("Reposición", "Reposició", "Replenishment")</p>
+                    <h3>@SelectedReplenishmentMeters.ToUiString("0.###") m</h3>
+                    <p class="muted">@L("Hoja agrupada con los colores seleccionados para reponer y su valor estimado.", "Full agrupat amb els colors seleccionats per reposar i el seu valor estimat.", "Grouped sheet with the selected colors to replenish and their estimated value.")</p>
                     <div class="print-preview-sheet">
                         <div class="print-preview-kpis">
-                            <span>@SelectedReplenishmentCandidates.Count colores</span>
-                            <span>@SelectedReplenishmentValue.ToString("0.00") €</span>
+                            <span>@SelectedReplenishmentCandidates.Count @L("colores", "colors", "colors")</span>
+                            <span>@SelectedReplenishmentValue.ToUiString("0.00") €</span>
                         </div>
                         @if (SelectedReplenishmentCandidates.Count == 0)
                         {
-                            <p class="muted">No hay colores seleccionados para reposición en este momento.</p>
+                            <p class="muted">@L("No hay colores seleccionados para reposición en este momento.", "No hi ha colors seleccionats per reposició en aquest moment.", "There are no colors selected for replenishment right now.")</p>
                         }
                         else
                         {
                             <ul class="document-list print-preview-list">
                                 @foreach (var item in SelectedReplenishmentCandidates.Take(4))
                                 {
-                                    <li>@DisplayValue(item.Color) · faltan @GetSuggestedReplenishmentMeters(item).ToString("0.###") m</li>
+                                    <li>@DisplayValue(item.Color) · @L("faltan", "falten", "missing") @GetSuggestedReplenishmentMeters(item).ToUiString("0.###") m</li>
                                 }
                                 @if (SelectedReplenishmentCandidates.Count > 4)
                                 {
-                                    <li>Y @((SelectedReplenishmentCandidates.Count - 4)) colores más en la selección.</li>
+                                    <li>@L("Y", "I", "And") @((SelectedReplenishmentCandidates.Count - 4)) @L("colores más en la selección.", "colors més a la selecció.", "more colors in the selection.")</li>
                                 }
                             </ul>
                         }
                     </div>
                     <div class="quick-links" style="margin-top: 0.85rem;">
-                        <a class="secondary-button link-button" href="@ReplenishmentSheetUrl" target="_blank">Abrir reposición</a>
+                        <a class="secondary-button link-button" href="@ReplenishmentSheetUrl" target="_blank">@L("Abrir reposición", "Obrir reposició", "Open replenishment")</a>
                     </div>
                 </article>
             </div>
@@ -974,61 +988,61 @@ else
     private RenderFragment RenderLabelPreview() => @<article class="fabric-label fabric-label-preview @(EffectiveLabelMode == "compact" ? "compact" : EffectiveLabelMode == "warehouse" ? "warehouse" : null)">
         @if (EffectiveLabelMode == "warehouse")
         {
-            <p class="eyebrow">Almacén</p>
+            <p class="eyebrow">@L("Almacén", "Magatzem", "Warehouse")</p>
             <h2>@model.Code</h2>
             <p><strong>@DisplayValue(model.Description)</strong></p>
-            <p>Disponible @model.AvailableStockMeters.ToString("0.###") m · @model.AvailableStockKilograms.ToString("0.###") kg</p>
-            <p>@DisplayValue(model.WidthText) · @(model.IsTubular ? "Tubular" : "Plano")</p>
+                                    <p>@L("Disponible", "Disponible", "Available") @model.AvailableStockMeters.ToUiString("0.###") m · @model.AvailableStockKilograms.ToUiString("0.###") kg</p>
+            <p>@DisplayValue(model.WidthText) · @(model.IsTubular ? L("Tubular", "Tubular", "Tubular") : L("Plano", "Pla", "Flat"))</p>
         }
         else if (EffectiveLabelMode == "compact")
         {
-            <p class="eyebrow">Teixit</p>
+            <p class="eyebrow">@L("Tejido", "Teixit", "Fabric")</p>
             <h2>@model.Code</h2>
             <p>@DisplayValue(model.Description)</p>
         }
         else
         {
-            <p class="eyebrow">Teixit</p>
+            <p class="eyebrow">@L("Tejido", "Teixit", "Fabric")</p>
             <h2>@model.Code</h2>
             <p><strong>@DisplayValue(model.Description)</strong></p>
             <p>@DisplayValue(model.CompositionText)</p>
-            <p>@DisplayValue(model.WidthText) · @model.GramWeight.ToString("0.###") gr/m2</p>
+            <p>@DisplayValue(model.WidthText) · @model.GramWeight.ToUiString("0.###") gr/m2</p>
         }
     </article>;
 
     private RenderFragment RenderValoracionTab() => @<section class="panel" style="margin-top: 1rem;">
         <div class="detail-panel-header">
             <div>
-                <h2>Valoració Stock</h2>
-                <p class="muted">Resumen económico del stock cru y del stock por color usando la información local del tejido.</p>
+                <h2>@L("Valoración stock", "Valoració estoc", "Stock valuation")</h2>
+                <p class="muted">@L("Resumen económico del stock crudo y del stock por color usando la información local del tejido.", "Resum econòmic de l'estoc cru i de l'estoc per color usant la informació local del teixit.", "Economic summary of raw stock and stock by color using the local fabric data.")</p>
             </div>
         </div>
 
         <div class="tejido-valuation-grid">
             <article class="info-card">
-                <p class="eyebrow">Stock cru</p>
-                <h3>@RawStockValue.ToString("0.00") €</h3>
-                <p class="muted">@model.RawStockKilograms.ToString("0.###") kg · @model.RawStockMeters.ToString("0.###") m</p>
+                <p class="eyebrow">@L("Stock crudo", "Estoc cru", "Raw stock")</p>
+                <h3>@RawStockValue.ToUiString("0.00") €</h3>
+                <p class="muted">@model.RawStockKilograms.ToUiString("0.###") kg · @model.RawStockMeters.ToUiString("0.###") m</p>
             </article>
             <article class="info-card">
-                <p class="eyebrow">Stock color</p>
-                <h3>@FinishedStockValue.ToString("0.00") €</h3>
-                <p class="muted">@TotalColorMeters.ToString("0.###") m sobre @ColorsCount colores</p>
+                <p class="eyebrow">@L("Stock color", "Estoc color", "Color stock")</p>
+                <h3>@FinishedStockValue.ToUiString("0.00") €</h3>
+                <p class="muted">@TotalColorMeters.ToUiString("0.###") m @L("sobre", "sobre", "across") @ColorsCount @L("colores", "colors", "colors")</p>
             </article>
             <article class="info-card">
-                <p class="eyebrow">Total</p>
-                <h3>@TotalStockValue.ToString("0.00") €</h3>
-                <p class="muted">Valor conjunto del tejido</p>
+                <p class="eyebrow">@L("Total", "Total", "Total")</p>
+                <h3>@TotalStockValue.ToUiString("0.00") €</h3>
+                <p class="muted">@L("Valor conjunto del tejido", "Valor conjunt del teixit", "Combined value of the fabric")</p>
             </article>
             <article class="info-card">
-                <p class="eyebrow">Cobertura</p>
-                <h3>@CoveragePercentage.ToString("0.#")%</h3>
-                <p class="muted">@ValuationHealthyCount en rango · @ValuationBelowMinimumCount bajo mínimo · @ValuationWithoutStockCount sin stock</p>
+                <p class="eyebrow">@L("Cobertura", "Cobertura", "Coverage")</p>
+                <h3>@CoveragePercentage.ToUiString("0.#")%</h3>
+                <p class="muted">@ValuationHealthyCount @L("en rango", "en rang", "in range") · @ValuationBelowMinimumCount @L("bajo mínimo", "sota mínim", "below minimum") · @ValuationWithoutStockCount @L("sin stock", "sense estoc", "without stock")</p>
             </article>
             <article class="info-card">
-                <p class="eyebrow">Peso stock color</p>
-                <h3>@RawVsFinishedPercentage.ToString("0.#")%</h3>
-                <p class="muted">del valor total está ya en colores</p>
+                <p class="eyebrow">@L("Peso stock color", "Pes estoc color", "Color stock share")</p>
+                <h3>@RawVsFinishedPercentage.ToUiString("0.#")%</h3>
+                <p class="muted">@L("del valor total está ya en colores", "del valor total ja és en colors", "of the total value is already in colors")</p>
             </article>
         </div>
 
@@ -1036,13 +1050,13 @@ else
             <article class="panel valuation-mini-panel">
                 <div class="detail-panel-header">
                     <div>
-                        <h3>Ranking por valor</h3>
-                        <p class="muted">Colores que más valor concentran en stock.</p>
+                        <h3>@L("Ranking por valor", "Rànquing per valor", "Top value ranking")</h3>
+                        <p class="muted">@L("Colores que más valor concentran en stock.", "Colors que concentren més valor en estoc.", "Colors with the highest stock value.")</p>
                     </div>
                 </div>
                 @if (TopValuationRows.Count == 0)
                 {
-                    <p class="muted">Sin colores valorables todavía.</p>
+                    <p class="muted">@L("Sin colores valorables todavía.", "Sense colors valorables encara.", "No valuable colors yet.")</p>
                 }
                 else
                 {
@@ -1051,7 +1065,7 @@ else
                         {
                             <article class="list-item">
                                 <strong>@row.Color</strong>
-                                <span>@row.EstimatedValue.ToString("0.00") € · @row.CurrentMeters.ToString("0.###") m · @GetCoverageLabel(row)</span>
+                                <span>@row.EstimatedValue.ToUiString("0.00") € · @row.CurrentMeters.ToUiString("0.###") m · @GetCoverageLabel(row)</span>
                             </article>
                         }
                     </div>
@@ -1060,13 +1074,13 @@ else
             <article class="panel valuation-mini-panel">
                 <div class="detail-panel-header">
                     <div>
-                        <h3>Alertas de stock</h3>
-                        <p class="muted">Colores con falta de cobertura o sin stock.</p>
+                        <h3>@L("Alertas de stock", "Alertes d'estoc", "Stock alerts")</h3>
+                        <p class="muted">@L("Colores con falta de cobertura o sin stock.", "Colors amb manca de cobertura o sense estoc.", "Colors with poor coverage or no stock.")</p>
                     </div>
                 </div>
                 @if (AlertValuationRows.Count == 0)
                 {
-                    <p class="muted">No hay alertas activas en la carta de colores.</p>
+                    <p class="muted">@L("No hay alertas activas en la carta de colores.", "No hi ha alertes actives a la carta de colors.", "There are no active alerts on the color card.")</p>
                 }
                 else
                 {
@@ -1075,7 +1089,7 @@ else
                         {
                             <article class="list-item">
                                 <strong>@row.Color</strong>
-                                <span>@GetCoverageLabel(row) · mínimo @row.MinimumMeters.ToString("0.###") m · actual @row.CurrentMeters.ToString("0.###") m</span>
+                                <span>@GetCoverageLabel(row) · mínimo @row.MinimumMeters.ToUiString("0.###") m · actual @row.CurrentMeters.ToUiString("0.###") m</span>
                             </article>
                         }
                     </div>
@@ -1087,22 +1101,22 @@ else
             <table class="data-table detail-table">
                 <thead>
                     <tr>
-                        <th>Color</th>
-                        <th>Estado</th>
-                        <th>Cobertura</th>
-                        <th>Actual</th>
-                        <th>Mínimo</th>
-                        <th>Tintar</th>
-                        <th>Precio</th>
+                        <th>@L("Color", "Color", "Color")</th>
+                        <th>@L("Estado", "Estat", "Status")</th>
+                        <th>@L("Cobertura", "Cobertura", "Coverage")</th>
+                        <th>@L("Actual", "Actual", "Current")</th>
+                        <th>@L("Mínimo", "Mínim", "Minimum")</th>
+                        <th>@L("Tintar", "Tintar", "Dyeing")</th>
+                        <th>@L("Precio", "Preu", "Price")</th>
                         <th>€/Mts.</th>
                         <th>€/KG</th>
-                        <th>Valor stock</th>
+                        <th>@L("Valor stock", "Valor estoc", "Stock value")</th>
                     </tr>
                 </thead>
                 <tbody>
                     @if (ValuationRows.Count == 0)
                     {
-                        <tr><td colspan="10" class="muted">No hay colores cargados para valorar el stock del tejido.</td></tr>
+                        <tr><td colspan="10" class="muted">@L("No hay colores cargados para valorar el stock del tejido.", "No hi ha colors carregats per valorar l'estoc del teixit.", "There are no colors loaded to value the fabric stock.")</td></tr>
                     }
                     else
                     {
@@ -1112,13 +1126,13 @@ else
                                 <td>@row.Color</td>
                                 <td><span class="status-pill status-pill-@GetValuationPillClass(row)">@GetValuationStatus(row)</span></td>
                                 <td>@GetCoverageLabel(row)</td>
-                                <td>@row.CurrentMeters.ToString("0.###")</td>
-                                <td>@row.MinimumMeters.ToString("0.###")</td>
-                                <td>@row.DyeingPrice.ToString("0.0000")</td>
-                                <td>@row.UnitCost.ToString("0.0000")</td>
-                                <td>@row.MetersPrice.ToString("0.0000")</td>
-                                <td>@row.KilogramsPrice.ToString("0.0000")</td>
-                                <td>@row.EstimatedValue.ToString("0.00") €</td>
+                                <td>@row.CurrentMeters.ToUiString("0.###")</td>
+                                <td>@row.MinimumMeters.ToUiString("0.###")</td>
+                                <td>@row.DyeingPrice.ToUiString("0.0000")</td>
+                                <td>@row.UnitCost.ToUiString("0.0000")</td>
+                                <td>@row.MetersPrice.ToUiString("0.0000")</td>
+                                <td>@row.KilogramsPrice.ToUiString("0.0000")</td>
+                                <td>@row.EstimatedValue.ToUiString("0.00") €</td>
                             </tr>
                         }
                     }
@@ -1130,14 +1144,14 @@ else
     private RenderFragment RenderColorsSection() => @<section class="panel detail-panel" style="margin-top: 1rem;">
         <div class="detail-panel-header">
             <div>
-                <h2>Colors per tipus de teixit</h2>
-                <p class="muted">Color, stock, mínimos y acciones rápidas de reposición por variante.</p>
+                <h2>@L("Colores por tipo de tejido", "Colors per tipus de teixit", "Colors by fabric type")</h2>
+                <p class="muted">@L("Color, stock, mínimos y acciones rápidas de reposición por variante.", "Color, estoc, mínims i accions ràpides de reposició per variant.", "Color, stock, minimums and quick replenishment actions by variant.")</p>
             </div>
             @if (!isReadOnly)
             {
                 <div class="inline-action-list">
-                    <button class="secondary-button" type="button" @onclick="UseCurrentStockAsMissingMinimums">Fijar mínimos vacíos con stock actual</button>
-                    <button class="secondary-button" type="button" @onclick="AddColor">Añadir línea</button>
+                    <button class="secondary-button" type="button" @onclick="UseCurrentStockAsMissingMinimums">@L("Fijar mínimos vacíos con stock actual", "Fixar mínims buits amb estoc actual", "Set empty minimums from current stock")</button>
+                    <button class="secondary-button" type="button" @onclick="AddColor">@L("Añadir línea", "Afegir línia", "Add line")</button>
                 </div>
             }
         </div>
@@ -1146,42 +1160,42 @@ else
             <section class="panel comparison-panel" style="margin-bottom: 1rem;">
                 <div class="detail-panel-header">
                     <div>
-                        <h3>Reposición agrupada</h3>
-                        <p class="muted">Selecciona los colores a reponer y genera una hoja agrupada del tejido.</p>
+                <h3>@L("Reposición agrupada", "Reposició agrupada", "Grouped replenishment")</h3>
+                <p class="muted">@L("Selecciona los colores a reponer y genera una hoja agrupada del tejido.", "Selecciona els colors a reposar i genera un full agrupat del teixit.", "Select the colors to replenish and generate a grouped fabric sheet.")</p>
                     </div>
                     <div class="inline-action-list">
-                        <button class="secondary-button" type="button" @onclick="SelectAllReplenishmentCandidates">Seleccionar todos</button>
-                        <button class="secondary-button" type="button" @onclick="ClearReplenishmentSelection">Limpiar selección</button>
-                        <a class="primary-button link-button" href="@ReplenishmentSheetUrl" target="_blank">Abrir hoja de reposición</a>
+                        <button class="secondary-button" type="button" @onclick="SelectAllReplenishmentCandidates">@L("Seleccionar todos", "Seleccionar-los tots", "Select all")</button>
+                        <button class="secondary-button" type="button" @onclick="ClearReplenishmentSelection">@L("Limpiar selección", "Netejar selecció", "Clear selection")</button>
+                <a class="primary-button link-button" href="@ReplenishmentSheetUrl" target="_blank">@L("Abrir hoja de reposición", "Obrir full de reposició", "Open replenishment sheet")</a>
                     </div>
                 </div>
                 <div class="stock-summary-status-grid">
                     <article class="stock-summary-status-card warning">
                         <strong>@SelectedReplenishmentCandidates.Count</strong>
-                        <span>colores seleccionados</span>
+                        <span>@L("colores seleccionados", "colors seleccionats", "selected colors")</span>
                     </article>
                     <article class="stock-summary-status-card warning">
-                        <strong>@SelectedReplenishmentMeters.ToString("0.###") m</strong>
-                        <span>metros a reponer</span>
+                        <strong>@SelectedReplenishmentMeters.ToUiString("0.###") m</strong>
+                        <span>@L("metros a reponer", "metres a reposar", "meters to replenish")</span>
                     </article>
                     <article class="stock-summary-status-card warning">
-                        <strong>@SelectedReplenishmentValue.ToString("0.00") €</strong>
-                        <span>valor estimado</span>
+                        <strong>@SelectedReplenishmentValue.ToUiString("0.00") €</strong>
+                        <span>@L("valor estimado", "valor estimat", "estimated value")</span>
                     </article>
                 </div>
                 <div class="table-scroll">
                     <table class="data-table detail-table">
                         <thead>
                             <tr>
-                                <th>Incl.</th>
-                                <th>Color</th>
-                                <th>Estado</th>
-                                <th>Actual</th>
-                                <th>Mínimo</th>
-                                <th>Falta</th>
+                        <th>@L("Incl.", "Incl.", "Incl.")</th>
+                        <th>@L("Color", "Color", "Color")</th>
+                        <th>@L("Estado", "Estat", "Status")</th>
+                        <th>@L("Actual", "Actual", "Current")</th>
+                        <th>@L("Mínimo", "Mínim", "Minimum")</th>
+                        <th>@L("Falta", "Falta", "Missing")</th>
                                 <th>€/Mts.</th>
-                                <th>Valor rep.</th>
-                                <th>Acciones</th>
+                        <th>@L("Valor rep.", "Valor rep.", "Repl. value")</th>
+                        <th>@L("Acciones", "Accions", "Actions")</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -1193,15 +1207,15 @@ else
                                     </td>
                                     <td><strong>@DisplayValue(item.Color)</strong></td>
                                     <td><span class="status-pill @GetColorStatusClass(item)">@GetColorStatusLabel(item)</span></td>
-                                    <td>@item.CurrentStock.ToString("0.###")</td>
-                                    <td>@item.MinimumStock.ToString("0.###")</td>
-                                    <td>@GetSuggestedReplenishmentMeters(item).ToString("0.###") m</td>
-                                    <td>@item.MetersPrice.ToString("0.0000")</td>
-                                    <td>@GetSuggestedReplenishmentValue(item).ToString("0.00") €</td>
+                                    <td>@item.CurrentStock.ToUiString("0.###")</td>
+                                    <td>@item.MinimumStock.ToUiString("0.###")</td>
+                                    <td>@GetSuggestedReplenishmentMeters(item).ToUiString("0.###") m</td>
+                                    <td>@item.MetersPrice.ToUiString("0.0000")</td>
+                                    <td>@GetSuggestedReplenishmentValue(item).ToUiString("0.00") €</td>
                                     <td>
                                         <div class="table-actions compact-actions">
-                                            <a class="inline-link" href="@BuildColorMovementsUrl(item)">Movs. color</a>
-                                            <a class="inline-link" href="@BuildReplenishmentAdjustmentUrl(item)">Reponer</a>
+                                            <a class="inline-link" href="@BuildColorMovementsUrl(item)">@L("Movs. color", "Movs. color", "Color movs.")</a>
+                                            <a class="inline-link" href="@BuildReplenishmentAdjustmentUrl(item)">@L("Reponer", "Reposar", "Replenish")</a>
                                         </div>
                                     </td>
                                 </tr>
@@ -1213,19 +1227,19 @@ else
         }
         <div class="tejido-color-signal-grid" style="margin-bottom: 1rem;">
             <article class="info-card stock-signal-card warning">
-                <p class="eyebrow">Reposición</p>
-                <h3>@ColorsBelowMinimumCount colores</h3>
-                <p class="muted">@SuggestedReplenishmentMeters.ToString("0.###") m sugeridos</p>
+                <p class="eyebrow">@L("Reposición", "Reposició", "Replenishment")</p>
+                <h3>@ColorsBelowMinimumCount @L("colores", "colors", "colors")</h3>
+                <p class="muted">@SuggestedReplenishmentMeters.ToUiString("0.###") m @L("sugeridos", "suggerits", "suggested")</p>
             </article>
             <article class="info-card stock-signal-card danger">
-                <p class="eyebrow">Sin mínimo</p>
-                <h3>@ColorsWithoutMinimumCount colores</h3>
-                <p class="muted">Revisa mínimos base para no perder cobertura.</p>
+                <p class="eyebrow">@L("Sin mínimo", "Sense mínim", "No minimum")</p>
+                <h3>@ColorsWithoutMinimumCount @L("colores", "colors", "colors")</h3>
+                <p class="muted">@L("Revisa mínimos base para no perder cobertura.", "Revisa mínims base per no perdre cobertura.", "Review base minimums to avoid losing coverage.")</p>
             </article>
             <article class="info-card stock-signal-card success">
-                <p class="eyebrow">Valor reposición</p>
-                <h3>@SuggestedReplenishmentValue.ToString("0.00") €</h3>
-                <p class="muted">Estimado usando el €/mts. actual de cada color.</p>
+                <p class="eyebrow">@L("Valor reposición", "Valor reposició", "Replenishment value")</p>
+                <h3>@SuggestedReplenishmentValue.ToUiString("0.00") €</h3>
+                <p class="muted">@L("Estimado usando el €/mts. actual de cada color.", "Estimat usant l'€/mts. actual de cada color.", "Estimated using the current €/mts. of each color.")</p>
             </article>
         </div>
         <div class="table-scroll">
@@ -1233,27 +1247,27 @@ else
                 <thead>
                     <tr>
                         <th>#</th>
-                        <th>Codi proveïdor</th>
-                        <th>Color</th>
-                        <th>Estado</th>
-                        <th>Cobertura</th>
-                        <th>Actual</th>
-                        <th>Mínimo</th>
-                        <th>Reposición</th>
-                        <th>Valor rep.</th>
-                        <th>Tintar</th>
-                        <th>Precio</th>
+                        <th>@L("Código proveedor", "Codi proveïdor", "Supplier code")</th>
+                        <th>@L("Color", "Color", "Color")</th>
+                        <th>@L("Estado", "Estat", "Status")</th>
+                        <th>@L("Cobertura", "Cobertura", "Coverage")</th>
+                        <th>@L("Actual", "Actual", "Current")</th>
+                        <th>@L("Mínimo", "Mínim", "Minimum")</th>
+                        <th>@L("Reposición", "Reposició", "Replenishment")</th>
+                        <th>@L("Valor rep.", "Valor rep.", "Repl. value")</th>
+                        <th>@L("Tintar", "Tintar", "Dyeing")</th>
+                        <th>@L("Precio", "Preu", "Price")</th>
                         <th>€/Mts.</th>
                         <th>€/KG</th>
-                        <th>Valor stock</th>
-                        <th>Notas</th>
-                        <th>Acciones</th>
+                        <th>@L("Valor stock", "Valor estoc", "Stock value")</th>
+                        <th>@L("Notas", "Notes", "Notes")</th>
+                        <th>@L("Acciones", "Accions", "Actions")</th>
                     </tr>
                 </thead>
                 <tbody>
                     @if (model.Colors.Count == 0)
                     {
-                        <tr><td colspan="16" class="muted">No hay colores cargados para este tejido.</td></tr>
+                        <tr><td colspan="16" class="muted">@L("No hay colores cargados para este tejido.", "No hi ha colors carregats per a aquest teixit.", "There are no colors loaded for this fabric.")</td></tr>
                     }
                     else
                     {
@@ -1269,28 +1283,28 @@ else
                                 <td>@GetColorCoverageLabel(item)</td>
                                 <td><InputNumber class="text-input table-input" @bind-Value="item.CurrentStock" /></td>
                                 <td><InputNumber class="text-input table-input" @bind-Value="item.MinimumStock" /></td>
-                                <td><strong>@GetSuggestedReplenishmentMeters(item).ToString("0.###") m</strong></td>
-                                <td><strong>@GetSuggestedReplenishmentValue(item).ToString("0.00") €</strong></td>
+                                <td><strong>@GetSuggestedReplenishmentMeters(item).ToUiString("0.###") m</strong></td>
+                                <td><strong>@GetSuggestedReplenishmentValue(item).ToUiString("0.00") €</strong></td>
                                 <td><InputNumber class="text-input table-input" @bind-Value="item.DyeingPrice" @bind-Value:after="RecalculateColorPrices" /></td>
                                 <td><InputNumber class="text-input table-input" @bind-Value="item.UnitCost" disabled /></td>
                                 <td><InputNumber class="text-input table-input" @bind-Value="item.MetersPrice" disabled /></td>
                                 <td><InputNumber class="text-input table-input" @bind-Value="item.KilogramsPrice" disabled /></td>
-                                <td><strong>@GetColorStockValue(item).ToString("0.00") €</strong></td>
+                                <td><strong>@GetColorStockValue(item).ToUiString("0.00") €</strong></td>
                                 <td><InputText class="text-input table-input" @bind-Value="item.Notes" /></td>
                                 <td>
                                     <div class="table-actions compact-actions">
-                                        <a class="inline-link" href="@BuildColorMovementsUrl(item)">Movs. color</a>
-                                        <a class="inline-link" href="@BuildDisposedMovementsUrl(item)">Movs. disp.</a>
-                                        <a class="inline-link" href="@BuildRawMovementsUrl()">Movs. cru</a>
-                                        <a class="inline-link" href="@BuildStockAdjustmentUrl(item)">Ajuste</a>
+                                        <a class="inline-link" href="@BuildColorMovementsUrl(item)">@L("Movs. color", "Movs. color", "Color movs.")</a>
+                                        <a class="inline-link" href="@BuildDisposedMovementsUrl(item)">@L("Movs. disp.", "Movs. disp.", "Disp. movs.")</a>
+                                        <a class="inline-link" href="@BuildRawMovementsUrl()">@L("Movs. cru", "Movs. cru", "Raw movs.")</a>
+                                        <a class="inline-link" href="@BuildStockAdjustmentUrl(item)">@L("Ajuste", "Ajust", "Adjust")</a>
                                         @if (GetSuggestedReplenishmentMeters(item) > 0m)
                                         {
-                                            <a class="inline-link" href="@BuildReplenishmentAdjustmentUrl(item)">Reponer</a>
+                                            <a class="inline-link" href="@BuildReplenishmentAdjustmentUrl(item)">@L("Reponer", "Reposar", "Replenish")</a>
                                         }
                                         @if (!isReadOnly)
                                         {
-                                            <button class="secondary-button minimal-button" type="button" @onclick="() => UseCurrentStockAsMinimum(item)">Usar actual como mínimo</button>
-                                            <button class="danger-link" type="button" @onclick="() => RemoveColor(item.LineNumber)">Quitar</button>
+                                            <button class="secondary-button minimal-button" type="button" @onclick="() => UseCurrentStockAsMinimum(item)">@L("Usar actual como mínimo", "Usar actual com a mínim", "Use current as minimum")</button>
+                        <button class="danger-link" type="button" @onclick="() => RemoveColor(item.LineNumber)">@L("Quitar", "Treure", "Remove")</button>
                                         }
                                     </div>
                                 </td>
@@ -1305,12 +1319,12 @@ else
     private RenderFragment RenderCompositionSection() => @<section class="panel detail-panel" style="margin-top: 1rem;">
         <div class="detail-panel-header">
             <div>
-                <h2>Composició</h2>
-                <p class="muted">Materias primas y porcentaje de composición. Total actual: @CompositionPercentageTotal%.</p>
+            <h2>@L("Composición", "Composició", "Composition")</h2>
+            <p class="muted">@L("Materias primas y porcentaje de composición. Total actual:", "Matèries primeres i percentatge de composició. Total actual:", "Raw materials and composition percentage. Current total:") @CompositionPercentageTotal%.</p>
             </div>
             @if (!isReadOnly)
             {
-                <button class="secondary-button" type="button" @onclick="AddComposition">Añadir línea</button>
+                <button class="secondary-button" type="button" @onclick="AddComposition">@L("Añadir línea", "Afegir línia", "Add line")</button>
             }
         </div>
         <div class="table-scroll">
@@ -1318,11 +1332,11 @@ else
                 <thead>
                     <tr>
                         <th>#</th>
-                        <th>Component</th>
+                        <th>@L("Componente", "Component", "Component")</th>
                         <th>%</th>
-                        <th>Proveedor</th>
-                        <th>Precio</th>
-                        <th>Importe</th>
+                        <th>@L("Proveedor", "Proveïdor", "Supplier")</th>
+                        <th>@L("Precio", "Preu", "Price")</th>
+                        <th>@L("Importe", "Import", "Amount")</th>
                         @if (!isReadOnly)
                         {
                             <th></th>
@@ -1332,7 +1346,7 @@ else
                 <tbody>
                     @if (model.Composition.Count == 0)
                     {
-                        <tr><td colspan="@(isReadOnly ? 6 : 7)" class="muted">No hay composición cargada para este tejido.</td></tr>
+                        <tr><td colspan="@(isReadOnly ? 6 : 7)" class="muted">@L("No hay composición cargada para este tejido.", "No hi ha composició carregada per a aquest teixit.", "There is no composition loaded for this fabric.")</td></tr>
                     }
                     else
                     {
@@ -1347,7 +1361,7 @@ else
                                 <td><InputNumber class="text-input table-input" @bind-Value="item.Amount" /></td>
                                 @if (!isReadOnly)
                                 {
-                                    <td><button class="danger-link" type="button" @onclick="() => RemoveComposition(item.LineNumber)">Quitar</button></td>
+                        <td><button class="danger-link" type="button" @onclick="() => RemoveComposition(item.LineNumber)">@L("Quitar", "Treure", "Remove")</button></td>
                                 }
                             </tr>
                         }
@@ -1360,12 +1374,12 @@ else
     private RenderFragment RenderFinishesSection() => @<section class="panel detail-panel" style="margin-top: 1rem;">
         <div class="detail-panel-header">
             <div>
-                <h2>Acabados</h2>
-                <p class="muted">Secuencia de acabados aplicada al tejido.</p>
+            <h2>@L("Acabados", "Acabats", "Finishes")</h2>
+            <p class="muted">@L("Secuencia de acabados aplicada al tejido.", "Seqüència d'acabats aplicada al teixit.", "Finish sequence applied to the fabric.")</p>
             </div>
             @if (!isReadOnly)
             {
-                <button class="secondary-button" type="button" @onclick="AddFinish">Añadir línea</button>
+                <button class="secondary-button" type="button" @onclick="AddFinish">@L("Añadir línea", "Afegir línia", "Add line")</button>
             }
         </div>
         <div class="table-scroll">
@@ -1373,11 +1387,11 @@ else
                 <thead>
                     <tr>
                         <th>#</th>
-                        <th>Acabado</th>
-                        <th>Proveedor</th>
-                        <th>Orden</th>
-                        <th>Precio m</th>
-                        <th>Precio kg</th>
+                        <th>@L("Acabado", "Acabat", "Finish")</th>
+                        <th>@L("Proveedor", "Proveïdor", "Supplier")</th>
+                        <th>@L("Orden", "Ordre", "Order")</th>
+                        <th>@L("Precio m", "Preu m", "Price m")</th>
+                        <th>@L("Precio kg", "Preu kg", "Price kg")</th>
                         @if (!isReadOnly)
                         {
                             <th></th>
@@ -1387,7 +1401,7 @@ else
                 <tbody>
                     @if (model.Finishes.Count == 0)
                     {
-                        <tr><td colspan="@(isReadOnly ? 6 : 7)" class="muted">No hay acabados cargados para este tejido.</td></tr>
+                        <tr><td colspan="@(isReadOnly ? 6 : 7)" class="muted">@L("No hay acabados cargados para este tejido.", "No hi ha acabats carregats per a aquest teixit.", "There are no finishes loaded for this fabric.")</td></tr>
                     }
                     else
                     {
@@ -1402,7 +1416,7 @@ else
                                 <td><InputNumber class="text-input table-input" @bind-Value="item.PricePerKilogram" /></td>
                                 @if (!isReadOnly)
                                 {
-                                    <td><button class="danger-link" type="button" @onclick="() => RemoveFinish(item.LineNumber)">Quitar</button></td>
+                        <td><button class="danger-link" type="button" @onclick="() => RemoveFinish(item.LineNumber)">@L("Quitar", "Treure", "Remove")</button></td>
                                 }
                             </tr>
                         }
@@ -1465,8 +1479,8 @@ else
             : $"{model.Description} · {item.Color}";
         var notes = string.Concat(
             "Reposición sugerida desde ficha de tejido. ",
-            "Mínimo ", item.MinimumStock.ToString("0.###"),
-            " m · actual ", item.CurrentStock.ToString("0.###"),
+            "Mínimo ", item.MinimumStock.ToUiString("0.###"),
+            " m · actual ", item.CurrentStock.ToUiString("0.###"),
             " m.");
 
         return string.Concat(
@@ -1504,19 +1518,19 @@ else
     private static decimal GetSuggestedReplenishmentValue(TejidoColorDetailDto item) =>
         Math.Round(GetSuggestedReplenishmentMeters(item) * Math.Max(item.MetersPrice, 0m), 2, MidpointRounding.AwayFromZero);
 
-    private static string GetColorCoverageLabel(TejidoColorDetailDto item) =>
+    private string GetColorCoverageLabel(TejidoColorDetailDto item) =>
         GetCoverageLabel(item.CurrentStock, item.MinimumStock);
 
-    private static string GetColorStatusLabel(TejidoColorDetailDto item)
+    private string GetColorStatusLabel(TejidoColorDetailDto item)
     {
         if (item.CurrentStock <= 0m)
         {
-            return "Sin stock";
+            return L("Sin stock", "Sense estoc", "No stock");
         }
 
         if (item.CurrentStock < item.MinimumStock)
         {
-            return "Bajo mínimo";
+            return L("Bajo mínimo", "Sota mínim", "Below minimum");
         }
 
         return "OK";
@@ -1552,19 +1566,19 @@ else
         return string.Empty;
     }
 
-    private static string GetValuationStatus(TejidoValuationRow row)
+    private string GetValuationStatus(TejidoValuationRow row)
     {
         if (row.HasNoStock)
         {
-            return "Sin stock";
+            return L("Sin stock", "Sense estoc", "No stock");
         }
 
         if (row.IsBelowMinimum)
         {
-            return "Bajo mínimo";
+            return L("Bajo mínimo", "Sota mínim", "Below minimum");
         }
 
-        return "En rango";
+        return L("En rango", "En rang", "In range");
     }
 
     private static string GetValuationPillClass(TejidoValuationRow row)
@@ -1597,19 +1611,21 @@ else
         return string.Empty;
     }
 
-    private static string GetCoverageLabel(TejidoValuationRow row)
+    private string GetCoverageLabel(TejidoValuationRow row)
     {
         return GetCoverageLabel(row.CurrentMeters, row.MinimumMeters);
     }
 
-    private static string GetCoverageLabel(decimal currentMeters, decimal minimumMeters)
+    private string GetCoverageLabel(decimal currentMeters, decimal minimumMeters)
     {
         if (minimumMeters <= 0m)
         {
-            return currentMeters > 0m ? "Sin mínimo · con stock" : "Sin mínimo";
+            return currentMeters > 0m
+                ? L("Sin mínimo · con stock", "Sense mínim · amb estoc", "No minimum · with stock")
+                : L("Sin mínimo", "Sense mínim", "No minimum");
         }
 
-        return $"{Math.Round(currentMeters / minimumMeters * 100m, 1, MidpointRounding.AwayFromZero):0.#}%";
+        return $"{Math.Round(currentMeters / minimumMeters * 100m, 1, MidpointRounding.AwayFromZero).ToUiString("0.#")}%";
     }
 
     private static string NormalizeLabelMode(string? mode)
@@ -1622,23 +1638,23 @@ else
         };
     }
 
-    private static string GetLabelModeDisplayName(string mode)
+    private string GetLabelModeDisplayName(string mode)
     {
         return NormalizeLabelMode(mode) switch
         {
-            "compact" => "Compacta",
-            "warehouse" => "Almacén",
-            _ => "Estándar"
+            "compact" => L("Compacta", "Compacta", "Compact"),
+            "warehouse" => L("Almacén", "Magatzem", "Warehouse"),
+            _ => L("Estándar", "Estàndard", "Standard")
         };
     }
 
-    private static string GetLabelModeDescription(string mode)
+    private string GetLabelModeDescription(string mode)
     {
         return NormalizeLabelMode(mode) switch
         {
-            "compact" => "Formato corto para identificar rápido código y descripción en tiradas cortas.",
-            "warehouse" => "Formato pensado para almacén, centrado en disponibilidad, ancho y tipo de tejido.",
-            _ => "Formato completo con código, descripción, composición y datos básicos del tejido."
+            "compact" => L("Formato corto para identificar rápido código y descripción en tiradas cortas.", "Format curt per identificar ràpid codi i descripció en tirades curtes.", "Short format to quickly identify code and description in short runs."),
+            "warehouse" => L("Formato pensado para almacén, centrado en disponibilidad, ancho y tipo de tejido.", "Format pensat per a magatzem, centrat en disponibilitat, ample i tipus de teixit.", "Warehouse-oriented format focused on availability, width and fabric type."),
+            _ => L("Formato completo con código, descripción, composición y datos básicos del tejido.", "Format complet amb codi, descripció, composició i dades bàsiques del teixit.", "Full format with code, description, composition and basic fabric data.")
         };
     }
 

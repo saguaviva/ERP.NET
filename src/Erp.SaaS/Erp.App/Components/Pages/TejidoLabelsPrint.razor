@@ -3,19 +3,20 @@
 @attribute [Authorize(Roles = "TenantAdmin,TenantReader")]
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject ITejidoQueries TejidoQueries
+@inject AppText T
 
-<PageTitle>Etiquetas tejido @Code</PageTitle>
+<PageTitle>@($"{L("Etiquetas tejido", "Etiquetes teixit", "Fabric labels")} {Code}")</PageTitle>
 
 <div class="document-shell">
     <div class="document-toolbar no-print">
-        <a class="secondary-button link-button" href="/articulos/tejidos/editar/@Uri.EscapeDataString(Code)">Volver al tejido</a>
-        <button class="primary-button" type="button" onclick="window.print()">Guardar como PDF / Imprimir</button>
+        <a class="secondary-button link-button" href="/articulos/tejidos/editar/@Uri.EscapeDataString(Code)">@L("Volver al tejido", "Tornar al teixit", "Back to fabric")</a>
+        <button class="primary-button" type="button" onclick="window.print()">@L("Imprimir / guardar PDF", "Imprimir / desar PDF", "Print / save PDF")</button>
     </div>
 
     @if (!tenantId.HasValue || !companyId.HasValue)
     {
         <div class="empty-state document-state">
-            <p>No hay empresa activa seleccionada.</p>
+            <p>@L("No hay empresa activa seleccionada.", "No hi ha cap empresa activa seleccionada.", "There is no active company selected.")</p>
         </div>
     }
     else if (!string.IsNullOrWhiteSpace(errorMessage))
@@ -25,7 +26,7 @@
     else if (tejido is null)
     {
         <div class="empty-state document-state">
-            <p>No se ha encontrado el tejido solicitado.</p>
+            <p>@L("No se ha encontrado el tejido solicitado.", "No s'ha trobat el teixit sol·licitat.", "The requested fabric could not be found.")</p>
         </div>
     }
     else
@@ -33,13 +34,13 @@
         <section class="document-page">
             <header class="document-header">
                 <div>
-                    <p class="eyebrow">Etiquetes teixit</p>
+                    <p class="eyebrow">@L("Etiquetas tejido", "Etiquetes teixit", "Fabric labels")</p>
                     <h1>@tejido.Code</h1>
                     <p class="muted">@tejido.Description</p>
                 </div>
                 <div class="document-header-meta">
                     <div>
-                        <span class="muted">Cantidad</span>
+                        <span class="muted">@L("Cantidad", "Quantitat", "Quantity")</span>
                         <strong>@Math.Max(LabelCount, 1)</strong>
                     </div>
                 </div>
@@ -70,6 +71,13 @@
     private TejidoDetailDto? tejido;
     private string errorMessage = string.Empty;
     private string EffectiveMode => string.IsNullOrWhiteSpace(Mode) ? "standard" : Mode.Trim().ToLowerInvariant();
+    private string L(string spanish, string catalan, string english) =>
+        T.CurrentLanguage switch
+        {
+            AppLanguages.Catalan => catalan,
+            AppLanguages.English => english,
+            _ => spanish
+        };
 
     protected override async Task OnParametersSetAsync()
     {
@@ -99,25 +107,25 @@
     private RenderFragment RenderLabel() => @<article class="fabric-label @(EffectiveMode == "compact" ? "compact" : EffectiveMode == "warehouse" ? "warehouse" : null)">
         @if (EffectiveMode == "warehouse")
         {
-            <p class="eyebrow">Almacén</p>
+            <p class="eyebrow">@L("Almacén", "Magatzem", "Warehouse")</p>
             <h2>@tejido!.Code</h2>
             <p><strong>@tejido.Description</strong></p>
-            <p>Disponible @tejido.AvailableStockMeters.ToString("0.###") m · @tejido.AvailableStockKilograms.ToString("0.###") kg</p>
-            <p>@DisplayValue(tejido.WidthText) · @(tejido.IsTubular ? "Tubular" : "Plano")</p>
+            <p>@L("Disponible", "Disponible", "Available") @tejido.AvailableStockMeters.ToUiString("0.###") m · @tejido.AvailableStockKilograms.ToUiString("0.###") kg</p>
+            <p>@DisplayValue(tejido.WidthText) · @(tejido.IsTubular ? L("Tubular", "Tubular", "Tubular") : L("Plano", "Pla", "Flat"))</p>
         }
         else if (EffectiveMode == "compact")
         {
-            <p class="eyebrow">Teixit</p>
+            <p class="eyebrow">@L("Tejido", "Teixit", "Fabric")</p>
             <h2>@tejido!.Code</h2>
             <p>@tejido.Description</p>
         }
         else
         {
-            <p class="eyebrow">Teixit</p>
+            <p class="eyebrow">@L("Tejido", "Teixit", "Fabric")</p>
             <h2>@tejido!.Code</h2>
             <p><strong>@tejido.Description</strong></p>
             <p>@DisplayValue(tejido.CompositionText)</p>
-            <p>@DisplayValue(tejido.WidthText) · @tejido.GramWeight.ToString("0.###") gr/m2</p>
+            <p>@DisplayValue(tejido.WidthText) · @tejido.GramWeight.ToUiString("0.###") gr/m2</p>
         }
     </article>;
 }

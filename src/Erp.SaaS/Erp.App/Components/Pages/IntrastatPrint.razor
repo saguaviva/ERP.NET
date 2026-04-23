@@ -3,14 +3,15 @@
 @attribute [Authorize(Roles = "TenantAdmin,TenantReader")]
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject IIntrastatQueries IntrastatQueries
+@inject AppText T
 
-<PageTitle>Intrastat</PageTitle>
+<PageTitle>@L("Intrastat", "Intrastat", "Intrastat")</PageTitle>
 
 @if (!tenantId.HasValue || !companyId.HasValue)
 {
     <div class="document-shell">
         <div class="empty-state document-state">
-            <p>No hay empresa activa seleccionada.</p>
+            <p>@L("No hay empresa activa seleccionada.", "No hi ha cap empresa activa seleccionada.", "There is no active company selected.")</p>
         </div>
     </div>
 }
@@ -24,33 +25,33 @@ else
 {
     <div class="document-shell">
         <div class="document-toolbar no-print">
-            <a class="secondary-button link-button" href="/ventas/intrastat">Volver a Intrastat</a>
-            <button class="primary-button" type="button" onclick="window.print()">Guardar como PDF / Imprimir</button>
+            <a class="secondary-button link-button" href="/ventas/intrastat">@L("Volver a Intrastat", "Tornar a Intrastat", "Back to Intrastat")</a>
+            <button class="primary-button" type="button" onclick="window.print()">@L("Imprimir / guardar PDF", "Imprimir / desar PDF", "Print / save PDF")</button>
         </div>
 
         <section class="document-page">
             <header class="document-header">
                 <div>
-                    <p class="eyebrow">Intrastat</p>
-                    <h1>Listado ventas UE · @filter.Month.ToString("00")/@filter.Year</h1>
-                    <p class="muted">Salida operativa equivalente al Excel legacy con detalle, matriz, pesos, transporte e importes.</p>
+                    <p class="eyebrow">@L("Intrastat", "Intrastat", "Intrastat")</p>
+                    <h1>@L("Listado ventas UE", "Llistat vendes UE", "EU sales report") · @filter.Month.ToString("00")/@filter.Year</h1>
+                    <p class="muted">@L("Presentación operativa alineada con el Excel legacy: detalle, matriz, pesos, transporte e importes.", "Presentació operativa alineada amb l'Excel legacy: detall, matriu, pesos, transport i imports.", "Operational layout aligned with the legacy Excel: detail, matrix, weights, transport and amounts.")</p>
                 </div>
                 <div class="document-header-meta">
                     <div>
-                        <span class="muted">Líneas</span>
+                        <span class="muted">@L("Líneas", "Línies", "Lines")</span>
                         <strong>@report.TotalCount</strong>
                     </div>
                     <div>
-                        <span class="muted">Países</span>
+                        <span class="muted">@L("Países", "Països", "Countries")</span>
                         <strong>@report.CountriesCount</strong>
                     </div>
                     <div>
-                        <span class="muted">Kg total</span>
-                        <strong>@report.TotalWeightKg.ToString("0.00")</strong>
+                        <span class="muted">@L("Kg total", "Kg total", "Total kg")</span>
+                        <strong>@report.TotalWeightKg.ToUiString("0.00")</strong>
                     </div>
                     <div>
-                        <span class="muted">Total</span>
-                        <strong>@report.TotalWithTransportAmount.ToString("0.00") €</strong>
+                        <span class="muted">@L("Total", "Total", "Total")</span>
+                        <strong>@report.TotalWithTransportAmount.ToUiString("0.00") €</strong>
                     </div>
                 </div>
             </header>
@@ -58,48 +59,48 @@ else
             <section class="document-section">
                 <div class="document-grid-two">
                     <section class="document-box">
-                        <h2>Resumen</h2>
+                        <h2>@L("Resumen", "Resum", "Summary")</h2>
                         <div class="document-kv-grid">
                             <div>
-                                <span class="muted">Import venda</span>
-                                <strong>@report.SalesAmount.ToString("0.00") €</strong>
+                                <span class="muted">@L("Importe venta", "Import venda", "Sales amount")</span>
+                                <strong>@report.SalesAmount.ToUiString("0.00") €</strong>
                             </div>
                             <div>
-                                <span class="muted">Transport</span>
-                                <strong>@report.TransportAmount.ToString("0.00") €</strong>
+                                <span class="muted">@L("Transporte", "Transport", "Transport")</span>
+                                <strong>@report.TransportAmount.ToUiString("0.00") €</strong>
                             </div>
                             <div>
-                                <span class="muted">Clasificadas</span>
+                                <span class="muted">@L("Clasificadas", "Classificades", "Classified")</span>
                                 <strong>@report.ClassifiedLinesCount</strong>
                             </div>
                             <div>
-                                <span class="muted">Sin NC code</span>
+                                <span class="muted">@L("Sin NC code", "Sense NC code", "Without NC code")</span>
                                 <strong>@report.UnclassifiedLinesCount</strong>
                             </div>
                         </div>
                     </section>
                     <section class="document-box">
-                        <h2>Filtro</h2>
-                        <p><strong>Mes:</strong> @filter.Month.ToString("00")</p>
-                        <p><strong>Año:</strong> @filter.Year</p>
-                        <p><strong>Búsqueda:</strong> @(string.IsNullOrWhiteSpace(filter.Search) ? "Sin filtro" : filter.Search)</p>
-                        <p><strong>Solo clasificadas:</strong> @(filter.OnlyClassified ? "Sí" : "No")</p>
+                        <h2>@L("Filtro", "Filtre", "Filter")</h2>
+                        <p><strong>@L("Mes", "Mes", "Month"):</strong> @filter.Month.ToString("00")</p>
+                        <p><strong>@L("Año", "Any", "Year"):</strong> @filter.Year</p>
+                        <p><strong>@L("Búsqueda", "Cerca", "Search"):</strong> @(string.IsNullOrWhiteSpace(filter.Search) ? L("Sin filtro", "Sense filtre", "No filter") : filter.Search)</p>
+                        <p><strong>@L("Solo clasificadas", "Només classificades", "Only classified"):</strong> @(filter.OnlyClassified ? L("Sí", "Sí", "Yes") : L("No", "No", "No"))</p>
                     </section>
                 </div>
             </section>
 
             <section class="document-section">
-                <h2>Matriz Excel legacy</h2>
+                <h2>@L("Matriz estilo Excel legacy", "Matriu estil Excel legacy", "Legacy-style Excel matrix")</h2>
                 <table class="data-table document-table intrastat-matrix-table">
                     <thead>
                         <tr>
-                            <th rowspan="2">Clients</th>
-                            <th rowspan="2">Ordre alfabètic</th>
-                            <th rowspan="2">Sigles</th>
-                            <th colspan="@report.MatrixNcCodes.Count">Codis arancelaris · PESOS/Kgrs</th>
-                            <th rowspan="2">TOTAL PESOS/Kgrs</th>
-                            <th colspan="@report.MatrixNcCodes.Count">Codis arancelaris · FACTURES€</th>
-                            <th rowspan="2">TOTAL FACTURES€</th>
+                            <th rowspan="2">@L("Clientes", "Clients", "Clients")</th>
+                            <th rowspan="2">@L("Orden alfabético", "Ordre alfabètic", "Alphabetical order")</th>
+                            <th rowspan="2">@L("Siglas", "Sigles", "Code")</th>
+                            <th colspan="@report.MatrixNcCodes.Count">@L("Códigos arancelarios · PESOS/Kgrs", "Codis aranzelaris · PESOS/Kgrs", "Tariff codes · WEIGHTS/Kgs")</th>
+                            <th rowspan="2">@L("TOTAL PESOS/Kgrs", "TOTAL PESOS/Kgrs", "TOTAL WEIGHTS/Kgs")</th>
+                            <th colspan="@report.MatrixNcCodes.Count">@L("Códigos arancelarios · FACTURAS€", "Codis aranzelaris · FACTURES€", "Tariff codes · INVOICES€")</th>
+                            <th rowspan="2">@L("TOTAL FACTURAS€", "TOTAL FACTURES€", "TOTAL INVOICES€")</th>
                         </tr>
                         <tr>
                             @foreach (var ncCode in report.MatrixNcCodes)
@@ -116,19 +117,19 @@ else
                         @foreach (var item in report.MatrixRows)
                         {
                             <tr class="@GetMatrixRowClass(item)">
-                                <td>@(item.HasClients ? "si" : "no")</td>
+                                <td>@(item.HasClients ? L("sí", "sí", "yes") : L("no", "no", "no"))</td>
                                 <td>@item.CountryName</td>
                                 <td>@item.CountryCode</td>
                                 @foreach (var ncCode in report.MatrixNcCodes)
                                 {
                                     <td class="numeric-cell">@FormatMatrixCell(item.WeightByNcCode.TryGetValue(ncCode, out var weightValue) ? weightValue : 0m)</td>
                                 }
-                                <td class="numeric-cell">@item.TotalWeightKg.ToString("0.00")</td>
+                                <td class="numeric-cell">@item.TotalWeightKg.ToUiString("0.00")</td>
                                 @foreach (var ncCode in report.MatrixNcCodes)
                                 {
                                     <td class="numeric-cell">@FormatMatrixCell(item.AmountByNcCode.TryGetValue(ncCode, out var amountValue) ? amountValue : 0m)</td>
                                 }
-                                <td class="numeric-cell">@item.TotalInvoiceAmount.ToString("0.00")</td>
+                                <td class="numeric-cell">@item.TotalInvoiceAmount.ToUiString("0.00")</td>
                             </tr>
                         }
                     </tbody>
@@ -136,24 +137,24 @@ else
             </section>
 
             <section class="document-section">
-                <h2>Detalle</h2>
+                <h2>@L("Detalle", "Detall", "Detail")</h2>
                 <table class="data-table document-table">
                     <thead>
                         <tr>
-                            <th>Factura</th>
-                            <th>Fecha</th>
-                            <th>Cliente</th>
-                            <th>Descripción</th>
-                            <th>Composición</th>
-                            <th>Talla</th>
-                            <th>Cantidad</th>
-                            <th>Pes unit.</th>
-                            <th>Pes total/Kgrs</th>
-                            <th>Import</th>
-                            <th>NC code</th>
-                            <th>VAT</th>
-                            <th>Dte?</th>
-                            <th>País</th>
+                            <th>@L("Factura", "Factura", "Invoice")</th>
+                            <th>@L("Fecha", "Data", "Date")</th>
+                            <th>@L("Cliente", "Client", "Customer")</th>
+                            <th>@L("Descripción", "Descripció", "Description")</th>
+                            <th>@L("Composición", "Composició", "Composition")</th>
+                            <th>@L("Talla", "Talla", "Size")</th>
+                            <th>@L("Cantidad", "Quantitat", "Quantity")</th>
+                            <th>@L("Peso unit.", "Pes unit.", "Unit weight")</th>
+                            <th>@L("Peso total/Kgrs", "Pes total/Kgrs", "Total weight/Kgs")</th>
+                            <th>@L("Importe", "Import", "Amount")</th>
+                            <th>@L("Código NC", "Codi NC", "CN code")</th>
+                            <th>@L("IVA", "IVA", "VAT")</th>
+                            <th>@L("Dte?", "Dte?", "Disc.?")</th>
+                            <th>@L("País", "País", "Country")</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -175,13 +176,13 @@ else
                                 </td>
                                 <td>@DisplayValue(item.Composition)</td>
                                 <td>@DisplayValue(item.Size)</td>
-                                <td>@item.Quantity.ToString("0.###")</td>
-                                <td>@item.UnitWeight.ToString("0.###")</td>
-                                <td>@item.TotalWeightKg.ToString("0.00")</td>
-                                <td>@item.NetAmount.ToString("0.00") €</td>
-                                <td>@(string.IsNullOrWhiteSpace(item.IntrastatCode) ? "Sin clasificar" : item.IntrastatCode)</td>
+                                <td>@item.Quantity.ToUiString("0.###")</td>
+                                <td>@item.UnitWeight.ToUiString("0.###")</td>
+                                <td>@item.TotalWeightKg.ToUiString("0.00")</td>
+                                <td>@item.NetAmount.ToUiString("0.00") €</td>
+                                <td>@(string.IsNullOrWhiteSpace(item.IntrastatCode) ? L("Sin clasificar", "Sense classificar", "Unclassified") : item.IntrastatCode)</td>
                                 <td>@DisplayValue(item.ClientTaxId)</td>
-                                <td>@(item.DiscountAmount == 0m ? "-" : $"{item.DiscountAmount:0.00} €")</td>
+                    <td>@(item.DiscountAmount == 0m ? "-" : $"{item.DiscountAmount.ToUiString("0.00")} €")</td>
                                 <td>@item.CountryCode</td>
                             </tr>
                         }
@@ -210,6 +211,13 @@ else
     private IntrastatFilter filter = new() { Page = 1, PageSize = 10000 };
     private IntrastatReportDto report = new();
     private string errorMessage = string.Empty;
+    private string L(string spanish, string catalan, string english) =>
+        T.CurrentLanguage switch
+        {
+            AppLanguages.Catalan => catalan,
+            AppLanguages.English => english,
+            _ => spanish
+        };
 
     protected override async Task OnInitializedAsync()
     {
@@ -245,7 +253,7 @@ else
         row.IsDomesticReference ? "intrastat-domestic-row" : string.Empty;
 
     private static string FormatMatrixCell(decimal value) =>
-        value == 0m ? string.Empty : value.ToString("0.00");
+        value == 0m ? string.Empty : value.ToUiString("0.00");
 
     private static string DisplayValue(string value) =>
         string.IsNullOrWhiteSpace(value) ? "-" : value;

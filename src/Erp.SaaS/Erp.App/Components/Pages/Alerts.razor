@@ -1,0 +1,299 @@
+@page "/alertas"
+@attribute [Authorize(Roles = "TenantAdmin,TenantReader")]
+@using System.Globalization
+@using Erp.Application.Alerts
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IOperationalAlertQueries AlertQueries
+@inject AppText T
+
+<PageTitle>@T["menu.alerts"]</PageTitle>
+
+<div class="page-header">
+    <div>
+        <p class="eyebrow">@L("Operación", "Operació", "Operations")</p>
+        <h1>@T["menu.alerts"]</h1>
+        <p class="lead">@L("Vigila cobros y pagos vencidos, retrasos documentales, órdenes atascadas, borradores antiguos y stock bajo mínimo de la empresa activa.", "Vigila cobraments i pagaments vençuts, retards documentals, ordres encallades, esborranys antics i estoc sota mínim de l'empresa activa.", "Track overdue collections and payments, delayed documents, stuck work orders, stale drafts and low-minimum stock in the active company.")</p>
+    </div>
+    <div class="quick-links">
+        <a class="secondary-button link-button" href="/listados">@L("Abrir listados", "Obrir llistats", "Open reports")</a>
+        <a class="secondary-button link-button" href="/estadisticas">@L("Abrir estadísticas", "Obrir estadístiques", "Open statistics")</a>
+        <a class="secondary-button link-button" href="/produccion/acabados">@L("Ver acabados", "Veure acabats", "View finishing")</a>
+    </div>
+</div>
+
+@if (!tenantId.HasValue || !companyId.HasValue)
+{
+    <div class="empty-state">
+        <p>@L("Selecciona una empresa activa para cargar las alertas operativas.", "Selecciona una empresa activa per carregar les alertes operatives.", "Select an active company to load operational alerts.")</p>
+    </div>
+}
+else
+{
+    @if (!string.IsNullOrWhiteSpace(errorMessage))
+    {
+        <div class="alert danger">@errorMessage</div>
+    }
+
+    @if (isLoading)
+    {
+        <section class="panel">
+            <div class="loading-banner">
+                <span class="loading-indicator" aria-hidden="true"></span>
+                <span>@L("Cargando alertas...", "Carregant alertes...", "Loading alerts...")</span>
+            </div>
+        </section>
+    }
+    else
+    {
+        <div class="card-grid">
+            <section class="info-card accent-card">
+                <h2>@dashboard.TotalAlerts.ToString("N0", CultureInfo.CurrentCulture)</h2>
+                <p class="muted">@L("alertas activas", "alertes actives", "active alerts")</p>
+            </section>
+            <section class="info-card">
+                <h2>@dashboard.CriticalAlerts.ToString("N0", CultureInfo.CurrentCulture)</h2>
+                <p class="muted">@L("críticas", "crítiques", "critical")</p>
+            </section>
+            <section class="info-card">
+                <h2>@dashboard.WarningAlerts.ToString("N0", CultureInfo.CurrentCulture)</h2>
+                <p class="muted">@L("aviso", "avís", "warning")</p>
+            </section>
+            <section class="info-card">
+                <h2>@dashboard.ActiveGroups.ToString("N0", CultureInfo.CurrentCulture)</h2>
+                <p class="muted">@L("grupos activos", "grups actius", "active groups")</p>
+            </section>
+        </div>
+
+        <section class="panel dashboard-section">
+            <div class="dashboard-section-header">
+                <div>
+                    <p class="eyebrow">@L("Estado", "Estat", "Status")</p>
+                    <h2>@L("Panel operativo", "Panell operatiu", "Operational board")</h2>
+                    <p class="lead">
+                        @if (dashboard.TotalAlerts == 0)
+                        {
+                            @L("No hay alertas activas en este momento.", "No hi ha alertes actives en aquest moment.", "There are no active alerts right now.")
+                        }
+                        else
+                        {
+                            @L("Las alertas se han generado con la información local más reciente disponible para esta empresa.", "Les alertes s'han generat amb la informació local més recent disponible per a aquesta empresa.", "Alerts were generated from the latest local data available for this company.")
+                        }
+                    </p>
+                </div>
+                <div class="quick-links">
+                    <span class="status-pill @(GetSeverityClass(BuildOverallSeverity()))">@TranslateSeverity(BuildOverallSeverity())</span>
+                    <span class="sidebar-muted">@L("Generado", "Generat", "Generated"): @dashboard.GeneratedUtc.ToLocalTime().ToString("dd/MM/yyyy HH:mm", CultureInfo.CurrentCulture)</span>
+                </div>
+            </div>
+
+            @if (dashboard.TotalAlerts == 0)
+            {
+                <div class="empty-state">
+                    <p>@L("Todo parece en orden: no hay cobros vencidos, pagos pendientes fuera de plazo, órdenes atascadas ni stock bajo mínimo detectado.", "Tot sembla en ordre: no hi ha cobraments vençuts, pagaments pendents fora de termini, ordres encallades ni estoc sota mínim detectat.", "Everything looks under control: no overdue collections, overdue payments, stuck orders or low-minimum stock were detected.")</p>
+                </div>
+            }
+        </section>
+
+        @foreach (var group in OrderedGroups)
+        {
+            <section class="panel dashboard-section">
+                <div class="dashboard-section-header">
+                    <div>
+                        <p class="eyebrow">@TranslateSeverity(group.Severity)</p>
+                        <h2>@GetGroupTitle(group.Key)</h2>
+                        <p class="lead">@GetGroupDescription(group.Key)</p>
+                    </div>
+                    <div class="quick-links">
+                        <span class="status-pill @(GetSeverityClass(group.Severity))">@TranslateSeverity(group.Severity)</span>
+                        <span class="status-pill">@group.TotalCount.ToString("N0", CultureInfo.CurrentCulture)</span>
+                        @if (!string.IsNullOrWhiteSpace(group.DefaultRoute))
+                        {
+                            <a class="secondary-button link-button" href="@group.DefaultRoute">@L("Abrir módulo", "Obrir mòdul", "Open module")</a>
+                        }
+                    </div>
+                </div>
+
+                <div class="table-scroll">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>@L("Documento", "Document", "Document")</th>
+                                <th>@L("Contexto", "Context", "Context")</th>
+                                <th>@L("Detalle", "Detall", "Detail")</th>
+                                <th>@L("Fecha ref.", "Data ref.", "Reference date")</th>
+                                <th>@L("Edad", "Antiguitat", "Age")</th>
+                                <th>@L("Impacto", "Impacte", "Impact")</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in group.Items)
+                            {
+                                <tr>
+                                    <td>
+                                        <strong>@item.Title</strong>
+                                    </td>
+                                    <td>@DisplayValue(item.Subtitle)</td>
+                                    <td>@DisplayValue(item.Detail)</td>
+                                    <td>@(item.ReferenceDate?.ToString("dd/MM/yyyy", CultureInfo.CurrentCulture) ?? "-")</td>
+                                    <td>@FormatAge(item.AgeDays)</td>
+                                    <td>@FormatMetric(item.MetricValue, item.MetricKind)</td>
+                                    <td><a class="inline-link" href="@item.Route">@L("Abrir", "Obrir", "Open")</a></td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        }
+    }
+}
+
+@code {
+    private Guid? tenantId;
+    private Guid? companyId;
+    private bool isLoading;
+    private string errorMessage = string.Empty;
+    private OperationalAlertDashboardDto dashboard = new();
+
+    private IReadOnlyList<OperationalAlertGroupDto> OrderedGroups =>
+        dashboard.Groups
+            .OrderBy(group => GetSeverityRank(group.Severity))
+            .ThenByDescending(group => group.TotalCount)
+            .ThenBy(group => GetGroupTitle(group.Key), StringComparer.CurrentCultureIgnoreCase)
+            .ToArray();
+
+    private string L(string spanish, string catalan, string english) =>
+        T.CurrentLanguage switch
+        {
+            AppLanguages.Catalan => catalan,
+            AppLanguages.English => english,
+            _ => spanish
+        };
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        tenantId = user.GetTenantId();
+        companyId = user.GetActiveCompanyId();
+        await LoadAsync();
+    }
+
+    private async Task LoadAsync()
+    {
+        if (!tenantId.HasValue || !companyId.HasValue)
+        {
+            return;
+        }
+
+        isLoading = true;
+        errorMessage = string.Empty;
+
+        try
+        {
+            dashboard = await AlertQueries.GetDashboardAsync(tenantId.Value, companyId.Value);
+        }
+        catch (Exception exception)
+        {
+            errorMessage = exception.Message;
+            dashboard = new OperationalAlertDashboardDto();
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private string GetGroupTitle(string key) =>
+        key switch
+        {
+            "overdue-sales-invoices" => L("Cobros vencidos", "Cobraments vençuts", "Overdue collections"),
+            "overdue-purchase-invoices" => L("Pagos vencidos", "Pagaments vençuts", "Overdue payments"),
+            "delayed-sales-orders" => L("Pedidos de venta retrasados", "Comandes de venda retardades", "Delayed sales orders"),
+            "delayed-purchase-orders" => L("Pedidos de compra retrasados", "Comandes de compra retardades", "Delayed purchase orders"),
+            "stale-finish-orders" => L("Órdenes de acabado atascadas", "Ordres d'acabat encallades", "Stale finishing orders"),
+            "draft-stock-counts" => L("Inventarios en borrador antiguos", "Inventaris en esborrany antics", "Stale draft stock counts"),
+            "draft-stock-transfers" => L("Traspasos en borrador antiguos", "Traspassos en esborrany antics", "Stale draft transfers"),
+            "low-fabric-stock" => L("Tejidos bajo mínimo", "Teixits sota mínim", "Fabrics below minimum"),
+            "low-yarn-stock" => L("Hilos bajo mínimo", "Fils sota mínim", "Yarns below minimum"),
+            _ => key
+        };
+
+    private string GetGroupDescription(string key) =>
+        key switch
+        {
+            "overdue-sales-invoices" => L("Facturas de cliente con vencimiento superado y saldo todavía pendiente de cobro.", "Factures de client amb venciment superat i saldo encara pendent de cobrament.", "Customer invoices past due date with outstanding amount still pending collection."),
+            "overdue-purchase-invoices" => L("Facturas proveedor fuera de plazo y aún no pagadas por completo.", "Factures de proveïdor fora de termini i encara no pagades del tot.", "Supplier invoices already overdue and not fully paid yet."),
+            "delayed-sales-orders" => L("Pedidos comerciales con fecha solicitada vencida y sin cerrar el circuito de expedición.", "Comandes comercials amb data sol·licitada vençuda i sense tancar el circuit d'expedició.", "Commercial orders past their requested date and still open in the shipping flow."),
+            "delayed-purchase-orders" => L("Pedidos a proveedor con fecha esperada vencida y todavía sin recepción completa.", "Comandes a proveïdor amb data prevista vençuda i encara sense recepció completa.", "Supplier purchase orders past expected date and still not fully received."),
+            "stale-finish-orders" => L("Órdenes de acabado pendientes o en curso sin movimiento reciente.", "Ordres d'acabat pendents o en curs sense moviment recent.", "Finishing orders pending or in progress with no recent activity."),
+            "draft-stock-counts" => L("Inventarios abiertos hace días y todavía sin validar ni cerrar.", "Inventaris oberts fa dies i encara sense validar ni tancar.", "Stock counts that were opened days ago and remain unvalidated or unfinished."),
+            "draft-stock-transfers" => L("Traspasos entre almacenes abiertos desde hace días y todavía en borrador.", "Traspassos entre magatzems oberts des de fa dies i encara en esborrany.", "Warehouse transfers left in draft for too long."),
+            "low-fabric-stock" => L("Colores de tejido por debajo del mínimo declarado para su maestro.", "Colors de teixit per sota del mínim declarat al seu mestre.", "Fabric colours already below their configured minimum level."),
+            "low-yarn-stock" => L("Colores de hilo por debajo del mínimo declarado para su maestro.", "Colors de fil per sota del mínim declarat al seu mestre.", "Yarn colours already below their configured minimum level."),
+            _ => string.Empty
+        };
+
+    private string TranslateSeverity(string severity) =>
+        severity switch
+        {
+            "critical" => L("Crítica", "Crítica", "Critical"),
+            "warning" => L("Aviso", "Avís", "Warning"),
+            "info" => L("Info", "Info", "Info"),
+            _ => L("Info", "Info", "Info")
+        };
+
+    private static int GetSeverityRank(string severity) =>
+        severity switch
+        {
+            "critical" => 0,
+            "warning" => 1,
+            "info" => 2,
+            _ => 3
+        };
+
+    private string GetSeverityClass(string severity) =>
+        severity switch
+        {
+            "critical" => "danger",
+            "warning" => "warning",
+            _ => "success"
+        };
+
+    private string BuildOverallSeverity()
+    {
+        if (dashboard.CriticalAlerts > 0)
+        {
+            return "critical";
+        }
+
+        if (dashboard.WarningAlerts > 0)
+        {
+            return "warning";
+        }
+
+        return "info";
+    }
+
+    private string FormatMetric(decimal? value, string metricKind)
+    {
+        if (!value.HasValue)
+        {
+            return "-";
+        }
+
+        return metricKind switch
+        {
+            "currency" => string.Format(CultureInfo.CurrentCulture, "{0:N2} €", value.Value),
+            "quantity" => value.Value.ToString("N3", CultureInfo.CurrentCulture),
+            _ => value.Value.ToString("N2", CultureInfo.CurrentCulture)
+        };
+    }
+
+    private string FormatAge(int ageDays) =>
+        string.Format(CultureInfo.CurrentCulture, L("{0} días", "{0} dies", "{0} days"), ageDays.ToString("N0", CultureInfo.CurrentCulture));
+
+    private static string DisplayValue(string? value) =>
+        string.IsNullOrWhiteSpace(value) ? "-" : value.Trim();
+}

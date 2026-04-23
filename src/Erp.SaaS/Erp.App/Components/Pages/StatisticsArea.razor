@@ -1,0 +1,902 @@
+@page "/estadisticas/ventas"
+@page "/estadisticas/compras"
+@page "/estadisticas/produccion"
+@page "/estadisticas/almacen"
+@attribute [Authorize(Roles = "TenantAdmin,TenantReader")]
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
+@inject IReportingQueries ReportingQueries
+@inject AppText T
+
+@using Erp.Application.Reporting
+@using System.Globalization
+
+<PageTitle>@PageTitleText</PageTitle>
+
+<div class="page-header">
+    <div>
+        <p class="eyebrow">@L("Estadísticas", "Estadístiques", "Statistics")</p>
+        <h1>@HeaderTitle</h1>
+        <p class="lead">@HeaderLead</p>
+    </div>
+    <div class="quick-links">
+        <a class="secondary-button link-button" href="/estadisticas">@L("Volver a estadísticas", "Tornar a estadístiques", "Back to statistics")</a>
+        <a class="secondary-button link-button" href="@ReportsRoute">@ReportsLinkLabel</a>
+        <a class="secondary-button link-button" href="@ExportCsvHref">@L("Exportar CSV", "Exportar CSV", "Export CSV")</a>
+    </div>
+</div>
+
+@if (!tenantId.HasValue || !companyId.HasValue)
+{
+    <div class="empty-state">
+        <p>@L("Selecciona una empresa activa para calcular las estadísticas del área.", "Selecciona una empresa activa per calcular les estadístiques de l'àrea.", "Select an active company to calculate area statistics.")</p>
+    </div>
+}
+else
+{
+    <section class="panel">
+        <div class="filter-row">
+            <label class="field compact-field">
+                <span>@L("Desde", "Des de", "From")</span>
+                <input class="text-input" type="date" @bind="filter.DateFrom" @bind:format="yyyy-MM-dd" disabled="@isLoading" />
+            </label>
+            <label class="field compact-field">
+                <span>@L("Hasta", "Fins a", "To")</span>
+                <input class="text-input" type="date" @bind="filter.DateTo" @bind:format="yyyy-MM-dd" disabled="@isLoading" />
+            </label>
+            <button class="secondary-button" @onclick="LoadAsync" disabled="@isLoading">@(isLoading ? L("Cargando...", "Carregant...", "Loading...") : L("Actualizar", "Actualitzar", "Refresh"))</button>
+        </div>
+    </section>
+
+    @if (!string.IsNullOrWhiteSpace(errorMessage))
+    {
+        <div class="alert danger">@errorMessage</div>
+    }
+
+    @if (isLoading)
+    {
+        <section class="panel">
+            <div class="loading-banner">
+                <span class="loading-indicator" aria-hidden="true"></span>
+                <span>@LoadingLabel</span>
+            </div>
+        </section>
+    }
+    else
+    {
+        <section class="panel dashboard-section">
+            <div class="dashboard-section-header">
+                <div>
+                    <p class="eyebrow">@PrimaryKicker</p>
+                    <h2>@PrimaryTitle</h2>
+                    <p class="lead">@PrimaryLead</p>
+                </div>
+            </div>
+            <div class="dashboard-metric-grid">
+                @foreach (var card in AreaMetricCards)
+                {
+                    <article class="@(card.AccentClass)">
+                        <span class="dashboard-metric-label">@card.Label</span>
+                        <strong class="dashboard-metric-value">@card.Value</strong>
+                        <span class="dashboard-metric-description">@card.Description</span>
+                    </article>
+                }
+            </div>
+        </section>
+
+        <div class="comparison-grid">
+            <section class="panel">
+                <p class="eyebrow">@L("Comparativa", "Comparativa", "Comparison")</p>
+                <h2>@ComparisonTitle</h2>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>@L("Métrica", "Mètrica", "Metric")</th>
+                            <th>@L("Actual", "Actual", "Current")</th>
+                            <th>@L("Anterior", "Anterior", "Previous")</th>
+                            <th>@L("Delta", "Delta", "Delta")</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (FilteredComparisons.Count == 0)
+                        {
+                            <tr>
+                                <td colspan="4" class="table-empty">@L("Sin comparativa para este rango.", "Sense comparativa per a aquest rang.", "No comparison available for this range.")</td>
+                            </tr>
+                        }
+                        else
+                        {
+                            @foreach (var item in FilteredComparisons)
+                            {
+                                <tr>
+                                    <td>@TranslateComparisonLabel(item.Label)</td>
+                                    <td>@FormatComparisonValue(item.CurrentValue, item.ValueKind)</td>
+                                    <td>@FormatComparisonValue(item.PreviousValue, item.ValueKind)</td>
+                                    <td>@BuildDeltaLabel(item)</td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+                <p class="lead">@BuildPreviousRangeLabel()</p>
+            </section>
+
+            <section class="panel">
+                <p class="eyebrow">@L("Evolución", "Evolució", "Timeline")</p>
+                <h2>@TimelineTitle</h2>
+                @RenderTimelineTable()
+            </section>
+        </div>
+
+        <div class="comparison-grid">
+            @foreach (var breakdown in AreaBreakdowns)
+            {
+                <section class="panel">
+                    <p class="eyebrow">@breakdown.Kicker</p>
+                    <h2>@breakdown.Title</h2>
+                    @RenderBreakdownTable(breakdown.Items, breakdown.LabelTitle, breakdown.ShowAmount)
+                </section>
+            }
+        </div>
+
+        @if (area.Slug == "sales")
+        {
+            <div class="comparison-grid">
+                <section class="panel">
+                    <p class="eyebrow">@L("Ventas", "Vendes", "Sales")</p>
+                    <h2>@L("Concentración y mix por cliente", "Concentració i mix per client", "Customer concentration and mix")</h2>
+                    <div class="dashboard-metric-grid">
+                        <article class="dashboard-metric-card dashboard-metric-card-info">
+                            <span class="dashboard-metric-label">@L("Cliente principal", "Client principal", "Top client")</span>
+                            <strong class="dashboard-metric-value">@FormatPercent(stats.SalesTopClientSharePercent)</strong>
+                            <span class="dashboard-metric-description">@L("Peso sobre la facturación del rango", "Pes sobre la facturació del rang", "Share of invoicing in range")</span>
+                        </article>
+                        <article class="dashboard-metric-card dashboard-metric-card-warning">
+                            <span class="dashboard-metric-label">@L("Top 5 clientes", "Top 5 clients", "Top 5 clients")</span>
+                            <strong class="dashboard-metric-value">@FormatPercent(stats.SalesTop5ClientsSharePercent)</strong>
+                            <span class="dashboard-metric-description">@L("Concentración comercial acumulada", "Concentració comercial acumulada", "Accumulated commercial concentration")</span>
+                        </article>
+                    </div>
+                    @RenderDistributionTable(stats.SalesCustomerMix, L("Cliente", "Client", "Client"))
+                </section>
+
+                <section class="panel">
+                    <p class="eyebrow">@L("Ventas", "Vendes", "Sales")</p>
+                    <h2>@L("Mix por artículo", "Mix per article", "Item mix")</h2>
+                    @RenderDistributionTable(stats.SalesItemMix, L("Artículo", "Article", "Item"))
+                </section>
+            </div>
+
+            <div class="comparison-grid">
+                <section class="panel">
+                    <p class="eyebrow">@L("Dirección", "Direcció", "Executive")</p>
+                    <h2>@L("MTD / YTD comercial", "MTD / YTD comercial", "MTD / YTD sales")</h2>
+                    <div class="dashboard-metric-grid">
+                        <article class="dashboard-metric-card dashboard-metric-card-info">
+                            <span class="dashboard-metric-label">@L("Facturado MTD", "Facturat MTD", "Invoiced MTD")</span>
+                            <strong class="dashboard-metric-value">@FormatCurrency(stats.SalesInvoiceAmountMonthToDate)</strong>
+                            <span class="dashboard-metric-description">@L("Desde el inicio del mes hasta la fecha de corte", "Des de l'inici del mes fins a la data de tall", "From month start to the cutoff date")</span>
+                        </article>
+                        <article class="dashboard-metric-card dashboard-metric-card-warning">
+                            <span class="dashboard-metric-label">@L("Facturado YTD", "Facturat YTD", "Invoiced YTD")</span>
+                            <strong class="dashboard-metric-value">@FormatCurrency(stats.SalesInvoiceAmountYearToDate)</strong>
+                            <span class="dashboard-metric-description">@L("Desde el inicio del año hasta la fecha de corte", "Des de l'inici de l'any fins a la data de tall", "From year start to the cutoff date")</span>
+                        </article>
+                    </div>
+                </section>
+
+                <section class="panel">
+                    <p class="eyebrow">@L("Cobros", "Cobraments", "Collections")</p>
+                    <h2>@L("Aging de cobro", "Aging de cobrament", "Receivables aging")</h2>
+                    @RenderBreakdownTable(stats.SalesAgingBuckets, L("Bucket", "Bucket", "Bucket"), true)
+                </section>
+
+                <section class="panel">
+                    <p class="eyebrow">@L("Riesgo", "Risc", "Risk")</p>
+                    <h2>@L("Riesgo comercial por cliente", "Risc comercial per client", "Commercial risk by client")</h2>
+                    <div class="dashboard-metric-grid">
+                        <article class="dashboard-metric-card dashboard-metric-card-info">
+                            <span class="dashboard-metric-label">@L("Cliente principal", "Client principal", "Top client")</span>
+                            <strong class="dashboard-metric-value">@FormatPercent(stats.SalesOutstandingTopClientSharePercent)</strong>
+                            <span class="dashboard-metric-description">@L("Peso sobre el saldo pendiente", "Pes sobre el saldo pendent", "Share of total outstanding exposure")</span>
+                        </article>
+                        <article class="dashboard-metric-card dashboard-metric-card-warning">
+                            <span class="dashboard-metric-label">@L("Top 5 clientes", "Top 5 clients", "Top 5 clients")</span>
+                            <strong class="dashboard-metric-value">@FormatPercent(stats.SalesOutstandingTop5ClientsSharePercent)</strong>
+                            <span class="dashboard-metric-description">@L("Concentración del saldo pendiente", "Concentració del saldo pendent", "Outstanding balance concentration")</span>
+                        </article>
+                    </div>
+                    @RenderDistributionTable(stats.SalesOutstandingRiskByClient, L("Cliente", "Client", "Client"))
+                </section>
+            </div>
+        }
+
+        @if (area.Slug == "purchases")
+        {
+            <div class="comparison-grid">
+                <section class="panel">
+                    <p class="eyebrow">@L("Compras", "Compres", "Purchases")</p>
+                    <h2>@L("Aging de pago", "Aging de pagament", "Payables aging")</h2>
+                    @RenderBreakdownTable(stats.PurchaseAgingBuckets, L("Bucket", "Bucket", "Bucket"), true)
+                </section>
+
+                <section class="panel">
+                    <p class="eyebrow">@L("Compras", "Compres", "Purchases")</p>
+                    <h2>@L("Recepción vs factura", "Recepció vs factura", "Receipt vs invoice")</h2>
+                    @RenderGapTable(stats.PurchaseReceiptInvoiceGaps)
+                </section>
+
+                <section class="panel">
+                    <p class="eyebrow">@L("Dirección", "Direcció", "Executive")</p>
+                    <h2>@L("MTD / YTD compras", "MTD / YTD compres", "MTD / YTD purchases")</h2>
+                    <div class="dashboard-metric-grid">
+                        <article class="dashboard-metric-card dashboard-metric-card-info">
+                            <span class="dashboard-metric-label">@L("Facturado MTD", "Facturat MTD", "Invoiced MTD")</span>
+                            <strong class="dashboard-metric-value">@FormatCurrency(stats.PurchaseInvoiceAmountMonthToDate)</strong>
+                            <span class="dashboard-metric-description">@L("Desde el inicio del mes hasta la fecha de corte", "Des de l'inici del mes fins a la data de tall", "From month start to the cutoff date")</span>
+                        </article>
+                        <article class="dashboard-metric-card dashboard-metric-card-warning">
+                            <span class="dashboard-metric-label">@L("Facturado YTD", "Facturat YTD", "Invoiced YTD")</span>
+                            <strong class="dashboard-metric-value">@FormatCurrency(stats.PurchaseInvoiceAmountYearToDate)</strong>
+                            <span class="dashboard-metric-description">@L("Desde el inicio del año hasta la fecha de corte", "Des de l'inici de l'any fins a la data de tall", "From year start to the cutoff date")</span>
+                        </article>
+                    </div>
+                </section>
+            </div>
+        }
+
+        @if (area.Slug == "production")
+        {
+            <div class="comparison-grid">
+                <section class="panel">
+                    <p class="eyebrow">@L("Producción", "Producció", "Production")</p>
+                    <h2>@L("Carga por acabador", "Càrrega per acabador", "Load by finisher")</h2>
+                    @RenderBreakdownTable(stats.ProductionLoadByFinisher, L("Acabador", "Acabador", "Finisher"), true)
+                </section>
+
+                <section class="panel">
+                    <p class="eyebrow">@L("Producción", "Producció", "Production")</p>
+                    <h2>@L("Carga semanal", "Càrrega setmanal", "Weekly load")</h2>
+                    @RenderBreakdownTable(stats.ProductionLoadByWeek, L("Semana", "Setmana", "Week"), true)
+                </section>
+            </div>
+        }
+
+        @if (area.Slug == "warehouse")
+        {
+            <div class="comparison-grid">
+                <section class="panel">
+                    <p class="eyebrow">@L("Almacén", "Magatzem", "Warehouse")</p>
+                    <h2>@L("Rotación por almacén", "Rotació per magatzem", "Rotation by warehouse")</h2>
+                    @RenderBreakdownTable(stats.WarehouseRotationByWarehouse, L("Almacén", "Magatzem", "Warehouse"), true)
+                </section>
+
+                <section class="panel">
+                    <p class="eyebrow">@L("Almacén", "Magatzem", "Warehouse")</p>
+                    <h2>@L("Antigüedad de stock", "Antiguitat d'estoc", "Stock age")</h2>
+                    @RenderBreakdownTable(stats.WarehouseStockAgeBuckets, L("Bucket", "Bucket", "Bucket"), true)
+                </section>
+
+                <section class="panel">
+                    <p class="eyebrow">@L("Almacén", "Magatzem", "Warehouse")</p>
+                    <h2>@L("Cobertura de stock", "Cobertura d'estoc", "Stock coverage")</h2>
+                    @RenderBreakdownTable(stats.WarehouseCoverageBuckets, L("Bucket", "Bucket", "Bucket"), true)
+                </section>
+            </div>
+        }
+    }
+}
+
+@code {
+    [SupplyParameterFromQuery(Name = "from")]
+    public DateTime? FromQuery { get; set; }
+
+    [SupplyParameterFromQuery(Name = "to")]
+    public DateTime? ToQuery { get; set; }
+
+    private Guid? tenantId;
+    private Guid? companyId;
+    private bool isLoading;
+    private string errorMessage = string.Empty;
+    private string? lastLoadKey;
+    private BusinessStatisticsFilter filter = new() { DateFrom = DateTime.Today.AddDays(-30), DateTo = DateTime.Today };
+    private BusinessStatisticsDto stats = new();
+    private AreaDefinition area = AreaDefinition.Empty;
+
+    private string PageTitleText => area.Localize(T, "pageTitle");
+    private string HeaderTitle => area.Localize(T, "title");
+    private string HeaderLead => area.Localize(T, "lead");
+    private string ReportsRoute => area.ReportsRoute;
+    private string ReportsLinkLabel => area.Localize(T, "reportsLink");
+    private string LoadingLabel => area.Localize(T, "loadingLabel");
+    private string PrimaryKicker => area.Localize(T, "primaryKicker");
+    private string PrimaryTitle => area.Localize(T, "primaryTitle");
+    private string PrimaryLead => area.Localize(T, "primaryLead");
+    private string ComparisonTitle => area.Localize(T, "comparisonTitle");
+    private string TimelineTitle => area.Localize(T, "timelineTitle");
+    private string ExportCsvHref => NavigationManager.GetUriWithQueryParameters("/estadisticas/export/csv", new Dictionary<string, object?>
+    {
+        ["from"] = filter.DateFrom?.ToString("yyyy-MM-dd"),
+        ["to"] = filter.DateTo?.ToString("yyyy-MM-dd"),
+        ["area"] = area.Slug
+    });
+    private IReadOnlyList<MetricCard> AreaMetricCards => area.BuildMetricCards(T, stats);
+    private IReadOnlyList<BreakdownDefinition> AreaBreakdowns => area.BuildBreakdowns(T, stats);
+    private IReadOnlyList<StatisticComparisonItemDto> FilteredComparisons => area.FilterComparisons(stats.PeriodComparisons);
+
+    private string L(string spanish, string catalan, string english) =>
+        T.CurrentLanguage switch
+        {
+            AppLanguages.Catalan => catalan,
+            AppLanguages.English => english,
+            _ => spanish
+        };
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        tenantId = user.GetTenantId();
+        companyId = user.GetActiveCompanyId();
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        area = AreaDefinition.FromRoute(NavigationManager.ToBaseRelativePath(NavigationManager.Uri));
+        var loadKey = string.Join("|",
+            area.StatisticsRoute,
+            FromQuery?.ToString("yyyy-MM-dd") ?? string.Empty,
+            ToQuery?.ToString("yyyy-MM-dd") ?? string.Empty,
+            tenantId?.ToString() ?? string.Empty,
+            companyId?.ToString() ?? string.Empty);
+
+        if (string.Equals(loadKey, lastLoadKey, StringComparison.Ordinal))
+        {
+            return;
+        }
+
+        filter.DateFrom = FromQuery ?? DateTime.Today.AddDays(-30);
+        filter.DateTo = ToQuery ?? DateTime.Today;
+        lastLoadKey = loadKey;
+        await LoadAsync();
+    }
+
+    private async Task LoadAsync()
+    {
+        if (!tenantId.HasValue || !companyId.HasValue)
+        {
+            return;
+        }
+
+        isLoading = true;
+        errorMessage = string.Empty;
+        try
+        {
+            stats = await ReportingQueries.GetBusinessStatisticsAsync(tenantId.Value, companyId.Value, filter);
+            var target = NavigationManager.GetUriWithQueryParameters(area.StatisticsRoute, new Dictionary<string, object?>
+            {
+                ["from"] = filter.DateFrom?.ToString("yyyy-MM-dd"),
+                ["to"] = filter.DateTo?.ToString("yyyy-MM-dd")
+            });
+            if (!string.Equals(target, NavigationManager.Uri, StringComparison.Ordinal))
+            {
+                NavigationManager.NavigateTo(target, replace: true);
+            }
+        }
+        catch (Exception exception)
+        {
+            errorMessage = exception.Message;
+            stats = new();
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private string FormatCurrency(decimal value) => string.Format(CultureInfo.CurrentCulture, "{0:N2} €", value);
+    private string FormatPercent(decimal value) => string.Format(CultureInfo.CurrentCulture, "{0:N2} %", value);
+    private string FormatCount(int value) => value.ToString("N0", CultureInfo.CurrentCulture);
+    private string FormatNumber(decimal value) => value.ToString("N2", CultureInfo.CurrentCulture);
+    private string FormatQuantity(decimal value) => value.ToString("N3", CultureInfo.CurrentCulture);
+
+    private string FormatComparisonValue(decimal value, string valueKind) =>
+        valueKind switch
+        {
+            "currency" => FormatCurrency(value),
+            "count" => value.ToString("N0", CultureInfo.CurrentCulture),
+            _ => value.ToString("N2", CultureInfo.CurrentCulture)
+        };
+
+    private string BuildDeltaLabel(StatisticComparisonItemDto item)
+    {
+        var sign = item.DeltaValue > 0 ? "+" : string.Empty;
+        var deltaValue = FormatComparisonValue(item.DeltaValue, item.ValueKind);
+        return $"{sign}{deltaValue} ({sign}{item.DeltaPercentage.ToString("N2", CultureInfo.CurrentCulture)}%)";
+    }
+
+    private string TranslateComparisonLabel(string label) =>
+        label switch
+        {
+            "Facturación ventas" => L("Facturación ventas", "Facturació vendes", "Sales invoicing"),
+            "Facturación compras" => L("Facturación compras", "Facturació compres", "Purchase invoicing"),
+            "Pendiente cobro" => L("Pendiente cobro", "Pendent cobrament", "Outstanding sales"),
+            "Pendiente pago" => L("Pendiente pago", "Pendent pagament", "Outstanding purchases"),
+            "Movimientos stock" => L("Movimientos stock", "Moviments estoc", "Stock movements"),
+            "Órdenes vivas" => L("Órdenes vivas", "Ordres vives", "Live work orders"),
+            _ => label
+        };
+
+    private string BuildPreviousRangeLabel()
+    {
+        var currentFrom = filter.DateFrom?.Date ?? DateTime.Today.AddDays(-30);
+        var currentTo = filter.DateTo?.Date ?? DateTime.Today;
+        var currentToExclusive = currentTo.AddDays(1);
+        var previousFrom = currentFrom - (currentToExclusive - currentFrom);
+        var previousTo = currentFrom.AddDays(-1);
+        return L(
+            $"Comparando contra {previousFrom:dd/MM/yyyy} - {previousTo:dd/MM/yyyy}.",
+            $"Comparant contra {previousFrom:dd/MM/yyyy} - {previousTo:dd/MM/yyyy}.",
+            $"Compared against {previousFrom:dd/MM/yyyy} - {previousTo:dd/MM/yyyy}.");
+    }
+
+    private RenderFragment RenderBreakdownTable(IReadOnlyCollection<StatisticBreakdownItemDto> items, string labelTitle, bool showAmount) => builder =>
+    {
+        var sequence = 0;
+        builder.OpenElement(sequence++, "table");
+        builder.AddAttribute(sequence++, "class", "data-table");
+        builder.OpenElement(sequence++, "thead");
+        builder.OpenElement(sequence++, "tr");
+        builder.OpenElement(sequence++, "th");
+        builder.AddContent(sequence++, labelTitle);
+        builder.CloseElement();
+        builder.OpenElement(sequence++, "th");
+        builder.AddContent(sequence++, L("Cantidad", "Quantitat", "Count"));
+        builder.CloseElement();
+        if (showAmount)
+        {
+            builder.OpenElement(sequence++, "th");
+            builder.AddContent(sequence++, L("Importe", "Import", "Amount"));
+            builder.CloseElement();
+        }
+
+        builder.CloseElement();
+        builder.CloseElement();
+        builder.OpenElement(sequence++, "tbody");
+
+        if (items.Count == 0)
+        {
+            builder.OpenElement(sequence++, "tr");
+            builder.OpenElement(sequence++, "td");
+            builder.AddAttribute(sequence++, "colspan", showAmount ? 3 : 2);
+            builder.AddAttribute(sequence++, "class", "table-empty");
+            builder.AddContent(sequence++, L("Sin datos para este rango.", "Sense dades per a aquest rang.", "No data for this range."));
+            builder.CloseElement();
+            builder.CloseElement();
+        }
+        else
+        {
+            foreach (var item in items)
+            {
+                builder.OpenElement(sequence++, "tr");
+                builder.OpenElement(sequence++, "td");
+                builder.AddContent(sequence++, TranslateAnalyticsLabel(item.Label));
+                builder.CloseElement();
+                builder.OpenElement(sequence++, "td");
+                builder.AddContent(sequence++, FormatCount(item.Count));
+                builder.CloseElement();
+                if (showAmount)
+                {
+                    builder.OpenElement(sequence++, "td");
+                    builder.AddContent(sequence++, FormatCurrency(item.Amount));
+                    builder.CloseElement();
+                }
+
+                builder.CloseElement();
+            }
+        }
+
+        builder.CloseElement();
+        builder.CloseElement();
+    };
+
+    private RenderFragment RenderDistributionTable(IReadOnlyCollection<StatisticDistributionItemDto> items, string labelTitle) => builder =>
+    {
+        var sequence = 0;
+        builder.OpenElement(sequence++, "table");
+        builder.AddAttribute(sequence++, "class", "data-table");
+        builder.OpenElement(sequence++, "thead");
+        builder.OpenElement(sequence++, "tr");
+        builder.OpenElement(sequence++, "th");
+        builder.AddContent(sequence++, labelTitle);
+        builder.CloseElement();
+        builder.OpenElement(sequence++, "th");
+        builder.AddContent(sequence++, L("Cantidad", "Quantitat", "Count"));
+        builder.CloseElement();
+        builder.OpenElement(sequence++, "th");
+        builder.AddContent(sequence++, L("Importe", "Import", "Amount"));
+        builder.CloseElement();
+        builder.OpenElement(sequence++, "th");
+        builder.AddContent(sequence++, L("Peso %", "Pes %", "Share %"));
+        builder.CloseElement();
+        builder.CloseElement();
+        builder.CloseElement();
+        builder.OpenElement(sequence++, "tbody");
+
+        if (items.Count == 0)
+        {
+            builder.OpenElement(sequence++, "tr");
+            builder.OpenElement(sequence++, "td");
+            builder.AddAttribute(sequence++, "colspan", 4);
+            builder.AddAttribute(sequence++, "class", "table-empty");
+            builder.AddContent(sequence++, L("Sin datos para este rango.", "Sense dades per a aquest rang.", "No data for this range."));
+            builder.CloseElement();
+            builder.CloseElement();
+        }
+        else
+        {
+            foreach (var item in items)
+            {
+                builder.OpenElement(sequence++, "tr");
+                builder.OpenElement(sequence++, "td");
+                builder.AddContent(sequence++, item.Label);
+                builder.CloseElement();
+                builder.OpenElement(sequence++, "td");
+                builder.AddContent(sequence++, FormatCount(item.Count));
+                builder.CloseElement();
+                builder.OpenElement(sequence++, "td");
+                builder.AddContent(sequence++, FormatCurrency(item.Amount));
+                builder.CloseElement();
+                builder.OpenElement(sequence++, "td");
+                builder.AddContent(sequence++, FormatPercent(item.SharePercent));
+                builder.CloseElement();
+                builder.CloseElement();
+            }
+        }
+
+        builder.CloseElement();
+        builder.CloseElement();
+    };
+
+    private RenderFragment RenderGapTable(IReadOnlyCollection<StatisticGapItemDto> items) => builder =>
+    {
+        var sequence = 0;
+        builder.OpenElement(sequence++, "table");
+        builder.AddAttribute(sequence++, "class", "data-table");
+        builder.OpenElement(sequence++, "thead");
+        builder.OpenElement(sequence++, "tr");
+        builder.OpenElement(sequence++, "th");
+        builder.AddContent(sequence++, L("Proveedor", "Proveïdor", "Supplier"));
+        builder.CloseElement();
+        builder.OpenElement(sequence++, "th");
+        builder.AddContent(sequence++, L("Recepcionado", "Recepcionat", "Received"));
+        builder.CloseElement();
+        builder.OpenElement(sequence++, "th");
+        builder.AddContent(sequence++, L("Facturado", "Facturat", "Invoiced"));
+        builder.CloseElement();
+        builder.OpenElement(sequence++, "th");
+        builder.AddContent(sequence++, L("Gap", "Gap", "Gap"));
+        builder.CloseElement();
+        builder.CloseElement();
+        builder.CloseElement();
+        builder.OpenElement(sequence++, "tbody");
+
+        if (items.Count == 0)
+        {
+            builder.OpenElement(sequence++, "tr");
+            builder.OpenElement(sequence++, "td");
+            builder.AddAttribute(sequence++, "colspan", 4);
+            builder.AddAttribute(sequence++, "class", "table-empty");
+            builder.AddContent(sequence++, L("Sin datos para este rango.", "Sense dades per a aquest rang.", "No data for this range."));
+            builder.CloseElement();
+            builder.CloseElement();
+        }
+        else
+        {
+            foreach (var item in items)
+            {
+                builder.OpenElement(sequence++, "tr");
+                builder.OpenElement(sequence++, "td");
+                builder.AddContent(sequence++, item.Label);
+                builder.CloseElement();
+                builder.OpenElement(sequence++, "td");
+                builder.AddContent(sequence++, FormatCurrency(item.ExpectedValue));
+                builder.CloseElement();
+                builder.OpenElement(sequence++, "td");
+                builder.AddContent(sequence++, FormatCurrency(item.ActualValue));
+                builder.CloseElement();
+                builder.OpenElement(sequence++, "td");
+                builder.AddContent(sequence++, FormatCurrency(item.GapValue));
+                builder.CloseElement();
+                builder.CloseElement();
+            }
+        }
+
+        builder.CloseElement();
+        builder.CloseElement();
+    };
+
+    private RenderFragment RenderTimelineTable() => builder =>
+    {
+        var sequence = 0;
+        builder.OpenElement(sequence++, "table");
+        builder.AddAttribute(sequence++, "class", "data-table");
+        builder.OpenElement(sequence++, "thead");
+        builder.OpenElement(sequence++, "tr");
+        builder.OpenElement(sequence++, "th");
+        builder.AddContent(sequence++, L("Semana", "Setmana", "Week"));
+        builder.CloseElement();
+        foreach (var column in area.BuildTimelineColumns(T))
+        {
+            builder.OpenElement(sequence++, "th");
+            builder.AddContent(sequence++, column.Header);
+            builder.CloseElement();
+        }
+
+        builder.CloseElement();
+        builder.CloseElement();
+        builder.OpenElement(sequence++, "tbody");
+
+        if (stats.WeeklyTimeline.Count == 0)
+        {
+            builder.OpenElement(sequence++, "tr");
+            builder.OpenElement(sequence++, "td");
+            builder.AddAttribute(sequence++, "colspan", area.BuildTimelineColumns(T).Count + 1);
+            builder.AddAttribute(sequence++, "class", "table-empty");
+            builder.AddContent(sequence++, L("Sin evolución para este rango.", "Sense evolució per a aquest rang.", "No timeline data for this range."));
+            builder.CloseElement();
+            builder.CloseElement();
+        }
+        else
+        {
+            foreach (var point in stats.WeeklyTimeline)
+            {
+                builder.OpenElement(sequence++, "tr");
+                builder.OpenElement(sequence++, "td");
+                builder.AddContent(sequence++, point.Label);
+                builder.CloseElement();
+                foreach (var column in area.BuildTimelineColumns(T))
+                {
+                    builder.OpenElement(sequence++, "td");
+                    builder.AddContent(sequence++, column.Value(point));
+                    builder.CloseElement();
+                }
+
+                builder.CloseElement();
+            }
+        }
+
+        builder.CloseElement();
+        builder.CloseElement();
+    };
+
+    private sealed record MetricCard(string Label, string Value, string Description, string AccentClass);
+    private sealed record BreakdownDefinition(string Kicker, string Title, string LabelTitle, IReadOnlyCollection<StatisticBreakdownItemDto> Items, bool ShowAmount);
+    private sealed record TimelineColumn(string Header, Func<StatisticTimelinePointDto, string> Value);
+
+    private string TranslateAnalyticsLabel(string label) =>
+        label switch
+        {
+            "aging_current" => L("Al día", "Al dia", "Current"),
+            "aging_1_30" => L("1-30 días", "1-30 dies", "1-30 days"),
+            "aging_31_60" => L("31-60 días", "31-60 dies", "31-60 days"),
+            "aging_61_90" => L("61-90 días", "61-90 dies", "61-90 days"),
+            "aging_90_plus" => L("90+ días", "90+ dies", "90+ days"),
+            "stock_age_0_30" => L("0-30 días", "0-30 dies", "0-30 days"),
+            "stock_age_31_90" => L("31-90 días", "31-90 dies", "31-90 days"),
+            "stock_age_91_180" => L("91-180 días", "91-180 dies", "91-180 days"),
+            "stock_age_180_plus" => L("180+ días", "180+ dies", "180+ days"),
+            "coverage_none" => L("Sin salida", "Sense sortida", "No outbound"),
+            "coverage_0_30" => L("0-30 días", "0-30 dies", "0-30 days"),
+            "coverage_31_90" => L("31-90 días", "31-90 dies", "31-90 days"),
+            "coverage_90_plus" => L("90+ días", "90+ dies", "90+ days"),
+            _ => label
+        };
+
+    private sealed class AreaDefinition
+    {
+        public static readonly AreaDefinition Empty = new("sales");
+
+        private readonly string slug;
+
+        private AreaDefinition(string slug)
+        {
+            this.slug = slug;
+        }
+
+        public string Slug => slug;
+
+        public string ReportsRoute =>
+            slug switch
+            {
+                "sales" => "/listados/ventas",
+                "purchases" => "/listados/compras",
+                "production" => "/listados/produccion",
+                "warehouse" => "/listados/almacen",
+                _ => "/listados/ventas"
+            };
+
+        public string StatisticsRoute =>
+            slug switch
+            {
+                "sales" => "/estadisticas/ventas",
+                "purchases" => "/estadisticas/compras",
+                "production" => "/estadisticas/produccion",
+                "warehouse" => "/estadisticas/almacen",
+                _ => "/estadisticas/ventas"
+            };
+
+        public static AreaDefinition FromRoute(string route)
+        {
+            var normalized = (route ?? string.Empty).Split('?', '#')[0].Trim('/');
+            return normalized switch
+            {
+                "estadisticas/compras" => new("purchases"),
+                "estadisticas/produccion" => new("production"),
+                "estadisticas/almacen" => new("warehouse"),
+                _ => new("sales")
+            };
+        }
+
+        public string Localize(AppText text, string key) =>
+            (slug, key) switch
+            {
+                ("sales", "pageTitle") => Localize(text, "Estadísticas / Ventas", "Estadístiques / Vendes", "Statistics / Sales"),
+                ("sales", "title") => Localize(text, "Estadísticas de ventas", "Estadístiques de vendes", "Sales statistics"),
+                ("sales", "lead") => Localize(text, "Lectura analítica del circuito comercial, facturación, cobro y cliente.", "Lectura analítica del circuit comercial, facturació, cobrament i client.", "Analytical view of the commercial flow, billing, collection and clients."),
+                ("sales", "reportsLink") => Localize(text, "Abrir listados de ventas", "Obrir llistats de vendes", "Open sales reports"),
+                ("sales", "loadingLabel") => Localize(text, "Calculando estadísticas de ventas...", "Calculant estadístiques de vendes...", "Calculating sales statistics..."),
+                ("sales", "primaryKicker") => Localize(text, "Ventas", "Vendes", "Sales"),
+                ("sales", "primaryTitle") => Localize(text, "Resumen comercial", "Resum comercial", "Commercial summary"),
+                ("sales", "primaryLead") => Localize(text, "Pedidos, albaranes, facturas, remesas y cobro en el rango seleccionado.", "Comandes, albarans, factures, remeses i cobrament en el rang seleccionat.", "Orders, shipments, invoices, remittances and collections within the selected range."),
+                ("sales", "comparisonTitle") => Localize(text, "Ventas vs período anterior", "Vendes vs període anterior", "Sales vs previous period"),
+                ("sales", "timelineTitle") => Localize(text, "Ritmo semanal de ventas", "Ritme setmanal de vendes", "Weekly sales pace"),
+
+                ("purchases", "pageTitle") => Localize(text, "Estadísticas / Compras", "Estadístiques / Compres", "Statistics / Purchases"),
+                ("purchases", "title") => Localize(text, "Estadísticas de compras", "Estadístiques de compres", "Purchase statistics"),
+                ("purchases", "lead") => Localize(text, "Lectura analítica del aprovisionamiento, recepción, facturación y pago a proveedor.", "Lectura analítica de l'aprovisionament, recepció, facturació i pagament a proveïdor.", "Analytical view of procurement, receipts, supplier invoicing and payments."),
+                ("purchases", "reportsLink") => Localize(text, "Abrir listados de compras", "Obrir llistats de compres", "Open purchase reports"),
+                ("purchases", "loadingLabel") => Localize(text, "Calculando estadísticas de compras...", "Calculant estadístiques de compres...", "Calculating purchase statistics..."),
+                ("purchases", "primaryKicker") => Localize(text, "Compras", "Compres", "Purchases"),
+                ("purchases", "primaryTitle") => Localize(text, "Resumen proveedor", "Resum proveïdor", "Supplier summary"),
+                ("purchases", "primaryLead") => Localize(text, "Pedidos, recepciones, facturas proveedor y nivel de pago del rango seleccionado.", "Comandes, recepcions, factures proveïdor i nivell de pagament del rang seleccionat.", "Orders, receipts, supplier invoices and payment level for the selected range."),
+                ("purchases", "comparisonTitle") => Localize(text, "Compras vs período anterior", "Compres vs període anterior", "Purchases vs previous period"),
+                ("purchases", "timelineTitle") => Localize(text, "Ritmo semanal de compras", "Ritme setmanal de compres", "Weekly purchase pace"),
+
+                ("production", "pageTitle") => Localize(text, "Estadísticas / Producción", "Estadístiques / Producció", "Statistics / Production"),
+                ("production", "title") => Localize(text, "Estadísticas de producción", "Estadístiques de producció", "Production statistics"),
+                ("production", "lead") => Localize(text, "Trabajo vivo, estados de fabricación y carga de planta en el rango seleccionado.", "Treball viu, estats de fabricació i càrrega de planta en el rang seleccionat.", "Live work, work-order statuses and plant load in the selected range."),
+                ("production", "reportsLink") => Localize(text, "Abrir listados de producción", "Obrir llistats de producció", "Open production reports"),
+                ("production", "loadingLabel") => Localize(text, "Calculando estadísticas de producción...", "Calculant estadístiques de producció...", "Calculating production statistics..."),
+                ("production", "primaryKicker") => Localize(text, "Producción", "Producció", "Production"),
+                ("production", "primaryTitle") => Localize(text, "Resumen de planta", "Resum de planta", "Plant summary"),
+                ("production", "primaryLead") => Localize(text, "Órdenes vivas, acabadores y ritmo semanal de fabricación.", "Ordres vives, acabadors i ritme setmanal de fabricació.", "Live work orders, finishers and weekly production pace."),
+                ("production", "comparisonTitle") => Localize(text, "Producción vs período anterior", "Producció vs període anterior", "Production vs previous period"),
+                ("production", "timelineTitle") => Localize(text, "Ritmo semanal de órdenes", "Ritme setmanal d'ordres", "Weekly work-order pace"),
+
+                ("warehouse", "pageTitle") => Localize(text, "Estadísticas / Almacén", "Estadístiques / Magatzem", "Statistics / Warehouse"),
+                ("warehouse", "title") => Localize(text, "Estadísticas de almacén", "Estadístiques de magatzem", "Warehouse statistics"),
+                ("warehouse", "lead") => Localize(text, "Posiciones, movimientos, inventarios y traspasos con lectura operativa por almacén.", "Posicions, moviments, inventaris i traspassos amb lectura operativa per magatzem.", "Positions, movements, counts and transfers with warehouse-focused operational insight."),
+                ("warehouse", "reportsLink") => Localize(text, "Abrir listados de almacén", "Obrir llistats de magatzem", "Open warehouse reports"),
+                ("warehouse", "loadingLabel") => Localize(text, "Calculando estadísticas de almacén...", "Calculant estadístiques de magatzem...", "Calculating warehouse statistics..."),
+                ("warehouse", "primaryKicker") => Localize(text, "Almacén", "Magatzem", "Warehouse"),
+                ("warehouse", "primaryTitle") => Localize(text, "Resumen logístico", "Resum logístic", "Warehouse summary"),
+                ("warehouse", "primaryLead") => Localize(text, "Actividad de stock, inventarios, traspasos y carga por almacén.", "Activitat d'estoc, inventaris, traspassos i càrrega per magatzem.", "Stock activity, counts, transfers and warehouse load."),
+                ("warehouse", "comparisonTitle") => Localize(text, "Almacén vs período anterior", "Magatzem vs període anterior", "Warehouse vs previous period"),
+                ("warehouse", "timelineTitle") => Localize(text, "Ritmo semanal de almacén", "Ritme setmanal de magatzem", "Weekly warehouse pace"),
+                _ => string.Empty
+            };
+
+        public IReadOnlyList<MetricCard> BuildMetricCards(AppText text, BusinessStatisticsDto stats) =>
+            slug switch
+            {
+                "sales" =>
+                [
+                    new(Localize(text, "Pedidos venta", "Comandes venda", "Sales orders"), stats.SalesOrderCount.ToString("N0", CultureInfo.CurrentCulture), string.Format(CultureInfo.CurrentCulture, "{0:N2} €", stats.SalesOrderAmount), "dashboard-metric-card"),
+                    new(Localize(text, "Albaranes", "Albarans", "Shipments"), stats.SalesShipmentCount.ToString("N0", CultureInfo.CurrentCulture), string.Format(CultureInfo.CurrentCulture, "{0:N2} €", stats.SalesShipmentAmount), "dashboard-metric-card"),
+                    new(Localize(text, "Facturas", "Factures", "Invoices"), stats.SalesInvoiceCount.ToString("N0", CultureInfo.CurrentCulture), string.Format(CultureInfo.CurrentCulture, "{0:N2} €", stats.SalesInvoiceAmount), "dashboard-metric-card"),
+                    new(Localize(text, "Remesas", "Remeses", "Remittances"), stats.RemittanceCount.ToString("N0", CultureInfo.CurrentCulture), string.Format(CultureInfo.CurrentCulture, "{0:N2} €", stats.RemittanceOutstandingAmount), "dashboard-metric-card dashboard-metric-card-info"),
+                    new(Localize(text, "Pendiente cobro", "Pendent cobrament", "Outstanding sales"), string.Format(CultureInfo.CurrentCulture, "{0:N2} €", stats.SalesOutstandingAmount), string.Format(CultureInfo.CurrentCulture, "{0:N2} %", stats.SalesCollectionRate), "dashboard-metric-card dashboard-metric-card-warning")
+                ],
+                "purchases" =>
+                [
+                    new(Localize(text, "Pedidos compra", "Comandes compra", "Purchase orders"), stats.PurchaseOrderCount.ToString("N0", CultureInfo.CurrentCulture), string.Format(CultureInfo.CurrentCulture, "{0:N2} €", stats.PurchaseOrderAmount), "dashboard-metric-card"),
+                    new(Localize(text, "Recepciones", "Recepcions", "Receipts"), stats.PurchaseReceiptCount.ToString("N0", CultureInfo.CurrentCulture), stats.PurchaseReceivedQuantity.ToString("N3", CultureInfo.CurrentCulture), "dashboard-metric-card"),
+                    new(Localize(text, "Facturas proveedor", "Factures proveïdor", "Supplier invoices"), stats.PurchaseInvoiceCount.ToString("N0", CultureInfo.CurrentCulture), string.Format(CultureInfo.CurrentCulture, "{0:N2} €", stats.PurchaseInvoiceAmount), "dashboard-metric-card"),
+                    new(Localize(text, "Pagado", "Pagat", "Paid"), string.Format(CultureInfo.CurrentCulture, "{0:N2} €", stats.PurchasePaidAmount), string.Format(CultureInfo.CurrentCulture, "{0:N2} %", stats.PurchasePaymentRate), "dashboard-metric-card dashboard-metric-card-info"),
+                    new(Localize(text, "Pendiente pago", "Pendent pagament", "Outstanding purchases"), string.Format(CultureInfo.CurrentCulture, "{0:N2} €", stats.PurchaseOutstandingAmount), Localize(text, "Importe todavía no pagado", "Import encara no pagat", "Amount still pending payment"), "dashboard-metric-card dashboard-metric-card-warning")
+                ],
+                "production" =>
+                [
+                    new(Localize(text, "Órdenes vivas", "Ordres vives", "Live work orders"), stats.LiveFinishOrders.ToString("N0", CultureInfo.CurrentCulture), Localize(text, "Trabajo pendiente o en curso", "Treball pendent o en curs", "Pending or in-progress work"), "dashboard-metric-card"),
+                    new(Localize(text, "Órdenes en rango", "Ordres en rang", "Orders in range"), stats.FinishStatusBreakdown.Sum(item => item.Count).ToString("N0", CultureInfo.CurrentCulture), Localize(text, "Suma de estados del período", "Suma d'estats del període", "Sum of statuses in range"), "dashboard-metric-card"),
+                    new(Localize(text, "Acabadores visibles", "Acabadors visibles", "Visible finishers"), stats.TopFinishers.Count.ToString("N0", CultureInfo.CurrentCulture), Localize(text, "Top acabadores del rango", "Top acabadors del rang", "Top finishers in range"), "dashboard-metric-card dashboard-metric-card-info"),
+                    new(Localize(text, "Movimientos soporte", "Moviments suport", "Support movements"), stats.StockMovementsInRange.ToString("N0", CultureInfo.CurrentCulture), Localize(text, "Actividad logística asociada", "Activitat logística associada", "Related logistics activity"), "dashboard-metric-card"),
+                    new(Localize(text, "Balance neto", "Balanç net", "Net balance"), string.Format(CultureInfo.CurrentCulture, "{0:N2} €", stats.NetBillingBalance), Localize(text, "Contexto comercial del rango", "Context comercial del rang", "Commercial context for the range"), "dashboard-metric-card dashboard-metric-card-warning")
+                ],
+                "warehouse" =>
+                [
+                    new(Localize(text, "Posiciones stock", "Posicions estoc", "Stock positions"), stats.StockPositions.ToString("N0", CultureInfo.CurrentCulture), Localize(text, "Posiciones vivas calculadas", "Posicions vives calculades", "Calculated live positions"), "dashboard-metric-card"),
+                    new(Localize(text, "Movimientos", "Moviments", "Movements"), stats.StockMovementsInRange.ToString("N0", CultureInfo.CurrentCulture), Localize(text, "Actividad de stock en el rango", "Activitat d'estoc en el rang", "Stock activity in range"), "dashboard-metric-card dashboard-metric-card-info"),
+                    new(Localize(text, "Inventarios borrador", "Inventaris esborrany", "Draft counts"), stats.DraftCounts.ToString("N0", CultureInfo.CurrentCulture), Localize(text, "Conteos todavía abiertos", "Comptatges encara oberts", "Counts still open"), "dashboard-metric-card"),
+                    new(Localize(text, "Traspasos borrador", "Traspassos esborrany", "Draft transfers"), stats.DraftTransfers.ToString("N0", CultureInfo.CurrentCulture), Localize(text, "Traspasos pendientes", "Traspassos pendents", "Transfers still pending"), "dashboard-metric-card"),
+                    new(Localize(text, "Movimiento por posición", "Moviment per posició", "Moves per position"), CalculateRatio(stats.StockMovementsInRange, stats.StockPositions).ToString("N2", CultureInfo.CurrentCulture), Localize(text, "Actividad media de almacén", "Activitat mitjana de magatzem", "Average warehouse activity"), "dashboard-metric-card dashboard-metric-card-warning")
+                ],
+                _ => []
+            };
+
+        public IReadOnlyList<BreakdownDefinition> BuildBreakdowns(AppText text, BusinessStatisticsDto stats) =>
+            slug switch
+            {
+                "sales" =>
+                [
+                    new(Localize(text, "Clientes", "Clients", "Clients"), Localize(text, "Top clientes", "Top clients", "Top clients"), Localize(text, "Cliente", "Client", "Client"), stats.TopClients, true),
+                    new(Localize(text, "Ventas", "Vendes", "Sales"), Localize(text, "Estados de venta", "Estats de venda", "Sales statuses"), Localize(text, "Estado", "Estat", "Status"), stats.SalesStatusBreakdown, true),
+                    new(Localize(text, "Ventas", "Vendes", "Sales"), Localize(text, "Top artículos facturados", "Top articles facturats", "Top billed items"), Localize(text, "Artículo", "Article", "Item"), stats.TopBilledItems, true)
+                ],
+                "purchases" =>
+                [
+                    new(Localize(text, "Proveedores", "Proveïdors", "Suppliers"), Localize(text, "Top proveedores", "Top proveïdors", "Top suppliers"), Localize(text, "Proveedor", "Proveïdor", "Supplier"), stats.TopSuppliers, true),
+                    new(Localize(text, "Compras", "Compres", "Purchases"), Localize(text, "Estados de compra", "Estats de compra", "Purchase statuses"), Localize(text, "Estado", "Estat", "Status"), stats.PurchaseStatusBreakdown, true)
+                ],
+                "production" =>
+                [
+                    new(Localize(text, "Producción", "Producció", "Production"), Localize(text, "Estados de fabricación", "Estats de fabricació", "Work order statuses"), Localize(text, "Estado", "Estat", "Status"), stats.FinishStatusBreakdown, false),
+                    new(Localize(text, "Producción", "Producció", "Production"), Localize(text, "Top acabadores", "Top acabadors", "Top finishers"), Localize(text, "Acabador", "Acabador", "Finisher"), stats.TopFinishers, true)
+                ],
+                "warehouse" =>
+                [
+                    new(Localize(text, "Almacén", "Magatzem", "Warehouse"), Localize(text, "Top almacenes", "Top magatzems", "Top warehouses"), Localize(text, "Almacén", "Magatzem", "Warehouse"), stats.TopWarehouses, true),
+                    new(Localize(text, "Almacén", "Magatzem", "Warehouse"), Localize(text, "Tipos de movimiento", "Tipus de moviment", "Movement types"), Localize(text, "Tipo", "Tipus", "Type"), stats.MovementTypeBreakdown, true)
+                ],
+                _ => []
+            };
+
+        public IReadOnlyList<StatisticComparisonItemDto> FilterComparisons(IReadOnlyCollection<StatisticComparisonItemDto> items) =>
+            slug switch
+            {
+                "sales" => items.Where(item => item.Label is "Facturación ventas" or "Pendiente cobro").ToArray(),
+                "purchases" => items.Where(item => item.Label is "Facturación compras" or "Pendiente pago").ToArray(),
+                "production" => items.Where(item => item.Label is "Órdenes vivas").ToArray(),
+                "warehouse" => items.Where(item => item.Label is "Movimientos stock").ToArray(),
+                _ => []
+            };
+
+        public IReadOnlyList<TimelineColumn> BuildTimelineColumns(AppText text) =>
+            slug switch
+            {
+                "sales" =>
+                [
+                    new(Localize(text, "Facturación", "Facturació", "Invoicing"), point => string.Format(CultureInfo.CurrentCulture, "{0:N2} €", point.SalesInvoiceAmount)),
+                    new(Localize(text, "Facturas", "Factures", "Invoices"), point => point.SalesInvoiceCount.ToString("N0", CultureInfo.CurrentCulture))
+                ],
+                "purchases" =>
+                [
+                    new(Localize(text, "Facturación", "Facturació", "Invoicing"), point => string.Format(CultureInfo.CurrentCulture, "{0:N2} €", point.PurchaseInvoiceAmount)),
+                    new(Localize(text, "Facturas", "Factures", "Invoices"), point => point.PurchaseInvoiceCount.ToString("N0", CultureInfo.CurrentCulture))
+                ],
+                "production" =>
+                [
+                    new(Localize(text, "Órdenes", "Ordres", "Orders"), point => point.FinishOrderCount.ToString("N0", CultureInfo.CurrentCulture)),
+                    new(Localize(text, "Movimientos soporte", "Moviments suport", "Support moves"), point => point.StockMovementCount.ToString("N0", CultureInfo.CurrentCulture))
+                ],
+                "warehouse" =>
+                [
+                    new(Localize(text, "Movimientos", "Moviments", "Movements"), point => point.StockMovementCount.ToString("N0", CultureInfo.CurrentCulture)),
+                    new(Localize(text, "Órdenes soporte", "Ordres suport", "Support orders"), point => point.FinishOrderCount.ToString("N0", CultureInfo.CurrentCulture))
+                ],
+                _ => []
+            };
+
+        private static decimal CalculateRatio(int movements, int positions) =>
+            positions <= 0 ? 0m : Math.Round((decimal)movements / positions, 2);
+
+        private static string Localize(AppText text, string spanish, string catalan, string english) =>
+            text.CurrentLanguage switch
+            {
+                AppLanguages.Catalan => catalan,
+                AppLanguages.English => english,
+                _ => spanish
+            };
+    }
+}

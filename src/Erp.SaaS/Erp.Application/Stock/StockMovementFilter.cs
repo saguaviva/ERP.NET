@@ -4,6 +4,10 @@ public sealed class StockMovementFilter
 {
     public string Search { get; set; } = string.Empty;
     public string Warehouse { get; set; } = string.Empty;
+    public string CatalogScope { get; set; } = string.Empty;
+    public string SupplierName { get; set; } = string.Empty;
+    public string Color { get; set; } = string.Empty;
+    public string MovementType { get; set; } = string.Empty;
     public int Page { get; set; } = 1;
     public int PageSize { get; set; } = 25;
     public string SortColumn { get; set; } = string.Empty;

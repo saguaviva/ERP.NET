@@ -1,7 +1,10 @@
 @page "/ventas/pedidos/nuevo"
 @page "/ventas/pedidos/editar/{OrderNumber:int}"
+@page "/ventas/pedidos-teixits-mostres/nuevo"
+@page "/ventas/pedidos-teixits-mostres/editar/{OrderNumber:int}"
 @attribute [Authorize(Roles = "TenantAdmin,TenantReader")]
 @inject AuthenticationStateProvider AuthenticationStateProvider
+@inject AppText T
 @inject IAuditLogService AuditLogService
 @inject IClienteQueries ClienteQueries
 @inject ILegacySyncService LegacySyncService
@@ -9,30 +12,30 @@
 @inject ISalesOrderService SalesOrderService
 @inject NavigationManager NavigationManager
 
-<PageTitle>@(OrderNumber.HasValue ? $"Pedido venta {OrderNumber}" : "Nuevo pedido de cliente")</PageTitle>
+<PageTitle>@PageTitleText</PageTitle>
 
 <div class="page-header">
     <div>
-        <p class="eyebrow">Ventas</p>
-        <h1>@(OrderNumber.HasValue ? $"Pedido {OrderNumber}" : "Nuevo pedido de cliente")</h1>
-        <p class="lead">Cabecera, líneas y expedición parcial o total con salida de stock desde almacén.</p>
+        <p class="eyebrow">@L("Ventas", "Vendes", "Sales")</p>
+        <h1>@PageHeadingText</h1>
+        <p class="lead">@PageLeadText</p>
     </div>
     <div class="quick-links">
-        <a class="secondary-button link-button" href="/ventas/pedidos">Volver al listado</a>
-        <a class="secondary-button link-button" href="/ventas/pre-facturacion">Abrir pre-facturación</a>
+        <a class="secondary-button link-button" href="@BackToListHref">@BackToListText</a>
+        <a class="secondary-button link-button" href="@PreInvoicingHref">@PreInvoicingText</a>
     </div>
 </div>
 
 @if (!tenantId.HasValue || !companyId.HasValue)
 {
     <div class="empty-state">
-        <p>No hay empresa activa seleccionada.</p>
+        <p>@L("No hay empresa activa seleccionada.", "No hi ha cap empresa activa seleccionada.", "There is no active company selected.")</p>
     </div>
 }
 else if (!canEdit && !OrderNumber.HasValue)
 {
     <div class="empty-state">
-        <p>No tienes permisos para crear pedidos de cliente.</p>
+        <p>@L("No tienes permisos para crear pedidos de cliente.", "No tens permisos per crear comandes de client.", "You do not have permission to create customer orders.")</p>
     </div>
 }
 else
@@ -45,10 +48,16 @@ else
     @if (isLegacySyncActive)
     {
         <div class="alert warning">
-            Este módulo está sincronizado desde legacy para la empresa activa. La sync manual refresca solo los pedidos con origen legacy; cualquier cambio que guardes desde la web convertirá el pedido a local y ya no se sobrescribirá.
+            @(IsTeixitsMostresOrdersRoute
+                ? L("Este módulo reutiliza el pedido comercial general y lo filtra al circuito Teixits-Mostres. La sync manual refresca solo los pedidos con origen legacy; cualquier cambio que guardes desde la web convertirá el pedido a local y ya no se sobrescribirá.",
+                    "Aquest mòdul reutilitza la comanda comercial general i la filtra al circuit Teixits-Mostres. La sync manual refresca només les comandes amb origen legacy; qualsevol canvi que guardis des del web convertirà la comanda a local i ja no se sobreescriurà.",
+                    "This module reuses the standard commercial order and filters it to the fabric and sample workflow. Manual sync refreshes only legacy-origin orders; any change you save from the web converts the order to local and it will no longer be overwritten.")
+                : L("Este módulo está sincronizado desde legacy para la empresa activa. La sync manual refresca solo los pedidos con origen legacy; cualquier cambio que guardes desde la web convertirá el pedido a local y ya no se sobrescribirá.",
+                    "Aquest mòdul està sincronitzat des de legacy per a l'empresa activa. La sync manual refresca només les comandes amb origen legacy; qualsevol canvi que guardis des del web convertirà la comanda a local i ja no se sobreescriurà.",
+                    "This module is synced from legacy for the active company. Manual sync refreshes only orders with legacy origin; any change you save from the web converts the order to local and it will no longer be overwritten."))
             @if (lastSyncUtc.HasValue)
             {
-                <span> Última sync: @lastSyncUtc.Value.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss").</span>
+                <span> @L("Última sync:", "Última sync:", "Last sync:") @lastSyncUtc.Value.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss").</span>
             }
         </div>
     }
@@ -56,9 +65,9 @@ else
     <EditForm Model="model" OnValidSubmit="SaveAsync">
         <div class="form-grid">
             <label class="field">
-                <span>Cliente</span>
+                <span>@L("Cliente", "Client", "Customer")</span>
                 <InputSelect class="text-input" @bind-Value="model.ClientCode" disabled="@(!canModify)">
-                    <option value="0">Selecciona cliente</option>
+                    <option value="0">@L("Selecciona cliente", "Selecciona client", "Select customer")</option>
                     @foreach (var client in clients)
                     {
                         <option value="@client.Code">@client.Name (@client.Code)</option>
@@ -70,15 +79,15 @@ else
                 }
             </label>
             <label class="field">
-                <span>Fecha documento</span>
+                <span>@L("Fecha documento", "Data document", "Document date")</span>
                 <InputDate class="text-input" @bind-Value="model.DocumentDate" disabled="@(!canModify)" />
             </label>
             <label class="field">
-                <span>Fecha solicitada</span>
+                <span>@L("Fecha solicitada", "Data sol·licitada", "Requested date")</span>
                 <InputDate class="text-input" @bind-Value="model.RequestedDate" disabled="@(!canModify)" />
             </label>
             <label class="field">
-                <span>Estado</span>
+                <span>@L("Estado", "Estat", "Status")</span>
                 <InputSelect class="text-input" @bind-Value="model.Status" disabled="@(!canModify || HasAnyShipment)">
                     @foreach (var status in SalesOrderStatuses.All)
                     {
@@ -87,11 +96,11 @@ else
                 </InputSelect>
                 @if (HasAnyShipment)
                 {
-                    <span class="field-hint">El estado pasa a depender de las cantidades expedidas.</span>
+                    <span class="field-hint">@L("El estado pasa a depender de las cantidades expedidas.", "L'estat passa a dependre de les quantitats expedides.", "Status now depends on shipped quantities.")</span>
                 }
             </label>
             <label class="field wide">
-                <span>Notas</span>
+                <span>@L("Notas", "Notes", "Notes")</span>
                 <InputTextArea class="text-area" @bind-Value="model.Notes" disabled="@(!canModify)" />
             </label>
         </div>
@@ -99,12 +108,12 @@ else
         <section class="panel">
             <div class="page-header">
                 <div>
-                    <h2>Líneas</h2>
-                    <p class="muted">Añade artículos, cantidades, precios y fechas pedidas por línea.</p>
+                    <h2>@L("Líneas", "Línies", "Lines")</h2>
+                    <p class="muted">@L("Añade artículos, cantidades, precios y fechas pedidas por línea.", "Afegeix articles, quantitats, preus i dates demanades per línia.", "Add items, quantities, prices, and requested dates per line.")</p>
                 </div>
                 @if (canModify)
                 {
-                    <button class="secondary-button" type="button" @onclick="AddLine">Añadir línea</button>
+                    <button class="secondary-button" type="button" @onclick="AddLine">@L("Añadir línea", "Afegir línia", "Add line")</button>
                 }
             </div>
 
@@ -114,45 +123,45 @@ else
                     var line = model.Lines[index];
                     <section class="panel line-editor">
                         <div class="panel-header">
-                            <strong>Línea @line.LineNumber</strong>
+                            <strong>@L($"Línea {line.LineNumber}", $"Línia {line.LineNumber}", $"Line {line.LineNumber}")</strong>
                             @if (canModify && model.Lines.Count > 1)
                             {
-                                <button class="secondary-button" type="button" @onclick="() => RemoveLine(index)">Quitar</button>
+                                <button class="secondary-button" type="button" @onclick="() => RemoveLine(index)">@L("Quitar", "Treure", "Remove")</button>
                             }
                         </div>
                         <div class="form-grid">
                             <label class="field">
-                                <span>Artículo</span>
+                                <span>@L("Artículo", "Article", "Item")</span>
                                 <InputText class="text-input" @bind-Value="line.ItemCode" disabled="@(!canModify)" />
                             </label>
                             <label class="field wide">
-                                <span>Descripción</span>
+                                <span>@L("Descripción", "Descripció", "Description")</span>
                                 <InputText class="text-input" @bind-Value="line.Description" disabled="@(!canModify)" />
                             </label>
                             <label class="field">
-                                <span>Cantidad</span>
+                                <span>@L("Cantidad", "Quantitat", "Quantity")</span>
                                 <InputNumber class="text-input" @bind-Value="line.Quantity" disabled="@(!canModify)" />
                             </label>
                             <label class="field">
-                                <span>Unidad</span>
+                                <span>@L("Unidad", "Unitat", "Unit")</span>
                                 <InputText class="text-input" @bind-Value="line.UnitOfMeasure" disabled="@(!canModify)" />
                             </label>
                             <label class="field">
-                                <span>Precio unitario</span>
+                                <span>@L("Precio unitario", "Preu unitari", "Unit price")</span>
                                 <InputNumber class="text-input" @bind-Value="line.UnitPrice" disabled="@(!canModify)" />
                             </label>
                             <label class="field">
-                                <span>Pedida</span>
+                                <span>@L("Pedida", "Demanada", "Requested")</span>
                                 <InputDate class="text-input" @bind-Value="line.RequestedDate" disabled="@(!canModify)" />
                             </label>
                             <label class="field wide">
-                                <span>Notas línea</span>
+                                <span>@L("Notas línea", "Notes línia", "Line notes")</span>
                                 <InputTextArea class="text-area" @bind-Value="line.Notes" disabled="@(!canModify)" />
                             </label>
                         </div>
                         <div class="stack">
-                            <div class="muted">Total línea: @LineTotal(line).ToString("0.00") €</div>
-                            <div class="muted">Expedido: @line.ShippedQuantity.ToString("0.###") · Pendiente: @line.PendingQuantity.ToString("0.###")</div>
+                            <div class="muted">@L("Total línea:", "Total línia:", "Line total:") @LineTotal(line).ToUiString("0.00") €</div>
+                            <div class="muted">@L("Expedido:", "Expedit:", "Shipped:") @line.ShippedQuantity.ToUiString("0.###") · @L("Pendiente:", "Pendent:", "Pending:") @line.PendingQuantity.ToUiString("0.###")</div>
                         </div>
                     </section>
                 }
@@ -160,27 +169,27 @@ else
         </section>
 
         <section class="panel">
-            <h2>Resumen</h2>
+            <h2>@L("Resumen", "Resum", "Summary")</h2>
             <div class="card-grid purchase-summary-grid purchase-metrics-grid">
                 <article class="info-card">
                     <h2>@model.Lines.Count</h2>
-                    <p class="muted">líneas</p>
+                    <p class="muted">@L("líneas", "línies", "lines")</p>
                 </article>
                 <article class="info-card">
-                    <h2>@TotalQuantity.ToString("0.###")</h2>
-                    <p class="muted">cantidad total</p>
+                    <h2>@TotalQuantity.ToUiString("0.###")</h2>
+                    <p class="muted">@L("cantidad total", "quantitat total", "total quantity")</p>
                 </article>
                 <article class="info-card">
-                    <h2>@TotalShippedQuantity.ToString("0.###")</h2>
-                    <p class="muted">expedido</p>
+                    <h2>@TotalShippedQuantity.ToUiString("0.###")</h2>
+                    <p class="muted">@L("expedido", "expedit", "shipped")</p>
                 </article>
                 <article class="info-card">
-                    <h2>@TotalPendingQuantity.ToString("0.###")</h2>
-                    <p class="muted">pendiente</p>
+                    <h2>@TotalPendingQuantity.ToUiString("0.###")</h2>
+                    <p class="muted">@L("pendiente", "pendent", "pending")</p>
                 </article>
                 <article class="info-card accent-card">
-                    <h2>@TotalAmount.ToString("0.00") €</h2>
-                    <p class="muted">importe total</p>
+                    <h2>@TotalAmount.ToUiString("0.00") €</h2>
+                    <p class="muted">@L("importe total", "import total", "total amount")</p>
                 </article>
             </div>
         </section>
@@ -188,7 +197,7 @@ else
         @if (canModify)
         {
             <div class="quick-links" style="margin-top: 1rem;">
-                <button class="primary-button" type="submit">Guardar pedido</button>
+                <button class="primary-button" type="submit">@L("Guardar pedido", "Guardar comanda", "Save order")</button>
             </div>
         }
     </EditForm>
@@ -198,20 +207,20 @@ else
         @if (canModify && model.Lines.Any(line => line.PendingQuantity > 0) && !string.Equals(model.Status, SalesOrderStatuses.Cancelled, StringComparison.OrdinalIgnoreCase))
         {
             <section class="panel" style="margin-top: 1rem;">
-                <h2>Salida de mercancía</h2>
-                <p class="muted">Marca solo las cantidades que salen ahora. La salida generará movimientos de stock reales.</p>
+                <h2>@L("Salida de mercancía", "Sortida de mercaderia", "Goods shipment")</h2>
+                <p class="muted">@L("Marca solo las cantidades que salen ahora. La salida generará movimientos de stock reales.", "Marca només les quantitats que surten ara. La sortida generarà moviments d'estoc reals.", "Mark only the quantities shipping now. The shipment will generate real stock movements.")</p>
 
                 <div class="form-grid">
                     <label class="field">
-                        <span>Fecha de salida</span>
+                        <span>@L("Fecha de salida", "Data de sortida", "Shipment date")</span>
                         <InputDate class="text-input" @bind-Value="shipmentForm.ShipmentDate" />
                     </label>
                     <label class="field">
-                        <span>Almacén</span>
+                        <span>@L("Almacén", "Magatzem", "Warehouse")</span>
                         <InputText class="text-input" @bind-Value="shipmentForm.Warehouse" />
                     </label>
                     <label class="field wide">
-                        <span>Notas de salida</span>
+                        <span>@L("Notas de salida", "Notes de sortida", "Shipment notes")</span>
                         <InputTextArea class="text-area" @bind-Value="shipmentForm.Notes" />
                     </label>
                 </div>
@@ -219,12 +228,12 @@ else
                 <table class="data-table">
                     <thead>
                         <tr>
-                            <th>Línea</th>
-                            <th>Descripción</th>
-                            <th>Pedida</th>
-                            <th>Expedida</th>
-                            <th>Pendiente</th>
-                            <th>Salir ahora</th>
+                            <th>@L("Línea", "Línia", "Line")</th>
+                            <th>@L("Descripción", "Descripció", "Description")</th>
+                            <th>@L("Pedida", "Demanada", "Requested")</th>
+                            <th>@L("Expedida", "Expedida", "Shipped")</th>
+                            <th>@L("Pendiente", "Pendent", "Pending")</th>
+                            <th>@L("Salir ahora", "Sortir ara", "Ship now")</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -233,9 +242,9 @@ else
                             <tr>
                                 <td>@line.LineNumber</td>
                                 <td>@line.Description</td>
-                                <td>@line.Quantity.ToString("0.###")</td>
-                                <td>@line.ShippedQuantity.ToString("0.###")</td>
-                                <td>@line.PendingQuantity.ToString("0.###")</td>
+                                <td>@line.Quantity.ToUiString("0.###")</td>
+                                <td>@line.ShippedQuantity.ToUiString("0.###")</td>
+                                <td>@line.PendingQuantity.ToUiString("0.###")</td>
                                 <td>
                                     <InputNumber class="text-input receipt-qty-input" @bind-Value="line.ShipNowQuantity" />
                                 </td>
@@ -245,32 +254,32 @@ else
                 </table>
 
                 <div class="quick-links" style="margin-top: 1rem;">
-                    <button class="primary-button" type="button" @onclick="RegisterShipmentAsync">Registrar salida</button>
+                    <button class="primary-button" type="button" @onclick="RegisterShipmentAsync">@L("Registrar salida", "Registrar sortida", "Register shipment")</button>
                 </div>
             </section>
         }
 
         <section class="panel" style="margin-top: 1rem;">
-            <h2>Salidas registradas</h2>
+            <h2>@L("Salidas registradas", "Sortides registrades", "Registered shipments")</h2>
             <div class="list-block">
                 @if (shipments.Count == 0)
                 {
-                    <p class="muted">Todavía no hay salidas registradas para este pedido.</p>
+                    <p class="muted">@L("Todavía no hay salidas registradas para este pedido.", "Encara no hi ha sortides registrades per a aquesta comanda.", "There are no registered shipments for this order yet.")</p>
                 }
                 else
                 {
                     @foreach (var shipment in shipments)
                     {
                         <article class="list-item">
-                            <strong>@shipment.DisplayNumber · @shipment.ShipmentDate.ToString("dd/MM/yyyy") · @shipment.TotalShippedQuantity.ToString("0.###") uds</strong>
-                            <span>Almacén: @DisplayValue(shipment.Warehouse)</span>
-                            <span>Facturación: @FormatInvoiceStatus(shipment.InvoiceStatus)</span>
+                            <strong>@shipment.DisplayNumber · @shipment.ShipmentDate.ToString("dd/MM/yyyy") · @shipment.TotalShippedQuantity.ToUiString("0.###") @L("uds", "uds", "units")</strong>
+                            <span>@L("Almacén:", "Magatzem:", "Warehouse:") @DisplayValue(shipment.Warehouse)</span>
+                            <span>@L("Facturación:", "Facturació:", "Invoicing:") @FormatInvoiceStatus(shipment.InvoiceStatus)</span>
                             @if (!string.IsNullOrWhiteSpace(shipment.Notes))
                             {
                                 <span>@shipment.Notes</span>
                             }
-                            <span>@string.Join(" · ", shipment.Lines.Select(line => $"L{line.LineNumber}: -{line.ShippedQuantity:0.###}"))</span>
-                            <span><a class="inline-link" href="/ventas/albaranes/@shipment.ShipmentNumber">Abrir albarán</a> · <a class="inline-link" href="/ventas/albaranes/@shipment.ShipmentNumber/pdf" target="_blank">PDF</a></span>
+                                        <span>@string.Join(" · ", shipment.Lines.Select(line => $"L{line.LineNumber.ToUiString("N0")}: -{line.ShippedQuantity.ToUiString("0.###")}"))</span>
+                            <span><a class="inline-link" href="@BuildShipmentDetailHref(shipment.ShipmentNumber)">@L("Abrir albarán", "Obrir albarà", "Open shipment")</a> · <a class="inline-link" href="@BuildShipmentPdfHref(shipment.ShipmentNumber)" target="_blank">@L("PDF", "PDF", "PDF")</a></span>
                         </article>
                     }
                 }
@@ -278,11 +287,11 @@ else
         </section>
 
         <section class="panel" style="margin-top: 1rem;">
-            <h2>Historial reciente del pedido</h2>
+            <h2>@L("Historial reciente del pedido", "Historial recent de la comanda", "Recent order history")</h2>
             <div class="list-block">
                 @if (recentAuditLogs.Count == 0)
                 {
-                    <p class="muted">Todavía no hay eventos auditados para este pedido.</p>
+                    <p class="muted">@L("Todavía no hay eventos auditados para este pedido.", "Encara no hi ha esdeveniments auditats per a aquesta comanda.", "There are no audited events for this order yet.")</p>
                 }
                 else
                 {
@@ -320,6 +329,40 @@ else
     private string statusMessage = string.Empty;
     private bool isError;
     private ShipmentFormModel shipmentForm = new();
+    private bool IsTeixitsMostresOrdersRoute =>
+        NavigationManager.ToBaseRelativePath(NavigationManager.Uri).StartsWith("ventas/pedidos-teixits-mostres", StringComparison.OrdinalIgnoreCase);
+
+    private string PageTitleText => OrderNumber.HasValue
+        ? IsTeixitsMostresOrdersRoute
+            ? L($"Pedido teixits-mostres {OrderNumber}", $"Comanda teixits-mostres {OrderNumber}", $"Fabric & sample order {OrderNumber}")
+            : L($"Pedido venta {OrderNumber}", $"Comanda de venda {OrderNumber}", $"Sales order {OrderNumber}")
+        : IsTeixitsMostresOrdersRoute
+            ? L("Nuevo pedido teixits-mostres", "Nova comanda teixits-mostres", "New fabric & sample order")
+            : L("Nuevo pedido de cliente", "Nova comanda de client", "New customer order");
+
+    private string PageHeadingText => OrderNumber.HasValue
+        ? IsTeixitsMostresOrdersRoute
+            ? L($"Pedido Teixits-Mostres {OrderNumber}", $"Comanda Teixits-Mostres {OrderNumber}", $"Fabric & sample order {OrderNumber}")
+            : L($"Pedido {OrderNumber}", $"Comanda {OrderNumber}", $"Order {OrderNumber}")
+        : IsTeixitsMostresOrdersRoute
+            ? L("Nuevo pedido teixits-mostres", "Nova comanda teixits-mostres", "New fabric & sample order")
+            : L("Nuevo pedido de cliente", "Nova comanda de client", "New customer order");
+
+    private string PageLeadText => IsTeixitsMostresOrdersRoute
+        ? L("Cabecera, líneas y expedición parcial o total dentro del circuito comercial de tejidos y muestras.", "Capçalera, línies i expedició parcial o total dins del circuit comercial de teixits i mostres.", "Header, lines, and partial or full shipment within the fabrics and samples commercial workflow.")
+        : L("Cabecera, líneas y expedición parcial o total con salida de stock desde almacén.", "Capçalera, línies i expedició parcial o total amb sortida d'estoc des del magatzem.", "Header, lines, and partial or full shipment with stock leaving the warehouse.");
+
+    private string BackToListHref => IsTeixitsMostresOrdersRoute ? "/ventas/pedidos-teixits-mostres" : "/ventas/pedidos";
+
+    private string BackToListText => IsTeixitsMostresOrdersRoute
+        ? L("Volver a pedidos teixits-mostres", "Tornar a comandes teixits-mostres", "Back to fabric & sample orders")
+        : L("Volver al listado", "Tornar al llistat", "Back to list");
+
+    private string PreInvoicingHref => IsTeixitsMostresOrdersRoute ? "/ventas/pre-facturacion-teixits-mostres" : "/ventas/pre-facturacion";
+
+    private string PreInvoicingText => IsTeixitsMostresOrdersRoute
+        ? L("Abrir pre-facturación teixits-mostres", "Obrir pre-facturació teixits-mostres", "Open fabric & sample pre-invoicing")
+        : L("Abrir pre-facturación", "Obrir pre-facturació", "Open pre-invoicing");
 
     private ClienteListItemDto? SelectedClient =>
         clients.FirstOrDefault(client => client.Code == model.ClientCode);
@@ -413,12 +456,12 @@ else
             });
 
             statusMessage = OrderNumber.HasValue
-                ? "Pedido actualizado correctamente."
-                : "Pedido creado correctamente.";
+                ? L("Pedido actualizado correctamente.", "Comanda actualitzada correctament.", "Order updated successfully.")
+                : L("Pedido creado correctamente.", "Comanda creada correctament.", "Order created successfully.");
 
             if (!OrderNumber.HasValue)
             {
-                NavigationManager.NavigateTo($"/ventas/pedidos/editar/{orderNumber}", forceLoad: false);
+                NavigationManager.NavigateTo(BuildOrderEditHref(orderNumber), forceLoad: false);
                 return;
             }
 
@@ -463,7 +506,7 @@ else
             });
 
             shipmentForm = new ShipmentFormModel();
-            statusMessage = "Salida registrada correctamente.";
+            statusMessage = L("Salida registrada correctamente.", "Sortida registrada correctament.", "Shipment registered successfully.");
             await ReloadOrderAsync();
             await LoadAuditAsync();
         }
@@ -507,7 +550,7 @@ else
         var detail = await SalesOrderQueries.GetByOrderNumberAsync(tenantId.Value, companyId.Value, OrderNumber.Value);
         if (detail is null)
         {
-            statusMessage = "No se ha encontrado el pedido solicitado.";
+            statusMessage = L("No se ha encontrado el pedido solicitado.", "No s'ha trobat la comanda sol·licitada.", "The requested order could not be found.");
             isError = true;
             model = SalesOrderFormModel.CreateDefault();
             shipments = [];
@@ -536,28 +579,51 @@ else
 
     private int GetNextLineNumber() => model.Lines.Count == 0 ? 1 : model.Lines.Max(line => line.LineNumber) + 1;
 
+    private string BuildOrderEditHref(int orderNumber) =>
+        IsTeixitsMostresOrdersRoute
+            ? $"/ventas/pedidos-teixits-mostres/editar/{orderNumber}"
+            : $"/ventas/pedidos/editar/{orderNumber}";
+
+    private string BuildShipmentDetailHref(int shipmentNumber) =>
+        IsTeixitsMostresOrdersRoute
+            ? $"/ventas/albaranes-teixits-mostres/{shipmentNumber}"
+            : $"/ventas/albaranes/{shipmentNumber}";
+
+    private string BuildShipmentPdfHref(int shipmentNumber) =>
+        IsTeixitsMostresOrdersRoute
+            ? $"/ventas/albaranes-teixits-mostres/{shipmentNumber}/pdf"
+            : $"/ventas/albaranes/{shipmentNumber}/pdf";
+
+    private string L(string spanish, string catalan, string english) =>
+        T.CurrentLanguage switch
+        {
+            AppLanguages.Catalan => catalan,
+            AppLanguages.English => english,
+            _ => spanish
+        };
+
     private static decimal LineTotal(SalesOrderLineFormModel line) =>
         decimal.Round(line.Quantity * line.UnitPrice, 2, MidpointRounding.AwayFromZero);
 
-    private static string FormatStatus(string status) => status switch
+    private string FormatStatus(string status) => status switch
     {
-        SalesOrderStatuses.Draft => "Borrador",
-        SalesOrderStatuses.Confirmed => "Confirmado",
-        SalesOrderStatuses.PartiallyShipped => "Expedido parcial",
-        SalesOrderStatuses.Shipped => "Expedido total",
-        SalesOrderStatuses.Cancelled => "Cancelado",
+        SalesOrderStatuses.Draft => L("Borrador", "Esborrany", "Draft"),
+        SalesOrderStatuses.Confirmed => L("Confirmado", "Confirmada", "Confirmed"),
+        SalesOrderStatuses.PartiallyShipped => L("Expedido parcial", "Expedit parcial", "Partially shipped"),
+        SalesOrderStatuses.Shipped => L("Expedido total", "Expedit total", "Fully shipped"),
+        SalesOrderStatuses.Cancelled => L("Cancelado", "Cancel·lada", "Cancelled"),
         _ => status
     };
 
-    private static string FormatInvoiceStatus(string status) => status switch
+    private string FormatInvoiceStatus(string status) => status switch
     {
-        "Pending" => "Pendiente de facturar",
-        "Drafted" => "En borrador de factura",
-        "Invoiced" => "Facturado",
+        "Pending" => L("Pendiente de facturar", "Pendent de facturar", "Pending invoicing"),
+        "Drafted" => L("En borrador de factura", "En esborrany de factura", "In invoice draft"),
+        "Invoiced" => L("Facturado", "Facturat", "Invoiced"),
         _ => status
     };
 
-    private static string DisplayValue(string value) => string.IsNullOrWhiteSpace(value) ? "Sin dato" : value;
+    private string DisplayValue(string value) => string.IsNullOrWhiteSpace(value) ? L("Sin dato", "Sense dada", "No data") : value;
 
     private sealed class SalesOrderFormModel
     {

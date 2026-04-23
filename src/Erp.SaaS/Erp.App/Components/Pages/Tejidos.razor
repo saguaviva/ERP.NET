@@ -99,7 +99,7 @@ else
             <span class="results-summary">
                 @(totalCount == 0
                     ? L("Sin resultados", "Sense resultats", "No results")
-                    : L($"Mostrando {PageStart}-{PageEnd} de {totalCount} tejidos", $"Mostrant {PageStart}-{PageEnd} de {totalCount} teixits", $"Showing {PageStart}-{PageEnd} of {totalCount} fabrics"))
+                    : L($"Mostrando {PageStart.ToUiString("N0")}-{PageEnd.ToUiString("N0")} de {totalCount.ToUiString("N0")} tejidos", $"Mostrant {PageStart.ToUiString("N0")}-{PageEnd.ToUiString("N0")} de {totalCount.ToUiString("N0")} teixits", $"Showing {PageStart.ToUiString("N0")}-{PageEnd.ToUiString("N0")} of {totalCount.ToUiString("N0")} fabrics"))
             </span>
             <label class="field compact-field">
                 <span>@L("Tamaño de página", "Mida de pàgina", "Page size")</span>
@@ -195,10 +195,10 @@ else
                                 <td>@item.WeaverCode</td>
                                 <td>@item.FinisherCode</td>
                                 <td>@item.WidthText</td>
-                                <td>@item.GramWeight.ToString("0.###")</td>
-                                <td>@item.PricePerMeter.ToString("0.00##")</td>
-                                <td>@item.PricePerKilogram.ToString("0.00##")</td>
-                                <td>@item.AvailableStockMeters.ToString("0.###")</td>
+                                <td>@item.GramWeight.ToUiString("0.###")</td>
+                                <td>@item.PricePerMeter.ToUiString("0.00##")</td>
+                                <td>@item.PricePerKilogram.ToUiString("0.00##")</td>
+                                <td>@item.AvailableStockMeters.ToUiString("0.###")</td>
                                 <td>@(item.IsTubular ? L("Sí", "Sí", "Yes") : L("No", "No", "No"))</td>
                                 <td>@(string.IsNullOrWhiteSpace(item.Origin) ? "-" : item.Origin)</td>
                                 <td><a class="inline-link" href="/articulos/tejidos/editar/@Uri.EscapeDataString(item.Code)">@(canEdit ? L("Abrir ficha", "Obrir fitxa", "Open record") : L("Ver ficha", "Veure fitxa", "View record"))</a></td>

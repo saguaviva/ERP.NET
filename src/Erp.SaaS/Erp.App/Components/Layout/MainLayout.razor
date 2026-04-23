@@ -11,7 +11,7 @@
         <div class="shell-toolbar no-print">
             <button type="button"
                     class="shell-toggle"
-                    aria-label="Mostrar u ocultar menú lateral"
+                    aria-label="@L("Mostrar u ocultar menú lateral", "Mostrar o ocultar menú lateral", "Show or hide side menu")"
                     aria-expanded="@(!isSidebarHidden)"
                     @onclick="ToggleSidebarAsync">
                 <span class="shell-toggle-icon" aria-hidden="true">@(isSidebarHidden ? "☰" : "←")</span>
@@ -26,13 +26,21 @@
 </div>
 
 <div id="blazor-error-ui" data-nosnippet>
-    Ha ocurrido un error inesperado.
-    <a href="." class="reload">Recargar</a>
+    @L("Ha ocurrido un error inesperado.", "S'ha produït un error inesperat.", "An unexpected error occurred.")
+    <a href="." class="reload">@L("Recargar", "Recarregar", "Reload")</a>
     <span class="dismiss">x</span>
 </div>
 
 @code {
     private bool isSidebarHidden;
+
+    private string L(string spanish, string catalan, string english) =>
+        T.CurrentLanguage switch
+        {
+            AppLanguages.Catalan => catalan,
+            AppLanguages.English => english,
+            _ => spanish
+        };
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {

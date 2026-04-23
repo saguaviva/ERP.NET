@@ -9,6 +9,8 @@ public sealed class ParteAcabadoFilter
     public int? OperationCode { get; set; }
     public string SourceSampleKind { get; set; } = string.Empty;
     public string SourceSampleCode { get; set; } = string.Empty;
+    public bool SampleWorkflowOnly { get; set; }
+    public bool ModelWorkflowOnly { get; set; }
     public bool LiveOnly { get; set; }
     public int Page { get; set; } = 1;
     public int PageSize { get; set; } = 25;

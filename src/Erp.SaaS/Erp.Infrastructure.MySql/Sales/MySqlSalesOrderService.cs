@@ -2,10 +2,12 @@ using Erp.Application.Auditing;
 using Erp.Application.Companies;
 using Erp.Application.Contexts;
 using Erp.Application.LegacySync;
+using Erp.Application.Numbering;
 using Erp.Application.Sales;
 using Erp.Application.Stock;
 using Erp.Domain.Common;
 using Erp.Infrastructure.MySql.Database;
+using Erp.Infrastructure.MySql.Numbering;
 using Erp.Infrastructure.MySql.Support;
 using MySqlConnector;
 
@@ -61,8 +63,12 @@ public sealed class MySqlSalesOrderService : ISalesOrderQueries, ISalesOrderServ
         var search = filter.Search?.Trim() ?? string.Empty;
         var likeSearch = $"%{search}%";
         var status = filter.Status?.Trim() ?? string.Empty;
+        var catalogScope = NormalizeCatalogScope(filter.CatalogScope);
 
         await using var connection = await _saasConnectionFactory.OpenConnectionAsync(cancellationToken);
+        var centerCode = string.IsNullOrWhiteSpace(catalogScope)
+            ? string.Empty
+            : await ResolveCompanyCenterCodeAsync(connection, tenantId, companyId, cancellationToken);
         await using (var countCommand = connection.CreateCommand())
         {
             countCommand.CommandText =
@@ -78,21 +84,58 @@ public sealed class MySqlSalesOrderService : ISalesOrderQueries, ISalesOrderServ
                             AND COALESCE(so.is_deleted, 0) = 0
                         )
                       )
-                  AND (
-                        @status = ''
-                        OR so.status = @status
-                      )
-                  AND (
-                        @search = ''
-                        OR CAST(so.order_number AS CHAR) LIKE @likeSearch
-                        OR COALESCE(so.client_name, '') LIKE @likeSearch
-                        OR so.notes LIKE @likeSearch
+                      AND (
+                            @status = ''
+                            OR so.status = @status
+                          )
+                      AND (
+                            @catalogScope = ''
+                            OR (
+                                @catalogScope = 'Models'
+                                AND EXISTS (
+                                    SELECT 1
+                                    FROM sales_order_lines scope_sol
+                                    INNER JOIN article_models am
+                                      ON am.tenant_id = scope_sol.tenant_id
+                                     AND am.company_id = scope_sol.company_id
+                                     AND am.CENTRO = @centerCode
+                                     AND COALESCE(am.is_deleted, 0) = 0
+                                     AND am.CODI = COALESCE(scope_sol.item_code, '')
+                                    WHERE scope_sol.tenant_id = so.tenant_id
+                                      AND scope_sol.company_id = so.company_id
+                                      AND scope_sol.order_number = so.order_number
+                                )
+                            )
+                            OR (
+                                @catalogScope = 'TeixitsMostres'
+                                AND NOT EXISTS (
+                                    SELECT 1
+                                    FROM sales_order_lines scope_sol
+                                    INNER JOIN article_models am
+                                      ON am.tenant_id = scope_sol.tenant_id
+                                     AND am.company_id = scope_sol.company_id
+                                     AND am.CENTRO = @centerCode
+                                     AND COALESCE(am.is_deleted, 0) = 0
+                                     AND am.CODI = COALESCE(scope_sol.item_code, '')
+                                    WHERE scope_sol.tenant_id = so.tenant_id
+                                      AND scope_sol.company_id = so.company_id
+                                      AND scope_sol.order_number = so.order_number
+                                )
+                            )
+                          )
+                      AND (
+                            @search = ''
+                            OR CAST(so.order_number AS CHAR) LIKE @likeSearch
+                            OR COALESCE(so.client_name, '') LIKE @likeSearch
+                            OR so.notes LIKE @likeSearch
                       );
                 """;
             countCommand.Parameters.AddWithValue("@tenantId", tenantId.ToString());
             countCommand.Parameters.AddWithValue("@companyId", companyId.ToString());
             countCommand.Parameters.AddWithValue("@includeClosed", filter.IncludeClosed);
             countCommand.Parameters.AddWithValue("@status", status);
+            countCommand.Parameters.AddWithValue("@catalogScope", catalogScope);
+            countCommand.Parameters.AddWithValue("@centerCode", centerCode);
             countCommand.Parameters.AddWithValue("@search", search);
             countCommand.Parameters.AddWithValue("@likeSearch", likeSearch);
 
@@ -138,6 +181,41 @@ public sealed class MySqlSalesOrderService : ISalesOrderQueries, ISalesOrderServ
                         OR so.status = @status
                       )
                   AND (
+                        @catalogScope = ''
+                        OR (
+                            @catalogScope = 'Models'
+                            AND EXISTS (
+                                SELECT 1
+                                FROM sales_order_lines scope_sol
+                                INNER JOIN article_models am
+                                  ON am.tenant_id = scope_sol.tenant_id
+                                 AND am.company_id = scope_sol.company_id
+                                 AND am.CENTRO = @centerCode
+                                 AND COALESCE(am.is_deleted, 0) = 0
+                                 AND am.CODI = COALESCE(scope_sol.item_code, '')
+                                WHERE scope_sol.tenant_id = so.tenant_id
+                                  AND scope_sol.company_id = so.company_id
+                                  AND scope_sol.order_number = so.order_number
+                            )
+                        )
+                        OR (
+                            @catalogScope = 'TeixitsMostres'
+                            AND NOT EXISTS (
+                                SELECT 1
+                                FROM sales_order_lines scope_sol
+                                INNER JOIN article_models am
+                                  ON am.tenant_id = scope_sol.tenant_id
+                                 AND am.company_id = scope_sol.company_id
+                                 AND am.CENTRO = @centerCode
+                                 AND COALESCE(am.is_deleted, 0) = 0
+                                 AND am.CODI = COALESCE(scope_sol.item_code, '')
+                                WHERE scope_sol.tenant_id = so.tenant_id
+                                  AND scope_sol.company_id = so.company_id
+                                  AND scope_sol.order_number = so.order_number
+                            )
+                        )
+                      )
+                  AND (
                         @search = ''
                         OR CAST(so.order_number AS CHAR) LIKE @likeSearch
                         OR COALESCE(so.client_name, '') LIKE @likeSearch
@@ -151,6 +229,8 @@ public sealed class MySqlSalesOrderService : ISalesOrderQueries, ISalesOrderServ
             command.Parameters.AddWithValue("@companyId", companyId.ToString());
             command.Parameters.AddWithValue("@includeClosed", filter.IncludeClosed);
             command.Parameters.AddWithValue("@status", status);
+            command.Parameters.AddWithValue("@catalogScope", catalogScope);
+            command.Parameters.AddWithValue("@centerCode", centerCode);
             command.Parameters.AddWithValue("@search", search);
             command.Parameters.AddWithValue("@likeSearch", likeSearch);
             command.Parameters.AddWithValue("@limit", pageSize);
@@ -390,8 +470,12 @@ public sealed class MySqlSalesOrderService : ISalesOrderQueries, ISalesOrderServ
         var page = Math.Max(filter.Page, 1);
         var offset = (page - 1) * pageSize;
         var search = filter.Search?.Trim() ?? string.Empty;
+        var catalogScope = NormalizeCatalogScope(filter.CatalogScope);
         var likeSearch = $"%{search}%";
         await using var connection = await _saasConnectionFactory.OpenConnectionAsync(cancellationToken);
+        var centerCode = string.IsNullOrWhiteSpace(catalogScope)
+            ? string.Empty
+            : await ResolveCompanyCenterCodeAsync(connection, tenantId, companyId, cancellationToken);
         await using (var countCommand = connection.CreateCommand())
         {
             countCommand.CommandText =
@@ -406,6 +490,47 @@ public sealed class MySqlSalesOrderService : ISalesOrderQueries, ISalesOrderServ
                   AND ss.company_id = @companyId
                   AND COALESCE(ss.is_deleted, 0) = 0
                   AND (
+                        @catalogScope = ''
+                        OR (
+                            @catalogScope = 'Models'
+                            AND EXISTS (
+                                SELECT 1
+                                FROM sales_order_shipment_lines scope_shl
+                                INNER JOIN sales_order_lines scope_sol
+                                  ON scope_sol.tenant_id = scope_shl.tenant_id
+                                 AND scope_sol.company_id = scope_shl.company_id
+                                 AND scope_sol.order_number = scope_shl.order_number
+                                 AND scope_sol.line_number = scope_shl.line_number
+                                INNER JOIN article_models am
+                                  ON am.tenant_id = scope_sol.tenant_id
+                                 AND am.company_id = scope_sol.company_id
+                                 AND am.CENTRO = @centerCode
+                                 AND COALESCE(am.is_deleted, 0) = 0
+                                 AND am.CODI = COALESCE(scope_sol.item_code, '')
+                                WHERE scope_shl.shipment_id = ss.shipment_id
+                            )
+                        )
+                        OR (
+                            @catalogScope = 'TeixitsMostres'
+                            AND NOT EXISTS (
+                                SELECT 1
+                                FROM sales_order_shipment_lines scope_shl
+                                INNER JOIN sales_order_lines scope_sol
+                                  ON scope_sol.tenant_id = scope_shl.tenant_id
+                                 AND scope_sol.company_id = scope_shl.company_id
+                                 AND scope_sol.order_number = scope_shl.order_number
+                                 AND scope_sol.line_number = scope_shl.line_number
+                                INNER JOIN article_models am
+                                  ON am.tenant_id = scope_sol.tenant_id
+                                 AND am.company_id = scope_sol.company_id
+                                 AND am.CENTRO = @centerCode
+                                 AND COALESCE(am.is_deleted, 0) = 0
+                                 AND am.CODI = COALESCE(scope_sol.item_code, '')
+                                WHERE scope_shl.shipment_id = ss.shipment_id
+                            )
+                        )
+                      )
+                  AND (
                         @search = ''
                         OR CAST(ss.shipment_number AS CHAR) LIKE @likeSearch
                         OR CAST(ss.order_number AS CHAR) LIKE @likeSearch
@@ -417,6 +542,8 @@ public sealed class MySqlSalesOrderService : ISalesOrderQueries, ISalesOrderServ
                 """;
             countCommand.Parameters.AddWithValue("@tenantId", tenantId.ToString());
             countCommand.Parameters.AddWithValue("@companyId", companyId.ToString());
+            countCommand.Parameters.AddWithValue("@catalogScope", catalogScope);
+            countCommand.Parameters.AddWithValue("@centerCode", centerCode);
             countCommand.Parameters.AddWithValue("@search", search);
             countCommand.Parameters.AddWithValue("@likeSearch", likeSearch);
 
@@ -460,6 +587,47 @@ public sealed class MySqlSalesOrderService : ISalesOrderQueries, ISalesOrderServ
                   AND ss.company_id = @companyId
                   AND COALESCE(ss.is_deleted, 0) = 0
                   AND (
+                        @catalogScope = ''
+                        OR (
+                            @catalogScope = 'Models'
+                            AND EXISTS (
+                                SELECT 1
+                                FROM sales_order_shipment_lines scope_shl
+                                INNER JOIN sales_order_lines scope_sol
+                                  ON scope_sol.tenant_id = scope_shl.tenant_id
+                                 AND scope_sol.company_id = scope_shl.company_id
+                                 AND scope_sol.order_number = scope_shl.order_number
+                                 AND scope_sol.line_number = scope_shl.line_number
+                                INNER JOIN article_models am
+                                  ON am.tenant_id = scope_sol.tenant_id
+                                 AND am.company_id = scope_sol.company_id
+                                 AND am.CENTRO = @centerCode
+                                 AND COALESCE(am.is_deleted, 0) = 0
+                                 AND am.CODI = COALESCE(scope_sol.item_code, '')
+                                WHERE scope_shl.shipment_id = ss.shipment_id
+                            )
+                        )
+                        OR (
+                            @catalogScope = 'TeixitsMostres'
+                            AND NOT EXISTS (
+                                SELECT 1
+                                FROM sales_order_shipment_lines scope_shl
+                                INNER JOIN sales_order_lines scope_sol
+                                  ON scope_sol.tenant_id = scope_shl.tenant_id
+                                 AND scope_sol.company_id = scope_shl.company_id
+                                 AND scope_sol.order_number = scope_shl.order_number
+                                 AND scope_sol.line_number = scope_shl.line_number
+                                INNER JOIN article_models am
+                                  ON am.tenant_id = scope_sol.tenant_id
+                                 AND am.company_id = scope_sol.company_id
+                                 AND am.CENTRO = @centerCode
+                                 AND COALESCE(am.is_deleted, 0) = 0
+                                 AND am.CODI = COALESCE(scope_sol.item_code, '')
+                                WHERE scope_shl.shipment_id = ss.shipment_id
+                            )
+                        )
+                      )
+                  AND (
                         @search = ''
                         OR CAST(ss.shipment_number AS CHAR) LIKE @likeSearch
                         OR CAST(ss.order_number AS CHAR) LIKE @likeSearch
@@ -474,6 +642,8 @@ public sealed class MySqlSalesOrderService : ISalesOrderQueries, ISalesOrderServ
                 """;
             command.Parameters.AddWithValue("@tenantId", tenantId.ToString());
             command.Parameters.AddWithValue("@companyId", companyId.ToString());
+            command.Parameters.AddWithValue("@catalogScope", catalogScope);
+            command.Parameters.AddWithValue("@centerCode", centerCode);
             command.Parameters.AddWithValue("@search", search);
             command.Parameters.AddWithValue("@likeSearch", likeSearch);
             command.Parameters.AddWithValue("@pageSize", pageSize);
@@ -651,9 +821,13 @@ public sealed class MySqlSalesOrderService : ISalesOrderQueries, ISalesOrderServ
         var page = Math.Max(filter.Page, 1);
         var offset = (page - 1) * pageSize;
         var search = filter.Search?.Trim() ?? string.Empty;
+        var catalogScope = NormalizeCatalogScope(filter.CatalogScope);
         var likeSearch = $"%{search}%";
 
         await using var connection = await _saasConnectionFactory.OpenConnectionAsync(cancellationToken);
+        var centerCode = string.IsNullOrWhiteSpace(catalogScope)
+            ? string.Empty
+            : await ResolveCompanyCenterCodeAsync(connection, tenantId, companyId, cancellationToken);
         await using (var countCommand = connection.CreateCommand())
         {
             countCommand.CommandText =
@@ -669,6 +843,47 @@ public sealed class MySqlSalesOrderService : ISalesOrderQueries, ISalesOrderServ
                   AND COALESCE(ss.is_deleted, 0) = 0
                   AND ss.invoice_status = 'Pending'
                   AND (
+                        @catalogScope = ''
+                        OR (
+                            @catalogScope = 'Models'
+                            AND EXISTS (
+                                SELECT 1
+                                FROM sales_order_shipment_lines scope_shl
+                                INNER JOIN sales_order_lines scope_sol
+                                  ON scope_sol.tenant_id = scope_shl.tenant_id
+                                 AND scope_sol.company_id = scope_shl.company_id
+                                 AND scope_sol.order_number = scope_shl.order_number
+                                 AND scope_sol.line_number = scope_shl.line_number
+                                INNER JOIN article_models am
+                                  ON am.tenant_id = scope_sol.tenant_id
+                                 AND am.company_id = scope_sol.company_id
+                                 AND am.CENTRO = @centerCode
+                                 AND COALESCE(am.is_deleted, 0) = 0
+                                 AND am.CODI = COALESCE(scope_sol.item_code, '')
+                                WHERE scope_shl.shipment_id = ss.shipment_id
+                            )
+                        )
+                        OR (
+                            @catalogScope = 'TeixitsMostres'
+                            AND NOT EXISTS (
+                                SELECT 1
+                                FROM sales_order_shipment_lines scope_shl
+                                INNER JOIN sales_order_lines scope_sol
+                                  ON scope_sol.tenant_id = scope_shl.tenant_id
+                                 AND scope_sol.company_id = scope_shl.company_id
+                                 AND scope_sol.order_number = scope_shl.order_number
+                                 AND scope_sol.line_number = scope_shl.line_number
+                                INNER JOIN article_models am
+                                  ON am.tenant_id = scope_sol.tenant_id
+                                 AND am.company_id = scope_sol.company_id
+                                 AND am.CENTRO = @centerCode
+                                 AND COALESCE(am.is_deleted, 0) = 0
+                                 AND am.CODI = COALESCE(scope_sol.item_code, '')
+                                WHERE scope_shl.shipment_id = ss.shipment_id
+                            )
+                        )
+                      )
+                  AND (
                         @search = ''
                         OR CAST(ss.shipment_number AS CHAR) LIKE @likeSearch
                         OR CAST(ss.order_number AS CHAR) LIKE @likeSearch
@@ -680,6 +895,8 @@ public sealed class MySqlSalesOrderService : ISalesOrderQueries, ISalesOrderServ
                 """;
             countCommand.Parameters.AddWithValue("@tenantId", tenantId.ToString());
             countCommand.Parameters.AddWithValue("@companyId", companyId.ToString());
+            countCommand.Parameters.AddWithValue("@catalogScope", catalogScope);
+            countCommand.Parameters.AddWithValue("@centerCode", centerCode);
             countCommand.Parameters.AddWithValue("@search", search);
             countCommand.Parameters.AddWithValue("@likeSearch", likeSearch);
 
@@ -723,6 +940,47 @@ public sealed class MySqlSalesOrderService : ISalesOrderQueries, ISalesOrderServ
                   AND COALESCE(ss.is_deleted, 0) = 0
                   AND ss.invoice_status = 'Pending'
                   AND (
+                        @catalogScope = ''
+                        OR (
+                            @catalogScope = 'Models'
+                            AND EXISTS (
+                                SELECT 1
+                                FROM sales_order_shipment_lines scope_shl
+                                INNER JOIN sales_order_lines scope_sol
+                                  ON scope_sol.tenant_id = scope_shl.tenant_id
+                                 AND scope_sol.company_id = scope_shl.company_id
+                                 AND scope_sol.order_number = scope_shl.order_number
+                                 AND scope_sol.line_number = scope_shl.line_number
+                                INNER JOIN article_models am
+                                  ON am.tenant_id = scope_sol.tenant_id
+                                 AND am.company_id = scope_sol.company_id
+                                 AND am.CENTRO = @centerCode
+                                 AND COALESCE(am.is_deleted, 0) = 0
+                                 AND am.CODI = COALESCE(scope_sol.item_code, '')
+                                WHERE scope_shl.shipment_id = ss.shipment_id
+                            )
+                        )
+                        OR (
+                            @catalogScope = 'TeixitsMostres'
+                            AND NOT EXISTS (
+                                SELECT 1
+                                FROM sales_order_shipment_lines scope_shl
+                                INNER JOIN sales_order_lines scope_sol
+                                  ON scope_sol.tenant_id = scope_shl.tenant_id
+                                 AND scope_sol.company_id = scope_shl.company_id
+                                 AND scope_sol.order_number = scope_shl.order_number
+                                 AND scope_sol.line_number = scope_shl.line_number
+                                INNER JOIN article_models am
+                                  ON am.tenant_id = scope_sol.tenant_id
+                                 AND am.company_id = scope_sol.company_id
+                                 AND am.CENTRO = @centerCode
+                                 AND COALESCE(am.is_deleted, 0) = 0
+                                 AND am.CODI = COALESCE(scope_sol.item_code, '')
+                                WHERE scope_shl.shipment_id = ss.shipment_id
+                            )
+                        )
+                      )
+                  AND (
                         @search = ''
                         OR CAST(ss.shipment_number AS CHAR) LIKE @likeSearch
                         OR CAST(ss.order_number AS CHAR) LIKE @likeSearch
@@ -737,6 +995,8 @@ public sealed class MySqlSalesOrderService : ISalesOrderQueries, ISalesOrderServ
                 """;
             command.Parameters.AddWithValue("@tenantId", tenantId.ToString());
             command.Parameters.AddWithValue("@companyId", companyId.ToString());
+            command.Parameters.AddWithValue("@catalogScope", catalogScope);
+            command.Parameters.AddWithValue("@centerCode", centerCode);
             command.Parameters.AddWithValue("@search", search);
             command.Parameters.AddWithValue("@likeSearch", likeSearch);
             command.Parameters.AddWithValue("@pageSize", pageSize);
@@ -789,9 +1049,13 @@ public sealed class MySqlSalesOrderService : ISalesOrderQueries, ISalesOrderServ
         var page = Math.Max(filter.Page, 1);
         var offset = (page - 1) * pageSize;
         var search = filter.Search?.Trim() ?? string.Empty;
+        var catalogScope = NormalizeCatalogScope(filter.CatalogScope);
         var likeSearch = $"%{search}%";
 
         await using var connection = await _saasConnectionFactory.OpenConnectionAsync(cancellationToken);
+        var centerCode = string.IsNullOrWhiteSpace(catalogScope)
+            ? string.Empty
+            : await ResolveCompanyCenterCodeAsync(connection, tenantId, companyId, cancellationToken);
         await using (var countCommand = connection.CreateCommand())
         {
             countCommand.CommandText =
@@ -801,6 +1065,37 @@ public sealed class MySqlSalesOrderService : ISalesOrderQueries, ISalesOrderServ
                 WHERE tenant_id = @tenantId
                   AND company_id = @companyId
                   AND (
+                        @catalogScope = ''
+                        OR (
+                            @catalogScope = 'Models'
+                            AND EXISTS (
+                                SELECT 1
+                                FROM sales_invoice_draft_lines sidl
+                                INNER JOIN article_models am
+                                  ON am.tenant_id = sidl.tenant_id
+                                 AND am.company_id = sidl.company_id
+                                 AND am.CENTRO = @centerCode
+                                 AND COALESCE(am.is_deleted, 0) = 0
+                                 AND am.CODI = COALESCE(sidl.item_code, '')
+                                WHERE sidl.draft_id = sales_invoice_drafts.draft_id
+                            )
+                        )
+                        OR (
+                            @catalogScope = 'TeixitsMostres'
+                            AND NOT EXISTS (
+                                SELECT 1
+                                FROM sales_invoice_draft_lines sidl
+                                INNER JOIN article_models am
+                                  ON am.tenant_id = sidl.tenant_id
+                                 AND am.company_id = sidl.company_id
+                                 AND am.CENTRO = @centerCode
+                                 AND COALESCE(am.is_deleted, 0) = 0
+                                 AND am.CODI = COALESCE(sidl.item_code, '')
+                                WHERE sidl.draft_id = sales_invoice_drafts.draft_id
+                            )
+                        )
+                      )
+                  AND (
                         @search = ''
                         OR CAST(draft_number AS CHAR) LIKE @likeSearch
                         OR client_name LIKE @likeSearch
@@ -809,6 +1104,8 @@ public sealed class MySqlSalesOrderService : ISalesOrderQueries, ISalesOrderServ
                 """;
             countCommand.Parameters.AddWithValue("@tenantId", tenantId.ToString());
             countCommand.Parameters.AddWithValue("@companyId", companyId.ToString());
+            countCommand.Parameters.AddWithValue("@catalogScope", catalogScope);
+            countCommand.Parameters.AddWithValue("@centerCode", centerCode);
             countCommand.Parameters.AddWithValue("@search", search);
             countCommand.Parameters.AddWithValue("@likeSearch", likeSearch);
 
@@ -844,6 +1141,37 @@ public sealed class MySqlSalesOrderService : ISalesOrderQueries, ISalesOrderServ
                 WHERE sid.tenant_id = @tenantId
                   AND sid.company_id = @companyId
                   AND (
+                        @catalogScope = ''
+                        OR (
+                            @catalogScope = 'Models'
+                            AND EXISTS (
+                                SELECT 1
+                                FROM sales_invoice_draft_lines sidl
+                                INNER JOIN article_models am
+                                  ON am.tenant_id = sidl.tenant_id
+                                 AND am.company_id = sidl.company_id
+                                 AND am.CENTRO = @centerCode
+                                 AND COALESCE(am.is_deleted, 0) = 0
+                                 AND am.CODI = COALESCE(sidl.item_code, '')
+                                WHERE sidl.draft_id = sid.draft_id
+                            )
+                        )
+                        OR (
+                            @catalogScope = 'TeixitsMostres'
+                            AND NOT EXISTS (
+                                SELECT 1
+                                FROM sales_invoice_draft_lines sidl
+                                INNER JOIN article_models am
+                                  ON am.tenant_id = sidl.tenant_id
+                                 AND am.company_id = sidl.company_id
+                                 AND am.CENTRO = @centerCode
+                                 AND COALESCE(am.is_deleted, 0) = 0
+                                 AND am.CODI = COALESCE(sidl.item_code, '')
+                                WHERE sidl.draft_id = sid.draft_id
+                            )
+                        )
+                      )
+                  AND (
                         @search = ''
                         OR CAST(sid.draft_number AS CHAR) LIKE @likeSearch
                         OR sid.client_name LIKE @likeSearch
@@ -854,6 +1182,8 @@ public sealed class MySqlSalesOrderService : ISalesOrderQueries, ISalesOrderServ
                 """;
             command.Parameters.AddWithValue("@tenantId", tenantId.ToString());
             command.Parameters.AddWithValue("@companyId", companyId.ToString());
+            command.Parameters.AddWithValue("@catalogScope", catalogScope);
+            command.Parameters.AddWithValue("@centerCode", centerCode);
             command.Parameters.AddWithValue("@search", search);
             command.Parameters.AddWithValue("@likeSearch", likeSearch);
             command.Parameters.AddWithValue("@pageSize", pageSize);
@@ -1070,9 +1400,13 @@ public sealed class MySqlSalesOrderService : ISalesOrderQueries, ISalesOrderServ
         var page = Math.Max(filter.Page, 1);
         var offset = (page - 1) * pageSize;
         var search = filter.Search?.Trim() ?? string.Empty;
+        var catalogScope = NormalizeCatalogScope(filter.CatalogScope);
         var likeSearch = $"%{search}%";
 
         await using var connection = await _saasConnectionFactory.OpenConnectionAsync(cancellationToken);
+        var centerCode = string.IsNullOrWhiteSpace(catalogScope)
+            ? string.Empty
+            : await ResolveCompanyCenterCodeAsync(connection, tenantId, companyId, cancellationToken);
         await using (var countCommand = connection.CreateCommand())
         {
             countCommand.CommandText =
@@ -1083,6 +1417,37 @@ public sealed class MySqlSalesOrderService : ISalesOrderQueries, ISalesOrderServ
                   AND si.company_id = @companyId
                   AND COALESCE(si.is_deleted, 0) = 0
                   AND (
+                        @catalogScope = ''
+                        OR (
+                            @catalogScope = 'Models'
+                            AND EXISTS (
+                                SELECT 1
+                                FROM sales_invoice_lines sil
+                                INNER JOIN article_models am
+                                  ON am.tenant_id = sil.tenant_id
+                                 AND am.company_id = sil.company_id
+                                 AND am.CENTRO = @centerCode
+                                 AND COALESCE(am.is_deleted, 0) = 0
+                                 AND am.CODI = COALESCE(sil.item_code, '')
+                                WHERE sil.invoice_id = si.invoice_id
+                            )
+                        )
+                        OR (
+                            @catalogScope = 'TeixitsMostres'
+                            AND NOT EXISTS (
+                                SELECT 1
+                                FROM sales_invoice_lines sil
+                                INNER JOIN article_models am
+                                  ON am.tenant_id = sil.tenant_id
+                                 AND am.company_id = sil.company_id
+                                 AND am.CENTRO = @centerCode
+                                 AND COALESCE(am.is_deleted, 0) = 0
+                                 AND am.CODI = COALESCE(sil.item_code, '')
+                                WHERE sil.invoice_id = si.invoice_id
+                            )
+                        )
+                      )
+                  AND (
                         @search = ''
                         OR CAST(si.invoice_number AS CHAR) LIKE @likeSearch
                         OR CAST(si.draft_number AS CHAR) LIKE @likeSearch
@@ -1092,6 +1457,8 @@ public sealed class MySqlSalesOrderService : ISalesOrderQueries, ISalesOrderServ
                 """;
             countCommand.Parameters.AddWithValue("@tenantId", tenantId.ToString());
             countCommand.Parameters.AddWithValue("@companyId", companyId.ToString());
+            countCommand.Parameters.AddWithValue("@catalogScope", catalogScope);
+            countCommand.Parameters.AddWithValue("@centerCode", centerCode);
             countCommand.Parameters.AddWithValue("@search", search);
             countCommand.Parameters.AddWithValue("@likeSearch", likeSearch);
 
@@ -1130,6 +1497,37 @@ public sealed class MySqlSalesOrderService : ISalesOrderQueries, ISalesOrderServ
                   AND si.company_id = @companyId
                   AND COALESCE(si.is_deleted, 0) = 0
                   AND (
+                        @catalogScope = ''
+                        OR (
+                            @catalogScope = 'Models'
+                            AND EXISTS (
+                                SELECT 1
+                                FROM sales_invoice_lines sil
+                                INNER JOIN article_models am
+                                  ON am.tenant_id = sil.tenant_id
+                                 AND am.company_id = sil.company_id
+                                 AND am.CENTRO = @centerCode
+                                 AND COALESCE(am.is_deleted, 0) = 0
+                                 AND am.CODI = COALESCE(sil.item_code, '')
+                                WHERE sil.invoice_id = si.invoice_id
+                            )
+                        )
+                        OR (
+                            @catalogScope = 'TeixitsMostres'
+                            AND NOT EXISTS (
+                                SELECT 1
+                                FROM sales_invoice_lines sil
+                                INNER JOIN article_models am
+                                  ON am.tenant_id = sil.tenant_id
+                                 AND am.company_id = sil.company_id
+                                 AND am.CENTRO = @centerCode
+                                 AND COALESCE(am.is_deleted, 0) = 0
+                                 AND am.CODI = COALESCE(sil.item_code, '')
+                                WHERE sil.invoice_id = si.invoice_id
+                            )
+                        )
+                      )
+                  AND (
                         @search = ''
                         OR CAST(si.invoice_number AS CHAR) LIKE @likeSearch
                         OR CAST(si.draft_number AS CHAR) LIKE @likeSearch
@@ -1141,6 +1539,8 @@ public sealed class MySqlSalesOrderService : ISalesOrderQueries, ISalesOrderServ
                 """;
             command.Parameters.AddWithValue("@tenantId", tenantId.ToString());
             command.Parameters.AddWithValue("@companyId", companyId.ToString());
+            command.Parameters.AddWithValue("@catalogScope", catalogScope);
+            command.Parameters.AddWithValue("@centerCode", centerCode);
             command.Parameters.AddWithValue("@search", search);
             command.Parameters.AddWithValue("@likeSearch", likeSearch);
             command.Parameters.AddWithValue("@pageSize", pageSize);
@@ -1588,8 +1988,8 @@ public sealed class MySqlSalesOrderService : ISalesOrderQueries, ISalesOrderServ
         var existingLineState = previous?.Lines.ToDictionary(line => line.LineNumber) ?? [];
         ValidateAgainstShippedLines(existingLineState, command);
 
-        var orderNumber = command.OrderNumber ?? await GetNextOrderNumberAsync(connection, command.TenantId, command.CompanyId, cancellationToken);
         await using var transaction = await connection.BeginTransactionAsync(cancellationToken);
+        var orderNumber = command.OrderNumber ?? await GetNextOrderNumberAsync(connection, transaction, command.TenantId, command.CompanyId, cancellationToken);
 
         if (command.OrderNumber.HasValue)
         {
@@ -1794,7 +2194,7 @@ public sealed class MySqlSalesOrderService : ISalesOrderQueries, ISalesOrderServ
 
         await using var transaction = await connection.BeginTransactionAsync(cancellationToken);
         var shipmentId = Guid.NewGuid();
-        var shipmentNumber = await GetNextShipmentNumberAsync(connection, command.TenantId, command.CompanyId, cancellationToken);
+        var shipmentNumber = await GetNextShipmentNumberAsync(connection, transaction, command.TenantId, command.CompanyId, cancellationToken);
         var shipmentSeries = BuildShipmentSeries(currentOrder.CompanyLegacyCenterCode);
 
         await using (var insertShipmentCommand = connection.CreateCommand())
@@ -3406,41 +3806,31 @@ public sealed class MySqlSalesOrderService : ISalesOrderQueries, ISalesOrderServ
 
     private static async Task<int> GetNextOrderNumberAsync(
         MySqlConnection connection,
+        MySqlTransaction transaction,
         Guid tenantId,
         Guid companyId,
         CancellationToken cancellationToken)
-    {
-        await using var command = connection.CreateCommand();
-        command.CommandText =
-            """
-            SELECT COALESCE(MAX(order_number), 0) + 1
-            FROM sales_orders
-            WHERE tenant_id = @tenantId
-              AND company_id = @companyId;
-            """;
-        command.Parameters.AddWithValue("@tenantId", tenantId.ToString());
-        command.Parameters.AddWithValue("@companyId", companyId.ToString());
-        return Convert.ToInt32(await command.ExecuteScalarAsync(cancellationToken));
-    }
+        => await DocumentNumberingSqlHelper.ReserveNextNumberAsync(
+            connection,
+            transaction,
+            tenantId,
+            companyId,
+            DocumentNumberingKeys.SalesOrder,
+            cancellationToken);
 
     private static async Task<int> GetNextShipmentNumberAsync(
         MySqlConnection connection,
+        MySqlTransaction transaction,
         Guid tenantId,
         Guid companyId,
         CancellationToken cancellationToken)
-    {
-        await using var command = connection.CreateCommand();
-        command.CommandText =
-            """
-            SELECT COALESCE(MAX(shipment_number), 0) + 1
-            FROM sales_order_shipments
-            WHERE tenant_id = @tenantId
-              AND company_id = @companyId;
-            """;
-        command.Parameters.AddWithValue("@tenantId", tenantId.ToString());
-        command.Parameters.AddWithValue("@companyId", companyId.ToString());
-        return Convert.ToInt32(await command.ExecuteScalarAsync(cancellationToken));
-    }
+        => await DocumentNumberingSqlHelper.ReserveNextNumberAsync(
+            connection,
+            transaction,
+            tenantId,
+            companyId,
+            DocumentNumberingKeys.SalesShipment,
+            cancellationToken);
 
     private static async Task<int> GetNextInvoiceDraftNumberAsync(
         MySqlConnection connection,
@@ -3448,20 +3838,13 @@ public sealed class MySqlSalesOrderService : ISalesOrderQueries, ISalesOrderServ
         Guid tenantId,
         Guid companyId,
         CancellationToken cancellationToken)
-    {
-        await using var command = connection.CreateCommand();
-        command.Transaction = transaction;
-        command.CommandText =
-            """
-            SELECT COALESCE(MAX(draft_number), 0) + 1
-            FROM sales_invoice_drafts
-            WHERE tenant_id = @tenantId
-              AND company_id = @companyId;
-            """;
-        command.Parameters.AddWithValue("@tenantId", tenantId.ToString());
-        command.Parameters.AddWithValue("@companyId", companyId.ToString());
-        return Convert.ToInt32(await command.ExecuteScalarAsync(cancellationToken));
-    }
+        => await DocumentNumberingSqlHelper.ReserveNextNumberAsync(
+            connection,
+            transaction,
+            tenantId,
+            companyId,
+            DocumentNumberingKeys.SalesInvoiceDraft,
+            cancellationToken);
 
     private static async Task<int> GetNextInvoiceNumberAsync(
         MySqlConnection connection,
@@ -3469,20 +3852,13 @@ public sealed class MySqlSalesOrderService : ISalesOrderQueries, ISalesOrderServ
         Guid tenantId,
         Guid companyId,
         CancellationToken cancellationToken)
-    {
-        await using var command = connection.CreateCommand();
-        command.Transaction = transaction;
-        command.CommandText =
-            """
-            SELECT COALESCE(MAX(invoice_number), 0) + 1
-            FROM sales_invoices
-            WHERE tenant_id = @tenantId
-              AND company_id = @companyId;
-            """;
-        command.Parameters.AddWithValue("@tenantId", tenantId.ToString());
-        command.Parameters.AddWithValue("@companyId", companyId.ToString());
-        return Convert.ToInt32(await command.ExecuteScalarAsync(cancellationToken));
-    }
+        => await DocumentNumberingSqlHelper.ReserveNextNumberAsync(
+            connection,
+            transaction,
+            tenantId,
+            companyId,
+            DocumentNumberingKeys.SalesInvoice,
+            cancellationToken);
 
     private static async Task<List<DraftShipmentSelection>> LoadPendingShipmentSelectionAsync(
         MySqlConnection connection,
@@ -4200,6 +4576,21 @@ public sealed class MySqlSalesOrderService : ISalesOrderQueries, ISalesOrderServ
 
         var direction = filter.SortDescending ? "DESC" : "ASC";
         return $"ORDER BY {column} {direction}, ss.shipment_number DESC";
+    }
+
+    private static string NormalizeCatalogScope(string? catalogScope)
+    {
+        if (string.Equals(catalogScope?.Trim(), "Models", StringComparison.OrdinalIgnoreCase))
+        {
+            return "Models";
+        }
+
+        if (string.Equals(catalogScope?.Trim(), "TeixitsMostres", StringComparison.OrdinalIgnoreCase))
+        {
+            return "TeixitsMostres";
+        }
+
+        return string.Empty;
     }
 
     private static string BuildPendingShipmentSearchOrderByClause(SalesPreInvoiceFilter filter)

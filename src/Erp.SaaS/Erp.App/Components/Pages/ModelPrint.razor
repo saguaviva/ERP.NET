@@ -3,19 +3,20 @@
 @attribute [Authorize(Roles = "TenantAdmin,TenantReader")]
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject IModeloQueries ModeloQueries
+@inject AppText T
 
-<PageTitle>Ficha model @Id</PageTitle>
+<PageTitle>@($"{L("Ficha técnica del model", "Fitxa tècnica del model", "Model specification sheet")} {Id}")</PageTitle>
 
 <div class="document-shell">
     <div class="document-toolbar no-print">
-        <a class="secondary-button link-button" href="/articulos/models/editar/@Id">Volver al model</a>
-        <button class="primary-button" type="button" onclick="window.print()">Guardar como PDF / Imprimir</button>
+        <a class="secondary-button link-button" href="/articulos/models/editar/@Id">@L("Volver al model", "Tornar al model", "Back to model")</a>
+        <button class="primary-button" type="button" onclick="window.print()">@L("Imprimir / guardar PDF", "Imprimir / desar PDF", "Print / save PDF")</button>
     </div>
 
     @if (!tenantId.HasValue || !companyId.HasValue)
     {
         <div class="empty-state document-state">
-            <p>No hay empresa activa seleccionada.</p>
+            <p>@L("No hay empresa activa seleccionada.", "No hi ha cap empresa activa seleccionada.", "There is no active company selected.")</p>
         </div>
     }
     else if (!string.IsNullOrWhiteSpace(errorMessage))
@@ -25,7 +26,7 @@
     else if (model is null)
     {
         <div class="empty-state document-state">
-            <p>No se ha encontrado el model solicitado.</p>
+            <p>@L("No se ha encontrado el model solicitado.", "No s'ha trobat el model sol·licitat.", "The requested model could not be found.")</p>
         </div>
     }
     else
@@ -33,21 +34,21 @@
         <section class="document-page">
             <header class="document-header">
                 <div>
-                    <p class="eyebrow">Fitxa model</p>
+                    <p class="eyebrow">@L("Ficha técnica del model", "Fitxa tècnica del model", "Model specification sheet")</p>
                     <h1>@model.Code</h1>
                     <p class="muted">@DisplayValue(model.Description)</p>
                 </div>
                 <div class="document-header-meta">
                     <div>
-                        <span class="muted">Centro</span>
+                        <span class="muted">@L("Centro", "Centre", "Center")</span>
                         <strong>@DisplayValue(model.CompanyCenterCode)</strong>
                     </div>
                     <div>
-                        <span class="muted">Temporada</span>
+                        <span class="muted">@L("Temporada", "Temporada", "Season")</span>
                         <strong>@DisplayValue(model.Season)</strong>
                     </div>
                     <div>
-                        <span class="muted">Serie</span>
+                        <span class="muted">@L("Serie", "Sèrie", "Series")</span>
                         <strong>@DisplayValue(model.Series)</strong>
                     </div>
                 </div>
@@ -56,29 +57,29 @@
             <section class="document-section">
                 <div class="document-grid-two">
                     <section class="document-box">
-                        <h2>Ficha principal</h2>
+                        <h2>@L("Datos principales", "Dades principals", "Main details")</h2>
                         <div class="document-kv-grid">
-                            <div><span class="muted">Cliente</span><strong>@DisplayClient</strong></div>
-                            <div><span class="muted">Codi model</span><strong>@DisplayValue(model.ModelCode)</strong></div>
-                            <div><span class="muted">Tejido</span><strong>@DisplayFabric</strong></div>
-                            <div><span class="muted">Proveedor</span><strong>@DisplaySupplier</strong></div>
-                            <div><span class="muted">Ample</span><strong>@DisplayValue(model.WidthText)</strong></div>
-                            <div><span class="muted">Rendiment</span><strong>@model.Yield.ToString("0.###")</strong></div>
-                            <div><span class="muted">IVA</span><strong>@DisplayValue(model.VatCode)</strong></div>
-                            <div><span class="muted">Origen</span><strong>@DisplayValue(model.Origin)</strong></div>
+                            <div><span class="muted">@L("Cliente", "Client", "Customer")</span><strong>@DisplayClient</strong></div>
+                            <div><span class="muted">@L("Código model", "Codi model", "Model code")</span><strong>@DisplayValue(model.ModelCode)</strong></div>
+                            <div><span class="muted">@L("Tejido", "Teixit", "Fabric")</span><strong>@DisplayFabric</strong></div>
+                            <div><span class="muted">@L("Proveedor", "Proveïdor", "Supplier")</span><strong>@DisplaySupplier</strong></div>
+                            <div><span class="muted">@L("Ancho", "Ample", "Width")</span><strong>@DisplayValue(model.WidthText)</strong></div>
+                            <div><span class="muted">@L("Rendimiento", "Rendiment", "Yield")</span><strong>@model.Yield.ToUiString("0.###")</strong></div>
+                            <div><span class="muted">@L("IVA", "IVA", "VAT")</span><strong>@DisplayValue(model.VatCode)</strong></div>
+                            <div><span class="muted">@L("Origen", "Origen", "Origin")</span><strong>@DisplayValue(model.Origin)</strong></div>
                         </div>
                     </section>
                     <section class="document-box">
-                        <h2>Venta y costes</h2>
+                        <h2>@L("Venta y costes", "Venda i costos", "Sales and costs")</h2>
                         <div class="document-kv-grid">
-                            <div><span class="muted">Coste</span><strong>@model.CostPrice.ToString("0.00##")</strong></div>
-                            <div><span class="muted">Margen</span><strong>@model.MarginPercent.ToString("0.0#") %</strong></div>
-                            <div><span class="muted">Venta</span><strong>@model.SalePrice.ToString("0.00##")</strong></div>
-                            <div><span class="muted">Venta final</span><strong>@model.FinalSalePrice.ToString("0.00##")</strong></div>
-                            <div><span class="muted">N pack</span><strong>@model.PackagingPrice.ToString("0.00##")</strong></div>
-                            <div><span class="muted">Manipulación</span><strong>@model.ManipulationPrice.ToString("0.00##")</strong></div>
-                            <div><span class="muted">N fornitura</span><strong>@model.FornituraPrice.ToString("0.00##")</strong></div>
-                            <div><span class="muted">N confec</span><strong>@model.TailoringPrice.ToString("0.00##")</strong></div>
+                            <div><span class="muted">@L("Coste", "Cost", "Cost")</span><strong>@model.CostPrice.ToUiString("0.00##")</strong></div>
+                            <div><span class="muted">@L("Margen", "Marge", "Margin")</span><strong>@model.MarginPercent.ToUiString("0.0#") %</strong></div>
+                            <div><span class="muted">@L("Venta", "Venda", "Sale")</span><strong>@model.SalePrice.ToUiString("0.00##")</strong></div>
+                            <div><span class="muted">@L("Venta final", "Venda final", "Final sale")</span><strong>@model.FinalSalePrice.ToUiString("0.00##")</strong></div>
+                            <div><span class="muted">@L("Coste pack", "Cost pack", "Pack cost")</span><strong>@model.PackagingPrice.ToUiString("0.00##")</strong></div>
+                            <div><span class="muted">@L("Manipulación", "Manipulació", "Handling")</span><strong>@model.ManipulationPrice.ToUiString("0.00##")</strong></div>
+                            <div><span class="muted">@L("Coste fornitura", "Cost fornitura", "Trim cost")</span><strong>@model.FornituraPrice.ToUiString("0.00##")</strong></div>
+                            <div><span class="muted">@L("Coste confección", "Cost confecció", "Tailoring cost")</span><strong>@model.TailoringPrice.ToUiString("0.00##")</strong></div>
                         </div>
                     </section>
                 </div>
@@ -87,54 +88,54 @@
             <section class="document-section">
                 <div class="document-grid-two">
                     <section class="document-box">
-                        <h2>Operaciones y talleres</h2>
+                        <h2>@L("Operaciones y talleres", "Operacions i tallers", "Operations and workshops")</h2>
                         <div class="document-kv-grid">
-                            <div><span class="muted">Tint</span><strong>@DisplayWorkshop(model.DyeingWorkshopCode, model.DyeingWorkshopName)</strong></div>
-                            <div><span class="muted">Acabat</span><strong>@DisplayWorkshop(model.FinishingWorkshopCode, model.FinishingWorkshopName)</strong></div>
-                            <div><span class="muted">Estampació</span><strong>@DisplayWorkshop(model.PrintingWorkshopCode, model.PrintingWorkshopName)</strong></div>
-                            <div><span class="muted">Confecció</span><strong>@DisplayWorkshop(model.TailoringWorkshopCode, model.TailoringWorkshopName)</strong></div>
-                            <div><span class="muted">Fornitura resum</span><strong>@DisplayValue(model.FornituraSummary)</strong></div>
-                            <div><span class="muted">C estamp 1</span><strong>@DisplayValue(model.PrintingCode1)</strong></div>
-                            <div><span class="muted">C estamp 2</span><strong>@DisplayValue(model.PrintingCode2)</strong></div>
-                            <div><span class="muted">N estamp 1/2</span><strong>@($"{model.PrintingUnits1:0.##} / {model.PrintingUnits2:0.##}")</strong></div>
+                            <div><span class="muted">@L("Tintura", "Tintura", "Dyeing")</span><strong>@DisplayWorkshop(model.DyeingWorkshopCode, model.DyeingWorkshopName)</strong></div>
+                            <div><span class="muted">@L("Acabado", "Acabat", "Finishing")</span><strong>@DisplayWorkshop(model.FinishingWorkshopCode, model.FinishingWorkshopName)</strong></div>
+                            <div><span class="muted">@L("Estampación", "Estampació", "Printing")</span><strong>@DisplayWorkshop(model.PrintingWorkshopCode, model.PrintingWorkshopName)</strong></div>
+                            <div><span class="muted">@L("Confección", "Confecció", "Tailoring")</span><strong>@DisplayWorkshop(model.TailoringWorkshopCode, model.TailoringWorkshopName)</strong></div>
+                            <div><span class="muted">@L("Resumen fornitura", "Resum fornitura", "Trim summary")</span><strong>@DisplayValue(model.FornituraSummary)</strong></div>
+                            <div><span class="muted">@L("Código estamp. 1", "Codi estamp. 1", "Print code 1")</span><strong>@DisplayValue(model.PrintingCode1)</strong></div>
+                            <div><span class="muted">@L("Código estamp. 2", "Codi estamp. 2", "Print code 2")</span><strong>@DisplayValue(model.PrintingCode2)</strong></div>
+<div><span class="muted">@L("Unidades estamp. 1/2", "Unitats estamp. 1/2", "Print units 1/2")</span><strong>@($"{model.PrintingUnits1.ToUiString("0.##")} / {model.PrintingUnits2.ToUiString("0.##")}")</strong></div>
                         </div>
                     </section>
                     <section class="document-box">
-                        <h2>Tallas y notas</h2>
+                        <h2>@L("Tallas y notas", "Talles i notes", "Sizes and notes")</h2>
                         <div class="document-kv-grid">
-                            <div><span class="muted">Talla 01</span><strong>@DisplayValue(model.Size01)</strong></div>
-                            <div><span class="muted">Talla 02</span><strong>@DisplayValue(model.Size02)</strong></div>
-                            <div><span class="muted">Talla 03</span><strong>@DisplayValue(model.Size03)</strong></div>
-                            <div><span class="muted">Talla 04</span><strong>@DisplayValue(model.Size04)</strong></div>
-                            <div><span class="muted">Talla 05</span><strong>@DisplayValue(model.Size05)</strong></div>
-                            <div><span class="muted">Talla 06</span><strong>@DisplayValue(model.Size06)</strong></div>
-                            <div><span class="muted">Talla 07</span><strong>@DisplayValue(model.Size07)</strong></div>
-                            <div><span class="muted">Talla 08</span><strong>@DisplayValue(model.Size08)</strong></div>
-                            <div><span class="muted">Talla 09</span><strong>@DisplayValue(model.Size09)</strong></div>
-                            <div><span class="muted">Talla 10</span><strong>@DisplayValue(model.Size10)</strong></div>
+                            <div><span class="muted">@L("Talla 01", "Talla 01", "Size 01")</span><strong>@DisplayValue(model.Size01)</strong></div>
+                            <div><span class="muted">@L("Talla 02", "Talla 02", "Size 02")</span><strong>@DisplayValue(model.Size02)</strong></div>
+                            <div><span class="muted">@L("Talla 03", "Talla 03", "Size 03")</span><strong>@DisplayValue(model.Size03)</strong></div>
+                            <div><span class="muted">@L("Talla 04", "Talla 04", "Size 04")</span><strong>@DisplayValue(model.Size04)</strong></div>
+                            <div><span class="muted">@L("Talla 05", "Talla 05", "Size 05")</span><strong>@DisplayValue(model.Size05)</strong></div>
+                            <div><span class="muted">@L("Talla 06", "Talla 06", "Size 06")</span><strong>@DisplayValue(model.Size06)</strong></div>
+                            <div><span class="muted">@L("Talla 07", "Talla 07", "Size 07")</span><strong>@DisplayValue(model.Size07)</strong></div>
+                            <div><span class="muted">@L("Talla 08", "Talla 08", "Size 08")</span><strong>@DisplayValue(model.Size08)</strong></div>
+                            <div><span class="muted">@L("Talla 09", "Talla 09", "Size 09")</span><strong>@DisplayValue(model.Size09)</strong></div>
+                            <div><span class="muted">@L("Talla 10", "Talla 10", "Size 10")</span><strong>@DisplayValue(model.Size10)</strong></div>
                         </div>
-                        <p style="margin-top: 1rem;">@(string.IsNullOrWhiteSpace(model.Notes) ? "Sin notas." : model.Notes)</p>
+                        <p style="margin-top: 1rem;">@(string.IsNullOrWhiteSpace(model.Notes) ? L("Sin notas registradas.", "Sense notes registrades.", "No notes recorded.") : model.Notes)</p>
                     </section>
                 </div>
             </section>
 
             <section class="document-section">
-                <h2>Escandall</h2>
+                <h2>@L("Escandall", "Escandall", "Bill of materials")</h2>
                 <table class="data-table document-table">
                     <thead>
                         <tr>
                             <th>#</th>
-                            <th>Pieza</th>
-                            <th>Tejido</th>
-                            <th>Consum</th>
-                            <th>Preu</th>
-                            <th>Cost</th>
+                            <th>@L("Pieza", "Peça", "Piece")</th>
+                            <th>@L("Tejido", "Teixit", "Fabric")</th>
+                            <th>@L("Consumo", "Consum", "Consumption")</th>
+                            <th>@L("Precio", "Preu", "Price")</th>
+                            <th>@L("Coste", "Cost", "Cost")</th>
                         </tr>
                     </thead>
                     <tbody>
                         @if (model.ScandalloLines.Count == 0)
                         {
-                            <tr><td colspan="6">Sin líneas de escandallo.</td></tr>
+                            <tr><td colspan="6">@L("Sin líneas de escandallo.", "Sense línies d'escandall.", "No bill of materials lines.")</td></tr>
                         }
                         else
                         {
@@ -144,9 +145,9 @@
                                     <td>@row.LineNumber</td>
                                     <td>@DisplayValue(row.Title)</td>
                                     <td>@DisplayValue(row.FabricCode)</td>
-                                    <td>@row.Consumption.ToString("0.####")</td>
-                                    <td>@row.UnitPrice.ToString("0.00##")</td>
-                                    <td>@row.CostPrice.ToString("0.00##")</td>
+                                    <td>@row.Consumption.ToUiString("0.####")</td>
+                                    <td>@row.UnitPrice.ToUiString("0.00##")</td>
+                                    <td>@row.CostPrice.ToUiString("0.00##")</td>
                                 </tr>
                             }
                         }
@@ -157,20 +158,20 @@
             <section class="document-section">
                 <div class="document-grid-two">
                     <section class="document-box">
-                        <h2>Colores</h2>
+                        <h2>@L("Colores", "Colors", "Colors")</h2>
                         <table class="data-table document-table">
                             <thead>
                                 <tr>
                                     <th>#</th>
                                     <th>MODCOL</th>
-                                    <th>Pieza</th>
-                                    <th>Color pieza</th>
+                                    <th>@L("Pieza", "Peça", "Piece")</th>
+                                    <th>@L("Color pieza", "Color peça", "Piece color")</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @if (model.ColorLines.Count == 0)
                                 {
-                                    <tr><td colspan="4">Sin colores.</td></tr>
+                                    <tr><td colspan="4">@L("Sin colores.", "Sense colors.", "No colors.")</td></tr>
                                 }
                                 else
                                 {
@@ -188,22 +189,22 @@
                         </table>
                     </section>
                     <section class="document-box">
-                        <h2>Fornitures</h2>
+                        <h2>@L("Fornituras", "Fornitures", "Trims")</h2>
                         <table class="data-table document-table">
                             <thead>
                                 <tr>
                                     <th>#</th>
-                                    <th>Fornitura</th>
-                                    <th>Medida</th>
-                                    <th>Unitats</th>
-                                    <th>Preu</th>
-                                    <th>Import</th>
+                                    <th>@L("Fornitura", "Fornitura", "Trim")</th>
+                                    <th>@L("Medida", "Mesura", "Size")</th>
+                                    <th>@L("Unidades", "Unitats", "Units")</th>
+                                    <th>@L("Precio", "Preu", "Price")</th>
+                                    <th>@L("Importe", "Import", "Amount")</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @if (model.FornituraLines.Count == 0)
                                 {
-                                    <tr><td colspan="6">Sin fornituras.</td></tr>
+                                    <tr><td colspan="6">@L("Sin fornituras registradas.", "Sense fornitures registrades.", "No trims recorded.")</td></tr>
                                 }
                                 else
                                 {
@@ -213,9 +214,9 @@
                                             <td>@row.LineNumber</td>
                                             <td>@DisplayValue(row.FornituraCode)</td>
                                             <td>@DisplayValue(row.Measure)</td>
-                                            <td>@row.Units.ToString("0.####")</td>
-                                            <td>@row.UnitPrice.ToString("0.00##")</td>
-                                            <td>@row.ImportAmount.ToString("0.00##")</td>
+                                            <td>@row.Units.ToUiString("0.####")</td>
+                                            <td>@row.UnitPrice.ToUiString("0.00##")</td>
+                                            <td>@row.ImportAmount.ToUiString("0.00##")</td>
                                         </tr>
                                     }
                                 }
@@ -226,13 +227,13 @@
             </section>
 
             <section class="document-section">
-                <h2>Stock</h2>
+                <h2>@L("Stock", "Estoc", "Stock")</h2>
                 <table class="data-table document-table">
                     <thead>
                         <tr>
                             <th>#</th>
-                            <th>Color</th>
-                            <th>Talla</th>
+                            <th>@L("Color", "Color", "Color")</th>
+                            <th>@L("Talla", "Talla", "Size")</th>
                             <th>01</th>
                             <th>02</th>
                             <th>03</th>
@@ -248,7 +249,7 @@
                     <tbody>
                         @if (model.StockLines.Count == 0)
                         {
-                            <tr><td colspan="13">Sin stock cargado.</td></tr>
+                            <tr><td colspan="13">@L("Sin stock registrado.", "Sense estoc registrat.", "No stock records.")</td></tr>
                         }
                         else
                         {
@@ -258,16 +259,16 @@
                                     <td>@row.LineNumber</td>
                                     <td>@DisplayValue(row.Color)</td>
                                     <td>@DisplayValue(row.SizeText)</td>
-                                    <td>@row.SizeQuantity01.ToString("0.##")</td>
-                                    <td>@row.SizeQuantity02.ToString("0.##")</td>
-                                    <td>@row.SizeQuantity03.ToString("0.##")</td>
-                                    <td>@row.SizeQuantity04.ToString("0.##")</td>
-                                    <td>@row.SizeQuantity05.ToString("0.##")</td>
-                                    <td>@row.SizeQuantity06.ToString("0.##")</td>
-                                    <td>@row.SizeQuantity07.ToString("0.##")</td>
-                                    <td>@row.SizeQuantity08.ToString("0.##")</td>
-                                    <td>@row.SizeQuantity09.ToString("0.##")</td>
-                                    <td>@row.SizeQuantity10.ToString("0.##")</td>
+                                    <td>@row.SizeQuantity01.ToUiString("0.##")</td>
+                                    <td>@row.SizeQuantity02.ToUiString("0.##")</td>
+                                    <td>@row.SizeQuantity03.ToUiString("0.##")</td>
+                                    <td>@row.SizeQuantity04.ToUiString("0.##")</td>
+                                    <td>@row.SizeQuantity05.ToUiString("0.##")</td>
+                                    <td>@row.SizeQuantity06.ToUiString("0.##")</td>
+                                    <td>@row.SizeQuantity07.ToUiString("0.##")</td>
+                                    <td>@row.SizeQuantity08.ToUiString("0.##")</td>
+                                    <td>@row.SizeQuantity09.ToUiString("0.##")</td>
+                                    <td>@row.SizeQuantity10.ToUiString("0.##")</td>
                                 </tr>
                             }
                         }
@@ -286,6 +287,13 @@
     private Guid? companyId;
     private ModeloDetailDto? model;
     private string errorMessage = string.Empty;
+    private string L(string spanish, string catalan, string english) =>
+        T.CurrentLanguage switch
+        {
+            AppLanguages.Catalan => catalan,
+            AppLanguages.English => english,
+            _ => spanish
+        };
 
     private string DisplayClient => model is null
         ? "-"

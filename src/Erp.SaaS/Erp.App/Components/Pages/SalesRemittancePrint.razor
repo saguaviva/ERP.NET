@@ -1,0 +1,158 @@
+@page "/ventas/remesas/{RemittanceNumber:int}/imprimir"
+@layout EmptyLayout
+@attribute [Authorize(Roles = "TenantAdmin,TenantReader")]
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject ISalesRemittanceQueries SalesRemittanceQueries
+@inject AppText T
+
+<PageTitle>@($"{L("Remesa", "Remesa", "Remittance")} {RemittanceNumber}")</PageTitle>
+
+<div class="document-shell">
+    <div class="document-toolbar no-print">
+        <a class="secondary-button link-button" href="/ventas/remesas/editar/@RemittanceNumber">@L("Volver a la remesa", "Tornar a la remesa", "Back to remittance")</a>
+        <button class="primary-button" type="button" onclick="window.print()">@L("Imprimir / guardar PDF", "Imprimir / desar PDF", "Print / save PDF")</button>
+    </div>
+
+    @if (!tenantId.HasValue || !companyId.HasValue)
+    {
+        <div class="empty-state document-state">
+            <p>@L("No hay empresa activa seleccionada.", "No hi ha cap empresa activa seleccionada.", "There is no active company selected.")</p>
+        </div>
+    }
+    else if (!string.IsNullOrWhiteSpace(errorMessage))
+    {
+        <div class="alert danger document-state">@errorMessage</div>
+    }
+    else if (detail is null)
+    {
+        <div class="empty-state document-state">
+            <p>@L("No se ha encontrado la remesa solicitada.", "No s'ha trobat la remesa sol·licitada.", "The requested remittance could not be found.")</p>
+        </div>
+    }
+    else
+    {
+        <section class="document-page">
+            <header class="document-header">
+                <div>
+                    <p class="eyebrow">@L("Remesa de cliente", "Remesa de client", "Customer remittance")</p>
+                    <h1>@detail.DisplayNumber</h1>
+                    <p class="muted">@L("Estado", "Estat", "Status") @FormatStatus(detail.Status) · @L("Banco", "Banc", "Bank") @DisplayValue(detail.BankName)</p>
+                </div>
+                <div class="document-header-meta">
+                    <div>
+                        <span class="muted">@L("Fecha", "Data", "Date")</span>
+                        <strong>@detail.RemittanceDate.ToString("dd/MM/yyyy")</strong>
+                    </div>
+                    <div>
+                        <span class="muted">@L("Vencimiento", "Venciment", "Due date")</span>
+                        <strong>@(detail.DueDate?.ToString("dd/MM/yyyy") ?? "-")</strong>
+                    </div>
+                    <div>
+                        <span class="muted">@L("Facturas", "Factures", "Invoices")</span>
+                        <strong>@detail.InvoiceCount</strong>
+                    </div>
+                </div>
+            </header>
+
+            <section class="document-section">
+                <div class="document-grid-two">
+                    <section class="document-box">
+                        <h2>@L("Resumen económico", "Resum econòmic", "Financial summary")</h2>
+                        <div class="document-kv-grid">
+                            <div><span class="muted">@L("Clientes", "Clients", "Clients")</span><strong>@detail.ClientCount</strong></div>
+                            <div><span class="muted">@L("Total", "Total", "Total")</span><strong>@detail.TotalAmount.ToUiString("0.00") €</strong></div>
+                            <div><span class="muted">@L("Cobrado", "Cobrat", "Collected")</span><strong>@detail.CollectedAmount.ToUiString("0.00") €</strong></div>
+                            <div><span class="muted">@L("Pendiente", "Pendent", "Outstanding")</span><strong>@detail.OutstandingAmount.ToUiString("0.00") €</strong></div>
+                        </div>
+                    </section>
+                    <section class="document-box">
+                        <h2>@L("Notas", "Notes", "Notes")</h2>
+                        <p>@(string.IsNullOrWhiteSpace(detail.Notes) ? L("Sin notas registradas.", "Sense notes registrades.", "No notes recorded.") : detail.Notes)</p>
+                    </section>
+                </div>
+            </section>
+
+            <section class="document-section">
+                <h2>@L("Facturas incluidas", "Factures incloses", "Included invoices")</h2>
+                <table class="data-table document-table">
+                    <thead>
+                        <tr>
+                            <th>@L("Factura", "Factura", "Invoice")</th>
+                            <th>@L("Cliente", "Client", "Client")</th>
+                            <th>@L("Fecha", "Data", "Date")</th>
+                            <th>@L("Vencimiento", "Venciment", "Due date")</th>
+                            <th>@L("Total", "Total", "Total")</th>
+                            <th>@L("Cobrado", "Cobrat", "Collected")</th>
+                            <th>@L("Pendiente", "Pendent", "Outstanding")</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var invoice in detail.Invoices.OrderBy(item => item.LineNumber))
+                        {
+                            <tr>
+                                <td>@invoice.DisplayNumber</td>
+                                <td>@invoice.ClientName</td>
+                                <td>@invoice.IssueDate.ToString("dd/MM/yyyy")</td>
+                                <td>@(invoice.DueDate?.ToString("dd/MM/yyyy") ?? "-")</td>
+                                <td>@invoice.TotalAmount.ToUiString("0.00") €</td>
+                                <td>@invoice.AmountPaid.ToUiString("0.00") €</td>
+                                <td>@invoice.OutstandingAmount.ToUiString("0.00") €</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </section>
+        </section>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public int RemittanceNumber { get; set; }
+
+    private Guid? tenantId;
+    private Guid? companyId;
+    private SalesRemittanceDetailDto? detail;
+    private string errorMessage = string.Empty;
+
+    private string L(string spanish, string catalan, string english) =>
+        T.CurrentLanguage switch
+        {
+            AppLanguages.Catalan => catalan,
+            AppLanguages.English => english,
+            _ => spanish
+        };
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        tenantId = user.GetTenantId();
+        companyId = user.GetActiveCompanyId();
+
+        if (!tenantId.HasValue || !companyId.HasValue)
+        {
+            return;
+        }
+
+        try
+        {
+            detail = await SalesRemittanceQueries.GetByNumberAsync(tenantId.Value, companyId.Value, RemittanceNumber);
+        }
+        catch (Exception exception)
+        {
+            errorMessage = exception.Message;
+        }
+    }
+
+    private string FormatStatus(string status) => status switch
+    {
+        SalesRemittanceStatuses.Draft => L("Borrador", "Esborrany", "Draft"),
+        SalesRemittanceStatuses.Sent => L("Enviada", "Enviada", "Sent"),
+        SalesRemittanceStatuses.Collected => L("Cobrada", "Cobrada", "Collected"),
+        SalesRemittanceStatuses.Cancelled => L("Anulada", "Anul·lada", "Cancelled"),
+        _ => status
+    };
+
+    private static string DisplayValue(string value) => string.IsNullOrWhiteSpace(value) ? "-" : value;
+}

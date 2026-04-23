@@ -1,5 +1,5 @@
 (function () {
-    const validThemes = new Set(["current", "blue-modern", "compact", "ultra-compact"]);
+    const validThemes = new Set(["current", "blue-modern", "institutional", "compact", "ultra-compact"]);
     const collapsedNavSectionsStorageKey = "erp-collapsed-nav-sections-v2";
 
     function normalize(theme) {

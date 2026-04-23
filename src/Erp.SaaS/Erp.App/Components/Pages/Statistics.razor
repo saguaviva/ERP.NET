@@ -1,0 +1,559 @@
+@page "/estadisticas"
+@attribute [Authorize(Roles = "TenantAdmin,TenantReader")]
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
+@inject IReportingQueries ReportingQueries
+@inject AppText T
+
+@using Erp.Application.Reporting
+@using System.Globalization
+
+<PageTitle>@L("Estadísticas", "Estadístiques", "Statistics")</PageTitle>
+
+<div class="page-header">
+    <div>
+        <p class="eyebrow">@L("Legacy", "Legacy", "Legacy")</p>
+        <h1>@L("Estadísticas", "Estadístiques", "Statistics")</h1>
+        <p class="lead">@L("KPIs y resúmenes de negocio sobre ventas, compras, producción, stock y finanzas de la empresa activa.", "KPIs i resums de negoci sobre vendes, compres, producció, estoc i finances de l'empresa activa.", "Business KPIs and summaries for sales, purchases, production, stock and finance in the active company.")</p>
+    </div>
+    <div class="quick-links">
+        <a class="secondary-button link-button" href="/alertas">@L("Ver alertas", "Veure alertes", "View alerts")</a>
+        <a class="secondary-button link-button" href="/listados">@L("Abrir listados", "Obrir llistats", "Open reports")</a>
+        <a class="secondary-button link-button" href="/ventas/intrastat">@L("Ver intrastat", "Veure intrastat", "View intrastat")</a>
+        <a class="secondary-button link-button" href="@ExportCsvHref">@L("Exportar CSV", "Exportar CSV", "Export CSV")</a>
+        <a class="secondary-button link-button" href="/estadisticas/ventas">@L("Ver por áreas", "Veure per àrees", "View by area")</a>
+    </div>
+</div>
+
+@if (!tenantId.HasValue || !companyId.HasValue)
+{
+    <div class="empty-state">
+        <p>@L("Selecciona una empresa activa para calcular las estadísticas.", "Selecciona una empresa activa per calcular les estadístiques.", "Select an active company to calculate statistics.")</p>
+    </div>
+}
+else
+{
+    <section class="panel">
+        <div class="filter-row">
+            <label class="field compact-field">
+                <span>@L("Desde", "Des de", "From")</span>
+                <input class="text-input" type="date" @bind="filter.DateFrom" @bind:format="yyyy-MM-dd" disabled="@isLoading" />
+            </label>
+            <label class="field compact-field">
+                <span>@L("Hasta", "Fins a", "To")</span>
+                <input class="text-input" type="date" @bind="filter.DateTo" @bind:format="yyyy-MM-dd" disabled="@isLoading" />
+            </label>
+            <button class="secondary-button" @onclick="LoadAsync" disabled="@isLoading">@(isLoading ? L("Cargando...", "Carregant...", "Loading...") : L("Actualizar", "Actualitzar", "Refresh"))</button>
+        </div>
+    </section>
+
+    <section class="panel dashboard-section">
+        <div class="dashboard-section-header">
+            <div>
+                <p class="eyebrow">@L("Áreas", "Àrees", "Areas")</p>
+                <h2>@L("Estadísticas por área", "Estadístiques per àrea", "Statistics by area")</h2>
+                <p class="lead">@L("Accede a paneles especializados de Ventas, Compras, Producción y Almacén sin perder el filtro temporal actual.", "Accedeix a panells especialitzats de Vendes, Compres, Producció i Magatzem sense perdre el filtre temporal actual.", "Open specialised Sales, Purchases, Production and Warehouse dashboards without losing the current date filter.")</p>
+            </div>
+        </div>
+        <div class="dashboard-actions-grid">
+            <a class="dashboard-action-tile" href="@BuildAreaHref("/estadisticas/ventas")">
+                <strong>@L("Ventas", "Vendes", "Sales")</strong>
+                <span>@L("Facturación, cobro, clientes y mix comercial.", "Facturació, cobrament, clients i mix comercial.", "Billing, collections, clients and commercial mix.")</span>
+            </a>
+            <a class="dashboard-action-tile" href="@BuildAreaHref("/estadisticas/compras")">
+                <strong>@L("Compras", "Compres", "Purchases")</strong>
+                <span>@L("Aprovisionamiento, recepciones, proveedor y pago.", "Aprovisionament, recepcions, proveïdor i pagament.", "Procurement, receipts, supplier flow and payment.")</span>
+            </a>
+            <a class="dashboard-action-tile" href="@BuildAreaHref("/estadisticas/produccion")">
+                <strong>@L("Producción", "Producció", "Production")</strong>
+                <span>@L("Órdenes, estados de fabricación y acabadores.", "Ordres, estats de fabricació i acabadors.", "Work orders, production statuses and finishers.")</span>
+            </a>
+            <a class="dashboard-action-tile" href="@BuildAreaHref("/estadisticas/almacen")">
+                <strong>@L("Almacén", "Magatzem", "Warehouse")</strong>
+                <span>@L("Stock, movimientos, inventarios y traspasos.", "Estoc, moviments, inventaris i traspassos.", "Stock, movements, counts and transfers.")</span>
+            </a>
+        </div>
+    </section>
+
+    @if (!string.IsNullOrWhiteSpace(errorMessage))
+    {
+        <div class="alert danger">@errorMessage</div>
+    }
+
+    @if (isLoading)
+    {
+        <section class="panel">
+            <div class="loading-banner">
+                <span class="loading-indicator" aria-hidden="true"></span>
+                <span>@L("Calculando estadísticas...", "Calculant estadístiques...", "Calculating statistics...")</span>
+            </div>
+        </section>
+    }
+    else
+    {
+        <section class="panel dashboard-section">
+            <div class="dashboard-section-header">
+                <div>
+                    <p class="eyebrow">@L("Dirección", "Direcció", "Executive")</p>
+                    <h2>@L("Resumen ejecutivo", "Resum executiu", "Executive summary")</h2>
+                    <p class="lead">@L("Lectura rápida de saldo comercial, tickets medios y nivel de cobro/pago del rango seleccionado.", "Lectura ràpida del saldo comercial, tickets mitjans i nivell de cobrament/pagament del rang seleccionat.", "Quick read of commercial balance, average ticket and collection/payment level for the selected range.")</p>
+                </div>
+            </div>
+            <div class="dashboard-metric-grid">
+                <article class="dashboard-metric-card dashboard-metric-card-info">
+                    <span class="dashboard-metric-label">@L("Balance neto", "Balanç net", "Net balance")</span>
+                    <strong class="dashboard-metric-value">@FormatCurrency(stats.NetBillingBalance)</strong>
+                    <span class="dashboard-metric-description">@L("Facturado ventas menos facturado compras", "Facturat vendes menys facturat compres", "Sales invoiced minus purchase invoiced")</span>
+                </article>
+                <article class="dashboard-metric-card">
+                    <span class="dashboard-metric-label">@L("Cobrado", "Cobrat", "Collected")</span>
+                    <strong class="dashboard-metric-value">@FormatCurrency(stats.SalesCollectedAmount)</strong>
+                    <span class="dashboard-metric-description">@FormatPercent(stats.SalesCollectionRate)</span>
+                </article>
+                <article class="dashboard-metric-card">
+                    <span class="dashboard-metric-label">@L("Pagado", "Pagat", "Paid")</span>
+                    <strong class="dashboard-metric-value">@FormatCurrency(stats.PurchasePaidAmount)</strong>
+                    <span class="dashboard-metric-description">@FormatPercent(stats.PurchasePaymentRate)</span>
+                </article>
+                <article class="dashboard-metric-card">
+                    <span class="dashboard-metric-label">@L("Ticket medio venta", "Ticket mitjà venda", "Average sales ticket")</span>
+                    <strong class="dashboard-metric-value">@FormatCurrency(stats.AverageSalesInvoiceAmount)</strong>
+                    <span class="dashboard-metric-description">@L("Sobre facturas emitidas", "Sobre factures emeses", "Across issued invoices")</span>
+                </article>
+                <article class="dashboard-metric-card">
+                    <span class="dashboard-metric-label">@L("Ticket medio compra", "Ticket mitjà compra", "Average purchase ticket")</span>
+                    <strong class="dashboard-metric-value">@FormatCurrency(stats.AveragePurchaseInvoiceAmount)</strong>
+                    <span class="dashboard-metric-description">@L("Sobre facturas proveedor", "Sobre factures proveïdor", "Across supplier invoices")</span>
+                </article>
+                <article class="dashboard-metric-card">
+                    <span class="dashboard-metric-label">@L("Movimiento por posición", "Moviment per posició", "Moves per position")</span>
+                    <strong class="dashboard-metric-value">@FormatNumber(CalculateRatio(stats.StockMovementsInRange, stats.StockPositions))</strong>
+                    <span class="dashboard-metric-description">@L("Actividad media de almacén", "Activitat mitjana de magatzem", "Average warehouse activity")</span>
+                </article>
+            </div>
+        </section>
+
+        <div class="comparison-grid">
+            <section class="panel">
+                <p class="eyebrow">@L("Comparativa", "Comparativa", "Comparison")</p>
+                <h2>@L("Vs período anterior", "Vs període anterior", "Vs previous period")</h2>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>@L("Métrica", "Mètrica", "Metric")</th>
+                            <th>@L("Actual", "Actual", "Current")</th>
+                            <th>@L("Anterior", "Anterior", "Previous")</th>
+                            <th>@L("Delta", "Delta", "Delta")</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (stats.PeriodComparisons.Count == 0)
+                        {
+                            <tr>
+                                <td colspan="4" class="table-empty">@L("Sin comparativa para este rango.", "Sense comparativa per a aquest rang.", "No comparison available for this range.")</td>
+                            </tr>
+                        }
+                        else
+                        {
+                            @foreach (var item in stats.PeriodComparisons)
+                            {
+                                <tr>
+                                    <td>@TranslateComparisonLabel(item.Label)</td>
+                                    <td>@FormatComparisonValue(item.CurrentValue, item.ValueKind)</td>
+                                    <td>@FormatComparisonValue(item.PreviousValue, item.ValueKind)</td>
+                                    <td>@BuildDeltaLabel(item)</td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+                <p class="lead">@BuildPreviousRangeLabel()</p>
+            </section>
+
+            <section class="panel">
+                <p class="eyebrow">@L("Evolución", "Evolució", "Timeline")</p>
+                <h2>@L("Pulso semanal", "Pols setmanal", "Weekly pulse")</h2>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>@L("Semana", "Setmana", "Week")</th>
+                            <th>@L("Ventas", "Vendes", "Sales")</th>
+                            <th>@L("Compras", "Compres", "Purchases")</th>
+                            <th>@L("Movimientos", "Moviments", "Movements")</th>
+                            <th>@L("Órdenes", "Ordres", "Orders")</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (stats.WeeklyTimeline.Count == 0)
+                        {
+                            <tr>
+                                <td colspan="5" class="table-empty">@L("Sin evolución para este rango.", "Sense evolució per a aquest rang.", "No timeline data for this range.")</td>
+                            </tr>
+                        }
+                        else
+                        {
+                            @foreach (var point in stats.WeeklyTimeline)
+                            {
+                                <tr>
+                                    <td>@point.Label</td>
+                                    <td>@FormatCurrency(point.SalesInvoiceAmount) <span class="muted">(@FormatCount(point.SalesInvoiceCount))</span></td>
+                                    <td>@FormatCurrency(point.PurchaseInvoiceAmount) <span class="muted">(@FormatCount(point.PurchaseInvoiceCount))</span></td>
+                                    <td>@FormatCount(point.StockMovementCount)</td>
+                                    <td>@FormatCount(point.FinishOrderCount)</td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </section>
+        </div>
+
+        <section class="panel dashboard-section">
+            <div class="dashboard-section-header">
+                <div>
+                    <p class="eyebrow">@L("Ventas", "Vendes", "Sales")</p>
+                    <h2>@L("Circuito comercial", "Circuit comercial", "Commercial flow")</h2>
+                    <p class="lead">@L("Pedidos, albaranes, facturas y remesas dentro del período seleccionado.", "Comandes, albarans, factures i remeses dins del període seleccionat.", "Orders, shipments, invoices and remittances within the selected range.")</p>
+                </div>
+            </div>
+            <div class="dashboard-metric-grid">
+                <article class="dashboard-metric-card">
+                    <span class="dashboard-metric-label">@L("Pedidos venta", "Comandes venda", "Sales orders")</span>
+                    <strong class="dashboard-metric-value">@FormatCount(stats.SalesOrderCount)</strong>
+                    <span class="dashboard-metric-description">@FormatCurrency(stats.SalesOrderAmount)</span>
+                </article>
+                <article class="dashboard-metric-card">
+                    <span class="dashboard-metric-label">@L("Albaranes", "Albarans", "Shipments")</span>
+                    <strong class="dashboard-metric-value">@FormatCount(stats.SalesShipmentCount)</strong>
+                    <span class="dashboard-metric-description">@FormatCurrency(stats.SalesShipmentAmount)</span>
+                </article>
+                <article class="dashboard-metric-card">
+                    <span class="dashboard-metric-label">@L("Facturas", "Factures", "Invoices")</span>
+                    <strong class="dashboard-metric-value">@FormatCount(stats.SalesInvoiceCount)</strong>
+                    <span class="dashboard-metric-description">@FormatCurrency(stats.SalesInvoiceAmount)</span>
+                </article>
+                <article class="dashboard-metric-card dashboard-metric-card-warning">
+                    <span class="dashboard-metric-label">@L("Pendiente cobro", "Pendent cobrament", "Outstanding sales")</span>
+                    <strong class="dashboard-metric-value">@FormatCurrency(stats.SalesOutstandingAmount)</strong>
+                    <span class="dashboard-metric-description">@L("Importe todavía no cobrado", "Import encara no cobrat", "Amount still pending collection")</span>
+                </article>
+                <article class="dashboard-metric-card dashboard-metric-card-info">
+                    <span class="dashboard-metric-label">@L("Remesas", "Remeses", "Remittances")</span>
+                    <strong class="dashboard-metric-value">@FormatCount(stats.RemittanceCount)</strong>
+                    <span class="dashboard-metric-description">@FormatCurrency(stats.RemittanceOutstandingAmount)</span>
+                </article>
+            </div>
+        </section>
+
+        <section class="panel dashboard-section">
+            <div class="dashboard-section-header">
+                <div>
+                    <p class="eyebrow">@L("Compras", "Compres", "Purchases")</p>
+                    <h2>@L("Circuito proveedor", "Circuit proveïdor", "Supplier flow")</h2>
+                    <p class="lead">@L("Pedidos, recepciones y facturas proveedor dentro del período seleccionado.", "Comandes, recepcions i factures proveïdor dins del període seleccionat.", "Purchase orders, receipts and supplier invoices within the selected range.")</p>
+                </div>
+            </div>
+            <div class="dashboard-metric-grid">
+                <article class="dashboard-metric-card">
+                    <span class="dashboard-metric-label">@L("Pedidos compra", "Comandes compra", "Purchase orders")</span>
+                    <strong class="dashboard-metric-value">@FormatCount(stats.PurchaseOrderCount)</strong>
+                    <span class="dashboard-metric-description">@FormatCurrency(stats.PurchaseOrderAmount)</span>
+                </article>
+                <article class="dashboard-metric-card">
+                    <span class="dashboard-metric-label">@L("Recepciones", "Recepcions", "Receipts")</span>
+                    <strong class="dashboard-metric-value">@FormatCount(stats.PurchaseReceiptCount)</strong>
+                    <span class="dashboard-metric-description">@FormatQuantity(stats.PurchaseReceivedQuantity)</span>
+                </article>
+                <article class="dashboard-metric-card">
+                    <span class="dashboard-metric-label">@L("Facturas proveedor", "Factures proveïdor", "Supplier invoices")</span>
+                    <strong class="dashboard-metric-value">@FormatCount(stats.PurchaseInvoiceCount)</strong>
+                    <span class="dashboard-metric-description">@FormatCurrency(stats.PurchaseInvoiceAmount)</span>
+                </article>
+                <article class="dashboard-metric-card dashboard-metric-card-warning">
+                    <span class="dashboard-metric-label">@L("Pendiente pago", "Pendent pagament", "Outstanding purchases")</span>
+                    <strong class="dashboard-metric-value">@FormatCurrency(stats.PurchaseOutstandingAmount)</strong>
+                    <span class="dashboard-metric-description">@L("Importe todavía no pagado", "Import encara no pagat", "Amount still pending payment")</span>
+                </article>
+            </div>
+        </section>
+
+        <section class="panel dashboard-section">
+            <div class="dashboard-section-header">
+                <div>
+                    <p class="eyebrow">@L("Operación", "Operació", "Operations")</p>
+                    <h2>@L("Planta y almacén", "Planta i magatzem", "Production and warehouse")</h2>
+                    <p class="lead">@L("Estado del trabajo vivo, inventarios, traspasos y actividad de stock.", "Estat del treball viu, inventaris, traspassos i activitat d'estoc.", "State of live work, counts, transfers and stock activity.")</p>
+                </div>
+            </div>
+            <div class="dashboard-metric-grid">
+                <article class="dashboard-metric-card">
+                    <span class="dashboard-metric-label">@L("Órdenes vivas", "Ordres vives", "Live work orders")</span>
+                    <strong class="dashboard-metric-value">@FormatCount(stats.LiveFinishOrders)</strong>
+                    <span class="dashboard-metric-description">@L("Partes en pendiente o proceso", "Parts en pendent o procés", "Work orders in pending or in-progress status")</span>
+                </article>
+                <article class="dashboard-metric-card">
+                    <span class="dashboard-metric-label">@L("Posiciones stock", "Posicions estoc", "Stock positions")</span>
+                    <strong class="dashboard-metric-value">@FormatCount(stats.StockPositions)</strong>
+                    <span class="dashboard-metric-description">@L("Posiciones vivas calculadas en almacén", "Posicions vives calculades al magatzem", "Live stock positions calculated in warehouse")</span>
+                </article>
+                <article class="dashboard-metric-card">
+                    <span class="dashboard-metric-label">@L("Movimientos", "Moviments", "Movements")</span>
+                    <strong class="dashboard-metric-value">@FormatCount(stats.StockMovementsInRange)</strong>
+                    <span class="dashboard-metric-description">@L("Movimientos de stock en el rango", "Moviments d'estoc en el rang", "Stock movements in the selected range")</span>
+                </article>
+                <article class="dashboard-metric-card">
+                    <span class="dashboard-metric-label">@L("Inventarios borrador", "Inventaris esborrany", "Draft counts")</span>
+                    <strong class="dashboard-metric-value">@FormatCount(stats.DraftCounts)</strong>
+                    <span class="dashboard-metric-description">@L("Conteos todavía abiertos", "Comptatges encara oberts", "Counts still open")</span>
+                </article>
+                <article class="dashboard-metric-card">
+                    <span class="dashboard-metric-label">@L("Traspasos borrador", "Traspassos esborrany", "Draft transfers")</span>
+                    <strong class="dashboard-metric-value">@FormatCount(stats.DraftTransfers)</strong>
+                    <span class="dashboard-metric-description">@L("Traspasos pendientes de completar", "Traspassos pendents de completar", "Transfers pending completion")</span>
+                </article>
+            </div>
+        </section>
+
+        <div class="comparison-grid">
+            <section class="panel">
+                <p class="eyebrow">@L("Clientes", "Clients", "Clients")</p>
+                <h2>@L("Top clientes", "Top clients", "Top clients")</h2>
+                @RenderBreakdownTable(stats.TopClients, L("Cliente", "Client", "Client"), true)
+            </section>
+            <section class="panel">
+                <p class="eyebrow">@L("Proveedores", "Proveïdors", "Suppliers")</p>
+                <h2>@L("Top proveedores", "Top proveïdors", "Top suppliers")</h2>
+                @RenderBreakdownTable(stats.TopSuppliers, L("Proveedor", "Proveïdor", "Supplier"), true)
+            </section>
+            <section class="panel">
+                <p class="eyebrow">@L("Ventas", "Vendes", "Sales")</p>
+                <h2>@L("Estados de venta", "Estats de venda", "Sales statuses")</h2>
+                @RenderBreakdownTable(stats.SalesStatusBreakdown, L("Estado", "Estat", "Status"), true)
+            </section>
+            <section class="panel">
+                <p class="eyebrow">@L("Compras", "Compres", "Purchases")</p>
+                <h2>@L("Estados de compra", "Estats de compra", "Purchase statuses")</h2>
+                @RenderBreakdownTable(stats.PurchaseStatusBreakdown, L("Estado", "Estat", "Status"), true)
+            </section>
+            <section class="panel">
+                <p class="eyebrow">@L("Producción", "Producció", "Production")</p>
+                <h2>@L("Estados de fabricación", "Estats de fabricació", "Work order statuses")</h2>
+                @RenderBreakdownTable(stats.FinishStatusBreakdown, L("Estado", "Estat", "Status"), false)
+            </section>
+        </div>
+
+        <div class="comparison-grid">
+            <section class="panel">
+                <p class="eyebrow">@L("Almacén", "Magatzem", "Warehouse")</p>
+                <h2>@L("Top almacenes", "Top magatzems", "Top warehouses")</h2>
+                @RenderBreakdownTable(stats.TopWarehouses, L("Almacén", "Magatzem", "Warehouse"), true)
+            </section>
+            <section class="panel">
+                <p class="eyebrow">@L("Almacén", "Magatzem", "Warehouse")</p>
+                <h2>@L("Tipos de movimiento", "Tipus de moviment", "Movement types")</h2>
+                @RenderBreakdownTable(stats.MovementTypeBreakdown, L("Tipo", "Tipus", "Type"), true)
+            </section>
+            <section class="panel">
+                <p class="eyebrow">@L("Ventas", "Vendes", "Sales")</p>
+                <h2>@L("Top artículos facturados", "Top articles facturats", "Top billed items")</h2>
+                @RenderBreakdownTable(stats.TopBilledItems, L("Artículo", "Article", "Item"), true)
+            </section>
+            <section class="panel">
+                <p class="eyebrow">@L("Producción", "Producció", "Production")</p>
+                <h2>@L("Top acabadores", "Top acabadors", "Top finishers")</h2>
+                @RenderBreakdownTable(stats.TopFinishers, L("Acabador", "Acabador", "Finisher"), true)
+            </section>
+        </div>
+    }
+}
+
+@code {
+    [SupplyParameterFromQuery(Name = "from")]
+    public DateTime? FromQuery { get; set; }
+
+    [SupplyParameterFromQuery(Name = "to")]
+    public DateTime? ToQuery { get; set; }
+
+    private Guid? tenantId;
+    private Guid? companyId;
+    private bool isLoading;
+    private string errorMessage = string.Empty;
+    private BusinessStatisticsFilter filter = new() { DateFrom = DateTime.Today.AddDays(-30), DateTo = DateTime.Today };
+    private BusinessStatisticsDto stats = new();
+    private string ExportCsvHref => NavigationManager.GetUriWithQueryParameters("/estadisticas/export/csv", new Dictionary<string, object?>
+    {
+        ["from"] = filter.DateFrom?.ToString("yyyy-MM-dd"),
+        ["to"] = filter.DateTo?.ToString("yyyy-MM-dd")
+    });
+
+    private string L(string spanish, string catalan, string english) =>
+        T.CurrentLanguage switch
+        {
+            AppLanguages.Catalan => catalan,
+            AppLanguages.English => english,
+            _ => spanish
+        };
+
+    private decimal CalculateRatio(int movements, int positions) =>
+        positions <= 0 ? 0m : Math.Round((decimal)movements / positions, 2);
+
+    private string FormatCurrency(decimal value) => string.Format(CultureInfo.CurrentCulture, "{0:N2} €", value);
+
+    private string FormatPercent(decimal value) => string.Format(CultureInfo.CurrentCulture, "{0:N2} %", value);
+
+    private string FormatCount(int value) => value.ToString("N0", CultureInfo.CurrentCulture);
+
+    private string FormatNumber(decimal value) => value.ToString("N2", CultureInfo.CurrentCulture);
+
+    private string FormatQuantity(decimal value) => value.ToString("N3", CultureInfo.CurrentCulture);
+
+    private string BuildAreaHref(string route) =>
+        NavigationManager.GetUriWithQueryParameters(route, new Dictionary<string, object?>
+        {
+            ["from"] = filter.DateFrom?.ToString("yyyy-MM-dd"),
+            ["to"] = filter.DateTo?.ToString("yyyy-MM-dd")
+        });
+
+    private string FormatComparisonValue(decimal value, string valueKind) =>
+        valueKind switch
+        {
+            "currency" => FormatCurrency(value),
+            "count" => value.ToString("N0", CultureInfo.CurrentCulture),
+            _ => value.ToString("N2", CultureInfo.CurrentCulture)
+        };
+
+    private string BuildDeltaLabel(StatisticComparisonItemDto item)
+    {
+        var sign = item.DeltaValue > 0 ? "+" : string.Empty;
+        var deltaValue = FormatComparisonValue(item.DeltaValue, item.ValueKind);
+        return $"{sign}{deltaValue} ({sign}{item.DeltaPercentage.ToString("N2", CultureInfo.CurrentCulture)}%)";
+    }
+
+    private string TranslateComparisonLabel(string label) =>
+        label switch
+        {
+            "Facturación ventas" => L("Facturación ventas", "Facturació vendes", "Sales invoicing"),
+            "Facturación compras" => L("Facturación compras", "Facturació compres", "Purchase invoicing"),
+            "Pendiente cobro" => L("Pendiente cobro", "Pendent cobrament", "Outstanding sales"),
+            "Pendiente pago" => L("Pendiente pago", "Pendent pagament", "Outstanding purchases"),
+            "Movimientos stock" => L("Movimientos stock", "Moviments estoc", "Stock movements"),
+            "Órdenes vivas" => L("Órdenes vivas", "Ordres vives", "Live work orders"),
+            _ => label
+        };
+
+    private string BuildPreviousRangeLabel()
+    {
+        var currentFrom = filter.DateFrom?.Date ?? DateTime.Today.AddDays(-30);
+        var currentTo = filter.DateTo?.Date ?? DateTime.Today;
+        var currentToExclusive = currentTo.AddDays(1);
+        var previousFrom = currentFrom - (currentToExclusive - currentFrom);
+        var previousTo = currentFrom.AddDays(-1);
+        return L(
+            $"Comparando contra {previousFrom:dd/MM/yyyy} - {previousTo:dd/MM/yyyy}.",
+            $"Comparant contra {previousFrom:dd/MM/yyyy} - {previousTo:dd/MM/yyyy}.",
+            $"Compared against {previousFrom:dd/MM/yyyy} - {previousTo:dd/MM/yyyy}.");
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        tenantId = user.GetTenantId();
+        companyId = user.GetActiveCompanyId();
+        filter.DateFrom = FromQuery ?? DateTime.Today.AddDays(-30);
+        filter.DateTo = ToQuery ?? DateTime.Today;
+        await LoadAsync();
+    }
+
+    private async Task LoadAsync()
+    {
+        if (!tenantId.HasValue || !companyId.HasValue)
+        {
+            return;
+        }
+
+        isLoading = true;
+        errorMessage = string.Empty;
+        try
+        {
+            stats = await ReportingQueries.GetBusinessStatisticsAsync(tenantId.Value, companyId.Value, filter);
+            var target = NavigationManager.GetUriWithQueryParameters(new Dictionary<string, object?>
+            {
+                ["from"] = filter.DateFrom?.ToString("yyyy-MM-dd"),
+                ["to"] = filter.DateTo?.ToString("yyyy-MM-dd")
+            });
+            if (!string.Equals(target, NavigationManager.Uri, StringComparison.Ordinal))
+            {
+                NavigationManager.NavigateTo(target, replace: true);
+            }
+        }
+        catch (Exception exception)
+        {
+            errorMessage = exception.Message;
+            stats = new();
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private RenderFragment RenderBreakdownTable(IReadOnlyCollection<StatisticBreakdownItemDto> items, string labelTitle, bool showAmount) => builder =>
+    {
+        var sequence = 0;
+        builder.OpenElement(sequence++, "table");
+        builder.AddAttribute(sequence++, "class", "data-table");
+        builder.OpenElement(sequence++, "thead");
+        builder.OpenElement(sequence++, "tr");
+        builder.OpenElement(sequence++, "th");
+        builder.AddContent(sequence++, labelTitle);
+        builder.CloseElement();
+        builder.OpenElement(sequence++, "th");
+        builder.AddContent(sequence++, L("Cantidad", "Quantitat", "Count"));
+        builder.CloseElement();
+        if (showAmount)
+        {
+            builder.OpenElement(sequence++, "th");
+            builder.AddContent(sequence++, L("Importe", "Import", "Amount"));
+            builder.CloseElement();
+        }
+
+        builder.CloseElement();
+        builder.CloseElement();
+        builder.OpenElement(sequence++, "tbody");
+        if (items.Count == 0)
+        {
+            builder.OpenElement(sequence++, "tr");
+            builder.OpenElement(sequence++, "td");
+            builder.AddAttribute(sequence++, "colspan", showAmount ? 3 : 2);
+            builder.AddAttribute(sequence++, "class", "table-empty");
+            builder.AddContent(sequence++, L("Sin datos para este rango.", "Sense dades per a aquest rang.", "No data for this range."));
+            builder.CloseElement();
+            builder.CloseElement();
+        }
+        else
+        {
+            foreach (var item in items)
+            {
+                builder.OpenElement(sequence++, "tr");
+                builder.OpenElement(sequence++, "td");
+                builder.AddContent(sequence++, item.Label);
+                builder.CloseElement();
+                builder.OpenElement(sequence++, "td");
+                builder.AddContent(sequence++, FormatCount(item.Count));
+                builder.CloseElement();
+                if (showAmount)
+                {
+                    builder.OpenElement(sequence++, "td");
+                    builder.AddContent(sequence++, FormatCurrency(item.Amount));
+                    builder.CloseElement();
+                }
+
+                builder.CloseElement();
+            }
+        }
+
+        builder.CloseElement();
+        builder.CloseElement();
+    };
+}

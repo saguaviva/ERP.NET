@@ -2,9 +2,11 @@ using Erp.Application.Auditing;
 using Erp.Application.Companies;
 using Erp.Application.Contexts;
 using Erp.Application.Disposiciones;
+using Erp.Application.Numbering;
 using Erp.Application.Stock;
 using Erp.Domain.Common;
 using Erp.Infrastructure.MySql.Database;
+using Erp.Infrastructure.MySql.Numbering;
 using Erp.Infrastructure.MySql.Support;
 using MySqlConnector;
 
@@ -332,7 +334,7 @@ public sealed class MySqlDisposicionService : IDisposicionQueries, IDisposicionS
 
         if (command.Number <= 0)
         {
-            command.Number = await GenerateNextDisplayNumberAsync(connection, transaction, centerCode, command.Year, cancellationToken);
+            command.Number = await GenerateNextDisplayNumberAsync(connection, transaction, command.TenantId, command.CompanyId, centerCode, command.Year, cancellationToken);
         }
 
         await ApplyStockTransitionsAsync(connection, transaction, centerCode, code, previous, command, cancellationToken);
@@ -744,23 +746,19 @@ public sealed class MySqlDisposicionService : IDisposicionQueries, IDisposicionS
     private static async Task<int> GenerateNextDisplayNumberAsync(
         MySqlConnection connection,
         MySqlTransaction transaction,
+        Guid tenantId,
+        Guid companyId,
         string centerCode,
         string year,
         CancellationToken cancellationToken)
-    {
-        await using var command = connection.CreateCommand();
-        command.Transaction = transaction;
-        command.CommandText =
-            """
-            SELECT COALESCE(MAX(IDDISPOS), 0) + 1
-            FROM dispos
-            WHERE CENTRO = @centerCode
-              AND ANY = @year;
-            """;
-        command.Parameters.AddWithValue("@centerCode", centerCode);
-        command.Parameters.AddWithValue("@year", year);
-        return Convert.ToInt32(await command.ExecuteScalarAsync(cancellationToken));
-    }
+        => await DocumentNumberingSqlHelper.ReserveNextDispositionNumberAsync(
+            connection,
+            transaction,
+            tenantId,
+            companyId,
+            centerCode,
+            year,
+            cancellationToken);
 
     private static (decimal TotalPieces, decimal TotalKilograms) CalculateTotals(IEnumerable<SaveDisposicionLineInput> lines)
     {

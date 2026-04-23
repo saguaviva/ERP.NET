@@ -48,7 +48,7 @@ else
             <span class="results-summary">
                 @(totalCount == 0
                     ? L("Sin resultados", "Sense resultats", "No results")
-                    : L($"Mostrando {PageStart}-{PageEnd} de {totalCount} traspasos", $"Mostrant {PageStart}-{PageEnd} de {totalCount} traspassos", $"Showing {PageStart}-{PageEnd} of {totalCount} transfers"))
+                    : L($"Mostrando {PageStart.ToUiString("N0")}-{PageEnd.ToUiString("N0")} de {totalCount.ToUiString("N0")} traspasos", $"Mostrant {PageStart.ToUiString("N0")}-{PageEnd.ToUiString("N0")} de {totalCount.ToUiString("N0")} traspassos", $"Showing {PageStart.ToUiString("N0")}-{PageEnd.ToUiString("N0")} of {totalCount.ToUiString("N0")} transfers"))
             </span>
             <label class="field compact-field">
                 <span>@L("Tamaño de página", "Mida de pàgina", "Page size")</span>
@@ -80,7 +80,7 @@ else
             <p class="muted">@L("completados en página", "completats a la pàgina", "completed on page")</p>
         </section>
         <section class="info-card accent-card">
-            <h2>@items.Sum(item => item.TotalQuantity).ToString("0.###")</h2>
+            <h2>@items.Sum(item => item.TotalQuantity).ToUiString("0.###")</h2>
             <p class="muted">@L("cantidad total en página", "quantitat total a la pàgina", "total quantity on page")</p>
         </section>
     </div>
@@ -141,7 +141,7 @@ else
                             <td>@DisplayValue(item.FromWarehouse)</td>
                             <td>@DisplayValue(item.ToWarehouse)</td>
                             <td>@item.LineCount</td>
-                            <td>@item.TotalQuantity.ToString("0.###")</td>
+                            <td>@item.TotalQuantity.ToUiString("0.###")</td>
                             <td>
                                 <a class="inline-link" href="/almacen/traspasos/editar/@item.TransferNumber">@L("Abrir", "Obrir", "Open")</a>
                             </td>

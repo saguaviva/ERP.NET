@@ -1,0 +1,372 @@
+@page "/base-datos/mailing/nuevo"
+@page "/base-datos/mailing/editar/{CampaignId:guid}"
+@attribute [Authorize]
+@using Erp.Application.Mailing
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IMailingCampaignQueries MailingQueries
+@inject IMailingCampaignService MailingService
+@inject NavigationManager NavigationManager
+@inject AppText T
+
+<PageTitle>@(CampaignId.HasValue ? L("Editar mailing", "Editar mailing", "Edit mailing") : L("Nuevo mailing", "Nou mailing", "New mailing"))</PageTitle>
+
+<div class="page-header">
+    <div>
+        <p class="eyebrow">@T["menu.base"]</p>
+        <h1>@(CampaignId.HasValue ? L("Editar mailing", "Editar mailing", "Edit mailing") : L("Nuevo mailing", "Nou mailing", "New mailing"))</h1>
+        <p class="lead">@L("Replica el flujo de cartas del legacy: define el colectivo, selecciona destinatarios y congela la versión imprimible en la SaaS local.", "Replica el flux de cartes del legacy: defineix el col·lectiu, selecciona destinataris i congela la versió imprimible a la SaaS local.", "Replicate the legacy mailing flow: choose the audience, select recipients and freeze the printable version in the local SaaS.")</p>
+    </div>
+    <div class="quick-links">
+        @if (CampaignId.HasValue)
+        {
+            <a class="secondary-button" href="@($"/base-datos/mailing/{CampaignId.Value}/imprimir")">@L("Imprimir / guardar PDF", "Imprimir / desar PDF", "Print / save PDF")</a>
+        }
+        <a class="secondary-button" href="/base-datos/mailing">@L("Volver al listado", "Tornar al llistat", "Back to list")</a>
+        <button class="primary-button" type="button" @onclick="SaveAsync" disabled="@isSaving">@((isSaving ? L("Guardando...", "Desant...", "Saving...") : L("Guardar mailing", "Desar mailing", "Save mailing")))</button>
+    </div>
+</div>
+
+@if (!tenantId.HasValue || !companyId.HasValue)
+{
+    <div class="empty-state">
+        <p>@L("Selecciona una empresa activa para editar mailing.", "Selecciona una empresa activa per editar mailing.", "Select an active company to edit mailing.")</p>
+    </div>
+}
+else
+{
+    @if (!string.IsNullOrWhiteSpace(statusMessage))
+    {
+        <div class="alert @(isError ? "danger" : "success")">@statusMessage</div>
+    }
+
+    @if (isLoading)
+    {
+        <section class="panel">
+            <div class="loading-banner">
+                <span class="loading-indicator" aria-hidden="true"></span>
+                <span>@L("Cargando mailing...", "Carregant mailing...", "Loading mailing...")</span>
+            </div>
+        </section>
+    }
+    else
+    {
+        <section class="panel">
+            <div class="form-grid">
+                <label class="field">
+                    <span>@L("Título", "Títol", "Title")</span>
+                    <input class="text-input" @bind="title" />
+                </label>
+                <label class="field">
+                    <span>@L("Colectivo", "Col·lectiu", "Audience")</span>
+                    <select class="text-input" value="@sourceType" @onchange="OnSourceTypeChanged">
+                        @foreach (var option in MailingSourceTypes.OrderedTypes)
+                        {
+                            <option value="@option">@GetSourceLabel(option)</option>
+                        }
+                    </select>
+                </label>
+                <label class="field wide">
+                    <span>@L("Notas", "Notes", "Notes")</span>
+                    <input class="text-input" @bind="notes" />
+                </label>
+                <label class="field wide">
+                    <span>@L("Texto del mailing", "Text del mailing", "Mailing text")</span>
+                    <InputTextArea class="text-input" @bind-Value="bodyText" rows="10" />
+                </label>
+            </div>
+
+            <div class="alert" style="margin-top: 1rem;">
+                @L("Marcadores disponibles: {Name}, {TaxId}, {Address}, {PostalCode}, {City}, {Province}, {Email}.", "Marcadors disponibles: {Name}, {TaxId}, {Address}, {PostalCode}, {City}, {Province}, {Email}.", "Available placeholders: {Name}, {TaxId}, {Address}, {PostalCode}, {City}, {Province}, {Email}.")
+            </div>
+        </section>
+
+        <section class="panel" style="margin-top: 1rem;">
+            <div class="detail-panel-header">
+                <div>
+                    <h2>@L("Destinatarios", "Destinataris", "Recipients")</h2>
+                    <p class="muted">@L("Puedes guardar una tirada para todos o congelar una selección manual, igual que en el legacy.", "Pots desar una tirada per a tots o congelar una selecció manual, igual que al legacy.", "You can save a run for everyone or freeze a manual selection, just like in the legacy.")</p>
+                </div>
+            </div>
+
+            <div class="filter-grid">
+                <label class="field">
+                    <span>@L("Modo", "Mode", "Mode")</span>
+                    <select class="text-input" @bind="selectionMode">
+                        <option value="all">@L("Todos los destinatarios del colectivo", "Tots els destinataris del col·lectiu", "All recipients in the audience")</option>
+                        <option value="manual">@L("Selección manual", "Selecció manual", "Manual selection")</option>
+                    </select>
+                </label>
+                <label class="field">
+                    <span>@L("Buscar destinatarios", "Buscar destinataris", "Search recipients")</span>
+                    <input class="text-input" @bind="recipientSearch" />
+                </label>
+            </div>
+
+            <div class="quick-links" style="margin-top: 1rem;">
+                <button class="secondary-button" type="button" @onclick="LoadRecipientsAsync">@L("Buscar destinatarios", "Buscar destinataris", "Search recipients")</button>
+                @if (IsManualSelection)
+                {
+                    <button class="secondary-button" type="button" @onclick="SelectVisibleRecipients">@L("Seleccionar visibles", "Seleccionar visibles", "Select visible")</button>
+                    <button class="secondary-button" type="button" @onclick="ClearVisibleRecipients">@L("Quitar visibles", "Treure visibles", "Clear visible")</button>
+                    <button class="secondary-button" type="button" @onclick="ClearAllRecipients">@L("Vaciar selección", "Buidar selecció", "Clear selection")</button>
+                }
+            </div>
+
+            <section class="card-grid" style="margin-top: 1rem;">
+                <article class="info-card">
+                    <p class="eyebrow">@L("Modo", "Mode", "Mode")</p>
+                    <h2>@(IsManualSelection ? L("Manual", "Manual", "Manual") : L("Todos", "Tots", "All"))</h2>
+                    <p class="muted">@L("Define si congelas una selección concreta o todo el colectivo actual.", "Defineix si congeles una selecció concreta o tot el col·lectiu actual.", "Choose whether to freeze a specific selection or the whole current audience.")</p>
+                </article>
+                <article class="info-card">
+                    <p class="eyebrow">@L("Seleccionados", "Seleccionats", "Selected")</p>
+                    <h2>@selectedRecipientCodes.Count</h2>
+                    <p class="muted">@L("Solo aplica cuando trabajas con selección manual.", "Només aplica quan treballes amb selecció manual.", "Only applies when using manual selection.")</p>
+                </article>
+                <article class="info-card">
+                    <p class="eyebrow">@L("Resultados visibles", "Resultats visibles", "Visible results")</p>
+                    <h2>@recipientResult.TotalCount</h2>
+                    <p class="muted">@L("La búsqueda de destinatarios trabaja sobre la empresa activa.", "La cerca de destinataris treballa sobre l'empresa activa.", "Recipient search runs against the active company.")</p>
+                </article>
+            </section>
+
+            @if (IsManualSelection)
+            {
+                <div class="table-scroll" style="margin-top: 1rem;">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th>@L("Código", "Codi", "Code")</th>
+                                <th>@L("Nombre", "Nom", "Name")</th>
+                                <th>@L("Población", "Població", "City")</th>
+                                <th>@L("Email", "Email", "Email")</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (recipientResult.Items.Count == 0)
+                            {
+                                <tr>
+                                    <td colspan="5" class="table-empty">@L("No hay destinatarios con este filtro.", "No hi ha destinataris amb aquest filtre.", "There are no recipients matching this filter.")</td>
+                                </tr>
+                            }
+                            else
+                            {
+                                @foreach (var recipient in recipientResult.Items)
+                                {
+                                    <tr>
+                                        <td>
+                                            <input type="checkbox" checked="@selectedRecipientCodes.Contains(recipient.Code)" @onchange="args => ToggleRecipient(recipient.Code, args.Value)" />
+                                        </td>
+                                        <td>@recipient.Code</td>
+                                        <td>
+                                            <div class="table-primary">@recipient.Name</div>
+                                            <div class="table-secondary">@recipient.TaxId</div>
+                                        </td>
+                                        <td>@recipient.City</td>
+                                        <td>@recipient.Email</td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </section>
+    }
+}
+
+@code {
+    [Parameter] public Guid? CampaignId { get; set; }
+
+    private Guid? tenantId;
+    private Guid? companyId;
+    private bool isLoading = true;
+    private bool isSaving;
+    private bool isError;
+    private string statusMessage = string.Empty;
+    private string title = string.Empty;
+    private string sourceType = MailingSourceTypes.Clients;
+    private string notes = string.Empty;
+    private string bodyText = string.Empty;
+    private string selectionMode = "all";
+    private string recipientSearch = string.Empty;
+    private MailingRecipientSearchResultDto recipientResult = new();
+    private HashSet<int> selectedRecipientCodes = [];
+
+    private bool IsManualSelection => string.Equals(selectionMode, "manual", StringComparison.OrdinalIgnoreCase);
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        tenantId = user.GetTenantId();
+        companyId = user.GetActiveCompanyId();
+        await LoadAsync();
+    }
+
+    private async Task LoadAsync()
+    {
+        isLoading = true;
+        statusMessage = string.Empty;
+        isError = false;
+        selectedRecipientCodes = [];
+
+        if (!tenantId.HasValue || !companyId.HasValue)
+        {
+            isLoading = false;
+            return;
+        }
+
+        try
+        {
+            if (CampaignId.HasValue)
+            {
+                var detail = await MailingQueries.GetByIdAsync(tenantId.Value, companyId.Value, CampaignId.Value);
+                if (detail is null)
+                {
+                    throw new InvalidOperationException(L("No se ha encontrado el mailing.", "No s'ha trobat el mailing.", "The mailing could not be found."));
+                }
+
+                title = detail.Title;
+                sourceType = detail.SourceType;
+                notes = detail.Notes;
+                bodyText = detail.BodyText;
+                selectionMode = detail.IncludeAllRecipients ? "all" : "manual";
+                selectedRecipientCodes = detail.Recipients.Select(item => item.Code).ToHashSet();
+            }
+            else
+            {
+                title = string.Empty;
+                sourceType = MailingSourceTypes.Clients;
+                notes = string.Empty;
+                bodyText = L("Estimado/a {Name},\n\nNos ponemos en contacto contigo para compartir esta comunicación.\n\nAtentamente,", "Benvolgut/da {Name},\n\nEns posem en contacte amb tu per compartir aquesta comunicació.\n\nAtentament,", "Dear {Name},\n\nWe are reaching out to share this communication with you.\n\nKind regards,");
+                selectionMode = "all";
+            }
+
+            await LoadRecipientsAsync();
+        }
+        catch (Exception exception)
+        {
+            isError = true;
+            statusMessage = exception.Message;
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private async Task LoadRecipientsAsync()
+    {
+        if (!tenantId.HasValue || !companyId.HasValue)
+        {
+            recipientResult = new MailingRecipientSearchResultDto();
+            return;
+        }
+
+        recipientResult = await MailingQueries.SearchRecipientsAsync(tenantId.Value, companyId.Value, new MailingRecipientFilter
+        {
+            SourceType = sourceType,
+            Search = recipientSearch,
+            Page = 1,
+            PageSize = 200
+        });
+    }
+
+    private async Task SaveAsync()
+    {
+        if (!tenantId.HasValue || !companyId.HasValue)
+        {
+            return;
+        }
+
+        isSaving = true;
+        statusMessage = string.Empty;
+        isError = false;
+
+        try
+        {
+            var campaignId = await MailingService.SaveAsync(new SaveMailingCampaignCommand
+            {
+                TenantId = tenantId.Value,
+                CompanyId = companyId.Value,
+                CampaignId = CampaignId,
+                Title = title,
+                SourceType = sourceType,
+                Notes = notes,
+                BodyText = bodyText,
+                IncludeAllRecipients = !IsManualSelection,
+                RecipientCodes = selectedRecipientCodes.OrderBy(item => item).ToArray()
+            });
+
+            statusMessage = L("Mailing guardado correctamente.", "Mailing desat correctament.", "Mailing saved successfully.");
+            CampaignId = campaignId;
+            NavigationManager.NavigateTo($"/base-datos/mailing/editar/{campaignId}", forceLoad: false);
+        }
+        catch (Exception exception)
+        {
+            isError = true;
+            statusMessage = exception.Message;
+        }
+        finally
+        {
+            isSaving = false;
+        }
+    }
+
+    private async Task OnSourceTypeChanged(ChangeEventArgs args)
+    {
+        sourceType = MailingSourceTypes.Normalize(args.Value?.ToString());
+        selectedRecipientCodes.Clear();
+
+        await LoadRecipientsAsync();
+    }
+
+    private void ToggleRecipient(int code, object? rawValue)
+    {
+        var isChecked = rawValue is bool booleanValue && booleanValue;
+        if (isChecked)
+        {
+            selectedRecipientCodes.Add(code);
+        }
+        else
+        {
+            selectedRecipientCodes.Remove(code);
+        }
+    }
+
+    private void SelectVisibleRecipients()
+    {
+        foreach (var recipient in recipientResult.Items)
+        {
+            selectedRecipientCodes.Add(recipient.Code);
+        }
+    }
+
+    private void ClearVisibleRecipients()
+    {
+        foreach (var recipient in recipientResult.Items)
+        {
+            selectedRecipientCodes.Remove(recipient.Code);
+        }
+    }
+
+    private void ClearAllRecipients() => selectedRecipientCodes.Clear();
+
+    private string GetSourceLabel(string value) => MailingSourceTypes.Normalize(value) switch
+    {
+        MailingSourceTypes.Suppliers => L("Proveedores", "Proveïdors", "Suppliers"),
+        MailingSourceTypes.Representatives => L("Representantes", "Representants", "Representatives"),
+        MailingSourceTypes.Carriers => L("Transportistas", "Transportistes", "Carriers"),
+        _ => L("Clientes", "Clients", "Clients")
+    };
+
+    private string L(string spanish, string catalan, string english) =>
+        T.CurrentLanguage switch
+        {
+            AppLanguages.Catalan => catalan,
+            AppLanguages.English => english,
+            _ => spanish
+        };
+}

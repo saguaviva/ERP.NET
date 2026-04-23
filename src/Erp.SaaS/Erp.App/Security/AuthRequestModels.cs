@@ -37,3 +37,9 @@ public sealed class SetLanguageForm
     public string Culture { get; set; } = string.Empty;
     public string? ReturnUrl { get; set; }
 }
+
+public sealed class SetOutputLanguageForm
+{
+    public string Culture { get; set; } = string.Empty;
+    public string? ReturnUrl { get; set; }
+}

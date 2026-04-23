@@ -4,24 +4,25 @@
 @inject IClienteQueries ClienteQueries
 @inject IClienteService ClienteService
 @inject ILegacySyncService LegacySyncService
+@inject AppText T
 
-<PageTitle>Bandeja de duplicados</PageTitle>
+<PageTitle>@L("Bandeja de duplicados", "Safata de duplicats", "Duplicate inbox")</PageTitle>
 
 <div class="page-header">
     <div>
-        <p class="eyebrow">CRM</p>
-        <h1>Bandeja de duplicados</h1>
-        <p class="lead">Revisión en bloque de coincidencias detectadas por NIF, email, nombre o teléfono.</p>
+        <p class="eyebrow">@L("CRM", "CRM", "CRM")</p>
+        <h1>@L("Bandeja de duplicados", "Safata de duplicats", "Duplicate inbox")</h1>
+        <p class="lead">@L("Revisión en bloque de coincidencias detectadas por NIF, email, nombre o teléfono.", "Revisió en bloc de coincidències detectades per NIF, correu, nom o telèfon.", "Bulk review of matches detected by tax ID, email, name or phone.")</p>
     </div>
     <div class="quick-links">
-        <a class="secondary-button link-button" href="/crm/clientes">Volver a clientes</a>
+        <a class="secondary-button link-button" href="/crm/clientes">@L("Volver a clientes", "Tornar a clients", "Back to clients")</a>
     </div>
 </div>
 
 @if (!tenantId.HasValue || !companyId.HasValue)
 {
     <div class="empty-state">
-        <p>No hay empresa activa seleccionada.</p>
+        <p>@L("No hay empresa activa seleccionada.", "No hi ha cap empresa activa seleccionada.", "No active company selected.")</p>
     </div>
 }
 else
@@ -34,8 +35,8 @@ else
     @if (isLegacySyncActive)
     {
         <div class="alert">
-            CRM / Clientes está en convivencia con legacy para esta empresa.
-            La bandeja sigue siendo operativa en la SaaS local. La sync manual solo refresca registros legacy y no pisa tus revisiones ni propuestas locales.
+            @L("CRM / Clientes está en convivencia con legacy para esta empresa.", "CRM / Clients està en convivència amb legacy per a aquesta empresa.", "CRM / Clients is running alongside legacy for this company.")
+            @L("La bandeja sigue siendo operativa en la SaaS local. La sync manual solo refresca registros legacy y no pisa tus revisiones ni propuestas locales.", "La safata continua sent operativa a la SaaS local. La sync manual només refresca registres legacy i no trepitja les teves revisions ni propostes locals.", "The inbox remains operational in the local SaaS. Manual sync only refreshes legacy records and does not overwrite your local reviews or proposals.")
             @if (!string.IsNullOrWhiteSpace(syncStatusLabel))
             {
                 <span>@syncStatusLabel</span>
@@ -45,40 +46,40 @@ else
 
     <section class="card-grid">
         <article class="info-card">
-            <p class="eyebrow">Pendientes</p>
+            <p class="eyebrow">@L("Pendientes", "Pendents", "Pending")</p>
             <h2>@pairs.Count(IsOpen)</h2>
-            <p class="muted">Parejas sin revisar todavía.</p>
+            <p class="muted">@L("Parejas sin revisar todavía.", "Parelles encara sense revisar.", "Pairs not reviewed yet.")</p>
         </article>
         <article class="info-card">
-            <p class="eyebrow">Conflictos duros</p>
+            <p class="eyebrow">@L("Conflictos duros", "Conflictes durs", "Hard conflicts")</p>
             <h2>@pairs.Count(pair => pair.IsHardConflict)</h2>
-            <p class="muted">Coincidencias por NIF o email.</p>
+            <p class="muted">@L("Coincidencias por NIF o email.", "Coincidències per NIF o correu.", "Matches by tax ID or email.")</p>
         </article>
         <article class="info-card">
-            <p class="eyebrow">Falsos positivos</p>
+            <p class="eyebrow">@L("Falsos positivos", "Falsos positius", "False positives")</p>
             <h2>@pairs.Count(IsFalsePositive)</h2>
-            <p class="muted">Parejas descartadas manualmente.</p>
+            <p class="muted">@L("Parejas descartadas manualmente.", "Parelles descartades manualment.", "Pairs manually discarded.")</p>
         </article>
         <article class="info-card">
-            <p class="eyebrow">Principal propuesto</p>
+            <p class="eyebrow">@L("Principal propuesto", "Principal proposat", "Suggested principal")</p>
             <h2>@pairs.Count(HasPreferredPrincipal)</h2>
-            <p class="muted">Parejas con candidato de consolidación.</p>
+            <p class="muted">@L("Parejas con candidato de consolidación.", "Parelles amb candidat de consolidació.", "Pairs with a consolidation candidate.")</p>
         </article>
     </section>
 
     <section class="panel">
         <div class="filter-row">
-            <button class="@(inboxFilter == InboxFilterMode.Open ? "primary-button" : "secondary-button")" @onclick="() => SetInboxFilter(InboxFilterMode.Open)">Abiertos (@pairs.Count(IsOpen))</button>
-            <button class="@(inboxFilter == InboxFilterMode.Reviewed ? "primary-button" : "secondary-button")" @onclick="() => SetInboxFilter(InboxFilterMode.Reviewed)">Revisados (@pairs.Count(IsReviewed))</button>
-            <button class="@(inboxFilter == InboxFilterMode.FalsePositive ? "primary-button" : "secondary-button")" @onclick="() => SetInboxFilter(InboxFilterMode.FalsePositive)">Falsos positivos (@pairs.Count(IsFalsePositive))</button>
-            <button class="@(inboxFilter == InboxFilterMode.All ? "primary-button" : "secondary-button")" @onclick="() => SetInboxFilter(InboxFilterMode.All)">Todos (@pairs.Count)</button>
+            <button class="@(inboxFilter == InboxFilterMode.Open ? "primary-button" : "secondary-button")" @onclick="() => SetInboxFilter(InboxFilterMode.Open)">@L("Abiertos", "Oberts", "Open") (@pairs.Count(IsOpen))</button>
+            <button class="@(inboxFilter == InboxFilterMode.Reviewed ? "primary-button" : "secondary-button")" @onclick="() => SetInboxFilter(InboxFilterMode.Reviewed)">@L("Revisados", "Revisats", "Reviewed") (@pairs.Count(IsReviewed))</button>
+            <button class="@(inboxFilter == InboxFilterMode.FalsePositive ? "primary-button" : "secondary-button")" @onclick="() => SetInboxFilter(InboxFilterMode.FalsePositive)">@L("Falsos positivos", "Falsos positius", "False positives") (@pairs.Count(IsFalsePositive))</button>
+            <button class="@(inboxFilter == InboxFilterMode.All ? "primary-button" : "secondary-button")" @onclick="() => SetInboxFilter(InboxFilterMode.All)">@L("Todos", "Tots", "All") (@pairs.Count)</button>
         </div>
         <div class="filter-row" style="margin-top: 0.85rem;">
-            <input class="text-input" @bind="SearchText" @bind:event="oninput" placeholder="Buscar por código, nombre, NIF, email, teléfono o revisor" />
-            <button class="@(conflictFilter == ConflictFilterMode.All ? "primary-button" : "secondary-button")" @onclick="() => SetConflictFilter(ConflictFilterMode.All)">Todos</button>
-            <button class="@(conflictFilter == ConflictFilterMode.Hard ? "primary-button" : "secondary-button")" @onclick="() => SetConflictFilter(ConflictFilterMode.Hard)">Solo duros</button>
-            <button class="@(conflictFilter == ConflictFilterMode.Soft ? "primary-button" : "secondary-button")" @onclick="() => SetConflictFilter(ConflictFilterMode.Soft)">Solo revisión manual</button>
-            <button class="secondary-button" @onclick="LoadAsync">Recargar</button>
+            <input class="text-input" @bind="SearchText" @bind:event="oninput" placeholder="@L("Buscar por código, nombre, NIF, email, teléfono o revisor", "Buscar per codi, nom, NIF, correu, telèfon o revisor", "Search by code, name, tax ID, email, phone or reviewer")" />
+            <button class="@(conflictFilter == ConflictFilterMode.All ? "primary-button" : "secondary-button")" @onclick="() => SetConflictFilter(ConflictFilterMode.All)">@L("Todos", "Tots", "All")</button>
+            <button class="@(conflictFilter == ConflictFilterMode.Hard ? "primary-button" : "secondary-button")" @onclick="() => SetConflictFilter(ConflictFilterMode.Hard)">@L("Solo duros", "Només durs", "Hard only")</button>
+            <button class="@(conflictFilter == ConflictFilterMode.Soft ? "primary-button" : "secondary-button")" @onclick="() => SetConflictFilter(ConflictFilterMode.Soft)">@L("Solo revisión manual", "Només revisió manual", "Manual review only")</button>
+            <button class="secondary-button" @onclick="LoadAsync">@L("Recargar", "Recarregar", "Reload")</button>
         </div>
     </section>
 
@@ -86,7 +87,7 @@ else
         <div class="list-block">
             @if (filteredPairs.Count == 0)
             {
-                <p class="muted">No hay duplicados para el filtro seleccionado.</p>
+                <p class="muted">@L("No hay duplicados para el filtro seleccionado.", "No hi ha duplicats per al filtre seleccionat.", "There are no duplicates for the selected filter.")</p>
             }
             else
             {
@@ -101,7 +102,9 @@ else
                             </strong>
                             <div class="filter-row">
                                 <span class="status-pill @(pair.IsHardConflict ? "danger" : "warning")">
-                                    @(pair.IsHardConflict ? "Conflicto duro" : "Revisión manual")
+                                    @(pair.IsHardConflict
+                                        ? L("Conflicto duro", "Conflicte dur", "Hard conflict")
+                                        : L("Revisión manual", "Revisió manual", "Manual review"))
                                 </span>
                                 <span class="status-pill @GetReviewStatusCss(pair)">
                                     @GetReviewStatusLabel(pair)
@@ -115,25 +118,27 @@ else
                         <div class="quick-links">
                             @if (canEdit)
                             {
-                                <a class="inline-link" href="/crm/clientes/editar/@pair.LeftCode">Abrir @pair.LeftCode</a>
-                                <a class="inline-link" href="/crm/clientes/editar/@pair.RightCode">Abrir @pair.RightCode</a>
+                                <a class="inline-link" href="/crm/clientes/editar/@pair.LeftCode">@L("Abrir", "Obrir", "Open") @pair.LeftCode</a>
+                                <a class="inline-link" href="/crm/clientes/editar/@pair.RightCode">@L("Abrir", "Obrir", "Open") @pair.RightCode</a>
                             }
                             else
                             {
-                                <span class="muted">Sin permiso de edición</span>
+                                <span class="muted">@L("Sin permiso de edición", "Sense permís d'edició", "No edit permission")</span>
                             }
                             <button class="secondary-button" type="button" @onclick="() => ToggleComparisonAsync(pair)">
-                                @(IsComparisonExpanded(pair) ? "Ocultar comparativa" : "Comparar lado a lado")
+                                @(IsComparisonExpanded(pair)
+                                    ? L("Ocultar comparativa", "Amagar comparativa", "Hide comparison")
+                                    : L("Comparar lado a lado", "Comparar costat a costat", "Compare side by side"))
                             </button>
                         </div>
                         @if (canEdit)
                         {
                             <div class="quick-links">
-                                <button class="secondary-button" type="button" @onclick="() => SetReviewAsync(pair, ClienteDuplicateReviewStatus.Reviewed)">Marcar revisado</button>
-                                <button class="secondary-button" type="button" @onclick="() => SetReviewAsync(pair, ClienteDuplicateReviewStatus.FalsePositive)">Falso positivo</button>
+                                <button class="secondary-button" type="button" @onclick="() => SetReviewAsync(pair, ClienteDuplicateReviewStatus.Reviewed)">@L("Marcar revisado", "Marcar revisat", "Mark reviewed")</button>
+                                <button class="secondary-button" type="button" @onclick="() => SetReviewAsync(pair, ClienteDuplicateReviewStatus.FalsePositive)">@L("Falso positivo", "Fals positiu", "False positive")</button>
                                 @if (!string.IsNullOrWhiteSpace(pair.ReviewStatus))
                                 {
-                                    <button class="secondary-button" type="button" @onclick="() => ClearReviewAsync(pair)">Quitar marca</button>
+                                    <button class="secondary-button" type="button" @onclick="() => ClearReviewAsync(pair)">@L("Quitar marca", "Treure marca", "Clear mark")</button>
                                 }
                             </div>
                         }
@@ -145,7 +150,7 @@ else
                             <section class="panel comparison-panel">
                                 @if (comparison is null || comparison.IsLoading)
                                 {
-                                    <p class="muted">Cargando comparativa...</p>
+                                    <p class="muted">@L("Cargando comparativa...", "Carregant comparativa...", "Loading comparison...")</p>
                                 }
                                 else if (!string.IsNullOrWhiteSpace(comparison.ErrorMessage))
                                 {
@@ -153,74 +158,74 @@ else
                                 }
                                 else if (comparison.Left is null || comparison.Right is null)
                                 {
-                                    <p class="muted">No se ha podido cargar uno de los dos clientes.</p>
+                                    <p class="muted">@L("No se ha podido cargar uno de los dos clientes.", "No s'ha pogut carregar un dels dos clients.", "One of the two clients could not be loaded.")</p>
                                 }
                                 else
                                 {
                                     <div class="comparison-grid">
                                         <article class="info-card">
-                                            <p class="eyebrow">Cliente @comparison.Left.Code</p>
+                                            <p class="eyebrow">@L("Cliente", "Client", "Client") @comparison.Left.Code</p>
                                             <h2>@comparison.Left.Name</h2>
                                             @if (IsPreferredPrincipal(pair, comparison.Left.Code))
                                             {
-                                                <span class="status-pill success">Principal propuesto</span>
+                                                <span class="status-pill success">@L("Principal propuesto", "Principal proposat", "Suggested principal")</span>
                                             }
                                             @if (canEdit)
                                             {
                                                 <div class="quick-links">
-                                                    <button class="secondary-button" type="button" @onclick="() => SetPreferredPrincipalAsync(pair, comparison.Left.Code!.Value)">Proponer como principal</button>
+                                                    <button class="secondary-button" type="button" @onclick="() => SetPreferredPrincipalAsync(pair, comparison.Left.Code!.Value)">@L("Proponer como principal", "Proposar com a principal", "Suggest as principal")</button>
                                                 </div>
                                             }
                                             <div class="stack comparison-fields">
-                                                @RenderField("NIF", comparison.Left.TaxId, comparison.Right.TaxId)
-                                                @RenderField("Contacto", comparison.Left.ContactName, comparison.Right.ContactName)
-                                                @RenderField("Teléfono", comparison.Left.Phone, comparison.Right.Phone)
+                                                @RenderField(L("NIF", "NIF", "Tax ID"), comparison.Left.TaxId, comparison.Right.TaxId)
+                                                @RenderField(L("Contacto", "Contacte", "Contact"), comparison.Left.ContactName, comparison.Right.ContactName)
+                                                @RenderField(L("Teléfono", "Telèfon", "Phone"), comparison.Left.Phone, comparison.Right.Phone)
                                                 @RenderField("Fax", comparison.Left.Fax, comparison.Right.Fax)
-                                                @RenderField("Email principal", comparison.Left.PrimaryEmail, comparison.Right.PrimaryEmail)
-                                                @RenderField("Email secundario", comparison.Left.SecondaryEmail, comparison.Right.SecondaryEmail)
-                                                @RenderField("Dirección", comparison.Left.Address, comparison.Right.Address)
-                                                @RenderField("Código postal", comparison.Left.PostalCode, comparison.Right.PostalCode)
-                                                @RenderField("Ciudad", comparison.Left.City, comparison.Right.City)
-                                                @RenderField("Provincia", comparison.Left.Province, comparison.Right.Province)
-                                                @RenderField("País", comparison.Left.Country, comparison.Right.Country)
+                                                @RenderField(L("Email principal", "Email principal", "Primary email"), comparison.Left.PrimaryEmail, comparison.Right.PrimaryEmail)
+                                                @RenderField(L("Email secundario", "Email secundari", "Secondary email"), comparison.Left.SecondaryEmail, comparison.Right.SecondaryEmail)
+                                                @RenderField(L("Dirección", "Adreça", "Address"), comparison.Left.Address, comparison.Right.Address)
+                                                @RenderField(L("Código postal", "Codi postal", "Postal code"), comparison.Left.PostalCode, comparison.Right.PostalCode)
+                                                @RenderField(L("Ciudad", "Ciutat", "City"), comparison.Left.City, comparison.Right.City)
+                                                @RenderField(L("Provincia", "Província", "Province"), comparison.Left.Province, comparison.Right.Province)
+                                                @RenderField(L("País", "País", "Country"), comparison.Left.Country, comparison.Right.Country)
                                                 @RenderField("Web", comparison.Left.Website, comparison.Right.Website)
-                                                @RenderField("Notas", comparison.Left.Notes, comparison.Right.Notes, true)
-                                                @RenderField("Estado", comparison.Left.IsBlocked ? "Bloqueado" : "Activo", comparison.Right.IsBlocked ? "Bloqueado" : "Activo")
+                                                @RenderField(L("Notas", "Notes", "Notes"), comparison.Left.Notes, comparison.Right.Notes, true)
+                                                @RenderField(L("Estado", "Estat", "Status"), comparison.Left.IsBlocked ? L("Bloqueado", "Bloquejat", "Blocked") : L("Activo", "Actiu", "Active"), comparison.Right.IsBlocked ? L("Bloqueado", "Bloquejat", "Blocked") : L("Activo", "Actiu", "Active"))
                                             </div>
                                         </article>
 
                                         <article class="info-card">
-                                            <p class="eyebrow">Cliente @comparison.Right.Code</p>
+                                            <p class="eyebrow">@L("Cliente", "Client", "Client") @comparison.Right.Code</p>
                                             <h2>@comparison.Right.Name</h2>
                                             @if (IsPreferredPrincipal(pair, comparison.Right.Code))
                                             {
-                                                <span class="status-pill success">Principal propuesto</span>
+                                                <span class="status-pill success">@L("Principal propuesto", "Principal proposat", "Suggested principal")</span>
                                             }
                                             @if (canEdit)
                                             {
                                                 <div class="quick-links">
-                                                    <button class="secondary-button" type="button" @onclick="() => SetPreferredPrincipalAsync(pair, comparison.Right.Code!.Value)">Proponer como principal</button>
+                                                    <button class="secondary-button" type="button" @onclick="() => SetPreferredPrincipalAsync(pair, comparison.Right.Code!.Value)">@L("Proponer como principal", "Proposar com a principal", "Suggest as principal")</button>
                                                     @if (HasPreferredPrincipal(pair))
                                                     {
-                                                        <button class="secondary-button" type="button" @onclick="() => ClearPreferredPrincipalAsync(pair)">Quitar propuesta</button>
+                                                        <button class="secondary-button" type="button" @onclick="() => ClearPreferredPrincipalAsync(pair)">@L("Quitar propuesta", "Treure proposta", "Clear proposal")</button>
                                                     }
                                                 </div>
                                             }
                                             <div class="stack comparison-fields">
-                                                @RenderField("NIF", comparison.Right.TaxId, comparison.Left.TaxId)
-                                                @RenderField("Contacto", comparison.Right.ContactName, comparison.Left.ContactName)
-                                                @RenderField("Teléfono", comparison.Right.Phone, comparison.Left.Phone)
+                                                @RenderField(L("NIF", "NIF", "Tax ID"), comparison.Right.TaxId, comparison.Left.TaxId)
+                                                @RenderField(L("Contacto", "Contacte", "Contact"), comparison.Right.ContactName, comparison.Left.ContactName)
+                                                @RenderField(L("Teléfono", "Telèfon", "Phone"), comparison.Right.Phone, comparison.Left.Phone)
                                                 @RenderField("Fax", comparison.Right.Fax, comparison.Left.Fax)
-                                                @RenderField("Email principal", comparison.Right.PrimaryEmail, comparison.Left.PrimaryEmail)
-                                                @RenderField("Email secundario", comparison.Right.SecondaryEmail, comparison.Left.SecondaryEmail)
-                                                @RenderField("Dirección", comparison.Right.Address, comparison.Left.Address)
-                                                @RenderField("Código postal", comparison.Right.PostalCode, comparison.Left.PostalCode)
-                                                @RenderField("Ciudad", comparison.Right.City, comparison.Left.City)
-                                                @RenderField("Provincia", comparison.Right.Province, comparison.Left.Province)
-                                                @RenderField("País", comparison.Right.Country, comparison.Left.Country)
+                                                @RenderField(L("Email principal", "Email principal", "Primary email"), comparison.Right.PrimaryEmail, comparison.Left.PrimaryEmail)
+                                                @RenderField(L("Email secundario", "Email secundari", "Secondary email"), comparison.Right.SecondaryEmail, comparison.Left.SecondaryEmail)
+                                                @RenderField(L("Dirección", "Adreça", "Address"), comparison.Right.Address, comparison.Left.Address)
+                                                @RenderField(L("Código postal", "Codi postal", "Postal code"), comparison.Right.PostalCode, comparison.Left.PostalCode)
+                                                @RenderField(L("Ciudad", "Ciutat", "City"), comparison.Right.City, comparison.Left.City)
+                                                @RenderField(L("Provincia", "Província", "Province"), comparison.Right.Province, comparison.Left.Province)
+                                                @RenderField(L("País", "País", "Country"), comparison.Right.Country, comparison.Left.Country)
                                                 @RenderField("Web", comparison.Right.Website, comparison.Left.Website)
-                                                @RenderField("Notas", comparison.Right.Notes, comparison.Left.Notes, true)
-                                                @RenderField("Estado", comparison.Right.IsBlocked ? "Bloqueado" : "Activo", comparison.Left.IsBlocked ? "Bloqueado" : "Activo")
+                                                @RenderField(L("Notas", "Notes", "Notes"), comparison.Right.Notes, comparison.Left.Notes, true)
+                                                @RenderField(L("Estado", "Estat", "Status"), comparison.Right.IsBlocked ? L("Bloqueado", "Bloquejat", "Blocked") : L("Activo", "Actiu", "Active"), comparison.Left.IsBlocked ? L("Bloqueado", "Bloquejat", "Blocked") : L("Activo", "Actiu", "Active"))
                                             </div>
                                         </article>
                                     </div>
@@ -235,6 +240,14 @@ else
 }
 
 @code {
+    private string L(string spanish, string catalan, string english) =>
+        T.CurrentLanguage switch
+        {
+            AppLanguages.Catalan => catalan,
+            AppLanguages.English => english,
+            _ => spanish
+        };
+
     private Guid? tenantId;
     private Guid? companyId;
     private bool canEdit;
@@ -387,8 +400,8 @@ else
 
             await LoadAsync();
             statusMessage = status == ClienteDuplicateReviewStatus.FalsePositive
-                ? "Pareja marcada como falso positivo."
-                : "Pareja marcada como revisada.";
+                ? L("Pareja marcada como falso positivo.", "Parella marcada com a fals positiu.", "Pair marked as false positive.")
+                : L("Pareja marcada como revisada.", "Parella marcada com a revisada.", "Pair marked as reviewed.");
         }
         catch (Exception exception)
         {
@@ -419,7 +432,7 @@ else
             });
 
             await LoadAsync();
-            statusMessage = "Marca eliminada.";
+            statusMessage = L("Marca eliminada.", "Marca eliminada.", "Mark cleared.");
         }
         catch (Exception exception)
         {
@@ -443,7 +456,7 @@ else
     private static bool IsPreferredPrincipal(ClienteDuplicatePairDto pair, int? clientCode) =>
         clientCode.HasValue && pair.PreferredClientCode == clientCode.Value;
 
-    private static string FormatPairSharedData(ClienteDuplicatePairDto pair)
+    private string FormatPairSharedData(ClienteDuplicatePairDto pair)
     {
         var parts = new List<string>();
 
@@ -462,17 +475,21 @@ else
             parts.Add($"Tel={pair.SharedPhone}");
         }
 
-        return parts.Count == 0 ? "Sin dato compartido principal" : string.Join(" · ", parts);
+        return parts.Count == 0 ? L("Sin dato compartido principal", "Sense dada compartida principal", "No primary shared data") : string.Join(" · ", parts);
     }
 
-    private static string FormatPairReview(ClienteDuplicatePairDto pair)
+    private string FormatPairReview(ClienteDuplicatePairDto pair)
     {
         if (string.IsNullOrWhiteSpace(pair.ReviewStatus))
         {
-            return pair.IsHardConflict ? "Pendiente · conflicto duro" : "Pendiente · revisión manual";
+            return pair.IsHardConflict
+                ? L("Pendiente · conflicto duro", "Pendent · conflicte dur", "Pending · hard conflict")
+                : L("Pendiente · revisión manual", "Pendent · revisió manual", "Pending · manual review");
         }
 
-        var status = IsFalsePositive(pair) ? "Falso positivo" : "Revisado";
+        var status = IsFalsePositive(pair)
+            ? L("Falso positivo", "Fals positiu", "False positive")
+            : L("Revisado", "Revisat", "Reviewed");
         if (pair.ReviewUpdatedUtc.HasValue && !string.IsNullOrWhiteSpace(pair.ReviewUpdatedBy))
         {
             return $"{status} por {pair.ReviewUpdatedBy} · {pair.ReviewUpdatedUtc.Value.ToLocalTime():dd/MM/yyyy HH:mm:ss}";
@@ -486,15 +503,15 @@ else
         return status;
     }
 
-    private static string FormatPreferredPrincipal(ClienteDuplicatePairDto pair)
+    private string FormatPreferredPrincipal(ClienteDuplicatePairDto pair)
     {
         if (!pair.PreferredClientCode.HasValue)
         {
-            return "Sin principal propuesto todavía.";
+            return L("Sin principal propuesto todavía.", "Encara sense principal proposat.", "No principal suggested yet.");
         }
 
         var preferredName = pair.PreferredClientCode.Value == pair.LeftCode ? pair.LeftName : pair.RightName;
-        var label = $"Principal propuesto: {pair.PreferredClientCode.Value} · {preferredName}";
+        var label = $"{L("Principal propuesto", "Principal proposat", "Suggested principal")}: {pair.PreferredClientCode.Value} · {preferredName}";
 
         if (pair.PreferredUpdatedUtc.HasValue && !string.IsNullOrWhiteSpace(pair.PreferredUpdatedBy))
         {
@@ -524,19 +541,19 @@ else
         return pair.IsHardConflict ? "danger" : "warning";
     }
 
-    private static string GetReviewStatusLabel(ClienteDuplicatePairDto pair)
+    private string GetReviewStatusLabel(ClienteDuplicatePairDto pair)
     {
         if (IsFalsePositive(pair))
         {
-            return "Falso positivo";
+            return L("Falso positivo", "Fals positiu", "False positive");
         }
 
         if (IsReviewed(pair))
         {
-            return "Revisado";
+            return L("Revisado", "Revisat", "Reviewed");
         }
 
-        return "Pendiente";
+        return L("Pendiente", "Pendent", "Pending");
     }
 
     private async Task ToggleComparisonAsync(ClienteDuplicatePairDto pair)
@@ -564,7 +581,7 @@ else
             {
                 comparisons[key] = new ComparisonState
                 {
-                    ErrorMessage = "No hay empresa activa seleccionada."
+                    ErrorMessage = L("No hay empresa activa seleccionada.", "No hi ha cap empresa activa seleccionada.", "No active company selected.")
                 };
                 return;
             }
@@ -610,7 +627,10 @@ else
             });
 
             await LoadAsync();
-            statusMessage = $"Cliente {preferredClientCode} marcado como principal propuesto.";
+            statusMessage = string.Format(
+                System.Globalization.CultureInfo.CurrentCulture,
+                L("Cliente {0} marcado como principal propuesto.", "Client {0} marcat com a principal proposat.", "Client {0} marked as suggested principal."),
+                preferredClientCode);
         }
         catch (Exception exception)
         {
@@ -641,7 +661,7 @@ else
             });
 
             await LoadAsync();
-            statusMessage = "Propuesta de principal eliminada.";
+            statusMessage = L("Propuesta de principal eliminada.", "Proposta de principal eliminada.", "Principal proposal cleared.");
         }
         catch (Exception exception)
         {
@@ -700,8 +720,8 @@ else
         builder.CloseElement();
     };
 
-    private static string DisplayValue(string? value) =>
-        string.IsNullOrWhiteSpace(value) ? "Sin dato" : value.Trim();
+    private string DisplayValue(string? value) =>
+        string.IsNullOrWhiteSpace(value) ? L("Sin dato", "Sense dada", "No data") : value.Trim();
 
     private static bool AreEquivalent(string? left, string? right) =>
         string.Equals(NormalizeValue(left), NormalizeValue(right), StringComparison.OrdinalIgnoreCase);

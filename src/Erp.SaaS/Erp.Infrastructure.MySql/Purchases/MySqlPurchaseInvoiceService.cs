@@ -1,9 +1,11 @@
 using Erp.Application.Auditing;
 using Erp.Application.Companies;
 using Erp.Application.Contexts;
+using Erp.Application.Numbering;
 using Erp.Application.Purchases;
 using Erp.Domain.Common;
 using Erp.Infrastructure.MySql.Database;
+using Erp.Infrastructure.MySql.Numbering;
 using Erp.Infrastructure.MySql.Support;
 using MySqlConnector;
 
@@ -1336,20 +1338,13 @@ public sealed class MySqlPurchaseInvoiceService : IPurchaseInvoiceQueries, IPurc
         Guid tenantId,
         Guid companyId,
         CancellationToken cancellationToken)
-    {
-        await using var command = connection.CreateCommand();
-        command.Transaction = transaction;
-        command.CommandText =
-            """
-            SELECT COALESCE(MAX(invoice_number), 0) + 1
-            FROM purchase_invoices
-            WHERE tenant_id = @tenantId
-              AND company_id = @companyId;
-            """;
-        command.Parameters.AddWithValue("@tenantId", tenantId.ToString());
-        command.Parameters.AddWithValue("@companyId", companyId.ToString());
-        return Convert.ToInt32(await command.ExecuteScalarAsync(cancellationToken));
-    }
+        => await DocumentNumberingSqlHelper.ReserveNextNumberAsync(
+            connection,
+            transaction,
+            tenantId,
+            companyId,
+            DocumentNumberingKeys.PurchaseInvoice,
+            cancellationToken);
 
     private static async Task<int> GetNextInvoicePaymentNumberAsync(
         MySqlConnection connection,

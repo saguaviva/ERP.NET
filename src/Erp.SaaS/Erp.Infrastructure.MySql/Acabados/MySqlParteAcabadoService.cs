@@ -3,9 +3,11 @@ using Erp.Application.Auditing;
 using Erp.Application.BaseData;
 using Erp.Application.Companies;
 using Erp.Application.Contexts;
+using Erp.Application.Numbering;
 using Erp.Application.Stock;
 using Erp.Domain.Common;
 using Erp.Infrastructure.MySql.Database;
+using Erp.Infrastructure.MySql.Numbering;
 using Erp.Infrastructure.MySql.Support;
 using MySqlConnector;
 
@@ -57,6 +59,8 @@ public sealed class MySqlParteAcabadoService : IParteAcabadoQueries, IParteAcaba
         var sourceSampleKind = ParteAcabadoSourceKinds.Normalize(filter.SourceSampleKind);
         var sourceSampleCode = filter.SourceSampleCode?.Trim() ?? string.Empty;
         var liveOnly = filter.LiveOnly;
+        var sampleWorkflowOnly = filter.SampleWorkflowOnly;
+        var modelWorkflowOnly = filter.ModelWorkflowOnly;
 
         await using var connection = await _connectionFactory.OpenConnectionAsync(cancellationToken);
 
@@ -76,6 +80,8 @@ public sealed class MySqlParteAcabadoService : IParteAcabadoQueries, IParteAcaba
               AND (@sourceSampleKind = '' OR header.source_sample_kind = @sourceSampleKind)
               AND (@sourceSampleCode = '' OR header.source_sample_code = @sourceSampleCode)
               AND (@liveOnly = 0 OR header.status IN ('Pending', 'InProgress'))
+              AND (@sampleWorkflowOnly = 0 OR header.source_sample_kind IN ('sample', 'complement'))
+              AND (@modelWorkflowOnly = 0 OR header.source_sample_kind = 'model')
               AND (
                     @search = ''
                     OR CAST(header.order_number AS CHAR) LIKE @likeSearch
@@ -95,7 +101,7 @@ public sealed class MySqlParteAcabadoService : IParteAcabadoQueries, IParteAcaba
                     OR COALESCE(header.notes, '') LIKE @likeSearch
                   );
             """;
-        FillSearchParameters(countCommand, tenantId, companyId, centerCode, search, likeSearch, status, finisherCode, machineCode, operationCode, sourceSampleKind, sourceSampleCode, liveOnly);
+        FillSearchParameters(countCommand, tenantId, companyId, centerCode, search, likeSearch, status, finisherCode, machineCode, operationCode, sourceSampleKind, sourceSampleCode, liveOnly, sampleWorkflowOnly, modelWorkflowOnly);
         var totalCount = Convert.ToInt32(await countCommand.ExecuteScalarAsync(cancellationToken));
         if (totalCount == 0)
         {
@@ -120,6 +126,7 @@ public sealed class MySqlParteAcabadoService : IParteAcabadoQueries, IParteAcaba
                    header.source_sample_kind,
                    header.source_sample_code,
                    header.source_sample_line_number,
+                   header.source_record_id,
                    header.primary_fabric_code,
                    header.primary_fabric_description,
                    header.primary_color,
@@ -143,6 +150,8 @@ public sealed class MySqlParteAcabadoService : IParteAcabadoQueries, IParteAcaba
               AND (@sourceSampleKind = '' OR header.source_sample_kind = @sourceSampleKind)
               AND (@sourceSampleCode = '' OR header.source_sample_code = @sourceSampleCode)
               AND (@liveOnly = 0 OR header.status IN ('Pending', 'InProgress'))
+              AND (@sampleWorkflowOnly = 0 OR header.source_sample_kind IN ('sample', 'complement'))
+              AND (@modelWorkflowOnly = 0 OR header.source_sample_kind = 'model')
               AND (
                     @search = ''
                     OR CAST(header.order_number AS CHAR) LIKE @likeSearch
@@ -164,7 +173,7 @@ public sealed class MySqlParteAcabadoService : IParteAcabadoQueries, IParteAcaba
             {BuildSearchOrderByClause(filter)}
             LIMIT @limit OFFSET @offset;
             """;
-        FillSearchParameters(command, tenantId, companyId, centerCode, search, likeSearch, status, finisherCode, machineCode, operationCode, sourceSampleKind, sourceSampleCode, liveOnly);
+        FillSearchParameters(command, tenantId, companyId, centerCode, search, likeSearch, status, finisherCode, machineCode, operationCode, sourceSampleKind, sourceSampleCode, liveOnly, sampleWorkflowOnly, modelWorkflowOnly);
         command.Parameters.AddWithValue("@limit", pageSize);
         command.Parameters.AddWithValue("@offset", offset);
 
@@ -187,6 +196,7 @@ public sealed class MySqlParteAcabadoService : IParteAcabadoQueries, IParteAcaba
                 SourceSampleKind = reader.GetStringOrEmpty("source_sample_kind"),
                 SourceSampleCode = reader.GetStringOrEmpty("source_sample_code"),
                 SourceSampleLineNumber = reader.IsDBNull(reader.GetOrdinal("source_sample_line_number")) ? null : reader.GetInt32("source_sample_line_number"),
+                SourceRecordId = reader.GetStringOrEmpty("source_record_id"),
                 PrimaryFabricCode = reader.GetStringOrEmpty("primary_fabric_code"),
                 PrimaryFabricDescription = reader.GetStringOrEmpty("primary_fabric_description"),
                 PrimaryColor = reader.GetStringOrEmpty("primary_color"),
@@ -236,6 +246,7 @@ public sealed class MySqlParteAcabadoService : IParteAcabadoQueries, IParteAcaba
                    source_sample_kind,
                    source_sample_code,
                    source_sample_line_number,
+                   source_record_id,
                    notes,
                    total_kilograms,
                    total_pieces,
@@ -279,6 +290,7 @@ public sealed class MySqlParteAcabadoService : IParteAcabadoQueries, IParteAcaba
             SourceSampleKind = reader.GetStringOrEmpty("source_sample_kind"),
             SourceSampleCode = reader.GetStringOrEmpty("source_sample_code"),
             SourceSampleLineNumber = reader.IsDBNull(reader.GetOrdinal("source_sample_line_number")) ? null : reader.GetInt32("source_sample_line_number"),
+            SourceRecordId = reader.GetStringOrEmpty("source_record_id"),
             Notes = reader.GetStringOrEmpty("notes"),
             TotalKilograms = reader.GetDecimalOrDefault("total_kilograms"),
             TotalPieces = reader.GetDecimalOrDefault("total_pieces"),
@@ -353,6 +365,7 @@ public sealed class MySqlParteAcabadoService : IParteAcabadoQueries, IParteAcaba
                     source_sample_kind,
                     source_sample_code,
                     source_sample_line_number,
+                    source_record_id,
                     primary_fabric_code,
                     primary_fabric_description,
                     primary_color,
@@ -385,6 +398,7 @@ public sealed class MySqlParteAcabadoService : IParteAcabadoQueries, IParteAcaba
                     @sourceSampleKind,
                     @sourceSampleCode,
                     @sourceSampleLineNumber,
+                    @sourceRecordId,
                     @primaryFabricCode,
                     @primaryFabricDescription,
                     @primaryColor,
@@ -422,6 +436,7 @@ public sealed class MySqlParteAcabadoService : IParteAcabadoQueries, IParteAcaba
                     source_sample_kind = @sourceSampleKind,
                     source_sample_code = @sourceSampleCode,
                     source_sample_line_number = @sourceSampleLineNumber,
+                    source_record_id = @sourceRecordId,
                     primary_fabric_code = @primaryFabricCode,
                     primary_fabric_description = @primaryFabricDescription,
                     primary_color = @primaryColor,
@@ -515,6 +530,7 @@ public sealed class MySqlParteAcabadoService : IParteAcabadoQueries, IParteAcaba
         command.OperationName = command.OperationName?.Trim() ?? string.Empty;
         command.DispositionLabel = command.DispositionLabel?.Trim() ?? string.Empty;
         command.SourceSampleCode = command.SourceSampleCode?.Trim() ?? string.Empty;
+        command.SourceRecordId = command.SourceRecordId?.Trim() ?? string.Empty;
         command.SourceSampleKind = ParteAcabadoSourceKinds.Normalize(command.SourceSampleKind, hasLinkedSource: !string.IsNullOrWhiteSpace(command.SourceSampleCode));
         command.Notes = command.Notes?.Trim() ?? string.Empty;
         command.Date ??= DateTime.Today;
@@ -1083,6 +1099,7 @@ public sealed class MySqlParteAcabadoService : IParteAcabadoQueries, IParteAcaba
         command.Parameters.AddWithValue("@sourceSampleKind", DbValue(source.SourceSampleKind));
         command.Parameters.AddWithValue("@sourceSampleCode", DbValue(source.SourceSampleCode));
         command.Parameters.AddWithValue("@sourceSampleLineNumber", source.SourceSampleLineNumber.HasValue ? source.SourceSampleLineNumber.Value : DBNull.Value);
+        command.Parameters.AddWithValue("@sourceRecordId", DbValue(source.SourceRecordId));
         command.Parameters.AddWithValue("@primaryFabricCode", DbValue(summary.PrimaryFabricCode));
         command.Parameters.AddWithValue("@primaryFabricDescription", DbValue(summary.PrimaryFabricDescription));
         command.Parameters.AddWithValue("@primaryColor", DbValue(summary.PrimaryColor));
@@ -1100,22 +1117,13 @@ public sealed class MySqlParteAcabadoService : IParteAcabadoQueries, IParteAcaba
         Guid companyId,
         string centerCode,
         CancellationToken cancellationToken)
-    {
-        await using var command = connection.CreateCommand();
-        command.Transaction = transaction;
-        command.CommandText =
-            """
-            SELECT COALESCE(MAX(order_number), 0) + 1
-            FROM finish_work_orders
-            WHERE tenant_id = @tenantId
-              AND company_id = @companyId
-              AND center_code = @centerCode;
-            """;
-        command.Parameters.AddWithValue("@tenantId", tenantId.ToString());
-        command.Parameters.AddWithValue("@companyId", companyId.ToString());
-        command.Parameters.AddWithValue("@centerCode", centerCode);
-        return Convert.ToInt32(await command.ExecuteScalarAsync(cancellationToken));
-    }
+        => await DocumentNumberingSqlHelper.ReserveNextNumberAsync(
+            connection,
+            transaction,
+            tenantId,
+            companyId,
+            DocumentNumberingKeys.FinishWorkOrder,
+            cancellationToken);
 
     private static async Task<string> ResolveOrderIdAsync(
         MySqlConnection connection,
@@ -1158,7 +1166,9 @@ public sealed class MySqlParteAcabadoService : IParteAcabadoQueries, IParteAcaba
         int operationCode,
         string sourceSampleKind,
         string sourceSampleCode,
-        bool liveOnly)
+        bool liveOnly,
+        bool sampleWorkflowOnly,
+        bool modelWorkflowOnly)
     {
         command.Parameters.AddWithValue("@tenantId", tenantId.ToString());
         command.Parameters.AddWithValue("@companyId", companyId.ToString());
@@ -1172,6 +1182,8 @@ public sealed class MySqlParteAcabadoService : IParteAcabadoQueries, IParteAcaba
         command.Parameters.AddWithValue("@sourceSampleKind", sourceSampleKind);
         command.Parameters.AddWithValue("@sourceSampleCode", sourceSampleCode);
         command.Parameters.AddWithValue("@liveOnly", liveOnly ? 1 : 0);
+        command.Parameters.AddWithValue("@sampleWorkflowOnly", sampleWorkflowOnly ? 1 : 0);
+        command.Parameters.AddWithValue("@modelWorkflowOnly", modelWorkflowOnly ? 1 : 0);
     }
 
     private static string BuildSearchOrderByClause(ParteAcabadoFilter filter)
