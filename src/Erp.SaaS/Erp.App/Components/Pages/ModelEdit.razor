@@ -63,7 +63,7 @@ else
         </div>
     }
 
-    @if (!canEdit && string.IsNullOrWhiteSpace(Id))
+    @if (!canEdit && !HasExistingRecord)
     {
         <div class="alert">
             @L("No tienes permisos de edición para crear models en esta empresa.", "No tens permisos d'edició per crear models en aquesta empresa.", "You do not have edit permissions to create models in this company.")
@@ -800,6 +800,9 @@ else
     [Parameter]
     public string? Id { get; set; }
 
+    private bool IsNewRoute => EditRouteMode.IsCreateRoute(NavigationManager, "articulos/models/nuevo");
+    private bool HasExistingRecord => !IsNewRoute && !string.IsNullOrWhiteSpace(Id);
+
     private string L(string spanish, string catalan, string english) =>
         T.CurrentLanguage switch
         {
@@ -824,7 +827,7 @@ else
     private string colorToAdd = string.Empty;
     private string colorToRemove = string.Empty;
 
-    private string PageTitleText => string.IsNullOrWhiteSpace(Id)
+    private string PageTitleText => !HasExistingRecord
         ? L("Nuevo model", "Nou model", "New model")
         : $"Model · {model.Code}";
     private bool isReadOnly => isLoading || !canEdit;
@@ -880,7 +883,7 @@ else
             return;
         }
 
-        if (string.IsNullOrWhiteSpace(Id))
+        if (!HasExistingRecord)
         {
             model = new ModeloDetailDto();
             recentAuditLogs = [];
@@ -970,7 +973,7 @@ else
             {
                 TenantId = tenantId.Value,
                 CompanyId = companyId.Value,
-                Id = model.Id == Guid.Empty ? null : model.Id,
+                Id = HasExistingRecord && model.Id != Guid.Empty ? model.Id : null,
                 Code = model.Code,
                 Series = model.Series,
                 Season = model.Season,

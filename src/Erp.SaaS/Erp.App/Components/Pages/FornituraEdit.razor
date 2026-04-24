@@ -9,12 +9,12 @@
 @inject NavigationManager NavigationManager
 @inject AppText T
 
-<PageTitle>@(!string.IsNullOrWhiteSpace(Code) ? L($"Editar fornitura {Code}", $"Editar fornitura {Code}", $"Edit trim {Code}") : L("Nueva fornitura", "Nova fornitura", "New trim"))</PageTitle>
+<PageTitle>@(HasExistingRecord ? L($"Editar fornitura {CurrentCode}", $"Editar fornitura {CurrentCode}", $"Edit trim {CurrentCode}") : L("Nueva fornitura", "Nova fornitura", "New trim"))</PageTitle>
 
 <div class="page-header">
     <div>
         <p class="eyebrow">@T["menu.articles"]</p>
-        <h1>@(!string.IsNullOrWhiteSpace(Code) ? L($"Editar fornitura {Code}", $"Editar fornitura {Code}", $"Edit trim {Code}") : L("Nueva fornitura", "Nova fornitura", "New trim"))</h1>
+        <h1>@(HasExistingRecord ? L($"Editar fornitura {CurrentCode}", $"Editar fornitura {CurrentCode}", $"Edit trim {CurrentCode}") : L("Nueva fornitura", "Nova fornitura", "New trim"))</h1>
         <p class="lead">@(isLegacySyncActive
             ? L("Edición sobre la SaaS local. La importación manual desde legacy refresca solo registros marcados como legacy.", "Edició sobre la SaaS local. La importació manual des de legacy refresca només registres marcats com legacy.", "Editing on the local SaaS. Manual legacy import refreshes only records marked as legacy.")
             : L("Alta y edición sobre la tabla forni replicada en la SaaS local, filtrada por la empresa activa.", "Alta i edició sobre la taula forni replicada a la SaaS local, filtrada per l'empresa activa.", "Create and edit records on the forni table replicated into the local SaaS, filtered by the active company."))</p>
@@ -48,7 +48,7 @@ else
         </div>
     }
 
-    @if (!canEdit && string.IsNullOrWhiteSpace(Code))
+    @if (!canEdit && !HasExistingRecord)
     {
         <div class="alert">
             @L("No tienes permisos de edición para crear fornituras nuevas en esta empresa.", "No tens permisos d'edició per crear fornitures noves en aquesta empresa.", "You do not have edit permissions to create new trims in this company.")
@@ -60,7 +60,7 @@ else
             <div class="form-grid">
                 <label class="field">
                     <span>@L("Código", "Codi", "Code")</span>
-                    <InputText class="text-input" @bind-Value="model.Code" disabled="@(!string.IsNullOrWhiteSpace(Code))" />
+                    <InputText class="text-input" @bind-Value="model.Code" disabled="@HasExistingRecord" />
                 </label>
                 <label class="field wide">
                     <span>@L("Descripción", "Descripció", "Description")</span>
@@ -177,11 +177,11 @@ else
                 {
                     <button class="primary-button" type="submit">@L("Guardar fornitura", "Desar fornitura", "Save trim")</button>
                 }
-                @if (canEdit && !string.IsNullOrWhiteSpace(Code))
+                @if (canEdit && HasExistingRecord)
                 {
                     <button class="secondary-button danger-button" type="button" @onclick="DeleteAsync">@L("Eliminar fornitura", "Eliminar fornitura", "Delete trim")</button>
                 }
-                @if (!string.IsNullOrWhiteSpace(Code))
+                @if (HasExistingRecord)
                 {
                     <button class="secondary-button" type="button" @onclick="LoadAuditAsync">@L("Recargar historial", "Recarregar historial", "Reload history")</button>
                 }
@@ -189,7 +189,7 @@ else
         </fieldset>
     </EditForm>
 
-    @if (!string.IsNullOrWhiteSpace(Code))
+    @if (HasExistingRecord)
     {
         <section class="panel" style="margin-top: 1rem;">
             <h2>@L("Historial reciente de la fornitura", "Historial recent de la fornitura", "Recent trim history")</h2>
@@ -221,6 +221,9 @@ else
     [Parameter]
     public string? Code { get; set; }
 
+    private bool IsNewRoute => EditRouteMode.IsCreateRoute(NavigationManager, "articulos/fornituras/nueva");
+    private bool HasExistingRecord => !IsNewRoute && !string.IsNullOrWhiteSpace(Code);
+    private string CurrentCode => HasExistingRecord ? Uri.UnescapeDataString(Code!) : string.Empty;
     private Guid? tenantId;
     private Guid? companyId;
     private bool canEdit;
@@ -248,9 +251,9 @@ else
         await LoadSyncStatusAsync();
         isReadOnly = !canEdit;
 
-        if (!string.IsNullOrWhiteSpace(Code))
+        if (HasExistingRecord)
         {
-            var detail = await FornituraQueries.GetByCodeAsync(tenantId.Value, companyId.Value, Uri.UnescapeDataString(Code));
+            var detail = await FornituraQueries.GetByCodeAsync(tenantId.Value, companyId.Value, CurrentCode);
             if (detail is null)
             {
                 statusMessage = L("No se ha encontrado la fornitura solicitada.", "No s'ha trobat la fornitura sol·licitada.", "The requested trim was not found.");
@@ -288,12 +291,14 @@ else
         {
             statusMessage = string.Empty;
             isError = false;
+            var isNew = !HasExistingRecord;
 
             var savedCode = await FornituraService.SaveAsync(new SaveFornituraCommand
             {
                 TenantId = tenantId.Value,
                 CompanyId = companyId.Value,
-                Code = string.IsNullOrWhiteSpace(Code) ? model.Code : Uri.UnescapeDataString(Code),
+                IsNew = isNew,
+                Code = isNew ? model.Code : CurrentCode,
                 Description = model.Description,
                 UnitPrice = model.UnitPrice,
                 SupplierCode = model.SupplierCode,
@@ -319,11 +324,11 @@ else
                     .ToList()
             });
 
-            statusMessage = !string.IsNullOrWhiteSpace(Code)
+            statusMessage = !isNew
                 ? L("Fornitura actualizada correctamente.", "Fornitura actualitzada correctament.", "Trim updated successfully.")
                 : L("Fornitura creada correctamente.", "Fornitura creada correctament.", "Trim created successfully.");
 
-            if (string.IsNullOrWhiteSpace(Code))
+            if (isNew)
             {
                 NavigationManager.NavigateTo($"/articulos/fornituras/editar/{Uri.EscapeDataString(savedCode)}", forceLoad: false);
                 return;
@@ -365,7 +370,7 @@ else
 
     private async Task LoadAuditAsync()
     {
-        if (!tenantId.HasValue || string.IsNullOrWhiteSpace(Code))
+        if (!tenantId.HasValue || !HasExistingRecord)
         {
             recentAuditLogs = [];
             return;
@@ -375,7 +380,7 @@ else
             limit: 15,
             tenantId: tenantId.Value,
             entityName: "Fornitura",
-            entityId: Uri.UnescapeDataString(Code));
+            entityId: CurrentCode);
     }
 
     private void AddVariant()
@@ -407,7 +412,7 @@ else
 
     private async Task DeleteAsync()
     {
-        if (!tenantId.HasValue || !companyId.HasValue || string.IsNullOrWhiteSpace(Code))
+        if (!tenantId.HasValue || !companyId.HasValue || !HasExistingRecord)
         {
             return;
         }
@@ -421,7 +426,7 @@ else
 
         try
         {
-            await FornituraService.DeleteAsync(tenantId.Value, companyId.Value, Uri.UnescapeDataString(Code));
+            await FornituraService.DeleteAsync(tenantId.Value, companyId.Value, CurrentCode);
             NavigationManager.NavigateTo("/articulos/fornituras", forceLoad: false);
         }
         catch (Exception exception)

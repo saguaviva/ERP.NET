@@ -9,19 +9,19 @@
 @inject NavigationManager NavigationManager
 @inject AppText T
 
-<PageTitle>@(Code.HasValue ? $"{L("Editar disposición", "Editar disposició", "Edit disposition")} {Code}" : L("Nueva disposición", "Nova disposició", "New disposition"))</PageTitle>
+<PageTitle>@(HasExistingRecord ? $"{L("Editar disposición", "Editar disposició", "Edit disposition")} {CurrentCode}" : L("Nueva disposición", "Nova disposició", "New disposition"))</PageTitle>
 
 <div class="page-header">
     <div>
         <p class="eyebrow">@L("ARTÍCULOS", "ARTICLES", "ARTICLES")</p>
-        <h1>@(Code.HasValue ? $"{L("Editar disposición", "Editar disposició", "Edit disposition")} {Code}" : L("Nueva disposición", "Nova disposició", "New disposition"))</h1>
+        <h1>@(HasExistingRecord ? $"{L("Editar disposición", "Editar disposició", "Edit disposition")} {CurrentCode}" : L("Nueva disposición", "Nova disposició", "New disposition"))</h1>
         <p class="lead">@(isLegacySyncActive
             ? L("Edición sobre la SaaS local. La importación manual desde legacy refresca solo registros marcados como legacy.", "Edició sobre la SaaS local. La importació manual des de legacy refresca només registres marcats com a legacy.", "Editing on the local SaaS copy. Manual import from legacy refreshes only records marked as legacy.")
             : L("Alta y edición sobre la réplica local de disposiciones, filtrada por la empresa activa.", "Alta i edició sobre la rèplica local de disposicions, filtrada per l'empresa activa.", "Create and edit on the local dispositions replica, filtered by the active company."))</p>
     </div>
     <div class="quick-links">
         <a class="secondary-button link-button" href="/articulos/disposiciones">@L("Volver al listado", "Tornar al llistat", "Back to list")</a>
-        @if (Code.HasValue)
+        @if (HasExistingRecord)
         {
             @if (canEdit && !model.IsCancelled)
             {
@@ -58,7 +58,7 @@ else
         </div>
     }
 
-    @if (!canEdit && !Code.HasValue)
+    @if (!canEdit && !HasExistingRecord)
     {
         <div class="alert">
             @L("No tienes permisos de edición para crear disposiciones nuevas en esta empresa.", "No tens permisos d'edició per crear disposicions noves en aquesta empresa.", "You do not have edit permissions to create new dispositions in this company.")
@@ -284,11 +284,11 @@ else
                 {
                     <button class="primary-button" type="submit">@L("Guardar disposición", "Desar disposició", "Save disposition")</button>
                 }
-                @if (canEdit && Code.HasValue)
+                @if (canEdit && HasExistingRecord)
                 {
                     <button class="secondary-button danger-button" type="button" @onclick="DeleteAsync">@L("Eliminar disposición", "Eliminar disposició", "Delete disposition")</button>
                 }
-                @if (Code.HasValue)
+                @if (HasExistingRecord)
                 {
                     <button class="secondary-button" type="button" @onclick="LoadAuditAsync">@L("Recargar historial", "Recarregar historial", "Reload history")</button>
                 }
@@ -296,7 +296,7 @@ else
         </fieldset>
     </EditForm>
 
-    @if (Code.HasValue)
+    @if (HasExistingRecord)
     {
         <section class="panel" style="margin-top: 1rem;">
             <h2>@L("Historial reciente de la disposición", "Historial recent de la disposició", "Recent disposition history")</h2>
@@ -328,6 +328,9 @@ else
     [Parameter]
     public int? Code { get; set; }
 
+    private bool IsNewRoute => EditRouteMode.IsCreateRoute(NavigationManager, "articulos/disposiciones/nueva");
+    private bool HasExistingRecord => !IsNewRoute && Code.HasValue;
+    private int CurrentCode => HasExistingRecord ? Code!.Value : 0;
     private Guid? tenantId;
     private Guid? companyId;
     private bool canEdit;
@@ -392,9 +395,9 @@ else
         await LoadSyncStatusAsync();
         isReadOnly = !canEdit;
 
-        if (Code.HasValue)
+        if (HasExistingRecord)
         {
-            var detail = await DisposicionQueries.GetByCodeAsync(tenantId.Value, companyId.Value, Code.Value);
+            var detail = await DisposicionQueries.GetByCodeAsync(tenantId.Value, companyId.Value, CurrentCode);
             if (detail is null)
             {
                 statusMessage = L("No se ha encontrado la disposición solicitada.", "No s'ha trobat la disposició sol·licitada.", "The requested disposition could not be found.");
@@ -444,7 +447,7 @@ else
             {
                 TenantId = tenantId.Value,
                 CompanyId = companyId.Value,
-                Code = Code,
+                Code = HasExistingRecord ? CurrentCode : null,
                 Year = model.Year,
                 Number = model.Number,
                 Date = model.Date,
@@ -481,11 +484,11 @@ else
                     .ToList()
             });
 
-            statusMessage = Code.HasValue
+            statusMessage = HasExistingRecord
                 ? L("Disposición actualizada correctamente.", "Disposició actualitzada correctament.", "Disposition updated successfully.")
                 : L("Disposición creada correctamente.", "Disposició creada correctament.", "Disposition created successfully.");
 
-            if (!Code.HasValue)
+            if (!HasExistingRecord)
             {
                 NavigationManager.NavigateTo($"/articulos/disposiciones/editar/{savedCode}", forceLoad: false);
                 return;
@@ -506,14 +509,14 @@ else
 
     private async Task DeleteAsync()
     {
-        if (!tenantId.HasValue || !companyId.HasValue || !Code.HasValue)
+        if (!tenantId.HasValue || !companyId.HasValue || !HasExistingRecord)
         {
             return;
         }
 
         try
         {
-            await DisposicionService.DeleteAsync(tenantId.Value, companyId.Value, Code.Value);
+            await DisposicionService.DeleteAsync(tenantId.Value, companyId.Value, CurrentCode);
             NavigationManager.NavigateTo("/articulos/disposiciones", forceLoad: false);
         }
         catch (Exception exception)
@@ -648,7 +651,7 @@ else
 
     private async Task LoadAuditAsync()
     {
-        if (!tenantId.HasValue || !Code.HasValue)
+        if (!tenantId.HasValue || !HasExistingRecord)
         {
             recentAuditLogs = [];
             return;
@@ -658,7 +661,7 @@ else
             limit: 15,
             tenantId: tenantId.Value,
             entityName: "Disposicion",
-            entityId: Code.Value.ToString());
+            entityId: CurrentCode.ToString());
     }
 
     private string BuildTejidoUrl(DisposicionLineDto line) =>
@@ -681,7 +684,7 @@ else
     }
 
     private string BuildParteAcabadoUrl() =>
-        Code.HasValue ? $"/produccion/acabados/nueva?disposicionCode={Code.Value}" : "/produccion/acabados/nueva";
+        HasExistingRecord ? $"/produccion/acabados/nueva?disposicionCode={CurrentCode}" : "/produccion/acabados/nueva";
 
     private IReadOnlyList<StockMovementSummary> BuildStockMovementSummaries()
     {

@@ -4,6 +4,7 @@ public sealed class SaveFornituraCommand
 {
     public Guid TenantId { get; set; }
     public Guid CompanyId { get; set; }
+    public bool IsNew { get; set; }
     public string? Code { get; set; }
     public string Description { get; set; } = string.Empty;
     public decimal UnitPrice { get; set; }

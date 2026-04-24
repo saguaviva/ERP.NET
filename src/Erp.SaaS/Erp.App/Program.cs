@@ -12,6 +12,7 @@ using Erp.Application.Contexts;
 using Erp.Application.DemoAccess;
 using Erp.Application.Intrastat;
 using Erp.Application.Reporting;
+using Erp.Application.Search;
 using Erp.Infrastructure.MySql;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -55,6 +56,7 @@ builder.Services.AddAuthorization();
 builder.Services.AddScoped<ICurrentUserContext, HttpContextCurrentUserContext>();
 builder.Services.AddScoped<ITenantContext, HttpContextTenantContext>();
 builder.Services.AddScoped<IActiveCompanyContext, HttpContextActiveCompanyContext>();
+builder.Services.AddScoped<IGlobalSearchService, GlobalSearchService>();
 builder.Services.AddMySqlInfrastructure(builder.Configuration);
 
 var app = builder.Build();

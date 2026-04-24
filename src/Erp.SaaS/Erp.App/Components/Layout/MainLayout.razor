@@ -8,16 +8,7 @@
     </aside>
 
     <main class="shell-main">
-        <div class="shell-toolbar no-print">
-            <button type="button"
-                    class="shell-toggle"
-                    aria-label="@L("Mostrar u ocultar menú lateral", "Mostrar o ocultar menú lateral", "Show or hide side menu")"
-                    aria-expanded="@(!isSidebarHidden)"
-                    @onclick="ToggleSidebarAsync">
-                <span class="shell-toggle-icon" aria-hidden="true">@(isSidebarHidden ? "☰" : "←")</span>
-                <span class="shell-toggle-label">@(isSidebarHidden ? T["shell.showMenu"] : T["shell.hideMenu"])</span>
-            </button>
-        </div>
+        <AppTopBar IsSidebarHidden="@isSidebarHidden" OnToggleSidebar="ToggleSidebarAsync" />
 
         <article class="shell-content">
             @Body

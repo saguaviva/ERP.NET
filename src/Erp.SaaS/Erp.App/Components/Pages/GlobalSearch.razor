@@ -1,0 +1,269 @@
+@page "/buscar"
+@attribute [Authorize(Roles = "TenantAdmin,TenantReader")]
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IGlobalSearchService GlobalSearchService
+@inject NavigationManager NavigationManager
+@inject AppText T
+
+<PageTitle>@L("Buscar", "Buscar", "Search")</PageTitle>
+
+<div class="page-header">
+    <div>
+        <p class="eyebrow">@L("Buscador global", "Cercador global", "Global search")</p>
+        <h1>@L("Resultados de búsqueda", "Resultats de cerca", "Search results")</h1>
+        <p class="lead">@L("Busca pantallas y datos reales de la empresa activa: CRM, artículos, ventas, compras, producción, almacén, base y mailing.", "Cerca pantalles i dades reals de l'empresa activa: CRM, articles, vendes, compres, producció, magatzem, base i mailing.", "Search screens and live data in the active company: CRM, articles, sales, purchases, production, warehouse, master data, and mailing.")</p>
+    </div>
+</div>
+
+<section class="panel global-search-page-panel">
+    <form class="filter-row" @onsubmit="SubmitSearch" @onsubmit:preventDefault="true">
+        <input class="text-input"
+               value="@searchText"
+               placeholder="@L("Buscar cliente, proveedor, artículo, factura, pedido, stock, parte o campaña", "Buscar client, proveidor, article, factura, comanda, estoc, part o campanya", "Search client, supplier, item, invoice, order, stock, work order, or campaign")"
+               @oninput="OnSearchTextChanged" />
+        <button class="secondary-button" type="submit" disabled="@isLoading">
+            @(isLoading ? L("Buscando...", "Cercant...", "Searching...") : L("Buscar", "Buscar", "Search"))
+        </button>
+    </form>
+</section>
+
+@if (!tenantId.HasValue || !companyId.HasValue)
+{
+    <div class="empty-state">
+        <p>@L("Selecciona una empresa activa para usar el buscador global de datos.", "Selecciona una empresa activa per usar el cercador global de dades.", "Select an active company to use live global search.")</p>
+    </div>
+}
+else if (string.IsNullOrWhiteSpace(normalizedQuery) || normalizedQuery.Length < 2)
+{
+    <div class="empty-state">
+        <p>@L("Escribe al menos dos caracteres para buscar en toda la aplicación.", "Escriu almenys dos caràcters per cercar a tota l'aplicació.", "Type at least two characters to search the whole application.")</p>
+    </div>
+}
+else if (isLoading)
+{
+    <div class="empty-state">
+        <p>@L("Buscando en toda la aplicación...", "Cercant a tota l'aplicació...", "Searching the whole application...")</p>
+    </div>
+}
+else if (!string.IsNullOrWhiteSpace(errorMessage))
+{
+    <div class="alert danger">@errorMessage</div>
+}
+else if (searchResult is null || searchResult.Groups.All(group => group.Items.Count == 0))
+{
+    <div class="empty-state">
+        <p>@L("No hay resultados para esa búsqueda en la empresa activa.", "No hi ha resultats per a aquesta cerca a l'empresa activa.", "No results found in the active company.")</p>
+    </div>
+}
+else
+{
+    <div class="search-results-overview">
+        <span>@L($"Resultados para \"{normalizedQuery}\"", $"Resultats per a \"{normalizedQuery}\"", $"Results for \"{normalizedQuery}\"")</span>
+        <strong>@searchResult.TotalCount.ToUiString("N0")</strong>
+    </div>
+
+    @foreach (var group in searchResult.Groups.Where(group => group.Items.Count > 0))
+    {
+        <section class="panel global-search-result-section">
+            <div class="section-heading">
+                <div>
+                    <p class="eyebrow">@GroupEyebrow(group)</p>
+                    <h2>@GroupTitle(group)</h2>
+                </div>
+                <span class="results-summary">@group.TotalCount.ToUiString("N0")</span>
+            </div>
+
+            <div class="global-search-result-grid">
+                @foreach (var item in group.Items)
+                {
+                    <a class="global-search-result-card" href="@item.Href">
+                        <span class="global-search-result-area">@ItemBadge(item)</span>
+                        <strong>@item.Title</strong>
+                        <span>@BuildItemMeta(item)</span>
+                    </a>
+                }
+            </div>
+        </section>
+    }
+}
+
+@code {
+    [SupplyParameterFromQuery(Name = "q")]
+    public string? Query { get; set; }
+
+    private Guid? tenantId;
+    private Guid? companyId;
+    private string searchText = string.Empty;
+    private string normalizedQuery = string.Empty;
+    private bool isLoading;
+    private string errorMessage = string.Empty;
+    private GlobalSearchResultDto? searchResult;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        searchText = Query ?? string.Empty;
+        normalizedQuery = searchText.Trim();
+        await LoadContextAndSearchAsync();
+    }
+
+    private async Task LoadContextAndSearchAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        tenantId = user.GetTenantId();
+        companyId = user.GetActiveCompanyId();
+
+        if (!tenantId.HasValue || !companyId.HasValue || normalizedQuery.Length < 2)
+        {
+            searchResult = null;
+            return;
+        }
+
+        isLoading = true;
+        errorMessage = string.Empty;
+
+        try
+        {
+            searchResult = await GlobalSearchService.SearchAsync(
+                tenantId.Value,
+                companyId.Value,
+                new GlobalSearchFilter
+                {
+                    Search = normalizedQuery,
+                    MaxResultsPerGroup = 25
+                });
+        }
+        catch (Exception)
+        {
+            searchResult = null;
+            errorMessage = L("No he podido completar la búsqueda global. Intenta de nuevo o acota el texto.", "No he pogut completar la cerca global. Torna-ho a provar o acota el text.", "Global search could not be completed. Try again or narrow the query.");
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private void OnSearchTextChanged(ChangeEventArgs args)
+    {
+        searchText = args.Value?.ToString() ?? string.Empty;
+    }
+
+    private async Task SubmitSearch()
+    {
+        var nextQuery = searchText.Trim();
+        if (string.Equals(nextQuery, normalizedQuery, StringComparison.Ordinal))
+        {
+            await LoadContextAndSearchAsync();
+            return;
+        }
+
+        NavigationManager.NavigateTo($"/buscar?q={Uri.EscapeDataString(nextQuery)}");
+    }
+
+    private string GroupTitle(GlobalSearchGroupDto group) =>
+        group.Key switch
+        {
+            "clients" => L("Clientes", "Clients", "Clients"),
+            "suppliers" => L("Proveedores", "Proveidors", "Suppliers"),
+            "representatives" => L("Representantes", "Representants", "Representatives"),
+            "carriers" => L("Transportistas", "Transportistes", "Carriers"),
+            "workshops" => L("Talleres", "Tallers", "Workshops"),
+            "fornituras" => L("Fornituras", "Fornitures", "Trims"),
+            "yarns" => L("Hilos", "Fils", "Yarns"),
+            "fabrics" => L("Tejidos", "Teixits", "Fabrics"),
+            "models" => L("Models", "Models", "Models"),
+            "samples" => L("Muestras", "Mostres", "Samples"),
+            "dispositions" => L("Disposiciones", "Disposicions", "Dispositions"),
+            "sales-orders" => L("Pedidos", "Comandes", "Orders"),
+            "sales-shipments" => L("Albaranes", "Albarans", "Shipments"),
+            "sales-drafts" => L("Borradores", "Esborranys", "Drafts"),
+            "sales-invoices" => L("Facturas", "Factures", "Invoices"),
+            "sales-remittances" => L("Remesas", "Remeses", "Remittances"),
+            "purchase-orders" => L("Pedidos de compra", "Comandes de compra", "Purchase orders"),
+            "purchase-receipts" => L("Recepciones de compra", "Recepcions de compra", "Purchase receipts"),
+            "purchase-invoices" => L("Facturas proveedor", "Factures proveidor", "Supplier invoices"),
+            "finishing-orders" => L("Partes de acabado", "Parts d'acabat", "Finishing orders"),
+            "stock-balances" => L("Stock actual", "Estoc actual", "Current stock"),
+            "stock-movements" => L("Movimientos de stock", "Moviments d'estoc", "Stock movements"),
+            "stock-transfers" => L("Traspasos", "Traspassos", "Transfers"),
+            "stock-counts" => L("Inventarios", "Inventaris", "Counts"),
+            "base-catalogs" => L("Base", "Base", "Master data"),
+            "mailing-campaigns" => L("Mailing", "Mailing", "Mailing"),
+            _ => group.Title
+        };
+
+    private string GroupEyebrow(GlobalSearchGroupDto group) =>
+        group.Key switch
+        {
+            "clients" or "suppliers" or "representatives" or "carriers" or "workshops" => "CRM",
+            "fornituras" or "yarns" or "fabrics" or "models" or "samples" or "dispositions" => T["menu.articles"],
+            "sales-orders" or "sales-shipments" or "sales-drafts" or "sales-invoices" or "sales-remittances" => T["menu.sales"],
+            "purchase-orders" or "purchase-receipts" or "purchase-invoices" => T["menu.purchases"],
+            "finishing-orders" => T["menu.production"],
+            "stock-balances" or "stock-movements" or "stock-transfers" or "stock-counts" => T["menu.warehouse"],
+            "base-catalogs" or "mailing-campaigns" => T["menu.base"],
+            _ => L("Datos", "Dades", "Data")
+        };
+
+    private string ItemBadge(GlobalSearchItemDto item) =>
+        item.Kind switch
+        {
+            "client" => L("Cliente", "Client", "Client"),
+            "supplier" => L("Proveedor", "Proveidor", "Supplier"),
+            "representative" => L("Representante", "Representant", "Representative"),
+            "carrier" => L("Transportista", "Transportista", "Carrier"),
+            "workshop" => L("Taller", "Taller", "Workshop"),
+            "fornitura" => L("Fornitura", "Fornitura", "Trim"),
+            "yarn" => L("Hilo", "Fil", "Yarn"),
+            "fabric" => L("Tejido", "Teixit", "Fabric"),
+            "model" => L("Model", "Model", "Model"),
+            "sample" => L("Muestra", "Mostra", "Sample"),
+            "disposition" => L("Disposición", "Disposició", "Disposition"),
+            "sales-order" => L("Pedido", "Comanda", "Order"),
+            "sales-shipment" => L("Albarán", "Albarà", "Shipment"),
+            "sales-draft" => L("Borrador", "Esborrany", "Draft"),
+            "sales-invoice" => L("Factura", "Factura", "Invoice"),
+            "sales-remittance" => L("Remesa", "Remesa", "Remittance"),
+            "purchase-order" => L("Pedido compra", "Comanda compra", "Purchase order"),
+            "purchase-receipt" => L("Recepción", "Recepció", "Receipt"),
+            "purchase-invoice" => L("Factura proveedor", "Factura proveidor", "Supplier invoice"),
+            "finishing-order" => L("Parte acabado", "Part acabat", "Finishing order"),
+            "stock-balance" => L("Stock", "Estoc", "Stock"),
+            "stock-movement" => L("Movimiento", "Moviment", "Movement"),
+            "stock-transfer" => L("Traspaso", "Traspàs", "Transfer"),
+            "stock-count" => L("Inventario", "Inventari", "Count"),
+            "base-catalog" => item.Badge,
+            "mailing-campaign" => L("Mailing", "Mailing", "Mailing"),
+            _ => item.Badge
+        };
+
+    private string BuildItemMeta(GlobalSearchItemDto item)
+    {
+        var parts = new List<string>();
+        if (item.Date.HasValue)
+        {
+            parts.Add(item.Date.Value.ToString("dd/MM/yyyy"));
+        }
+
+        if (!string.IsNullOrWhiteSpace(item.Subtitle))
+        {
+            parts.Add(item.Subtitle);
+        }
+
+        if (item.Amount.HasValue)
+        {
+            parts.Add($"{item.Amount.Value.ToUiString("N2")} €");
+        }
+
+        return string.Join(" · ", parts);
+    }
+
+    private string L(string spanish, string catalan, string english) =>
+        T.CurrentLanguage switch
+        {
+            AppLanguages.Catalan => catalan,
+            AppLanguages.English => english,
+            _ => spanish
+        };
+}

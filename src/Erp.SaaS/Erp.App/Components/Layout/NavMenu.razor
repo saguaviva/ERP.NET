@@ -1,6 +1,7 @@
+@using System.Globalization
+@using System.Text
 @implements IDisposable
 @inject AuthenticationStateProvider AuthenticationStateProvider
-@inject ICompanyAccessService CompanyAccessService
 @inject IJSRuntime JS
 @inject NavigationManager NavigationManager
 @inject AppText T
@@ -11,10 +12,6 @@
         <strong>CoreFlow</strong>
     </a>
 </div>
-
-<LanguageSwitcher />
-<DocumentLanguageSwitcher />
-<ThemeSwitcher />
 
 @if (isAuthenticated)
 {
@@ -31,23 +28,6 @@
             <div class="sidebar-muted">@T["menu.security.passwordChangeRequired"]</div>
         </div>
     }
-    else if (allowedCompanies.Count > 0)
-    {
-        <div class="sidebar-panel">
-            <div class="sidebar-label">@T["menu.activeCompany"]</div>
-            <form method="post" action="/account/switch-company" data-enhance="false">
-                <AntiforgeryToken />
-                <input type="hidden" name="returnUrl" value="@CurrentPath" />
-                <select class="sidebar-select" name="companyId" onchange="this.form.submit()">
-                    @foreach (var company in allowedCompanies)
-                    {
-                        <option selected="@(company.CompanyId == activeCompanyId)" value="@company.CompanyId">@company.Name (@company.LegacyCenterCode)</option>
-                    }
-                </select>
-            </form>
-        </div>
-    }
-
     @if (!requiresPasswordChange)
     {
         <nav class="sidebar-nav">
@@ -103,10 +83,9 @@ else
     private bool navCollapseStateLoaded;
     private string displayName = string.Empty;
     private string email = string.Empty;
-    private Guid? activeCompanyId;
-    private IReadOnlyCollection<AllowedCompanyDto> allowedCompanies = [];
     private IReadOnlyList<SidebarSection> navigationSections = [];
     private HashSet<string> collapsedSectionKeys = new(StringComparer.OrdinalIgnoreCase);
+    private string globalSearchQuery = string.Empty;
 
     private string CurrentPath
     {
@@ -125,34 +104,20 @@ else
         isAuthenticated = user.Identity?.IsAuthenticated ?? false;
         if (!isAuthenticated)
         {
-            allowedCompanies = [];
             navigationSections = [];
             return;
         }
 
         displayName = user.Identity?.Name ?? string.Empty;
         email = user.FindFirstValue(ClaimTypes.Email) ?? string.Empty;
-        activeCompanyId = user.GetActiveCompanyId();
         isPlatformAdmin = user.IsPlatformAdmin();
         canManageTenant = isPlatformAdmin || user.IsInRole(PlatformRoles.TenantAdmin);
         requiresPasswordChange = user.RequiresPasswordChange();
 
         if (requiresPasswordChange)
         {
-            allowedCompanies = [];
             navigationSections = [];
             return;
-        }
-
-        var userId = user.GetUserId();
-        var tenantId = user.GetTenantId();
-        if (userId.HasValue && tenantId.HasValue)
-        {
-            allowedCompanies = await CompanyAccessService.GetAllowedCompaniesAsync(userId.Value, tenantId.Value);
-        }
-        else
-        {
-            allowedCompanies = [];
         }
 
         navigationSections = BuildNavigationSections();
@@ -197,8 +162,17 @@ else
 
     private void OnLocationChanged(object? sender, Microsoft.AspNetCore.Components.Routing.LocationChangedEventArgs e)
     {
+        globalSearchQuery = string.Empty;
         _ = InvokeAsync(StateHasChanged);
     }
+
+    private string L(string spanish, string catalan, string english) =>
+        T.CurrentLanguage switch
+        {
+            AppLanguages.Catalan => catalan,
+            AppLanguages.English => english,
+            _ => spanish
+        };
 
     private IReadOnlyList<SidebarSection> BuildNavigationSections()
     {
@@ -296,6 +270,275 @@ else
         return sections;
     }
 
+    private void OnGlobalSearchInput(ChangeEventArgs args)
+    {
+        globalSearchQuery = args.Value?.ToString() ?? string.Empty;
+    }
+
+    private void ClearGlobalSearch()
+    {
+        globalSearchQuery = string.Empty;
+    }
+
+    private void OnGlobalSearchKeyDown(KeyboardEventArgs args)
+    {
+        if (!string.Equals(args.Key, "Enter", StringComparison.OrdinalIgnoreCase))
+        {
+            return;
+        }
+
+        var firstResult = GetGlobalSearchResults().FirstOrDefault();
+        if (firstResult is null)
+        {
+            return;
+        }
+
+        globalSearchQuery = string.Empty;
+        NavigationManager.NavigateTo(firstResult.Entry.Href);
+    }
+
+    private IReadOnlyList<GlobalSearchResult> GetGlobalSearchResults()
+    {
+        var tokens = TokenizeForSearch(globalSearchQuery);
+        if (tokens.Count == 0)
+        {
+            return [];
+        }
+
+        return BuildGlobalSearchEntries()
+            .Select(entry => new GlobalSearchResult(entry, ScoreGlobalSearchEntry(entry, tokens)))
+            .Where(result => result.Score > 0)
+            .OrderByDescending(result => result.Score)
+            .ThenBy(result => result.Entry.Area)
+            .ThenBy(result => result.Entry.Label)
+            .Take(9)
+            .ToArray();
+    }
+
+    private IReadOnlyList<GlobalSearchEntry> BuildGlobalSearchEntries()
+    {
+        var entries = new List<GlobalSearchEntry>
+        {
+            Entry(T["menu.dashboard"], "/", L("Inicio", "Inici", "Home"), L("Panel, métricas y accesos rápidos.", "Tauler, mètriques i accessos ràpids.", "Dashboard, metrics, and quick links."), "dashboard panel inicio tauler home metricas indicadores kpi resumen"),
+            Entry(T["menu.manual"], "/manual", L("Ayuda", "Ajuda", "Help"), L("Manual de usuario y guía práctica.", "Manual d'usuari i guia pràctica.", "User manual and practical guide."), "manual ayuda guia documentacion instrucciones formacion help docs"),
+            Entry(T["menu.alerts"], "/alertas", L("Operación", "Operació", "Operations"), L("Alertas operativas y trabajo pendiente.", "Alertes operatives i feina pendent.", "Operational alerts and pending work."), "alertas avisos incidencias pendiente revisar errores warning bloqueos trabajo"),
+            Entry(T["menu.reports"], "/listados", T["menu.reports"], L("Listados generales y reporting operativo.", "Llistats generals i reporting operatiu.", "General reports and operational reporting."), "listados informes reports reporting consultas exportar excel csv"),
+            Entry(L("Listados de ventas", "Llistats de vendes", "Sales reports"), "/listados/ventas", T["menu.reports"], L("Reporting de ventas y documentos comerciales.", "Reporting de vendes i documents comercials.", "Sales and commercial document reporting."), "ventas listados facturas pedidos albaranes clientes comercial reports"),
+            Entry(L("Listados de compras", "Llistats de compres", "Purchase reports"), "/listados/compras", T["menu.reports"], L("Reporting de proveedores, pedidos, recepciones y facturas.", "Reporting de proveidors, comandes, recepcions i factures.", "Supplier, order, receipt, and invoice reporting."), "compras proveedores pedidos recepciones facturas reports"),
+            Entry(L("Listados de producción", "Llistats de producció", "Production reports"), "/listados/produccion", T["menu.reports"], L("Carga, estados y trabajo productivo.", "Càrrega, estats i feina productiva.", "Load, status, and production work."), "produccion planta acabados partes ordenes carga semana reports"),
+            Entry(L("Listados de almacén", "Llistats de magatzem", "Warehouse reports"), "/listados/almacen", T["menu.reports"], L("Stock, movimientos, traspasos e inventarios.", "Estoc, moviments, traspassos i inventaris.", "Stock, movements, transfers, and counts."), "almacen stock estoc movimientos traspasos inventarios reports"),
+            Entry(T["menu.statistics"], "/estadisticas", T["menu.statistics"], L("KPIs y resumen ejecutivo.", "KPIs i resum executiu.", "KPIs and executive summary."), "estadisticas estadistica kpi metricas indicadores evolucion comparativa direccion analytics"),
+            Entry(L("Estadísticas de ventas", "Estadístiques de vendes", "Sales statistics"), "/estadisticas/ventas", T["menu.statistics"], L("Mix cliente/artículo, concentración y evolución.", "Mix client/article, concentració i evolució.", "Client/article mix, concentration, and trend."), "ventas clientes articulos facturacion concentracion ticket evolucion kpi"),
+            Entry(L("Estadísticas de compras", "Estadístiques de compres", "Purchase statistics"), "/estadisticas/compras", T["menu.statistics"], L("Aging proveedor y recepción frente a factura.", "Aging proveidor i recepció contra factura.", "Supplier aging and receipt versus invoice."), "compras proveedores aging recepcion factura pagos kpi"),
+            Entry(L("Estadísticas de producción", "Estadístiques de producció", "Production statistics"), "/estadisticas/produccion", T["menu.statistics"], L("Carga por acabador, estado y semana.", "Càrrega per acabador, estat i setmana.", "Load by finisher, status, and week."), "produccion planta acabador estado semana carga ordenes kpi"),
+            Entry(L("Estadísticas de almacén", "Estadístiques de magatzem", "Warehouse statistics"), "/estadisticas/almacen", T["menu.statistics"], L("Rotación, antigüedad y cobertura de stock.", "Rotació, antiguitat i cobertura d'estoc.", "Rotation, age, and stock coverage."), "almacen stock estoc rotacion antiguedad cobertura movimientos kpi"),
+
+            Entry(T["menu.crm.clients"], "/crm/clientes", T["menu.crm"], L("Clientes, datos fiscales y contacto.", "Clients, dades fiscals i contacte.", "Clients, fiscal data, and contact."), "cliente clientes client customer comprador crm comercial nif vat telefono email contacto ciudad bloqueo duplicados factura cobro"),
+            Entry(T["menu.crm.duplicates"], "/crm/clientes/duplicados", T["menu.crm"], L("Bandeja de duplicados de cliente.", "Safata de duplicats de client.", "Client duplicate tray."), "duplicado duplicados repetir repetidos cliente clientes limpiar fusion calidad nif email"),
+            Entry(T["menu.purchases.suppliers"], "/crm/proveedores", T["menu.crm"], L("Proveedores y datos de compra.", "Proveidors i dades de compra.", "Suppliers and purchase data."), "proveedor proveedores supplier proveidor compras facturas pedidos recepciones nif vat"),
+            Entry(T["menu.crm.representatives"], "/crm/representantes", T["menu.crm"], L("Representantes comerciales.", "Representants comercials.", "Sales representatives."), "representante representantes comercial vendedor agente comision ventas zona"),
+            Entry(T["menu.crm.carriers"], "/crm/transportistas", T["menu.crm"], L("Transportistas y agencias.", "Transportistes i agencies.", "Carriers and agencies."), "transportista transportistas transporte agencia envio expedicion albaran entrega carrier"),
+            Entry(T["menu.crm.workshops"], "/crm/talleres", T["menu.crm"], L("Talleres y colaboradores productivos.", "Tallers i col·laboradors productius.", "Workshops and production partners."), "taller talleres workshop proveedor produccion acabador planta externo"),
+
+            Entry(T["menu.articles.fornituras"], "/articulos/fornituras", T["menu.articles"], L("Fornituras y complementos de producto.", "Fornitures i complements de producte.", "Trims and product complements."), "fornitura fornituras complemento accesorio articulo coste escandallo pieza"),
+            Entry(T["menu.articles.hilos"], "/articulos/hilos", T["menu.articles"], L("Hilos, colores y proveedor.", "Fils, colors i proveidor.", "Yarns, colors, and supplier."), "hilo hilos fil fils yarn color proveedor coste precio iva carta stock almacen compras"),
+            Entry(T["menu.articles.tejidos"], "/articulos/tejidos", T["menu.articles"], L("Tejidos, ficha técnica, colores y stock.", "Teixits, fitxa tècnica, colors i estoc.", "Fabrics, technical sheet, colors, and stock."), "tejido tejidos teixit teixits tela fabric articulo ancho gramaje composicion escandallo color etiqueta reposicion valoracion stock"),
+            Entry(T["menu.articles.models"], "/articulos/models", T["menu.articles"], L("Models, escandallo y stock específico.", "Models, escandall i estoc especific.", "Models, breakdown, and specific stock."), "model models modelo modelos escandallo fornituras colores tallas stock articulo legacy"),
+            Entry(T["menu.articles.samples"], "/articulos/muestras", T["menu.articles"], L("Muestras con desglose técnico.", "Mostres amb desglossament tècnic.", "Samples with technical breakdown."), "muestra muestras mostra mostres sample colores tallas desglose tecnico parte produccion cliente comercial"),
+            Entry(T["menu.articles.complements"], "/articulos/complementos", T["menu.articles"], L("Complementos y circuito técnico paralelo.", "Complements i circuit tècnic paral·lel.", "Complements and parallel technical flow."), "complemento complementos complements muestra accesorio tecnico desglose parte produccion"),
+            Entry(T["menu.articles.dispositions"], "/articulos/disposiciones", T["menu.articles"], L("Disposiciones, cliente, color y piezas.", "Disposicions, client, color i peces.", "Dispositions, client, color, and pieces."), "disposicion disposiciones preparar trabajo cliente color piezas kilos acabador crear parte imprimir produccion"),
+
+            Entry(T["menu.base.numbering"], "/base-datos/numeraciones", T["menu.base"], L("Series y contadores de documentos.", "Series i comptadors de documents.", "Document series and counters."), "numeracion numeraciones serie series contador documento factura pedido albaran"),
+            Entry(T["menu.base.mailing"], "/base-datos/mailing", T["menu.base"], L("Campañas y comunicaciones.", "Campanyes i comunicacions.", "Campaigns and communications."), "mailing campaña campanas email correo comunicacion imprimir clientes"),
+            Entry(T["menu.base.banks"], "/base-datos/bancos-cajas", T["menu.base"], L("Bancos y cajas.", "Bancs i caixes.", "Banks and cashboxes."), "banco bancos caja cajas bancs caixes cobros pagos remesas financiero"),
+            Entry(T["menu.base.paymentForms"], "/base-datos/formas-pago", T["menu.base"], L("Formas de pago.", "Formes de pagament.", "Payment methods."), "forma pago formas pagos vencimiento cobro proveedor cliente factura recibo"),
+            Entry(T["menu.base.operations"], "/base-datos/operacions", T["menu.base"], L("Operaciones productivas.", "Operacions productives.", "Production operations."), "operacion operaciones operacions proceso produccion acabado planta maquinaria"),
+            Entry(T["menu.base.machines"], "/base-datos/maquinas", T["menu.base"], L("Máquinas usadas en producción.", "Màquines usades en producció.", "Machines used in production."), "maquina maquinas maquines produccion planta telar acabado parte muestra"),
+            Entry(T["menu.base.seasons"], "/base-datos/temporadas", T["menu.base"], L("Temporadas y colecciones.", "Temporades i col·leccions.", "Seasons and collections."), "temporada temporadas season coleccion campaña articulos ventas"),
+            Entry(T["menu.base.vatTypes"], "/base-datos/tipos-iva", T["menu.base"], L("Tipos de IVA.", "Tipus d'IVA.", "VAT types."), "iva vat impuesto fiscal factura compras ventas tipo"),
+            Entry(T["menu.base.incoterms"], "/base-datos/incoterms", T["menu.base"], L("Incoterms comerciales.", "Incoterms comercials.", "Commercial Incoterms."), "incoterm incoterms transporte comercio internacional condiciones entrega"),
+
+            Entry(T["menu.production.finishing"], "/produccion/acabados", T["menu.production"], L("Partes de acabado y trabajo de planta.", "Parts d'acabat i feina de planta.", "Finishing orders and plant work."), "produccion produccio planta acabado acabados parte partes orden fabricacion maquina acabador estado muestra disposicion trabajo"),
+
+            Entry(T["menu.sales.orders"], "/ventas/pedidos", T["menu.sales"], L("Pedidos de cliente.", "Comandes de client.", "Customer orders."), "pedido pedidos comanda comandes order cliente ventas lineas articulo cantidad"),
+            Entry(T["menu.sales.fabricSampleOrders"], "/ventas/pedidos-teixits-mostres", T["menu.sales"], L("Pedidos Teixits-Mostres.", "Comandes Teixits-Mostres.", "Fabric/sample orders."), "pedido pedidos teixits mostres muestras tejidos venta cliente circuito"),
+            Entry(T["menu.sales.shipments"], "/ventas/albaranes", T["menu.sales"], L("Albaranes de venta.", "Albarans de venda.", "Sales shipments."), "albaran albaranes entrega expedicion envio shipment cliente ventas factura"),
+            Entry(T["menu.sales.fabricSampleShipments"], "/ventas/albaranes-teixits-mostres", T["menu.sales"], L("Albaranes Teixits-Mostres.", "Albarans Teixits-Mostres.", "Fabric/sample shipments."), "albaran albaranes teixits mostres muestras tejidos entrega ventas"),
+            Entry(T["menu.sales.modelShipments"], "/ventas/albaranes-models", T["menu.sales"], L("Albaranes Models.", "Albarans Models.", "Model shipments."), "albaran models modelo entrega ventas stock"),
+            Entry(T["menu.sales.preinvoicing"], "/ventas/pre-facturacion", T["menu.sales"], L("Pre-facturación y borradores.", "Pre-facturació i esborranys.", "Pre-invoicing and drafts."), "prefacturacion pre factura borrador borradores emitir ventas cliente"),
+            Entry(T["menu.sales.fabricSamplePreinvoicing"], "/ventas/pre-facturacion-teixits-mostres", T["menu.sales"], L("Pre-facturación Teixits-Mostres.", "Pre-facturació Teixits-Mostres.", "Fabric/sample pre-invoicing."), "prefacturacion teixits mostres borrador factura ventas"),
+            Entry(T["menu.sales.invoices"], "/ventas/facturas", T["menu.sales"], L("Facturas de cliente.", "Factures de client.", "Customer invoices."), "factura facturas invoice cliente ventas cobro pendiente contabilidad pdf total abono"),
+            Entry(T["menu.sales.fabricSampleInvoices"], "/ventas/facturas-teixits-mostres", T["menu.sales"], L("Facturas Teixits-Mostres.", "Factures Teixits-Mostres.", "Fabric/sample invoices."), "factura facturas teixits mostres cliente cobro pdf ventas"),
+            Entry(T["menu.sales.modelInvoices"], "/ventas/facturas-models", T["menu.sales"], L("Facturas Models.", "Factures Models.", "Model invoices."), "factura facturas models modelo cliente ventas pdf"),
+            Entry(T["menu.sales.remittances"], "/ventas/remesas", T["menu.sales"], L("Remesas y cobros.", "Remeses i cobraments.", "Remittances and collections."), "remesa remesas cobro cobros banco recibo recibos pendiente factura ventas"),
+            Entry(T["menu.sales.intrastat"], "/ventas/intrastat", T["menu.sales"], L("Declaración Intrastat.", "Declaració Intrastat.", "Intrastat declaration."), "intrastat ue europa pais nc code arancelario excel exportar ventas factura comunidad"),
+
+            Entry(T["menu.purchases.orders"], "/compras/pedidos", T["menu.purchases"], L("Pedidos de proveedor.", "Comandes de proveidor.", "Supplier orders."), "compra compras pedido pedidos proveedor supplier order articulo cantidad"),
+            Entry(T["menu.purchases.yarnOrders"], "/compras/comandes-fils", T["menu.purchases"], L("Pedidos de hilos.", "Comandes de fils.", "Yarn orders."), "hilos fils yarn pedidos compras proveedor color stock"),
+            Entry(T["menu.purchases.sampleWorkOrders"], "/compras/ordenes-fabricacion-muestras", T["menu.purchases"], L("Órdenes fabricación muestras.", "Ordres fabricació mostres.", "Sample production orders."), "orden fabricacion muestra muestras produccion compras planta parte"),
+            Entry(T["menu.purchases.modelWorkOrders"], "/compras/ordenes-fabricacion-models", T["menu.purchases"], L("Órdenes fabricación models.", "Ordres fabricació models.", "Model production orders."), "orden fabricacion model models produccion compras planta parte"),
+            Entry(T["menu.purchases.receipts"], "/compras/recepciones", T["menu.purchases"], L("Recepciones de compra.", "Recepcions de compra.", "Purchase receipts."), "recepcion recepciones entrada mercancia proveedor compra albaran pedido stock"),
+            Entry(T["menu.purchases.yarnReceipts"], "/compras/albaranes-entrega-fils", T["menu.purchases"], L("Albaranes entrega hilos.", "Albarans entrega fils.", "Yarn delivery notes."), "albaran entrega fils hilos recepcion proveedor stock compras"),
+            Entry(T["menu.purchases.invoices"], "/compras/facturas", T["menu.purchases"], L("Facturas de proveedor.", "Factures de proveidor.", "Supplier invoices."), "factura facturas proveedor compras pago pendiente recepcion contabilidad"),
+
+            Entry(T["menu.warehouse.stock"], "/almacen/stock-actual", T["menu.warehouse"], L("Stock actual por artículo y ubicación.", "Estoc actual per article i ubicació.", "Current stock by item and location."), "stock estoc almacen magatzem existencias articulo color ubicacion posicion disponible"),
+            Entry(T["menu.warehouse.fabrics"], "/almacen/tejidos", T["menu.warehouse"], L("Stock de tejidos.", "Estoc de teixits.", "Fabric stock."), "stock tejidos teixits telas fabric almacen color metros kilos"),
+            Entry(T["menu.warehouse.yarns"], "/almacen/fils", T["menu.warehouse"], L("Stock de hilos.", "Estoc de fils.", "Yarn stock."), "stock hilos fils yarn almacen proveedor color movimiento"),
+            Entry(T["menu.warehouse.models"], "/almacen/models", T["menu.warehouse"], L("Stock de models.", "Estoc de models.", "Model stock."), "stock models modelo almacen articulo color tallas"),
+            Entry(T["menu.warehouse.counts"], "/almacen/inventarios", T["menu.warehouse"], L("Inventarios y conteos.", "Inventaris i recomptes.", "Stock counts and inventories."), "inventario inventarios conteo recuento ciego planta diferencias validar cerrar stock almacen"),
+            Entry(T["menu.warehouse.transfers"], "/almacen/traspasos", T["menu.warehouse"], L("Traspasos entre almacenes.", "Traspassos entre magatzems.", "Transfers between warehouses."), "traspaso traspasos transfer mover stock almacen origen destino ubicacion"),
+            Entry(T["menu.warehouse.movements"], "/almacen/movimientos", T["menu.warehouse"], L("Histórico de movimientos.", "Històric de moviments.", "Movement history."), "movimiento movimientos historico entradas salidas ajuste traspaso stock almacen"),
+            Entry(T["menu.warehouse.adjustments"], "/almacen/ajustes", T["menu.warehouse"], L("Ajustes de stock.", "Ajustos d'estoc.", "Stock adjustments."), "ajuste ajustes regularizar diferencia stock inventario almacen correccion"),
+        };
+
+        if (canManageTenant)
+        {
+            entries.Add(Entry(T["menu.base.companies"], "/base-datos/empresas", T["menu.base"], L("Empresas y centros activos.", "Empreses i centres actius.", "Companies and active centers."), "empresa empresas company centro tenant administracion usuario permisos"));
+            entries.Add(Entry(T["menu.admin.tenant"], "/administracion", T["menu.admin"], L("Usuarios, tenant y configuración.", "Usuaris, tenant i configuració.", "Users, tenant, and configuration."), "administracion admin tenant usuarios permisos roles invitaciones contraseña configuracion"));
+        }
+
+        if (isPlatformAdmin)
+        {
+            entries.Add(Entry(T["menu.admin.platform"], "/plataforma", T["menu.admin"], L("Administración de plataforma.", "Administració de plataforma.", "Platform administration."), "plataforma platform admin tenants demo acceso invitaciones superadmin"));
+        }
+
+        return entries;
+    }
+
+    private GlobalSearchEntry Entry(string label, string href, string area, string description, string keywords) =>
+        new(label, href, area, description, Tags(keywords));
+
+    private static string[] Tags(string keywords) =>
+        keywords.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
+    private static int ScoreGlobalSearchEntry(GlobalSearchEntry entry, IReadOnlyList<string> tokens)
+    {
+        var words = TokenizeForSearch($"{entry.Label} {entry.Area} {entry.Description} {string.Join(' ', entry.Keywords)}");
+        if (words.Count == 0)
+        {
+            return 0;
+        }
+
+        var score = 0;
+        foreach (var token in tokens)
+        {
+            var tokenScore = 0;
+            foreach (var word in words)
+            {
+                if (word == token)
+                {
+                    tokenScore = Math.Max(tokenScore, 45);
+                }
+                else if (word.StartsWith(token, StringComparison.Ordinal))
+                {
+                    tokenScore = Math.Max(tokenScore, 30);
+                }
+                else if (word.Contains(token, StringComparison.Ordinal) || token.Contains(word, StringComparison.Ordinal))
+                {
+                    tokenScore = Math.Max(tokenScore, 18);
+                }
+                else if (AreSimilarWords(token, word))
+                {
+                    tokenScore = Math.Max(tokenScore, 14);
+                }
+            }
+
+            if (tokenScore == 0)
+            {
+                return 0;
+            }
+
+            score += tokenScore;
+        }
+
+        return score;
+    }
+
+    private static IReadOnlyList<string> TokenizeForSearch(string value)
+    {
+        var normalized = NormalizeForSearch(value);
+        if (string.IsNullOrWhiteSpace(normalized))
+        {
+            return [];
+        }
+
+        var ignored = new HashSet<string>(["de", "del", "la", "el", "los", "las", "un", "una", "y", "o", "a", "en", "per", "por", "the", "of", "to"], StringComparer.Ordinal);
+        return normalized
+            .Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            .Where(token => token.Length > 1 && !ignored.Contains(token))
+            .Distinct(StringComparer.Ordinal)
+            .ToArray();
+    }
+
+    private static string NormalizeForSearch(string value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return string.Empty;
+        }
+
+        var builder = new StringBuilder(value.Length);
+        var normalized = value.Normalize(NormalizationForm.FormD);
+        foreach (var character in normalized)
+        {
+            var category = CharUnicodeInfo.GetUnicodeCategory(character);
+            if (category == UnicodeCategory.NonSpacingMark)
+            {
+                continue;
+            }
+
+            if (char.IsLetterOrDigit(character))
+            {
+                builder.Append(char.ToLowerInvariant(character));
+            }
+            else
+            {
+                builder.Append(' ');
+            }
+        }
+
+        return builder.ToString();
+    }
+
+    private static bool AreSimilarWords(string token, string word)
+    {
+        if (token.Length < 4 || word.Length < 4)
+        {
+            return false;
+        }
+
+        var distance = LevenshteinDistance(token, word);
+        var tolerance = Math.Max(1, Math.Min(token.Length, word.Length) / 4);
+        return distance <= tolerance;
+    }
+
+    private static int LevenshteinDistance(string left, string right)
+    {
+        var previous = new int[right.Length + 1];
+        var current = new int[right.Length + 1];
+
+        for (var column = 0; column <= right.Length; column++)
+        {
+            previous[column] = column;
+        }
+
+        for (var row = 1; row <= left.Length; row++)
+        {
+            current[0] = row;
+            for (var column = 1; column <= right.Length; column++)
+            {
+                var cost = left[row - 1] == right[column - 1] ? 0 : 1;
+                current[column] = Math.Min(
+                    Math.Min(current[column - 1] + 1, previous[column] + 1),
+                    previous[column - 1] + cost);
+            }
+
+            (previous, current) = (current, previous);
+        }
+
+        return previous[right.Length];
+    }
+
     private async Task ToggleSectionAsync(string key)
     {
         if (collapsedSectionKeys.Contains(key))
@@ -327,6 +570,10 @@ else
     private sealed record SidebarSection(string Key, string Title, IReadOnlyList<SidebarLink> Links);
 
     private sealed record SidebarLink(string Label, string Href, NavLinkMatch Match = NavLinkMatch.Prefix);
+
+    private sealed record GlobalSearchEntry(string Label, string Href, string Area, string Description, IReadOnlyList<string> Keywords);
+
+    private sealed record GlobalSearchResult(GlobalSearchEntry Entry, int Score);
 
     public void Dispose()
     {

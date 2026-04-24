@@ -10,12 +10,12 @@
 @inject NavigationManager NavigationManager
 @inject AppText T
 
-<PageTitle>@(!string.IsNullOrWhiteSpace(Code) ? $"{L("Editar tejido", "Editar teixit", "Edit fabric")} {Code}" : L("Nuevo tejido", "Nou teixit", "New fabric"))</PageTitle>
+<PageTitle>@(HasExistingRecord ? $"{L("Editar tejido", "Editar teixit", "Edit fabric")} {CurrentCode}" : L("Nuevo tejido", "Nou teixit", "New fabric"))</PageTitle>
 
 <div class="page-header">
     <div>
         <p class="eyebrow">@L("ARTÍCULOS", "ARTICLES", "ARTICLES")</p>
-        <h1>@(!string.IsNullOrWhiteSpace(Code) ? $"{L("Ficha tejido", "Fitxa teixit", "Fabric sheet")} {Code}" : L("Nuevo tejido", "Nou teixit", "New fabric"))</h1>
+        <h1>@(HasExistingRecord ? $"{L("Ficha tejido", "Fitxa teixit", "Fabric sheet")} {CurrentCode}" : L("Nuevo tejido", "Nou teixit", "New fabric"))</h1>
         <p class="lead">@(isLegacySyncActive
             ? L("Edición sobre la SaaS local. La importación manual desde legacy refresca solo registros marcados como legacy.", "Edició sobre la SaaS local. La importació manual des de legacy refresca només registres marcats com a legacy.", "Editing on the local SaaS copy. Manual import from legacy refreshes only records marked as legacy.")
             : L("Alta y edición sobre la réplica local de tejidos, filtrada por la empresa activa.", "Alta i edició sobre la rèplica local de teixits, filtrada per l'empresa activa.", "Create and edit on the local fabrics replica, filtered by the active company."))</p>
@@ -50,7 +50,7 @@ else
         </div>
     }
 
-    @if (!canEdit && string.IsNullOrWhiteSpace(Code))
+    @if (!canEdit && !HasExistingRecord)
     {
         <div class="alert">
             @L("No tienes permisos de edición para crear tejidos nuevos en esta empresa.", "No tens permisos d'edició per crear teixits nous en aquesta empresa.", "You do not have edit permissions to create new fabrics in this company.")
@@ -60,7 +60,7 @@ else
     <section class="card-grid tejido-metrics-grid">
         <article class="info-card">
             <p class="eyebrow">@L("Origen", "Origen", "Origin")</p>
-            <h2>@(string.IsNullOrWhiteSpace(Code) ? L("Nuevo tejido", "Nou teixit", "New fabric") : model.Code)</h2>
+            <h2>@(!HasExistingRecord ? L("Nuevo tejido", "Nou teixit", "New fabric") : model.Code)</h2>
             <p class="muted">@DisplayOrigin</p>
         </article>
         <article class="info-card">
@@ -110,11 +110,11 @@ else
                 {
                     <button class="primary-button" type="submit">@L("Guardar tejido", "Desar teixit", "Save fabric")</button>
                 }
-                @if (canEdit && !string.IsNullOrWhiteSpace(Code))
+                @if (canEdit && HasExistingRecord)
                 {
                     <button class="secondary-button danger-button" type="button" @onclick="DeleteAsync">@L("Eliminar tejido", "Eliminar teixit", "Delete fabric")</button>
                 }
-                @if (!string.IsNullOrWhiteSpace(Code))
+                @if (HasExistingRecord)
                 {
                     <button class="secondary-button" type="button" @onclick="LoadAuditAsync">@L("Recargar historial", "Recarregar historial", "Reload history")</button>
                 }
@@ -122,7 +122,7 @@ else
         </fieldset>
     </EditForm>
 
-    @if (!string.IsNullOrWhiteSpace(Code))
+    @if (HasExistingRecord)
     {
         <section class="panel" style="margin-top: 1rem;">
             <h2>@L("Historial reciente del tejido", "Historial recent del teixit", "Recent fabric history")</h2>
@@ -153,6 +153,10 @@ else
 @code {
     [Parameter]
     public string? Code { get; set; }
+
+    private bool IsNewRoute => EditRouteMode.IsCreateRoute(NavigationManager, "articulos/tejidos/nuevo");
+    private bool HasExistingRecord => !IsNewRoute && !string.IsNullOrWhiteSpace(Code);
+    private string CurrentCode => HasExistingRecord ? Uri.UnescapeDataString(Code!) : string.Empty;
 
     private enum TejidoTab
     {
@@ -202,7 +206,7 @@ else
     private decimal CompositionPercentageGap => 100m - CompositionPercentageTotal;
     private string DisplayOrigin => string.IsNullOrWhiteSpace(model.Code)
         ? L("Pendiente de guardar", "Pendent de desar", "Pending save")
-        : $"{L("Origen", "Origen", "Origin")} {(string.IsNullOrWhiteSpace(Code) ? "local" : "local/legacy")} · {L("centro", "centre", "center")} {model.CompanyCenterCode}";
+        : $"{L("Origen", "Origen", "Origin")} {(!HasExistingRecord ? "local" : "local/legacy")} · {L("centro", "centre", "center")} {model.CompanyCenterCode}";
     private decimal NormalizedWidthMeters => ResolveWidthMeters(model.Width2, model.WidthText);
     private decimal LinearMeterWeight => Math.Round(model.GramWeight * Math.Max(NormalizedWidthMeters, 0m) * (model.IsTubular ? 2m : 1m), 3, MidpointRounding.AwayFromZero);
     private decimal RawStockValue => Math.Round(model.RawStockKilograms * model.RawCost, 2, MidpointRounding.AwayFromZero);
@@ -268,9 +272,9 @@ else
         await LoadSyncStatusAsync();
         isReadOnly = !canEdit;
 
-        if (!string.IsNullOrWhiteSpace(Code))
+        if (HasExistingRecord)
         {
-            var detail = await TejidoQueries.GetByCodeAsync(tenantId.Value, companyId.Value, Uri.UnescapeDataString(Code));
+            var detail = await TejidoQueries.GetByCodeAsync(tenantId.Value, companyId.Value, CurrentCode);
             if (detail is null)
             {
                 statusMessage = L("No se ha encontrado el tejido solicitado.", "No s'ha trobat el teixit sol·licitat.", "The requested fabric was not found.");
@@ -333,13 +337,15 @@ else
         {
             statusMessage = string.Empty;
             isError = false;
+            var isNew = !HasExistingRecord;
             RecalculateColorPrices();
 
             var savedCode = await TejidoService.SaveAsync(new SaveTejidoCommand
             {
                 TenantId = tenantId.Value,
                 CompanyId = companyId.Value,
-                Code = string.IsNullOrWhiteSpace(Code) ? model.Code : Uri.UnescapeDataString(Code),
+                IsNew = isNew,
+                Code = isNew ? model.Code : CurrentCode,
                 Description = model.Description,
                 CompositionText = model.CompositionText,
                 MachineCode = model.MachineCode,
@@ -400,11 +406,11 @@ else
                 }).ToList()
             });
 
-            statusMessage = !string.IsNullOrWhiteSpace(Code)
+            statusMessage = !isNew
                 ? L("Tejido actualizado correctamente.", "Teixit actualitzat correctament.", "Fabric updated successfully.")
                 : L("Tejido creado correctamente.", "Teixit creat correctament.", "Fabric created successfully.");
 
-            if (string.IsNullOrWhiteSpace(Code))
+            if (isNew)
             {
                 NavigationManager.NavigateTo($"/articulos/tejidos/editar/{Uri.EscapeDataString(savedCode)}", forceLoad: false);
                 return;
@@ -480,14 +486,14 @@ else
 
     private async Task DeleteAsync()
     {
-        if (!tenantId.HasValue || !companyId.HasValue || string.IsNullOrWhiteSpace(Code))
+        if (!tenantId.HasValue || !companyId.HasValue || !HasExistingRecord)
         {
             return;
         }
 
         try
         {
-            await TejidoService.DeleteAsync(tenantId.Value, companyId.Value, Uri.UnescapeDataString(Code));
+            await TejidoService.DeleteAsync(tenantId.Value, companyId.Value, CurrentCode);
             NavigationManager.NavigateTo("/articulos/tejidos");
         }
         catch (Exception exception)
@@ -499,7 +505,7 @@ else
 
     private async Task LoadAuditAsync()
     {
-        if (!tenantId.HasValue || string.IsNullOrWhiteSpace(Code))
+        if (!tenantId.HasValue || !HasExistingRecord)
         {
             recentAuditLogs = [];
             return;
@@ -509,7 +515,7 @@ else
             limit: 12,
             tenantId: tenantId.Value,
             entityName: "Tejido",
-            entityId: Uri.UnescapeDataString(Code));
+            entityId: CurrentCode);
     }
 
     private void OpenLabelsPrint()
@@ -629,7 +635,7 @@ else
                 <div class="form-grid">
                     <label class="field">
                         <span>@L("Código tejido", "Codi teixit", "Fabric code")</span>
-                        <InputText class="text-input" @bind-Value="model.Code" disabled="@(!string.IsNullOrWhiteSpace(Code))" />
+                        <InputText class="text-input" @bind-Value="model.Code" disabled="@HasExistingRecord" />
                     </label>
                     <label class="field wide">
                         <span>@L("Descripción", "Descripció", "Description")</span>

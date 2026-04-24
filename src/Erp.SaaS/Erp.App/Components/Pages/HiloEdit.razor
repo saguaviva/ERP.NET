@@ -9,12 +9,12 @@
 @inject NavigationManager NavigationManager
 @inject AppText T
 
-<PageTitle>@(!string.IsNullOrWhiteSpace(Code) ? L($"Editar hilo {Code}", $"Editar fil {Code}", $"Edit yarn {Code}") : L("Nuevo hilo", "Nou fil", "New yarn"))</PageTitle>
+<PageTitle>@(HasExistingRecord ? L($"Editar hilo {CurrentCode}", $"Editar fil {CurrentCode}", $"Edit yarn {CurrentCode}") : L("Nuevo hilo", "Nou fil", "New yarn"))</PageTitle>
 
 <div class="page-header">
     <div>
         <p class="eyebrow">@T["menu.articles"]</p>
-        <h1>@(!string.IsNullOrWhiteSpace(Code) ? L($"Editar hilo {Code}", $"Editar fil {Code}", $"Edit yarn {Code}") : L("Nuevo hilo", "Nou fil", "New yarn"))</h1>
+        <h1>@(HasExistingRecord ? L($"Editar hilo {CurrentCode}", $"Editar fil {CurrentCode}", $"Edit yarn {CurrentCode}") : L("Nuevo hilo", "Nou fil", "New yarn"))</h1>
         <p class="lead">@(isLegacySyncActive
             ? L("Edición sobre la SaaS local. La importación manual desde legacy refresca solo registros marcados como legacy.", "Edició sobre la SaaS local. La importació manual des de legacy refresca només registres marcats com legacy.", "Editing on the local SaaS. Manual legacy import refreshes only records marked as legacy.")
             : L("Alta y edición sobre la tabla fil replicada en la SaaS local, filtrada por la empresa activa.", "Alta i edició sobre la taula fil replicada a la SaaS local, filtrada per l'empresa activa.", "Create and edit records on the fil table replicated into the local SaaS, filtered by the active company."))</p>
@@ -48,7 +48,7 @@ else
         </div>
     }
 
-    @if (!canEdit && string.IsNullOrWhiteSpace(Code))
+    @if (!canEdit && !HasExistingRecord)
     {
         <div class="alert">
             @L("No tienes permisos de edición para crear hilos nuevos en esta empresa.", "No tens permisos d'edició per crear fils nous en aquesta empresa.", "You do not have edit permissions to create new yarns in this company.")
@@ -60,7 +60,7 @@ else
             <div class="form-grid">
                 <label class="field">
                     <span>@L("Código", "Codi", "Code")</span>
-                    <InputText class="text-input" @bind-Value="model.Code" disabled="@(!string.IsNullOrWhiteSpace(Code))" />
+                    <InputText class="text-input" @bind-Value="model.Code" disabled="@HasExistingRecord" />
                 </label>
                 <label class="field wide">
                     <span>@L("Descripción", "Descripció", "Description")</span>
@@ -159,11 +159,11 @@ else
                 {
                     <button class="primary-button" type="submit">@L("Guardar hilo", "Desar fil", "Save yarn")</button>
                 }
-                @if (canEdit && !string.IsNullOrWhiteSpace(Code))
+                @if (canEdit && HasExistingRecord)
                 {
                     <button class="secondary-button danger-button" type="button" @onclick="DeleteAsync">@L("Eliminar hilo", "Eliminar fil", "Delete yarn")</button>
                 }
-                @if (!string.IsNullOrWhiteSpace(Code))
+                @if (HasExistingRecord)
                 {
                     <button class="secondary-button" type="button" @onclick="LoadAuditAsync">@L("Recargar historial", "Recarregar historial", "Reload history")</button>
                 }
@@ -171,7 +171,7 @@ else
         </fieldset>
     </EditForm>
 
-    @if (!string.IsNullOrWhiteSpace(Code))
+    @if (HasExistingRecord)
     {
         <section class="panel" style="margin-top: 1rem;">
             <h2>@L("Historial reciente del hilo", "Historial recent del fil", "Recent yarn history")</h2>
@@ -203,6 +203,9 @@ else
     [Parameter]
     public string? Code { get; set; }
 
+    private bool IsNewRoute => EditRouteMode.IsCreateRoute(NavigationManager, "articulos/hilos/nuevo");
+    private bool HasExistingRecord => !IsNewRoute && !string.IsNullOrWhiteSpace(Code);
+    private string CurrentCode => HasExistingRecord ? Uri.UnescapeDataString(Code!) : string.Empty;
     private Guid? tenantId;
     private Guid? companyId;
     private bool canEdit;
@@ -230,9 +233,9 @@ else
         await LoadSyncStatusAsync();
         isReadOnly = !canEdit;
 
-        if (!string.IsNullOrWhiteSpace(Code))
+        if (HasExistingRecord)
         {
-            var detail = await HiloQueries.GetByCodeAsync(tenantId.Value, companyId.Value, Uri.UnescapeDataString(Code));
+            var detail = await HiloQueries.GetByCodeAsync(tenantId.Value, companyId.Value, CurrentCode);
             if (detail is null)
             {
                 statusMessage = L("No se ha encontrado el hilo solicitado.", "No s'ha trobat el fil sol·licitat.", "The requested yarn was not found.");
@@ -270,12 +273,14 @@ else
         {
             statusMessage = string.Empty;
             isError = false;
+            var isNew = !HasExistingRecord;
 
             var savedCode = await HiloService.SaveAsync(new SaveHiloCommand
             {
                 TenantId = tenantId.Value,
                 CompanyId = companyId.Value,
-                Code = string.IsNullOrWhiteSpace(Code) ? model.Code : Uri.UnescapeDataString(Code),
+                IsNew = isNew,
+                Code = isNew ? model.Code : CurrentCode,
                 Description = model.Description,
                 SupplierCode = model.SupplierCode,
                 CostPrice = model.CostPrice,
@@ -301,11 +306,11 @@ else
                     .ToList()
             });
 
-            statusMessage = !string.IsNullOrWhiteSpace(Code)
+            statusMessage = !isNew
                 ? L("Hilo actualizado correctamente.", "Fil actualitzat correctament.", "Yarn updated successfully.")
                 : L("Hilo creado correctamente.", "Fil creat correctament.", "Yarn created successfully.");
 
-            if (string.IsNullOrWhiteSpace(Code))
+            if (isNew)
             {
                 NavigationManager.NavigateTo($"/articulos/hilos/editar/{Uri.EscapeDataString(savedCode)}", forceLoad: false);
                 return;
@@ -369,14 +374,14 @@ else
 
     private async Task DeleteAsync()
     {
-        if (!tenantId.HasValue || !companyId.HasValue || string.IsNullOrWhiteSpace(Code))
+        if (!tenantId.HasValue || !companyId.HasValue || !HasExistingRecord)
         {
             return;
         }
 
         try
         {
-            await HiloService.DeleteAsync(tenantId.Value, companyId.Value, Uri.UnescapeDataString(Code));
+            await HiloService.DeleteAsync(tenantId.Value, companyId.Value, CurrentCode);
             NavigationManager.NavigateTo("/articulos/hilos");
         }
         catch (Exception exception)
@@ -388,7 +393,7 @@ else
 
     private async Task LoadAuditAsync()
     {
-        if (!tenantId.HasValue || string.IsNullOrWhiteSpace(Code))
+        if (!tenantId.HasValue || !HasExistingRecord)
         {
             recentAuditLogs = [];
             return;
@@ -398,7 +403,7 @@ else
             limit: 12,
             tenantId: tenantId.Value,
             entityName: "Hilo",
-            entityId: Uri.UnescapeDataString(Code));
+            entityId: CurrentCode);
     }
 
     private string L(string spanish, string catalan, string english) =>

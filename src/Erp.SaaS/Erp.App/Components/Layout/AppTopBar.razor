@@ -1,0 +1,149 @@
+@implements IDisposable
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject ICompanyAccessService CompanyAccessService
+@inject IJSRuntime JS
+@inject NavigationManager NavigationManager
+@inject AppText T
+
+<header class="app-topbar no-print">
+    <div class="app-topbar-actions">
+        <button type="button"
+                class="shell-toggle app-topbar-button"
+                aria-label="@L("Volver atrás", "Tornar enrere", "Go back")"
+                @onclick="GoBackAsync">
+            <span class="shell-toggle-icon" aria-hidden="true">←</span>
+            <span class="shell-toggle-label">@L("Atrás", "Enrere", "Back")</span>
+        </button>
+
+        <button type="button"
+                class="shell-toggle app-topbar-button"
+                aria-label="@L("Mostrar u ocultar menú lateral", "Mostrar o ocultar menú lateral", "Show or hide side menu")"
+                aria-expanded="@(!IsSidebarHidden)"
+                @onclick="() => OnToggleSidebar.InvokeAsync()">
+            <span class="shell-toggle-icon" aria-hidden="true">@(IsSidebarHidden ? "☰" : "≡")</span>
+            <span class="shell-toggle-label">@(IsSidebarHidden ? T["shell.showMenu"] : T["shell.hideMenu"])</span>
+        </button>
+    </div>
+
+    <GlobalNavigationSearch CssClass="app-topbar-search" InputId="global-navigation-search-top" ShowLabel="false" ShowHint="false" />
+
+    <div class="app-topbar-controls">
+        <LanguageSwitcher />
+        <DocumentLanguageSwitcher />
+
+        @if (isAuthenticated && !requiresPasswordChange && allowedCompanies.Count > 0)
+        {
+            <div class="sidebar-panel language-panel company-panel">
+                <div class="sidebar-label">@T["menu.activeCompany"]</div>
+                <form method="post" action="/account/switch-company" data-enhance="false">
+                    <AntiforgeryToken />
+                    <input type="hidden" name="returnUrl" value="@CurrentPath" />
+                    <select class="sidebar-select" name="companyId" onchange="this.form.submit()">
+                        @foreach (var company in allowedCompanies)
+                        {
+                            <option selected="@(company.CompanyId == activeCompanyId)" value="@company.CompanyId">@company.Name (@company.LegacyCenterCode)</option>
+                        }
+                    </select>
+                </form>
+            </div>
+        }
+
+        <ThemeSwitcher />
+    </div>
+</header>
+
+@code {
+    [Parameter] public bool IsSidebarHidden { get; set; }
+    [Parameter] public EventCallback OnToggleSidebar { get; set; }
+
+    private bool isAuthenticated;
+    private bool requiresPasswordChange;
+    private Guid? activeCompanyId;
+    private IReadOnlyCollection<AllowedCompanyDto> allowedCompanies = [];
+
+    private string CurrentPath
+    {
+        get
+        {
+            var relativePath = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
+            return string.IsNullOrWhiteSpace(relativePath) ? "/" : $"/{relativePath}";
+        }
+    }
+
+    protected override void OnInitialized()
+    {
+        NavigationManager.LocationChanged += OnLocationChanged;
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await LoadUserContextAsync();
+    }
+
+    private async Task LoadUserContextAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        isAuthenticated = user.Identity?.IsAuthenticated ?? false;
+        if (!isAuthenticated)
+        {
+            activeCompanyId = null;
+            allowedCompanies = [];
+            return;
+        }
+
+        activeCompanyId = user.GetActiveCompanyId();
+        requiresPasswordChange = user.RequiresPasswordChange();
+
+        if (requiresPasswordChange)
+        {
+            allowedCompanies = [];
+            return;
+        }
+
+        var userId = user.GetUserId();
+        var tenantId = user.GetTenantId();
+        allowedCompanies = userId.HasValue && tenantId.HasValue
+            ? await CompanyAccessService.GetAllowedCompaniesAsync(userId.Value, tenantId.Value)
+            : [];
+    }
+
+    private async Task GoBackAsync()
+    {
+        try
+        {
+            await JS.InvokeVoidAsync("history.back");
+        }
+        catch (JSException)
+        {
+            NavigationManager.NavigateTo("/");
+        }
+        catch (InvalidOperationException)
+        {
+            NavigationManager.NavigateTo("/");
+        }
+    }
+
+    private void OnLocationChanged(object? sender, Microsoft.AspNetCore.Components.Routing.LocationChangedEventArgs e)
+    {
+        _ = InvokeAsync(async () =>
+        {
+            await LoadUserContextAsync();
+            StateHasChanged();
+        });
+    }
+
+    private string L(string spanish, string catalan, string english) =>
+        T.CurrentLanguage switch
+        {
+            AppLanguages.Catalan => catalan,
+            AppLanguages.English => english,
+            _ => spanish
+        };
+
+    public void Dispose()
+    {
+        NavigationManager.LocationChanged -= OnLocationChanged;
+    }
+}

@@ -33,7 +33,7 @@
         {
             <a class="secondary-button link-button" href="@BuildAcabadosByMachineUrl(model.MachineCode)">@L("Abrir acabados", "Obrir acabats", "Open finishing")</a>
         }
-        @if (!string.IsNullOrWhiteSpace(Code))
+        @if (HasExistingRecord)
         {
             <a class="secondary-button link-button" href="@BuildSheetPrintUrl()">@L("Imprimir ficha", "Imprimir fitxa", "Print sheet")</a>
         }
@@ -69,14 +69,14 @@ else
         </div>
     }
 
-    @if (!canEdit && string.IsNullOrWhiteSpace(Code))
+    @if (!canEdit && !HasExistingRecord)
     {
         <div class="alert">
             @L($"No tienes permisos de edición para crear {modulePluralLower} nuevas en esta empresa.", $"No tens permisos d'edició per crear {modulePluralLower} noves en aquesta empresa.", $"You do not have edit permissions to create new {modulePluralLower} in this company.")
         </div>
     }
 
-    @if (IsComplementMode && canEdit && string.IsNullOrWhiteSpace(Code))
+    @if (IsComplementMode && canEdit && !HasExistingRecord)
     {
         <section class="panel" style="margin-bottom: 1rem;">
             <div class="detail-panel-header">
@@ -157,7 +157,7 @@ else
                         <div class="form-grid">
                             <label class="field">
                                 <span>@L("Código", "Codi", "Code")</span>
-                                <InputText class="text-input" @bind-Value="model.Code" disabled="@(!string.IsNullOrWhiteSpace(Code))" />
+                                <InputText class="text-input" @bind-Value="model.Code" disabled="@HasExistingRecord" />
                             </label>
                             <label class="field wide">
                                 <span>@L("Descripción", "Descripció", "Description")</span>
@@ -416,7 +416,7 @@ else
                                     {
                                         <a class="secondary-button link-button" href="@BuildCreateParteFromSampleUrl(SelectedBreakdownLine.LineNumber)">@L("Crear parte", "Crear part", "Create order")</a>
                                     }
-                                    @if (!string.IsNullOrWhiteSpace(Code))
+                                    @if (HasExistingRecord)
                                     {
                                         <a class="secondary-button link-button" href="@BuildBreakdownPrintUrl(SelectedBreakdownLine.LineNumber)">@L("Imprimir desglose", "Imprimir desglossament", "Print breakdown")</a>
                                     }
@@ -641,7 +641,7 @@ else
                                 }
                             </ul>
                         </div>
-                        @if (!string.IsNullOrWhiteSpace(Code))
+                        @if (HasExistingRecord)
                         {
                             <a class="secondary-button link-button" href="@BuildSheetPrintUrl()">@L("Abrir ficha", "Obrir fitxa", "Open sheet")</a>
                         }
@@ -662,7 +662,7 @@ else
                                 }
                             </ul>
                         </div>
-                        @if (!string.IsNullOrWhiteSpace(Code))
+                        @if (HasExistingRecord)
                         {
                             <a class="secondary-button link-button" href="@BuildLabelsPrintUrl()">@L("Abrir etiquetas", "Obrir etiquetes", "Open labels")</a>
                         }
@@ -695,7 +695,7 @@ else
                                 }
                             </ul>
                         </div>
-                        @if (!string.IsNullOrWhiteSpace(Code) && SelectedBreakdownLine is not null)
+                        @if (HasExistingRecord && SelectedBreakdownLine is not null)
                         {
                             <a class="secondary-button link-button" href="@BuildBreakdownPrintUrl(SelectedBreakdownLine.LineNumber)">@L("Abrir desglose", "Obrir desglossament", "Open breakdown")</a>
                         }
@@ -809,11 +809,11 @@ else
                 {
                     <button class="primary-button" type="submit">@L("Guardar", "Desar", "Save") @moduleSingularLower</button>
                 }
-                @if (canEdit && !string.IsNullOrWhiteSpace(Code))
+                @if (canEdit && HasExistingRecord)
                 {
                     <button class="secondary-button danger-button" type="button" @onclick="DeleteAsync">@L("Eliminar", "Eliminar", "Delete") @moduleSingularLower</button>
                 }
-                @if (!string.IsNullOrWhiteSpace(Code))
+                @if (HasExistingRecord)
                 {
                     <button class="secondary-button" type="button" @onclick="LoadAuditAsync">@L("Recargar historial", "Recarregar historial", "Reload history")</button>
                 }
@@ -821,7 +821,7 @@ else
         </fieldset>
     </EditForm>
 
-    @if (!string.IsNullOrWhiteSpace(Code))
+    @if (HasExistingRecord)
     {
         <section class="panel" style="margin-top: 1rem;">
             <h2>@L($"Historial reciente del {moduleSingularLower}", $"Historial recent del {moduleSingularLower}", $"Recent {moduleSingularLower} history")</h2>
@@ -858,6 +858,12 @@ else
     private bool canEdit;
     private bool isReadOnly;
     private bool IsComplementMode => NavigationManager.Uri.Contains("/articulos/complementos", StringComparison.OrdinalIgnoreCase);
+    private bool IsNewRoute => EditRouteMode.IsCreateRoute(
+        NavigationManager,
+        "articulos/muestras/nueva",
+        "articulos/complementos/nueva");
+    private bool HasExistingRecord => !IsNewRoute && !string.IsNullOrWhiteSpace(Code);
+    private string CurrentCode => HasExistingRecord ? Uri.UnescapeDataString(Code!) : string.Empty;
     private string ModulePluralTitle => IsComplementMode
         ? L("Complementos", "Complements", "Complements")
         : L("Muestras", "Mostres", "Samples");
@@ -914,8 +920,8 @@ else
     private string DisplayMachine => !string.IsNullOrWhiteSpace(model.MachineName) ? model.MachineName : (model.MachineCode > 0 ? $"{L("Máquina", "Màquina", "Machine")} {model.MachineCode}" : L("Sin máquina", "Sense màquina", "No machine"));
     private string DisplayReference => string.IsNullOrWhiteSpace(model.Reference) ? L("Sin referencia", "Sense referència", "No reference") : model.Reference;
     private string DisplaySeason => string.IsNullOrWhiteSpace(model.Season) ? L("Sin temporada", "Sense temporada", "No season") : model.Season;
-    private string PageTitleText => !string.IsNullOrWhiteSpace(Code)
-        ? $"{L("Editar", "Editar", "Edit")} {moduleSingularLower} {Code}"
+    private string PageTitleText => HasExistingRecord
+        ? $"{L("Editar", "Editar", "Edit")} {moduleSingularLower} {CurrentCode}"
         : $"{L("Nueva", "Nova", "New")} {moduleSingularLower}";
     private string PrintSheetEyebrow => IsComplementMode ? L("Ficha complemento", "Fitxa complement", "Complement sheet") : L("Ficha muestra", "Fitxa mostra", "Sample sheet");
     private string DisplayCodeAndDescription => string.IsNullOrWhiteSpace(model.Code)
@@ -973,9 +979,9 @@ else
         await LoadMachineOptionsAsync();
         await LoadOperationOptionsAsync();
         await LoadSyncStatusAsync();
-        if (!string.IsNullOrWhiteSpace(Code))
+        if (HasExistingRecord)
         {
-            var detail = await MuestraQueries.GetByCodeAsync(tenantId.Value, companyId.Value, Uri.UnescapeDataString(Code));
+            var detail = await MuestraQueries.GetByCodeAsync(tenantId.Value, companyId.Value, CurrentCode);
             if (detail is null)
             {
                 statusMessage = L($"No se ha encontrado el {moduleSingularLower} solicitado.", $"No s'ha trobat el {moduleSingularLower} sol·licitat.", $"The requested {moduleSingularLower} was not found.");
@@ -1134,7 +1140,7 @@ else
 
     private async Task TryApplyDuplicateFromQueryAsync()
     {
-        if (!IsComplementMode || !string.IsNullOrWhiteSpace(Code) || !tenantId.HasValue || !companyId.HasValue)
+        if (!IsComplementMode || HasExistingRecord || !tenantId.HasValue || !companyId.HasValue)
         {
             return;
         }
@@ -1211,12 +1217,14 @@ else
         {
             statusMessage = string.Empty;
             isError = false;
+            var isNew = !HasExistingRecord;
 
             var savedCode = await MuestraService.SaveAsync(new SaveMuestraCommand
             {
                 TenantId = tenantId.Value,
                 CompanyId = companyId.Value,
-                Code = string.IsNullOrWhiteSpace(Code) ? model.Code : Uri.UnescapeDataString(Code),
+                IsNew = isNew,
+                Code = isNew ? model.Code : CurrentCode,
                 Description = model.Description,
                 ClientCode = model.ClientCode,
                 ClientName = model.ClientName,
@@ -1287,11 +1295,11 @@ else
                     .ToList()
             });
 
-            statusMessage = !string.IsNullOrWhiteSpace(Code)
+            statusMessage = !isNew
             ? $"{ModuleSingularTitle} {L("actualizado correctamente.", "actualitzat correctament.", "updated successfully.")}"
             : $"{ModuleSingularTitle} {L("creado correctamente.", "creat correctament.", "created successfully.")}";
 
-            if (string.IsNullOrWhiteSpace(Code))
+            if (isNew)
             {
                 NavigationManager.NavigateTo(BuildEditUrl(savedCode), forceLoad: false);
                 return;
@@ -1308,7 +1316,7 @@ else
 
     private async Task LoadAuditAsync()
     {
-        if (!tenantId.HasValue || string.IsNullOrWhiteSpace(Code))
+        if (!tenantId.HasValue || !HasExistingRecord)
         {
             recentAuditLogs = [];
             return;
@@ -1318,7 +1326,7 @@ else
             limit: 15,
             tenantId: tenantId.Value,
             entityName: ModuleSingularTitle,
-            entityId: Uri.UnescapeDataString(Code));
+            entityId: CurrentCode);
     }
 
     private async Task LoadLinkedFinishOrdersAsync()
@@ -1410,7 +1418,7 @@ else
 
     private async Task DeleteAsync()
     {
-        if (!tenantId.HasValue || !companyId.HasValue || string.IsNullOrWhiteSpace(Code))
+        if (!tenantId.HasValue || !companyId.HasValue || !HasExistingRecord)
         {
             return;
         }
@@ -1424,7 +1432,7 @@ else
 
         try
         {
-            await MuestraService.DeleteAsync(tenantId.Value, companyId.Value, Uri.UnescapeDataString(Code));
+            await MuestraService.DeleteAsync(tenantId.Value, companyId.Value, CurrentCode);
             NavigationManager.NavigateTo(BuildListUrl(), forceLoad: false);
         }
         catch (Exception exception)

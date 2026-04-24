@@ -285,9 +285,17 @@ public sealed class MySqlTejidoService : ITejidoQueries, ITejidoService
         var centerCode = await ResolveCompanyCenterCodeAsync(command.TenantId, command.CompanyId, cancellationToken);
 
         TejidoDetailDto? previous = null;
-        if (!string.IsNullOrWhiteSpace(command.Code))
+        if (command.IsNew)
         {
-            previous = await GetByCodeAsync(command.TenantId, command.CompanyId, command.Code, cancellationToken);
+            var duplicate = await GetByCodeAsync(command.TenantId, command.CompanyId, command.Code!, cancellationToken);
+            if (duplicate is not null)
+            {
+                throw new InvalidOperationException("Ya existe un tejido con este código.");
+            }
+        }
+        else
+        {
+            previous = await GetByCodeAsync(command.TenantId, command.CompanyId, command.Code!, cancellationToken);
             if (previous is null)
             {
                 throw new InvalidOperationException("No se ha encontrado el tejido que intentas modificar.");

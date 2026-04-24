@@ -309,7 +309,15 @@ public sealed class MySqlMuestraService : IMuestraQueries, IMuestraService
 
         await using var connection = await _connectionFactory.OpenConnectionAsync(cancellationToken);
         MuestraDetailDto? previous = null;
-        if (!string.IsNullOrWhiteSpace(command.Code))
+        if (command.IsNew)
+        {
+            var duplicate = await GetByCodeAsync(command.TenantId, command.CompanyId, code, cancellationToken);
+            if (duplicate is not null)
+            {
+                throw new InvalidOperationException("Ya existe una muestra con este código.");
+            }
+        }
+        else
         {
             previous = await GetByCodeAsync(command.TenantId, command.CompanyId, code, cancellationToken);
             if (previous is null)

@@ -186,9 +186,20 @@ public sealed class MySqlFornituraService : IFornituraQueries, IFornituraService
         Validate(command);
         var centerCode = await ResolveCompanyCenterCodeAsync(command.TenantId, command.CompanyId, cancellationToken);
         FornituraDetailDto? previous = null;
-        if (!string.IsNullOrWhiteSpace(command.Code))
+        if (command.IsNew)
         {
-            previous = await GetByCodeAsync(command.TenantId, command.CompanyId, command.Code, cancellationToken);
+            if (!string.IsNullOrWhiteSpace(command.Code))
+            {
+                var duplicate = await GetByCodeAsync(command.TenantId, command.CompanyId, command.Code, cancellationToken);
+                if (duplicate is not null)
+                {
+                    throw new InvalidOperationException("Ya existe una fornitura con este código.");
+                }
+            }
+        }
+        else
+        {
+            previous = await GetByCodeAsync(command.TenantId, command.CompanyId, command.Code!, cancellationToken);
             if (previous is null)
             {
                 throw new InvalidOperationException("No se ha encontrado la fornitura que intentas modificar.");
@@ -202,7 +213,7 @@ public sealed class MySqlFornituraService : IFornituraQueries, IFornituraService
 
         await using var transaction = await connection.BeginTransactionAsync(cancellationToken);
 
-        if (!string.IsNullOrWhiteSpace(command.Code))
+        if (!command.IsNew)
         {
             await using var updateCommand = connection.CreateCommand();
             updateCommand.Transaction = transaction;

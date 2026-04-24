@@ -64,6 +64,19 @@ He dejado una gu\u00eda corta para publicar la demo privada con el dominio tempo
 
 - [deploy-azure-app-service.md](/C:/Users/sagua/source/repos/ERP.NET/src/Erp.SaaS/docs/deploy-azure-app-service.md)
 
+## Manual de usuario
+
+El manual funcional para usuarios, con \u00edndice inicial, mapa de m\u00f3dulos, workflows operativos y buenas pr\u00e1cticas, est\u00e1 disponible en Word y en una versi\u00f3n Markdown editable:
+
+- [manual-usuario-coreflow.docx](/C:/Users/sagua/source/repos/ERP.NET/src/Erp.SaaS/docs/manual-usuario-coreflow.docx)
+- [manual-usuario-coreflow.md](/C:/Users/sagua/source/repos/ERP.NET/src/Erp.SaaS/docs/manual-usuario-coreflow.md)
+
+## Hetzner Cloud VPS
+
+La gu\u00eda para publicar `Erp.App` en un VPS barato de Hetzner con Ubuntu, MariaDB, Nginx, HTTPS y despliegue desde PowerShell est\u00e1 en:
+
+- [deploy-hetzner-vps.md](/C:/Users/sagua/source/repos/ERP.NET/src/Erp.SaaS/docs/deploy-hetzner-vps.md)
+
 ## Mapeo legacy
 
 La equivalencia entre `filiales`, `CENTRO`, `tenant` y `company` est\u00e1 documentada en [legacy-to-saas-mapping.md](/C:/Users/sagua/source/repos/ERP.NET/src/Erp.SaaS/docs/legacy-to-saas-mapping.md).
